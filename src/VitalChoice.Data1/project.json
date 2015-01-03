@@ -1,0 +1,24 @@
+{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "EntityFramework": "7.0.0.0-rc1-11897",
+        "LinqKit": "1.1.1.0",
+        "CoreCLR": "1.0.0.0-rc1-10219",
+        "Ix-Async": "1.2.2.0-withwpa81",
+        "EntityFramework.Commands": "7.0.0.0-rc1-11897",
+        "EntityFramework.Core": "7.0.0.0-rc1-11897",
+        "EntityFramework.SqlServer": "7.0.0.0-rc1-11897"
+    },
+
+    "frameworks": {
+        "aspnet50": {
+            "dependencies": {
+            }
+        },
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22231"
+            }
+        }
+    }
+}

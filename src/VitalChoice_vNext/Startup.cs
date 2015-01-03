@@ -34,7 +34,7 @@ namespace VitalChoice_vNext
             // Add EF services to the services container.
             services.AddEntityFramework(Configuration)
                 .AddSqlServer()
-                .AddDbContext<ApplicationDbContext>();
+                .AddDbContext<VitalChoiceContext>();
 
             // Add Identity services to the services container.
             services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration);
@@ -86,6 +86,11 @@ namespace VitalChoice_vNext
                 // Uncomment the following line to add a route for porting Web API 2 controllers.
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
+
+	        app.UseServices(x =>
+	        {
+				x.Add
+	        });
         }
     }
 }

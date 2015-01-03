@@ -1,10 +1,10 @@
-﻿{
+{
     /* Click to learn more about project.json  http://go.microsoft.com/fwlink/?LinkID=517074 */
     "webroot": "wwwroot",
     "version": "1.0.0-*",
     "dependencies": {
-        "EntityFramework.SqlServer": "7.0.0-beta1",
-        "EntityFramework.Commands": "7.0.0-beta1",
+        "EntityFramework.SqlServer": "7.0.0.0-rc1-11897",
+        "EntityFramework.Commands": "7.0.0.0-rc1-11897",
         "Microsoft.AspNet.Mvc": "6.0.0-beta1",
         //"Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta1",
         "Microsoft.AspNet.Diagnostics": "1.0.0-beta1",
@@ -18,13 +18,18 @@
         "Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta1",
         "Microsoft.Framework.Logging": "1.0.0-beta1",
         "Microsoft.Framework.Logging.Console": "1.0.0-beta1",
-        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1"
+        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1",
+        "VitalChoice.Data1": "1.0.0-*",
+        "CoreCLR": "1.0.0.0-rc1-10219",
+        "Ix-Async": "1.2.2.0-withwpa81",
+        "EntityFramework.Core": "7.0.0.0-rc1-11897",
+        "VitalChoice.Infrastructure": "1.0.0-*"
     },
     "commands": {
         /* Change the port number when you are self hosting this application */
         "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
         "gen": "Microsoft.Framework.CodeGeneration",
-        "ef":  "EntityFramework.Commands"
+        "ef": "EntityFramework.Commands"
     },
     "frameworks": {
         "aspnet50": { },

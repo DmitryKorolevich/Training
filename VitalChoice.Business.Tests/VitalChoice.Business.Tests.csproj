@@ -43,6 +43,9 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Interactive.Async">
+      <HintPath>..\packages\Ix-Async.1.2.2-withwpa81\lib\net45\System.Interactive.Async.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,20 +55,6 @@
   <ItemGroup>
     <Compile Include="Services\UserServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VItalChoice.Business\VItalChoice.Business.csproj">
-      <Project>{1f321640-eb21-42e4-8946-0b824d633cee}</Project>
-      <Name>VItalChoice.Business</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VitalChoice.Data\VitalChoice.Data.csproj">
-      <Project>{17F62BF4-49C6-4C72-8E58-F8C16C9D87AC}</Project>
-      <Name>VitalChoice.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VitalChoice.Entities\VitalChoice.Entities.csproj">
-      <Project>{7e469c2c-aa10-4112-83a6-ea6a38a0223a}</Project>
-      <Name>VitalChoice.Entities</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

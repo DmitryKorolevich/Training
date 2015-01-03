@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4288FBF5-1A92-4CA7-B77D-AA9248051199}</ProjectGuid>
+    <ProjectGuid>{7E469C2C-AA10-4112-83A6-EA6A38A0223A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VitalChoice.Data.Tests</RootNamespace>
-    <AssemblyName>VitalChoice.Data.Tests</AssemblyName>
+    <RootNamespace>VitalChoice.Entities</RootNamespace>
+    <AssemblyName>VitalChoice.Entities</AssemblyName>
     <TargetFrameworkVersion>v4.5.3</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,9 +39,6 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Interactive.Async">
-      <HintPath>..\packages\Ix-Async.1.2.2-withwpa81\lib\net45\System.Interactive.Async.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,12 +46,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VitalChoice.Data\VitalChoice.Data.csproj">
+      <Project>{17F62BF4-49C6-4C72-8E58-F8C16C9D87AC}</Project>
+      <Name>VitalChoice.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
