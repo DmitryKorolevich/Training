@@ -2,8 +2,8 @@
 
 namespace VitalChoice.Domain.Entities
 {
-    public class User: Entity
-    {
+	public class User : Entity
+	{
 		public string UserName { get; set; }
-    }
+	}
 }

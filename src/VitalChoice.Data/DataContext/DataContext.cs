@@ -1,52 +1,41 @@
-﻿using System;
+﻿using Microsoft.Data.Entity;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Framework.ConfigurationModel;
-using VitalChoice.Data;
-using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Infrastructure;
-using VitalChoice.Domain.Entities;
 
-namespace VitalChoice.Domain.Context
+namespace VitalChoice.Data.DataContext
 {
-	public class VitalChoiceContext : IdentityDbContext<AppUser>, IDataContext, IDataContextAsync
+	public class DataContext : IdentityDbContext<AppUser>, IDataContext, IDataContextAsync
 	{
 		private readonly Guid instanceId;
-/*
-		public VitalChoiceContext(DbContextOptions contextOptions)
-				: base(nameOrConnectionString)
+
+		public DataContext(string nameOrConnectionString)
+			: base(nameOrConnectionString)
 		{
 			instanceId = Guid.NewGuid();
 			Configuration.LazyLoadingEnabled = false;
 			Configuration.ProxyCreationEnabled = false;
-		}*/
+		}
 
 		public Guid InstanceId
 		{
 			get { return instanceId; }
 		}
 
-		public DbSet<T> Set<T>() where T : class
+		public new DbSet<T> Set<T>() where T : class
 		{
 			return base.Set<T>();
 		}
 
-		protected override void OnConfiguring(DbContextOptions builder)
+		/*protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
-			builder.UseSqlServer(@"Server=(localdb)\v11.0;Database=Blogging;Trusted_Connection=True;");
-		}
-
-		protected override void OnModelCreating(ModelBuilder builder)
-		{
-			builder.Entity<Blog>()
-				.OneToMany(b => b.Posts, p => p.Blog)
-				.ForeignKey(p => p.BlogId);
-		}
+			base.OnModelCreating(modelBuilder);
+		}*/
 
 		public override int SaveChanges()
 		{
@@ -87,11 +76,6 @@ namespace VitalChoice.Domain.Context
 		{
 			foreach (var dbEntityEntry in ChangeTracker.Entries())
 				((IObjectState)dbEntityEntry.Entity).ObjectState = StateHelper.ConvertState(dbEntityEntry.State);
-		}
-
-		public void Dispose()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }
