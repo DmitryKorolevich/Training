@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 
-namespace VitalChoice.Data
+namespace VitalChoice.Infrastructure
 {
     public class AppUser : IdentityUser
     {

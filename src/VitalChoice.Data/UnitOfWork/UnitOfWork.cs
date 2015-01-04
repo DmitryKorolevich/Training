@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.Objects;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Relational;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Infrastructure;
 using VitalChoice.Data.Repositories;
@@ -21,7 +23,6 @@ namespace VitalChoice.Data.UnitOfWork
 
         private readonly IDataContextAsync dataContext;
         private bool disposed;
-        private ObjectContext objectContext;
         private Dictionary<string, object> repositories;
         private DbTransaction transaction;
 
@@ -36,10 +37,9 @@ namespace VitalChoice.Data.UnitOfWork
 
         public void Dispose()
         {
-            if (objectContext != null && objectContext.Connection.State == ConnectionState.Open)
-                objectContext.Connection.Close();
+	        transaction?.Dispose();
 
-            Dispose(true);
+	        Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -55,11 +55,6 @@ namespace VitalChoice.Data.UnitOfWork
         public int SaveChanges()
         {
             return dataContext.SaveChanges();
-        }
-
-        public Task<int> SaveChangesAsync()
-        {
-            return dataContext.SaveChangesAsync();
         }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
@@ -87,12 +82,7 @@ namespace VitalChoice.Data.UnitOfWork
 
         public void BeginTransaction()
         {
-            objectContext = ((IObjectContextAdapter) dataContext).ObjectContext;
-            if (objectContext.Connection.State != ConnectionState.Open)
-            {
-                objectContext.Connection.Open();
-                transaction = objectContext.Connection.BeginTransaction();
-            }
+			transaction = ((DbContext) dataContext).Database.AsSqlServer().Connection.DbConnection.BeginTransaction();
         }
 
         public bool Commit()

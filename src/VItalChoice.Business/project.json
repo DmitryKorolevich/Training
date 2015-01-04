@@ -4,10 +4,10 @@
         "VitalChoice.Data": "1.0.0-*",
         "CoreCLR": "1.0.0.0-rc1-10219",
         "Ix-Async": "1.2.2.0-withwpa81",
-        "EntityFramework.Commands": "7.0.0.0-rc1-11897",
-        "EntityFramework.Core": "7.0.0.0-rc1-11897",
-        "EntityFramework.SqlServer": "7.0.0.0-rc1-11897",
-        "VitalChoice.Domain": "1.0.0-*"
+        "EntityFramework.Commands": "7.0.0.0-rc1-11898",
+        "EntityFramework.Core": "7.0.0.0-rc1-11898",
+        "VitalChoice.Domain": "1.0.0-*",
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404"
     },
 
     "frameworks": {

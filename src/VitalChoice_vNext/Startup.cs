@@ -12,6 +12,8 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
+using VitalChoice.Data;
+using VitalChoice.Domain.Context;
 using VitalChoice_vNext.Models;
 
 namespace VitalChoice_vNext
@@ -37,7 +39,7 @@ namespace VitalChoice_vNext
                 .AddDbContext<VitalChoiceContext>();
 
             // Add Identity services to the services container.
-            services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration);
+          //  services.AddDefaultIdentity<VitalChoiceContext, AppUser, IdentityRole>(Configuration); !!!!
 
             // Add MVC services to the services container.
             services.AddMvc();
@@ -87,10 +89,10 @@ namespace VitalChoice_vNext
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
-	        app.UseServices(x =>
+	       /* app.UseServices(x =>
 	        {
 				x.Add
-	        });
+	        });*/
         }
     }
 }

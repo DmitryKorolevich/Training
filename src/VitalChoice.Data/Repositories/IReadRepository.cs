@@ -11,7 +11,7 @@ namespace VitalChoice.Data.Repositories
 {
     public interface IReadRepository<TEntity> where TEntity : IObjectState
     {
-        TEntity Find(params object[] keyValues);
+       /* TEntity Find(params object[] keyValues);*/
        /* IQueryable<TEntity> SelectQuery(string query, params object[] parameters);*/
        
         IQueryFluent<TEntity> Query(IQueryObject<TEntity> queryObject);

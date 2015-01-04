@@ -22,11 +22,6 @@ namespace VitalChoice.Data.Services
 		    this.Repository = repository;
         }
 
-        public virtual TEntity Find(params object[] keyValues)
-        {
-            return Repository.Find(keyValues);
-        }
-
 		//public virtual IQueryable<TEntity> SelectQuery(string query, params object[] parameters)
 		//{
 		//	return repository.SelectQuery(query, parameters).AsQueryable();
@@ -47,7 +42,7 @@ namespace VitalChoice.Data.Services
 			Repository.Insert(entity);
 		}
 
-        public virtual void InsertGraphRange(IEnumerable<TEntity> entities)
+        public virtual void InsertGraphRange(params TEntity[] entities)
         {
 			Repository.InsertGraphRange(entities);
 		}
@@ -57,7 +52,7 @@ namespace VitalChoice.Data.Services
 			Repository.Update(entity);
 		}
 
-        public virtual void Delete(object id)
+        public virtual void Delete(int id)
         {
 			Repository.Delete(id);
 		}
@@ -82,24 +77,14 @@ namespace VitalChoice.Data.Services
             return Repository.Query(query).Select();
         }
 
-        public virtual async Task<TEntity> FindAsync(params object[] keyValues)
+		public virtual async Task<bool> DeleteAsync(int id)
         {
-            return await Repository.FindAsync(keyValues);
+            return await DeleteAsync(CancellationToken.None, id);
         }
 
-        public virtual async Task<TEntity> FindAsync(CancellationToken cancellationToken, params object[] keyValues)
+        public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
         {
-            return await Repository.FindAsync(cancellationToken, keyValues);
-        }
-
-        public virtual async Task<bool> DeleteAsync(params object[] keyValues)
-        {
-            return await DeleteAsync(CancellationToken.None, keyValues);
-        }
-
-        public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, params object[] keyValues)
-        {
-            return await DeleteAsync(cancellationToken, keyValues);
+            return await DeleteAsync(cancellationToken, id);
         }
     }
 }

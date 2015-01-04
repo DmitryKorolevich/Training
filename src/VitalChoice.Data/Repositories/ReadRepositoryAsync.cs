@@ -4,9 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using LinqKit;
 using Microsoft.Data.Entity;
 using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 
 namespace VitalChoice.Data.Repositories
@@ -30,10 +30,6 @@ namespace VitalChoice.Data.Repositories
             }*/
 		}
 
-		public virtual TEntity Find(params object[] keyValues)
-		{
-			return DbSet.Find(keyValues);
-		}
 		/*
 				public virtual IQueryable<TEntity> SelectQuery(string query, params object[] parameters)
 				{
@@ -64,16 +60,6 @@ namespace VitalChoice.Data.Repositories
 		public virtual IQueryFluent<TEntity> Query(Expression<Func<TEntity, bool>> query)
 		{
 			return new QueryFluent<TEntity>(this, query);
-		}
-
-		public virtual async Task<TEntity> FindAsync(params object[] keyValues)
-		{
-			return await DbSet.FindAsync(keyValues);
-		}
-
-		public virtual async Task<TEntity> FindAsync(CancellationToken cancellationToken, params object[] keyValues)
-		{
-			return await DbSet.FindAsync(cancellationToken, keyValues);
 		}
 
 		internal IQueryable<TEntity> Select(

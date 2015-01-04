@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
@@ -32,9 +34,9 @@ namespace VitalChoice.Data.Repositories
 			Context.SaveChanges();
 		}
 
-		public virtual void InsertGraphRange(IEnumerable<TEntity> entities)
+		public virtual void InsertGraphRange(params TEntity[] entities)
 		{
-			DbSet.AddRange(entities);
+			DbSet.Add(entities);
 			Context.SaveChanges();
 		}
 
@@ -46,10 +48,13 @@ namespace VitalChoice.Data.Repositories
 			Context.SaveChanges();
 		}
 
-		public virtual void Delete(object id)
+		public virtual void Delete(int id)
 		{
-			var entity = DbSet.Find(id);
-			Delete(entity);
+			var entity = DbSet.FirstOrDefault(x=>x.Id == id);
+			if (entity!= null)
+			{
+				Delete(entity);
+			}
 		}
 
 		public virtual void Delete(TEntity entity)
@@ -60,14 +65,14 @@ namespace VitalChoice.Data.Repositories
 			Context.SaveChanges();
 		}
 
-		public virtual async Task<bool> DeleteAsync(params object[] keyValues)
+		public virtual async Task<bool> DeleteAsync(int id)
 		{
-			return await DeleteAsync(CancellationToken.None, keyValues);
+			return await DeleteAsync(CancellationToken.None, id);
 		}
 
-		public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, params object[] keyValues)
+		public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
 		{
-			var entity = await FindAsync(cancellationToken, keyValues);
+			var entity = await DbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 			if (entity == null) return false;
 
 			DbSet.Attach(entity);

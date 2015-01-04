@@ -2,11 +2,12 @@
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
+using VitalChoice.Domain.Context;
 using VitalChoice_vNext.Models;
 
 namespace VitalChoice_vNext.Migrations
 {
-    [ContextType(typeof(ApplicationDbContext))]
+    [ContextType(typeof(VitalChoiceContext))]
     public class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         public override IModel Model
@@ -27,8 +28,8 @@ namespace VitalChoice_vNext.Migrations
                 {
                     b.Property<string>("ClaimType");
                     b.Property<string>("ClaimValue");
-                    b.Property<int>("Id")
-                        .GenerateValuesOnAdd();
+	                b.Property<int>("Id");
+                        //.GenerateValuesOnAdd();
                     b.Property<string>("RoleId");
                     b.Key("Id");
                     b.ForRelational().Table("AspNetRoleClaims");
@@ -38,8 +39,8 @@ namespace VitalChoice_vNext.Migrations
                 {
                     b.Property<string>("ClaimType");
                     b.Property<string>("ClaimValue");
-                    b.Property<int>("Id")
-                        .GenerateValuesOnAdd();
+	                b.Property<int>("Id");
+                        //.GenerateValuesOnAdd();
                     b.Property<string>("UserId");
                     b.Key("Id");
                     b.ForRelational().Table("AspNetUserClaims");

@@ -1,12 +1,10 @@
-﻿using Microsoft.Data.Entity;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity.ChangeTracking;
-using Microsoft.Framework.ConfigurationModel;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Infrastructure;
+using VitalChoice.Infrastructure;
 
 namespace VitalChoice.Data.DataContext
 {
@@ -14,28 +12,12 @@ namespace VitalChoice.Data.DataContext
 	{
 		private readonly Guid instanceId;
 
-		public DataContext(string nameOrConnectionString)
-			: base(nameOrConnectionString)
+		public DataContext()
 		{
 			instanceId = Guid.NewGuid();
-			Configuration.LazyLoadingEnabled = false;
-			Configuration.ProxyCreationEnabled = false;
 		}
 
-		public Guid InstanceId
-		{
-			get { return instanceId; }
-		}
-
-		public new DbSet<T> Set<T>() where T : class
-		{
-			return base.Set<T>();
-		}
-
-		/*protected override void OnModelCreating(DbModelBuilder modelBuilder)
-		{
-			base.OnModelCreating(modelBuilder);
-		}*/
+		public Guid InstanceId => instanceId;
 
 		public override int SaveChanges()
 		{
@@ -43,14 +25,6 @@ namespace VitalChoice.Data.DataContext
 			var changes = base.SaveChanges();
 			SyncObjectsStatePostCommit();
 			return changes;
-		}
-
-		public override async Task<int> SaveChangesAsync()
-		{
-			SyncObjectsStatePreCommit();
-			var changesAsync = await base.SaveChangesAsync();
-			SyncObjectsStatePostCommit();
-			return changesAsync;
 		}
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
@@ -63,13 +37,13 @@ namespace VitalChoice.Data.DataContext
 
 		public void SyncObjectState(object entity)
 		{
-			Entry(entity).State = StateHelper.ConvertState(((IObjectState)entity).ObjectState);
+			Entry(entity).SetState(StateHelper.ConvertState(((IObjectState)entity).ObjectState));
 		}
 
 		private void SyncObjectsStatePreCommit()
 		{
 			foreach (var dbEntityEntry in ChangeTracker.Entries())
-				dbEntityEntry.State = StateHelper.ConvertState(((IObjectState)dbEntityEntry.Entity).ObjectState);
+				dbEntityEntry.SetState(StateHelper.ConvertState(((IObjectState)dbEntityEntry.Entity).ObjectState));
 		}
 
 		public void SyncObjectsStatePostCommit()

@@ -2,7 +2,7 @@
 
 using System;
 using System.Linq.Expressions;
-using LinqKit;
+using VitalChoice.Data.Extensions;
 
 #endregion
 

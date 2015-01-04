@@ -10,11 +10,11 @@ namespace VitalChoice.Data.Repositories
 		void Insert(TEntity entity);
 		void InsertRange(IEnumerable<TEntity> entities);
 		void InsertGraph(TEntity entity);
-		void InsertGraphRange(IEnumerable<TEntity> entities);
+		void InsertGraphRange(params TEntity[] entities);
 		void Update(TEntity entity);
-		void Delete(object id);
+		void Delete(int id);
 		void Delete(TEntity entity);
-		Task<bool> DeleteAsync(params object[] keyValues);
-		Task<bool> DeleteAsync(CancellationToken cancellationToken, params object[] keyValues);
+		Task<bool> DeleteAsync(int id);
+		Task<bool> DeleteAsync(CancellationToken cancellationToken, int id);
 	}
 }

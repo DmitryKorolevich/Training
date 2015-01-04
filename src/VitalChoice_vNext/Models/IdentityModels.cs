@@ -9,7 +9,7 @@ using Microsoft.Framework.OptionsModel;
 namespace VitalChoice_vNext.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
-    public class ApplicationUser : IdentityUser
+    /*public class ApplicationUser : IdentityUser
     {
 
     }
@@ -42,5 +42,5 @@ namespace VitalChoice_vNext.Models
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
-    }
+    }*/
 }

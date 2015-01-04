@@ -5,6 +5,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.Data;
+using VitalChoice.Infrastructure;
 using VitalChoice_vNext.Models;
 
 namespace VitalChoice_vNext.Controllers
@@ -12,14 +14,14 @@ namespace VitalChoice_vNext.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
-        public SignInManager<ApplicationUser> SignInManager { get; private set; }
+        public UserManager<AppUser> UserManager { get; private set; }
+        public SignInManager<AppUser> SignInManager { get; private set; }
 
         // GET: /Account/Login
         [HttpGet]
@@ -40,7 +42,7 @@ namespace VitalChoice_vNext.Controllers
             if (ModelState.IsValid)
             {
                 var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-                switch (signInStatus)
+               /* switch (signInStatus)
                 {
                     case SignInStatus.Success:
                         return RedirectToLocal(returnUrl);
@@ -48,7 +50,7 @@ namespace VitalChoice_vNext.Controllers
                     default:
                         ModelState.AddModelError("", "Invalid username or password.");
                         return View(model);
-                }
+                }*/
             }
 
             // If we got this far, something failed, redisplay form
@@ -73,7 +75,7 @@ namespace VitalChoice_vNext.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName };
+                var user = new AppUser { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -144,11 +146,11 @@ namespace VitalChoice_vNext.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error);
+               // ModelState.AddModelError("", error);
             }
         }
 
-        private async Task<ApplicationUser> GetCurrentUserAsync()
+        private async Task<AppUser> GetCurrentUserAsync()
         {
             return await UserManager.FindByIdAsync(Context.User.Identity.GetUserId());
         }
