@@ -1,11 +1,11 @@
 ﻿{
     "Data": {
         "DefaultConnection": { 
-            "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-VitalChoice_vNext-d9435282-9c62-4291-ab7f-97c9e38fb5fb;Trusted_Connection=True;MultipleActiveResultSets=true"
+            "ConnectionString": "Server=localhost;Database=VitalChoice;Trusted_Connection=True;MultipleActiveResultSets=true"
         }
     },
     "EntityFramework": {
-        "ApplicationDbContext": {
+        "VitalChoiceContext": {
             "ConnectionStringKey": "Data:DefaultConnection:ConnectionString"
         }
     }

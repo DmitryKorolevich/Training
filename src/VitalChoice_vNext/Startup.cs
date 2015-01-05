@@ -12,8 +12,10 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
+using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data;
 using VitalChoice.Domain.Context;
+using VitalChoice.Infrastructure;
 using VitalChoice_vNext.Models;
 
 namespace VitalChoice_vNext
@@ -38,12 +40,12 @@ namespace VitalChoice_vNext
                 .AddSqlServer()
                 .AddDbContext<VitalChoiceContext>();
 
-            // Add Identity services to the services container.
-          //  services.AddDefaultIdentity<VitalChoiceContext, AppUser, IdentityRole>(Configuration); !!!!
+			// Add Identity services to the services container.
+			//services.AddDefaultIdentity<VitalChoiceContext, AppUser, IdentityRole>(Configuration);
+			services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
-            // Add MVC services to the services container.
-            services.AddMvc();
-
+			// Add MVC services to the services container.
+			services.AddMvc();
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
@@ -89,10 +91,11 @@ namespace VitalChoice_vNext
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
-	       /* app.UseServices(x =>
-	        {
-				x.Add
-	        });*/
+			 
+	        //app.UseServices(x =>
+	        //{
+			//	x.
+	        //});
         }
     }
 }

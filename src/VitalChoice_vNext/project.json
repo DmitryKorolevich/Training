@@ -4,13 +4,13 @@
     "version": "1.0.0-*",
     "dependencies": {
         "EntityFramework.Commands": "7.0.0.0-rc1-11898",
-        "Microsoft.AspNet.Mvc": "6.0.0.0-beta1",
+        "Microsoft.AspNet.Mvc": "6.0.0-beta1",
         //"Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta1",
         "Microsoft.AspNet.Diagnostics": "1.0.0.0-rc1-11895",
-        "Microsoft.AspNet.Diagnostics.Entity": "7.0.0.0-beta1",
+        "Microsoft.AspNet.Diagnostics.Entity": "7.0.0.0-rc1-11897",
         "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404",
         "Microsoft.AspNet.Security.Cookies": "1.0.0.0-rc1-11328",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta1",
+        "Microsoft.AspNet.Server.IIS": "1.0.0.0-rc1-10850",
         "Microsoft.AspNet.Server.WebListener": "1.0.0-beta1",
         "Microsoft.AspNet.StaticFiles": "1.0.0-beta1",
         "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta1",
@@ -18,12 +18,12 @@
         "Microsoft.Framework.Logging": "1.0.0-beta1",
         "Microsoft.Framework.Logging.Console": "1.0.0-beta1",
         "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1",
-        "CoreCLR": "1.0.0.0-rc1-10219",
         "Ix-Async": "1.2.2.0-withwpa81",
         "VitalChoice.Infrastructure": "1.0.0-*",
         "EntityFramework.Core": "7.0.0.0-rc1-11898",
         "EntityFramework.SqlServer": "7.0.0.0-rc1-11898",
-        "VitalChoice.Domain": "1.0.0-*"
+        "VitalChoice.Domain": "1.0.0-*" //,
+        //"Microsoft.AspNet.DependencyInjection.Unity": "0.1.0.0-alpha-333"
     },
     "commands": {
         /* Change the port number when you are self hosting this application */
@@ -33,7 +33,11 @@
     },
     "frameworks": {
         "aspnet50": { },
-        "aspnetcore50": { }
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20.0-beta-22422"
+            }
+        }
     },
     "exclude": [
         "wwwroot",
