@@ -1,15 +1,15 @@
 {
     "version": "1.0.0-*",
     "dependencies": {
-         "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404"
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404"
     },
 
-    "frameworks" : {
-        "aspnet50" : { 
+    "frameworks": {
+        "aspnet50": {
             "dependencies": {
             }
         },
-        "aspnetcore50" : { 
+        "aspnetcore50": {
             "dependencies": {
             }
         }
