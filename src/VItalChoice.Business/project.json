@@ -2,9 +2,6 @@
     "version": "1.0.0-*",
     "dependencies": {
         "VitalChoice.Data": "1.0.0-*",
-        "Ix-Async": "1.2.2.0-withwpa81",
-        "EntityFramework.Commands": "7.0.0.0-rc1-11898",
-        "EntityFramework.Core": "7.0.0.0-rc1-11898",
         "VitalChoice.Domain": "1.0.0-*",
         "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404"
     },
@@ -16,7 +13,6 @@
         },
         "aspnetcore50": {
             "dependencies": {
-                "System.Runtime": "4.0.20.0-beta-22422"
             }
         }
     }

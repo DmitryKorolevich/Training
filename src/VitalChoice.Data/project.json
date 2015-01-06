@@ -1,13 +1,8 @@
 {
     "version": "1.0.0-*",
     "dependencies": {
-        "EntityFramework": "7.0.0.0-rc1-11897",
-        "Ix-Async": "1.2.2.0-withwpa81",
-        "EntityFramework.Commands": "7.0.0.0-rc1-11898",
-        "EntityFramework.Core": "7.0.0.0-rc1-11898",
-         "EntityFramework.SqlServer": "7.0.0.0-rc1-11898",
         "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404",
-"VitalChoice.Infrastructure": "1.0.0-*"
+        "VitalChoice.Infrastructure": "1.0.0-*"
     },
 
     "frameworks": {
@@ -17,7 +12,6 @@
         },
         "aspnetcore50": {
             "dependencies": {
-                "System.Runtime": "4.0.20.0-beta-22422"
             }
         }
     }
