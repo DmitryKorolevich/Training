@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modeling", "Modeling", "{E8
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "DataBaseModel", "DataBaseModel\DataBaseModel.modelproj", "{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Core", "src\VitalChoice.Core\VitalChoice.Core.kproj", "{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +75,6 @@ Global
 		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
 		{E8D2ADA1-EE04-4A2F-8522-B4DAB47842FD} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882} = {E8D2ADA1-EE04-4A2F-8522-B4DAB47842FD}
+		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
 	EndGlobalSection
 EndGlobal

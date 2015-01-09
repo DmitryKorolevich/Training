@@ -97,12 +97,11 @@ namespace VitalChoice.Data.UnitOfWork
             ((DataContext.DataContext)dataContext).SyncObjectsStatePostCommit();
         }
 
-        #endregion
-
-        // Uncomment, if rather have IRepositoryAsync<TEntity> IoC vs. Reflection Activation
-        //public IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : EntityBase
-        //{
-        //    return ServiceLocator.Current.GetInstance<IRepositoryAsync<TEntity>>();
-        //}
+	    #endregion
+/*
+		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : IObjectState
+		{
+            return ServiceLocator.Current.GetInstance<IRepositoryAsync<TEntity>>();
+        }*/
     }
 }

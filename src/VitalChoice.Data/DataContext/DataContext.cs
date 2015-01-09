@@ -8,7 +8,7 @@ using VitalChoice.Infrastructure;
 
 namespace VitalChoice.Data.DataContext
 {
-	public class DataContext : IdentityDbContext<AppUser>, IDataContext, IDataContextAsync
+	public class DataContext : IdentityDbContext<ApplicationUser>, IDataContext, IDataContextAsync
 	{
 		private readonly Guid instanceId;
 

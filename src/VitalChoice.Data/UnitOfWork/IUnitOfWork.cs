@@ -1,6 +1,4 @@
 ﻿using System;
-using VitalChoice.Data.Infrastructure;
-using VitalChoice.Data.Repositories;
 
 namespace VitalChoice.Data.UnitOfWork
 {

@@ -11,6 +11,7 @@ using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using VitalChoice.Domain.Context;
 using VitalChoice.Infrastructure;
+using VitalChoice.Core.DependencyInjection;
 
 namespace VitalChoice_vNext
 {
@@ -29,20 +30,11 @@ namespace VitalChoice_vNext
 		// This method gets called by the runtime.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			// Add EF services to the services container.
-			services.AddEntityFramework(Configuration)
-				.AddSqlServer()
-				.AddDbContext<VitalChoiceContext>();
+			var reg = new DefaultDependencyConfig();
 
-			// Add Identity services to the services container.
-			//services.AddDefaultIdentity<VitalChoiceContext, AppUser, IdentityRole>(Configuration);
-			services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
+			reg.RegisterInfrastructure(Configuration, services);
 
-			// Add MVC services to the services container.
-			services.AddMvc();
-			// Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
-			// You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
-			// services.AddWebApiConventions();
+			reg.Register(services);
 		}
 
 		// Configure is called after ConfigureServices is called.

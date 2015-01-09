@@ -2,8 +2,8 @@
 
 namespace VitalChoice.Infrastructure
 {
-    public class AppUser : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
-
+	    public int CustomerId { get; set; }
     }
 }

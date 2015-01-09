@@ -1,7 +1,7 @@
 ﻿{
     "Data": {
-        "DefaultConnection": { 
-            "ConnectionString": "Server=localhost;Database=VitalChoice;Trusted_Connection=True;MultipleActiveResultSets=true"
+        "DefaultConnection": {
+            "ConnectionString": "Server=localhost;Database=VitalChoice;Integrated security=True;"
         }
     },
     "EntityFramework": {

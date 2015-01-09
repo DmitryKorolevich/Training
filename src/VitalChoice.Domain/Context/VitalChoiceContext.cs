@@ -7,10 +7,25 @@ namespace VitalChoice.Domain.Context
 {
 	public class VitalChoiceContext : DataContext
 	{
+		private static bool created;
+
+		public VitalChoiceContext()
+		{
+			// Create the database and schema if it doesn't exist
+			// This is a temporary workaround to create database until Entity Framework database migrations 
+			// are supported in ASP.NET 5
+			if (!created)
+			{
+				Database.AsRelational().AsSqlServer().ApplyMigrations();
+				created = true;
+			}
+		}
 
 		protected override void OnConfiguring(DbContextOptions builder)
 		{
-			builder.UseSqlServer(@"Server=(localdb)\v11.0;Database=Blogging;Trusted_Connection=True;");
+			builder.UseSqlServer("Server=localhost;Database=VitalChoice;Integrated security=True;");
+
+			base.OnConfiguring(builder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
@@ -18,6 +33,8 @@ namespace VitalChoice.Domain.Context
 			/*builder.Entity<User>();*/
 			/*OneToMany(b => b.Posts, p => p.Blog)
 				.ForeignKey(p => p.BlogId)*/
+
+			base.OnModelCreating(builder);
 		}
 	}
 }

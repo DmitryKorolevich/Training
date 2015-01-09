@@ -1,11 +1,10 @@
-﻿/*using System;
+﻿using System;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Migrations.Builders;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
 using VitalChoice.Domain.Context;
-using VitalChoice_vNext.Models;
 
 namespace VitalChoice_vNext.Migrations
 {
@@ -122,7 +121,7 @@ namespace VitalChoice_vNext.Migrations
 		{
 			get
 			{
-				return "7.0.0-beta1";
+				return "7.0.0-rc1-11900";
 			}
 		}
 
@@ -144,8 +143,7 @@ namespace VitalChoice_vNext.Migrations
 				{
 					b.Property<string>("ClaimType");
 					b.Property<string>("ClaimValue");
-					b.Property<int>("Id");
-					// .GenerateValuesOnAdd();
+					b.Property<int>("Id").GenerateValueOnAdd();
 					b.Property<string>("RoleId");
 					b.Key("Id");
 					b.ForRelational().Table("AspNetRoleClaims");
@@ -155,8 +153,7 @@ namespace VitalChoice_vNext.Migrations
 				{
 					b.Property<string>("ClaimType");
 					b.Property<string>("ClaimValue");
-					b.Property<int>("Id");
-					//  .GenerateValuesOnAdd();
+					b.Property<int>("Id").GenerateValueOnAdd();
 					b.Property<string>("UserId");
 					b.Key("Id");
 					b.ForRelational().Table("AspNetUserClaims");
@@ -180,7 +177,7 @@ namespace VitalChoice_vNext.Migrations
 					b.ForRelational().Table("AspNetUserRoles");
 				});
 
-				builder.Entity("VitalChoice_vNext.Models.ApplicationUser", b =>
+				builder.Entity("VitalChoice.Infrastructure.ApplicationUser", b =>
 				{
 					b.Property<int>("AccessFailedCount");
 					b.Property<string>("Email");
@@ -195,6 +192,7 @@ namespace VitalChoice_vNext.Migrations
 					b.Property<string>("SecurityStamp");
 					b.Property<bool>("TwoFactorEnabled");
 					b.Property<string>("UserName");
+					b.Property<string>("CustomerId");
 					b.Key("Id");
 					b.ForRelational().Table("AspNetUsers");
 				});
@@ -206,16 +204,16 @@ namespace VitalChoice_vNext.Migrations
 
 				builder.Entity("Microsoft.AspNet.Identity.IdentityUserClaim`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", b =>
 				{
-					b.ForeignKey("VitalChoice_vNext.Models.ApplicationUser", "UserId");
+					b.ForeignKey("VitalChoice.Infrastructure.ApplicationUser", "UserId");
 				});
 
 				builder.Entity("Microsoft.AspNet.Identity.IdentityUserLogin`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", b =>
 				{
-					b.ForeignKey("VitalChoice_vNext.Models.ApplicationUser", "UserId");
+					b.ForeignKey("VitalChoice.Infrastructure.ApplicationUser", "UserId");
 				});
 
 				return builder.Model;
 			}
 		}
 	}
-}*/
+}

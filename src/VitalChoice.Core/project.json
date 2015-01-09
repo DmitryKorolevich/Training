@@ -1,0 +1,20 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Microsoft.AspNet.Mvc": "6.0.0-rc1-12251",
+        "VItalChoice.Business": "1.0.0-*",
+        "VItalChoice.Data": "1.0.0-*"
+    },
+
+    "frameworks" : {
+        "aspnet50" : { 
+            "dependencies": {
+            }
+        },
+        "aspnetcore50" : { 
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22231"
+            }
+        }
+    }
+}
