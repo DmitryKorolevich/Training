@@ -2,11 +2,11 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
 using System;
-using VitalChoice.Domain.Context;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice_vNext.Migrations
 {
-    [ContextType(typeof(VitalChoice.Domain.Context.VitalChoiceContext))]
+    [ContextType(typeof(VitalChoiceContext))]
     public partial class FirstMigration : IMigrationMetadata
     {
         string IMigrationMetadata.MigrationId

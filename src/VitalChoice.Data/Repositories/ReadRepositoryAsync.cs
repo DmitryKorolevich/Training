@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -81,7 +81,7 @@ namespace VitalChoice.Data.Repositories
 				query = query.AsExpandable().Where(filter);
 
 			if (page != null && pageSize != null)
-				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);//.AsNoTracking()
 
 			return query;
 		}

@@ -1,5 +1,5 @@
 ﻿
-namespace VitalChoice.Data.Infrastructure
+namespace VitalChoice.Domain.Infrastructure
 {
     public interface IObjectState
     {

@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Data.Infrastructure
+﻿namespace VitalChoice.Domain.Infrastructure
 {
     public enum ObjectState
     {

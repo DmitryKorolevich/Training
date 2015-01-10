@@ -4,8 +4,9 @@ using VitalChoice.Domain.Entities;
 
 namespace VItalChoice.Business.Services.Contracts
 {
-	public interface IUserService :IGenericService<User>
+	public interface ICommentService : IGenericService<Comment>
 	{
-		IEnumerable<User> QueryByName(string name);
+		IEnumerable<Comment> QueryByText(string name);
+		void InsertWithUser(Comment comment);
 	}
 }

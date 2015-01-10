@@ -1,9 +1,15 @@
-﻿using VitalChoice.Data;
+﻿using System;
 
 namespace VitalChoice.Domain.Entities
 {
-	public class User : Entity
+	public class Comment : Entity
 	{
-		public string UserName { get; set; }
+		public DateTime CreationDate { get; set; }
+
+		public string Text { get; set; }
+
+		public string AuthorId { get; set; }
+
+		public ApplicationUser Author { get; set; }
 	}
 }

@@ -6,8 +6,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Infrastructure;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Infrastructure;
 
 #endregion
 

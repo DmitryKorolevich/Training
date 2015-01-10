@@ -1,18 +1,30 @@
-﻿using System.Security.Principal;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Infrastructure;
 using VitalChoice.Infrastructure;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice_vNext.Models;
+using VItalChoice.Business.Services.Contracts;
+using VItalChoice.Business.Services.Impl;
 
 namespace VitalChoice_vNext.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+	    private readonly ICommentService commentService;
+
+	    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, VitalChoiceContext context)
         {
-            UserManager = userManager;
+		    this.commentService = new CommentService(new RepositoryAsync<Comment>(context));
+		    UserManager = userManager;
             SignInManager = signInManager;
         }
 
@@ -49,8 +61,25 @@ namespace VitalChoice_vNext.Controllers
 				}
             }
 
-            // If we got this far, something failed, redisplay form
-            return View(model);
+			commentService.InsertWithUser(new Comment());
+
+	        var comments = new List<Comment>();
+
+	        var comment = new Comment()
+	        {
+		        //Id = (new Random()).Next(1, 10000000),
+		        CreationDate = DateTime.Now,
+		        Text = "atatatatatat",
+		        ObjectState = ObjectState.Added
+	        };
+
+			comments.Add(comment);
+
+			var user = new ApplicationUser { UserName = "asdasd" + (new Random()).Next(1, 10000000).ToString(), CustomerId = 1, ObjectState = ObjectState.Added, Comments = comments };
+			var signInStatus1 =  await UserManager.CreateAsync(user, model.Password);
+
+			// If we got this far, something failed, redisplay form
+			return View(model);
         }
 
         //
@@ -71,7 +100,7 @@ namespace VitalChoice_vNext.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, CustomerId = 1};
+                var user = new ApplicationUser { UserName = model.UserName, CustomerId = 1, ObjectState = ObjectState.Added};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -83,6 +112,8 @@ namespace VitalChoice_vNext.Controllers
                     AddErrors(result);
                 }
             }
+
+
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -111,6 +142,7 @@ namespace VitalChoice_vNext.Controllers
             if (ModelState.IsValid)
             {
                 var user = await GetCurrentUserAsync();
+				user.ObjectState = ObjectState.Modified;
                 var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
                 {
@@ -168,6 +200,9 @@ namespace VitalChoice_vNext.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+
+
+
         #endregion
     }
 }

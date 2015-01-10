@@ -2,9 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Data.Entity;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Infrastructure;
-using VitalChoice.Infrastructure;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.DataContext
 {
@@ -15,6 +16,8 @@ namespace VitalChoice.Data.DataContext
 		public DataContext()
 		{
 			instanceId = Guid.NewGuid();
+			/*Configuration.LazyLoadingEnabled = false;
+			Configuration.ProxyCreationEnabled = false;*/
 		}
 
 		public Guid InstanceId => instanceId;

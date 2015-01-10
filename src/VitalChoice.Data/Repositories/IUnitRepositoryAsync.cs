@@ -1,4 +1,4 @@
-﻿using VitalChoice.Data.Infrastructure;
+﻿using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories
 {

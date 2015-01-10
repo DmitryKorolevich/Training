@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Infrastructure;
+using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Services
 {

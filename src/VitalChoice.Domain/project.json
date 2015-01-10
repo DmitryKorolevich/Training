@@ -1,8 +1,7 @@
 {
     "version": "1.0.0-*",
     "dependencies": {
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404",
-        "VitalChoice.Data": "1.0.0-*"
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0.0-rc1-11404"
     },
 
     "frameworks": {

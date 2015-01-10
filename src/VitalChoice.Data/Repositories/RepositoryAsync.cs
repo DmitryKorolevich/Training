@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
-using VitalChoice.Data.Infrastructure;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -19,6 +19,7 @@ namespace VitalChoice.Data.Repositories
 			((IObjectState)entity).ObjectState = ObjectState.Added;
 			DbSet.Attach(entity);
 			Context.SyncObjectState(entity);
+			Context.SaveChanges();
 		}
 
 		public virtual void InsertRange(IEnumerable<TEntity> entities)

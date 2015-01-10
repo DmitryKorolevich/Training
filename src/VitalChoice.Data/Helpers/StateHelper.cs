@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Data.Entity;
-using VitalChoice.Data.Infrastructure;
+using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Helpers
 {
-    public class StateHelper
+	public class StateHelper
     {
         public static EntityState ConvertState(ObjectState state)
         {
@@ -26,8 +26,7 @@ namespace VitalChoice.Data.Helpers
             switch (state)
             {
                 case EntityState.Unknown:
-                    return ObjectState.Unchanged;
-                case EntityState.Unchanged:
+				case EntityState.Unchanged:
                     return ObjectState.Unchanged;
                 case EntityState.Added:
                     return ObjectState.Added;

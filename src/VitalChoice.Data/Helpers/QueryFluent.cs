@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain;
 
 #endregion
 

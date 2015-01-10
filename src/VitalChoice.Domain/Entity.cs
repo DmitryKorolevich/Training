@@ -1,7 +1,6 @@
-﻿
-using VitalChoice.Data.Infrastructure;
+﻿using VitalChoice.Domain.Infrastructure;
 
-namespace VitalChoice.Data
+namespace VitalChoice.Domain
 {
     public abstract class Entity : IObjectState
     {

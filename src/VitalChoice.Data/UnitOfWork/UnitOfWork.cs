@@ -2,16 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Relational;
 using VitalChoice.Data.DataContext;
-using VitalChoice.Data.Infrastructure;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Infrastructure;
 
 #endregion
 

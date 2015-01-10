@@ -5,7 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
-using VitalChoice.Data.Infrastructure;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Infrastructure;
 
 #endregion
 

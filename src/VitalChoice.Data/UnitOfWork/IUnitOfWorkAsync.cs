@@ -2,8 +2,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using VitalChoice.Data.Infrastructure;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Infrastructure;
 
 #endregion
 

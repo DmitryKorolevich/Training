@@ -1,20 +1,18 @@
-﻿using System;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity.Migrations;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
+using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain.Context;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Infrastructure;
+using VitalChoice.Domain;
+using VitalChoice.Infrastructure.Context;
 using VItalChoice.Business.Services.Contracts;
 using VItalChoice.Business.Services.Impl;
 
 namespace VitalChoice.Core.DependencyInjection
 {
-    public class DefaultDependencyConfig : IDependencyConfig
+	public class DefaultDependencyConfig : IDependencyConfig
     {
 	    public void RegisterInfrastructure(IConfiguration configuration, IServiceCollection services)
 	    {
@@ -37,10 +35,10 @@ namespace VitalChoice.Core.DependencyInjection
 	    public void Register(IServiceCollection services)
 	    {
 		    services.AddScoped<IUnitOfWorkAsync, UnitOfWork>();
-			services.AddTransient(typeof(IGenericService<>), typeof(GenericService<>));
+			//services.AddScoped<IDataContextAsync, VitalChoiceContext>();
 			//services.AddTransient(typeof(IGenericService<User>), typeof(GenericService<User>));
-			services.AddTransient<IUserService, UserService>();
-		    services.AddTransient(typeof (IRepositoryAsync<>), typeof (RepositoryAsync<>));
+			services.AddTransient(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
+			services.AddTransient<ICommentService, CommentService>();
 	    }
 	}
 }

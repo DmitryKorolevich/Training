@@ -3,7 +3,8 @@
     "dependencies": {
         "Microsoft.AspNet.Mvc": "6.0.0-rc1-12251",
         "VItalChoice.Business": "1.0.0-*",
-        "VItalChoice.Data": "1.0.0-*"
+        "VItalChoice.Data": "1.0.0-*",
+        "VitalChoice.Infrastructure": "1.0.0-*"
     },
 
     "frameworks" : {
