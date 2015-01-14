@@ -29,7 +29,7 @@ public class Sku
 		set;
 	}
 
-	public virtual IEnumerable<Option> Option
+	public virtual IEnumerable<OptionValue> Option
 	{
 		get;
 		set;

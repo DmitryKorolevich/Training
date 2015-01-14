@@ -39,12 +39,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeneratedCode\Category.cs" />
+    <Compile Include="GeneratedCode\FieldType.cs" />
     <Compile Include="GeneratedCode\Lookup.cs" />
     <Compile Include="GeneratedCode\LookupValue.cs" />
     <Compile Include="GeneratedCode\Option.cs" />
     <Compile Include="GeneratedCode\OptionType.cs" />
+    <Compile Include="GeneratedCode\OptionValue.cs" />
     <Compile Include="GeneratedCode\Product.cs" />
+    <Compile Include="GeneratedCode\ProductCategoryOverride.cs" />
+    <Compile Include="GeneratedCode\ProductType.cs" />
     <Compile Include="GeneratedCode\Sku.cs" />
+    <Compile Include="GeneratedCode\TypeCategories.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

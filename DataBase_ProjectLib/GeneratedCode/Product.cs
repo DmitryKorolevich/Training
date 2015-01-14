@@ -29,5 +29,17 @@ public class Product
 		set;
 	}
 
+	public virtual int idProductType
+	{
+		get;
+		set;
+	}
+
+	public virtual ProductType ProductType
+	{
+		get;
+		set;
+	}
+
 }
 

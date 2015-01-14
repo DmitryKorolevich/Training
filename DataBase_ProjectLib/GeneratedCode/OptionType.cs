@@ -23,7 +23,7 @@ public class OptionType
 		set;
 	}
 
-	public virtual string TypeName
+	public virtual int idFieldType
 	{
 		get;
 		set;
@@ -36,6 +36,24 @@ public class OptionType
 	}
 
 	public virtual bool IsSkuPrivate
+	{
+		get;
+		set;
+	}
+
+	public virtual int idProductType
+	{
+		get;
+		set;
+	}
+
+	public virtual ProductType ProductType
+	{
+		get;
+		set;
+	}
+
+	public virtual FieldType FieldType
 	{
 		get;
 		set;
