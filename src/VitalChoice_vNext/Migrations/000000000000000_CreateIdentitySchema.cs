@@ -6,7 +6,7 @@ using Microsoft.Data.Entity.Migrations.Builders;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
 using VitalChoice.Infrastructure.Context;
 
-namespace VitalChoice_vNext.Migrations
+namespace VitalChoice.Migrations
 {
 	public partial class CreateIdentitySchema : Migration
 	{

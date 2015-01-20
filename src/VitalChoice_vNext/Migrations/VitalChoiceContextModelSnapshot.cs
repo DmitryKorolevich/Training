@@ -4,7 +4,7 @@ using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
 using VitalChoice.Infrastructure.Context;
 
-namespace VitalChoice_vNext.Migrations
+namespace VitalChoice.Migrations
 {
     [ContextType(typeof(VitalChoiceContext))]
     public class VitalChoiceContextModelSnapshot : ModelSnapshot

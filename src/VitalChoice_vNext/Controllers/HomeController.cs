@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 
-namespace VitalChoice_vNext.Controllers
+namespace VitalChoice.Controllers
 {
     public class HomeController : Controller
     {

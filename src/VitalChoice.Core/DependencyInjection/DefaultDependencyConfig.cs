@@ -7,8 +7,8 @@ using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
 using VitalChoice.Infrastructure.Context;
-using VItalChoice.Business.Services.Contracts;
-using VItalChoice.Business.Services.Impl;
+using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Business.Services.Impl;
 
 namespace VitalChoice.Core.DependencyInjection
 {

@@ -2,7 +2,7 @@
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 
-namespace VItalChoice.Business.Services.Contracts
+namespace VitalChoice.Business.Services.Contracts
 {
 	public interface ICommentService : IGenericService<Comment>
 	{

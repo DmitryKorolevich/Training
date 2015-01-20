@@ -40,13 +40,13 @@ namespace VitalChoice.Data.DataContext
 
 		public void SyncObjectState(object entity)
 		{
-			Entry(entity).SetState(StateHelper.ConvertState(((IObjectState)entity).ObjectState));
+            Entry(entity).State = StateHelper.ConvertState(((IObjectState)entity).ObjectState);
 		}
 
 		private void SyncObjectsStatePreCommit()
 		{
 			foreach (var dbEntityEntry in ChangeTracker.Entries())
-				dbEntityEntry.SetState(StateHelper.ConvertState(((IObjectState)dbEntityEntry.Entity).ObjectState));
+				dbEntityEntry.State = StateHelper.ConvertState(((IObjectState)dbEntityEntry.Entity).ObjectState);
 		}
 
 		public void SyncObjectsStatePostCommit()

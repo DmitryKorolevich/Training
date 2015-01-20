@@ -1,32 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22310.1
+VisualStudioVersion = 14.0.22512.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DDF62098-78D4-4AAF-B25F-84EEB32C65DE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Business", "src\VitalChoice.Business\VitalChoice.Business.kproj", "{79BDB4CD-1526-48F9-9964-DC433AD6548C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice_vNext", "src\VitalChoice_vNext\VitalChoice_vNext.kproj", "{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Data", "src\VitalChoice.Data\VitalChoice.Data.kproj", "{E9B8CD81-EC30-494B-A111-44D3FB77D20D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64F90661-44FA-4B64-B8F7-DBADAB957C74}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Domain", "src\VitalChoice.Domain\VitalChoice.Domain.kproj", "{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B12C3C32-D25B-4D9A-A228-ED6D1ECA1197}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice_vNext", "src\VitalChoice_vNext\VitalChoice_vNext.kproj", "{709A4F7F-49E0-42EB-AC37-B266D77E0F11}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Domain", "src\VitalChoice.Domain\VitalChoice.Domain.kproj", "{67394871-9006-4E0F-B72B-8AD7B9CE29CE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Infrastructure", "src\VitalChoice.Infrastructure\VitalChoice.Infrastructure.kproj", "{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Data", "src\VitalChoice.Data\VitalChoice.Data.kproj", "{EC738651-8F4B-4B2A-A484-B72911DBFB8A}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VItalChoice.Business", "src\VItalChoice.Business\VItalChoice.Business.kproj", "{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Infrastructure", "src\VitalChoice.Infrastructure\VitalChoice.Infrastructure.kproj", "{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modeling", "Modeling", "{E8D2ADA1-EE04-4A2F-8522-B4DAB47842FD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Core", "src\VitalChoice.Core\VitalChoice.Core.kproj", "{A45FADFE-6B80-43B7-9A2F-AA766F3480B0}"
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "DataBaseModel", "DataBaseModel\DataBaseModel.modelproj", "{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Core", "src\VitalChoice.Core\VitalChoice.Core.kproj", "{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,47 +23,36 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67394871-9006-4E0F-B72B-8AD7B9CE29CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67394871-9006-4E0F-B72B-8AD7B9CE29CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67394871-9006-4E0F-B72B-8AD7B9CE29CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67394871-9006-4E0F-B72B-8AD7B9CE29CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC738651-8F4B-4B2A-A484-B72911DBFB8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC738651-8F4B-4B2A-A484-B72911DBFB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC738651-8F4B-4B2A-A484-B72911DBFB8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC738651-8F4B-4B2A-A484-B72911DBFB8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{709A4F7F-49E0-42EB-AC37-B266D77E0F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{709A4F7F-49E0-42EB-AC37-B266D77E0F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{709A4F7F-49E0-42EB-AC37-B266D77E0F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{709A4F7F-49E0-42EB-AC37-B266D77E0F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A45FADFE-6B80-43B7-9A2F-AA766F3480B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A45FADFE-6B80-43B7-9A2F-AA766F3480B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A45FADFE-6B80-43B7-9A2F-AA766F3480B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A45FADFE-6B80-43B7-9A2F-AA766F3480B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{6DF85F20-7D8E-4DB9-BAA7-A1FA071D403A} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{B12C3C32-D25B-4D9A-A228-ED6D1ECA1197} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{67394871-9006-4E0F-B72B-8AD7B9CE29CE} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{EC738651-8F4B-4B2A-A484-B72911DBFB8A} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{413CC6C4-44D8-42F2-AB1F-62EC6805C3C9} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{6EB0E857-9C23-48CB-8757-F2F6B88BCC5F} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{E8D2ADA1-EE04-4A2F-8522-B4DAB47842FD} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
-		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882} = {E8D2ADA1-EE04-4A2F-8522-B4DAB47842FD}
-		{3235E543-BBFA-4FDF-8FE4-358ECD6CA208} = {DDF62098-78D4-4AAF-B25F-84EEB32C65DE}
 	EndGlobalSection
 EndGlobal

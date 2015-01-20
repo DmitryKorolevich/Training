@@ -4,7 +4,7 @@ using Microsoft.Data.Entity.Migrations.Infrastructure;
 using System;
 using VitalChoice.Infrastructure.Context;
 
-namespace VitalChoice_vNext.Migrations
+namespace VitalChoice.Migrations
 {
     [ContextType(typeof(VitalChoiceContext))]
     public partial class FirstMigration : IMigrationMetadata

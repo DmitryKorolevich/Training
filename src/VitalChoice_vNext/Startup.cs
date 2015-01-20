@@ -10,7 +10,7 @@ using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
 
-namespace VitalChoice_vNext
+namespace VitalChoice
 {
 	public class Startup
 	{
