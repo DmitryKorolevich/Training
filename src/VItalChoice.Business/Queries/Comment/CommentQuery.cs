@@ -1,6 +1,6 @@
 ﻿using VitalChoice.Data.Helpers;
 
-namespace VItalChoice.Business.Queries.Comment
+namespace VitalChoice.Business.Queries.Comment
 {
 	public class CommentQuery: QueryObject<VitalChoice.Domain.Entities.Comment>
 	{

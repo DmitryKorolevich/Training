@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VitalChoice_vNext.Models
+namespace VitalChoice.Models
 {
     public class ExternalLoginConfirmationViewModel
     {

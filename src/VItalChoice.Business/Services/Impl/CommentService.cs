@@ -4,10 +4,10 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Infrastructure;
-using VItalChoice.Business.Queries.Comment;
-using VItalChoice.Business.Services.Contracts;
+using VitalChoice.Business.Queries.Comment;
+using VitalChoice.Business.Services.Contracts;
 
-namespace VItalChoice.Business.Services.Impl
+namespace VitalChoice.Business.Services.Impl
 {
 	public class CommentService: GenericService<Comment>, ICommentService
 	{

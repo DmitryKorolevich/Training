@@ -3,7 +3,7 @@ using Microsoft.Data.Entity.Migrations.Builders;
 using Microsoft.Data.Entity.Migrations.Model;
 using System;
 
-namespace VitalChoice_vNext.Migrations
+namespace VitalChoice.Migrations
 {
     public partial class FirstMigration : Migration
     {

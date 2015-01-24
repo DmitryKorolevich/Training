@@ -10,11 +10,11 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Infrastructure;
 using VitalChoice.Infrastructure;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice_vNext.Models;
-using VItalChoice.Business.Services.Contracts;
-using VItalChoice.Business.Services.Impl;
+using VitalChoice.Models;
+using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Business.Services.Impl;
 
-namespace VitalChoice_vNext.Controllers
+namespace VitalChoice.Controllers
 {
     [Authorize]
     public class AccountController : Controller
@@ -50,7 +50,7 @@ namespace VitalChoice_vNext.Controllers
             if (ModelState.IsValid)
             {
                 var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-	            if (signInStatus.Succeeded)
+	            if (signInStatus == SignInStatus.Success)
 	            {
 		            return RedirectToLocal(returnUrl);
 	            }
@@ -174,7 +174,7 @@ namespace VitalChoice_vNext.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError("", error);
             }
         }
 
