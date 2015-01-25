@@ -24,14 +24,12 @@ namespace VitalChoice
 
 		public IConfiguration Configuration { get; set; }
 
-		// This method gets called by the runtime.
-		public void ConfigureServices(IServiceCollection services)
+
+		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
 			var reg = new DefaultDependencyConfig();
 
-			reg.RegisterInfrastructure(Configuration, services);
-
-			reg.Register(services);
+			return reg.RegisterInfrastructure(Configuration, services);
 		}
 
 		// Configure is called after ConfigureServices is called.

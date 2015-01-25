@@ -3,13 +3,14 @@
 using System;
 using System.Linq.Expressions;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
 
 #endregion
 
 namespace VitalChoice.Data.Repositories
 {
-    public interface IReadRepository<TEntity> where TEntity : IObjectState
+    public interface IReadRepository<TEntity> where TEntity : Entity
     {
        /* TEntity Find(params object[] keyValues);*/
        /* IQueryable<TEntity> SelectQuery(string query, params object[] parameters);*/

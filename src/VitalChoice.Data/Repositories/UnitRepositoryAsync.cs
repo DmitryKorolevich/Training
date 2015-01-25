@@ -1,5 +1,6 @@
 ﻿#region
 
+using Microsoft.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -21,9 +22,10 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Insert(TEntity entity)
 		{
-			((IObjectState)entity).ObjectState = ObjectState.Added;
+			//((IObjectState)entity).ObjectState = ObjectState.Added;
 			DbSet.Attach(entity);
-			Context.SyncObjectState(entity);
+			Context.SetState(entity, EntityState.Added);
+			//Context.SyncObjectState(entity);
 		}
 
 		public virtual void InsertRange(IEnumerable<TEntity> entities)
@@ -44,9 +46,10 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Update(TEntity entity)
 		{
-			((IObjectState)entity).ObjectState = ObjectState.Modified;
+			//((IObjectState)entity).ObjectState = ObjectState.Modified;
 			DbSet.Attach(entity);
-			Context.SyncObjectState(entity);
+			Context.SetState(entity, EntityState.Modified);
+			//Context.SyncObjectState(entity);
 		}
 
 		public virtual void Delete(int id)
@@ -60,9 +63,10 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Delete(TEntity entity)
 		{
-			((IObjectState)entity).ObjectState = ObjectState.Deleted;
+			//((IObjectState)entity).ObjectState = ObjectState.Deleted;
 			DbSet.Attach(entity);
-			Context.SyncObjectState(entity);
+			Context.SetState(entity, EntityState.Deleted);
+			//Context.SyncObjectState(entity);
 		}
 
 		public virtual async Task<bool> DeleteAsync(int id)

@@ -4,12 +4,13 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Services
 {
-    public interface IGenericService<TEntity> where TEntity : IObjectState
-    {
+    public interface IGenericService<TEntity> where TEntity : Entity
+	{
         void Insert(TEntity entity);
         void InsertRange(IEnumerable<TEntity> entities);
         void InsertGraph(TEntity entity);

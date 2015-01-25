@@ -10,9 +10,9 @@ namespace VitalChoice.Infrastructure.Context
 	{
 		private static bool created;
 
-		public DbSet<Comment> Blogs { get; set; }
+		public DbSet<Comment> Comments { get; set; }
 
-		public VitalChoiceContext()
+		public VitalChoiceContext(bool uofScoped = false)
 		{
 			// Create the database and schema if it doesn't exist
 			// This is a temporary workaround to create database until Entity Framework database migrations 
@@ -26,18 +26,18 @@ namespace VitalChoice.Infrastructure.Context
 
 		protected override void OnConfiguring(DbContextOptions builder)
 		{
-			//builder.UseSqlServer("Server=localhost;Database=VitalChoice;Integrated security=True;");
-			builder.UseSqlServer();
+			builder.UseSqlServer("Server=localhost;Database=VitalChoice;Integrated security=True;");
+			//builder.UseSqlServer();
 
 			base.OnConfiguring(builder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
+			//builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
 
-			builder.Entity<Comment>().ManyToOne(x => x.Author, y => y.Comments).ForeignKey(x=>x.AuthorId).ReferencedKey(y => y.Id);
-			builder.Entity<Comment>().Ignore(x => x.ObjectState);
+            builder.Entity<Comment>().ManyToOne(x => x.Author, y => y.Comments).ForeignKey(x=>x.AuthorId).ReferencedKey(y => y.Id);
+			//builder.Entity<Comment>().Ignore(x => x.ObjectState);
 
 			base.OnModelCreating(builder);
 		}

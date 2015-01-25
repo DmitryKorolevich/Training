@@ -1,5 +1,6 @@
 ﻿
 
+using Microsoft.Data.Entity;
 using System;
 
 namespace VitalChoice.Data.DataContext
@@ -8,6 +9,8 @@ namespace VitalChoice.Data.DataContext
     {
         int SaveChanges();
 
-        void SyncObjectState(object entity);
+		//void SyncObjectState(object entity);
+
+		void SetState(object entity, EntityState state);
     }
 }

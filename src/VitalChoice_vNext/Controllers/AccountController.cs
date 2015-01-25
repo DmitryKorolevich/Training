@@ -21,9 +21,9 @@ namespace VitalChoice.Controllers
     {
 	    private readonly ICommentService commentService;
 
-	    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, VitalChoiceContext context)
+	    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ICommentService commentService)
         {
-		    this.commentService = new CommentService(new RepositoryAsync<Comment>(context));
+		    this.commentService = commentService;
 		    UserManager = userManager;
             SignInManager = signInManager;
         }
@@ -47,7 +47,7 @@ namespace VitalChoice.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
 	            if (signInStatus == SignInStatus.Success)
@@ -63,7 +63,7 @@ namespace VitalChoice.Controllers
 
 			commentService.InsertWithUser(new Comment());
 
-	        var comments = new List<Comment>();
+	      /*  var comments = new List<Comment>();
 
 	        var comment = new Comment()
 	        {
@@ -76,7 +76,7 @@ namespace VitalChoice.Controllers
 			comments.Add(comment);
 
 			var user = new ApplicationUser { UserName = "asdasd" + (new Random()).Next(1, 10000000).ToString(), CustomerId = 1, ObjectState = ObjectState.Added, Comments = comments };
-			var signInStatus1 =  await UserManager.CreateAsync(user, model.Password);
+			var signInStatus1 =  await UserManager.CreateAsync(user, model.Password);*/
 
 			// If we got this far, something failed, redisplay form
 			return View(model);
@@ -100,7 +100,7 @@ namespace VitalChoice.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, CustomerId = 1, ObjectState = ObjectState.Added};
+                var user = new ApplicationUser { UserName = model.UserName, CustomerId = 1};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -142,7 +142,7 @@ namespace VitalChoice.Controllers
             if (ModelState.IsValid)
             {
                 var user = await GetCurrentUserAsync();
-				user.ObjectState = ObjectState.Modified;
+				//user.ObjectState = ObjectState.Modified;
                 var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
                 {

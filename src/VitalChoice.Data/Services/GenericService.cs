@@ -5,19 +5,21 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
 
 #endregion
 
 namespace VitalChoice.Data.Services
 {
-    public abstract class GenericService<TEntity> : IGenericService<TEntity> where TEntity : IObjectState
+    public abstract class GenericService<TEntity> : IGenericService<TEntity> where TEntity : Entity// IObjectState
     {
 	    protected IRepositoryAsync<TEntity> Repository { get; }
 
-	    protected GenericService(IRepositoryAsync<TEntity> repository)
+		protected GenericService(IRepositoryAsync<TEntity> repository)
 	    {
 		    this.Repository = repository;
         }

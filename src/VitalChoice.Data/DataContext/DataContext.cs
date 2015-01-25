@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Data.Entity;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
@@ -23,21 +24,26 @@ namespace VitalChoice.Data.DataContext
 
 		public override int SaveChanges()
 		{
-			SyncObjectsStatePreCommit();
+			//SyncObjectsStatePreCommit();
 			var changes = base.SaveChanges();
-			SyncObjectsStatePostCommit();
+			//SyncObjectsStatePostCommit();
 			return changes;
 		}
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
 		{
-			SyncObjectsStatePreCommit();
+			//SyncObjectsStatePreCommit();
 			var changesAsync = await base.SaveChangesAsync(cancellationToken);
-			SyncObjectsStatePostCommit();
+			//SyncObjectsStatePostCommit();
 			return changesAsync;
 		}
 
-		public void SyncObjectState(object entity)
+		public void SetState(object entity, EntityState state)
+		{
+			Entry(entity).State = state;
+        }
+
+		/*public void SyncObjectState(object entity)
 		{
             Entry(entity).State = StateHelper.ConvertState(((IObjectState)entity).ObjectState);
 		}
@@ -52,6 +58,6 @@ namespace VitalChoice.Data.DataContext
 		{
 			foreach (var dbEntityEntry in ChangeTracker.Entries())
 				((IObjectState)dbEntityEntry.Entity).ObjectState = StateHelper.ConvertState(dbEntityEntry.State);
-		}
+		}*/
 	}
 }

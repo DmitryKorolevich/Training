@@ -9,19 +9,21 @@ using Microsoft.Data.Entity;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Infrastructure;
+using Microsoft.Data.Entity.Relational;
+using VitalChoice.Domain;
 
 #endregion
 
 namespace VitalChoice.Data.UnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork, IUnitOfWorkAsync
+	public class UnitOfWork : IUnitOfWork, IUnitOfWorkAsync
     {
         #region Private Fields
 
         private readonly IDataContextAsync dataContext;
         private bool disposed;
         private Dictionary<string, object> repositories;
-        private DbTransaction transaction;
+        private RelationalTransaction transaction;
 
         #endregion Private Fields
 
@@ -59,7 +61,7 @@ namespace VitalChoice.Data.UnitOfWork
             return dataContext.SaveChangesAsync(cancellationToken);
         }
 
-        public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : IObjectState
+        public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
         {
             if (repositories == null)
                 repositories = new Dictionary<string, object>();
@@ -79,7 +81,7 @@ namespace VitalChoice.Data.UnitOfWork
 
         public void BeginTransaction()
         {
-			transaction = ((DbContext) dataContext).Database.AsSqlServer().Connection.DbConnection.BeginTransaction();
+			transaction = ((DbContext) dataContext).Database.AsRelational().AsSqlServer().Connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         }
 
         public bool Commit()
@@ -91,14 +93,14 @@ namespace VitalChoice.Data.UnitOfWork
         public void Rollback()
         {
             transaction.Rollback();
-            ((DataContext.DataContext)dataContext).SyncObjectsStatePostCommit();
+           // ((DataContext.DataContext)dataContext).SyncObjectsStatePostCommit();
         }
 
 	    #endregion
-/*
-		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : IObjectState
-		{
-            return ServiceLocator.Current.GetInstance<IRepositoryAsync<TEntity>>();
-        }*/
+
+		//public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : IObjectState
+		//{
+  //          return ServiceProviderExtensions.. <IUnitRepositoryAsync<TEntity>>();
+  //      }
     }
 }

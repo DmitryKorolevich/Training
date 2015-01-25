@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
 
 #endregion
 
 namespace VitalChoice.Data.Helpers
 {
-    public interface IQueryFluent<TEntity> where TEntity : IObjectState
+    public interface IQueryFluent<TEntity> where TEntity : Entity
     {
         IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         IQueryFluent<TEntity> Include(Expression<Func<TEntity, object>> expression);

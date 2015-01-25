@@ -1,8 +1,9 @@
-﻿using VitalChoice.Domain.Infrastructure;
+﻿using VitalChoice.Domain;
+using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories
 {
-    public interface IReadRepositoryAsync<TEntity> : IReadRepository<TEntity> where TEntity : IObjectState
+    public interface IReadRepositoryAsync<TEntity> : IReadRepository<TEntity> where TEntity : Entity
     {
        /* Task<TEntity> FindAsync(params object[] keyValues);
         Task<TEntity> FindAsync(CancellationToken cancellationToken, params object[] keyValues);*/
