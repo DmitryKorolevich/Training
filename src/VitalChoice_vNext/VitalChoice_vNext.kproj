@@ -18,10 +18,13 @@
     <SchemaVersion>2.0</SchemaVersion>
     <DevelopmentServerPort>51805</DevelopmentServerPort>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <ProduceOutputsOnBuild>False</ProduceOutputsOnBuild>
+  </PropertyGroup>
   <Import Project="$(VSToolsPath)\AspNet\Microsoft.Web.AspNet.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties bower_1json__JSONSchema="http://json.schemastore.org/bower" project_1json__JSONSchema="" package_1json__JSONSchema="http://json.schemastore.org/package" />
+      <UserProperties bower_1json__JSONSchema="http://json.schemastore.org/bower" project_1json__JSONSchema="http://www.asp.net/media/4878834/project.json" package_1json__JSONSchema="http://json.schemastore.org/package" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

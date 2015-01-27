@@ -1,19 +1,19 @@
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations.Infrastructure;
+using Microsoft.Data.Entity.Relational.Migrations.Infrastructure;
 using System;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Migrations
 {
-    [ContextType(typeof(VitalChoiceContext))]
-    public partial class FirstMigration : IMigrationMetadata
+    [ContextType(typeof(VitalChoice.Infrastructure.Context.VitalChoiceContext))]
+    public partial class initial : IMigrationMetadata
     {
         string IMigrationMetadata.MigrationId
         {
             get
             {
-                return "201501090010487_FirstMigration";
+                return "201501270045177_initial";
             }
         }
         
@@ -21,7 +21,7 @@ namespace VitalChoice.Migrations
         {
             get
             {
-                return "7.0.0-rc1-11900";
+                return "7.0.0-beta4-12023";
             }
         }
         
@@ -33,9 +33,12 @@ namespace VitalChoice.Migrations
                 
                 builder.Entity("Microsoft.AspNet.Identity.IdentityRole", b =>
                     {
+                        b.Property<string>("ConcurrencyStamp")
+                            .ConcurrencyToken();
                         b.Property<string>("Id")
                             .GenerateValueOnAdd();
                         b.Property<string>("Name");
+                        b.Property<string>("NormalizedName");
                         b.Key("Id");
                         b.ForRelational().Table("AspNetRoles");
                     });
@@ -80,9 +83,11 @@ namespace VitalChoice.Migrations
                         b.ForRelational().Table("AspNetUserRoles");
                     });
                 
-                builder.Entity("VitalChoice.Infrastructure.ApplicationUser", b =>
+                builder.Entity("VitalChoice.Domain.ApplicationUser", b =>
                     {
                         b.Property<int>("AccessFailedCount");
+                        b.Property<string>("ConcurrencyStamp")
+                            .ConcurrencyToken();
                         b.Property<int>("CustomerId");
                         b.Property<string>("Email");
                         b.Property<bool>("EmailConfirmed");
@@ -90,6 +95,7 @@ namespace VitalChoice.Migrations
                             .GenerateValueOnAdd();
                         b.Property<bool>("LockoutEnabled");
                         b.Property<DateTimeOffset?>("LockoutEnd");
+                        b.Property<string>("NormalizedEmail");
                         b.Property<string>("NormalizedUserName");
                         b.Property<string>("PasswordHash");
                         b.Property<string>("PhoneNumber");
@@ -101,6 +107,16 @@ namespace VitalChoice.Migrations
                         b.ForRelational().Table("AspNetUsers");
                     });
                 
+                builder.Entity("VitalChoice.Domain.Entities.Comment", b =>
+                    {
+                        b.Property<string>("AuthorId");
+                        b.Property<DateTime>("CreationDate");
+                        b.Property<int>("Id")
+                            .GenerateValueOnAdd();
+                        b.Property<string>("Text");
+                        b.Key("Id");
+                    });
+                
                 builder.Entity("Microsoft.AspNet.Identity.IdentityRoleClaim`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", b =>
                     {
                         b.ForeignKey("Microsoft.AspNet.Identity.IdentityRole", "RoleId");
@@ -108,12 +124,17 @@ namespace VitalChoice.Migrations
                 
                 builder.Entity("Microsoft.AspNet.Identity.IdentityUserClaim`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", b =>
                     {
-                        b.ForeignKey("VitalChoice.Infrastructure.ApplicationUser", "UserId");
+                        b.ForeignKey("VitalChoice.Domain.ApplicationUser", "UserId");
                     });
                 
                 builder.Entity("Microsoft.AspNet.Identity.IdentityUserLogin`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", b =>
                     {
-                        b.ForeignKey("VitalChoice.Infrastructure.ApplicationUser", "UserId");
+                        b.ForeignKey("VitalChoice.Domain.ApplicationUser", "UserId");
+                    });
+                
+                builder.Entity("VitalChoice.Domain.Entities.Comment", b =>
+                    {
+                        b.ForeignKey("VitalChoice.Domain.ApplicationUser", "AuthorId");
                     });
                 
                 return builder.Model;
