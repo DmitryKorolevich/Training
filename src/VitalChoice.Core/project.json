@@ -2,7 +2,7 @@
 	"version": "1.0.0-*",
 	"dependencies": {
 		"Microsoft.AspNet.Mvc": "6.0.0.0-beta3",
-		"Microsoft.AspNet.Identity": "3.0.0.0-beta4",
+		"Microsoft.AspNet.Identity": "3.0.0.0-beta3",
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
@@ -12,7 +12,7 @@
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
-				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta4"
+				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3"
 			}
 		},
 		"aspnetcore50": {

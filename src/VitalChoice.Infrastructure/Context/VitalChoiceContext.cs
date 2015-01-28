@@ -43,15 +43,10 @@ namespace VitalChoice.Infrastructure.Context
             //builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
 
 
-            //BUG: edited to work with beta 4
-            builder.Entity<Comment>()
-		        .HasOne(x => x.Author)
-		        .WithMany(x => x.Comments)
-		        .ForeignKey(x => x.AuthorId)
-		        .ReferencedKey(y => y.Id);
-			//builder.Entity<Comment>().Ignore(x => x.ObjectState);
+            builder.Entity<Comment>().ManyToOne(x => x.Author, y => y.Comments).ForeignKey(x => x.AuthorId).ReferencedKey(y => y.Id);
+            //builder.Entity<Comment>().Ignore(x => x.ObjectState);
 
-			base.OnModelCreating(builder);
+            base.OnModelCreating(builder);
 		}
 	}
 }
