@@ -1,8 +1,7 @@
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Relational.Migrations.Infrastructure;
+using Microsoft.Data.Entity.Migrations.Infrastructure;
 using System;
-using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Migrations
 {

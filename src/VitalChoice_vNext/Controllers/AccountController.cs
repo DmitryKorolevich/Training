@@ -50,7 +50,7 @@ namespace VitalChoice.Controllers
             if (!ModelState.IsValid)
             {
                 var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-	            if (signInStatus.Succeeded)
+	            if (signInStatus == SignInStatus.Success)
 	            {
 		            return RedirectToLocal(returnUrl);
 	            }
@@ -174,7 +174,7 @@ namespace VitalChoice.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError("", error);
             }
         }
 
