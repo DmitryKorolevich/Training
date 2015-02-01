@@ -10,8 +10,10 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using System;
+#if ASPNET50
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
+#endif
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -30,11 +32,11 @@ namespace VitalChoice.Core.DependencyInjection
 
 			// Add MVC services to the services container.
 			services.AddMvc();
-			// Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
-			// You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
-			// services.AddWebApiConventions();
-
-			var builder = new ContainerBuilder();
+            // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
+            // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
+            // services.AddWebApiConventions();
+#if ASPNET50
+            var builder = new ContainerBuilder();
 
 			builder.Populate(services);
 
@@ -45,6 +47,9 @@ namespace VitalChoice.Core.DependencyInjection
 			IContainer container = builder.Build();
 
 			return container.Resolve<IServiceProvider>();
+#else
+		    return null;
+#endif
 		}
 	}
 }
