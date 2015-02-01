@@ -22,7 +22,6 @@
 		"Microsoft.AspNet.StaticFiles": "1.0.0-beta3-11211",
 		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0.0-beta3-10788",
 		"Microsoft.Framework.Logging.Console": "1.0.0.0-beta3-10788",
-		"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808",
 		"EntityFramework.Commands": "7.0.0-beta3-12111",
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
@@ -33,6 +32,12 @@
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
+				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808"
+			}
+		},
+		"aspnetcore50": {
+			"dependencies": {
+				"System.Runtime": "4.0.20.0"
 			}
 		}
 	},

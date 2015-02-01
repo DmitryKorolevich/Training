@@ -4,13 +4,18 @@
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Domain": "1.0.0-*",
 		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3-11608",
-		"VitalChoice.Infrastructure": "1.0.0-*",
-		"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808"
+		"VitalChoice.Infrastructure": "1.0.0-*"
 	},
 
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
+				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808"
+			}
+		},
+		"aspnetcore50": {
+			"dependencies": {
+				"System.Runtime": "4.0.20.0"
 			}
 		}
 	}
