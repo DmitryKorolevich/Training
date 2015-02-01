@@ -10,11 +10,8 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using System;
-
-#if ASPNET50
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
-#endif
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -37,7 +34,6 @@ namespace VitalChoice.Core.DependencyInjection
 			// You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
 			// services.AddWebApiConventions();
 
-#if ASPNET50
 			var builder = new ContainerBuilder();
 
 			builder.Populate(services);
@@ -49,10 +45,6 @@ namespace VitalChoice.Core.DependencyInjection
 			IContainer container = builder.Build();
 
 			return container.Resolve<IServiceProvider>();
-#else
-
-			return null;
-#endif
 		}
 	}
 }

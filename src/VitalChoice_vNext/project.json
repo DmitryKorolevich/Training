@@ -12,32 +12,29 @@
 		"**.vspscc"
 	],
 	"dependencies": {
-		"Microsoft.AspNet.Server.IIS": "1.0.0-beta2",
-		"Microsoft.AspNet.Mvc": "6.0.0.0-beta2",
-		"Microsoft.AspNet.Diagnostics": "1.0.0.0-beta2",
-		"Microsoft.AspNet.Diagnostics.Entity": "7.0.0.0-beta2",
-		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta2",
-		"Microsoft.AspNet.Security.Cookies": "1.0.0.0-beta2",
-		"Microsoft.AspNet.Server.WebListener": "1.0.0.0-beta2",
-		"Microsoft.AspNet.StaticFiles": "1.0.0.0-beta2",
-		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0.0-beta2",
-		"Microsoft.Framework.CodeGenerators.Mvc": "1.0.0.0-beta2",
-		"Microsoft.Framework.Logging.Console": "1.0.0.0-beta2",
-		"EntityFramework.Commands": "7.0.0-beta2",
+		"Microsoft.AspNet.Server.IIS": "1.0.0-beta3-10984",
+		"Microsoft.AspNet.Mvc": "6.0.0-beta3-12564",
+		"Microsoft.AspNet.Diagnostics": "1.0.0-beta3-12078",
+		"Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta3-12078",
+		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3-11608",
+		"Microsoft.AspNet.Security.Cookies": "1.0.0-beta3-11505",
+		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3-11416",
+		"Microsoft.AspNet.StaticFiles": "1.0.0-beta3-11211",
+		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0.0-beta3-10788",
+		"Microsoft.Framework.Logging.Console": "1.0.0.0-beta3-10788",
+		"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808",
+		"EntityFramework.Commands": "7.0.0-beta3-12111",
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
-		"VItalChoice.Business": "1.0.0-*",
-		"VitalChoice.Core": "1.0.0-*",
-		"EntityFramework.SqlServer": "7.0.0-beta2"
+		"VitalChoice.Business": "1.0.0-*",
+		"VitalChoice.Core": "1.0.0-*"
 	},
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
-				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta2"
 			}
-		},
-		"aspnetcore50": { }
+		}
 	},
 	"commands": {
 		"web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",

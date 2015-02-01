@@ -1,6 +1,6 @@
-using Microsoft.Data.Entity.Migrations;
-using Microsoft.Data.Entity.Migrations.Builders;
 using System;
+using Microsoft.Data.Entity.Relational.Migrations;
+using Microsoft.Data.Entity.Relational.Migrations.Builders;
 
 namespace VitalChoice.Migrations
 {

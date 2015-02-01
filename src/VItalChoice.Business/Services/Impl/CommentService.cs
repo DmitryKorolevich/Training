@@ -5,6 +5,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Infrastructure;
 using VitalChoice.Business.Queries.Comment;
+using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.UnitOfWork;
@@ -30,8 +31,9 @@ namespace VitalChoice.Business.Services.Impl
 			//comment.Id = (new Random()).Next(1, 10000000);
 			comment.CreationDate = DateTime.Now;
 			comment.Text = "atatatatatat";
-			//comment.ObjectState = ObjectState.Added;
-			comment.AuthorId = "21496c6d-5239-417a-a737-5b3cd7b97a3d";
+            //comment.ObjectState = ObjectState.Added;
+            var query = new UserQuery();
+		    //comment.Author = Repository.Query(query.GetUser("multiarc")).Select();
 
 			Repository.Insert(comment);
 

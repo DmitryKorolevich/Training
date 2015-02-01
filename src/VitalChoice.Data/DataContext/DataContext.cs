@@ -40,7 +40,7 @@ namespace VitalChoice.Data.DataContext
 
 		public void SetState(object entity, EntityState state)
 		{
-            Entry(entity).State = state;
+            SetState(entity, state);
         }
 
 		/*public void SyncObjectState(object entity)

@@ -1,6 +1,6 @@
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations.Infrastructure;
+using Microsoft.Data.Entity.Relational.Migrations.Infrastructure;
 using System;
 using VitalChoice.Infrastructure.Context;
 
@@ -17,8 +17,12 @@ namespace VitalChoice.Migrations
                 
                 builder.Entity("Microsoft.AspNet.Identity.IdentityRole", b =>
                     {
-                        b.Property<string>("Id");
+                        b.Property<string>("ConcurrencyStamp")
+                            .ConcurrencyToken();
+                        b.Property<string>("Id")
+                            .GenerateValueOnAdd();
                         b.Property<string>("Name");
+                        b.Property<string>("NormalizedName");
                         b.Key("Id");
                         b.ForRelational().Table("AspNetRoles");
                     });
@@ -66,12 +70,16 @@ namespace VitalChoice.Migrations
                 builder.Entity("VitalChoice.Domain.ApplicationUser", b =>
                     {
                         b.Property<int>("AccessFailedCount");
+                        b.Property<string>("ConcurrencyStamp")
+                            .ConcurrencyToken();
                         b.Property<int>("CustomerId");
                         b.Property<string>("Email");
                         b.Property<bool>("EmailConfirmed");
-                        b.Property<string>("Id");
+                        b.Property<string>("Id")
+                            .GenerateValueOnAdd();
                         b.Property<bool>("LockoutEnabled");
                         b.Property<DateTimeOffset?>("LockoutEnd");
+                        b.Property<string>("NormalizedEmail");
                         b.Property<string>("NormalizedUserName");
                         b.Property<string>("PasswordHash");
                         b.Property<string>("PhoneNumber");
