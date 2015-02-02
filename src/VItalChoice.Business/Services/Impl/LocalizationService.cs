@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
@@ -25,7 +26,8 @@ namespace VitalChoice.Business.Services.Impl
 
 	    public string GetString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable, IFormattable
 	    {
-            var enumType = enumValue.GetType();
+            var enumType = enumValue.GetType().GetTypeInfo();
+           
             if (!enumType.IsEnum)
             {
                 throw new ArgumentException(string.Format("Not enum type {0}.", enumType.FullName));

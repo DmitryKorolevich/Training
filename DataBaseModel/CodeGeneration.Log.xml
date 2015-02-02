@@ -6,60 +6,66 @@
   <MessageClass Name="Error" Label="Error" Option="Show errors" />
   <MessageClass Name="Property" Label="Property" Option="Show metadata" />
   <MessageClass Name="Diagnostic" Label="Message" Option="Show diagnostic messages" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="High" Text="Code generation or text transformation started." />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="Name = ClassTemplate" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="Overwrite = True" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="ProjectPath = ..\DataBase_ProjectLib\DataBase_ProjectLib.csproj" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="TargetName = {Name}" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Medium" Text="DataBase_Project's Text Template Binding: 'ClassTemplate' will apply ClassTemplate.t4 to: 'DataBase_Project::LookupValue' -  (Class), 'DataBase_Project::Lookup' -  (Class), 'DataBase_Project::OptionValue' -  (Class), 'DataBase_Project::OptionType' -  (Class), 'DataBase_Project::Product' -  (Class), 'DataBase_Project::ProductType' -  (Class), 'DataBase_Project::Sku' -  (Class), 'DataBase_Project::FieldType' -  (Class), 'DataBase_Project::ProductCategoryOverride' -  (Class), 'DataBase_Project::TypeCategories' -  (Class), 'DataBase_Project::Category' -  (Class) " />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Medium" Text="'DataBase_Project::LookupValue' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\LookupValue.cs" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Medium" Text="'DataBase_Project::Lookup' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Lookup.cs" />
-  <Message Timestamp="2015-01-15T01:51:48" Importance="Medium" Text="'DataBase_Project::OptionValue' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\OptionValue.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::OptionType' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\OptionType.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::Product' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Product.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::ProductType' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\ProductType.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::Sku' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Sku.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::FieldType' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\FieldType.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::ProductCategoryOverride' -  (Class) : success (file created) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\ProductCategoryOverride.cs" />
-  <Message Timestamp="2015-01-15T01:51:49" Importance="Medium" Text="'DataBase_Project::TypeCategories' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\TypeCategories.cs" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Medium" Text="'DataBase_Project::Category' -  (Class) : success (file replaced) - G:\Work\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Category.cs" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="Name = StructTemplate" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="Overwrite = True" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="ProjectPath = ..\DataBase_ProjectLib\DataBase_ProjectLib.csproj" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="TargetName = {Name}" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Medium" Text="DataBase_Project's Text Template Binding: 'StructTemplate' will apply StructTemplate.t4 to: 'DataBase_Project::LookupValue' -  (Class), 'DataBase_Project::Lookup' -  (Class), 'DataBase_Project::OptionValue' -  (Class), 'DataBase_Project::OptionType' -  (Class), 'DataBase_Project::Product' -  (Class), 'DataBase_Project::ProductType' -  (Class), 'DataBase_Project::Sku' -  (Class), 'DataBase_Project::FieldType' -  (Class), 'DataBase_Project::ProductCategoryOverride' -  (Class), 'DataBase_Project::TypeCategories' -  (Class), 'DataBase_Project::Category' -  (Class) " />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::LookupValue' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::Lookup' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::OptionValue' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::OptionType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::Product' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::ProductType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::Sku' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::FieldType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::ProductCategoryOverride' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::TypeCategories' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::Category' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="The selection included 15 elements which were not bound to a template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
-  <Message Timestamp="2015-01-15T01:51:50" Importance="High" Text="Code generation complete. Errors: 0. Warnings: 0." />
+  <Message Timestamp="2015-02-02T15:11:31" Importance="High" Text="Code generation or text transformation started." />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="Name = ClassTemplate" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="Overwrite = True" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="ProjectPath = ..\DataBase_ProjectLib\DataBase_ProjectLib.csproj" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="TargetName = {Name}" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
+  <Message Timestamp="2015-02-02T15:11:32" Importance="Medium" Text="DataBase_Project's Text Template Binding: 'ClassTemplate' will apply ClassTemplate.t4 to: 'DataBase_Project::LookupValue' -  (Class), 'DataBase_Project::Lookup' -  (Class), 'DataBase_Project::OptionValue' -  (Class), 'DataBase_Project::OptionType' -  (Class), 'DataBase_Project::Product' -  (Class), 'DataBase_Project::ProductType' -  (Class), 'DataBase_Project::Sku' -  (Class), 'DataBase_Project::FieldType' -  (Class), 'DataBase_Project::ProductCategoryOverride' -  (Class), 'DataBase_Project::TypeCategories' -  (Class), 'DataBase_Project::Category' -  (Class), 'DataBase_Project::LocalizationItemData' -  (Class), 'DataBase_Project::LocalizationItem' -  (Class) " />
+  <Message Timestamp="2015-02-02T15:11:44" Importance="Medium" Text="Project Added: C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\DataBase_ProjectLib.csproj" />
+  <Message Timestamp="2015-02-02T15:11:44" Importance="Medium" Text="'DataBase_Project::LookupValue' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\LookupValue.cs" />
+  <Message Timestamp="2015-02-02T15:11:45" Importance="Medium" Text="'DataBase_Project::Lookup' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Lookup.cs" />
+  <Message Timestamp="2015-02-02T15:11:45" Importance="Medium" Text="'DataBase_Project::OptionValue' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\OptionValue.cs" />
+  <Message Timestamp="2015-02-02T15:11:45" Importance="Medium" Text="'DataBase_Project::OptionType' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\OptionType.cs" />
+  <Message Timestamp="2015-02-02T15:11:45" Importance="Medium" Text="'DataBase_Project::Product' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Product.cs" />
+  <Message Timestamp="2015-02-02T15:11:46" Importance="Medium" Text="'DataBase_Project::ProductType' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\ProductType.cs" />
+  <Message Timestamp="2015-02-02T15:11:46" Importance="Medium" Text="'DataBase_Project::Sku' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Sku.cs" />
+  <Message Timestamp="2015-02-02T15:11:46" Importance="Medium" Text="'DataBase_Project::FieldType' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\FieldType.cs" />
+  <Message Timestamp="2015-02-02T15:11:46" Importance="Medium" Text="'DataBase_Project::ProductCategoryOverride' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\ProductCategoryOverride.cs" />
+  <Message Timestamp="2015-02-02T15:11:46" Importance="Medium" Text="'DataBase_Project::TypeCategories' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\TypeCategories.cs" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Medium" Text="'DataBase_Project::Category' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\Category.cs" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Medium" Text="'DataBase_Project::LocalizationItemData' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\LocalizationItemData.cs" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Medium" Text="'DataBase_Project::LocalizationItem' -  (Class) : success (file created) - C:\Projects\Vital_Choice_Next\DataBase_ProjectLib\GeneratedCode\LocalizationItem.cs" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="Name = StructTemplate" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="Overwrite = True" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="ProjectPath = ..\DataBase_ProjectLib\DataBase_ProjectLib.csproj" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="TargetName = {Name}" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO 14.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Medium" Text="DataBase_Project's Text Template Binding: 'StructTemplate' will apply StructTemplate.t4 to: 'DataBase_Project::LookupValue' -  (Class), 'DataBase_Project::Lookup' -  (Class), 'DataBase_Project::OptionValue' -  (Class), 'DataBase_Project::OptionType' -  (Class), 'DataBase_Project::Product' -  (Class), 'DataBase_Project::ProductType' -  (Class), 'DataBase_Project::Sku' -  (Class), 'DataBase_Project::FieldType' -  (Class), 'DataBase_Project::ProductCategoryOverride' -  (Class), 'DataBase_Project::TypeCategories' -  (Class), 'DataBase_Project::Category' -  (Class), 'DataBase_Project::LocalizationItemData' -  (Class), 'DataBase_Project::LocalizationItem' -  (Class) " />
+  <Message Timestamp="2015-02-02T15:11:47" Importance="Diagnostic" Text="'DataBase_Project::LookupValue' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::Lookup' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::OptionValue' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::OptionType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::Product' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::ProductType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::Sku' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::FieldType' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::ProductCategoryOverride' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::TypeCategories' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::Category' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::LocalizationItemData' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:48" Importance="Diagnostic" Text="'DataBase_Project::LocalizationItem' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="The selection included 16 elements which were not bound to a template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="Diagnostic" Text="'DataBase_Project::' -  (Association): no bound template." />
+  <Message Timestamp="2015-02-02T15:11:50" Importance="High" Text="Code generation complete. Errors: 0. Warnings: 0." />
 </Log>
