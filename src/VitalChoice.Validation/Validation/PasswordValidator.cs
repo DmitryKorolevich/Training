@@ -1,8 +1,8 @@
-﻿using System.Linq;
+using System.Linq;
 using FluentValidation;
 using VitalChoice.Validation.Validation.Interfaces;
 
-namespace VitalChoice.Validation.Validation
+namespace QVitalChoice.Validation.Validation
 {
     public class PasswordValidator : AbstractValidator<IPasswordModel>
     {
@@ -11,12 +11,12 @@ namespace VitalChoice.Validation.Validation
             RuleFor(model => model.Password)
                 .Cascade(CascadeMode.StopOnFirstFailure)
                 .Equal(model => model.Password2)
-                .WithMessage("PasswordsMatch", ValidationScope.Common)
+                .WithMessageWithParams("PasswordsMatch")
                 .Length(6, int.MaxValue)
-                .WithMessage("FieldMinimumLength", "PasswordField", ValidationScope.Common, 6)
+                .WithMessage("FieldMinimumLength", "PasswordField", 6)
                 .Must
-                (model => !model.Any(char.IsControl) && !model.Any(char.IsPunctuation) && !model.Any(char.IsWhiteSpace))
-                .WithMessage("PasswordRules", ValidationScope.Common, 6);
+                (model => !model.Any(char.IsControl) && !model.Any((c) => c == '.') && !model.Any((c) => c == ',') && !model.Any(char.IsWhiteSpace))
+                .WithMessageWithParams("PasswordRules",6);
         }
     }
 }

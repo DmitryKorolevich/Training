@@ -3,7 +3,6 @@
 namespace VitalChoice.Validation.Models
 {
     public abstract class AbstractMode<TMode>: IMode
-        //where TMode: struct
     {
         public TMode Mode
         {

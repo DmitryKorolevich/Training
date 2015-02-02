@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace VitalChoice.Validation.Validation
+namespace QRProject.Common.ApiBase.Validation
 {
     public static class ValidatorsFactory
     {

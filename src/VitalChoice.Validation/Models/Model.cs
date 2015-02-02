@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Validation.Validation;
@@ -39,11 +40,13 @@ namespace VitalChoice.Validation.Models
             }
         }
 
+        [JsonIgnore]
         public virtual bool IsValid
         {
             get { return Validator == null || Validator.IsValid; }
         }
 
+        [JsonIgnore]
         public virtual IEnumerable<KeyValuePair<string, string>> Errors
         {
             get
@@ -55,6 +58,7 @@ namespace VitalChoice.Validation.Models
             }
         }
 
+        [JsonIgnore]
         public IModelValidator Validator { get; private set; }
 
         public virtual void Validate()
@@ -64,12 +68,14 @@ namespace VitalChoice.Validation.Models
             }
         }
 
+        [JsonIgnore]
         public TViewMode Mode
         {
             get { return (TViewMode)(this as IModel).ModeData; }
             set { (this as IModel).ModeData = value; }
         }
 
+        [JsonIgnore]
         IMode IModel.ModeData { get; set; }
     }
 }

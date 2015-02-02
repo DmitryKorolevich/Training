@@ -43,8 +43,9 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
 			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
 			builder.RegisterType<CommentService>().As<ICommentService>();
+            builder.RegisterType<LocalizationService>().As<ILocalizationService>().SingleInstance();
 
-			IContainer container = builder.Build();
+            IContainer container = builder.Build();
 
 			return container.Resolve<IServiceProvider>();
 #else

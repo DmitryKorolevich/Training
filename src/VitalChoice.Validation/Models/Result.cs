@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace VitalChoice.Validation.Models
 {
@@ -20,36 +21,57 @@ namespace VitalChoice.Validation.Models
             return result;
         }
 
+        public static Result<T> CreateErrorResult<T>(string errorMessage,string command, T data = default(T))
+        {
+            var result = new Result<T>(false, data,command);
+            result.AddMessage("", errorMessage);
+            return result;
+        }
+
+        public static Result<T> CreateErrorResult<T>(IEnumerable<MessageInfo> messages, T data = default(T))
+        {
+            var result = new Result<T>(false);
+            foreach (var messageInfo in messages)
+            {
+                result.AddMessage(messageInfo.Field,messageInfo.Message);
+            }
+            return result;
+        }
+
         public static Result<T> CreateSuccessResult<T>(T data = default(T))
         {
             return new Result<T>(true, data);
         }
     }
 
-    [DataContract]
     public struct Result<T>
     {
         private readonly List<MessageInfo> _messages;
         private readonly T _data;
         private readonly bool _success;
+        private readonly string _command;
 
-        public Result(bool status, T data = default(T))
+        public Result(bool status, T data = default(T),string command=null)
         {
             _messages = new List<MessageInfo>();
             _data = data;
             _success = status;
+            _command = command;
         }
 
-        [DataMember]
         public T Data
         {
             get { return _data; }
         }
 
-        [DataMember]
         public bool Success
         {
             get { return _success; }
+        }
+
+        public string Command
+        {
+            get { return _command; }
         }
 
         public void AddMessage(string field, string message)

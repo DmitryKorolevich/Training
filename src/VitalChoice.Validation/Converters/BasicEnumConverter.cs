@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft;
 using Newtonsoft.Json;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Helpers;
@@ -59,7 +60,7 @@ namespace VitalChoice.Validation.Converters
             bool nullable = !objectType.GetTypeInfo().IsEnum;
             var enumType = nullable ? Nullable.GetUnderlyingType(objectType) : objectType;
             Type underlyingType = enumType.GetTypeInfo().GetCustomAttributes(typeof(SerializeAsCharAttribute), false).Any() ? typeof(char) : enumType.UnderlyingSystemType;
-            Type readAs = nullable ? typeof (Nullable<>).MakeGenericType(underlyingType) : underlyingType;
+            Type readAs = nullable ? typeof(Nullable<>).MakeGenericType(underlyingType) : underlyingType;
             var readedData = serializer.Deserialize(reader, readAs);
             return readedData == null ? null : Enum.Parse(enumType, Convert.ChangeType(readedData, enumType.GetTypeInfo().GetEnumUnderlyingType()).ToString());
         }
@@ -67,7 +68,7 @@ namespace VitalChoice.Validation.Converters
         public override bool CanConvert(Type objectType)
         {
             return objectType.GetTypeInfo().IsEnum ||
-                   objectType.GetTypeInfo().IsValueType && objectType.GetTypeInfo().IsGenericType && objectType.GetGenericTypeDefinition() == typeof (Nullable<>) &&
+                   objectType.GetTypeInfo().IsValueType && objectType.GetTypeInfo().IsGenericType && objectType.GetGenericTypeDefinition() == typeof(Nullable<>) &&
                    Nullable.GetUnderlyingType(objectType).GetTypeInfo().IsEnum;
         }
     }
