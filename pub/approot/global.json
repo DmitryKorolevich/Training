@@ -43,13 +43,17 @@
       "version": "1.0.0-beta3-10789",
       "sha": "bnWZqHAEfuIcizzPA6MRP2vwXQvxQ2PJwtYOLVmw5POSiSkt9cpvSFc5hDNe46yHC1fQNgvV2IFcL6I1PhWkmQ=="
     },
-    "Microsoft.Framework.DependencyInjection.Autofac": {
-      "version": "1.0.0-beta3-10808",
-      "sha": "Lmxm52lsH2LYuy3w/uZkzPyz4i2whznzxlciUj/I6JqInwznL/ajkFb/PI52lYzcH+OddkaNyRzxroonmOziDA=="
-    },
     "EntityFramework.Commands": {
       "version": "7.0.0-beta3-12111",
       "sha": "sCQ4AWaydM4Csn9tuSb+sy4by9Eh+QfortkmiCXJiRDV7fPskC2vjwRsvqqM8kZB1QW0Z++Hmzrm1hKIOQ91Ow=="
+    },
+    "System.Runtime": {
+      "version": "4.0.20.0",
+      "sha": "4gmophM0+b/Oz7/AKgX72WLiA+g8/IsfwqrnZMBnbEaXKIuoG7HncNYSqBca2Jgr/gV0nTnxwzeHgdIEPsl4CQ=="
+    },
+    "Microsoft.Framework.DependencyInjection.Autofac": {
+      "version": "1.0.0-beta3-10808",
+      "sha": "Lmxm52lsH2LYuy3w/uZkzPyz4i2whznzxlciUj/I6JqInwznL/ajkFb/PI52lYzcH+OddkaNyRzxroonmOziDA=="
     },
     "Microsoft.AspNet.Loader.IIS.Interop": {
       "version": "1.0.0-beta3-10984",
@@ -119,10 +123,6 @@
       "version": "1.0.0-beta3-10855",
       "sha": "1ybFLNps8MyTEGgIFyj3lDJclYsE64qked/LFqg6I9CfcQtUbYCiFEfoy462LEB9zFPjONOVU80eFn9DIfVXKw=="
     },
-    "Autofac": {
-      "version": "3.3.0",
-      "sha": "Imzhu/WO3RAze1tCD1iBLB/r7X+SePoIm97O5wwb57P3Y8ZJ5JB5ymfiqxeUfsN38+4BuvKE59400OwdBv/idg=="
-    },
     "Microsoft.Framework.DependencyInjection": {
       "version": "1.0.0-beta3-10808",
       "sha": "AK9FtrW1dHQl/wYAuSa7jdAMP01lz0o7BVdmLr9M0kFT2yTDKtkEWCGOCMG44JNwQWDL0jSj4eyEmUwk+uacdg=="
@@ -130,6 +130,10 @@
     "Microsoft.AspNet.Hosting": {
       "version": "1.0.0-beta3-11018",
       "sha": "TOujULVZ+LTxunkScDQup8ibjVRWNZpyhYjW1ogSL+kn7g+TtxLpjKuiLDtrC3Xtu5ngnt66kmRy/tDC3ewx7Q=="
+    },
+    "Autofac": {
+      "version": "3.3.0",
+      "sha": "Imzhu/WO3RAze1tCD1iBLB/r7X+SePoIm97O5wwb57P3Y8ZJ5JB5ymfiqxeUfsN38+4BuvKE59400OwdBv/idg=="
     },
     "Microsoft.AspNet.Mvc.Core": {
       "version": "6.0.0-beta3-12564",

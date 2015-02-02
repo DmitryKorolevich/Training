@@ -4,8 +4,7 @@
 		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3-11608",
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
-		"VitalChoice.Domain": "1.0.0-*",
-		"System.Runtime": "4.0.20.0"
+		"VitalChoice.Domain": "1.0.0-*"
 	},
 
 	"frameworks": {
@@ -16,6 +15,7 @@
 		},
 		"aspnetcore50": {
 			"dependencies": {
+				"System.Runtime": "4.0.20.0"
 			}
 		}
 	}

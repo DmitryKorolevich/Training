@@ -27,8 +27,7 @@
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Business": "1.0.0-*",
-		"VitalChoice.Core": "1.0.0-*",
-		"System.Runtime": "4.0.20.0"
+		"VitalChoice.Core": "1.0.0-*"
 	},
 	"frameworks": {
 		"aspnet50": {
@@ -38,6 +37,7 @@
 		},
 		"aspnetcore50": {
 			"dependencies": {
+				"System.Runtime": "4.0.20.0"
 			}
 		}
 	},

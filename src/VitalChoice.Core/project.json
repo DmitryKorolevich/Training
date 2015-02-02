@@ -7,8 +7,7 @@
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Business": "1.0.0-*",
-		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3-10788",
-		"System.Runtime": "4.0.20.0"
+		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3-10788"
 	},
 
 	"frameworks": {
@@ -19,6 +18,7 @@
 		},
 		"aspnetcore50": {
 			"dependencies": {
+				"System.Runtime": "4.0.20.0"
 			}
 		}
 	}
