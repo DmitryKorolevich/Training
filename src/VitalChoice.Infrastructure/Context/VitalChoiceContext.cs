@@ -43,8 +43,16 @@ namespace VitalChoice.Infrastructure.Context
 		{
             //builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
 
-            builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId })
-                .ReferencedKey(p => new { p.GroupId, p.ItemId });
+		    builder.Entity<LocalizationItem>().Key(p => new {p.GroupId, p.ItemId});
+            builder.Entity<LocalizationItem>().Ignore(x => x.Id);
+		    builder.Entity<LocalizationItem>().Property(x => x.GroupName).MaxLength(250);
+            builder.Entity<LocalizationItem>().Property(x => x.ItemName).MaxLength(250);
+            builder.Entity<LocalizationItemData>().Key(p => new { p.GroupId, p.ItemId,p.CultureId });
+            builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
+            builder.Entity<LocalizationItemData>().Property(x => x.CultureId).MaxLength(5);
+            builder.Entity<LocalizationItemData>().Property(x => x.Value).MaxLength(1000);
+            builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey("GroupId","ItemId")
+                .ReferencedKey("GroupId", "ItemId");
             builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
     .ReferencedKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany(y => y.Comments).ForeignKey(x => x.AuthorId).ReferencedKey(y => y.Id);

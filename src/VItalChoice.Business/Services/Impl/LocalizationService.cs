@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Impl
             Repository = repository;
         }
 
-	    public string GetString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable, IFormattable
+        public string GetString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable, IFormattable
 	    {
             var enumType = enumValue.GetType().GetTypeInfo();
            
