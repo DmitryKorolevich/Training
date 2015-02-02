@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using FluentValidation.Results;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Validation.Validation.Interfaces;

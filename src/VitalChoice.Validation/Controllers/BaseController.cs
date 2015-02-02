@@ -51,7 +51,7 @@ namespace VitalChoice.Validation.Controllers
         [NonAction]
         protected void Parse(Type controllerType, ControllerSettings settings)
         {
-            var markedMethods = controllerType.GetTypeInfo().GetMethods()
+            var markedMethods = controllerType.GetTypeInfo().DeclaredMethods
                 .Where(m => m.GetCustomAttributes(typeof(ControlModeAttribute), false).Any());
             foreach (var markedMethod in markedMethods) {
                 var controlMode =

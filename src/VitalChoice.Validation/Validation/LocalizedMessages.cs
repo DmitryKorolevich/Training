@@ -15,12 +15,14 @@ namespace VitalChoice.Validation.Validation
 
         public static string GetMessage(string key, IEnumerable<object> args)
         {
-            return CommonManager.LocalizationData.GetString(ValidationGlobalMessagesNamespace + key, args);
+            throw new NotImplementedException();
+            //return CommonManager.LocalizationData.GetString(ValidationGlobalMessagesNamespace + key, args);
         }
 
         private static string GetFieldName(string key)
         {
-            return CommonManager.LocalizationData.GetString(ValidationGlobalFieldsNamespace + key);
+            throw new NotImplementedException();
+            //return CommonManager.LocalizationData.GetString(ValidationGlobalFieldsNamespace + key);
         }
 
         /// <summary>

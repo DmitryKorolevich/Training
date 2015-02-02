@@ -3,6 +3,7 @@ using Microsoft.Data.Entity.Metadata;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -42,7 +43,10 @@ namespace VitalChoice.Infrastructure.Context
 		{
             //builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
 
-
+            builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId })
+                .ReferencedKey(p => new { p.GroupId, p.ItemId });
+            builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
+    .ReferencedKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany(y => y.Comments).ForeignKey(x => x.AuthorId).ReferencedKey(y => y.Id);
             //builder.Entity<Comment>().Ignore(x => x.ObjectState);
 
