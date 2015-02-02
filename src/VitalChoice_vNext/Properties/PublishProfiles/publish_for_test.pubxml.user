@@ -10,7 +10,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="approot/global.json">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/Autofac/3.3.0/Autofac.nuspec">
       <publishTime>02/01/2015 14:03:56</publishTime>
@@ -49,82 +49,82 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/01/2015 14:30:56</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/k.cmd">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/klr.exe">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/klr.host.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/klr.net45.config">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/klr.net45.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/klr.net45.managed.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/kpm.cmd">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/lib/Microsoft.Framework.DesignTimeHost/Microsoft.Framework.DesignTimeHost.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/lib/Microsoft.Framework.PackageManager/Microsoft.Framework.PackageManager.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/lib/Microsoft.Framework.Project/Microsoft.Framework.Project.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.CodeAnalysis.CSharp.Desktop.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.CodeAnalysis.CSharp.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.CodeAnalysis.Desktop.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.CodeAnalysis.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Framework.ApplicationHost.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Framework.Runtime.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Framework.Runtime.Loader.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Framework.Runtime.Roslyn.Common.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Framework.Runtime.Roslyn.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Microsoft.Net.Http.Client.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/Newtonsoft.Json.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/System.Collections.Immutable.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/bin/System.Reflection.Metadata.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/KRE-CLR-amd64.1.0.0-beta3-10921.nupkg">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/KRE-CLR-amd64.1.0.0-beta3-10921.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/KRE-CLR-amd64.1.0.0-beta3-10921/KRE-CLR-amd64.nuspec">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/Microsoft.AspNet.Diagnostics.Entity/7.0.0-beta3-12078/lib/aspnet50/Microsoft.AspNet.Diagnostics.Entity.dll">
       <publishTime>02/01/2015 14:16:39</publishTime>
@@ -441,176 +441,227 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="approot/packages/System.Reflection.Metadata/1.0.18-beta/System.Reflection.Metadata.nuspec">
       <publishTime>02/01/2015 14:30:56</publishTime>
     </File>
+    <File Include="approot/packages/System.Runtime/4.0.20.0/lib/contract/System.Runtime.dll">
+      <publishTime>02/01/2015 21:16:39</publishTime>
+    </File>
+    <File Include="approot/packages/System.Runtime/4.0.20.0/System.Runtime.nuspec">
+      <publishTime>02/01/2015 21:16:39</publishTime>
+    </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/lib/aspnet50/VitalChoice.Business.dll">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/lib/aspnet50/VitalChoice.Business.xml">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Business/1.0.0/lib/aspnetcore50/VitalChoice.Business.dll">
+      <publishTime>02/02/2015 18:49:36</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Business/1.0.0/lib/aspnetcore50/VitalChoice.Business.xml">
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/root/Properties/debugSettings.json">
       <publishTime>01/25/2015 00:57:03</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/root/VItalChoice.Business.kproj">
-      <publishTime>02/01/2015 14:32:35</publishTime>
+      <publishTime>02/02/2015 18:47:53</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/root/VitalChoice.Business.kproj.user">
-      <publishTime>02/01/2015 13:24:20</publishTime>
+      <publishTime>02/01/2015 21:44:01</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/VitalChoice.Business.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/VitalChoice.Business.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Business/1.0.0/VitalChoice.Business.nuspec">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:36</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/lib/aspnet50/VitalChoice.Core.dll">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/lib/aspnet50/VitalChoice.Core.xml">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Core/1.0.0/lib/aspnetcore50/VitalChoice.Core.dll">
+      <publishTime>02/02/2015 18:49:37</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Core/1.0.0/lib/aspnetcore50/VitalChoice.Core.xml">
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/root/VitalChoice.Core.kproj">
-      <publishTime>02/01/2015 14:35:01</publishTime>
+      <publishTime>02/02/2015 18:47:46</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/root/VitalChoice.Core.kproj.user">
-      <publishTime>02/01/2015 13:24:15</publishTime>
+      <publishTime>02/01/2015 21:44:01</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/VitalChoice.Core.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/VitalChoice.Core.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Core/1.0.0/VitalChoice.Core.nuspec">
-      <publishTime>02/01/2015 14:37:04</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/lib/aspnet50/VitalChoice.Data.dll">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/lib/aspnet50/VitalChoice.Data.xml">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Data/1.0.0/lib/aspnetcore50/VitalChoice.Data.dll">
+      <publishTime>02/02/2015 18:49:35</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Data/1.0.0/lib/aspnetcore50/VitalChoice.Data.xml">
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/root/VitalChoice.Data.kproj">
-      <publishTime>02/01/2015 14:35:04</publishTime>
+      <publishTime>02/02/2015 18:47:40</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/root/VitalChoice.Data.kproj.user">
-      <publishTime>02/01/2015 13:24:07</publishTime>
+      <publishTime>02/01/2015 21:44:01</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/VitalChoice.Data.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/VitalChoice.Data.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Data/1.0.0/VitalChoice.Data.nuspec">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/lib/aspnet50/VitalChoice.Domain.dll">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/lib/aspnet50/VitalChoice.Domain.xml">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Domain/1.0.0/lib/aspnetcore50/VitalChoice.Domain.dll">
+      <publishTime>02/02/2015 18:49:34</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Domain/1.0.0/lib/aspnetcore50/VitalChoice.Domain.xml">
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/root/VitalChoice.Domain.kproj">
-      <publishTime>02/01/2015 14:35:04</publishTime>
+      <publishTime>02/02/2015 18:48:02</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/root/VitalChoice.Domain.kproj.user">
-      <publishTime>02/01/2015 13:24:01</publishTime>
+      <publishTime>02/01/2015 21:44:01</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/VitalChoice.Domain.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/VitalChoice.Domain.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Domain/1.0.0/VitalChoice.Domain.nuspec">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:34</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/lib/aspnet50/VitalChoice.Infrastructure.dll">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/lib/aspnet50/VitalChoice.Infrastructure.xml">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/lib/aspnetcore50/VitalChoice.Infrastructure.dll">
+      <publishTime>02/02/2015 18:49:35</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/lib/aspnetcore50/VitalChoice.Infrastructure.xml">
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/root/VitalChoice.Infrastructure.kproj">
-      <publishTime>02/01/2015 14:35:05</publishTime>
+      <publishTime>02/02/2015 18:48:08</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/root/VitalChoice.Infrastructure.kproj.user">
-      <publishTime>02/01/2015 13:23:56</publishTime>
+      <publishTime>02/01/2015 21:44:01</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/VitalChoice.Infrastructure.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/VitalChoice.Infrastructure.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice.Infrastructure/1.0.0/VitalChoice.Infrastructure.nuspec">
-      <publishTime>02/01/2015 14:37:03</publishTime>
+      <publishTime>02/02/2015 18:49:35</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/lib/aspnet50/VitalChoice_vNext.dll">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/lib/aspnet50/VitalChoice_vNext.xml">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice_vNext/1.0.0/lib/aspnetcore50/VitalChoice_vNext.dll">
+      <publishTime>02/02/2015 18:49:31</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice_vNext/1.0.0/lib/aspnetcore50/VitalChoice_vNext.xml">
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnet50/VitalChoice_vNext.dll">
-      <publishTime>01/29/2015 00:47:41</publishTime>
+      <publishTime>02/01/2015 21:48:39</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnet50/VitalChoice_vNext.pdb">
-      <publishTime>01/29/2015 00:47:41</publishTime>
+      <publishTime>02/01/2015 21:48:39</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnet50/VitalChoice_vNext.xml">
-      <publishTime>01/29/2015 00:47:41</publishTime>
+      <publishTime>02/01/2015 21:48:39</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnetcore50/VitalChoice_vNext.dll">
-      <publishTime>01/29/2015 00:47:44</publishTime>
+      <publishTime>02/01/2015 21:48:40</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnetcore50/VitalChoice_vNext.pdb">
-      <publishTime>01/29/2015 00:47:44</publishTime>
+      <publishTime>02/01/2015 21:48:40</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/aspnetcore50/VitalChoice_vNext.xml">
-      <publishTime>01/29/2015 00:47:44</publishTime>
+      <publishTime>02/01/2015 21:48:40</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/VitalChoice_vNext.1.0.0.nupkg">
-      <publishTime>01/29/2015 00:47:45</publishTime>
+      <publishTime>02/01/2015 21:48:41</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Debug/VitalChoice_vNext.1.0.0.symbols.nupkg">
-      <publishTime>01/29/2015 00:47:45</publishTime>
+      <publishTime>02/01/2015 21:48:41</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/profile/startup.prof">
-      <publishTime>01/27/2015 01:49:10</publishTime>
+      <publishTime>02/01/2015 21:39:29</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnet50/VitalChoice_vNext.dll">
-      <publishTime>02/01/2015 14:36:59</publishTime>
+      <publishTime>02/02/2015 18:49:29</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnet50/VitalChoice_vNext.pdb">
-      <publishTime>02/01/2015 14:36:59</publishTime>
+      <publishTime>02/02/2015 18:49:29</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnet50/VitalChoice_vNext.xml">
-      <publishTime>02/01/2015 14:36:59</publishTime>
+      <publishTime>02/02/2015 18:49:29</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnetcore50/VitalChoice_vNext.dll">
+      <publishTime>02/02/2015 18:49:30</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnetcore50/VitalChoice_vNext.pdb">
+      <publishTime>02/02/2015 18:49:30</publishTime>
+    </File>
+    <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/aspnetcore50/VitalChoice_vNext.xml">
+      <publishTime>02/02/2015 18:49:30</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/VitalChoice_vNext.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bin/Release/VitalChoice_vNext.1.0.0.symbols.nupkg">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/bower.json">
       <publishTime>01/30/2015 23:53:34</publishTime>
@@ -625,7 +676,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/18/2015 12:45:24</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/project.json">
-      <publishTime>02/01/2015 14:37:02</publishTime>
+      <publishTime>02/02/2015 18:49:33</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/root/Project_Readme.html">
       <publishTime>01/25/2015 00:57:03</publishTime>
@@ -670,31 +721,31 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/25/2015 00:57:03</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/VitalChoice_vNext.1.0.0.nupkg">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/VitalChoice_vNext.1.0.0.nupkg.sha512">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="approot/packages/VitalChoice_vNext/1.0.0/VitalChoice_vNext.nuspec">
-      <publishTime>02/01/2015 14:37:00</publishTime>
+      <publishTime>02/02/2015 18:49:31</publishTime>
     </File>
     <File Include="ef">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="ef.cmd">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="gen">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="gen.cmd">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="web">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="web.cmd">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="wwwroot/bin/AspNet.Loader.dll">
       <publishTime>02/01/2015 14:19:50</publishTime>
@@ -763,7 +814,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/18/2015 13:49:16</publishTime>
     </File>
     <File Include="wwwroot/web.config">
-      <publishTime>02/01/2015 16:14:57</publishTime>
+      <publishTime>02/02/2015 18:49:37</publishTime>
     </File>
     <File Include="wwwroot/_references.js">
       <publishTime>01/30/2015 23:53:34</publishTime>
