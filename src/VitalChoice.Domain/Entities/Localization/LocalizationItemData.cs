@@ -12,5 +12,7 @@ namespace VitalChoice.Domain.Entities.Localization
         public string CultureId { get; set; }
 
         public string Value { get; set; }
+
+        public LocalizationItem LocalizationItem { get; set; }
     }
 }
