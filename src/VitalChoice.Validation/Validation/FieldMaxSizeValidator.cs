@@ -1,7 +1,7 @@
 using System;
 using FluentValidation;
 
-namespace QRProject.Common.ApiBase.Validation
+namespace VitalChoice.Validation.Validation
 {
     public class FieldMaxSizeValidator : AbstractValidator<string>
     {
@@ -17,9 +17,8 @@ namespace QRProject.Common.ApiBase.Validation
             }
             else
             {
-                RuleFor(model => model)
-                    .Length(0, maxLenth).When(p => !String.IsNullOrEmpty(p))
-                    .WithMessage("FieldMaxSize", fieldName, maxLenth)
+                DefaultValidatorOptions.WithMessage(RuleFor(model => model)
+                        .Length(0, maxLenth).When(p => !String.IsNullOrEmpty(p)), "FieldMaxSize", fieldName, maxLenth)
                     .WithName(fieldName);
             }
         }

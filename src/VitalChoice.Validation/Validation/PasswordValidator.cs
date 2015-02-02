@@ -1,5 +1,6 @@
 using System.Linq;
 using FluentValidation;
+using VitalChoice.Validation.Validation;
 using VitalChoice.Validation.Validation.Interfaces;
 
 namespace QVitalChoice.Validation.Validation

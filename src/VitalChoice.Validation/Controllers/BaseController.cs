@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace QRProject.Api.Controllers.Base
+namespace VitalChoice.Validation.Controllers
 {
     public abstract class BaseController: Controller
     {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Framework.DependencyInjection;
+using VitalChoice.Validation.Controllers;
 
 namespace QRProject.Api.Controllers.Base
 {

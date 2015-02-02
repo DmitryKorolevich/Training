@@ -3,7 +3,8 @@
 	"dependencies": {
 		"FluentValidation.K": "1.0.0.0",
 		"Newtonsoft.Json": "6.0.8.0",
-		"Microsoft.AspNet.Mvc": "6.0.0-beta3-12564"
+		"Microsoft.AspNet.Mvc": "6.0.0-beta3-12564",
+		"System.Runtime": "4.0.20.0"
 	},
 
 	"frameworks": {
@@ -13,7 +14,6 @@
 		},
 		"aspnetcore50": {
 			"dependencies": {
-				"System.Runtime": "4.0.20.0",
 			}
 		}
 	}
