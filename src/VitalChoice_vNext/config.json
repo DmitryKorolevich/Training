@@ -8,5 +8,8 @@
         "VitalChoiceContext": {
             "ConnectionStringKey": "Data:DefaultConnection:ConnectionString"
         }
+    },
+    "Constants": {
+        "DefaultCultureId": "en-US"
     }
 }

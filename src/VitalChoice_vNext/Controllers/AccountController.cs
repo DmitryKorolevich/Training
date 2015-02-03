@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Models;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
+using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Controllers
 {

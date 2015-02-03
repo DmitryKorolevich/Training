@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using System.IO;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
@@ -21,15 +22,14 @@ namespace VitalChoice.Infrastructure.Context
 			if (!created)
 			{
 				Database.AsRelational().AsSqlServer().EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
-				created = true;
+                created = true;
 			}
 		}
 
 	    public VitalChoiceContext(bool uofScoped = false) : this()
 	    {
 	        
-	    }
-
+	    }       
 
         protected override void OnConfiguring(DbContextOptions builder)
 		{
@@ -43,18 +43,24 @@ namespace VitalChoice.Infrastructure.Context
 		{
             //builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
 
-		    builder.Entity<LocalizationItem>().Key(p => new {p.GroupId, p.ItemId});
-            builder.Entity<LocalizationItem>().Ignore(x => x.Id);
-		    builder.Entity<LocalizationItem>().Property(x => x.GroupName).MaxLength(250);
-            builder.Entity<LocalizationItem>().Property(x => x.ItemName).MaxLength(250);
+            #region LocalizationItems
+
+            builder.Entity<LocalizationItem>().Key(p => new {p.GroupId, p.ItemId});
             builder.Entity<LocalizationItemData>().Key(p => new { p.GroupId, p.ItemId,p.CultureId });
-            builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
-            builder.Entity<LocalizationItemData>().Property(x => x.CultureId).MaxLength(5);
-            builder.Entity<LocalizationItemData>().Property(x => x.Value).MaxLength(1000);
-            builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey("GroupId","ItemId")
-                .ReferencedKey("GroupId", "ItemId");
+            builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId })
+                .ReferencedKey(p => new { p.GroupId, p.ItemId });
+            builder.Entity<LocalizationItem>().Ignore(x => x.Id);
+            builder.Entity<LocalizationItem>().Property(x => x.GroupName).MaxLength(250).Required();
+            builder.Entity<LocalizationItem>().Property(x => x.ItemName).MaxLength(250).Required();
+            builder.Entity<LocalizationItem>().Property(x => x.Comment).MaxLength(250).Required();
             builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
-    .ReferencedKey(p => new { p.GroupId, p.ItemId });
+                .ReferencedKey(p => new { p.GroupId, p.ItemId });
+            builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
+            builder.Entity<LocalizationItemData>().Property(x => x.CultureId).MaxLength(5).Required();
+            builder.Entity<LocalizationItemData>().Property(x => x.Value).MaxLength(1000).Required();
+
+            #endregion
+
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany(y => y.Comments).ForeignKey(x => x.AuthorId).ReferencedKey(y => y.Id);
             //builder.Entity<Comment>().Ignore(x => x.ObjectState);
 

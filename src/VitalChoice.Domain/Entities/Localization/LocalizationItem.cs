@@ -14,6 +14,8 @@ namespace VitalChoice.Domain.Entities.Localization
 
         public string ItemName { get; set; }
 
+        public string Comment { get; set; }
+
         public List<LocalizationItemData> LocalizationItemDatas { get;set;}
     }
 }
