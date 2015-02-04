@@ -9,6 +9,7 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
+using Microsoft.AspNet.Mvc;
 
 namespace VitalChoice
 {
@@ -58,8 +59,7 @@ namespace VitalChoice
 			// Add cookie-based authentication to the request pipeline.
 			app.UseIdentity();
 
-			// Add MVC to the request pipeline.
-			app.UseMvc(routes =>
+            app.UseMvc(routes =>
 			{
 				routes.MapRoute(
 					name: "default",

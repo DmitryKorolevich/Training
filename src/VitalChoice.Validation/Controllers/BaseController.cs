@@ -43,9 +43,6 @@ namespace VitalChoice.Validation.Controllers
             return Settings;
         }
         
-        [NonAction]
-        internal abstract void Configure(string actionName);
-
         public ControllerSettings Settings { get; private set; }
 
         [NonAction]

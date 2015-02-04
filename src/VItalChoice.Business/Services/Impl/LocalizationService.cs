@@ -75,17 +75,17 @@ namespace VitalChoice.Business.Services.Impl
             SettingService = settingService;
         }
 
-        public string GetString<TEnum>(TEnum enumValue) where TEnum : struct, IComparable, IFormattable
+        public string GetString<TEnum>(TEnum enumValue) where TEnum : struct, IComparable
         {
             return GetDirectString(enumValue, GetCultureCode());
         }
 
-        public string GetString<TEnum>(TEnum enumValue, params object[] args) where TEnum : struct, IComparable, IFormattable
+        public string GetString<TEnum>(TEnum enumValue, params object[] args) where TEnum : struct, IComparable
         {
             return GetDirectString(enumValue, GetCultureCode(), args);
         }
 
-        public string GetDirectString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable, IFormattable
+        public string GetDirectString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable
         {
             var enumType = enumValue.GetType().GetTypeInfo();
            

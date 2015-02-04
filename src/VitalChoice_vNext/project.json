@@ -27,7 +27,8 @@
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Business": "1.0.0-*",
-		"VitalChoice.Core": "1.0.0-*"
+		"VitalChoice.Core": "1.0.0-*",
+		"VitalChoice.Validation": "1.0.0-*"
 	},
 	"frameworks": {
 		"aspnet50": {

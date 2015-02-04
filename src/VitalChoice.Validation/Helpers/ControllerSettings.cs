@@ -10,11 +10,7 @@ namespace VitalChoice.Validation.Helpers
     {
         public static ControllerSettings Create()
         {
-            throw new NotImplementedException();
-            //if (AuthenticationHelper.UserIDForAgency.HasValue) {
-            //    return new ControllerSettings(AuthenticationHelper.UserIDForAgency.Value);
-            //}
-            //throw new NotAgencyUserException();
+            return new ControllerSettings(Guid.Empty);
         }
 
         public ControllerSettings(Guid userId)

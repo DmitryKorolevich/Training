@@ -3,12 +3,15 @@
 	"dependencies": {
 		"FluentValidation.K": "5.6.0.0",
 		"Newtonsoft.Json": "6.0.8.0",
-		"Microsoft.AspNet.Mvc": "6.0.0-beta3-12564"
+        "Microsoft.AspNet.Mvc": "6.0.0-beta3-12564",        
+		"VitalChoice.Domain": "1.0.0-*",     
+		"VItalChoice.Business": "1.0.0-*",
 	},
 
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
+				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-beta3-10808"
 			}
 		},
 		"aspnetcore50": {

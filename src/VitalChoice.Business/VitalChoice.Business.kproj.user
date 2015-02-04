@@ -3,5 +3,6 @@
   <PropertyGroup>
     <TargetKREVersion>KRE-CLR-amd64.1.0.0-beta3-10921</TargetKREVersion>
     <DebugCLRTypeOverride>Profile</DebugCLRTypeOverride>
+    <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>
