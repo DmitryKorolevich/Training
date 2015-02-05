@@ -3,7 +3,7 @@
 
 module.exports = function (grunt) {
 	grunt.initConfig({
-		pkg:grunt.file.readJSON('package.json'),
+		pkg: grunt.file.readJSON('package.json'),
         bower: {
 		    install: {
 			    options: {
@@ -16,15 +16,16 @@ module.exports = function (grunt) {
         concat: {
         	options: {
         		// define a string to put between each file in the concatenated output
-        		separator: ';'
+        		separator: ' '
         	},
 			css: {
-				
+				src: ['temp/css/**/*.css'],
+				dest: 'temp/css/site.css'
 			},
 			js: {
 				src: ['App/**/*.js'],
 				// the location of the resulting JS file
-				dest: 'wwwroot/lib/<%= pkg.name %>.js'/*dist*/
+				dest: 'temp/js/app.js'/*dist*/
 			}
         },
         less: {
@@ -32,7 +33,7 @@ module.exports = function (grunt) {
         		options: {
         			paths: ["Assets/styles"]
         		},
-        		files: { "wwwroot/css/site.css": "assets/styles/*.less" }
+        		files: { "temp/css/site.css": "assets/styles/**/*.less" }
         	}
         },
         uglify: {
@@ -42,13 +43,13 @@ module.exports = function (grunt) {
         	},
         	dist: {
         		files: {
-        			'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+        			'temp/js/minified/app.min-<%= grunt.template.today("dd-mm-yyyy") %>.js': ['temp/js/**/*.js']
         		}
         	}
         },
         jshint: {
         	// define the files to lint
-        	files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+        	files: ['app/**/*.js'],
         	// configure JSHint (documented at http://www.jshint.com/docs/)
         	options: {
         		// more options here if you want to override JSHint defaults
@@ -59,20 +60,56 @@ module.exports = function (grunt) {
         		}
         	}
         },
+        clean:{ 
+        	wwwroot: ["wwwroot/app", "wwwroot/assets"],
+			temp: ["temp"]
+        },
+        copy: {
+        	development: {
+        		files: [
+				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
+
+				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/' }
+        		],
+        	},
+        	release: {
+        		files: [
+				  { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
+
+				  { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/' }
+        		],
+        	}
+        },
+        cssmin: {
+        	target: {
+        		files: [{ expand: true, cwd: 'temp/css/', src: ['site.css'], dest: 'temp/css/minified/', ext: '.min-<%= grunt.template.today("dd-mm-yyyy") %>.css' }],
+        		options: {
+        			shorthandCompacting: false,
+        			roundingPrecision: -1
+        		}
+        	}
+        },
         watch: {
-        	files: ['<%= jshint.files %>'],
-        	tasks: ['jshint']
+        	files: ['app/**/*.js', 'assets/**/*.less'],
+        	tasks: ['development', 'test'],
+        	options: {
+        		livereload: true,
+        	},
         }
     });
 
     // This command registers the default task which will install bower packages into wwwroot/lib
-	grunt.registerTask("default", ["bower:install"]);
+	grunt.registerTask("default", ["bower:install", "watch"]);
 
 	// this would be run by typing "grunt test" on the command line
 	grunt.registerTask('test', ['jshint']);
 
 	// the default task can be run just by typing "grunt" on the command line
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp']);
+
+	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'clean:temp']);
+
+	//grunt.registerTask('regularWatch', ['watch']);
 
     // The following line loads the grunt plugins.
     // This line needs to be at the end of this this file.
@@ -80,7 +117,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-less");
 	grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 };

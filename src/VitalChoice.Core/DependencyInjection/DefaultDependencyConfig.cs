@@ -10,6 +10,9 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using System;
+using Microsoft.AspNet.Mvc;
+using VitalChoice.Core.Infrastructure;
+
 #if ASPNET50
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -30,13 +33,22 @@ namespace VitalChoice.Core.DependencyInjection
 			//services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
+			services.AddOptions(configuration);
+
 			// Add MVC services to the services container.
 			services.AddMvc();
-            // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
-            // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
-            // services.AddWebApiConventions();
+
+			services.Configure<AppOptions>(options =>
+			{
+				options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
+				options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
+				options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+				options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
+			});
+
 #if ASPNET50
-            var builder = new ContainerBuilder();
+			var builder = new ContainerBuilder();
 
 			builder.Populate(services);
 
@@ -44,6 +56,9 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
 			builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<LocalizationService>().As<ILocalizationService>().SingleInstance();
+
+			builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
+			builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
 
             IContainer container = builder.Build();
 

@@ -1,0 +1,12 @@
+﻿{
+    "assetsDir": 'assets/js',
+    "minifiedFileName": "script",
+    
+    "files": [
+		 'lib/angular/angular.js' ,
+		 'lib/angular-bootstrap/ui-bootstrap-tpls.js',
+		 'lib/angular-route/angular-route.js',
+		'app/NewFolder/JavaScript1.js',
+		'app/JavaScript.js'
+    ]
+}
