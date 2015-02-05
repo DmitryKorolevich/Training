@@ -1,13 +1,11 @@
 ﻿<!DOCTYPE html>
-<html>
+<html data-ng-app="mainApp" data-ng-strict-di>
 <head>
-	<title>Hello World...</title>
+	<title>VitalChoice Admin panel</title>
 	@await Component.InvokeAsync("Assets", "styles")
 </head>
 <body>
-	<div class="col-md-8"> <!--ng-app="mainApp"-->
-
-	</div>
+	<div data-ng-include="app/shared/area/partials/area.html"></div>
 	@await Component.InvokeAsync("Assets", "scripts")
 </body>
 </html>

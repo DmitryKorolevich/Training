@@ -1,0 +1,9 @@
+﻿<div class="navbar" data-ng-controller="mainNavigationController">
+	<div class="navbar-nav">
+		<ul class="nav">
+			<li data-ng-repeat="menuItem in mainNavigationService.menues">
+				<a ui-sref="{{menuItem.stateName}}">{{menuItem.stateLabel}}</a>
+			</li>
+		</ul>
+	</div>
+</div>
