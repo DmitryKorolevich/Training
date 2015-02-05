@@ -24,7 +24,6 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
 
                 context.Result = new JsonResult(result);
             }
-            base.OnActionExecuted(context);
         }
 
         //HttpActionExecutedContext actionExecutedContext)

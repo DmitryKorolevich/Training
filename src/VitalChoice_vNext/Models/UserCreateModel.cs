@@ -16,7 +16,7 @@ namespace VitalChoice.Models
         [Localized(BaseButtonLabels.Cancel)]
         public int? AccountTypeId { get; set; }
 
-        public UserCreateModel() : base()
+        public UserCreateModel()
         {
 
         }

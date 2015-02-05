@@ -13,79 +13,68 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
+using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Cache.Memory;
+using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Business.Services.Impl
 {
-	public class LocalizationService : ILocalizationService
+	public static class LocalizationService
 	{
-        private Dictionary<int, Dictionary<int, List<LocalizationItemData>>> _localizationData = null;
-        private object _localizationDataCreateLock = new object();
+        public static Dictionary<int, Dictionary<int, List<LocalizationItemData>>> LocalizationData;
 
-        protected Dictionary<int, Dictionary<int, List<LocalizationItemData>>> LocalizationData
+        private static void CreateLocalizationData()
         {
-            get
+            LocalizationData = new Dictionary<int, Dictionary<int, List<LocalizationItemData>>>();
+            var localizationData = Repository.Query().Select().ToList();
+            foreach (var localizationDataItem in localizationData)
             {
-                if(_localizationData==null)
+                Dictionary<int, List<LocalizationItemData>> group = null;
+                if (LocalizationData.ContainsKey(localizationDataItem.GroupId))
                 {
-                    lock(_localizationDataCreateLock)
-                    {
-                        if (_localizationData == null)
-                        {
-                            var localizationData = Repository.Query().Select().ToList();
-                            _localizationData = new Dictionary<int, Dictionary<int, List<LocalizationItemData>>>();
-                            foreach (var localizationDataItem in localizationData)
-                            {
-                                Dictionary<int, List<LocalizationItemData>> group = null;
-                                if (_localizationData.ContainsKey(localizationDataItem.GroupId))
-                                {
-                                    group = _localizationData[localizationDataItem.GroupId];
-                                }
-                                else
-                                {
-                                    group = new Dictionary<int, List<LocalizationItemData>>();
-                                    _localizationData.Add(localizationDataItem.GroupId,group);
-                                }
-                                List<LocalizationItemData> items = null;
-                                if (group.ContainsKey(localizationDataItem.ItemId))
-                                {
-                                    items = group[localizationDataItem.ItemId];
-                                }
-                                else
-                                {
-                                    items = new List<LocalizationItemData>();
-                                    group.Add(localizationDataItem.ItemId, items);
-                                }
-                                items.Add(localizationDataItem);
-                            }
-                        }
-                    }
+                    group = LocalizationData[localizationDataItem.GroupId];
                 }
-
-                return _localizationData;
+                else
+                {
+                    group = new Dictionary<int, List<LocalizationItemData>>();
+                    LocalizationData.Add(localizationDataItem.GroupId, group);
+                }
+                List<LocalizationItemData> items = null;
+                if (group.ContainsKey(localizationDataItem.ItemId))
+                {
+                    items = group[localizationDataItem.ItemId];
+                }
+                else
+                {
+                    items = new List<LocalizationItemData>();
+                    group.Add(localizationDataItem.ItemId, items);
+                }
+                items.Add(localizationDataItem);
             }
         }
 
-        protected IRepositoryAsync<LocalizationItemData> Repository { get; private set; }
+        public static IRepositoryAsync<LocalizationItemData> Repository;
 
-        protected ISettingService SettingService { get; private set; }
+        public static ISettingService SettingService;
 
-        public LocalizationService(IRepositoryAsync<LocalizationItemData> repository, ISettingService settingService)
+        public static void Init(IRepositoryAsync<LocalizationItemData> repository, ISettingService settingService)
         {
             Repository = repository;
             SettingService = settingService;
+            CreateLocalizationData();
         }
 
-        public string GetString<TEnum>(TEnum enumValue) where TEnum : struct, IComparable
+        public static string GetString(object enumValue)
         {
             return GetDirectString(enumValue, GetCultureCode());
         }
 
-        public string GetString<TEnum>(TEnum enumValue, params object[] args) where TEnum : struct, IComparable
+        public static string GetString(object enumValue, params object[] args)
         {
             return GetDirectString(enumValue, GetCultureCode(), args);
         }
 
-        public string GetDirectString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable
+        public static string GetDirectString(object enumValue, string cultureId, params object[] args)
         {
             var enumType = enumValue.GetType().GetTypeInfo();
            
@@ -102,14 +91,13 @@ namespace VitalChoice.Business.Services.Impl
 
             return GetStringFromLocalizationDataItem(localizationGroupAttribute.GroupId, Convert.ToInt32(enumValue), cultureId, args);
         }
-        private string GetStringFromLocalizationDataItem(int groupId, int itemId, string cultureId, params object[] args)
+        private static string GetStringFromLocalizationDataItem(int groupId, int itemId, string cultureId, params object[] args)
         {
             string toReturn = null;
-            var data = LocalizationData;
-            if (data != null)
+            if (LocalizationService.LocalizationData != null)
             {
-                Dictionary<int, List<LocalizationItemData>> group = null;
-                if(data.TryGetValue(groupId, out group))
+                Dictionary <int, List<LocalizationItemData>> group = null;
+                if(LocalizationService.LocalizationData.TryGetValue(groupId, out group))
                 {
                     List<LocalizationItemData> items = null;
                     if (group.TryGetValue(itemId, out items))
@@ -127,7 +115,7 @@ namespace VitalChoice.Business.Services.Impl
                         if (item == null)
                         {
                             var defaultCulureId = SettingService.GetProjectConstant("DefaultCultureId");
-                            if(defaultCulureId!=null)
+                            if (defaultCulureId!=null)
                             {
                                 item = items.Where(p => p.CultureId == defaultCulureId).FirstOrDefault();
                             }
@@ -153,10 +141,11 @@ namespace VitalChoice.Business.Services.Impl
                     }
                 }                
             }
+            
             return toReturn;
         }
 
-        private string GetCultureCode()
+        private static string GetCultureCode()
         {
 #if ASPNET50
             return Thread.CurrentThread.CurrentCulture.Name ?? SettingService.GetProjectConstant("DefaultCultureId");

@@ -5,6 +5,8 @@ using Microsoft.AspNet.Mvc;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Business.Services.Impl;
+using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Validation.Controllers
 {
@@ -13,7 +15,6 @@ namespace VitalChoice.Validation.Controllers
         protected BaseController()
         {
             Settings = ControllerSettings.Create();
-            Parse(GetType(), Settings);
         }
 
         [NonAction]
@@ -21,10 +22,7 @@ namespace VitalChoice.Validation.Controllers
             where T: class, new()
             where TViewMode: class, IMode
         {
-            string actionName = ActionContext.ActionDescriptor.Name;
-            //string actionName = ControllerContext.Request.Properties["actionName"] as string;
-
-            model.Mode = Settings.GetValidationMode<TViewMode>(actionName);
+            model.Mode = (TViewMode)Settings.ValidationMode;
             model.Validate();
             if (!model.IsValid) {
                 foreach (var validationError in model.Errors) {
@@ -46,16 +44,16 @@ namespace VitalChoice.Validation.Controllers
         public ControllerSettings Settings { get; private set; }
 
         [NonAction]
-        protected void Parse(Type controllerType, ControllerSettings settings)
+        public virtual void Configure()
         {
-            var markedMethods = controllerType.GetTypeInfo().DeclaredMethods
-                .Where(m => m.GetCustomAttributes(typeof(ControlModeAttribute), false).Any());
-            foreach (var markedMethod in markedMethods) {
-                var controlMode =
-                    markedMethod.GetCustomAttributes(typeof(ControlModeAttribute), false).SingleOrDefault() as
+            var markedMethod = this.GetType().GetTypeInfo().DeclaredMethods.Where(m => m.Name == ActionContext.ActionDescriptor.Name).SingleOrDefault();
+            if (markedMethod != null)
+            {
+                var controlMode = markedMethod.GetCustomAttributes(typeof(ControlModeAttribute), false).SingleOrDefault() as
                     ControlModeAttribute;
-                if (controlMode != null) {
-                    settings.SetMode(controlMode.ViewModeType, controlMode.Mode, markedMethod.Name);
+                if (controlMode != null)
+                {
+                    Settings.SetMode(controlMode.ViewModeType, controlMode.Mode, markedMethod.Name);
                 }
             }
         }
