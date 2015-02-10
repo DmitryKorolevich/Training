@@ -4,6 +4,7 @@
     <TargetKREVersion>KRE-CLR-amd64.1.0.0-beta3-10921</TargetKREVersion>
     <ActiveDebugProfile>web</ActiveDebugProfile>
     <NameOfLastUsedPublishProfile>publish_for_test</NameOfLastUsedPublishProfile>
+    <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

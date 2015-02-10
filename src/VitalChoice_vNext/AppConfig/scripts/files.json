@@ -5,8 +5,24 @@
     "files": [
 		 'lib/angular/angular.js' ,
 		 'lib/angular-bootstrap/ui-bootstrap-tpls.js',
-		 'lib/angular-route/angular-route.js',
-		'app/NewFolder/JavaScript1.js',
-		'app/JavaScript.js'
+		 'lib/angular-ui-router/angular-ui-router.js',
+		'app/app.js',
+		'app/states.js',
+		'app/core/core.js',
+		'app/core/dataAccess/dataAccess.js',
+		'app/core/dataAccess/services/authenticationServices.js',
+		'app/core/utils/utils.js',
+		'app/modules/modules.js',
+		'app/modules/authentication/authentication.js',
+		'app/modules/authentication/controllers/loginController.js',
+		'app/shared/shared.js',
+		'app/shared/area/area.js',
+		'app/shared/area/controllers/workingPanelController.js',
+		'app/shared/layout/layout.js',
+		'app/shared/layout/controllers/indexController.js',
+		'app/shared/menu/menu.js',
+		'app/shared/menu/controllers/mainNavigationController.js',
+		'app/shared/menu/controllers/sidebarController.js',
+		'app/shared/menu/services/navigationFactory.js'
     ]
 }

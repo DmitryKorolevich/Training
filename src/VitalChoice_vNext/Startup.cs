@@ -4,6 +4,7 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.StaticFiles;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
@@ -58,6 +59,12 @@ namespace VitalChoice
 
 			// Add cookie-based authentication to the request pipeline.
 			app.UseIdentity();
+
+
+			//app.UseFileServer(new FileServerOptions() {
+   //                EnableDirectoryBrowsing = true,
+   //               // FileSystem = new PhysicalFileSystem(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app"))
+   //            });
 
 			// Add MVC to the request pipeline.
 			app.UseMvc(routes =>

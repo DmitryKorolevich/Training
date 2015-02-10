@@ -1,0 +1,10 @@
+﻿<div class="navbar">
+	<div class="navbar-nav">
+		<ul class="nav">
+			<li data-ng-repeat="menuItem in mainNavigationService.menues">
+				<a ui-sref="{{menuItem.stateName}}">{{menuItem.stateLabel}}</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<span>main menu</span>

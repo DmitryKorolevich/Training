@@ -30,11 +30,21 @@ module.exports = function (grunt) {
         },
         less: {
         	development: {
-        		options: {
-        			paths: ["Assets/styles"]
-        		},
-        		files: { "temp/css/site.css": "assets/styles/**/*.less" }
-        	}
+		        options: {
+			        paths: ["assets/styles"],
+		        },
+		        files:
+		        [
+			        {
+				        expand: true,
+				        cwd: 'assets/styles/',
+				        src: ['**/*.less', '!{boot,var,mix}*.less'],
+				        dest: 'temp/css/',
+				        ext: '.css'
+			        }
+		        ]
+		        //{ "temp/css/site.css": "assets/styles/bootswatch/variables.less", "assets/styles/bootswatch/bootswatch.less", "assets/styles/site.less" }
+	        }
         },
         uglify: {
         	options: {
@@ -70,15 +80,19 @@ module.exports = function (grunt) {
 				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 
 				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/' }
-        		],
+        		]
         	},
         	release: {
-        		files: [
-				  { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
-
-				  { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/' }
-        		],
-        	}
+		        files: [
+			        { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
+			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/' }
+		        ]
+	        },
+			bootswatch: {
+				files: [
+			        { expand: true, cwd: 'assets/styles/bootswatch/paper/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' }
+				]
+			}
         },
         cssmin: {
         	target: {
@@ -91,7 +105,7 @@ module.exports = function (grunt) {
         },
         watch: {
         	files: ['app/**/*.js', 'assets/**/*.less'],
-        	tasks: ['development', 'test'],
+        	tasks: ['development'/*, 'test'*/],
         	options: {
         		livereload: true,
         	},
@@ -105,11 +119,11 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', ['jshint']);
 
 	// the default task can be run just by typing "grunt" on the command line
-	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp']);
+	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'copy:bootswatch', 'clean:temp']);
 
-	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'clean:temp']);
+	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'copy:bootswatch', 'clean:temp']);
 
-	//grunt.registerTask('regularWatch', ['watch']);
+	grunt.registerTask('regularWatch', ['watch']);
 
     // The following line loads the grunt plugins.
     // This line needs to be at the end of this this file.
