@@ -21,9 +21,9 @@ angular.module('app.shared', [
 							templateUrl: 'app/shared/menu/partials/mainMenu.html',
 							controller: 'mainNavigationController'
 						},
-						'sidebar@index': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
+						'leftPanel@index': {
+							templateUrl: 'app/shared/area/partials/leftPanel.html',
+							controller: 'leftPanelController'
 						},
 						'workingPanel@index': {
 							templateUrl: 'app/shared/area/partials/workingPanel.html',

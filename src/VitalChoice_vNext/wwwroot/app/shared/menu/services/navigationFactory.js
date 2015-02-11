@@ -18,14 +18,14 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'child9', stateName: 'index.state2.childState9', stateLabel: 'Option 9' }
 			]
 		},
-		{ name: 'state3', stateName: 'index.state3', stateLabel: 'Module and Sidebar', sidebar: '' }, /*todo*/
+		{ name: 'state3', stateName: 'index.state3', stateLabel: 'Module and Sidebar'/*, sidebar: 'sidebar1'*/ },
 		{
 			name: 'state4', stateName: 'index.state4', stateLabel: 'Complex Module and Sidebar',
-			submenu: [
+			subMenu: [
 				{ name: 'child10', stateName: 'index.state4.childState10', stateLabel: 'Option 10' },
 				{ name: 'child11', stateName: 'index.state4.childState11', stateLabel: 'Option 11' }
-			],
-			sidebar: '' /*todo*/
+			]
+			/*sidebar: 'sidebar2'*/
 		},
 		{ name: 'state5', stateName: 'index.state5', stateLabel: 'Placeholder 1' },
 		{ name: 'state6', stateName: 'index.state6', stateLabel: 'Placeholder 2' }

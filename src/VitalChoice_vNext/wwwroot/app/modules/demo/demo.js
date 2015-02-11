@@ -52,8 +52,18 @@ angular.module('app.modules.demo', [])
 					templateUrl: 'app/modules/demo/partials/heading.html'
 				})
 				.state('index.state3', {
-					url: '/state3',
-					templateUrl: 'app/modules/demo/partials/indicators.html'
+					url: '/state3/state31',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/indicators.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+					
 				})
 				.state('index.state4', {
 					abstract: true,

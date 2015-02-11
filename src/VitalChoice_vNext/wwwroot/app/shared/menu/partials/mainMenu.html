@@ -12,17 +12,18 @@
 
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li data-ng-repeat="module in navigation.menu" ui-sref-active="active"> <!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu }"-->
+				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}"><!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu != null }"-->
 					<a data-ng-if="!module.subMenu" ui-sref="{{module.stateName}}">
 						{{module.stateLabel}}
 						<span data-ng-if="currentModule == module.name" class="sr-only">(current)</span>
 					</a>
-					<a data-ng-if="module.subMenu" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+					<a data-ng-if="module.subMenu != null" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 						{{module.stateLabel}}
 						<span class="caret"></span>
 					</a>
-					<ul data-ng-if="module.subMenu" class="dropdown-menu" role="menu">
-						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active"> <!--data-ng-class="{ active: currentSubModule == subModule.name }"-->
+					<ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
+						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active">
+							<!--data-ng-class="{ active: currentSubModule == subModule.name }"-->
 							<a ui-sref="{{subModule.stateName}}">{{subModule.stateLabel}}</a>
 						</li>
 					</ul>

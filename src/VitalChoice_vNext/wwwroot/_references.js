@@ -43,3 +43,8 @@
 /// <reference path="lib/angular-ui-router/angular-ui-router.js" />
 /// <reference path="lib/angular-bootstrap/ui-bootstrap-tpls.js" />
 /// <reference path="lib/angular/angular.js" />
+/// <reference path="lib/jquery/jquery.js" />
+/// <reference path="../app/shared/menu/services/navigationfactorypy.js" />
+/// <reference path="app/shared/menu/services/sidebarfactory.js" />
+/// <reference path="../app/shared/area/controllers/workingpanelcontroller - copy.js" />
+/// <reference path="app/shared/area/controllers/leftpanelcontroller.js" />
