@@ -1,6 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.shared.layout.controllers.indexController', [])
-.controller('indexController', ['$scope', function ($scope) {
-	//base initialization goes here
+.controller('indexController', ['$scope', 'navigationFactory', function ($scope, navigationFactory) {
+	function init() {
+		$scope.navigation = navigationFactory;
+	}
+
+	init();
 }]);

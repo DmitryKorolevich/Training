@@ -3,5 +3,4 @@
 angular.module('app.shared.area.controllers.workingPanelController', [])
 .controller('workingPanelController', ['$scope', function ($scope) {
 
-	alert("working area");
 }]);
