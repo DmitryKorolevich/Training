@@ -3,11 +3,11 @@
 	"dependencies": {
 		"Newtonsoft.Json": "6.0.8.0",
         "Microsoft.AspNet.Mvc": "6.0.0-beta3-12564",
-        "FluentValidation.K": "5.6.0.2",
+        "FluentValidation.K": "5.6.0.3",
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
-		"VitalChoice.Business": "1.0.0-*",
+		"VitalChoice.Business": "1.0.0-*"
 	},
 
 	"frameworks": {
