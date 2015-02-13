@@ -78,14 +78,15 @@ module.exports = function (grunt) {
         	development: {
         		files: [
 				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
-
-				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/' }
+				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
+				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
         		]
         	},
         	release: {
 		        files: [
 			        { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
-			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/' }
+			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/styles/' },
+					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
 		        ]
 	        },
 			bootswatch: {
