@@ -6,7 +6,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
-using VitalChoice.Validation.Controllers;
+/*using VitalChoice.Validation.Controllers;*/
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
@@ -21,6 +21,7 @@ using VitalChoice.Core.Infrastructure;
 #if ASPNET50
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
+using VitalChoice.Domain;
 #endif
 
 namespace VitalChoice.Core.DependencyInjection
@@ -39,14 +40,14 @@ namespace VitalChoice.Core.DependencyInjection
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
-            var describe = new ServiceDescriber(configuration);
-            services.TryAdd(describe.Transient<INestedProvider<ActionInvokerProviderContext>, BaseControllerActionInvokerProvider>());
+            /*var describe = new ServiceDescriber(configuration);
+            services.TryAdd(describe.Transient<INestedProvider<ActionInvokerProviderContext>, BaseControllerActionInvokerProvider>());*/
 
             // Add MVC services to the services container.
-            services.AddMvc().Configure<MvcOptions>(options =>
-			{
+			services.AddMvc();//.Configure<MvcOptions>(options =>
+			//{
                
-			});
+		//	});
 			
             services.AddOptions(configuration);
 
@@ -68,7 +69,7 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
 			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
 			builder.RegisterType<CommentService>().As<ICommentService>();
-            builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
+           // builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
 
 			builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
@@ -76,7 +77,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             IContainer container = builder.Build();
 
-            LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());
+           // LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());
 
             return container.Resolve<IServiceProvider>();
 #else

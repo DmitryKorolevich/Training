@@ -5,7 +5,7 @@
     <ActiveDebugProfile>web</ActiveDebugProfile>
     <NameOfLastUsedPublishProfile>publish_for_test</NameOfLastUsedPublishProfile>
     <DebugCLRTypeOverride>NET</DebugCLRTypeOverride>
-     <ShowAllFiles>false</ShowAllFiles>
+    <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

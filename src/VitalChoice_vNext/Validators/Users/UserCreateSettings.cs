@@ -1,4 +1,4 @@
-﻿using VitalChoice.Validation.Models;
+﻿/*using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Validators.Users
 {
@@ -8,4 +8,4 @@ namespace VitalChoice.Validators.Users
         public bool ShowAdditionalInfo { get; set; }
         public bool ShowAccountType { get; set; }
     }
-}
+}*/

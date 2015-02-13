@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using VitalChoice.Models;
 using VitalChoice.Validation.Logic;
 using FluentValidation;
@@ -27,4 +27,4 @@ namespace VitalChoice.Validators.Users
             }
         }
     }
-}
+}*/

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿/*using FluentValidation;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Models;
 using VitalChoice.Validation.Logic;
@@ -12,4 +12,4 @@ namespace VitalChoice.Validators.Users
             RuleFor(model => model.Name).NotEmpty().WithMessage(model => model.Name, ValidationMessages.FieldRequired);
         }
     }
-}
+}*/

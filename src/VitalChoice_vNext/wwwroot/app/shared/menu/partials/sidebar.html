@@ -1,4 +1,4 @@
-﻿<div class="left-pane">
+﻿<div>
 	<ul class="nav nav-pills nav-stacked">
 		<li data-ng-repeat="module in sidebar.menu" data-ng-class="{dropdown: module.subMenu != null}">
 			<!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu != null }"-->
@@ -6,7 +6,7 @@
 				{{module.stateLabel}}
 				<span data-ng-if="currentModule == module.name" class="sr-only">(current)</span>
 			</a>
-			<a data-ng-if="module.subMenu != null" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+			<a data-ng-if="module.subMenu != null" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 				{{module.stateLabel}}
 				<span class="caret"></span>
 			</a>

@@ -1,5 +1,8 @@
 .left-pane {
-  min-width: 300px;
-  width: 10%;
-  max-width: 500px;
+  position: absolute;
+  width: 250px;
+}
+.right-pane {
+  margin: 0 0 0 250px;
+  padding: 0 30px;
 }

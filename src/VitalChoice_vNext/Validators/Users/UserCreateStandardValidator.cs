@@ -1,4 +1,4 @@
-using FluentValidation;
+/*using FluentValidation;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Models;
@@ -27,4 +27,4 @@ namespace VitalChoice.Validators.Users
                              .WithMessage(model => model.AccountTypeId, ValidationMessages.FieldRequired));
         }
     }
-}
+}*/
