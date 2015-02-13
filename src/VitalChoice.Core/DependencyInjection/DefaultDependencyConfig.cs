@@ -6,11 +6,16 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
+using VitalChoice.Validation.Controllers;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using System;
 using Microsoft.AspNet.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Core.Infrastructure;
 
 #if ASPNET50
@@ -33,10 +38,18 @@ namespace VitalChoice.Core.DependencyInjection
 			//services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
-			services.AddOptions(configuration);
+            //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
+            var describe = new ServiceDescriber(configuration);
+            services.TryAdd(describe.Transient<INestedProvider<ActionInvokerProviderContext>, BaseControllerActionInvokerProvider>());
 
-			// Add MVC services to the services container.
-			services.AddMvc();
+            // Add MVC services to the services container.
+            services.AddMvc().Configure<MvcOptions>(options =>
+			{
+               
+			});
+			
+            services.AddOptions(configuration);
+
 
 			services.Configure<AppOptions>(options =>
 			{
@@ -55,17 +68,23 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
 			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
 			builder.RegisterType<CommentService>().As<ICommentService>();
-            builder.RegisterType<LocalizationService>().As<ILocalizationService>().SingleInstance();
+            builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
+            builder.RegisterInstance(configuration).As<IConfiguration>();
 
 			builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
 			builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
 
             IContainer container = builder.Build();
 
-			return container.Resolve<IServiceProvider>();
+            LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());
+
+            return container.Resolve<IServiceProvider>();
 #else
+
 		    return null;
 #endif
-		}
-	}
+
+
+        }
+    }
 }

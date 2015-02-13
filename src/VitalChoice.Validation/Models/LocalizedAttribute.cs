@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Validation.Models
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class LocalizedAttribute : Attribute
     {
-        public string PropertyKey { get; private set; }
+        public object EnumValue { get; private set; }
 
-        public LocalizedAttribute(string propertyKey)
+        public LocalizedAttribute(object enumValue)
         {
-            PropertyKey = propertyKey;
+            EnumValue = enumValue;
         }
 
-        public static string GetFieldLabel(PropertyInfo propertyInfo)
+        public static object GetFieldLabel(PropertyInfo propertyInfo) 
         {
             var attribute = propertyInfo.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as
                 LocalizedAttribute;
@@ -23,7 +24,7 @@ namespace VitalChoice.Validation.Models
                 throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", propertyInfo.Name),
                     propertyInfo.Name);
             }
-            return attribute.PropertyKey;
+            return attribute.EnumValue;
         }
     }
 }

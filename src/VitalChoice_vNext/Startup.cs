@@ -10,6 +10,7 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
+using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 
 namespace VitalChoice
@@ -60,14 +61,7 @@ namespace VitalChoice
 			// Add cookie-based authentication to the request pipeline.
 			app.UseIdentity();
 
-
-			//app.UseFileServer(new FileServerOptions() {
-   //                EnableDirectoryBrowsing = true,
-   //               // FileSystem = new PhysicalFileSystem(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app"))
-   //            });
-
-			// Add MVC to the request pipeline.
-			app.UseMvc(routes =>
+            app.UseMvc(routes =>
 			{
 				routes.MapRoute(
 					name: "default",

@@ -1,4 +1,4 @@
-﻿using VitalChoice.Validation.Validation.Interfaces;
+﻿using VitalChoice.Validation.Logic.Interfaces;
 
 namespace VitalChoice.Validation.Models.Interfaces
 {

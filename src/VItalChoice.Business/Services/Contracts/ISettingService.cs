@@ -6,9 +6,8 @@ using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Business.Services.Contracts
 {
-	public interface ILocalizationService
+	public interface ISettingService
 	{
-	    string GetString<TEnum>(TEnum enumValue, string cultureId, params object[] args)
-	        where TEnum : struct, IComparable, IFormattable;
+	    string GetProjectConstant(string key);
 	}
 }

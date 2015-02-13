@@ -11,7 +11,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Framework.DependencyInjection;
 using VitalChoice.Validation.Controllers;
 
-namespace QRProject.Api.Controllers.Base
+namespace VitalChoice.Validation.Controllers
 {
     public class BaseControllerActionInvoker : ControllerActionInvoker
     {
@@ -34,7 +34,7 @@ namespace QRProject.Api.Controllers.Base
             var baseController = actionExecutingContext.Controller as BaseController;
             if (baseController != null)
             {
-                baseController.Configure(actionExecutingContext.ActionDescriptor.Name);
+                baseController.Configure();
             }
             return base.InvokeActionAsync(actionExecutingContext);
         }

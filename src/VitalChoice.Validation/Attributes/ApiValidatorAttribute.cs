@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using VitalChoice.Validation.Validation;
+using VitalChoice.Validation.Logic;
 
 namespace VitalChoice.Validation.Attributes
 {

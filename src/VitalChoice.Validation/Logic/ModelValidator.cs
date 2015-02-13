@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using FluentValidation.Results;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validation.Validation.Interfaces;
+using VitalChoice.Validation.Logic.Interfaces;
 
-namespace VitalChoice.Validation.Validation
+namespace VitalChoice.Validation.Logic
 {
     public abstract class ModelValidator<T> : IModelValidator
         where T: IModel

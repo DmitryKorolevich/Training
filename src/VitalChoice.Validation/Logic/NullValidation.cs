@@ -1,6 +1,6 @@
 ﻿using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Validation.Validation
+namespace VitalChoice.Validation.Logic
 {
     public class NullValidation : ModelValidator<IModel>
     {

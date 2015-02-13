@@ -5,24 +5,38 @@ using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
 using VitalChoice.Validation.Models;
+using VitalChoice.Business.Services.Impl;
+using VitalChoice.Domain.Entities.Localization.Groups;
 
-namespace VitalChoice.Validation.Validation
+namespace VitalChoice.Validation.Logic
 {
-    public static class LocalizedMessages
+    public static class LocalizedMessages2
     {
-        private const string ValidationGlobalFieldsNamespace = "Common.Validation.Fields.";
-        private const string ValidationGlobalMessagesNamespace = "Common.Validation.Messages.";
 
-        public static string GetMessage(string key, IEnumerable<object> args)
+        public static string Do()
         {
-            throw new NotImplementedException();
-            //return CommonManager.LocalizationData.GetString(ValidationGlobalMessagesNamespace + key, args);
+            var data = LocalizationService.GetString(ValidationMessages.FieldLength);
+            return data;
+        }
+    }
+
+        public static class LocalizedMessages
+    {
+
+        public static string GetMessage<TEnum>(TEnum key, IEnumerable<object> args) where TEnum : IComparable
+        {
+            return LocalizationService.GetString(key, args.ToArray());
         }
 
-        private static string GetFieldName(string key)
+        private static string GetFieldName<TEnum>(TEnum key) where TEnum : IComparable
         {
-            throw new NotImplementedException();
-            //return CommonManager.LocalizationData.GetString(ValidationGlobalFieldsNamespace + key);
+            return LocalizationService.GetString(key);
+        }
+
+        public static string Do()
+        {
+            var data = LocalizationService.GetString(ValidationMessages.FieldLength);
+            return data;
         }
 
         /// <summary>
@@ -34,9 +48,9 @@ namespace VitalChoice.Validation.Validation
         /// <param name="expression">Select Property Expression</param>
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TEnum, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            Expression<Func<TModel, TResult>> expression, string messageKey)
+            Expression<Func<TModel, TResult>> expression, TEnum messageKey) where TEnum : IComparable
         {
             if (expression.Body.NodeType != ExpressionType.MemberAccess)
             {
@@ -54,7 +68,8 @@ namespace VitalChoice.Validation.Validation
             {
                 throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", memberExpression.Member.Name), memberExpression.Member.Name);
             }
-            return optionsChain.WithMessage(GetMessage(messageKey, new object[] { GetFieldName(attribute.PropertyKey)}));
+
+            return optionsChain.WithMessage(GetMessage(messageKey, new object[] { GetFieldName((IComparable)attribute.EnumValue)}));
         }
 
         /// <summary>
@@ -67,9 +82,9 @@ namespace VitalChoice.Validation.Validation
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TEnum, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            Expression<Func<TModel, TResult>> expression, string messageKey, params object[] args)
+            Expression<Func<TModel, TResult>> expression, TEnum messageKey, params object[] args) where TEnum : IComparable
         {
             if (expression.Body.NodeType != ExpressionType.MemberAccess)
             {
@@ -87,7 +102,7 @@ namespace VitalChoice.Validation.Validation
             {
                 throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", memberExpression.Member.Name), memberExpression.Member.Name);
             }
-            List<object> parameters = new List<object> { GetFieldName(attribute.PropertyKey) };
+            List<object> parameters = new List<object> { GetFieldName((IComparable)attribute.EnumValue) };
             if (args != null)
             {
                 parameters.AddRange(args);
@@ -105,12 +120,13 @@ namespace VitalChoice.Validation.Validation
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TEnum, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            string messageKey, string fieldKey, params object[] args)
+            TEnum messageKey, TEnum fieldKey, params object[] args) where TEnum : IComparable
         {
             List<object> parameters = new List<object> { GetFieldName(fieldKey) };
-            if (args != null) {
+            if (args != null)
+            {
                 parameters.AddRange(args);
             }
             return optionsChain.WithMessage(GetMessage(messageKey, parameters));
@@ -126,9 +142,9 @@ namespace VitalChoice.Validation.Validation
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithCustomFieldLabel<TModel, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithCustomFieldLabel<TModel, TEnum, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            string messageKey, string fieldKey, params object[] args)
+            TEnum messageKey, TEnum fieldKey, params object[] args) where TEnum : IComparable
         {
             List<object> parameters = new List<object> { fieldKey };
             if (args != null)
@@ -147,11 +163,12 @@ namespace VitalChoice.Validation.Validation
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithParams<TModel, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithParams<TModel, TEnum, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            string messageKey,params object[] args)
+            TEnum messageKey, params object[] args) where TEnum : IComparable
         {
-            if (args == null) {
+            if (args == null)
+            {
                 return optionsChain.WithMessage(GetMessage(messageKey, new object[0]));
             }
             return optionsChain.WithMessage(GetMessage(messageKey, args));

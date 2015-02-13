@@ -5,8 +5,8 @@ using System.Reflection;
 using Newtonsoft.Json;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validation.Validation;
-using VitalChoice.Validation.Validation.Interfaces;
+using VitalChoice.Validation.Logic;
+using VitalChoice.Validation.Logic.Interfaces;
 
 namespace VitalChoice.Validation.Models
 {

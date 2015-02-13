@@ -46,6 +46,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FE1D5CD3-418
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Validation", "src\VitalChoice.Validation\VitalChoice.Validation.kproj", "{7532A002-E434-445C-824F-B16EDB346A40}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B879DD49-6DC2-4527-8FA2-A43136C56929}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+	ProjectSection(FolderGlobals) = preProject
+		global_1json__JSONSchema = http://json.schemastore.org/global
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +120,7 @@ Global
 		{913F0CD0-43B1-4AB9-9B3D-E6B428CA1882}.Release|x64.Build.0 = Release|Any CPU
 		{7532A002-E434-445C-824F-B16EDB346A40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7532A002-E434-445C-824F-B16EDB346A40}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7532A002-E434-445C-824F-B16EDB346A40}.Debug|x64.Build.0 = Debug|Any CPU
 		{7532A002-E434-445C-824F-B16EDB346A40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7532A002-E434-445C-824F-B16EDB346A40}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection

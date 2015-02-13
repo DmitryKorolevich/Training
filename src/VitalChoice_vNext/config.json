@@ -1,14 +1,17 @@
-﻿{
-	"Data": {
-		"DefaultConnection": {
-			"ConnectionString": "Server=localhost;Database=VitalChoice;Integrated security=True;"
-		}
-	},
-	"EntityFramework": {
-		"VitalChoiceContext": {
-			"ConnectionStringKey": "Data:DefaultConnection:ConnectionString"
-		}
-	},
+{
+    "Data": {
+        "DefaultConnection": {
+            "ConnectionString": "Server=localhost;Database=VitalChoice;Integrated security=True;"
+        }
+    },
+    "EntityFramework": {
+        "VitalChoiceContext": {
+            "ConnectionStringKey": "Data:DefaultConnection:ConnectionString"
+        }
+    },
+    "Constants": {
+        "DefaultCultureId": "en-US"
+    },
 	"App": {
 		"ServeCdnContent": false,
 		"CdnServerBaseUrl": "not yet ready",

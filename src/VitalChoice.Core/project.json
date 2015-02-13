@@ -8,6 +8,7 @@
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Business": "1.0.0-*",
+		"VitalChoice.Validation": "1.0.0-*",
 		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3-10788"
 	},
 

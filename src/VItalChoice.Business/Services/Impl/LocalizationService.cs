@@ -12,20 +12,70 @@ using VitalChoice.Data.DataContext;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Infrastructure.UnitOfWork;
+using System.Threading;
+using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Cache.Memory;
+using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Business.Services.Impl
 {
-	public class LocalizationService : ILocalizationService
-    {
-        protected IRepositoryAsync<LocalizationItemData> Repository { get; private set; }
+	public static class LocalizationService
+	{
+        public static Dictionary<int, Dictionary<int, List<LocalizationItemData>>> LocalizationData;
 
-        public LocalizationService(IRepositoryAsync<LocalizationItemData> repository)
+        private static void CreateLocalizationData()
         {
-            Repository = repository;
+            LocalizationData = new Dictionary<int, Dictionary<int, List<LocalizationItemData>>>();
+            var localizationData = Repository.Query().Select().ToList();
+            foreach (var localizationDataItem in localizationData)
+            {
+                Dictionary<int, List<LocalizationItemData>> group = null;
+                if (LocalizationData.ContainsKey(localizationDataItem.GroupId))
+                {
+                    group = LocalizationData[localizationDataItem.GroupId];
+                }
+                else
+                {
+                    group = new Dictionary<int, List<LocalizationItemData>>();
+                    LocalizationData.Add(localizationDataItem.GroupId, group);
+                }
+                List<LocalizationItemData> items = null;
+                if (group.ContainsKey(localizationDataItem.ItemId))
+                {
+                    items = group[localizationDataItem.ItemId];
+                }
+                else
+                {
+                    items = new List<LocalizationItemData>();
+                    group.Add(localizationDataItem.ItemId, items);
+                }
+                items.Add(localizationDataItem);
+            }
         }
 
-        public string GetString<TEnum>(TEnum enumValue, string cultureId, params object[] args) where TEnum : struct, IComparable, IFormattable
-	    {
+        public static IRepositoryAsync<LocalizationItemData> Repository;
+
+        public static ISettingService SettingService;
+
+        public static void Init(IRepositoryAsync<LocalizationItemData> repository, ISettingService settingService)
+        {
+            Repository = repository;
+            SettingService = settingService;
+            CreateLocalizationData();
+        }
+
+        public static string GetString(object enumValue)
+        {
+            return GetDirectString(enumValue, GetCultureCode());
+        }
+
+        public static string GetString(object enumValue, params object[] args)
+        {
+            return GetDirectString(enumValue, GetCultureCode(), args);
+        }
+
+        public static string GetDirectString(object enumValue, string cultureId, params object[] args)
+        {
             var enumType = enumValue.GetType().GetTypeInfo();
            
             if (!enumType.IsEnum)
@@ -39,8 +89,69 @@ namespace VitalChoice.Business.Services.Impl
                 throw new ArgumentException(string.Format("LocalizationGroupAttribute isn't set on the given enum property {0}.", enumType.FullName));
             }
 
-            //TO DO
-            throw new NotImplementedException();
-	    }
+            return GetStringFromLocalizationDataItem(localizationGroupAttribute.GroupId, Convert.ToInt32(enumValue), cultureId, args);
+        }
+        private static string GetStringFromLocalizationDataItem(int groupId, int itemId, string cultureId, params object[] args)
+        {
+            string toReturn = null;
+            if (LocalizationService.LocalizationData != null)
+            {
+                Dictionary <int, List<LocalizationItemData>> group = null;
+                if(LocalizationService.LocalizationData.TryGetValue(groupId, out group))
+                {
+                    List<LocalizationItemData> items = null;
+                    if (group.TryGetValue(itemId, out items))
+                    {
+                        var item = items.Where(p => p.CultureId == cultureId).FirstOrDefault();
+                        //Check language part
+                        if (item == null)
+                        {
+                            if (cultureId!=null && cultureId.Length > 2)
+                            {
+                                item = items.Where(p => p.CultureId == cultureId.Substring(0,2)).FirstOrDefault();
+                            }
+                        }
+                        //Check default label
+                        if (item == null)
+                        {
+                            var defaultCulureId = SettingService.GetProjectConstant("DefaultCultureId");
+                            if (defaultCulureId!=null)
+                            {
+                                item = items.Where(p => p.CultureId == defaultCulureId).FirstOrDefault();
+                            }
+                            if (item == null)
+                            {
+                                if (defaultCulureId != null && defaultCulureId.Length > 2)
+                                {
+                                    item = items.Where(p => p.CultureId == defaultCulureId.Substring(0, 2)).FirstOrDefault();
+                                }
+                            }
+                        }
+                        if(item!=null)
+                        {
+                            if (args != null && args.Length > 0)
+                            {
+                                toReturn = String.Format(item.Value, args);
+                            }
+                            else
+                            {
+                                toReturn = item.Value;
+                            }
+                        }
+                    }
+                }                
+            }
+            
+            return toReturn;
+        }
+
+        private static string GetCultureCode()
+        {
+#if ASPNET50
+            return Thread.CurrentThread.CurrentCulture.Name ?? SettingService.GetProjectConstant("DefaultCultureId");
+#else
+            return SettingService.GetProjectConstant("DefaultCultureId");
+#endif
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Validation.Validation.Interfaces
+﻿namespace VitalChoice.Validation.Logic.Interfaces
 {
     public interface IPasswordModel
     {

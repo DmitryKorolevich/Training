@@ -10,11 +10,7 @@ namespace VitalChoice.Validation.Helpers
     {
         public static ControllerSettings Create()
         {
-            throw new NotImplementedException();
-            //if (AuthenticationHelper.UserIDForAgency.HasValue) {
-            //    return new ControllerSettings(AuthenticationHelper.UserIDForAgency.Value);
-            //}
-            //throw new NotAgencyUserException();
+            return new ControllerSettings(Guid.Empty);
         }
 
         public ControllerSettings(Guid userId)
@@ -48,11 +44,6 @@ namespace VitalChoice.Validation.Helpers
         //    }
         //}
 
-        public Dictionary<string, IMode> ViewModes
-        {
-            get { return _viewModes; }
-        }
-
         //private SettingTP GetSettings(Guid userId)
         //{
         //    var user = UserManager.GetUserById(userId);
@@ -62,32 +53,16 @@ namespace VitalChoice.Validation.Helpers
         //    return null;
         //}
 
-        public T GetValidationMode<T>(string actionName) 
-            where T: IMode
-        {
-            if (ViewModes.ContainsKey(actionName))
-            {
-                return (T) ViewModes[actionName];
-            }
-            else
-            {
-                return default(T);
-            }
-        }
+        public IMode ValidationMode { get; private set; }
 
         public void SetMode(Type viewModeType, object mode, string action)
         {
             if (!typeof(IMode).IsAssignableFrom(viewModeType))
                 throw new ArgumentException("viewModeType should implement IMode");
-            IMode existingMode;
-            if (ViewModes.TryGetValue(action, out existingMode)) {
-                existingMode.Mode = mode;
-            }
-            else {
-                var viewMode = (IMode)Activator.CreateInstance(viewModeType);
-                viewMode.Mode = mode;
-                ViewModes.Add(action, viewMode);
-            }
+
+            var viewMode = (IMode)Activator.CreateInstance(viewModeType);
+            viewMode.Mode = mode;
+            ValidationMode = viewMode;
         }
 
         internal void Clear()
