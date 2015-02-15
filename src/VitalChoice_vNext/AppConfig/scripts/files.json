@@ -28,6 +28,7 @@
 		'app/shared/menu/controllers/mainNavigationController.js',
 		'app/shared/menu/controllers/sidebarController.js',
 		'app/shared/menu/services/navigationFactory.js',
-		'app/shared/menu/services/sidebarFactory.js'
+		'app/shared/menu/services/sidebarFactory.js',
+		'app/modules/demo/controllers/productListController.js',
 	]
 }

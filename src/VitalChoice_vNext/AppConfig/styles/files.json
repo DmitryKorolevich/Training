@@ -1,10 +1,9 @@
 ﻿{
-    "assetsDir": 'assets/css',
-    "minifiedFileName": "style",
-    
-    "files": [
-        'lib/bootstrap/css/bootstrap.min.css',
-        'lib/bootstrap/css/bootstrap-theme.min.css',
+	"assetsDir": 'assets/css',
+	"minifiedFileName": "style",
+
+	"files": [
+		'lib/bootstrap/css/bootstrap.css',
 		'assets/styles/site.css'
-    ]
+	]
 }

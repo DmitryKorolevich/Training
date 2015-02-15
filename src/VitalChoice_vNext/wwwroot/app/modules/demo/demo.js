@@ -1,11 +1,78 @@
 ﻿'use strict';
 
-angular.module('app.modules.demo', [])
+angular.module('app.modules.demo', ['app.modules.demo.controllers.productListController'])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function ($stateProvider, $urlRouterProvider) {
 
 			$stateProvider
+				.state('index.oneCol.demo1', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				})
+				.state('index.oneCol.demo2', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				})
+				.state('index.oneCol.demo3', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				})
+				.state('index.oneCol.demo4', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo5', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo6', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo7', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				})
+				.state('index.oneCol.demo8', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo9', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo10', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo11', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo12', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo13', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo14', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				}).state('index.oneCol.demo15', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPage.html',
+				})
+				.state('index.twoCols.demo', {
+					url: '/demo',
+					templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html',
+				})
+				.state('index.oneCol.locate', {
+					url: '/products/locate',
+					templateUrl: 'app/modules/demo/partials/searchProducts.html',
+				})
+				.state('index.oneCol.list', {
+					url: '/products/list',
+					templateUrl: 'app/modules/demo/partials/products.html',
+					controller: 'productListController'
+				})
+				.state('index.oneCol.detail', {
+					url: '/products/detail/1',
+					templateUrl: 'app/modules/demo/partials/productDetail.html',
+				})
 				.state('index.oneCol.state1', {
 					url: '/state1',
 					templateUrl: 'app/modules/demo/partials/buttons.html'

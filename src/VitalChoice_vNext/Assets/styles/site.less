@@ -1,4 +1,14 @@
-﻿.left-pane{
+﻿@body-color:  #E3EEF2;
+
+.nav > li.dropdown:hover{
+	cursor:pointer;
+}
+
+.table{
+	max-width:2000px;
+}
+
+.left-pane{
 	position:absolute;
 	/*width:250px;*/
 }
@@ -9,11 +19,11 @@
 }
 
 .logo{
-	background-image: url(/assets/images/logo.jpg);
-	background-repeat: no-repeat;
-	width: 215px;
-	height: 66px;
-	display: block;
+	max-height:60px;
+}
+
+.btn-default{
+	border-bottom: 1px solid #717171;
 }
 
 .margin-zero{
@@ -26,6 +36,7 @@
 
 .custom-navbar-top{
 	border-radius: 3px  3px 0px 0px;
+	background:@body-color;
 }
 
   .sidebar .navbar-collapse {

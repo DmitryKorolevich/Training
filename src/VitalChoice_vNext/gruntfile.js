@@ -38,12 +38,18 @@ module.exports = function (grunt) {
 			        {
 				        expand: true,
 				        cwd: 'assets/styles/',
-				        src: ['**/*.less', '!{boot,var,mix}*.less'],
+				        src: ['*.less', '!{boot,var,mix}*.less'],//src: ['**/*.less'
 				        dest: 'temp/css/',
 				        ext: '.css'
-			        }
+			        },
+					{
+						expand: true,
+						cwd: 'assets/styles/bootstrap/',
+						src: ['bootstrap.less'],
+						dest: 'temp/boostrap/',
+						ext: '.css'
+					}
 		        ]
-		        //{ "temp/css/site.css": "assets/styles/bootswatch/variables.less", "assets/styles/bootswatch/bootswatch.less", "assets/styles/site.less" }
 	        }
         },
         uglify: {
@@ -79,6 +85,7 @@ module.exports = function (grunt) {
         		files: [
 				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
+				  { expand: true, cwd: 'temp/boostrap/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
         		]
         	},
@@ -86,18 +93,17 @@ module.exports = function (grunt) {
 		        files: [
 			        { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/styles/' },
+					{ expand: true, cwd: 'temp/boostrap/minified/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
 		        ]
-	        },
-			bootswatch: {
-				files: [
-			        { expand: true, cwd: 'assets/styles/bootswatch/paper/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' }
-				]
-			}
+	        }
         },
         cssmin: {
         	target: {
-        		files: [{ expand: true, cwd: 'temp/css/', src: ['site.css'], dest: 'temp/css/minified/', ext: '.min-<%= grunt.template.today("dd-mm-yyyy") %>.css' }],
+        		files: [
+					{ expand: true, cwd: 'temp/css/', src: ['site.css'], dest: 'temp/css/minified/', ext: '.min-<%= grunt.template.today("dd-mm-yyyy") %>.css' },
+					{ expand: true, cwd: 'temp/boostrap/', src: ['boostrap.css'], dest: 'temp/boostrap/minified/', ext: '.min.css' },
+        		],
         		options: {
         			shorthandCompacting: false,
         			roundingPrecision: -1
@@ -105,7 +111,7 @@ module.exports = function (grunt) {
         	}
         },
         watch: {
-        	files: ['app/**/*.js', 'assets/**/*.less'],
+        	files: ['app/**/*.js', 'app/**/*.html', 'assets/**/*.less'],
         	tasks: ['development'/*, 'test'*/],
         	options: {
         		livereload: true,
@@ -120,9 +126,9 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', ['jshint']);
 
 	// the default task can be run just by typing "grunt" on the command line
-	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'copy:bootswatch', 'clean:temp']);
+	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp']);
 
-	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'copy:bootswatch', 'clean:temp']);
+	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'clean:temp']);
 
 	grunt.registerTask('regularWatch', ['watch']);
 

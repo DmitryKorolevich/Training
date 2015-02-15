@@ -1,3 +1,9 @@
+.nav > li.dropdown:hover {
+  cursor: pointer;
+}
+.table {
+  max-width: 2000px;
+}
 .left-pane {
   position: absolute;
   /*width:250px;*/
@@ -7,11 +13,10 @@
   padding: 0 30px;
 }
 .logo {
-  background-image: url(/assets/images/logo.jpg);
-  background-repeat: no-repeat;
-  width: 215px;
-  height: 66px;
-  display: block;
+  max-height: 60px;
+}
+.btn-default {
+  border-bottom: 1px solid #717171;
 }
 .margin-zero {
   margin: 0;
@@ -21,6 +26,7 @@
 }
 .custom-navbar-top {
   border-radius: 3px  3px 0px 0px;
+  background: #e3eef2;
 }
 .sidebar .navbar-collapse {
   height: auto;
