@@ -1,4 +1,4 @@
-﻿{
+{
     "Data": {
         "DefaultConnection": {
             "ConnectionString": "Server=localhost;Database=VitalChoice;Integrated security=True;"
@@ -11,5 +11,11 @@
     },
     "Constants": {
         "DefaultCultureId": "en-US"
-    }
+    },
+	"App": {
+		"ServeCdnContent": false,
+		"CdnServerBaseUrl": "not yet ready",
+		"GenerateLowercaseUrls": true,
+		"EnableBundlingAndMinification" : false
+	}
 }

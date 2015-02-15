@@ -16,10 +16,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Core.Infrastructure;
 
 #if ASPNET50
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
+using VitalChoice.Domain;
 #endif
 
 namespace VitalChoice.Core.DependencyInjection
@@ -42,16 +44,25 @@ namespace VitalChoice.Core.DependencyInjection
             services.TryAdd(describe.Transient<INestedProvider<ActionInvokerProviderContext>, BaseControllerActionInvokerProvider>());
 
             // Add MVC services to the services container.
-            services.AddMvc().Configure<MvcOptions>(options =>
-			{
+			services.AddMvc();//.Configure<MvcOptions>(options =>
+			//{
                
+		//	});
+			
+            services.AddOptions(configuration);
+
+
+			services.Configure<AppOptions>(options =>
+			{
+				options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
+				options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
+				options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+				options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
 			});
-            // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
-            // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
-            // services.AddWebApiConventions();
 
 #if ASPNET50
-            var builder = new ContainerBuilder();
+			var builder = new ContainerBuilder();
 
 			builder.Populate(services);
 
@@ -60,6 +71,9 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
+
+			builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
+			builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
 
             IContainer container = builder.Build();
 

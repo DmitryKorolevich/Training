@@ -4,12 +4,14 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.StaticFiles;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.Core.Infrastructure;
 
 namespace VitalChoice
 {
@@ -65,7 +67,6 @@ namespace VitalChoice
 					name: "default",
 					template: "{controller}/{action}/{id?}",
 					defaults: new { controller = "Home", action = "Index" });
-
 				// Uncomment the following line to add a route for porting Web API 2 controllers.
 				// routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
 			});
