@@ -3,7 +3,7 @@
 angular.module('app.modules.demo', ['app.modules.demo.controllers.productListController'])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
-		function ($stateProvider, $urlRouterProvider) {
+		function($stateProvider, $urlRouterProvider) {
 
 			$stateProvider
 				.state('index.oneCol.demo1', {
@@ -179,6 +179,301 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 				.state('index.oneCol.state6', {
 					url: '/state6',
 					templateUrl: 'app/modules/demo/partials/dialogs.html'
+				})
+
+				/*reports main*/
+				.state('index.twoCols.demo1', {
+					url: '/report/:name',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/demoPage.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				}).state('index.twoCols.demo2', {
+					url: '/report/:name',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/demoPage.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				}).state('index.twoCols.demo3', {
+					url: '/report/:name',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/demoPage.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				}).state('index.twoCols.demo4', {
+					url: '/report/:name',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/demoPage.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				})
+				.state('index.twoCols.demo5', {
+					url: '/report/:name',
+					views:
+					{
+						'': {
+							templateUrl: 'app/modules/demo/partials/demoPage.html'
+						},
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				})
+
+				/*reports sidebar*/
+				/*1*/
+				.state('index.twoCols.demo1.child1', {
+					url: '/child1',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Summary Sales Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child2', {
+					url: '/child2',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Breakdown Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child3', {
+					url: '/child3',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>SKU Breakdown Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child4', {
+					url: '/child4',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Futures Breakdown Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child5', {
+					url: '/child5',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Order SKU and Address Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child6', {
+					url: '/child6',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Regional Sales Summary</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child7', {
+					url: '/child7',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Deleted Orders Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child8', {
+					url: '/child8',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Order SKU Counts</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child9', {
+					url: '/child9',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Shipped Via Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child10', {
+					url: '/child10',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Category Sales Report</h2>'
+						}
+					}
+				}).state('index.twoCols.demo1.child11', {
+					url: '/child11',
+					views:
+					{
+						'@index.twoCols': {
+							template: '<h2>Transaction & Refund Report</h2>'
+						}
+					}
+				})
+				/*2*/
+				.state('index.twoCols.demo2.child1', {
+					url: '/child1',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				/*3*/
+				.state('index.twoCols.demo3.child1', {
+					url: '/child1',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo3.child2', {
+					url: '/child2',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo3.child3', {
+					url: '/child3',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				/*4*/
+				.state('index.twoCols.demo4.child1', {
+					url: '/child1',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo4.child2', {
+					url: '/child2',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo4.child3', {
+					url: '/child3',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo4.child4', {
+					url: '/child4',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				/*5*/
+				.state('index.twoCols.demo5.child1', {
+					url: '/child1',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child2', {
+					url: '/child2',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child3', {
+					url: '/child3',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child4', {
+					url: '/child4',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child5', {
+					url: '/child5',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child6', {
+					url: '/child6',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
+				})
+				.state('index.twoCols.demo5.child7', {
+					url: '/child7',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+						}
+					}
 				});
 		}
-]);
+	]);

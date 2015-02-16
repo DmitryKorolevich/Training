@@ -30,7 +30,7 @@
 					<!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu != null }"-->
 					<a data-ng-if="!module.subMenu" ui-sref="{{module.stateName}}({name:module.name})">
 						{{module.stateLabel}}
-						<span data-ng-if="currentModule == module.name" class="sr-only">(current)</span>
+						<span data-ng-if="currentModule == module.name" class="sr-only">(current)</span><!--refactor this-->
 					</a>
 					<a data-ng-if="module.subMenu != null" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 						{{module.stateLabel}}
@@ -39,7 +39,7 @@
 					<ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
 						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active">
 							<!--data-ng-class="{ active: currentSubModule == subModule.name }"-->
-							<a ui-sref="{{subModule.stateName}}">{{subModule.stateLabel}}</a>
+							<a ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
 						</li>
 					</ul>
 				</li>

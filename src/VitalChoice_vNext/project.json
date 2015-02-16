@@ -19,11 +19,13 @@
 		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3-11608",
 		"Microsoft.AspNet.Security.Cookies": "1.0.0-beta3-11505",
 		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3-11416",
+		//"Microsoft.AspNet.Server.Kestrel": "1.0.0-beta3-11018",
+		"Kestrel": "1.0.0-beta3-10954",
 		"Microsoft.AspNet.StaticFiles": "1.0.0-beta3-11211",
 		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0.0-beta3-10788",
 		"Microsoft.Framework.Logging.Console": "1.0.0.0-beta3-10788",
 		"EntityFramework.Commands": "7.0.0-beta3-12111",
-        "FluentValidation.K": "5.6.0.2",
+		"FluentValidation.K": "5.6.0.2",
 		"VitalChoice.Domain": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
 		"VitalChoice.Infrastructure": "1.0.0-*",
@@ -45,6 +47,7 @@
 	},
 	"commands": {
 		"web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
+		"kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004",
 		"gen": "Microsoft.Framework.CodeGeneration",
 		"ef": "EntityFramework.Commands"
 	}

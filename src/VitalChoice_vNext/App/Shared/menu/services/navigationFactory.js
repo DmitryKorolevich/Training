@@ -21,7 +21,17 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'demo', stateName: 'index.oneCol.demo12', stateLabel: 'Update Multiple Products' },
 				{ name: 'demo', stateName: 'index.oneCol.demo13', stateLabel: 'Cart Cross Selling Items' },
 				{ name: 'demo', stateName: 'index.oneCol.demo14', stateLabel: 'Out of Stock Requests' },
-				{ name: 'demo', stateName: 'index.oneCol.demo15', stateLabel: 'Perishable Cart Threshold Amount' },
+				{ name: 'demo', stateName: 'index.oneCol.demo15', stateLabel: 'Perishable Cart Threshold Amount' }
+			]
+		},
+		{
+			name: 'reports', stateLabel: 'Reports',
+			subMenu: [
+				{ name: 'reportDemo1', stateName: 'index.twoCols.demo1', stateLabel: 'Sales, Orders' },
+				{ name: 'reportDemo2', stateName: 'index.twoCols.demo2', stateLabel: 'Wholesale' },
+				{ name: 'reportDemo3', stateName: 'index.twoCols.demo3', stateLabel: 'Affiliates' },
+				{ name: 'reportDemo4', stateName: 'index.twoCols.demo4', stateLabel: 'Operations' },
+				{ name: 'reportDemo5', stateName: 'index.twoCols.demo5', stateLabel: 'List Processing, Analysis' }
 			]
 		},
 		{ name: 'state1', stateName: 'index.oneCol.state1', stateLabel: 'Module' },
