@@ -71,7 +71,7 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 				})
 				.state('index.oneCol.detail', {
 					url: '/products/detail/1',
-					templateUrl: 'app/modules/demo/partials/productDetail.html',
+					templateUrl: 'app/modules/demo/partials/productDetailAngular.html',
 				})
 				.state('index.oneCol.state1', {
 					url: '/state1',

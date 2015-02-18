@@ -3,6 +3,7 @@
 var app = angular
 	.module('mainApp', [
 		'ui.router',
+		'ui.bootstrap',
 		'app.core',
 		'app.modules',
 		'app.shared'
