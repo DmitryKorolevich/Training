@@ -1,6 +1,13 @@
 .nav > li.dropdown:hover {
   cursor: pointer;
 }
+.nav-tabs > li:not(.active):hover a {
+  background-color: #eeeeee;
+}
+.nav-tabs > li:not(.active) a {
+  background-color: #F2F2F2;
+  border-bottom: 1px solid #dddddd;
+}
 .table {
   max-width: 2000px;
 }
