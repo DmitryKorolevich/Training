@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('app.modules.demo', ['app.modules.demo.controllers.productListController'])
+angular.module('app.modules.demo', ['app.modules.demo.controllers.productListController', 'app.modules.demo.controllers.productDetailController'])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function($stateProvider, $urlRouterProvider) {
@@ -72,6 +72,7 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 				.state('index.oneCol.detail', {
 					url: '/products/detail/1',
 					templateUrl: 'app/modules/demo/partials/productDetailAngular.html',
+					controller: 'productDetailController'
 				})
 				.state('index.oneCol.state1', {
 					url: '/state1',

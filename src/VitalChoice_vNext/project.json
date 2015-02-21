@@ -19,7 +19,6 @@
 		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3-11608",
 		"Microsoft.AspNet.Security.Cookies": "1.0.0-beta3-11505",
 		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3-11416",
-		//"Microsoft.AspNet.Server.Kestrel": "1.0.0-beta3-11018",
 		"Kestrel": "1.0.0-beta3-10954",
 		"Microsoft.AspNet.StaticFiles": "1.0.0-beta3-11211",
 		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0.0-beta3-10788",

@@ -4,6 +4,8 @@
 
 	"files": [
 		'lib/bootstrap/css/bootstrap.css',
+		'lib/font-awesome/font-awesome.css',
+		'lib/textAngular/textAngular.css',
 		'assets/styles/site.css'
 	]
 }

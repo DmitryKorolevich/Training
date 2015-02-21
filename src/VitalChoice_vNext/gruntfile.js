@@ -86,7 +86,8 @@ module.exports = function (grunt) {
 				  { expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 				  { expand: true, cwd: 'temp/boostrap/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
-				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
+				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
+				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' }
         		]
         	},
         	release: {
@@ -94,7 +95,8 @@ module.exports = function (grunt) {
 			        { expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/app/' },
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 					{ expand: true, cwd: 'temp/boostrap/minified/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
-					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' }
+					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
+					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' }
 		        ]
 	        }
         },

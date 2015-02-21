@@ -1,8 +1,12 @@
 ﻿<div style="max-width: 2000px;">
-	<div class="col-lg-12">
+	<div style="width: 155px; padding: 0px 10px 10px 10px;float:left;">
+		<button style="" ui-sref="index.oneCol.list" class="btn btn-primary">Save</button>
+		<button style="" ui-sref="index.oneCol.list" class="btn btn-default">Cancel</button>
+	</div>
+	<div class="col-lg-10">
 		<tabset>
 			<tab heading="Name and Description">
-				<div class="col-lg-7" style="margin: 30px; max-width: 2000px;">
+				<div class="col-lg-8" style="margin: 30px; max-width: 1900px;">
 					<div class="well">
 						<form class="form-horizontal">
 							<fieldset>
@@ -28,9 +32,14 @@
 								<div class="form-group">
 									<label for="description" class="col-lg-3 control-label">Description</label>
 									<div class="col-lg-9">
-										<textarea type="text" class="form-control" id="description" placeholder="Description" rows="20">
-											&lt;table border="0" cellspacing="0" cellpadding="0" width="100%"&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td valign="top"&gt; &lt;ul&gt; &lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;FREE SHIPPING&lt;/span&gt; &lt;/div&gt; &lt;/li&gt;&lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;The Salmon, Berries, and Marinade Mix in this pack&nbsp;&lt;/span&gt; &lt;span style="FONT-WEIGHT: bold"&gt;are certified Kosher&lt;/span&gt;&nbsp;(EarthK) &lt;/div&gt; &lt;/li&gt;&lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;Alaskan salmon, sablefish and halibut certified &lt;/span&gt;&lt;span style="FONT-WEIGHT: bold"&gt;sustainably harvested&lt;/span&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt; &lt;div style="TEXT-ALIGN: center"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;&lt;/span&gt;&lt;/div&gt;We've paired some of most popular organic foods and wild Pacific seafood products with &lt;span style="FONT-STYLE: italic"&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=550&amp;idcategory=261"&gt;Food Rules: An Eater's Manual&lt;/a&gt;&lt;/span&gt;, by journalist Michael Pollan, renowned author of&nbsp;&lt;span style="FONT-STYLE: italic"&gt;The Omnivore's Dilemma&lt;/span&gt;&lt;span style="FONT-STYLE: italic"&gt;.&lt;/span&gt;&nbsp;&lt;br&gt;&lt;br&gt;In addition to&nbsp;Michael's great book, which simplifies smart food choices, this special sampler/gift pack includes more than a dozen different tempting treats:&lt;br&gt; &lt;ul&gt; &lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=294&amp;idcategory=280"&gt;Alaskan Sockeye Salmon&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=320&amp;idcategory=282"&gt;Wild Pacific King Salmon&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=314&amp;idcategory=281"&gt;Alaskan Silver Salmon&lt;/a&gt; - 6 oz skin-on/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=554&amp;idcategory=631"&gt;Alaskan Sockeye Salmon Burger&lt;/a&gt;* - 4 oz patty  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=1&amp;idcategory=634"&gt;Alaskan Smoked Sockeye&lt;/a&gt; - 6 oz skin-on/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=395&amp;idcategory=310"&gt;Pacific Albacore Tuna&lt;/a&gt; - 6 oz of small, skinless/boneless medallions  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=387&amp;idcategory=309"&gt;Alaskan Halibut&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=405&amp;idcategory=218"&gt;Oven-Ready Smoked Alaskan Sablefish&lt;/a&gt;** - 4 oz skin-on/bone-in portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=105&amp;idcategory=234"&gt;Wild Organic Blueberries&lt;/a&gt; - 1 lb bag (approx. 3.5 cups)  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=154&amp;idcategory=255"&gt;Organic Salmon Marinade Mix&lt;/a&gt; - 2 oz gift tin  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=544&amp;idcategory=264"&gt;Organic Extra Dark Chocolate Medley&lt;/a&gt; - 1 bar each of Plain, Hazelnut, Blueberry, Ginger, Cherry-Almond, and Toasted Coconut.&lt;/li&gt;&lt;/ul&gt;*Our Salmon Burgers are 85% pure wild Alaskan Sockeye Salmon.&lt;br&gt;&lt;br&gt;**Lightly wood-smoked for flavor; requires cooking.&lt;/td&gt; &lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
-										</textarea>
+										<div class="col-lg-10" style="padding-left: 0px;">
+											<input data-ng-show="!descriptionExpanded" type="text" class="form-control" id="description" placeholder="Description" disabled value="{{description}}">
+											<div data-ng-show="descriptionExpanded" text-angular data-ng-model="description"></div>
+										</div>
+										<div class="col-lg-2" style="padding-right: 0px;padding-left: 0px;">
+											<a data-ng-show="descriptionExpanded" style="width:100%" data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
+											<a data-ng-show="!descriptionExpanded" style="width:100%" data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
+										</div>
 									</div>
 								</div>
 								<div class="form-group">
@@ -39,12 +48,6 @@
 										<textarea type="text" class="form-control" id="servicing" placeholder="Serving/Storage" rows="20">
 											&lt;table border="0" cellspacing="0" cellpadding="0" width="100%"&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td valign="top"&gt; &lt;ul&gt; &lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;FREE SHIPPING&lt;/span&gt; &lt;/div&gt; &lt;/li&gt;&lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;The Salmon, Berries, and Marinade Mix in this pack&nbsp;&lt;/span&gt; &lt;span style="FONT-WEIGHT: bold"&gt;are certified Kosher&lt;/span&gt;&nbsp;(EarthK) &lt;/div&gt; &lt;/li&gt;&lt;li&gt; &lt;div style="TEXT-ALIGN: left"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;Alaskan salmon, sablefish and halibut certified &lt;/span&gt;&lt;span style="FONT-WEIGHT: bold"&gt;sustainably harvested&lt;/span&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt; &lt;div style="TEXT-ALIGN: center"&gt;&lt;span style="FONT-WEIGHT: bold"&gt;&lt;/span&gt;&lt;/div&gt;We've paired some of most popular organic foods and wild Pacific seafood products with &lt;span style="FONT-STYLE: italic"&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=550&amp;idcategory=261"&gt;Food Rules: An Eater's Manual&lt;/a&gt;&lt;/span&gt;, by journalist Michael Pollan, renowned author of&nbsp;&lt;span style="FONT-STYLE: italic"&gt;The Omnivore's Dilemma&lt;/span&gt;&lt;span style="FONT-STYLE: italic"&gt;.&lt;/span&gt;&nbsp;&lt;br&gt;&lt;br&gt;In addition to&nbsp;Michael's great book, which simplifies smart food choices, this special sampler/gift pack includes more than a dozen different tempting treats:&lt;br&gt; &lt;ul&gt; &lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=294&amp;idcategory=280"&gt;Alaskan Sockeye Salmon&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=320&amp;idcategory=282"&gt;Wild Pacific King Salmon&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=314&amp;idcategory=281"&gt;Alaskan Silver Salmon&lt;/a&gt; - 6 oz skin-on/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=554&amp;idcategory=631"&gt;Alaskan Sockeye Salmon Burger&lt;/a&gt;* - 4 oz patty  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=1&amp;idcategory=634"&gt;Alaskan Smoked Sockeye&lt;/a&gt; - 6 oz skin-on/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=395&amp;idcategory=310"&gt;Pacific Albacore Tuna&lt;/a&gt; - 6 oz of small, skinless/boneless medallions  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=387&amp;idcategory=309"&gt;Alaskan Halibut&lt;/a&gt; - 6 oz skinless/boneless portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=405&amp;idcategory=218"&gt;Oven-Ready Smoked Alaskan Sablefish&lt;/a&gt;** - 4 oz skin-on/bone-in portion  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=105&amp;idcategory=234"&gt;Wild Organic Blueberries&lt;/a&gt; - 1 lb bag (approx. 3.5 cups)  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=154&amp;idcategory=255"&gt;Organic Salmon Marinade Mix&lt;/a&gt; - 2 oz gift tin  &lt;/li&gt;&lt;li&gt;&lt;a href="/shop/pc/viewPrd.asp?idproduct=544&amp;idcategory=264"&gt;Organic Extra Dark Chocolate Medley&lt;/a&gt; - 1 bar each of Plain, Hazelnut, Blueberry, Ginger, Cherry-Almond, and Toasted Coconut.&lt;/li&gt;&lt;/ul&gt;*Our Salmon Burgers are 85% pure wild Alaskan Sockeye Salmon.&lt;br&gt;&lt;br&gt;**Lightly wood-smoked for flavor; requires cooking.&lt;/td&gt; &lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
 										</textarea>
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="" class="col-lg-3 control-label">Nutrition Info</label>
-									<div class="col-lg-9" style="padding-top: 8px;">
-										<a href="#">Nutrition Info</a>
 									</div>
 								</div>
 								<div class="form-group">
@@ -121,7 +124,162 @@
 			<tab heading="Meta Tags">
 				<h3 style="margin-left: 30px">Meta Tags</h3>
 			</tab>
+			<tab heading="Nutritional Info">
+				<div class="col-lg-7" style="margin: 30px; max-width: 1900px;">
+					<div class="well">
+						<form class="form-horizontal">
+							<fieldset>
+								<legend>Nutritional Info</legend>
+								<div class="form-group">
+									<label for="title" class="col-lg-3 control-label">Title</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="title" placeholder="Title" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="serving_size" class="col-lg-3 control-label">Serving Size</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="serving_size" placeholder="Serving Size" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="servings" class="col-lg-3 control-label">Servings</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="servings" placeholder="Servings" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="calories" class="col-lg-3 control-label">Calories</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="calories" placeholder="Calories" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="calories_from_fat" class="col-lg-3 control-label">Calories from Fat</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="calories_from_fat" placeholder="Calories from Fat" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="total_fat" class="col-lg-3 control-label">Total Fat</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="total_fat" placeholder="Total Fat" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="total_fat_percent" class="col-lg-3 control-label">Total Fat Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="total_fat_percent" placeholder="Total Fat Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="saturated_fat" class="col-lg-3 control-label">Saturated Fat</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="saturated_fat" placeholder="Saturated Fat" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="saturated_fat_percent" class="col-lg-3 control-label">Saturated Fat Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="saturated_fat_percent" placeholder="Saturated Fat Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="trans_fat" class="col-lg-3 control-label">Trans Fat</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="trans_fat" placeholder="Trans Fat" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="trans_fat_percent" class="col-lg-3 control-label">Trans Fat Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="trans_fat_percent" placeholder="Trans Fat Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="cholesterol" class="col-lg-3 control-label">Cholesterol</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="cholesterol" placeholder="Cholesterol" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="cholesterol_percent" class="col-lg-3 control-label">Cholesterol Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="cholesterol_percent" placeholder="Cholesterol Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sodium" class="col-lg-3 control-label">Sodium</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sodium" placeholder="Sodium" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sodium_percent" class="col-lg-3 control-label">Sodium Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sodium_percent" placeholder="Sodium Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="total_carbohydrate" class="col-lg-3 control-label">Total Carbohydrate</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="total_carbohydrate" placeholder="Total Carbohydrate" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="total_carbohydrate_percent" class="col-lg-3 control-label">Total Carbohydrate Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="total_carbohydrate_percent" placeholder="Total Carbohydrate Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="dietary_fiber" class="col-lg-3 control-label">Dietary Fiber</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="dietary_fiber" placeholder="Dietary Fiber" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="dietary_fiber_percent" class="col-lg-3 control-label">Dietary Fiber Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="dietary_fiber_percent" placeholder="Dietary Fiber Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sugars" class="col-lg-3 control-label">Sugars</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sugars" placeholder="Sugars" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sugars_percent" class="col-lg-3 control-label">Sugars Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sugars_percent" placeholder="Sugars Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="protein" class="col-lg-3 control-label">Protein</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="protein" placeholder="Protein" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="protein_percent" class="col-lg-3 control-label">Protein Percent</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="protein_percent" placeholder="Protein Percent" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="nutri_additional_Notes" class="col-lg-3 control-label">Additional Notes</label>
+									<div class="col-lg-9">
+										<textarea type="text" class="form-control" id="nutri_additional_Notes" placeholder="Additional Notes" rows="10"></textarea>
+									</div>
+								</div>
+
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</tab>
 		</tabset>
 	</div>
 </div>
-<a style="margin: 50px;" ui-sref="index.oneCol.list" class="btn btn-primary btn-lg">Save</a>

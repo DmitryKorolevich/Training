@@ -8,6 +8,13 @@
 		'lib/angular-bootstrap/ui-bootstrap-tpls.js',
 		'lib/angular-ui-router/angular-ui-router.js',
 		'lib/bootstrap/js/bootstrap.js',
+		'lib/rangy/rangy-core.min.js',
+		'lib/rangy/rangy-cssclassapplier.min.js',
+		'lib/rangy/rangy-selectionsaverestore.min.js',
+		'lib/rangy/rangy-serializer.min.js',
+		'lib/textAngular/textAngular-sanitize.js',
+		'lib/textAngular/textAngular.js',
+		'lib/textAngular/textAngularSetup.js',
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',
@@ -30,5 +37,6 @@
 		'app/shared/menu/services/navigationFactory.js',
 		'app/shared/menu/services/sidebarFactory.js',
 		'app/modules/demo/controllers/productListController.js',
+		'app/modules/demo/controllers/productDetailController.js'
 	]
 }
