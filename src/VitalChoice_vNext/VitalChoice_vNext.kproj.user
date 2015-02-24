@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetKREVersion>KRE-CLR-amd64.1.0.0-beta3-10921</TargetKREVersion>
-    <ActiveDebugProfile>kestrel</ActiveDebugProfile>
+    <ActiveDebugProfile>web</ActiveDebugProfile>
     <NameOfLastUsedPublishProfile>publish_for_test</NameOfLastUsedPublishProfile>
     <DebugCLRTypeOverride>NET</DebugCLRTypeOverride>
     <ShowAllFiles>false</ShowAllFiles>
