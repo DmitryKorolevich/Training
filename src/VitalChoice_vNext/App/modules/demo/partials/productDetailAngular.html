@@ -10,16 +10,44 @@
 </div>
 	<div class="col-lg-10">
 		<tabset>
-			<tab heading="Name and Description">
+			<tab heading="Parent Details">
 				<div class="col-lg-8" style="margin: 30px; max-width: 1900px; min-width: 900px;">
 					<div class="well">
 						<form class="form-horizontal">
 							<fieldset>
-								<legend>Name, SKU, and Description</legend>
+								<span class="legend">Name, SKU and Description</span>
 								<div class="form-group">
 									<label for="" class="col-lg-3 control-label">Product ID</label>
 									<div class="col-lg-9" style="padding-top: 8px;">
 										<span>1431</span>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="active" class="col-lg-3 control-label">Active</label>
+									<div class="col-lg-9">
+										<div class="checkbox">
+											<label><input type="checkbox" class="" id="active" placeholder="Active" checked="checked"/></label>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="hide" class="col-lg-3 control-label">Hide within storefront</label>
+									<div class="col-lg-9">
+										<div class="checkbox">
+											<label>
+												<input type="checkbox" class="" id="hide" placeholder="Hide within storefront">
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="perishable" class="col-lg-3 control-label">Perishable</label>
+									<div class="col-lg-9">
+										<div class="checkbox">
+											<label>
+												<input type="checkbox" class="" id="perishable" placeholder="Perishable">
+											</label>
+										</div>
 									</div>
 								</div>
 								<div class="form-group">
@@ -32,6 +60,18 @@
 									<label for="name" class="col-lg-3 control-label">Name</label>
 									<div class="col-lg-9">
 										<input type="text" class="form-control" id="name" placeholder="Name" value="Good Health Gift">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="price" class="col-lg-3 control-label">Price</label>
+									<div class="col-lg-9">
+										<input type="number" class="form-control" id="price" placeholder="Price" value="10000"> <!--!!!!-->
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="wholesale_price" class="col-lg-3 control-label">Wholesale Price</label>
+									<div class="col-lg-9">
+										<input type="number" class="form-control" id="wholesale_price" placeholder="Wholesale Price" value="8000"> <!--!!!!-->
 									</div>
 								</div>
 								<div class="form-group">
@@ -124,54 +164,59 @@
 										<div data-ng-show="notesExpanded" text-angular data-ng-model="notes"></div>
 									</div>
 								</div>
+								<span class="legend">SEO</span>
 								<div class="form-group">
-									<label for="" class="col-lg-3 control-label">Cross Sell Image 1</label>
+									<label for="meta_title" class="col-lg-3 control-label">Meta Title</label>
 									<div class="col-lg-9">
-										<input type="text" class="form-control" id="1" placeholder="Cross Sell Image 1" value="Sell Image">
+										<textarea type="text" class="form-control" id="meta_title" placeholder="Meta Title" rows="10"></textarea>
 									</div>
 								</div>
 								<div class="form-group">
-									<label for="" class="col-lg-3 control-label">URL Cross Sell 1</label>
+									<label for="meta_description" class="col-lg-3 control-label">Meta Description</label>
 									<div class="col-lg-9">
-										<input type="text" class="form-control" id="2" placeholder="URL Cross Sell 1" value="URL Image">
+										<textarea type="text" class="form-control" id="meta_description" placeholder="Meta Description" rows="10"></textarea>
 									</div>
 								</div>
-
+								<div class="form-group">
+									<label for="selectCat" class="col-lg-3 control-label">Google Category</label>
+									<div class="col-lg-9">
+										<select class="form-control" id="selectCat">
+											<option>Google Category 1</option>
+											<option>Google Category 2</option>
+										</select>
+									</div>
+								</div>
+								<span class="legend">Tax</span>
+								<div class="form-group">
+									<label for="tax_code" class="col-lg-3 control-label">Tax Code</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="tax_code" placeholder="Tax Code">
+									</div>
+								</div>
+								<span class="legend">Other Settings</span>
+								<div class="form-group">
+									<label for="special_icon" class="col-lg-3 control-label">Special Icon</label>
+									<div class="col-lg-9">
+										<select class="form-control" id="special_icon">
+											<option>Option 1</option>
+											<option>Option 2</option>
+										</select>
+									</div>
+								</div>
 							</fieldset>
 						</form>
 					</div>
 				</div>
 			</tab>
-			<tab heading="Prices">
-				<h3 style="margin-left: 30px">Prices</h3>
+			<tab heading="Sub Products">
+				<h3 style="margin-left: 30px">Sub Products</h3>
 			</tab>
-			<tab heading="Categories">
-				<h3 style="margin-left: 30px">Categories</h3>
-			</tab>
-			<tab heading="Images">
-				<h3 style="margin-left: 30px">Images</h3>
-			</tab>
-			<tab heading="Inventory Settings">
-				<h3 style="margin-left: 30px">Inventory Settings</h3>
-			</tab>
-			<tab heading="Weight Shipping">
-				<h3 style="margin-left: 30px">Weight Shipping</h3>
-			</tab>
-			<tab heading="Other Settings">
-				<h3 style="margin-left: 30px">Other Settings</h3>
-			</tab>
-			<tab heading="Gift Certificate Settings">
-				<h3 style="margin-left: 30px">Gift Certificate Settings</h3>
-			</tab>
-			<tab heading="Meta Tags">
-				<h3 style="margin-left: 30px">Meta Tags</h3>
-			</tab>
-			<tab heading="Nutritional Info">
+			<tab heading="Nutritional">
 				<div class="col-lg-7" style="margin: 30px; max-width: 1900px;">
 					<div class="well">
 						<form class="form-horizontal">
 							<fieldset>
-								<legend>Nutritional Info</legend>
+								<legend>Nutritional</legend>
 								<div class="form-group">
 									<label for="title" class="col-lg-3 control-label">Title</label>
 									<div class="col-lg-9">
@@ -321,6 +366,144 @@
 						</form>
 					</div>
 				</div>
+			</tab>
+			<tab heading="Categories">
+				<h3 style="margin-left: 30px">Categories</h3>
+			</tab>
+			<tab heading="Cross Sell & Videos">
+				<div class="col-lg-8" style="margin: 30px; max-width: 1900px; min-width: 900px;">
+					<div class="well">
+						<form class="form-horizontal">
+							<fieldset>
+								<span class="legend">Cross Sell & Videos</span>
+								<div class="form-group">
+									<label for="image_1" class="col-lg-3 control-label">Cross Sell Image 1</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="image_1" placeholder="Cross Sell Image 1">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sell_1" class="col-lg-3 control-label">URL Cross Sell 1</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sell_1" placeholder="URL Cross Sell 1">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="image_2" class="col-lg-3 control-label">Cross Sell Image 2</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="image_2" placeholder="Cross Sell Image 2">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sell_2" class="col-lg-3 control-label">URL Cross Sell 2</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sell_2" placeholder="URL Cross Sell 2">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="image_3" class="col-lg-3 control-label">Cross Sell Image 3</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="image_3" placeholder="Cross Sell Image 3">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sell_3" class="col-lg-3 control-label">URL Cross Sell 3</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sell_3" placeholder="URL Cross Sell 3">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="image_1" class="col-lg-3 control-label">Cross Sell Image 4</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="image_4" placeholder="Cross Sell Image 4">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="sell_4" class="col-lg-3 control-label">URL Cross Sell 4</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="sell_4" placeholder="URL Cross Sell 4">
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group margin-top-30px">
+									<label for="youtube_video_1" class="col-lg-3 control-label">YouTube Video 1</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_video_1" placeholder="YouTube Video 1">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_image_1" class="col-lg-3 control-label">YouTube Image 1</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_image_1" placeholder="YouTube Image 1">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_text_1" class="col-lg-3 control-label">YouTube Text 1</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_text_1" placeholder="YouTube Text 1">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="youtube_video_2" class="col-lg-3 control-label">YouTube Video 2</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_video_2" placeholder="YouTube Video 2">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_image_2" class="col-lg-3 control-label">YouTube Image 2</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_image_2" placeholder="YouTube Image 2">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_text_2" class="col-lg-3 control-label">YouTube Text 2</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_text_2" placeholder="YouTube Text 2">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="youtube_video_3" class="col-lg-3 control-label">YouTube Video 3</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_video_3" placeholder="YouTube Video 3">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_image_3" class="col-lg-3 control-label">YouTube Image 3</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_image_3" placeholder="YouTube Image 3">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_text_3" class="col-lg-3 control-label">YouTube Text 3</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_text_3" placeholder="YouTube Text 3">
+									</div>
+								</div>
+								<div class="form-group margin-top-30px">
+									<label for="youtube_video_4" class="col-lg-3 control-label">YouTube Video 4</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_video_4" placeholder="YouTube Video 4">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_image_4" class="col-lg-3 control-label">YouTube Image 4</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_image_4" placeholder="YouTube Image 4">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="youtube_text_4" class="col-lg-3 control-label">YouTube Text 4</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="youtube_text_4" placeholder="YouTube Text 4">
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</tab>
+			<tab heading="Inventory & Shipping">
+				<h3 style="margin-left: 30px">Inventory & Shipping</h3>
 			</tab>
 		</tabset>
 	</div>

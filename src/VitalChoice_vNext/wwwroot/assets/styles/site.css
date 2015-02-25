@@ -1,3 +1,16 @@
+/*f66e21*/
+/*717171*/
+.legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 20px;
+  font-size: 21px;
+  line-height: inherit;
+  color: #555555;
+  border: 0;
+  border-bottom: 1px solid #e5e5e5;
+}
 .nav > li.dropdown:hover {
   cursor: pointer;
 }
@@ -27,6 +40,12 @@
 }
 .margin-zero {
   margin: 0;
+}
+.margin-top-15px {
+  margin-top: 15px;
+}
+.margin-top-30px {
+  margin-top: 30px;
 }
 .custom-navbar-bottom {
   border-radius: 0px 0px 3px  3px;
