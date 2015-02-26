@@ -1,5 +1,19 @@
 /*f66e21*/
 /*717171*/
+.ya-treeview {
+  font-size: inherit;
+}
+.ya-treeview a {
+  padding-top: 9px;
+  padding-left: 0px;
+  margin: 0;
+  font-size: inherit;
+  outline: 0;
+  -webkit-box-shadow: none!important;
+  box-shadow: none!important;
+  padding-right: 0;
+  margin-left: -10px;
+}
 .legend {
   display: block;
   width: 100%;
@@ -10,6 +24,10 @@
   color: #555555;
   border: 0;
   border-bottom: 1px solid #e5e5e5;
+}
+.category-status {
+  font-size: inherit;
+  margin-left: 15px;
 }
 .nav > li.dropdown:hover {
   cursor: pointer;

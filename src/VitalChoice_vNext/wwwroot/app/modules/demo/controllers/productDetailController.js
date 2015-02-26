@@ -102,12 +102,12 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					}
 				]
 			}, {
-				label: 'Cookbooks &amp; Cooking Accessories',
+				label: 'Cookbooks & Cooking Accessories',
 				status: 1,
 				checked: false,
 				children: [
 					{
-						label: 'Favorite Books &amp; Cookbooks',
+						label: 'Favorite Books & Cookbooks',
 						status: 1,
 						checked: false
 					},

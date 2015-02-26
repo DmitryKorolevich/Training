@@ -107,7 +107,7 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 				checked: false,
 				children: [
 					{
-						label: 'Favorite Books &amp; Cookbooks',
+						label: 'Favorite Books & Cookbooks',
 						status: 1,
 						checked: false
 					},
