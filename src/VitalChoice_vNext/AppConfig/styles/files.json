@@ -6,6 +6,7 @@
 		'lib/bootstrap/css/bootstrap.css',
 		'lib/font-awesome/font-awesome.css',
 		'lib/textAngular/textAngular.css',
+		'lib/angular-ya-treeview/ya-treeview.min.css',
 		'assets/styles/site.css'
 	]
 }

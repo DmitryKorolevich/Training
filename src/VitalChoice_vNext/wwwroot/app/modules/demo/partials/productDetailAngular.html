@@ -367,9 +367,20 @@
 					</div>
 				</div>
 			</tab>
-			<tab heading="Categories">
-				<h3 style="margin-left: 30px">Categories</h3>
-			</tab>
+		<tab heading="Categories">
+			<div class="col-lg-8" style="margin: 30px; max-width: 1900px; min-width: 900px;">
+				<div class="well">
+					<span class="legend">Categories</span>
+					<div ya-treeview ya-id="categoriesTree" ya-model="categories" ya-options="categoriesOptions" ya-context="categoriesContext">
+						<!--<span ng-class="{selected: categoriesContext.selectedNodes.indexOf(node) > -1}">{{ node.$model.label }}</span>-->
+						<div class="checkbox">
+							<label><input data-ng-checked="node.$model.checked" type="checkbox">{{node.$model.label}}</label>
+							<span data-ng-if="node.$model.status == 2" class="label label-warning">Hidden</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</tab>
 			<tab heading="Cross Sell & Videos">
 				<div class="col-lg-8" style="margin: 30px; max-width: 1900px; min-width: 900px;">
 					<div class="well">

@@ -44,7 +44,6 @@
 /// <reference path="app/modules/demo/demo.js" />
 /// <reference path="app/modules/authentication/controllers/loginController.js" />
 /// <reference path="app/modules/authentication/authentication.js" />
-/// <reference path="../app/modules/demo/controllers/productlistcontroller - copy.js" />
 /// <reference path="app/modules/demo/controllers/productdetailcontroller.js" />
 /// <reference path="lib/textAngular/textAngularSetup.js" />
 /// <reference path="lib/textAngular/textAngular.js" />
@@ -60,3 +59,6 @@
 /// <reference path="lib/angular-ui-grid/ui-grid.js" />
 /// <reference path="lib/angular-bootstrap/ui-bootstrap-tpls.js" />
 /// <reference path="lib/angular/angular.js" />
+/// <reference path="../App/modules/demo/controllers/productDetailController.js" />
+/// <reference path="lib/angular-sanitize/angular-sanitize.js" />
+/// <reference path="lib/angular-ya-treeview/ya-treeview-tpls.min.js" />

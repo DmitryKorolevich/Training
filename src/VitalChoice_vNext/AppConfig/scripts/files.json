@@ -15,6 +15,7 @@
 		'lib/textAngular/textAngular-sanitize.js',
 		'lib/textAngular/textAngular.js',
 		'lib/textAngular/textAngularSetup.js',
+		'lib/angular-ya-treeview/ya-treeview-tpls.min.js',
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',
