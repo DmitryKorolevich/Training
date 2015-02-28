@@ -8,421 +8,263 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 			$stateProvider
 				/*customer*/
 				.state('index.oneCol.locateCustomer', {
-					url: '/locateCustomer',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/customers/locate',
+					template: '<h2>Locate Customer</h2>'
 				})
 				.state('index.oneCol.addNewCustomer', {
-					url: '/addNewCustomer',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/customers/add',
+					template: '<h2>Add New Customer</h2>'
+				})
+				.state('index.twoCols.addNewCustomer', {
+					abstract: true,
+					url: '/customers/:name',
+					views:
+					{
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				})
+				.state('index.twoCols.addNewCustomer.accountProfile', {
+					url: '/accountProfile',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/accountProfile.html'
+						}
+					}
+				})
+				.state('index.twoCols.addNewCustomer.shippingAddress', {
+					url: '/shippingAddress',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/shippingAddress.html'
+						}
+					}
+				})
+				.state('index.twoCols.addNewCustomer.customerNotes', {
+					url: '/customerNotes',
+					views:
+					{
+						'@index.twoCols': {
+							templateUrl: 'app/modules/demo/partials/customerNotes.html'
+						}
+					}
 				})
 				/*orders*/
 				.state('index.oneCol.viewAllOrders', {
-					url: '/locateCustomer',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/orders',
+					template: '<h2>View Add Orders</h2>'
 				})
 				.state('index.oneCol.locateOrder', {
-					url: '/addNewCustomer',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/orders/locate',
+					template: '<h2>Locate Order</h2>'
 				})
 				.state('index.oneCol.placeNewOrder', {
-					url: '/placeNewOrder',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/orders/place',
+					template: '<h2>Place New Order</h2>'
 				})
 				/*reports*/
 				/*reports main*/
-				.state('index.twoCols.demo1', {
-					url: '/report/:name',
+				.state('index.twoCols.salesOrders', {
+					abstract: true,
+					url: '/reports/:name',
 					views:
 					{
-						'': {
-							templateUrl: 'app/modules/demo/partials/demoPage.html'
-						},
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				}).state('index.twoCols.demo2', {
-					url: '/report/:name',
-					views:
-					{
-						'': {
-							templateUrl: 'app/modules/demo/partials/demoPage.html'
-						},
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				}).state('index.twoCols.demo3', {
-					url: '/report/:name',
-					views:
-					{
-						'': {
-							templateUrl: 'app/modules/demo/partials/demoPage.html'
-						},
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				}).state('index.twoCols.demo4', {
-					url: '/report/:name',
-					views:
-					{
-						'': {
-							templateUrl: 'app/modules/demo/partials/demoPage.html'
-						},
 						'left': {
 							templateUrl: 'app/shared/menu/partials/sidebar.html',
 							controller: 'sidebarController'
 						}
 					}
 				})
-				.state('index.twoCols.demo5', {
-					url: '/report/:name',
+				.state('index.twoCols.wholesale', {
+					abstract: true,
+					url: '/reports/:name',
 					views:
 					{
-						'': {
-							templateUrl: 'app/modules/demo/partials/demoPage.html'
-						},
 						'left': {
 							templateUrl: 'app/shared/menu/partials/sidebar.html',
 							controller: 'sidebarController'
 						}
 					}
+				})
+				.state('index.oneCol.affiliates', {
+					url: '/report/:name',
+					template: '<h2>Affiliates</h2>'
+				}).state('index.twoCols.operations', {
+					abstract: true,
+					url: '/report/:name',
+					views:
+					{
+						'left': {
+							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							controller: 'sidebarController'
+						}
+					}
+				})
+				.state('index.oneCol.listProcessingAnalysis', {
+					url: '/report/:name',
+					template: '<h2>List Processing, Analysis</h2>'
 				})
 
 				/*reports sidebar*/
 				/*1*/
-				.state('index.twoCols.demo1.child1', {
-					url: '/child1',
+				.state('index.twoCols.salesOrders.healthWise', {
+					url: '/healthWise',
 					views:
 					{
 						'@index.twoCols': {
-							template: '<h2>Summary Sales Report</h2>'
+							template: '<h2>Health Wise</h2>'
 						}
 					}
-				}).state('index.twoCols.demo1.child2', {
-					url: '/child2',
+				}).state('index.twoCols.salesOrders.orderStatusHistory', {
+					url: '/orderStatusHistory',
 					views:
 					{
 						'@index.twoCols': {
-							template: '<h2>Breakdown Report</h2>'
+							template: '<h2>Order Status History</h2>'
 						}
 					}
-				}).state('index.twoCols.demo1.child3', {
-					url: '/child3',
+				}).state('index.twoCols.salesOrders.ooStockRequests', {
+					url: '/ooStockRequests',
 					views:
 					{
 						'@index.twoCols': {
-							template: '<h2>SKU Breakdown Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child4', {
-					url: '/child4',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Futures Breakdown Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child5', {
-					url: '/child5',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Order SKU and Address Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child6', {
-					url: '/child6',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Regional Sales Summary</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child7', {
-					url: '/child7',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Deleted Orders Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child8', {
-					url: '/child8',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Order SKU Counts</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child9', {
-					url: '/child9',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Shipped Via Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child10', {
-					url: '/child10',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Category Sales Report</h2>'
-						}
-					}
-				}).state('index.twoCols.demo1.child11', {
-					url: '/child11',
-					views:
-					{
-						'@index.twoCols': {
-							template: '<h2>Transaction & Refund Report</h2>'
+							template: '<h2>Out of Stock Requests</h2>'
 						}
 					}
 				})
 				/*2*/
-				.state('index.twoCols.demo2.child1', {
-					url: '/child1',
+				.state('index.twoCols.wholesale.wholesaleSummary', {
+					url: '/wholesaleSummary',
 					views:
 					{
 						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+							template: '<h2>Wholesale Summary Report</h2>'
 						}
 					}
 				})
-				/*3*/
-				.state('index.twoCols.demo3.child1', {
-					url: '/child1',
+				.state('index.twoCols.wholesale.wholesaleDropShipOrders', {
+					url: '/wholesaleDropShipOrders',
 					views:
 					{
 						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo3.child2', {
-					url: '/child2',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo3.child3', {
-					url: '/child3',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+							template: '<h2>Wholesale Drop Ship Orders Report</h2>'
 						}
 					}
 				})
 				/*4*/
-				.state('index.twoCols.demo4.child1', {
-					url: '/child1',
+				.state('index.twoCols.operations.vitalGreen', {
+					url: '/vitalGreen',
 					views:
 					{
 						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo4.child2', {
-					url: '/child2',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo4.child3', {
-					url: '/child3',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo4.child4', {
-					url: '/child4',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				/*5*/
-				.state('index.twoCols.demo5.child1', {
-					url: '/child1',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child2', {
-					url: '/child2',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child3', {
-					url: '/child3',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child4', {
-					url: '/child4',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child5', {
-					url: '/child5',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child6', {
-					url: '/child6',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
-						}
-					}
-				})
-				.state('index.twoCols.demo5.child7', {
-					url: '/child7',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/demoPageWithSidebar.html'
+							template: '<h2>VitalGreen</h2>'
 						}
 					}
 				})
 				/*products*/
 				.state('index.oneCol.locateProduct', {
-					url: '/locateCustomer',
+					url: '/products/locate',
 					templateUrl: 'app/modules/demo/partials/searchProducts.html'
 				})
 				.state('index.oneCol.productsList', {
-					url: '/productslist',
+					url: '/products',
 					templateUrl: 'app/modules/demo/partials/products.html',
 					controller: 'productListController'
 				})
 				.state('index.oneCol.productDetail', {
-					url: '/productDetail/1',
+					url: '/products/detail/1',
 					templateUrl: 'app/modules/demo/partials/productDetailAngular.html',
 					controller: 'productDetailController'
 				})
 				.state('index.oneCol.addNewProduct', {
-					url: '/addNewProduct',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/products/add',
+					template: '<h2>Add New Product</h2>'
 				})
 				.state('index.oneCol.manageCategories', {
-					url: '/manageCategories',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/products/manageCategories',
+					template: '<h2>Manage Categories</h2>'
 				})
 				.state('index.oneCol.manageProductReviews', {
-					url: '/manageProductReviews',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/products/manageProductReviews',
+					template: '<h2>Manage Product Reviews</h2>'
 				})
 				/*affiliates*/
 				.state('index.oneCol.locateAffiliate', {
-					url: '/locateAffiliate',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/affiliates/locate',
+					template: '<h2>Locate Affiliate</h2>'
 				})
 				.state('index.oneCol.addNewAffiliate', {
-					url: '/addNewAffiliate',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/affiliates/add',
+					template: '<h2>Add New Affiliate</h2>'
 				})
 				/*content*/
 				.state('index.oneCol.managePages', {
-					url: '/managePages',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/content/managePages',
+					template: '<h2>Manage Pages</h2>'
 				})
 				.state('index.oneCol.manageArticles', {
-					url: '/manageArticles',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/content/manageArticles',
+					template: '<h2>Manage Articles</h2>'
 				})
 				.state('index.oneCol.manageRecipes', {
-					url: '/manageRecipes',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/content/manageRecipes',
+					template: '<h2>Manage Recipes</h2>'
 				})
 				.state('index.oneCol.manageFaqs', {
-					url: '/manageFaqs',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/content/manageFaqs',
+					template: '<h2>Manage FAQs</h2>'
 				})
 				/*tools*/
 				.state('index.oneCol.productTaxCodes', {
-					url: '/productTaxCodes',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/tools/productTaxCodes',
+					template: '<h2>Product Tax Codes</h2>'
 				})
 				.state('index.oneCol.emailAddressProfiles', {
-					url: '/emailAddressProfiles',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/tools/emailAddressProfiles',
+					template: '<h2>Multiple Email Address Profiles</h2>'
 				})
 				.state('index.oneCol.reassignTransaction', {
-					url: '/reassignTransaction',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/tools/reassignTransaction',
+					template: '<h2>Reassign Transaction</h2>'
 				})
 				.state('index.oneCol.changeOrderStatus', {
-					url: '/changeOrderStatus',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/tools/changeOrderStatus',
+					template: '<h2>Change Order Status</h2>'
 				})
 				.state('index.oneCol.healthWise', {
-					url: '/healthWise',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/tools/healthWise',
+					template: '<h2>HealthWise</h2>'
 				})
 				/*users*/
 				.state('index.oneCol.manageUsers', {
-					url: '/manageUsers',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/users/manage',
+					template: '<h2>Manage Users</h2>'
 				})
 				/*settings*/
 				.state('index.oneCol.manageCountries', {
-					url: '/manageCountries',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/settings/manageCountries',
+					template: '<h2>Manage Countries</h2>'
 				})
 				.state('index.oneCol.manageStates', {
-					url: '/manageStates',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/settings/manageStates',
+					template: '<h2>Manage States</h2>'
 				})
 				.state('index.oneCol.perishableCartThreshold', {
-					url: '/perishableCartThreshold',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/settings/perishableCartThreshold',
+					template: '<h2>Perishable Cart Threshold</h2>'
 				})
 				/*help*/
 				.state('index.oneCol.submitBug', {
-					url: '/submitBug',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/help/submitBug',
+					template: '<h2>Submit Bug</h2>'
 				})
 				.state('index.oneCol.viewWiki', {
-					url: '/viewWiki',
-					templateUrl: 'app/modules/demo/partials/demoPage.html'
+					url: '/help/viewWiki',
+					template: '<h2>View Wiki</h2>'
 				});
 			/*---------------------------------*/
 		}

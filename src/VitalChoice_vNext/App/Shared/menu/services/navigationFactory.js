@@ -8,7 +8,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Customer',
 			subMenu: [
 				{ name: 'locateCustomer', stateName: 'index.oneCol.locateCustomer', stateLabel: 'Locate Customer' },
-				{ name: 'addNewCustomer', stateName: 'index.oneCol.addNewCustomer', stateLabel: 'Add New Customer' }
+				{ name: 'addNewCustomer', stateName: 'index.twoCols.addNewCustomer.accountProfile', stateLabel: 'Add New Customer' }
 			]
 		},
 		{
@@ -24,11 +24,11 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'reports',
 			stateLabel: 'Reports',
 			subMenu: [
-				{ name: 'salesOrders', stateName: 'index.twoCols.salesOrders', stateLabel: 'Sales, Orders' },
-				{ name: 'wholesale', stateName: 'index.twoCols.wholesale', stateLabel: 'Wholesale' },
+				{ name: 'salesOrders', stateName: 'index.twoCols.salesOrders.healthWise', stateLabel: 'Sales, Orders' },
+				{ name: 'wholesale', stateName: 'index.twoCols.wholesale.wholesaleSummary', stateLabel: 'Wholesale' },
 				{ name: 'affiliates', stateName: 'index.oneCol.affiliates', stateLabel: 'Affiliates' },
-				{ name: 'operations', stateName: 'index.twoCols.operations', stateLabel: 'Operations' },
-				{ name: 'listProcessingAnalysis', stateName: 'index.twoCols.listProcessingAnalysis', stateLabel: 'List Processing, Analysis' }
+				{ name: 'operations', stateName: 'index.twoCols.operations.vitalGreen', stateLabel: 'Operations' },
+				{ name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis' }
 			]
 		},
 		{

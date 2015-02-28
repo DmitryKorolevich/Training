@@ -141,7 +141,7 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 				checked: true
 			},
 			{
-				label: 'Organic Foods &amp; Grass-Fed Beef',
+				label: 'Organic Foods & Grass-Fed Beef',
 				status: 1,
 				checked: false,
 				children: [
