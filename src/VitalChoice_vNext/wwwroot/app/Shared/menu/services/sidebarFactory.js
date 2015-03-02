@@ -26,15 +26,6 @@ angular.module('app.shared.menu.services.sidebarFactory', [])
 			menu: [
 			  { name: 'sidebar-vitalGreen', stateName: 'index.twoCols.operations.vitalGreen', stateLabel: 'VitalGreen' }
 			]
-		},
-		{
-			name: 'addNewCustomer',
-			moduleName: 'addNewCustomer',
-			menu: [
-			  { name: 'sidebar-accountProfile', stateName: 'index.twoCols.addNewCustomer.accountProfile', stateLabel: 'Account Profile' },
-			  { name: 'sidebar-shippingAddress', stateName: 'index.twoCols.addNewCustomer.shippingAddress', stateLabel: 'Shipping Address' },
-			  { name: 'sidebar-customerNotes', stateName: 'index.twoCols.addNewCustomer.customerNotes', stateLabel: 'Customer Notes' }
-			]
 		}
 	];
 

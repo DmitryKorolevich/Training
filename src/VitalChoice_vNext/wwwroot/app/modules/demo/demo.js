@@ -13,45 +13,7 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 				})
 				.state('index.oneCol.addNewCustomer', {
 					url: '/customers/add',
-					template: '<h2>Add New Customer</h2>'
-				})
-				.state('index.twoCols.addNewCustomer', {
-					abstract: true,
-					url: '/customers/:name',
-					views:
-					{
-						'left': {
-							templateUrl: 'app/modules/demo/partials/customerControls.html',
-							controller: 'sidebarController'
-						}
-					}
-				})
-				.state('index.twoCols.addNewCustomer.accountProfile', {
-					url: '/accountProfile',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/accountProfile.html'
-						}
-					}
-				})
-				.state('index.twoCols.addNewCustomer.shippingAddress', {
-					url: '/shippingAddress',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/shippingAddress.html'
-						}
-					}
-				})
-				.state('index.twoCols.addNewCustomer.customerNotes', {
-					url: '/customerNotes',
-					views:
-					{
-						'@index.twoCols': {
-							templateUrl: 'app/modules/demo/partials/customerNotes.html'
-						}
-					}
+					templateUrl: 'app/modules/demo/partials/addNewCustomer.html'
 				})
 				/*orders*/
 				.state('index.oneCol.viewAllOrders', {
