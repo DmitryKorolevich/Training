@@ -21,7 +21,7 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 					views:
 					{
 						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
+							templateUrl: 'app/modules/demo/partials/customerControls.html',
 							controller: 'sidebarController'
 						}
 					}
