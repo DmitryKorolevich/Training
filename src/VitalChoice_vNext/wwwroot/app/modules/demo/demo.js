@@ -1,6 +1,12 @@
 ﻿'use strict';
 
-angular.module('app.modules.demo', ['app.modules.demo.controllers.productListController', 'app.modules.demo.controllers.productDetailController'])
+angular.module('app.modules.demo',
+	[
+		'app.modules.demo.controllers.productListController',
+		'app.modules.demo.controllers.productDetailController',
+		'app.modules.demo.controllers.customerListController',
+		'app.modules.demo.controllers.customerDetailController'
+	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function($stateProvider, $urlRouterProvider) {
@@ -9,11 +15,21 @@ angular.module('app.modules.demo', ['app.modules.demo.controllers.productListCon
 				/*customer*/
 				.state('index.oneCol.locateCustomer', {
 					url: '/customers/locate',
-					template: '<h2>Locate Customer</h2>'
+					templateUrl: 'app/modules/demo/partials/searchCustomer.html'
 				})
 				.state('index.oneCol.addNewCustomer', {
 					url: '/customers/add',
 					templateUrl: 'app/modules/demo/partials/addNewCustomer.html'
+				})
+				.state('index.oneCol.customersList', {
+					url: '/customers',
+					templateUrl: 'app/modules/demo/partials/customers.html',
+					controller: 'customerListController'
+				})
+				.state('index.oneCol.customerDetail', {
+					url: '/customers/detail/1',
+					templateUrl: 'app/modules/demo/partials/customerDetail.html',
+					controller: 'customerDetailController'
 				})
 				/*orders*/
 				.state('index.oneCol.viewAllOrders', {

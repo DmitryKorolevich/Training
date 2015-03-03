@@ -62,3 +62,7 @@
 /// <reference path="../App/modules/demo/controllers/productDetailController.js" />
 /// <reference path="lib/angular-sanitize/angular-sanitize.js" />
 /// <reference path="lib/angular-ya-treeview/ya-treeview-tpls.min.js" />
+/// <reference path="../app/modules/demo/controllers/customerlistcontroller.js" />
+/// <reference path="app/modules/demo/controllers/customerlistcontroller.js" />
+/// <reference path="../app/modules/demo/controllers/customerdetailcontroller.js" />
+/// <reference path="app/modules/demo/controllers/customerdetailcontroller.js" />
