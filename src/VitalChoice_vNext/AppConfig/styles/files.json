@@ -7,6 +7,7 @@
 		'lib/font-awesome/font-awesome.css',
 		'lib/textAngular/textAngular.css',
 		'lib/angular-ya-treeview/ya-treeview.min.css',
+		'lib/nvd3/nv.d3.css',
 		'assets/styles/site.css'
 	]
 }

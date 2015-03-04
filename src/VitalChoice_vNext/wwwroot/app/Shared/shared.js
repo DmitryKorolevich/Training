@@ -8,9 +8,9 @@ angular.module('app.shared', [
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function($stateProvider, $urlRouterProvider) {
-
 			$stateProvider
 				.state('index', {
+					abstract: true,
 					url: '',
 					views: {
 						'': {
@@ -29,11 +29,11 @@ angular.module('app.shared', [
 				})
 				.state('index.oneCol', {
 					abstract: true,
-					url: '/area',
+					url: '',
 					templateUrl: 'app/shared/area/partials/oneColumn.html'
 				}).state('index.twoCols', {
 					abstract: true,
-					url: '/area',
+					url: '',
 					templateUrl: 'app/shared/area/partials/twoColumn.html'
 				});;
 		}

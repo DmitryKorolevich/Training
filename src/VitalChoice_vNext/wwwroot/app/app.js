@@ -11,9 +11,7 @@ var app = angular
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function ($stateProvider, $urlRouterProvider) {
-
 			$urlRouterProvider.otherwise('app/shared/partials/404.html');
-
 		}
 	])
 //.controller('IndexCtrl', ['$scope', function ($scope) {

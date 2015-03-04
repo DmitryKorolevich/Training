@@ -5,13 +5,20 @@ angular.module('app.modules.demo',
 		'app.modules.demo.controllers.productListController',
 		'app.modules.demo.controllers.productDetailController',
 		'app.modules.demo.controllers.customerListController',
-		'app.modules.demo.controllers.customerDetailController'
+		'app.modules.demo.controllers.customerDetailController',
+		'app.modules.demo.controllers.dashboardController'
 	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
 		function($stateProvider, $urlRouterProvider) {
 
 			$stateProvider
+				/*dashboard*/
+				.state('index.oneCol.dashboard', {
+					url: '',
+					templateUrl: 'app/modules/demo/partials/dashboard.html',
+					controller: 'dashboardController'
+				})
 				/*customer*/
 				.state('index.oneCol.locateCustomer', {
 					url: '/customers/locate',

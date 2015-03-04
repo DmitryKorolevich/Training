@@ -16,6 +16,9 @@
 		'lib/textAngular/textAngular.js',
 		'lib/textAngular/textAngularSetup.js',
 		'lib/angular-ya-treeview/ya-treeview-tpls.min.js',
+		'lib/angularjs-nvd3-directives/angularjs-nvd3-directives.js',
+		'lib/d3/d3.js',
+		'lib/nvd3/nv.d3.js',
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',
@@ -40,6 +43,7 @@
 		'app/modules/demo/controllers/productListController.js',
 		'app/modules/demo/controllers/productDetailController.js',
 		'app/modules/demo/controllers/customerListController.js',
-		'app/modules/demo/controllers/customerDetailController.js'
+		'app/modules/demo/controllers/customerDetailController.js',
+		'app/modules/demo/controllers/dashboardController.js'
 	]
 }
