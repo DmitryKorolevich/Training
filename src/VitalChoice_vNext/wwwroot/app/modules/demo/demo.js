@@ -6,7 +6,8 @@ angular.module('app.modules.demo',
 		'app.modules.demo.controllers.productDetailController',
 		'app.modules.demo.controllers.customerListController',
 		'app.modules.demo.controllers.customerDetailController',
-		'app.modules.demo.controllers.dashboardController'
+		'app.modules.demo.controllers.dashboardController',
+		'app.modules.demo.controllers.orderDetailController'
 	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
@@ -49,7 +50,8 @@ angular.module('app.modules.demo',
 				})
 				.state('index.oneCol.placeNewOrder', {
 					url: '/orders/place',
-					template: '<h2>Place New Order</h2>'
+					templateUrl: 'app/modules/demo/partials/addNewOrder.html',
+					controller: 'orderDetailController'
 				})
 				/*reports*/
 				/*reports main*/

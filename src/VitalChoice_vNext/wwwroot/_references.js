@@ -71,3 +71,5 @@
 /// <reference path="lib/nvd3/nv.d3.js" />
 /// <reference path="../app/modules/demo/controllers/dashboardcontroller.js" />
 /// <reference path="app/modules/demo/controllers/dashboardcontroller.js" />
+/// <reference path="../app/modules/demo/controllers/orderdetailcontroller.js" />
+/// <reference path="app/modules/demo/controllers/orderdetailcontroller.js" />
