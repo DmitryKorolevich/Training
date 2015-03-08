@@ -46,10 +46,10 @@ angular.module('app.modules.demo.controllers.dashboardController', [])
                  {
                  	"key": "Sales by New Customers",
                  	"values": [
-						["Kopp, Kristin", 12312345.00],
+						["Kopp, Kristin", 1231234.00],
 						["Lee, Bruce", 567567.00],
-						["Jobs, Richard", 34234234.00],
-						["Cameron, James", 12312312.00],
+						["Jobs, Richard", 423423.00],
+						["Cameron, James", 1231231.00],
 						["Bay, Michel", 1277504.00],
 						["Jack, Brad", 342342.00],
 						["Cooper, Simon", 1343615.00],
@@ -66,14 +66,14 @@ angular.module('app.modules.demo.controllers.dashboardController', [])
                  {
                  	"key": "Sales by Existing Customers",
                  	"values": [
-						["Simmons, Mark", 3423422.00],
-						["Richrards, Rish", 12234564.00],
-						["Dylon, Bob", 2343244.00],
+						["Simmons, Mark", 423422.00],
+						["Richrards, Rish", 1223454.00],
+						["Dylon, Bob", 343244.00],
 						["Wick, Jim", 234234.00],
 						["May, Patricia", 1277504.00],
 						["Chippers, Richard", 324234.00],
 						["July, June", 1343615.00],
-						["Apolo, Tim", 36012339.00],
+						["Apolo, Tim", 601233.00],
 						["Pink, Luke", 123167.00],
 						["Lee, Tom", 12312.00],
 						["Page, Kira", 1559062.00],
