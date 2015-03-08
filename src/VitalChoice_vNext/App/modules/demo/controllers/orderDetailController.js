@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.demo.controllers.orderDetailController', [])
-.controller('orderDetailController', ['$scope', function ($scope) {
+.controller('orderDetailController', ['$scope', 'toaster', function ($scope, toaster) {
 	$scope.orders = [
 		{ RowStatus: 1, ProcessingStatus: 2, Status: 'Processed', Agent: 'GC', OrderType: 'Phone', OrderDate: '9/2/2015', OrderId: '111111', OrderTotal: '$1395.00', ShipTo: 'Smith, Bob' },
 		{ RowStatus: 1, ProcessingStatus: 2, Status: 'Refund', Agent: '', OrderType: 'Phone', OrderDate: '3/2/2010', OrderId: '223234', OrderTotal: '$3265.00', ShipTo: 'Gould, Gary' },
@@ -39,7 +39,7 @@ angular.module('app.modules.demo.controllers.orderDetailController', [])
 		Zip: '98264',
 		Phone: '3606565717',
 		Fax: 'US',
-		CurrentEmail: 'gary@g2-designgroup.com',
+		Email: 'gary@g2-designgroup.com',
 		Files: [
 			{ UploadDate: '6/3/2014', Description: 'Some file', FileName: 'fileName.gif' },
 			{ UploadDate: '16/3/2013', Description: 'Some file 2', FileName: 'fileName2.jpg' },
@@ -62,6 +62,28 @@ angular.module('app.modules.demo.controllers.orderDetailController', [])
 		TaxExempt: 0,
 		Website: '',
 		Tier: 0,
-		TradeClass: 0
+		TradeClass: 0,
 	};
+
+	$scope.openDate = function ($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.date.opened = true;
+    };
+
+    $scope.dateOptions = {
+        formatYear: 'yy',
+        startingDay: 1
+    };
+
+    $scope.date = { 
+      opened: false, 
+      InceptionDate: new Date()
+    };
+
+    $scope.$watch("currentCustomer.CustomerType", function (newValue) {
+    	if (newValue == 2) {
+    		toaster.pop('warning', "Caution!", "Changing customer type value will remove the current affiliate linking with customer.");
+    	}
+    });
 }]);

@@ -8,6 +8,7 @@
 		'lib/textAngular/textAngular.css',
 		'lib/angular-ya-treeview/ya-treeview.min.css',
 		'lib/nvd3/nv.d3.css',
+		'lib/AngularJS-Toaster/toaster.css',
 		'assets/styles/site.css'
 	]
 }

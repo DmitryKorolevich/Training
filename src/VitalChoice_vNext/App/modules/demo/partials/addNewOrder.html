@@ -10,7 +10,7 @@
 	<div class="col-lg-10">
 		<tabset>
 			<tab heading="Order">
-				
+	
 			</tab>
 			<tab heading="History">
 				<div class="col-lg-12">
@@ -79,7 +79,7 @@
 								</select>
 							</div>
 						</div>
-							<div data-ng-if="currentCustomer.CustomerType == 2">
+						<div data-ng-if="currentCustomer.CustomerType == 2">
 						<div class="form-group">
 							<label for="taxExempt" class="col-lg-3 control-label">Tax Exempt</label>
 							<div class="col-lg-9">
@@ -135,10 +135,15 @@
 						<div class="form-group">
 							<label for="website" class="col-lg-3 control-label">Inception Date</label>
 							<div class="col-lg-9">
-								<datepicker data-ng-model="currentCustomer.InceptionDate" show-weeks="true" class="well well-sm"></datepicker>
+								<p class="input-group">
+									<input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="date.InceptionDate" is-open="date.opened" datepicker-options="dateOptions" ng-required="true" />
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-disabled="false" ng-click="openDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+									</span>
+								</p>
 							</div>
 						</div>
-							</div>
+						</div>
 						<span class="legend">Profile Details</span>
 						<div class="form-group">
 							<label for="permanentlyUpdate" class="col-lg-3 control-label">Permanently Update Profile</label>
@@ -352,7 +357,7 @@
 										</tbody>
 									</table>
 								</div>
-								<button ui-sref="index.col.dashboard" class="btn btn-default btn-danger">Delete</button>
+								<button ui-sref="index.col.dashboard" class="btn btn-danger">Delete</button>
 							</div>
 						</div>
 						<span class="legend">Upload New File</span>
@@ -365,10 +370,13 @@
 						<div class="form-group">
 							<label class="col-lg-3 control-label"></label>
 							<div class="col-lg-9">
-								<div class="btn-group">
-									<input type="file" class="form-control" id="" placeholder="Choose File">
-									<input type="text" class="form-control" id="" placeholder="Description">
-								</div>
+								<input type="file" class="" id="" placeholder="Choose File">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-3 control-label"></label>
+							<div class="col-lg-9">
+								<button class="btn btn-primary">Upload</button>
 							</div>
 						</div>
 						<span class="legend">Update Password</span>
@@ -389,15 +397,15 @@
 							<div class="col-lg-3"></div>
 							<div class="col-lg-9">
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.CreditCardApproved" id="creditCard" placeholder="Credit Card">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.CreditCardApproved" id="creditCard" placeholder="Credit Card">
 									Credit Card
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.OACApproved" id="oac" placeholder="OAC">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.OACApproved" id="oac" placeholder="OAC">
 									OAC
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.CheckApproved" id="check" placeholder="Check">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.CheckApproved" id="check" placeholder="Check">
 									Check
 								</label>
 							</div>
@@ -405,7 +413,7 @@
 						<div class="form-group">
 							<label for="state" class="col-lg-3 control-label">Default Payment Method</label>
 							<div class="col-lg-9">
-								<select class="form-control" id="ddCreditCard" data-ng-model="currentCustomer.: 0">
+								<select class="form-control" id="ddCreditCard" data-ng-model="currentCustomer.DefaultPaymentMethod">
 									<option value="0">Credit Card</option>
 								</select>
 							</div>
@@ -415,23 +423,23 @@
 							<div class="col-lg-3"></div>
 							<div class="col-lg-9">
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.Extraice" id="extraice" placeholder="EXTRAICE">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.Extraice" id="extraice" placeholder="EXTRAICE">
 									EXTRAICE
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.Ib" id="ib" placeholder="IB">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.Ib" id="ib" placeholder="IB">
 									IB
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.In" id="in" placeholder="IN">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.In" id="in" placeholder="IN">
 									IN
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.Ps" id="ps" placeholder="PS">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.Ps" id="ps" placeholder="PS">
 									PS
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" data-ng-model="currentCustomer.Special" id="special" placeholder="SPECIAL">
+									<input type="checkbox" class="" data-ng-model="currentCustomer.Special" id="special" placeholder="SPECIAL">
 									SPECIAL
 								</label>
 							</div>
@@ -441,11 +449,11 @@
 							<div class="col-lg-3"></div>
 							<div class="col-lg-9">
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" placeholder="Do Not Mail">
+									<input type="checkbox" class="" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" placeholder="Do Not Mail">
 									Do Not Mail
 								</label>
 								<label class="checkbox-inline col-lg-2">
-									<input type="checkbox" checked="checked" class="" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" placeholder="Do Not Rent">
+									<input type="checkbox" class="" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" placeholder="Do Not Rent">
 									Do Not Rent
 								</label>
 							</div>
@@ -456,7 +464,7 @@
 							<div class="col-lg-9">
 								<div class="checkbox">
 									<label>
-										<input type="checkbox" checked="checked" class="" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount" placeholder="Suspend User Account">
+										<input type="checkbox" class="" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount" placeholder="Suspend User Account">
 									</label>
 								</div>
 							</div>

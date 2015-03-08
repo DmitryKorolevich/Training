@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('app.utils', ['textAngular', 'ya.treeview', 'ya.treeview.tpls','nvd3ChartDirectives' ])
+angular.module('app.utils', ['textAngular', 'ya.treeview', 'ya.treeview.tpls','nvd3ChartDirectives', 'toaster'])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {
 		taOptions.toolbar = [

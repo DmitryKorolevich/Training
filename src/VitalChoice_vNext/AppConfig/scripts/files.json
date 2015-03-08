@@ -19,6 +19,8 @@
 		'lib/angularjs-nvd3-directives/angularjs-nvd3-directives.js',
 		'lib/d3/d3.js',
 		'lib/nvd3/nv.d3.js',
+		'lib/angular-animate/angular-animate.js',
+		'lib/AngularJS-Toaster/toaster.js',
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',
