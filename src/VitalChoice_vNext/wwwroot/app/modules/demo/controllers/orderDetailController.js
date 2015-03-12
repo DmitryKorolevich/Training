@@ -63,6 +63,8 @@ angular.module('app.modules.demo.controllers.orderDetailController', [])
 		Website: '',
 		Tier: 0,
 		TradeClass: 0,
+		PaymentMethodType: 1,
+		SavedPaymentMethod: 0
 	};
 
 	$scope.openDate = function ($event) {
@@ -86,4 +88,31 @@ angular.module('app.modules.demo.controllers.orderDetailController', [])
     		toaster.pop('warning', "Caution!", "Changing customer type value will remove the current affiliate linking with customer.");
     	}
     });
+
+	$scope.Addresses = [
+		{ label: 'Gary Gould - 806 Front ST (Default)', value: 1 },
+		{ label: 'BOB1 SMITH - 1234 ANY STREET', value: 2 },
+	];
+
+	$scope.CurrentAddress = $scope.Addresses[0];
+
+	$scope.notes = [
+		{ Date: "3/6/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "2/6/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "1/6/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "3/5/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "3/5/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "3/5/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "13/4/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "10/4/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "5/4/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "1/4/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "4/3/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "3/3/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "28/2/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "3/2/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." },
+		{ Date: "13/1/2015", Agent: "GG", Priority: "Normal", Notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus tristique eleifend. Praesent bibendum aliquam massa hendrerit semper. Curabitur a mi mauris. Nam blandit ullamcorper iaculis. Morbi pharetra, lorem quis tristique luctus, dolor neque laoreet leo, in posuere odio arcu et metus. Maecenas sed augue non metus consectetur facilisis. Aliquam pulvinar nulla eget magna accumsan convallis." }
+	];
+
+	$scope.MergeDirection = 1;
 }]);
