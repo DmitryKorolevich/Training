@@ -1,4 +1,6 @@
-﻿INSERT INTO RecordStatusCodes
+﻿DELETE RecordStatusCodes 
+
+INSERT INTO RecordStatusCodes
 (StatusCode, Name)
 SELECT 'N', 'NotActive'
 UNION

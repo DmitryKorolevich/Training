@@ -64,7 +64,7 @@ namespace VitalChoice.Data.Helpers
             return repository.Select(expression, orderBy, includes).Select(selector);
         }
 
-        public async Task<IEnumerable<TEntity>> SingleAsync()
+        public async Task<IEnumerable<TEntity>> SelectAsync()
         {
             return await repository.SelectAsync(expression, orderBy, includes);
         }
