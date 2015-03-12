@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="10ccfece-663e-4442-94b1-5b7563940b6a" ChangeDateTime="03/12/2015 10:26:33">
+    <Property Name="ElementName" Value="[dbo].[ContentItems].[UrlId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Url" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7b3a1968-26b8-4d9d-b20d-e1cb30c62f7f" ChangeDateTime="03/12/2015 10:26:56">
+    <Property Name="ElementName" Value="[dbo].[ContentItems].[DateCreated]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Created" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="659a08db-645e-4d48-bb17-eeb41f9292ea" ChangeDateTime="03/12/2015 10:28:40">
+    <Property Name="ElementName" Value="[dbo].[ContentItemProcessors].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="03e1e0b1-5b9c-4675-8e1c-b4500c60bf72" ChangeDateTime="03/12/2015 10:29:22">
+    <Property Name="ElementName" Value="[dbo].[ContentItemProcessors].[Namespace]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Name" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6e9bd31e-2b8e-4ecf-9db6-e05d27b45cff" ChangeDateTime="03/12/2015 10:31:08">
+    <Property Name="ElementName" Value="[dbo].[ContentItemsToContentProcessors].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemsToContentProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ContentItemId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="362f5722-86f5-4859-b6f8-33e571e43429" ChangeDateTime="03/12/2015 10:32:33">
+    <Property Name="ElementName" Value="[dbo].[FK_ContentItemsToContentProcessors_ToContentItems]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemsToContentProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ContentItemsToContentProcessors_ContentItems]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="223e3a7a-6c49-4567-9812-1c2bcbb56e55" ChangeDateTime="03/12/2015 10:34:15">
+    <Property Name="ElementName" Value="[dbo].[FK_ContentItemsToContentProcessors_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemsToContentProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ContentItemsToContentProcessors_ContentProcessors]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="51159aac-7d98-4b79-8e82-5324d3d61084" ChangeDateTime="03/12/2015 10:59:29">
+    <Property Name="ElementName" Value="[dbo].[ContentItems].[Status]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StatusCode" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d3f33627-0fba-46ba-b9ba-1f552c361606" ChangeDateTime="03/12/2015 11:02:06">
+    <Property Name="ElementName" Value="[dbo].[RecordStatusCodes].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RecordStatusCodes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StatucCode" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f201ee87-871e-4676-85bf-08c65615ef69" ChangeDateTime="03/12/2015 11:02:48">
+    <Property Name="ElementName" Value="[dbo].[FK_ContentItems_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ContentItems_ToRecordStatusCodes]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ff2a90dc-941f-494d-8904-0f5246023871" ChangeDateTime="03/12/2015 11:02:51">
+    <Property Name="ElementName" Value="[dbo].[FK_ContentItems_ToRecordStatusCodes]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ContentItems_ToRecordStatusCode]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4580b465-1568-452e-b177-3ae199029004" ChangeDateTime="03/12/2015 12:12:08">
+    <Property Name="ElementName" Value="[dbo].[ContentCategories].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentCategories]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MasterContentItemId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5112ad84-385b-41c2-9970-71f3be86ed58" ChangeDateTime="03/12/2015 12:44:37">
+    <Property Name="ElementName" Value="[dbo].[ContentItems].[MetaTitle]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItems]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Title" />
+  </Operation>
+</Operations>

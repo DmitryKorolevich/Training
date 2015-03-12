@@ -11,3 +11,5 @@ Post-Deployment Script Template
 */
 
 :r .\Scripts\LocalizationItems.sql
+:r .\Scripts\RecordStatusCodes.sql
+:r .\Scripts\ContentItemsProcessors.sql
