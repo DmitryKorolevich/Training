@@ -49,24 +49,24 @@ namespace VitalChoice.Data.Helpers
             return this;
         }
 
-        public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount)
+        public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)
         {
             totalCount = repository.Select(expression).Count();
-            return repository.Select(expression, orderBy, includes, page, pageSize);
+            return repository.Select(expression, orderBy, includes, page, pageSize, tracking);
         }
-        public IEnumerable<TEntity> Select()
+        public IEnumerable<TEntity> Select(bool tracking = true)
         {
-            return repository.Select(expression, orderBy, includes);
-        }
-
-        public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector)
-        {
-            return repository.Select(expression, orderBy, includes).Select(selector);
+            return repository.Select(expression, orderBy, includes, tracking: tracking);
         }
 
-        public async Task<IEnumerable<TEntity>> SelectAsync()
+        public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
-            return await repository.SelectAsync(expression, orderBy, includes);
+            return repository.Select(expression, orderBy, includes, tracking: tracking).Select(selector);
+        }
+
+        public async Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true)
+        {
+            return await repository.SelectAsync(expression, orderBy, includes, tracking: tracking);
         }
     }
 }

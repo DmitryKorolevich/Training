@@ -17,10 +17,8 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Insert(TEntity entity)
 		{
-			//((IObjectState)entity).ObjectState = ObjectState.Added;
 			DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Added);
-			//Context.SyncObjectState(entity);
 			Context.SaveChanges();
 		}
 
@@ -45,10 +43,8 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Update(TEntity entity)
 		{
-			//((IObjectState)entity).ObjectState = ObjectState.Modified;
 			DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Modified);
-			//Context.SyncObjectState(entity);
 			Context.SaveChanges();
 		}
 
@@ -63,10 +59,8 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Delete(TEntity entity)
 		{
-			//((IObjectState)entity).ObjectState = ObjectState.Deleted;
 			DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Deleted);
-			//Context.SyncObjectState(entity);
 			Context.SaveChanges();
 		}
 

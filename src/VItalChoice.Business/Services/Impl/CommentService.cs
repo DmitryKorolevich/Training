@@ -43,12 +43,14 @@ namespace VitalChoice.Business.Services.Impl
 
 				var uofRepo = uof.RepositoryAsync<Comment>();
 
-				comment = new Comment();
-				comment.CreationDate = DateTime.Now;
-				comment.Text = "123123123";
-				//comment.ObjectState = ObjectState.Added;
-				comment.AuthorId = "21496c6d-5239-417a-a737-5b3cd7b97a3d";
-				uofRepo.Insert(comment);
+			    comment = new Comment
+			    {
+			        CreationDate = DateTime.Now,
+			        Text = "123123123",
+			        AuthorId = "21496c6d-5239-417a-a737-5b3cd7b97a3d"
+			    };
+			    //comment.ObjectState = ObjectState.Added;
+			    uofRepo.Insert(comment);
 
 				uof.SaveChanges();
 

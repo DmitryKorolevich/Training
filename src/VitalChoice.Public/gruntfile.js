@@ -124,9 +124,6 @@ module.exports = function (grunt) {
     // This command registers the default task which will install bower packages into wwwroot/lib
     grunt.registerTask("default", ["bower:install", "watch"]);
 
-    // this would be run by typing "grunt test" on the command line
-    grunt.registerTask('test', ['jshint']);
-
     // the default task can be run just by typing "grunt" on the command line
     grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp']);
 

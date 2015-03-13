@@ -22,10 +22,8 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Insert(TEntity entity)
 		{
-			//((IObjectState)entity).ObjectState = ObjectState.Added;
 			DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Added);
-			//Context.SyncObjectState(entity);
 		}
 
 		public virtual void InsertRange(IEnumerable<TEntity> entities)
@@ -44,15 +42,13 @@ namespace VitalChoice.Data.Repositories
 			DbSet.Add(entities);
 		}
 
-		public virtual void Update(TEntity entity)
-		{
-			//((IObjectState)entity).ObjectState = ObjectState.Modified;
-			DbSet.Attach(entity);
-			Context.SetState(entity, EntityState.Modified);
-			//Context.SyncObjectState(entity);
-		}
+        public virtual void Update(TEntity entity)
+        {
+            DbSet.Attach(entity);
+            Context.SetState(entity, EntityState.Modified);
+        }
 
-		public virtual void Delete(int id)
+        public virtual void Delete(int id)
 		{
 			var entity = DbSet.FirstOrDefault(x => x.Id == id);
 			if (entity != null)
@@ -63,10 +59,8 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void Delete(TEntity entity)
 		{
-			//((IObjectState)entity).ObjectState = ObjectState.Deleted;
 			DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Deleted);
-			//Context.SyncObjectState(entity);
 		}
 
 		public virtual async Task<bool> DeleteAsync(int id)

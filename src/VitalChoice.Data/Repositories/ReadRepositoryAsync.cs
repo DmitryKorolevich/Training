@@ -19,38 +19,15 @@ namespace VitalChoice.Data.Repositories
 		public ReadRepositoryAsync(IDataContextAsync context)
 		{
 			this.Context = context;
-			// Temporarily for FakeDbContext, Unit Test Fakes
 			var dbContext = context as DbContext;
 			if (dbContext != null)
 				this.DbSet = dbContext.Set<TEntity>();
-			/*else
-            {
-                var fakeContext = context as FakeDbContext;
-                if (fakeContext != null) dbSet = fakeContext.Set<TEntity>();
-            }*/
 		}
-
-		/*
-				public virtual IQueryable<TEntity> SelectQuery(string query, params object[] parameters)
-				{
-					return dbSet.SqlQuery(query, parameters).AsQueryable();
-				}*/
 
 		public IQueryFluent<TEntity> Query()
 		{
 			return new QueryFluent<TEntity>(this);
 		}
-
-		//public int Update(IQueryObject<TEntity> queryObject)
-		//{
-		//	return dbSet.Update(queryObject.Query());
-		//}
-
-		//public int Delete(IQueryObject<TEntity> queryObject)
-		//{
-		//	IQueryable<Entity> query = dbSet.AsQueryable();
-		//	return context.Delete(queryObject.Query());
-		//}
 
 		public virtual IQueryFluent<TEntity> Query(IQueryObject<TEntity> queryObject)
 		{
@@ -67,7 +44,8 @@ namespace VitalChoice.Data.Repositories
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
 			List<Expression<Func<TEntity, object>>> includes = null,
 			int? page = null,
-			int? pageSize = null)
+			int? pageSize = null,
+            bool tracking = true)
 		{
 			IQueryable<TEntity> query = DbSet;
 
@@ -80,8 +58,11 @@ namespace VitalChoice.Data.Repositories
 			if (filter != null)
 				query = query.AsExpandable().Where(filter);
 
+		    if (!tracking)
+		        query = query.AsNoTracking();
+
 			if (page != null && pageSize != null)
-				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);//.AsNoTracking()
+				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
 			return query;
 		}
@@ -91,19 +72,10 @@ namespace VitalChoice.Data.Repositories
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
 			List<Expression<Func<TEntity, object>>> includes = null,
 			int? page = null,
-			int? pageSize = null)
+			int? pageSize = null,
+            bool tracking = true)
 		{
-			return Select(query, orderBy, includes, page, pageSize).AsEnumerable();
+			return Select(query, orderBy, includes, page, pageSize, tracking).AsEnumerable();
 		}
-
-		//public IQueryable ODataQueryable(ODataQueryOptions<TEntity> oDataQueryOptions)
-		//{
-		//	return oDataQueryOptions.ApplyTo(dbSet);
-		//}
-
-		//public IQueryable<TEntity> ODataQueryable()
-		//{
-		//	return dbSet;
-		//}
 	}
 }
