@@ -69,6 +69,7 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
 			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
 			builder.RegisterType<CommentService>().As<ICommentService>();
+            builder.RegisterType<ContentService>().As<IContentService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
 

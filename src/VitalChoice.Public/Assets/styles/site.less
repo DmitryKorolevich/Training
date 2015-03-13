@@ -1,0 +1,135 @@
+﻿@import "bootstrap/variables.less";
+@import "bootstrap/mixins.less";
+
+@navbar-top-color:  #fff;
+
+h2{
+	margin-left:20px;
+}
+
+.ya-treeview {
+	font-size: inherit;
+}
+
+.ya-treeview a{
+	padding-top: 9px;
+	padding-left: 0px;
+	margin: 0;
+	font-size: inherit;
+	outline: 0;
+	-webkit-box-shadow: none!important;
+	box-shadow: none!important;
+	padding-right: 0;
+	margin-left: -10px;
+}
+
+.legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: @line-height-computed;
+  font-size: (@font-size-base * 1.5);
+  line-height: inherit;
+  color: @legend-color;
+  border: 0;
+  border-bottom: 1px solid @legend-border-color;
+}
+
+.category-status{
+	font-size: inherit;
+	margin-left: 15px;
+}
+
+.nav > li.dropdown:hover{
+	cursor:pointer;
+}
+
+.nav-tabs > li:not(.active):hover a{
+	background-color: #eeeeee;
+}
+
+.nav-tabs > li:not(.active) a{
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #dddddd;
+}
+
+.table{
+	max-width:2000px;
+}
+
+.table .btn:hover{
+	color:#ffffff;
+}
+
+.left-pane{
+	position:absolute;
+	/*width:250px;*/
+}
+
+.right-pane{
+	margin: 0 0 0 250px;
+	padding: 0 30px;
+}
+
+.logo{
+	max-height:60px;
+}
+
+.margin-zero{
+	margin:0;
+}
+
+.margin-top-15px{
+	margin-top:15px;
+}
+
+.margin-top-30px{
+	margin-top:30px;
+}
+
+.custom-navbar-bottom{
+	border-radius: 0px 0px 3px  3px;
+}
+
+.custom-navbar-top{
+	border-radius: 3px  3px 0px 0px;
+	background:@navbar-top-color;
+}
+
+  .sidebar .navbar-collapse {
+    height: auto;
+    border-top: 0;
+    box-shadow: none;
+    max-height: none;
+    padding-left:0;
+    padding-right:0;
+  }
+  .sidebar .navbar-collapse.collapse {
+    display: block !important;
+    width: auto !important;
+    padding-bottom: 0;
+    overflow: visible !important;
+  }
+  .sidebar .navbar-collapse.in {
+    overflow-x: visible;
+  }
+
+.sidebar.navbar
+{
+	max-width:250px;
+	min-width: 250px;
+	margin-right: 0;
+	margin-left: 0;
+}	
+
+.sidebar .navbar-nav,
+.sidebar .navbar-nav > li,
+.sidebar .navbar-left,
+.sidebar navbar-right,
+.sidebar .navbar-header
+{float:none !important;}
+
+.sidebar .navbar-right .dropdown-menu {left:0;right:auto;}
+.sidebar .navbar-collapse .navbar-nav.navbar-right:last-child {
+    margin-right: 0;
+}

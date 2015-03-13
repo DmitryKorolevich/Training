@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    @RenderSection("HeadBase", false)
+    @await Component.InvokeAsync("Assets", "styles")
+    @await Component.InvokeAsync("Assets", "scripts")
+</head>
+<body>
+    <div class="main-content">
+        <div class="main-content-bg">
+            <div class="content-wrapper">
+                <div class="menu-bar">
+                </div>
+                <div class="content-box">
+                    <div class="paddings">
+                        <div>
+                            @RenderBody()
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-box">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

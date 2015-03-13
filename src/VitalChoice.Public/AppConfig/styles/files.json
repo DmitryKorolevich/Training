@@ -1,0 +1,10 @@
+﻿{
+	"assetsDir": 'assets/css',
+	"minifiedFileName": "style",
+
+	"files": [
+		'lib/bootstrap/css/bootstrap.css',
+		'lib/font-awesome/font-awesome.css',
+		'assets/styles/site.css'
+	]
+}

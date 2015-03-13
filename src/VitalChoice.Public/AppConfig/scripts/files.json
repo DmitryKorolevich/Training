@@ -1,0 +1,11 @@
+﻿{
+	"assetsDir": 'assets/js',
+	"minifiedFileName": "script",
+
+	"files": [
+		'lib/jquery/jquery.js',
+		'lib/bootstrap/js/bootstrap.js',
+		'lib/d3/d3.js',
+		'lib/nvd3/nv.d3.js',
+	]
+}
