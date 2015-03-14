@@ -1,11 +1,8 @@
-﻿<h2 style="margin-left: 30px">Locate a Product</h2>
-
-<div class="col-lg-4" style="margin: 30px; max-width:2000px;">
-
+﻿<div class="container container-left">
 	<div class="well">
 		<form class="form-horizontal">
 			<fieldset>
-				<legend>Find Products</legend>
+				<legend>Find Product</legend>
 				<div class="form-group">
 					<label for="selectCat" class="col-lg-3 control-label">Category</label>
 					<div class="col-lg-9">
@@ -278,6 +275,8 @@
 					<div class="col-lg-3">
 						<input type="text" class="form-control" id="inputEmail" placeholder="From">
 					</div>
+					<div class="col-lg-1">
+					</div>
 					<label for="inputEmai2l" class="col-lg-1 control-label">To</label>
 					<div class="col-lg-3">
 						<input type="text" class="form-control" id="inputEmail2" placeholder="To">
@@ -345,9 +344,11 @@
 					</div>
 				</div>
 			</fieldset>
-			<a style="margin-top:20px;" ui-sref="index.oneCol.productsList" class="btn btn-primary btn-lg">Search</a>
-			<a style="margin-top:20px; float:right;" class="btn btn-info btn-lg">Reset</a>
+			<div class="margin-top-20px">
+				<a ui-sref="index.oneCol.productsList" class="btn btn-primary btn-lg">Search</a>
+				<a class="btn btn-info btn-lg pull-right">Reset</a>
+			</div>
 		</form>
-	  </div>
 	</div>
+</div>
 

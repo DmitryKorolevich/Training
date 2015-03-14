@@ -75,3 +75,5 @@
 /// <reference path="lib/angular-bootstrap/ui-bootstrap-tpls.js" />
 /// <reference path="lib/angular/angular.js" />
 /// <reference path="lib/angular-animate/angular-animate.js" />
+/// <reference path="../App/core/dataAccess/utils/utils.js" />
+/// <reference path="app/core/dataaccess/utils/utils.js" />
