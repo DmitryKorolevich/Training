@@ -91,4 +91,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Title" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="7eeee79a-532c-4825-b694-4f74c9539540" ChangeDateTime="03/17/2015 12:16:20">
+    <Property Name="ElementName" Value="[dbo].[ContentItemsToContentProcessors].[ContentProcessorId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ContentItemsToContentProcessors]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ContentItemProcessorId" />
+  </Operation>
 </Operations>

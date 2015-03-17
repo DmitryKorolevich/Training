@@ -2,8 +2,8 @@
 
 INSERT INTO RecordStatusCodes
 (StatusCode, Name)
-SELECT 'N', 'NotActive'
+SELECT 1, 'NotActive'
 UNION
-SELECT 'A', 'Active'
+SELECT 2, 'Active'
 UNION
-SELECT 'D', 'Deleted'
+SELECT 3, 'Deleted'

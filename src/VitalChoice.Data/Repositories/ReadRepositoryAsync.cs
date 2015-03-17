@@ -8,6 +8,7 @@ using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -47,12 +48,12 @@ namespace VitalChoice.Data.Repositories
 			int? pageSize = null,
             bool tracking = true)
 		{
-			IQueryable<TEntity> query = DbSet;
+            IQueryable<TEntity> query = DbSet;
 
-			if (includes != null)
-				query = includes.Aggregate(query, (current, include) => current.Include(include));
+            if (includes != null)
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
 
-			if (orderBy != null)
+            if (orderBy != null)
 				query = orderBy(query);
 
 			if (filter != null)

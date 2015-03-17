@@ -1,9 +1,11 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Data.Entity.Relational.Metadata;
 using System.IO;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Infrastructure.Context
@@ -50,14 +52,23 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<LocalizationItem>().HasMany(p => p.LocalizationItemDatas).WithOne(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId })
                 .ReferencedKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<LocalizationItem>().Ignore(x => x.Id);
-            builder.Entity<LocalizationItem>().Property(x => x.GroupName).MaxLength(250).Required();
-            builder.Entity<LocalizationItem>().Property(x => x.ItemName).MaxLength(250).Required();
-            builder.Entity<LocalizationItem>().Property(x => x.Comment).MaxLength(250).Required();
-            builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
-                .ReferencedKey(p => new { p.GroupId, p.ItemId });
+            //builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
+            //    .ReferencedKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
-            builder.Entity<LocalizationItemData>().Property(x => x.CultureId).MaxLength(5).Required();
-            builder.Entity<LocalizationItemData>().Property(x => x.Value).MaxLength(1000).Required();
+
+            #endregion
+
+            #region Contents
+
+            builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
+            builder.Entity<ContentCategory>().ToTable("ContentCategories").Key(p => p.Id);
+            builder.Entity<ContentCategory>().HasOne(p => p.MasterContentItem).WithMany();
+            builder.Entity<ContentItemToContentItemProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
+            builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
+            builder.Entity<ContentItemProcessor>().ToTable("ContentItemProcessors").Key(p => p.Id);
+            builder.Entity<ContentItem>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItem).ForeignKey(p=>p.ContentItemId).ReferencedKey(p=>p.Id);
+            builder.Entity<ContentItemProcessor>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).ReferencedKey(p => p.Id);
+
 
             #endregion
 
