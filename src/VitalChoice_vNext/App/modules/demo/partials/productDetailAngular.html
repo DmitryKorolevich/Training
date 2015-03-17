@@ -213,7 +213,166 @@
 						</div>
 					</tab>
 					<tab heading="Sub Products">
-						<h3>Sub Products</h3>
+						<div class="container-fluid">
+							<div class="row">
+								<div class="content-fixed-250px margin-bottom-30px">
+									<div class="input-group">
+										<input type="text" class="form-control" placeholder="Search for SKU">
+										<span class="input-group-btn">
+											<button class="btn btn-primary" type="button">Search</button>
+										</span>
+									</div>
+								</div>
+								<div class="container sub-container" data-ng-repeat="subSku in subSkus">
+									<div class="row">
+										<div class="panel panel-primary">
+											<div class="panel-heading clearfix form-horizontal">
+												<div class="form-group margin-zero">
+													<label class="col-lg-2 control-label">SKU</label>
+													<div class="col-lg-4">
+														<input type="text" class="form-control" placeholder="SKU" data-ng-model="subSku.SKU">
+													</div>
+													<label class="col-lg-2 control-label">Active</label>
+													<div class="col-lg-4">
+														<div class="checkbox">
+															<label>
+																<input type="checkbox" placeholder="Active" data-ng-model="subSku.Active">
+															</label>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="panel-body clearfix form-horizontal">
+												<div class="form-group">
+													<label class="col-lg-2 control-label">Retail</label>
+													<div class="col-lg-4">
+														<div class="input-group">
+															<span class="input-group-addon">$</span>
+															<input type="number" class="form-control" placeholder="Retail Price" data-ng-model="subSku.RetailPrice">
+														</div>
+													</div>
+													<label class="col-lg-2 control-label">Wholesale</label>
+													<div class="col-lg-4">
+														<div class="input-group">
+															<span class="input-group-addon">$</span>
+															<input type="number" class="form-control" placeholder="Wholesale Price" data-ng-model="subSku.WholesalePrice">
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="col-lg-2 control-label">Stock</label>
+													<div class="col-lg-4 form-control-static">
+														<span class="text-danger">0</span>
+													</div>
+													<label class="col-lg-2 control-label">+/- units</label>
+													<div class="col-lg-4">
+														<input type="number" class="form-control" placeholder="" data-ng-model="subSku.Stock">
+													</div>
+												</div>
+												<h4 class="help-block centered-text">Other settings</h4>
+												<div class="form-group">
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox" data-ng-model="subSku.DisregardStock">
+															Disregard Stock
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox" data-ng-model="subSku.AllowBackOrder">
+															Allow Back Order
+														</label>
+													</div>
+													<div class="col-lg-6">
+														<label class="checkbox-inline col-lg-8">
+															<input type="checkbox" data-ng-model="subSku.ShipsWithin">
+															When Backed Ordered, Days Ships Within
+														</label>
+														<div class="col-lg-4">
+															<input type="number" class="form-control" data-ng-model="subSku.ShipsWithinDuration"/>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-lg-6">
+														<label class="checkbox-inline">
+															<input type="checkbox" data-ng-model="subSku.CrossSellingItem">
+															Cart Cross Selling Item<br/> <a>View Cart Cross Selling Items</a>
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<select class="form-control">
+															<option>None</option>
+															<option>Orphan-N</option>
+														</select>
+														<span class="help-block">Orphan Type</span>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox" data-ng-model="subSku.AutoShipProduct">
+															Auto-Ship Product
+														</label>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															Disallow Single
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															Hide within storefront
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															Non-discountable
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															Exclude from google merchant data feed
+														</label>
+													</div>
+												</div>
+												<h5 class="help-block centered-text">Auto-Ship Frequency Allowed</h5>
+												<div class="form-group">
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															1
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															2
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															3
+														</label>
+													</div>
+													<div class="col-lg-3">
+														<label class="checkbox-inline">
+															<input type="checkbox">
+															6
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</tab>
 					<tab heading="Nutritional">
 						<div class="container container-left">

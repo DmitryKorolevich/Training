@@ -324,5 +324,80 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					}
 				}
 			};
-		}
+
+			$scope.subSkus = [
+				{
+					SKU: 'FRP006',
+					Active: true,
+					RetailPrice: 55.00,
+					WholesalePrice: 9.00,
+					UnitsToMake: 1,
+					Stock: 5,
+					DisregardStock: true,
+					AllowBackOrder: false,
+					ShipsWithin: true,
+					CrossSellingItem: false
+				},
+				{
+					SKU: 'FRP007',
+					Active: true,
+					RetailPrice: 79.00,
+					WholesalePrice: 79.00,
+					UnitsToMake: 1,
+					Stock: 2,
+					DisregardStock: true,
+					AllowBackOrder: false,
+					ShipsWithin: false,
+					ShipsWithinDuration: 1,
+					CrossSellingItem: false,
+					AutoShipProduct: true,
+					AutoShipFrequencyAllowed: []
+				},
+				{
+					SKU: 'FRP008',
+					Active: true,
+					RetailPrice: 56.00,
+					WholesalePrice: 71.00,
+					UnitsToMake: 1,
+					Stock: 51,
+					DisregardStock: true,
+					AllowBackOrder: false,
+					ShipsWithin: false,
+					ShipsWithinDuration: 8,
+					CrossSellingItem: false,
+					AutoShipProduct: true,
+					AutoShipFrequencyAllowed: []
+				},
+				{
+					SKU: 'FRP009',
+					Active: true,
+					RetailPrice: 6.00,
+					WholesalePrice: 7.00,
+					UnitsToMake: 9,
+					Stock: 1,
+					DisregardStock: true,
+					AllowBackOrder: true,
+					ShipsWithin: true,
+					ShipsWithinDuration: 23,
+					CrossSellingItem: true,
+					AutoShipProduct: true,
+					AutoShipFrequencyAllowed: []
+				},
+				{
+					SKU: 'FRP010',
+					Active: true,
+					RetailPrice: 6.35,
+					WholesalePrice: 71.00,
+					UnitsToMake: 9,
+					Stock: 10,
+					DisregardStock: true,
+					AllowBackOrder: true,
+					ShipsWithin: true,
+					ShipsWithinDuration: 23,
+					CrossSellingItem: false,
+					AutoShipProduct: true,
+					AutoShipFrequencyAllowed: []
+				}
+			];
+	}
 	]);
