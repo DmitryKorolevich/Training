@@ -67,7 +67,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
             builder.Entity<ContentItemProcessor>().ToTable("ContentItemProcessors").Key(p => p.Id);
             builder.Entity<ContentItem>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItem).ForeignKey(p=>p.ContentItemId).ReferencedKey(p=>p.Id);
-            builder.Entity<ContentItemProcessor>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).ReferencedKey(p => p.Id);
+            //builder.Entity<ContentItemProcessor>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).ReferencedKey(p => p.Id);
 
 
             #endregion

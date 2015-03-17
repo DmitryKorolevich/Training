@@ -35,10 +35,10 @@ namespace VitalChoice.Business.Services.Impl
 
         public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, int? categoryid = null)
         {
-            var master = (masterContentItemRepository.Query(p => p.Id == 1).Select()).FirstOrDefault();
-            var contentItemToRep = (rRepository.Query(p => p.ContentItemId == 2).Select()).FirstOrDefault();
+            //var master = (masterContentItemRepository.Query(p => p.Id == 1).Select()).FirstOrDefault();
+            //var contentItemToRep = (rRepository.Query(p => p.ContentItemId == 2).Select()).FirstOrDefault();
             var contentItem = (contentItemRepository.Query(p => p.Id == 2).Include(p=>p.ContentItemToContentItemProcessors).Select()).FirstOrDefault();
-            var category = (await contentCategoryRepository.Query(p => p.Id == 2).Include(p=>p.MasterContentItem).SelectAsync()).FirstOrDefault();
+            //var category = (await contentCategoryRepository.Query(p => p.Id == 2).Include(p=>p.MasterContentItem).SelectAsync()).FirstOrDefault();
 
             ExecutedContentItem toReturn = new ExecutedContentItem()
             {
