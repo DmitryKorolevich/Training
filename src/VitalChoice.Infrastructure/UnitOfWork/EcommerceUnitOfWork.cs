@@ -9,10 +9,10 @@ using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork
 {
-    public class VitalChoiceUnitOfWork : UnitOfWorkBase
+    public class EcommerceUnitOfWork : UnitOfWorkBase
 	{
 		protected override IUnitOfWorkAsync Init()
-		{
+	    {
 			var context = new VitalChoiceContext();
 			return new Data.UnitOfWork.UnitOfWork(context);
 		}
