@@ -19,6 +19,6 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string MetaDescription { get; set; }
 
-        public IEnumerable<ContentItemToContentItemProcessor> ContentItemToContentItemProcessors { get; set; }
+        public ICollection<ContentItemToContentItemProcessor> ContentItemToContentItemProcessors { get; set; }
     }
 }
