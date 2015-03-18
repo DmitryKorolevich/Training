@@ -1,22 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Infrastructure;
 using VitalChoice.Business.Queries.Comment;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Data.DataContext;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Infrastructure.UnitOfWork;
 
 namespace VitalChoice.Business.Services.Impl
 {
 	public class CommentService: GenericService<Comment>, ICommentService
 	{
-		public CommentService(IRepositoryAsync<Comment> repository) : base(repository)
+		public CommentService(IEcommerceRepositoryAsync<Sample> ecommerceRepository, IRepositoryAsync<Comment> repository) : base(repository)
 		{
+			var resEcommerce = ecommerceRepository.Query().Select();
+
+			var res = repository.Query().Select();
+
+			using (var uof = new VitalChoiceUnitOfWork())
+			{
+				var uofRepo = uof.RepositoryAsync<Comment>();
+			}
+
+			using (var uof = new EcommerceUnitOfWork())
+			{
+				var uofRepo = uof.RepositoryAsync<Sample>();
+			}
 		}
 
 		public IEnumerable<Comment> QueryByText(string text)

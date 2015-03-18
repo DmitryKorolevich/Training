@@ -18,11 +18,13 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Core.Infrastructure;
 
-//#if ASPNET50
+#if ASPNET50
 using Autofac;
+using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain;
-//#endif
+#endif
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -61,13 +63,18 @@ namespace VitalChoice.Core.DependencyInjection
 				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
 			});
 
-//#if ASPNET50
+#if ASPNET50
 			var builder = new ContainerBuilder();
 
 			builder.Populate(services);
 
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
-			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>)).WithParameter("context", container.Resolve<VitalChoiceContext>());
+			builder.RegisterType<EcommerceContext>();
+			builder.RegisterGeneric(typeof(RepositoryAsync<>))
+				.As(typeof(IRepositoryAsync<>));
+            builder.RegisterGeneric(typeof (EcommerceRepositoryAsync<>))
+				.As(typeof (IEcommerceRepositoryAsync<>))
+				.WithParameter((pi,cc)=> pi.Name == "context", (pi,cc)=>cc.Resolve<EcommerceContext>());
 			builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<ContentService>().As<IContentService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
@@ -81,7 +88,7 @@ namespace VitalChoice.Core.DependencyInjection
             LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());
 
             return container.Resolve<IServiceProvider>();
-//#else
+#else
 
 		    return null;
 #endif

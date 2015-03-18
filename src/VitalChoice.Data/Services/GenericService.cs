@@ -5,17 +5,15 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
 
 #endregion
 
 namespace VitalChoice.Data.Services
 {
-    public abstract class GenericService<TEntity> : IGenericService<TEntity> where TEntity : Entity// IObjectState
+    public abstract class GenericService<TEntity> : IGenericService<TEntity> where TEntity : Entity
     {
 	    protected IRepositoryAsync<TEntity> Repository { get; }
 
@@ -23,11 +21,6 @@ namespace VitalChoice.Data.Services
 	    {
 		    this.Repository = repository;
         }
-
-		//public virtual IQueryable<TEntity> SelectQuery(string query, params object[] parameters)
-		//{
-		//	return repository.SelectQuery(query, parameters).AsQueryable();
-		//}
 
         public virtual void Insert(TEntity entity)
         {

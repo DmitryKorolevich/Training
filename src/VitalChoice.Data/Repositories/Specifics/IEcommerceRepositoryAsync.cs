@@ -9,7 +9,7 @@ using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories.Specifics
 {
-	public class VitalChoiceRepositoryAsync<TEntity> : RepositoryAsync<TEntity> where TEntity : Entity
+	public interface IEcommerceRepositoryAsync<TEntity> : IRepositoryAsync<TEntity> where TEntity : Entity
 	{
 	}
 }

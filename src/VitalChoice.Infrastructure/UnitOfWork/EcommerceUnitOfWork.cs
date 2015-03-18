@@ -1,10 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
+﻿using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork
@@ -13,7 +7,7 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 	{
 		protected override IUnitOfWorkAsync Init()
 	    {
-			var context = new VitalChoiceContext();
+			var context = new EcommerceContext();
 			return new Data.UnitOfWork.UnitOfWork(context);
 		}
 	}

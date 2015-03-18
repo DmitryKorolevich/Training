@@ -9,7 +9,7 @@ using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories.Specifics
 {
-	public class EcommerceRepositoryAsync<TEntity> : RepositoryAsync<TEntity> where TEntity : Entity
+	public class EcommerceRepositoryAsync<TEntity> : RepositoryAsync<TEntity>, IEcommerceRepositoryAsync<TEntity> where TEntity : Entity
 	{
 		public EcommerceRepositoryAsync(IDataContextAsync context) : base(context)
 		{

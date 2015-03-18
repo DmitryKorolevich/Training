@@ -6,6 +6,7 @@ using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Infrastructure.Context
@@ -34,14 +35,15 @@ namespace VitalChoice.Infrastructure.Context
         protected override void OnConfiguring(DbContextOptions builder)
 		{
 			builder.UseSqlServer("Server=localhost;Database=Ecommerce;Integrated security=True;");
-			//builder.UseSqlServer();
 
 			base.OnConfiguring(builder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            base.OnModelCreating(builder);
+			builder.Entity<Sample>().ToTable("Sample");
+
+			base.OnModelCreating(builder);
 		}
 	}
 }

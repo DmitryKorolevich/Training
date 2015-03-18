@@ -36,15 +36,12 @@ namespace VitalChoice.Infrastructure.Context
         protected override void OnConfiguring(DbContextOptions builder)
 		{
 			builder.UseSqlServer("Server=localhost;Database=VitalChoice;Integrated security=True;");
-			//builder.UseSqlServer();
 
 			base.OnConfiguring(builder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            //builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
-
             #region LocalizationItems
 
             builder.Entity<LocalizationItem>().Key(p => new {p.GroupId, p.ItemId});
