@@ -3,11 +3,11 @@ using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork
 {
-    public class VitalChoiceUnitOfWork : UnitOfWorkBase
+    public class EcommerceUnitOfWork : UnitOfWorkBase
 	{
 		protected override IUnitOfWorkAsync Init()
-		{
-			var context = new VitalChoiceContext();
+	    {
+			var context = new EcommerceContext();
 			return new Data.UnitOfWork.UnitOfWork(context);
 		}
 	}
