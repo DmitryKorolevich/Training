@@ -44,8 +44,8 @@ namespace VitalChoice.Business.Services.Impl
             var contentItem = (contentItemRepository.Query(p => p.Id == 2).Include(p=>p.ContentItemToContentItemProcessors.Select(pp=>pp.ContentItemProcessor)).Select()).FirstOrDefault();
             //var category = (await contentCategoryRepository.Query(p => p.Id == 2).Include(p=>p.MasterContentItem).SelectAsync()).FirstOrDefault();
 
-            VitalChoiceContext context = new VitalChoiceContext();
-            var item =  context.Set<ContentItem>().Where(p => p.Id == 2).Include(p => p.ContentItemToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).FirstOrDefault();
+            //VitalChoiceContext context = new VitalChoiceContext();
+            //var item =  context.Set<ContentItemToContentItemProcessor>().Where(p => p.Id == 2).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentItemProcessors).FirstOrDefault();
 
             //var test= tRepository.Query(p => p.Id == 1).Include(p => p.Text2s).Select().FirstOrDefault();
 
