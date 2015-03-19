@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Domain
 {
-    public class ApplicationUser : IdentityUser//, IObjectState
+    public class ApplicationUser : IdentityUser
     {
 	    public int CustomerId { get; set; }
 

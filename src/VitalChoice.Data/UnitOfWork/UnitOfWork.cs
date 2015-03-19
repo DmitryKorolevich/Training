@@ -93,14 +93,8 @@ namespace VitalChoice.Data.UnitOfWork
         public void Rollback()
         {
             transaction.Rollback();
-           // ((DataContext.DataContext)dataContext).SyncObjectsStatePostCommit();
         }
 
 	    #endregion
-
-		//public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : IObjectState
-		//{
-  //          return ServiceProviderExtensions.. <IUnitRepositoryAsync<TEntity>>();
-  //      }
     }
 }

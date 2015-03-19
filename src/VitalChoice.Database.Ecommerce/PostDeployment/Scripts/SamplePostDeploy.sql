@@ -1,4 +1,4 @@
 ﻿INSERT INTO [Sample]
-(Name)
+(Id, Name)
 VALUES
-('Alex')
+('1', 'Alex')

@@ -20,7 +20,9 @@ using VitalChoice.Core.Infrastructure;
 
 #if ASPNET50
 using Autofac;
+using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain;
 #endif
 
@@ -67,7 +69,12 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.Populate(services);
 
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
-			builder.RegisterGeneric(typeof(RepositoryAsync<>)).As(typeof(IRepositoryAsync<>));
+			builder.RegisterType<EcommerceContext>();
+			builder.RegisterGeneric(typeof(RepositoryAsync<>))
+				.As(typeof(IRepositoryAsync<>));
+            builder.RegisterGeneric(typeof (EcommerceRepositoryAsync<>))
+				.As(typeof (IEcommerceRepositoryAsync<>))
+				.WithParameter((pi,cc)=> pi.Name == "context", (pi,cc)=>cc.Resolve<EcommerceContext>());
 			builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<ContentService>().As<IContentService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
