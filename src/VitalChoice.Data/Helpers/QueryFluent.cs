@@ -12,61 +12,76 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Helpers
 {
-    public sealed class QueryFluent<TEntity> : IQueryFluent<TEntity> where TEntity : Entity
+    public class QueryFluent<TEntity> : IQueryFluent<TEntity>
+        where TEntity : Entity
     {
-        private readonly Expression<Func<TEntity, bool>> expression;
-        private readonly List<Expression<Func<TEntity, object>>> includes;
-        private readonly ReadRepositoryAsync<TEntity> repository;
-        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy;
+        private readonly Expression<Func<TEntity, bool>> _expression;
+        protected readonly ReadRepositoryAsync<TEntity> Repository;
+        private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _orderBy;
+        protected IQueryable<TEntity> Query;
+
+        internal QueryFluent(QueryFluent<TEntity> queryFluent)
+        {
+            Query = queryFluent.Query;
+            Repository = queryFluent.Repository;
+            _expression = queryFluent._expression;
+            _orderBy = queryFluent._orderBy;
+        }
 
         public QueryFluent(ReadRepositoryAsync<TEntity> repository)
         {
-            this.repository = repository;
-            includes = new List<Expression<Func<TEntity, object>>>();
+            Query = repository.DbSet;
+            Repository = repository;
         }
 
         public QueryFluent(ReadRepositoryAsync<TEntity> repository, IQueryObject<TEntity> queryObject)
             : this(repository)
         {
-            expression = queryObject.Query();
+            _expression = queryObject.Query();
         }
 
         public QueryFluent(ReadRepositoryAsync<TEntity> repository, Expression<Func<TEntity, bool>> expression)
             : this(repository)
         {
-            this.expression = expression;
+            _expression = expression;
         }
 
         public IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy)
         {
-            this.orderBy = orderBy;
+            _orderBy = orderBy;
             return this;
         }
 
-        public IQueryFluent<TEntity> Include(Expression<Func<TEntity, object>> expression)
+        public IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression)
         {
-            includes.Add(expression);
-            return this;
+            Query = Query.Include(expression);
+            return new IncludableQueryFluent<TEntity, TProperty>(this);
+        }
+
+        public IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>>> expression)
+        {
+            Query = Query.Include(expression);
+            return new IncludableQueryFluent<TEntity, TProperty>(this);
         }
 
         public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)
         {
-            totalCount = repository.Select(expression).Count();
-            return repository.Select(expression, orderBy, includes, page, pageSize, tracking);
+            totalCount = Repository.Select(Query, _expression).Count();
+            return Repository.Select(Query, _expression, _orderBy, page, pageSize, tracking);
         }
         public IEnumerable<TEntity> Select(bool tracking = true)
         {
-            return repository.Select(expression, orderBy, includes, tracking: tracking);
+            return Repository.Select(Query, _expression, _orderBy, tracking: tracking);
         }
 
         public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
-            return repository.Select(expression, orderBy, includes, tracking: tracking).Select(selector);
+            return Repository.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
         }
 
         public async Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true)
         {
-            return await repository.SelectAsync(expression, orderBy, includes, tracking: tracking);
+            return await Repository.SelectAsync(Query, _expression, _orderBy, tracking: tracking);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace VitalChoice.Data.Repositories
 	public class ReadRepositoryAsync<TEntity> : IReadRepositoryAsync<TEntity> where TEntity : Entity
 	{
 		protected IDataContextAsync Context { get; }
-		protected DbSet<TEntity> DbSet { get; }
+		internal DbSet<TEntity> DbSet { get; }
 
 		public ReadRepositoryAsync(IDataContextAsync context)
 		{
@@ -40,19 +40,14 @@ namespace VitalChoice.Data.Repositories
 			return new QueryFluent<TEntity>(this, query);
 		}
 
-		internal IQueryable<TEntity> Select(
-			Expression<Func<TEntity, bool>> filter = null,
+        internal IQueryable<TEntity> Select(
+            IQueryable<TEntity> query,
+            Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-			List<Expression<Func<TEntity, object>>> includes = null,
 			int? page = null,
 			int? pageSize = null,
             bool tracking = true)
-		{
-            IQueryable<TEntity> query = DbSet;
-
-            if (includes != null)
-                query = includes.Aggregate(query, (current, include) => current.Include(include));
-            
+		{          
             if (orderBy != null)
 				query = orderBy(query);
 
@@ -69,14 +64,14 @@ namespace VitalChoice.Data.Repositories
 		}
 
 		internal async Task<IEnumerable<TEntity>> SelectAsync(
-			Expression<Func<TEntity, bool>> query = null,
+            IQueryable<TEntity> query,
+            Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-			List<Expression<Func<TEntity, object>>> includes = null,
 			int? page = null,
 			int? pageSize = null,
             bool tracking = true)
 		{
-			return Select(query, orderBy, includes, page, pageSize, tracking).AsEnumerable();
+			return Select(query, filter, orderBy, page, pageSize, tracking).AsEnumerable();
 		}
 	}
 }
