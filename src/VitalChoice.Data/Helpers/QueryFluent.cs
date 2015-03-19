@@ -16,6 +16,7 @@ namespace VitalChoice.Data.Helpers
     {
         private readonly Expression<Func<TEntity, bool>> expression;
         private readonly List<Expression<Func<TEntity, object>>> includes;
+        private readonly List<IQueryIncludeFluent<TEntity,Entity>> includesNew;
         private readonly ReadRepositoryAsync<TEntity> repository;
         private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy;
 
@@ -23,6 +24,7 @@ namespace VitalChoice.Data.Helpers
         {
             this.repository = repository;
             includes = new List<Expression<Func<TEntity, object>>>();
+            includesNew = new List<IQueryIncludeFluent<TEntity, Entity>>();
         }
 
         public QueryFluent(ReadRepositoryAsync<TEntity> repository, IQueryObject<TEntity> queryObject)
@@ -42,11 +44,18 @@ namespace VitalChoice.Data.Helpers
             this.orderBy = orderBy;
             return this;
         }
-
+        
         public IQueryFluent<TEntity> Include(Expression<Func<TEntity, object>> expression)
         {
             includes.Add(expression);
             return this;
+        }
+
+        IQueryIncludeFluent<TEntity, TProperty> IQueryFluent<TEntity>.IncludeNew<TProperty>(Expression<Func<TEntity, TProperty>> expression)
+        {
+            IQueryIncludeFluent<TEntity, TProperty> queryInclude = new QueryIncludeFluent<TEntity, TProperty>(this, expression);
+            //includes.Add(queryInclude);
+            return queryInclude;
         }
 
         public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)

@@ -12,13 +12,8 @@ using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Helpers
 {
-    public interface IQueryFluent<TEntity> where TEntity : Entity
+    public interface IQueryFluent<TEntity> : IQueryBaseFluent<TEntity> where TEntity : Entity
     {
-        IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
-        IQueryFluent<TEntity> Include(Expression<Func<TEntity, object>> expression);
-        IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
-        IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
-        IEnumerable<TEntity> Select(bool tracking = true);
-        Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true);
+        IQueryIncludeFluent<TEntity, TProperty> IncludeNew<TProperty>(Expression<Func<TEntity, TProperty>> expression) where TProperty : Entity;
     }
 }
