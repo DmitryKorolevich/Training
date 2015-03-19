@@ -20,7 +20,7 @@ namespace VitalChoice.Data.Helpers
         private Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> _orderBy;
         protected IQueryable<TEntity> Query;
 
-        internal QueryFluent(QueryFluent<TEntity> queryFluent)
+        protected QueryFluent(QueryFluent<TEntity> queryFluent)
         {
             Query = queryFluent.Query;
             Repository = queryFluent.Repository;
@@ -37,12 +37,14 @@ namespace VitalChoice.Data.Helpers
         public QueryFluent(ReadRepositoryAsync<TEntity> repository, IQueryObject<TEntity> queryObject)
             : this(repository)
         {
+            Query = repository.DbSet;
             _expression = queryObject.Query();
         }
 
         public QueryFluent(ReadRepositoryAsync<TEntity> repository, Expression<Func<TEntity, bool>> expression)
             : this(repository)
         {
+            Query = repository.DbSet;
             _expression = expression;
         }
 
