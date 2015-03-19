@@ -50,8 +50,8 @@ namespace VitalChoice.Data.Repositories
 		{
             IQueryable<TEntity> query = DbSet;
 
-            //if (includes != null)
-            //    query = includes.Aggregate(query, (current, include) => current.Include(include));
+            if (includes != null)
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
             
             if (orderBy != null)
 				query = orderBy(query);
