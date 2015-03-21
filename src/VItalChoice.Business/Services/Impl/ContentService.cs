@@ -41,11 +41,12 @@ namespace VitalChoice.Business.Services.Impl
         {
             //var master = (masterContentItemRepository.Query(p => p.Id == 1).Select()).FirstOrDefault();
             //var contentItemToRep = (rRepository.Query(p => p.ContentItemId == 2).Select()).FirstOrDefault();
-            var contentItem = (contentItemRepository.Query(p => p.Id == 2).Include(p=>p.ContentItemToContentItemProcessors.Select(pp=>pp.ContentItemProcessor)).Select()).FirstOrDefault();
+            //var contentItem = contentItemRepository.Query(p => p.Id == 2).Include(p=>p.ContentItemToContentItemProcessors).Select().FirstOrDefault();
             //var category = (await contentCategoryRepository.Query(p => p.Id == 2).Include(p=>p.MasterContentItem).SelectAsync()).FirstOrDefault();
 
             VitalChoiceContext context = new VitalChoiceContext();
-            var item =  context.Set<ContentItem>().Where(p => p.Id == 2).Include(p => p.ContentItemToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).FirstOrDefault();
+            var query = context.Set<ContentItemToContentItemProcessor>().Where(p => p.Id == 2).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentItemProcessors);
+            //query= query
 
             //var test= tRepository.Query(p => p.Id == 1).Include(p => p.Text2s).Select().FirstOrDefault();
 
