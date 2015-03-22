@@ -77,3 +77,7 @@
 /// <reference path="lib/angular-animate/angular-animate.js" />
 /// <reference path="../App/core/dataAccess/utils/utils.js" />
 /// <reference path="app/core/dataaccess/utils/utils.js" />
+/// <reference path="lib/angular-ui-sortable/sortable.js" />
+/// <reference path="lib/jquery-ui/jquery-ui.js" />
+/// <reference path="lib/angular-ui-sortable/sortable.js" />
+/// <reference path="lib/jquery-ui/jquery-ui.js" />

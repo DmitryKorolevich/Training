@@ -399,5 +399,11 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					AutoShipFrequencyAllowed: []
 				}
 			];
+
+			$scope.sortableOptions = {
+				handle: ' .sortable-move',
+				 items: ' .panel:not(.panel-heading)',
+				axis: 'y'
+			}
 	}
 	]);

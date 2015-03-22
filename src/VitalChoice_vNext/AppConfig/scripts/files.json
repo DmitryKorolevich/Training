@@ -4,6 +4,7 @@
 
 	"files": [
 		'lib/jquery/jquery.js',
+		'lib/jquery-ui/jquery-ui.js',
 		'lib/angular/angular.js',
 		'lib/angular-bootstrap/ui-bootstrap-tpls.js',
 		'lib/angular-ui-router/angular-ui-router.js',
@@ -21,6 +22,7 @@
 		'lib/nvd3/nv.d3.js',
 		'lib/angular-animate/angular-animate.js',
 		'lib/AngularJS-Toaster/toaster.js',
+		'lib/angular-ui-sortable/sortable.js',
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',

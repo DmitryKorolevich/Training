@@ -10,7 +10,8 @@
     "angular-ya-treeview": "~0.2.2",
 	"angularjs-nvd3-directives": "~0.0.7",
 	"AngularJS-Toaster": "~0.4.10",
-	"angular-animate": "~1.2.8"
+	"angular-animate": "~1.2.8",
+	"angular-ui-sortable": "~0.13.3"
   },
   "exportsOverride": {
     "bootstrap": {
