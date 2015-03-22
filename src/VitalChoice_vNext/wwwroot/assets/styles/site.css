@@ -1,5 +1,14 @@
 /*f66e21*/
 /*717171*/
+.table {
+  max-width: 2500px;
+}
+.container {
+  max-width: 850px;
+}
+.container.small-container {
+  max-width: 768px;
+}
 .container.sub-container {
   margin-right: 20px;
   margin-left: 0;
@@ -57,9 +66,6 @@ h2 {
 .nav-tabs > li:not(.active) a {
   background-color: #F2F2F2;
   border-bottom: 1px solid #dddddd;
-}
-.table {
-  max-width: 2000px;
 }
 .table .btn:hover {
   color: #ffffff;
