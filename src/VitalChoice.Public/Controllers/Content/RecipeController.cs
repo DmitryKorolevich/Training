@@ -16,16 +16,45 @@ namespace VitalChoice.Public.Content.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Category(int? categoryid=null)
+        public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, categoryid);
-            return BaseView(new ContentPageViewModel(toReturn));
+            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe);
+            if (toReturn != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            else
+            {
+                return BaseNotFoundView();
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Recipe(int recipeid)
+        public async Task<IActionResult> Category(string url)
         {
-            throw new NotImplementedException();
+            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, url);
+            if (toReturn != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            else
+            {
+                return BaseNotFoundView();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Recipe(string url)
+        {
+            ExecutedContentItem toReturn = await contentService.GetContentItemContentAsync(ContentType.Recipe, url);
+            if (toReturn != null)
+            {
+                return BaseView(new ContentPageViewModel(toReturn));
+            }
+            else
+            {
+                return BaseNotFoundView();
+            }
         }
     }
 }

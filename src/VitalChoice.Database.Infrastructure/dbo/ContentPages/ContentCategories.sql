@@ -12,5 +12,19 @@
     CONSTRAINT [FK_ContentCategories_ToContentItem] FOREIGN KEY ([ContentItemId]) REFERENCES [ContentItems]([Id]),
 	CONSTRAINT [FK_ContentCategories_ToRecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes]([StatusCode])
 )
+
 GO
+
+CREATE INDEX [IX_ContentCategories_Url] ON [dbo].[ContentCategories] ([Url]) WITH (FILLFACTOR = 80); 
+
+GO
+
+CREATE INDEX [IX_ContentCategories_MasterContentItemId] ON [dbo].[ContentCategories] ([MasterContentItemId]) WITH (FILLFACTOR = 80); 
+
+GO
+
+CREATE INDEX [IX_ContentCategories_ParentId] ON [dbo].[ContentCategories] ([ParentId]) WITH (FILLFACTOR = 80); 
+
+GO
+
 --CREATE TRIGGER to resolve what type of inserted/update category vs parent id

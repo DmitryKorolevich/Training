@@ -7,3 +7,9 @@
     CONSTRAINT [FK_RecipesToContentCategories_Recipes] FOREIGN KEY ([RecipeId]) REFERENCES [Recipes]([Id]) ON DELETE CASCADE, 
     CONSTRAINT [FK_RecipesToContentCategories_ContentCategories] FOREIGN KEY ([ContentCategoryId]) REFERENCES [ContentCategories]([Id]) ON DELETE CASCADE
 )
+
+GO
+
+CREATE INDEX [IX_RecipesToContentCategories_ContentCategoryId] ON [dbo].[RecipesToContentCategories] ([ContentCategoryId]) WITH (FILLFACTOR = 80); 
+
+GO
