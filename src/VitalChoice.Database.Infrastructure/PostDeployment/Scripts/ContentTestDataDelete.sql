@@ -1,0 +1,7 @@
+﻿DELETE ContentItemsToContentProcessors 
+DELETE RecipesToContentCategories 
+DELETE Recipes
+DELETE ContentCategories
+DELETE ContentPages
+DELETE ContentItems
+DELETE MasterContentItems

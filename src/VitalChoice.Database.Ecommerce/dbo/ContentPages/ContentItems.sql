@@ -1,0 +1,11 @@
+﻿CREATE TABLE [dbo].[ContentItems]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(250) NOT NULL, 
+    [Created] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [Updated] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [Template] NVARCHAR(MAX) NOT NULL, 
+    [Title] NVARCHAR(250) NULL, 
+    [MetaKeywords] NVARCHAR(250) NULL, 
+    [MetaDescription] NVARCHAR(250) NULL, 
+)

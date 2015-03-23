@@ -15,6 +15,13 @@ using VitalChoice.Domain.Entities.Content;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Business.Services.Contracts.ContentProcessors;
+using System.Collections.Generic;
+using System.Dynamic;
+using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities.Localization;
+using System;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -23,44 +30,104 @@ namespace VitalChoice.Business.Services.Impl
         private readonly IRepositoryAsync<MasterContentItem> masterContentItemRepository;
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
-        private readonly IRepositoryAsync<ContentItemToContentItemProcessor> rRepository;
-        private readonly IRepositoryAsync<Test> tRepository;
+        private readonly IContentProcessorsService contentProcessorsService;
 
         public ContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<ContentItemToContentItemProcessor> rRepository,
-            IRepositoryAsync<Test> tRepository)
+            IContentProcessorsService contentProcessorsService)
 		{
             this.masterContentItemRepository = masterContentItemRepository;
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
-            this.rRepository = rRepository;
-            this.tRepository = tRepository;
+            this.contentProcessorsService = contentProcessorsService;
         }
 
-        public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, int? categoryid = null)
+        public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, int? categoryId = null)
         {
-            //var master = (masterContentItemRepository.Query(p => p.Id == 1).Select()).FirstOrDefault();
-            //var contentItemToRep = (rRepository.Query(p => p.ContentItemId == 2).Select()).FirstOrDefault();
-            //var contentItem = contentItemRepository.Query(p => p.Id == 2).Include(p=>p.ContentItemToContentItemProcessors).Select().FirstOrDefault();
-            //var category = (await contentCategoryRepository.Query(p => p.Id == 2).Include(p=>p.MasterContentItem).SelectAsync()).FirstOrDefault();
+            ExecutedContentItem toReturn = null;
+            ContentCategory category = null;
+            //TO DO - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
+            if (categoryId.HasValue)
+            {
+                category = (await contentCategoryRepository.Query(p => p.Id == categoryId).Include(p => p.MasterContentItem).Include(p => p.ContentItem).
+                    ThenInclude(p => p.ContentItemsToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).SelectAsync(false)).FirstOrDefault();
+                if (category.MasterContentItem.Type != type)
+                {
+                    category = null;
+                }
+            }
+            else
+            {
+                var masterTemplateIds = (await masterContentItemRepository.Query(p => p.Type == ContentType.Recipe).SelectAsync(false)).Select(p => p.Id).ToList();
+                category = (await contentCategoryRepository.Query(p => !p.ParentId.HasValue && masterTemplateIds.Contains(p.MasterContentItemId)).Include(p => p.MasterContentItem).Include(p => p.ContentItem).
+                    ThenInclude(p => p.ContentItemsToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).SelectAsync(false)).FirstOrDefault();
+            }
 
-            VitalChoiceContext context = new VitalChoiceContext();
-            var query = context.Set<ContentItemToContentItemProcessor>().Where(p => p.Id == 2).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentItemProcessors);
-            //query= query
+            if (category == null)
+            {
+                //TO DO - write to log. No a certain category
+                return toReturn;
+            }
 
-            //var test= tRepository.Query(p => p.Id == 1).Include(p => p.Text2s).Select().FirstOrDefault();
+            //Try load parent templates if needed
+            if(category.ContentItem==null)
+            {
+                category = await TryLoadParentTemplate(category);
+            }
 
-            ExecutedContentItem toReturn = new ExecutedContentItem()
+            //TO DO - check complining templates valid date, and recompile if needed
+
+            if (category.ContentItem == null)
+            {
+                //TO DO - write to log. Category without a template
+                return toReturn;
+            }
+
+            dynamic model = new ExpandoObject();
+            Dictionary<string, object> queryDate = new Dictionary<string, object>();
+            queryDate.Add(ContentConstants.CATEGORY_ID, categoryId);
+            foreach(var contentItemsToContentItemProcessor in category.ContentItem.ContentItemsToContentItemProcessors)
+            {
+                var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentItemProcessor.Type);
+                model = await processor.ExecuteAsync(model, queryDate);
+            }
+
+            //TO DO - execute a certain template
+
+            toReturn = new ExecutedContentItem()
             {
                 HTML = "<div>Test HTML</div>",
                 Title = "Test title",
                 MetaDescription = "Test MetaDescription",
                 MetaKeywords = "Test MetaKeywords",
             };
-
-            await Task.Run(() => { });
-
+            
             return toReturn;
+        }
+
+        private async Task<ContentCategory> TryLoadParentTemplate(ContentCategory category)
+        {
+            if(category.ParentId.HasValue)
+            {
+                ContentCategory parentCategory = null;
+                using (var uof = new VitalChoiceUnitOfWork())
+                {
+                    parentCategory = (await uof.RepositoryAsync<ContentCategory>().Query(p => p.Id == category.ParentId.Value).Include(p => p.MasterContentItem).Include(p => p.ContentItem).
+                    ThenInclude(p => p.ContentItemsToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).SelectAsync(false)).FirstOrDefault();
+                }
+                if(parentCategory!=null && parentCategory.ContentItem!=null)
+                {
+                    category.ContentItem = parentCategory.ContentItem;
+                    category.ContentItemId = parentCategory.ContentItemId;
+                    category.MasterContentItem = parentCategory.MasterContentItem;
+                    category.MasterContentItemId = parentCategory.MasterContentItemId;
+                }
+                else
+                {
+                    category = await TryLoadParentTemplate(category);
+                }
+            }
+            return category;
         }
     }
 }
