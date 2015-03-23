@@ -86,6 +86,8 @@
     <Build Include="dbo\ContentPages\Recipes.sql" />
     <Build Include="dbo\ContentPages\ContentPages.sql" />
     <Build Include="dbo\ContentPages\RecipesToContentCategories.sql" />
+    <None Include="PostDeployment\Scripts\ContentTestDataInsert.sql" />
+    <None Include="PostDeployment\Scripts\ContentTestDataDelete.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

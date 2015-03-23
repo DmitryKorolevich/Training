@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Relational.Metadata;
+using System.Data.SqlClient;
 using System.IO;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
@@ -34,14 +35,24 @@ namespace VitalChoice.Infrastructure.Context
 
         protected override void OnConfiguring(DbContextOptions builder)
 		{
-			builder.UseSqlServer("Server=localhost;Database=Ecommerce;Integrated security=True;");
+            var connectionString = (new SqlConnectionStringBuilder
+            {
+                DataSource = @"localhost",
+                // TODO: Currently nested queries are run while processing the results of outer queries
+                // This either requires MARS or creation of a new connection for each query. Currently using
+                // MARS since cloning connections is known to be problematic.
+                MultipleActiveResultSets = true,
+                InitialCatalog = "Ecommerce",
+                IntegratedSecurity = true,
+                ConnectTimeout = 60
+            }).ConnectionString;
+            builder.UseSqlServer(connectionString);
 
 			base.OnConfiguring(builder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-			builder.Entity<Sample>().ToTable("Sample");
 
 			base.OnModelCreating(builder);
 		}

@@ -9,6 +9,9 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string Template { get; set; }
 
-        public ContentType Type { get; set; }                
+        public ContentType Type { get; set; }
+
+        public virtual ICollection<ContentCategory> ContentCategories { get;set; }
+        public virtual ICollection<Recipe> Recipes { get; set; }
     }
 }

@@ -48,8 +48,6 @@ namespace VitalChoice.Infrastructure.Context
                 ConnectTimeout = 60
             }).ConnectionString;
             builder.UseSqlServer(connectionString);
-            //builder.UseSqlServer("Server=localhost;Database=VitalChoice;Integrated security=True;");
-			//builder.UseSqlServer();
 
 			base.OnConfiguring(builder);
 		}
@@ -75,23 +73,23 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
             builder.Entity<ContentCategory>().ToTable("ContentCategories").Key(p => p.Id);
-            builder.Entity<ContentCategory>().HasOne(p => p.MasterContentItem).WithMany();
+            builder.Entity<ContentCategory>().HasOne(p => p.MasterContentItem).WithMany(p=>p.ContentCategories).ForeignKey(p=>p.MasterContentItemId).ReferencedKey(p=>p.Id);
+
             builder.Entity<ContentItemToContentItemProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
             builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
             builder.Entity<ContentItemProcessor>().ToTable("ContentItemProcessors").Key(p => p.Id);
-            builder.Entity<ContentItem>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItem).ForeignKey(p=>p.ContentItemId).ReferencedKey(p=>p.Id);
-            builder.Entity<ContentItemProcessor>().HasMany(p => p.ContentItemToContentItemProcessors).WithOne(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).ReferencedKey(p => p.Id);
+            builder.Entity<ContentItem>().HasMany(p => p.ContentItemsToContentItemProcessors).WithOne(p => p.ContentItem).ForeignKey(p=>p.ContentItemId).ReferencedKey(p=>p.Id);
+            builder.Entity<ContentItemProcessor>().HasMany(p => p.ContentItemsToContentItemProcessors).WithOne(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).ReferencedKey(p => p.Id);
+
+            builder.Entity<Recipe>().ToTable("Recipes").Key(p => p.Id);
+            builder.Entity<Recipe>().HasMany(p => p.RecipesToContentCategories).WithOne(p => p.Recipe).ForeignKey(p => p.RecipeId).ReferencedKey(p => p.Id);
+            builder.Entity<Recipe>().HasOne(p => p.MasterContentItem).WithMany(p => p.Recipes).ForeignKey(p => p.MasterContentItemId).ReferencedKey(p => p.Id);
+            builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories").Key(p => p.Id);
 
 
             #endregion
 
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany(y => y.Comments).ForeignKey(x => x.AuthorId).ReferencedKey(y => y.Id);
-            ////builder.Entity<Comment>().Ignore(x => x.ObjectState);
-
-            builder.Entity<Test>().Key(p => p.Id);
-            builder.Entity<Test2>().Key(p => p.Id);
-            builder.Entity<Test2>().HasOne(x => x.Test).WithMany(y => y.Text2s).ForeignKey(x => x.TestId).ReferencedKey(y => y.Id);
-
 
             base.OnModelCreating(builder);
 		}

@@ -8,13 +8,18 @@ namespace VitalChoice.Public
         public static void RegisterRoutes(IRouteBuilder routeBuilder)
         {
             routeBuilder.MapRoute(
+                name: "Recipes_Categories",
+                template: "recipes/categories",
+                defaults: new { controller = "Recipe", action = "Categories" });
+
+            routeBuilder.MapRoute(
                 name: "Recipes_Category",
-                template: "recipes/category/{categoryid?}",
+                template: "recipes/category/{url}",
                 defaults: new { controller = "Recipe", action = "Category" });
 
             routeBuilder.MapRoute(
                 name: "Recipes_Recipe",
-                template: "recipes/{recipeid}",
+                template: "recipes/{url}",
                 defaults: new { controller = "Recipe", action = "Recipe" });
 
 

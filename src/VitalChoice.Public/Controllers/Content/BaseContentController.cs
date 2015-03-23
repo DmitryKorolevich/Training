@@ -22,5 +22,12 @@ namespace VitalChoice.Public.Content.Controllers
         {
             return View("~/Views/Content/ContentPage.cshtml", model);
         }
+
+        public virtual ViewResult BaseNotFoundView()
+        {
+            var result = View("~/Views/Shared/Error404.cshtml");
+            result.StatusCode = 404;
+            return result;
+        }
     }
 }

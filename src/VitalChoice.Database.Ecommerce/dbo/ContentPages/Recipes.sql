@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Recipes]
 (
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+	[Id] INT NOT NULL PRIMARY KEY, 
     [Url] NVARCHAR(250) NOT NULL, 
     [Name] NVARCHAR(250) NOT NULL, 
     [ContentItemId] INT NOT NULL, 
@@ -10,7 +10,3 @@
     CONSTRAINT [FK_Recipes_ToMasterContentItem] FOREIGN KEY (MasterContentItemId) REFERENCES MasterContentItems([Id]),
 	CONSTRAINT [FK_Recipes_ToRecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes]([StatusCode]),
 )
-
-GO
-
-CREATE INDEX [IX_Recipes_Url] ON [dbo].[Recipes] ([Url]) WITH (FILLFACTOR = 80); 

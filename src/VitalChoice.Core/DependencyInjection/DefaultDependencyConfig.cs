@@ -24,6 +24,8 @@ using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain;
+using VitalChoice.Business.Services.Contracts.ContentProcessors;
+using VitalChoice.Business.Services.Impl.ContentProcessors;
 #endif
 
 namespace VitalChoice.Core.DependencyInjection
@@ -78,9 +80,10 @@ namespace VitalChoice.Core.DependencyInjection
 			builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<ContentService>().As<IContentService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
+            builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
 
-			builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
+            builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
 			builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
 
             IContainer container = builder.Build();
