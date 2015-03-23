@@ -308,127 +308,92 @@
 														</div>
 													</div>
 												</div>
-												<!--<div class="panel panel-primary">
-													<div class="panel-heading clearfix form-horizontal">
-														<div class="form-group margin-zero">
-															<label class="col-md-2 control-label">SKU</label>
-															<div class="col-md-4">
-																<input type="text" class="form-control" placeholder="SKU" data-ng-model="subSku.SKU">
-															</div>
-															<label class="col-md-2 control-label">Active</label>
-															<div class="col-md-4">
-																<div class="checkbox">
-																	<label>
-																		<input type="checkbox" placeholder="Active" data-ng-model="subSku.Active">
-																	</label>
-																</div>
-															</div>
-														</div>
-													</div>
-													<div class="panel-body clearfix form-horizontal">
-														<div class="form-group">
-															
-														</div>
-														<div class="form-group">
-															
-														</div>
-														<h4 class="help-block centered-text">Other settings</h4>
-														<div class="form-group">
-															
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox" data-ng-model="subSku.AllowBackOrder">
-																	Allow Back Order
-																</label>
-															</div>
-															<div class="col-md-6">
-																<label class="checkbox-inline col-md-8">
-																	<input type="checkbox" data-ng-model="subSku.ShipsWithin">
-																	When Backed Ordered, Days Ships Within
-																</label>
-																<div class="col-md-4">
-																	<input type="number" class="form-control" data-ng-model="subSku.ShipsWithinDuration" />
-																</div>
-															</div>
-														</div>
-														<div class="form-group">
-															<div class="col-md-6">
-																<label class="checkbox-inline">
-																	<input type="checkbox" data-ng-model="subSku.CrossSellingItem">
-																	Cart Cross Selling Item<br /> <a>View Cart Cross Selling Items</a>
-																</label>
-															</div>
-															<div class="col-md-3">
-																<select class="form-control">
-																	<option>None</option>
-																	<option>Orphan-N</option>
-																</select>
-																<span class="help-block">Orphan Type</span>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox" data-ng-model="subSku.AutoShipProduct">
-																	Auto-Ship Product
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="fixed-accordion-row">
+															<label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
+															<div class="checkbox">
+																<label>
+																	<input id="lblDisallowSingle{{subSku.Id}}" type="checkbox">
 																</label>
 															</div>
 														</div>
-														<div class="form-group">
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	Disallow Single
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	Hide within storefront
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	Non-discountable
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	Exclude from google merchant data feed
-																</label>
-															</div>
-														</div>
-														<h5 class="help-block centered-text">Auto-Ship Frequency Allowed</h5>
-														<div class="form-group">
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	1
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	2
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	3
-																</label>
-															</div>
-															<div class="col-md-3">
-																<label class="checkbox-inline">
-																	<input type="checkbox">
-																	6
+														<div class="fixed-accordion-row">
+															<label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
+															<div class="checkbox">
+																<label>
+																	<input id="lblNonDiscountable{{subSku.Id}}" type="checkbox">
 																</label>
 															</div>
 														</div>
 													</div>
-												</div>-->
+												</div>
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="fixed-accordion-row">
+															<label class="control-label">Orphan Type</label>
+															<select class="form-control">
+																<option>None</option>
+																<option>Orphan-N</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="fixed-accordion-row extra-spacing">
+															<label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
+															<div class="checkbox">
+																<label>
+																	<input id="lblAutoship{{subSku.Id}}" type="checkbox">
+																</label>
+															</div>
+														</div>
+														<div class="fixed-accordion-row extra-spacing">
+															<label class="control-label">Auto-Ship Frequency</label>
+															<label class="checkbox-inline">
+																<input type="checkbox">
+																1
+															</label>
+															<label class="checkbox-inline">
+																<input type="checkbox">
+																2
+															</label>
+															<label class="checkbox-inline">
+																<input type="checkbox">
+																3
+															</label>
+															<label class="checkbox-inline">
+																<input type="checkbox">
+																6
+															</label>
+														</div>
+														<div class="fixed-accordion-row">
+															<label class="control-label">% Off</label>
+															<input type="number" class="form-control half-size-input" placeholder="">
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="fixed-accordion-row extra-spacing">
+															<label class="control-label">Seller</label>
+															<select class="form-control">
+																<option>Seller 1</option>
+																<option>Seller 2</option>
+															</select>
+														</div>
+														<div class="fixed-accordion-row">
+															<label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
+															<div class="checkbox">
+																<label>
+																	<input id="lblHideFromFeed{{subSku.Id}}" type="checkbox">
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
 											</div>
-											atatatatat
 										</accordion-group>
 									</div>
 								</accordion>
