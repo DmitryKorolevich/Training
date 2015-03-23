@@ -81,3 +81,5 @@
 /// <reference path="lib/jquery-ui/jquery-ui.js" />
 /// <reference path="lib/angular-ui-sortable/sortable.js" />
 /// <reference path="lib/jquery-ui/jquery-ui.js" />
+/// <reference path="../app/core/utils/templateoverrides.js" />
+/// <reference path="app/core/utils/templateoverrides.js" />

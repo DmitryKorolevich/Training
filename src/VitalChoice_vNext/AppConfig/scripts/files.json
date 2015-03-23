@@ -28,6 +28,7 @@
 		'app/core/core.js',
 		'app/core/dataAccess/dataAccess.js',
 		'app/core/dataAccess/services/authenticationServices.js',
+		'app/core/utils/templateOverrides.js',
 		'app/core/utils/utils.js',
 		'app/modules/modules.js',
 		'app/modules/authentication/authentication.js',

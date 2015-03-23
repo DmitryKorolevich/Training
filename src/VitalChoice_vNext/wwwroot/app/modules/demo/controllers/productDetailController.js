@@ -327,6 +327,8 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 
 			$scope.subSkus = [
 				{
+					Order: 1,
+					Id: '43454',
 					SKU: 'FRP006',
 					Active: true,
 					RetailPrice: 55.00,
@@ -339,6 +341,8 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					CrossSellingItem: false
 				},
 				{
+					Order: 2,
+					Id: '12312',
 					SKU: 'FRP007',
 					Active: true,
 					RetailPrice: 79.00,
@@ -354,6 +358,8 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					AutoShipFrequencyAllowed: []
 				},
 				{
+					Order: 3,
+					Id: '44444',
 					SKU: 'FRP008',
 					Active: true,
 					RetailPrice: 56.00,
@@ -369,6 +375,8 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					AutoShipFrequencyAllowed: []
 				},
 				{
+					Order: 4,
+					Id: '5555',
 					SKU: 'FRP009',
 					Active: true,
 					RetailPrice: 6.00,
@@ -384,6 +392,8 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 					AutoShipFrequencyAllowed: []
 				},
 				{
+					Order: 5,
+					Id: '12323',
 					SKU: 'FRP010',
 					Active: true,
 					RetailPrice: 6.35,
