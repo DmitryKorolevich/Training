@@ -50,6 +50,7 @@
 		'app/modules/demo/controllers/customerListController.js',
 		'app/modules/demo/controllers/customerDetailController.js',
 		'app/modules/demo/controllers/dashboardController.js',
-		'app/modules/demo/controllers/orderDetailController.js'
+		'app/modules/demo/controllers/orderDetailController.js',
+		'app/modules/demo/controllers/modalAddSubProductController.js'
 	]
 }

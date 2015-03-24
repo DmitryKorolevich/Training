@@ -7,7 +7,8 @@ angular.module('app.modules.demo',
 		'app.modules.demo.controllers.customerListController',
 		'app.modules.demo.controllers.customerDetailController',
 		'app.modules.demo.controllers.dashboardController',
-		'app.modules.demo.controllers.orderDetailController'
+		'app.modules.demo.controllers.orderDetailController',
+		'app.modules.demo.controllers.modalAddSubProductController'
 	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',

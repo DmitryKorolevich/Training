@@ -83,3 +83,5 @@
 /// <reference path="lib/jquery-ui/jquery-ui.js" />
 /// <reference path="../app/core/utils/templateoverrides.js" />
 /// <reference path="app/core/utils/templateoverrides.js" />
+/// <reference path="../app/modules/demo/controllers/modaladdsubproductcontroller.js" />
+/// <reference path="app/modules/demo/controllers/modaladdsubproductcontroller.js" />

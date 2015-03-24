@@ -421,6 +421,7 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 				var modalInstance = $modal.open({
 					templateUrl: 'app/modules/demo/partials/addSubProduct.html',
 					controller: 'modalAddSubProductController',
+					size: 'lg',
 					resolve: {
 						items: function () {
 							return $scope.items;
