@@ -6,9 +6,8 @@ using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Content;
 using System.Threading.Tasks;
 using VitalChoice.Public.Models;
-using VitalChoice.Core.Infrastructure;
 using Microsoft.Framework.Logging;
-using System.Reflection;
+using VitalChoice.Business.Services.Impl;
 
 namespace VitalChoice.Public.Content.Controllers
 {
@@ -21,7 +20,7 @@ namespace VitalChoice.Public.Content.Controllers
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var logger = AppLoggerFactory.GetDefault();
+            var logger = LoggerService.GetDefault();
             logger.WriteError("test");
 
             ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe);

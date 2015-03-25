@@ -5,13 +5,17 @@
         "Microsoft.AspNet.Mvc": "6.0.0-*",   
 		"VitalChoice.Infrastructure": "1.0.0-*",
 		"VitalChoice.Data": "1.0.0-*",
-		"VitalChoice.Domain": "1.0.0-*"
+        "VitalChoice.Domain": "1.0.0-*",        
+        "Microsoft.Framework.Logging": "1.0.0-*",
+        "Microsoft.Framework.Logging.Console": "1.0.0-*",
+        "Microsoft.Data.SQLite": "1.0.0-*",
 	},
 
 	"frameworks": {
 		"aspnet50": {
 			"dependencies": {
-				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*"
+				"Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*",
+                "Microsoft.Framework.Logging.NLog": "1.0.0-*",
 			}
 		},
 		"aspnetcore50": {
