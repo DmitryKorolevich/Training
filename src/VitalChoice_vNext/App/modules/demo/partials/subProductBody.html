@@ -1,0 +1,116 @@
+﻿
+	<div class="form-group">
+		<div class="col-md-12">
+			<div class="fixed-accordion-row">
+				<label class="control-label">Retail Price</label>
+				<div class="input-group">
+					<span class="input-group-addon">$</span>
+					<input type="number" class="form-control" placeholder="" data-ng-model="subSku.RetailPrice">
+				</div>
+			</div>
+			<div class="fixed-accordion-row">
+				<label class="control-label">Wholesale Price</label>
+				<div class="input-group">
+					<span class="input-group-addon">$</span>
+					<input type="number" class="form-control" placeholder="" data-ng-model="subSku.WholesalePrice">
+				</div>
+			</div>
+			<div class="fixed-accordion-row">
+				<label class="control-label">Stock</label>
+				<input type="number" class="form-control half-size-input" placeholder="" data-ng-model="subSku.Stock">
+			</div>
+			<div class="fixed-accordion-row">
+				<label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
+				<div class="checkbox">
+					<label>
+						<input id="lblDisregard{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisregardStock">
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-12">
+			<div class="fixed-accordion-row">
+				<label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
+				<div class="checkbox">
+					<label>
+						<input id="lblDisallowSingle{{subSku.Id}}" type="checkbox">
+					</label>
+				</div>
+			</div>
+			<div class="fixed-accordion-row">
+				<label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
+				<div class="checkbox">
+					<label>
+						<input id="lblNonDiscountable{{subSku.Id}}" type="checkbox">
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-12">
+			<div class="fixed-accordion-row">
+				<label class="control-label">Orphan Type</label>
+				<select class="form-control">
+					<option>None</option>
+					<option>Orphan-N</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-12">
+			<div class="fixed-accordion-row extra-spacing">
+				<label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
+				<div class="checkbox">
+					<label>
+						<input id="lblAutoship{{subSku.Id}}" type="checkbox">
+					</label>
+				</div>
+			</div>
+			<div class="fixed-accordion-row extra-spacing">
+				<label class="control-label">Auto-Ship Frequency</label>
+				<label class="checkbox-inline">
+					<input type="checkbox">
+					1
+				</label>
+				<label class="checkbox-inline">
+					<input type="checkbox">
+					2
+				</label>
+				<label class="checkbox-inline">
+					<input type="checkbox">
+					3
+				</label>
+				<label class="checkbox-inline">
+					<input type="checkbox">
+					6
+				</label>
+			</div>
+			<div class="fixed-accordion-row">
+				<label class="control-label">% Off</label>
+				<input type="number" class="form-control half-size-input" placeholder="">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-12">
+			<div class="fixed-accordion-row extra-spacing">
+				<label class="control-label">Seller</label>
+				<select class="form-control">
+					<option>Seller 1</option>
+					<option>Seller 2</option>
+				</select>
+			</div>
+			<div class="fixed-accordion-row">
+				<label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
+				<div class="checkbox">
+					<label>
+						<input id="lblHideFromFeed{{subSku.Id}}" type="checkbox">
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>

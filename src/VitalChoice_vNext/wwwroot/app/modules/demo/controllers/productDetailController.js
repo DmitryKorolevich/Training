@@ -413,7 +413,9 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 			$scope.sortableOptions = {
 				handle: ' .sortable-move',
 				 items: ' .panel:not(.panel-heading)',
-				axis: 'y'
+				 axis: 'y',
+				 start: function(e, ui) { $scope.dragging = true; },
+				 stop: function(e, ui) { $scope.dragging = false; }
 			}
 
 			$scope.open = function () {
