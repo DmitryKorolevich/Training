@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>VitalChoice.Database.Infrastructure</Name>
+    <Name>VitalChoice.Infrastructure</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{d6da9079-67fe-4cfe-98cb-3711c8313e88}</ProjectGuid>
@@ -65,6 +65,7 @@
     <Folder Include="PostDeployment" />
     <Folder Include="PostDeployment\Scripts" />
     <Folder Include="dbo\ContentPages" />
+    <Folder Include="deploy" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\AspNetRoles.sql" />
@@ -93,6 +94,7 @@
     <None Include="Local.publish.xml" />
     <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
     <None Include="PostDeployment\Scripts\ContentItemsProcessors.sql" />
+    <None Include="deploy\deploy.ps1" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />

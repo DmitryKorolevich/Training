@@ -42,7 +42,7 @@ namespace VitalChoice.Infrastructure.Context
                 // This either requires MARS or creation of a new connection for each query. Currently using
                 // MARS since cloning connections is known to be problematic.
                 MultipleActiveResultSets = true,
-                InitialCatalog = "Ecommerce",
+                InitialCatalog = "VitalChoice.Ecommerce",
                 IntegratedSecurity = true,
                 ConnectTimeout = 60
             }).ConnectionString;

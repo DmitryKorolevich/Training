@@ -75,7 +75,7 @@ VALUES
 SELECT @recipeId=@@IDENTITY
 
 INSERT INTO RecipesToContentCategories
-(ContentCategoryId,RecipesId)
+(ContentCategoryId,RecipeId)
 VALUES
 (@contentCategoryId,@recipeId)
 
@@ -94,6 +94,6 @@ VALUES
 SELECT @recipeId=@@IDENTITY
 
 INSERT INTO RecipesToContentCategories
-(ContentCategoryId,RecipesId)
+(ContentCategoryId,RecipeId)
 VALUES
 (@contentCategoryId,@recipeId)
