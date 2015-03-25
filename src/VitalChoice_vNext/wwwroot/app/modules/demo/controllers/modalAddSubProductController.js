@@ -5,10 +5,10 @@ angular.module('app.modules.demo.controllers.modalAddSubProductController', [])
 	$scope.items = items;
 
 	$scope.ok = function () {
-		$modalInstance.dismiss('cancel');
+		$modalInstance.close();
 	};
 
 	$scope.cancel = function () {
-		$modalInstance.dismiss('cancel');
+		$modalInstance.close();
 	};
 }]);

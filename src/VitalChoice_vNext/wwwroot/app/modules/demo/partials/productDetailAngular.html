@@ -216,24 +216,18 @@
 						<div class="container container-left big-container">
 							<div class="well row">
 								<span class="legend">Sub Product Group Name</span>
-								<div class="row form-group margin-bottom-30px">
+								<div class="row form-group">
 									<div class="col-md-12">
-										<input type="text" class="form-control" id="subProductGroupName" placeholder="Number of Portions" value="">
+										<input type="text" class="form-control" id="subProductGroupName" placeholder="Example: Number of Portions" value="">
 									</div>
 								</div>
+								<span class="legend">Add New Product SKU</span>
+								<div class="form-group">
+									<button data-ng-click="open();" class="btn btn-primary">Add New SKU</button>
+								</div>
+								<span class="legend">Product SKUs</span>
 								<div class="row form-group">
 									<div class="col-md-4">
-										<span class="legend">Add New Product SKU</span>
-									</div>
-									<div class="col-md-8">
-										<button data-ng-click="open();" class="btn btn-primary">Add New SKU</button>
-									</div>
-								</div>
-								<div class="row form-group">
-									<div class="col-md-9">
-										<span class="legend">Product SKUs</span>
-									</div>
-									<div class="col-md-3">
 										<div class="input-group">
 											<input type="text" class="form-control" placeholder="Filter by SKU">
 											<span class="input-group-btn">
@@ -242,14 +236,16 @@
 										</div>
 									</div>
 								</div>
+								<span class="help-block">*Drag and drop using icon to reorder sub products</span>
 								<accordion class="sortable-accordion">
 									<div ui-sortable="sortableOptions" data-ng-model="subSkus">
 										<accordion-group data-ng-repeat="subSku in subSkus">
 											<accordion-heading>
 												<div class="form-horizontal">
 													<div class="row">
-														<div class="col-md-1">
-															<div class="sortable-move btn btn-primary"><i class="glyphicon glyphicon-sort"></i></div>
+														<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+															<div class="sortable-move btn btn-primary"><i class="glyphicon glyphicon-sort"></i>
+															</div>
 														</div>
 														<div class="col-md-11">
 															<div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
@@ -285,123 +281,7 @@
 													</div>
 												</div>
 											</accordion-heading>
-											<div class="form-horizontal">
-												<div class="form-group">
-													<div class="col-md-12">
-														<div class="fixed-accordion-row">
-															<label class="control-label">Retail Price</label>
-															<div class="input-group">
-																<span class="input-group-addon">$</span>
-																<input type="number" class="form-control" placeholder="Retail Price" data-ng-model="subSku.RetailPrice">
-															</div>
-														</div>
-														<div class="fixed-accordion-row">
-															<label class="control-label">Wholesale Price</label>
-															<div class="input-group">
-																<span class="input-group-addon">$</span>
-																<input type="number" class="form-control" placeholder="Wholesale Price" data-ng-model="subSku.WholesalePrice">
-															</div>
-														</div>
-														<div class="fixed-accordion-row">
-															<label class="control-label">Stock</label>
-															<input type="number" class="form-control half-size-input" placeholder="Stock" data-ng-model="subSku.Stock">
-														</div>
-														<div class="fixed-accordion-row">
-															<label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
-															<div class="checkbox">
-																<label>
-																	<input id="lblDisregard{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisregardStock">
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="col-md-12">
-														<div class="fixed-accordion-row">
-															<label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
-															<div class="checkbox">
-																<label>
-																	<input id="lblDisallowSingle{{subSku.Id}}" type="checkbox">
-																</label>
-															</div>
-														</div>
-														<div class="fixed-accordion-row">
-															<label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
-															<div class="checkbox">
-																<label>
-																	<input id="lblNonDiscountable{{subSku.Id}}" type="checkbox">
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="col-md-12">
-														<div class="fixed-accordion-row">
-															<label class="control-label">Orphan Type</label>
-															<select class="form-control">
-																<option>None</option>
-																<option>Orphan-N</option>
-															</select>
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="col-md-12">
-														<div class="fixed-accordion-row extra-spacing">
-															<label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
-															<div class="checkbox">
-																<label>
-																	<input id="lblAutoship{{subSku.Id}}" type="checkbox">
-																</label>
-															</div>
-														</div>
-														<div class="fixed-accordion-row extra-spacing">
-															<label class="control-label">Auto-Ship Frequency</label>
-															<label class="checkbox-inline">
-																<input type="checkbox">
-																1
-															</label>
-															<label class="checkbox-inline">
-																<input type="checkbox">
-																2
-															</label>
-															<label class="checkbox-inline">
-																<input type="checkbox">
-																3
-															</label>
-															<label class="checkbox-inline">
-																<input type="checkbox">
-																6
-															</label>
-														</div>
-														<div class="fixed-accordion-row">
-															<label class="control-label">% Off</label>
-															<input type="number" class="form-control half-size-input" placeholder="">
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="col-md-12">
-														<div class="fixed-accordion-row extra-spacing">
-															<label class="control-label">Seller</label>
-															<select class="form-control">
-																<option>Seller 1</option>
-																<option>Seller 2</option>
-															</select>
-														</div>
-														<div class="fixed-accordion-row">
-															<label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
-															<div class="checkbox">
-																<label>
-																	<input id="lblHideFromFeed{{subSku.Id}}" type="checkbox">
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+											<div class="form-horizontal" data-ng-include="'app/modules/demo/partials/subProductBody.html'"></div>
 										</accordion-group>
 									</div>
 								</accordion>
