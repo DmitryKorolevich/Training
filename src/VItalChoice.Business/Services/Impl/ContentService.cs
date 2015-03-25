@@ -79,11 +79,11 @@ namespace VitalChoice.Business.Services.Impl
                 category = await TryLoadParentTemplate(category);
             }
 
-            //TO DO - check complining templates valid date, and recompile if needed
+            //TODO: - check complining templates valid date, and recompile if needed
 
             if (category.ContentItem == null)
             {
-                //TO DO - write to log. Category without a template
+                //TODO: - write to log. Category without a template
                 return toReturn;
             }
 
