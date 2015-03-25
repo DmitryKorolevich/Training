@@ -6,14 +6,14 @@ using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using System.Diagnostics;
 using NLog.Targets.Wrappers;
+using VitalChoice.Business.Services.Contracts;
 #endif
 
-
-namespace VitalChoice.Core.Infrastructure
+namespace VitalChoice.Business.Services.Impl
 {
-    public static class AppLoggerFactory
+    public static class LoggerService
     {
-        private static readonly Lazy<ILoggerFactory> sFactory = new Lazy<ILoggerFactory>(BuildFactory);
+        private static readonly Lazy<ILoggerFactory> factory = new Lazy<ILoggerFactory>(BuildFactory);
 
         private static readonly Dictionary<string, ILogger> loggers = new Dictionary<string, ILogger>();
 
@@ -34,16 +34,20 @@ namespace VitalChoice.Core.Infrastructure
                     return loggers[name];
                 }
 
-                ILogger logger = sFactory.Value.Create(name);
+                ILogger logger = factory.Value.Create(name);
                 loggers.Add(name, logger);
 
                 return logger;
             }
         }
+        //public static void Init(ISettingService settingService)
+        //{
+        //    LoggerService.settingService = settingService;
+        //}
 
         private static ILogger Get(Type type)
         {
-            return Get(type == null ? string.Empty : type.FullName); ;
+            return Get(type == null ? string.Empty : type.FullName);
         }
 
         private static ILoggerFactory BuildFactory()
