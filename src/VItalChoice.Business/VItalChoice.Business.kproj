@@ -20,6 +20,9 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AssemblyName>VitalChoice.Business</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AssemblyName>VItalChoice.Business</AssemblyName>
+  </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>

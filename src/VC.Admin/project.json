@@ -32,7 +32,6 @@
         "VitalChoice.Data": "1.0.0-*",
         "VitalChoice.Infrastructure": "1.0.0-*",
         "VitalChoice.Core": "1.0.0-*",
-        "VitalChoice.Business": "1.0.0-*",
         "VitalChoice.Validation": "1.0.0-*"
     },
     "frameworks": {
@@ -43,16 +42,16 @@
             }
         },
         "dnxcore50": {
-            "compilationOptions": {"define": ["DNXCORE50"]},
+            "compilationOptions": { "define": [ "DNXCORE50" ] },
             "dependencies": {
                 "System.Runtime": "4.0.20-*"
             }
         }
     },
-	"commands": {
-		"web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
-		"kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004",
-		"gen": "Microsoft.Framework.CodeGeneration",
-		"ef": "EntityFramework.Commands"
-	}
+    "commands": {
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
+        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004",
+        "gen": "Microsoft.Framework.CodeGeneration",
+        "ef": "EntityFramework.Commands"
+    }
 }
