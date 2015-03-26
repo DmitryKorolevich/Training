@@ -39,7 +39,7 @@ namespace VitalChoice.Data.Repositories
 
 		public virtual void InsertGraphRange(params TEntity[] entities)
 		{
-			DbSet.Add(entities);
+			DbSet.AddRange(entities);
 		}
 
         public virtual void Update(TEntity entity)
