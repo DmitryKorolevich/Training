@@ -46,7 +46,7 @@ namespace VitalChoice.Core.DependencyInjection
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
-            services.TryAdd(ServiceDescriptor.Transient<IActionInvokerProvider, BaseControllerActionInvokerProvider>());
+            services.TryAdd(ServiceDescriptor.Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());
 
             // Add MVC services to the services container.
 			services.AddMvc();//.Configure<MvcOptions>(options =>
