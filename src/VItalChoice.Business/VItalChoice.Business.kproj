@@ -21,7 +21,7 @@
     <AssemblyName>VitalChoice.Business</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AssemblyName>VItalChoice.Business</AssemblyName>
+    <AssemblyName>VitalChoice.Business</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
