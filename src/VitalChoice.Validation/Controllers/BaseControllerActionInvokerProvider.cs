@@ -2,6 +2,8 @@
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Core;
+using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 
 namespace VitalChoice.Validation.Controllers
 {

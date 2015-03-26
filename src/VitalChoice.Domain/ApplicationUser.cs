@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNet.Identity;
 using VitalChoice.Domain.Entities;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace VitalChoice.Domain
 {

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using Microsoft.Data.Entity;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
+using Microsoft.Data.Entity.Query;
 
 namespace VitalChoice.Data.Helpers
 {

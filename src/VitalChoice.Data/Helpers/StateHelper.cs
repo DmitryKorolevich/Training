@@ -21,21 +21,20 @@ namespace VitalChoice.Data.Helpers
             }
         }
 
-        public static ObjectState ConvertState(EntityState state)
-        {
-            switch (state)
-            {
-                case EntityState.Unknown:
-				case EntityState.Unchanged:
-                    return ObjectState.Unchanged;
-                case EntityState.Added:
-                    return ObjectState.Added;
-                case EntityState.Deleted:
-                    return ObjectState.Deleted;
-                case EntityState.Modified:
-                    return ObjectState.Modified;
-                default:
-                    throw new ArgumentOutOfRangeException("state");
+        public static ObjectState ConvertState(EntityState state) {
+            switch (state) {
+            case EntityState.Unchanged:
+                return ObjectState.Unchanged;
+            case EntityState.Added:
+                return ObjectState.Added;
+            case EntityState.Deleted:
+                return ObjectState.Deleted;
+            case EntityState.Modified:
+                return ObjectState.Modified;
+            case EntityState.Detached:
+                return ObjectState.Detached;
+            default:
+                throw new ArgumentOutOfRangeException("state");
             }
         }
     }

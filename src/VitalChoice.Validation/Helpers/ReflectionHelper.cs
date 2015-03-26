@@ -8,7 +8,7 @@ namespace VitalChoice.Validation.Helpers
 //    {
 //        public static TypeCode GetTypeCode(this Type type)
 //        {
-//#if ASPNET50
+//#if dnx451
 //            return Type.GetTypeCode(type);
 //#else
 //            throw new NotImplementedException();

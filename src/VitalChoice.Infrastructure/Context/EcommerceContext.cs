@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Relational.Metadata;
 using System.Data.SqlClient;
@@ -31,9 +32,9 @@ namespace VitalChoice.Infrastructure.Context
 	    public EcommerceContext(bool uofScoped = false) : this()
 	    {
 	        
-	    }       
+	    }
 
-        protected override void OnConfiguring(DbContextOptions builder)
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {

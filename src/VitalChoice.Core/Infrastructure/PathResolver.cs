@@ -1,8 +1,8 @@
-﻿#if ASPNET50 || ASPNETCORE50 || NET45
+﻿#if dnx451 || dnxcore50 || NET45
 using System;
 using System.IO;
 
-#if ASPNET50 || ASPNETCORE50
+#if dnx451 || dnxcore50
 using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Infrastructure;
 #endif
@@ -15,7 +15,7 @@ namespace VitalChoice.Core.Infrastructure
 		{
 			get
 			{
-#if ASPNET50 || ASPNETCORE50
+#if dnx451 || dnxcore50
 				var locator = CallContextServiceLocator.Locator;
 
 				var appEnv = (IApplicationEnvironment)locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));

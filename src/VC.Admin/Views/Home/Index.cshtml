@@ -1,0 +1,11 @@
+﻿<!DOCTYPE html>
+<html data-ng-app="mainApp" data-ng-strict-di>
+<head>
+	<title>Vital Choice Admin panel</title>
+	@await Component.InvokeAsync("Assets", "styles")
+</head>
+<body>
+	<div data-ui-view=""></div>
+	@await Component.InvokeAsync("Assets", "scripts")
+</body>
+</html>

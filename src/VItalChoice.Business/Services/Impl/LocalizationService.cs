@@ -14,7 +14,6 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Cache.Memory;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Business.Services.Impl
@@ -147,7 +146,7 @@ namespace VitalChoice.Business.Services.Impl
 
         private static string GetCultureCode()
         {
-#if ASPNET50
+#if dnx451
             return Thread.CurrentThread.CurrentCulture.Name ?? SettingService.GetProjectConstant("DefaultCultureId");
 #else
             return SettingService.GetProjectConstant("DefaultCultureId");

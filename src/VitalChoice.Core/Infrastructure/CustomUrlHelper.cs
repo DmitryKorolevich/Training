@@ -46,14 +46,14 @@ namespace VitalChoice.Core.Infrastructure
 			return ConvertToLowercaseUrl(base.Content(contentPath));
 		}
 
-		public override string RouteUrl(string routeName, object values, string protocol, string host, string fragment)
+		public override string RouteUrl(UrlRouteContext context)
 		{
-			return ConvertToLowercaseUrl(base.RouteUrl(routeName, values, protocol, host, fragment));
+			return ConvertToLowercaseUrl(base.RouteUrl(context));
 		}
 
-		public override string Action(string action, string controller, object values, string protocol, string host, string fragment)
+		public override string Action(UrlActionContext context)
 		{
-			return ConvertToLowercaseUrl(base.Action(action, controller, values, protocol, host, fragment));
+			return ConvertToLowercaseUrl(base.Action(context));
 		}
 
 		private string ConvertToLowercaseUrl(string url)

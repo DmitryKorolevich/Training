@@ -10,6 +10,8 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Framework.DependencyInjection;
 using VitalChoice.Validation.Controllers;
+using Microsoft.AspNet.Mvc.Core;
+using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 
 namespace VitalChoice.Validation.Controllers
 {
