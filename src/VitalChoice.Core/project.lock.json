@@ -2728,6 +2728,56 @@
         "lib/portable-net451+win81+wpa81/Microsoft.Framework.Logging.xml"
       ]
     },
+    "Microsoft.Framework.Logging.Console/1.0.0-beta5-11086": {
+      "serviceable": false,
+      "sha": "OHmZcWjfL3SW4GXTQEFWGXLlqkUl7Kj1/3Vgm3+opZi8cchjrio/lFBoQmdEY+Iwzc+nkx07+Uq8+34L68/7HA==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta5-11086"
+          },
+          "frameworkAssemblies": [
+            "mscorlib",
+            "System",
+            "System.Core",
+            "Microsoft.CSharp"
+          ],
+          "runtimeAssemblies": [
+            "lib/dnx451/Microsoft.Framework.Logging.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/dnx451/Microsoft.Framework.Logging.Console.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta5-11086",
+            "System.Runtime": "4.0.20-beta-22725",
+            "System.Console": "4.0.0-beta-22725",
+            "System.IO": "4.0.10-beta-22725",
+            "System.Threading": "4.0.10-beta-22725"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/dnxcore50/Microsoft.Framework.Logging.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/dnxcore50/Microsoft.Framework.Logging.Console.dll"
+          ]
+        }
+      },
+      "files": [
+        "Microsoft.Framework.Logging.Console.1.0.0-beta5-11086.nupkg",
+        "Microsoft.Framework.Logging.Console.1.0.0-beta5-11086.nupkg.sha512",
+        "Microsoft.Framework.Logging.Console.nuspec",
+        "lib/dnx451/Microsoft.Framework.Logging.Console.dll",
+        "lib/dnx451/Microsoft.Framework.Logging.Console.xml",
+        "lib/dnxcore50/Microsoft.Framework.Logging.Console.dll",
+        "lib/dnxcore50/Microsoft.Framework.Logging.Console.xml",
+        "lib/net45/Microsoft.Framework.Logging.Console.dll",
+        "lib/net45/Microsoft.Framework.Logging.Console.xml"
+      ]
+    },
     "Microsoft.Framework.Logging.Interfaces/1.0.0-beta5-11086": {
       "serviceable": false,
       "sha": "mO9LwjXhaKXVsBtvtrmSKVFTSzvPLjwShujJMVptWwjFLTK6UvCSijhp/k7qvt6Uke5qb3Xl4rhde/piDJuqzA==",

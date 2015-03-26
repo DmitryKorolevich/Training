@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Impl
 
         private static string GetCultureCode()
         {
-#if dnx451
+#if DNX451
             return Thread.CurrentThread.CurrentCulture.Name ?? SettingService.GetProjectConstant("DefaultCultureId");
 #else
             return SettingService.GetProjectConstant("DefaultCultureId");

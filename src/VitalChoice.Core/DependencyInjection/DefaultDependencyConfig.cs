@@ -20,7 +20,7 @@ using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
 
-#if dnx451
+#if DNX451
 using Autofac;
 using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -66,7 +66,7 @@ namespace VitalChoice.Core.DependencyInjection
 				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
 			});
 
-#if dnx451
+#if DNX451
 			var builder = new ContainerBuilder();
 
 			builder.Populate(services);

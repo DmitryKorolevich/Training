@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Framework.Logging;
 
-#if dnx451
+#if DNX451
 using Microsoft.Framework.Logging.Console;
 using System.Diagnostics;
 using NLog.Targets.Wrappers;
@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Services.Impl
 
         public static ILogger GetDefault()
         {
-#if dnx451
+#if DNX451
             return Get(new StackFrame(1, false).GetMethod().DeclaringType);
 #endif
             return null;
@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Impl
         private static ILoggerFactory BuildFactory()
         {
             ILoggerFactory factory = null;
-#if dnx451
+#if DNX451
             factory = new LoggerFactory();
             var path = AppDomain.CurrentDomain.BaseDirectory;
             var config = new NLog.Config.XmlLoggingConfiguration(path+"\\..\\nlog.config");
