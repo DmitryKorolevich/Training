@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22609.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Business", "src\VitalChoice.Business\VitalChoice.Business.kproj", "{79BDB4CD-1526-48F9-9964-DC433AD6548C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E9B8CD81-EC30-494B-A111-44D3FB77D20D} = {E9B8CD81-EC30-494B-A111-44D3FB77D20D}
-		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35} = {ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}
-		{FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7} = {FAF3B0D8-3E00-4901-8EFE-ED7029FEA3D7}
-	EndProjectSection
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Data", "src\VitalChoice.Data\VitalChoice.Data.kproj", "{E9B8CD81-EC30-494B-A111-44D3FB77D20D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35} = {ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35}
@@ -74,6 +67,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{6E7B8F
 		src\deploy\global-deploy.ps1 = src\deploy\global-deploy.ps1
 	EndProjectSection
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VItalChoice.Business", "src\VItalChoice.Business\VItalChoice.Business.kproj", "{79BDB4CD-1526-48F9-9964-DC433AD6548C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,14 +77,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|x64.Build.0 = Debug|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|x64.ActiveCfg = Release|Any CPU
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|x64.Build.0 = Release|Any CPU
 		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9B8CD81-EC30-494B-A111-44D3FB77D20D}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -177,12 +164,19 @@ Global
 		{4D9EECA1-BF37-4345-ABEB-E2C4F17F7536}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{4D9EECA1-BF37-4345-ABEB-E2C4F17F7536}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D9EECA1-BF37-4345-ABEB-E2C4F17F7536}.Release|x64.ActiveCfg = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Debug|x64.Build.0 = Debug|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|x64.ActiveCfg = Release|Any CPU
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{79BDB4CD-1526-48F9-9964-DC433AD6548C} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{E9B8CD81-EC30-494B-A111-44D3FB77D20D} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{ED03D8D2-FADE-4C4A-A94D-8DCBDC134C35} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{709A4F7F-49E0-42EB-AC37-B266D77E0F11} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
@@ -194,5 +188,6 @@ Global
 		{3B3E46E5-2CFB-4D1D-8DEF-4B47C5EF6055} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{0E932C0D-6F22-4866-9771-C4DD79564E3E} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{6E7B8F1E-A4E3-44FD-92C6-DADFF716F160} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
+		{79BDB4CD-1526-48F9-9964-DC433AD6548C} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 	EndGlobalSection
 EndGlobal
