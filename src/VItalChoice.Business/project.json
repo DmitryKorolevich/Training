@@ -8,7 +8,7 @@
         "VitalChoice.Domain": "1.0.0-*",
         "Microsoft.Framework.Logging": "1.0.0-*",
         "Microsoft.Framework.Logging.Console": "1.0.0-*",
-        "Microsoft.Data.SQLite": "1.0.0-*"
+        "Microsoft.Data.SQLite": "1.0.0-*",
     },
 
     "frameworks": {

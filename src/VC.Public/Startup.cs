@@ -12,6 +12,7 @@ using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Business.Services.Impl;
 
 namespace VitalChoice.Public
 {
@@ -30,20 +31,20 @@ namespace VitalChoice.Public
 
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			var reg = new DefaultDependencyConfig();
-
-			return reg.RegisterInfrastructure(Configuration, services);
+            var reg = new DefaultDependencyConfig();
+            return reg.RegisterInfrastructure(Configuration, services);
 		}
 
 		// Configure is called after ConfigureServices is called.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
 		{
-			// Configure the HTTP request pipeline.
-			// Add the console logger.
-			loggerfactory.AddConsole();
+            // Configure the HTTP request pipeline.
+            // Add the console logger.
+            loggerfactory.AddConsole();
+            LoggerService.Build(env.WebRootPath);
 
-			// Add the following to the request pipeline only in development environment.
-			if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
+            // Add the following to the request pipeline only in development environment.
+            if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
 			{
 				app.UseErrorPage(ErrorPageOptions.ShowAll);
 				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);

@@ -12,6 +12,7 @@ using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Business.Services.Impl;
 
 namespace VitalChoice
 {
@@ -41,9 +42,10 @@ namespace VitalChoice
 			// Configure the HTTP request pipeline.
 			// Add the console logger.
 			loggerfactory.AddConsole();
+            LoggerService.Build(env.WebRootPath);
 
-			// Add the following to the request pipeline only in development environment.
-			if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
+            // Add the following to the request pipeline only in development environment.
+            if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
 			{
 				app.UseErrorPage(ErrorPageOptions.ShowAll);
 				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);

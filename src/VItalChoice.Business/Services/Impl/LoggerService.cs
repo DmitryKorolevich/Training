@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Services.Impl
 {
     public static class LoggerService
     {
-        private static readonly Lazy<ILoggerFactory> factory = new Lazy<ILoggerFactory>(BuildFactory);
+        private static ILoggerFactory factory = null;
 
         private static readonly Dictionary<string, ILogger> loggers = new Dictionary<string, ILogger>();
 
@@ -34,7 +34,7 @@ namespace VitalChoice.Business.Services.Impl
                     return loggers[name];
                 }
 
-                ILogger logger = factory.Value.CreateLogger(name);
+                ILogger logger = factory.CreateLogger(name);
                 loggers.Add(name, logger);
 
                 return logger;
@@ -50,13 +50,12 @@ namespace VitalChoice.Business.Services.Impl
             return Get(type == null ? string.Empty : type.FullName);
         }
 
-        private static ILoggerFactory BuildFactory()
+        public static ILoggerFactory Build(string rootPath)
         {
-            ILoggerFactory factory = null;
 #if DNX451
             factory = new LoggerFactory();
-            var path = AppDomain.CurrentDomain.BaseDirectory;
-            var config = new NLog.Config.XmlLoggingConfiguration(path+"\\..\\nlog.config");
+            var path = AppDomain.CurrentDomain.BaseDirectory; ;
+            var config = new NLog.Config.XmlLoggingConfiguration(rootPath + "\\..\\..\\nlog.config");
             foreach (var target in config.ConfiguredNamedTargets)
             {
                 WrapperTargetBase targetBase = target as WrapperTargetBase;
