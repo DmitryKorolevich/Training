@@ -19,7 +19,16 @@ namespace VitalChoice.Data.Helpers
         }
 
         public IIncludableQueryFluent<TEntity, TProperty> ThenInclude<TProperty>(Expression<Func<TPreviousProperty, TProperty>> expression) {
-            Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
+            try
+            {
+                Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
+                return new IncludableQueryFluent<TEntity, TProperty>(this);
+            }
+            catch
+            {
+
+            }
+            Query = ((IIncludableQueryable<TEntity, ICollection<TPreviousProperty>>)Query).ThenInclude(expression);
             return new IncludableQueryFluent<TEntity, TProperty>(this);
         }
 
