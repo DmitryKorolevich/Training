@@ -12,5 +12,7 @@ namespace VitalChoice.Domain.Entities.Content
         public string Description { get; set; }
 
         public virtual ICollection<ContentItemToContentItemProcessor> ContentItemsToContentItemProcessors { get; set; }
+
+        public N N { get; set; }
     }
 }
