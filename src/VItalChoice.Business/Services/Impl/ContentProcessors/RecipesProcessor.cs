@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Impl.ContentProcessors
             }
             using (var uof = new VitalChoiceUnitOfWork())
             {
-                //TO DO - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
+                //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
                 var repository = uof.RepositoryAsync<RecipeToContentCategory>();
                 var recipeToContentCategories = (await repository.Query(p => p.ContentCategoryId== categoryId).
                     Include(p=>p.Recipe).SelectAsync(false)).ToList().Where(p=>p.Recipe.StatusCode == RecordStatusCode.Active).ToList();

@@ -50,12 +50,12 @@ namespace VitalChoice.Business.Services.Impl
         {
             ExecutedContentItem toReturn = null;
             ContentCategory category = null;
-            //TO DO - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
+            //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
                 category = (await contentCategoryRepository.Query(p => p.Url == categoryUrl).Include(p => p.MasterContentItem).Include(p => p.ContentItem).
                     ThenInclude(p => p.ContentItemsToContentItemProcessors).ThenInclude(p => p.ContentItemProcessor).SelectAsync(false)).FirstOrDefault();
-                if (category!=null && category.MasterContentItem.Type != type)
+                if (category != null && category.MasterContentItem.Type != type)
                 {
                     category = null;
                 }

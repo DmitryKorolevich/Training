@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Framework.Logging;
+using System.IO;
+using System.Xml;
 
 #if DNX451
 using Microsoft.Framework.Logging.Console;
@@ -40,28 +42,29 @@ namespace VitalChoice.Business.Services.Impl
                 return logger;
             }
         }
-        //public static void Init(ISettingService settingService)
-        //{
-        //    LoggerService.settingService = settingService;
-        //}
 
         private static ILogger Get(Type type)
         {
             return Get(type == null ? string.Empty : type.FullName);
         }
 
-        public static ILoggerFactory Build(string rootPath)
+        public static ILoggerFactory Build(string rootPath,string logPath)
         {
 #if DNX451
             factory = new LoggerFactory();
-            var path = AppDomain.CurrentDomain.BaseDirectory; ;
-            var config = new NLog.Config.XmlLoggingConfiguration(rootPath + "\\..\\..\\nlog.config");
-            foreach (var target in config.ConfiguredNamedTargets)
+            var xml = File.ReadAllText(rootPath + "\\..\\..\\nlog.config");
+            xml = xml.Replace("{logdir}", logPath);
+            using (var stringReader = new StringReader(xml))
             {
-                WrapperTargetBase targetBase = target as WrapperTargetBase;
-                //TODO: modify for the needed url if needed
+                XmlReader reader = XmlReader.Create(stringReader);
+                var config = new NLog.Config.XmlLoggingConfiguration(reader, rootPath + "\\..\\..\\nlog.config");
+                foreach (var target in config.ConfiguredNamedTargets)
+                {
+                    WrapperTargetBase targetBase = target as WrapperTargetBase;
+                    //TODO: modify for the needed url if needed
+                }
+                factory.AddNLog(new global::NLog.LogFactory(config));
             }
-            factory.AddNLog(new global::NLog.LogFactory(config));
 #endif
 
             return factory;

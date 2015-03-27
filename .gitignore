@@ -183,3 +183,4 @@ FakesAssemblies/
 /src/VitalChoice.Public/wwwroot
 /src/VitalChoice.Public/bower_components
 project.lock.json
+config.local.json

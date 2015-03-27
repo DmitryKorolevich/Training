@@ -13,20 +13,28 @@ using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
+using System.IO;
 
 namespace VitalChoice
 {
 	public class Startup
 	{
-		public Startup(IHostingEnvironment env)
-		{
-			// Setup configuration sources.
-			Configuration = new Configuration()
-				.AddJsonFile("config.json")
-				.AddEnvironmentVariables();
-		}
+        public Startup(IHostingEnvironment env)
+        {
+            // Setup configuration sources.
+            var configuration = new Configuration()
+                .AddJsonFile("config.json")
+                .AddEnvironmentVariables();
 
-		public IConfiguration Configuration { get; set; }
+            var path = PathResolver.ResolveAppRelativePath("config.local.json");
+            if (File.Exists(path))
+            {
+                configuration.AddJsonFile("config.local.json");
+            }
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; set; }
 
 
 		public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -42,7 +50,7 @@ namespace VitalChoice
 			// Configure the HTTP request pipeline.
 			// Add the console logger.
 			loggerfactory.AddConsole();
-            LoggerService.Build(env.WebRootPath);
+            LoggerService.Build(env.WebRootPath, Configuration.Get("App:LogPath"));
 
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
