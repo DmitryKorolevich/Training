@@ -65,7 +65,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{6E7B8F
 		src\deploy\global-deploy.ps1 = src\deploy\global-deploy.ps1
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VItalChoice.Business", "src\VItalChoice.Business\VItalChoice.Business.kproj", "{79BDB4CD-1526-48F9-9964-DC433AD6548C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Business", "src\VitalChoice.Business\VitalChoice.Business.kproj", "{79BDB4CD-1526-48F9-9964-DC433AD6548C}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Validation", "src\VitalChoice.Validation\VitalChoice.Validation.kproj", "{7532A002-E434-445C-824F-B16EDB346A40}"
 EndProject
