@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         less: {
             development: {
                 options: {
-                    paths: ["assets/styles"],
+                    paths: ["assets/styles"]
                 },
                 files:
 		        [

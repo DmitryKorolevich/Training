@@ -116,8 +116,8 @@ module.exports = function (grunt) {
         	files: ['app/**/*.js', 'app/**/*.html', 'assets/**/*.less'],
         	tasks: ['development'/*, 'test'*/],
         	options: {
-        		livereload: true,
-        	},
+        		livereload: true
+        	}
         }
     });
 
