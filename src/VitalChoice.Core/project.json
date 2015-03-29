@@ -7,9 +7,9 @@
         "VitalChoice.Data": "1.0.0-*",
         "VitalChoice.Domain": "1.0.0-*",
         "VitalChoice.Infrastructure": "1.0.0-*",
-        "VitalChoice.Validation": "1.0.0-*",
         "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
-        "Microsoft.Data.SQLite": "1.0.0-*"
+        "Microsoft.Data.SQLite": "1.0.0-*",
+        "VitalChoice.Validation": "1.0.0-*"
     },
 
     "frameworks": {

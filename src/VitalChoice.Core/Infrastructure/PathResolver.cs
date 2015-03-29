@@ -9,7 +9,7 @@ using Microsoft.Framework.Runtime.Infrastructure;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	internal static class PathResolver
+	public static class PathResolver
 	{
 		private static string ApplicationBaseDirectory
 		{

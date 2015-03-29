@@ -63,7 +63,7 @@ namespace VitalChoice.Data.Helpers
         public IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>>> expression)
         {
             Query = Query.Include(expression);
-            return new IncludableQueryFluent<TEntity, TProperty>(this);
+            return new IncludableQueryFluent<TEntity, TProperty>(this,true);
         }
 
         public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)
