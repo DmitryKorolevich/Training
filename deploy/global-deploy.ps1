@@ -20,7 +20,9 @@ if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
 	cp "${RootBuild}\src\Logs_log.template.ldf" "${RootDeploy}\logs\Logs_log.template.ldf"
 	cp "${RootBuild}\src\Logs.template.mdf" "${RootDeploy}\logs\Logs.template.mdf"
 }
-dnu restore "${RootBuild}\" --parallel
+Push-Location "${RootBuild}"
+dnu restore --parallel
+Pop-Location
 ls -Path "${RootBuild}\src" | `
 foreach{
 	if ($_.GetType().Name.Equals("DirectoryInfo")) {
