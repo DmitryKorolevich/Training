@@ -1,5 +1,6 @@
 ﻿#region
 
+using Microsoft.Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
