@@ -1,0 +1,1 @@
+powershell -File ".\global-deploy.ps1"

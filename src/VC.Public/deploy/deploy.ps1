@@ -7,7 +7,6 @@ if ($RootDeploy.Equals("")) {
 $targetNames = GetTargets
 foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
-	GruntTask -taskName "default"
-	GruntTask -taskName "development"
+#	GruntTask -taskName "development"
 	DnuAll -deployPath "${RootDeploy}\${target}"
 }
