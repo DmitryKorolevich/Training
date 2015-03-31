@@ -14,7 +14,7 @@ using VitalChoice.Domain.Entities.Localization;
 namespace VitalChoice.Infrastructure.Context
 {
 	public class EcommerceContext : DataContext
-	{
+    {
 		private static bool created;
 
 		public EcommerceContext()

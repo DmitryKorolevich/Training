@@ -16,10 +16,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
-using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Core.Infrastructure;
 
 #if DNX451
 using Autofac;
@@ -58,16 +58,12 @@ namespace VitalChoice.Core.DependencyInjection
             services.AddOptions();
 
             services.Configure<AppOptions>(options =>
-			{
-				options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
-				options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
-				options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
-				options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
-				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
-			});
-
-            services.Configure<AppSettings>(options =>
             {
+                options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
+                options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
+                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+                options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+                options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
                 options.LogPath = configuration.Get("App:LogPath");
             });
 

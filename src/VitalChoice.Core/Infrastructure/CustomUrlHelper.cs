@@ -3,6 +3,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
+using VitalChoice.Domain.Entities.Options;
 
 namespace VitalChoice.Core.Infrastructure
 {

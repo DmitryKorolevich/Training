@@ -12,16 +12,17 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Domain.Entities.Options;
 
 namespace VitalChoice.Infrastructure.Context
 {
 	public class LogsContext : DataContext
-	{
+    {
 		private static bool created;
 
-        private readonly IOptions<AppSettings> appOptionsAccessor;
+        private readonly IOptions<AppOptions> appOptionsAccessor;
         
-	    public LogsContext(IOptions<AppSettings> appOptionsAccessor)
+	    public LogsContext(IOptions<AppOptions> appOptionsAccessor)
 	    {
             this.appOptionsAccessor = appOptionsAccessor;
 

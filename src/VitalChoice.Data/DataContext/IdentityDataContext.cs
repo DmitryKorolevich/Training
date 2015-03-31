@@ -7,11 +7,11 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.DataContext
 {
-	public class DataContext : DbContext, IDataContext, IDataContextAsync
+	public class IdentityDataContext : IdentityDbContext<ApplicationUser>, IDataContext, IDataContextAsync
 	{
 		private readonly Guid instanceId;
 
-		public DataContext()
+		public IdentityDataContext()
 		{
 			instanceId = Guid.NewGuid();
         }

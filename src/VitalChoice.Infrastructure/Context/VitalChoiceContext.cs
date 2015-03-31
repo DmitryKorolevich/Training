@@ -11,8 +11,8 @@ using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Infrastructure.Context
 {
-	public class VitalChoiceContext : DataContext
-	{
+	public class VitalChoiceContext : IdentityDataContext
+    {
 		private static bool created;
 
 		public DbSet<Comment> Comments { get; set; }
