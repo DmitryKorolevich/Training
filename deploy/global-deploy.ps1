@@ -13,7 +13,7 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = "C:\Temp\vc"
-robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /e /purge /nfl /ndl /njh /r:2 /w:1
+robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /r:2 /w:1
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {

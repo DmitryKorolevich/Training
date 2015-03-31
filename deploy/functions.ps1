@@ -10,7 +10,7 @@ function GetTargets() {
 	return $targetNames
 }
 function CopyTarget($targetName) {
-	robocopy "${targetName}\" ".." /e /ndl /nfl /njh
+	robocopy "${targetName}\" ".." /e /ndl /nfl /njh /is /it
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
