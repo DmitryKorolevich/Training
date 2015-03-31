@@ -16,9 +16,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
+using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Core.Infrastructure;
 
 #if DNX451
 using Autofac;
@@ -56,30 +57,35 @@ namespace VitalChoice.Core.DependencyInjection
 			
             services.AddOptions();
 
-
-			services.Configure<AppOptions>(options =>
-			{
-				options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
-				options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
-				options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
-				options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
-				options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
-			});
+            services.Configure<AppOptions>(options =>
+            {
+                options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
+                options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
+                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+                options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+                options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
+                options.LogPath = configuration.Get("App:LogPath");
+            });
 
 #if DNX451
-			var builder = new ContainerBuilder();
+            var builder = new ContainerBuilder();
 
 			builder.Populate(services);
 
 			builder.Register<IDataContextAsync>(x=>x.Resolve<VitalChoiceContext>());
 			builder.RegisterType<EcommerceContext>();
-			builder.RegisterGeneric(typeof(RepositoryAsync<>))
+            builder.RegisterType<LogsContext>();
+            builder.RegisterGeneric(typeof(RepositoryAsync<>))
 				.As(typeof(IRepositoryAsync<>));
             builder.RegisterGeneric(typeof (EcommerceRepositoryAsync<>))
 				.As(typeof (IEcommerceRepositoryAsync<>))
 				.WithParameter((pi,cc)=> pi.Name == "context", (pi,cc)=>cc.Resolve<EcommerceContext>());
-			builder.RegisterType<CommentService>().As<ICommentService>();
+            builder.RegisterGeneric(typeof(LogsRepositoryAsync<>))
+                .As(typeof(ILogsRepositoryAsync<>))
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
+            builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<ContentService>().As<IContentService>();
+            builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
