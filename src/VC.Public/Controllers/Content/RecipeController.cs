@@ -8,13 +8,18 @@ using System.Threading.Tasks;
 using VitalChoice.Public.Models;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Services.Impl;
+using VitalChoice.Infrastructure.Context;
+using VitalChoice.Domain.Entities.Logs;
 
 namespace VitalChoice.Public.Content.Controllers
 {
     public class RecipeController : BaseContentController
     {
-        public RecipeController(IContentService contentService) : base(contentService)
+        private readonly ILogViewService logViewService;
+
+        public RecipeController(IContentService contentService, ILogViewService logViewService) : base(contentService)
         {
+            this.logViewService = logViewService;
         }
 
         [HttpGet]
@@ -22,6 +27,9 @@ namespace VitalChoice.Public.Content.Controllers
         {
             var logger = LoggerService.GetDefault();
             logger.LogError("test");
+
+            //var pagedList = logViewService.GetCommonItems();
+            //var pagedList2 = logViewService.GetCommonItems(logLevel: "fatal");
 
             ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe);
             if (toReturn != null)

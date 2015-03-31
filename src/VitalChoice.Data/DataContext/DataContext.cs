@@ -14,7 +14,7 @@ namespace VitalChoice.Data.DataContext
 		public DataContext()
 		{
 			instanceId = Guid.NewGuid();
-		}
+        }
 
 		public Guid InstanceId => instanceId;
 

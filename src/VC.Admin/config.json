@@ -17,6 +17,6 @@
 		"CdnServerBaseUrl": "not yet ready",
 		"GenerateLowercaseUrls": true,
 		"EnableBundlingAndMinification" : false,
-        "LogPath": "C:\\Projects\\VitalChoice\\src", 
+        "LogPath": "C:\\Projects\\VitalChoice\\src\\logs", 
 	}
 }
