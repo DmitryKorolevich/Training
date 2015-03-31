@@ -32,7 +32,6 @@ function NpmCopy($projectPath) {
 	robocopy "c:\inetpub\temp\npm\" ".." /e /ndl /nfl /njh /is /it
 	Push-Location ".."
 	npm install
-	npm update
 	Pop-Location
 }
 function BuildDbProject() {
