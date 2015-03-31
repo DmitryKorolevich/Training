@@ -70,6 +70,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{BEC47A
 		deploy\global-deploy.ps1 = deploy\global-deploy.ps1
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "update-dnx", "update-dnx", "{82696B3D-EE83-49A0-B389-BC86ECF43930}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\update-dnx\update-all-runtimes.ps1 = deploy\update-dnx\update-all-runtimes.ps1
+		deploy\update-dnx\update-all.cmd = deploy\update-dnx\update-all.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -190,5 +196,6 @@ Global
 		{0E932C0D-6F22-4866-9771-C4DD79564E3E} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{79BDB4CD-1526-48F9-9964-DC433AD6548C} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{7532A002-E434-445C-824F-B16EDB346A40} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
+		{82696B3D-EE83-49A0-B389-BC86ECF43930} = {BEC47AD2-C420-4C81-A32E-2229FAC8C5CA}
 	EndGlobalSection
 EndGlobal
