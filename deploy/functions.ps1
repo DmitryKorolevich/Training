@@ -28,6 +28,11 @@ function BowerInstall() {
 	bower install
 	Pop-Location
 }
+function NpmInstall() {
+	Push-Location ".."
+	npm install
+	Pop-Location
+}
 function BuildDbProject() {
 	
 }

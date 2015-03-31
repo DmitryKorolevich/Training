@@ -8,6 +8,7 @@ $targetNames = GetTargets
 foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
 	BowerInstall
+	NpmInstall
 	GruntTask -taskName "bower-install"
 	GruntTask -taskName "development"
 	DnuAll -deployPath "${RootDeploy}\${target}"

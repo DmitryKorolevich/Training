@@ -1,5 +1,4 @@
 ﻿/// <autosync enabled="true" />
-/// <reference path="../gruntfile.js" />
 /// <reference path="lib/rangy/rangy-serializer.min.js" />
 /// <reference path="lib/rangy/rangy-selectionsaverestore.min.js" />
 /// <reference path="lib/rangy/rangy-cssclassapplier.min.js" />
