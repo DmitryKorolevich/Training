@@ -19,7 +19,9 @@ function DnuAll($deployPath) {
 	Pop-Location
 }
 function GruntTask($taskName) {
-	grunt -b ".." --gruntfile "..\gruntfile.js" ${taskName}
+	Push-Location ".."
+	grunt $taskName
+	Pop-Location
 }
 function BowerInstall() {
 	Push-Location ".."
