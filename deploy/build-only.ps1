@@ -17,9 +17,9 @@ foreach{
 		$isExclude = Any -name $projectName -inlist $exclude
 		if (!$isExclude) {
 			$project = $RootBuild + "\src\" + $projectName
-			$deployScript = $project + "deploy.ps1"
+			$deployScript = $project + "\deploy\deploy.ps1"
 			if (test-path $deployScript) {
-				Push-Location ${project}
+				Push-Location $project
 				if (test-path "project.json") {
 					dnu build
 				}
