@@ -2,6 +2,8 @@
 	[string]$Src
 )
 
+. ".\functions.ps1"
+
 if ($Src.Equals("")) {
 	$Src = ".."
 }
