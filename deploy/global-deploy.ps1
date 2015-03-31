@@ -13,6 +13,7 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = "C:\Temp\vc"
+echo "Copy checkout files to temp..."
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /r:2 /w:1 >> copy.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
@@ -21,6 +22,7 @@ if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
 	cp "${RootBuild}\src\Logs.template.mdf" "${RootDeploy}\logs\Logs.template.mdf"
 }
 Push-Location "${RootBuild}"
+echo "Restoring packages..."
 dnu restore --parallel >> restore.log
 Pop-Location
 ls -Path "${RootBuild}\src" | `
