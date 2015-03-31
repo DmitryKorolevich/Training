@@ -13,7 +13,7 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = "C:\Temp\vc"
-robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /r:2 /w:1
+robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /r:2 /w:1 >> copy.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
@@ -21,7 +21,7 @@ if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
 	cp "${RootBuild}\src\Logs.template.mdf" "${RootDeploy}\logs\Logs.template.mdf"
 }
 Push-Location "${RootBuild}"
-dnu restore --parallel
+dnu restore --parallel >> restore.log
 Pop-Location
 ls -Path "${RootBuild}\src" | `
 foreach{

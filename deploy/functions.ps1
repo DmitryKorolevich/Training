@@ -10,28 +10,28 @@ function GetTargets() {
 	return $targetNames
 }
 function CopyTarget($targetName) {
-	robocopy "${targetName}\" ".." /e /ndl /nfl /njh /is /it
+	robocopy "${targetName}\" ".." /e /ndl /nfl /njh /is /it >> copy.log
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
-	dnu restore --parallel
+	dnu restore --parallel >> restore.log
 	dnu publish -o "${deployPath}"
 	Pop-Location
 }
 function GruntTask($taskName) {
 	Push-Location ".."
-	grunt $taskName
+	grunt $taskName >> grunt.log
 	Pop-Location
 }
 function BowerInstall() {
 	Push-Location ".."
-	bower install
+	bower install >> bower.log
 	Pop-Location
 }
 function NpmCopy($projectPath) {
 	robocopy "c:\inetpub\temp\npm\" ".." /e /ndl /nfl /njh /is /it
 	Push-Location ".."
-	npm install
+	npm install >> npm.log
 	Pop-Location
 }
 function BuildDbProject() {

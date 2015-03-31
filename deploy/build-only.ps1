@@ -9,7 +9,7 @@ if ($Src.Equals("")) {
 }
 $RootBuild = "C:\Temp\vc"
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /e /purge /nfl /ndl /njh /r:2 /w:1
-dnu restore "${RootBuild}\" --parallel
+dnu restore "${RootBuild}\" --parallel >> restore.log
 ls -Path "${RootBuild}\src" | `
 foreach{
 	if ($_.GetType().Name.Equals("DirectoryInfo")) {
