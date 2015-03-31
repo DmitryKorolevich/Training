@@ -13,11 +13,18 @@ function CopyTarget($targetName) {
 	robocopy "${targetName}\" ".." /e /ndl /nfl /njh
 }
 function DnuAll($deployPath) {
-	dnu restore ..\project.json
-	dnu publish ..\project.json -o "${deployPath}"
+	Push-Location ".."
+	dnu restore
+	dnu publish -o "${deployPath}"
+	Pop-Location
 }
 function GruntTask($taskName) {
 	grunt -b ".." --gruntfile "..\gruntfile.js" ${taskName}
+}
+function BowerInstall() {
+	Push-Location ".."
+	bower install
+	Pop-Location
 }
 function BuildDbProject() {
 	

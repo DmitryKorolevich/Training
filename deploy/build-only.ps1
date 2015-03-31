@@ -1,14 +1,7 @@
 ﻿Param(
-	[string]$RootDeploy,
 	[string]$Src
 )
 
-. ".\functions.ps1"
-. ".\exclude_projects.ps1"
-
-if ($RootDeploy.Equals("")) {
-	$RootDeploy = "c:\inetpub\wwwroot\vitalchoice_new"
-}
 if ($Src.Equals("")) {
 	$Src = ".."
 }
@@ -21,11 +14,13 @@ foreach{
 		$projectName = $_.Name
 		$isExclude = Any -name $projectName -inlist $exclude
 		if (!$isExclude) {
-			$project = $RootBuild + "\src\" + $projectName + "\deploy\"
+			$project = $RootBuild + "\src\" + $projectName
 			$deployScript = $project + "deploy.ps1"
 			if (test-path $deployScript) {
 				Push-Location ${project}
-				iex "${deployScript} -RootDeploy ${RootDeploy}"
+				if (test-path "project.json") {
+					dnu build
+				}
 				Pop-Location
 			}
 		}
