@@ -32,8 +32,8 @@ function BuildDbProject() {
 function Any($name, $inlist) {
 	foreach($item in $inlist) {
 		if ($name.Equals($item)) { 
-			return true;
+			return $TRUE;
 		}
 	}
-	return false;
+	return $FALSE;
 }
