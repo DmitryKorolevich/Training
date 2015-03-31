@@ -14,6 +14,12 @@ if ($Src.Equals("")) {
 }
 $RootBuild = "C:\Temp\vc"
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /e /purge /nfl /ndl /njh /r:2 /w:1
+ni -itemtype directory -path "${RootDeploy}\logs\"
+cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
+if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
+	cp "${RootBuild}\src\Logs_log.template.ldf" "${RootDeploy}\logs\Logs_log.template.ldf"
+	cp "${RootBuild}\src\Logs.template.mdf" "${RootDeploy}\logs\Logs.template.mdf"
+}
 dnu restore "${RootBuild}\" --parallel
 ls -Path "${RootBuild}\src" | `
 foreach{

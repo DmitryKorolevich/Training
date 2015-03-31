@@ -65,6 +65,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{BEC47AD2-C420-4C81-A32E-2229FAC8C5CA}"
 	ProjectSection(SolutionItems) = preProject
 		deploy\build-all.cmd = deploy\build-all.cmd
+		deploy\build-only.ps1 = deploy\build-only.ps1
 		deploy\exclude_projects.ps1 = deploy\exclude_projects.ps1
 		deploy\functions.ps1 = deploy\functions.ps1
 		deploy\global-deploy.ps1 = deploy\global-deploy.ps1

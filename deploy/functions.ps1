@@ -14,7 +14,7 @@ function CopyTarget($targetName) {
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
-	dnu restore
+	dnu restore --parallel
 	dnu publish -o "${deployPath}"
 	Pop-Location
 }
