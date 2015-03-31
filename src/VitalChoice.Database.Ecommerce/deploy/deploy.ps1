@@ -1,1 +1,1 @@
-MSBuild /t:Publish /p:SqlPublishProfilePath="VitalChoice.Database.Ecommerce.publish.xml" "..\VitalChoice.Database.Ecommerce.sqlproj"
+& "c:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" /t:Publish /p:SqlPublishProfilePath="VitalChoice.Database.Ecommerce.publish.xml" "..\VitalChoice.Database.Ecommerce.sqlproj"
