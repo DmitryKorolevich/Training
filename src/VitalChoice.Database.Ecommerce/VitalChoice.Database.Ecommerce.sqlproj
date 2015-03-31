@@ -74,6 +74,7 @@
     <None Include="PostDeployment\Scripts\SamplePostDeploy.sql" />
     <None Include="Local.publish.xml" />
     <None Include="deploy\deploy.ps1" />
+    <None Include="deploy\VitalChoice.Database.Ecommerce.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Sample.sql" />

@@ -1,0 +1,1 @@
+MSBuild /t:Publish /p:SqlPublishProfilePath="VitalChoice.Database.Infrastructure.publish.xml" "..\VitalChoice.Database.Infrastructure.sqlproj"

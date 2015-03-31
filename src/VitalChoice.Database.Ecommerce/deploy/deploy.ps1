@@ -1,0 +1,1 @@
+MSBuild /t:Publish /p:SqlPublishProfilePath="VitalChoice.Database.Ecommerce.publish.xml" "..\VitalChoice.Database.Ecommerce.sqlproj"
