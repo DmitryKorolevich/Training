@@ -26,7 +26,6 @@ using Autofac;
 using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain;
 using VitalChoice.Business.Services.Contracts.ContentProcessors;
 using VitalChoice.Business.Services.Impl.ContentProcessors;
 #endif

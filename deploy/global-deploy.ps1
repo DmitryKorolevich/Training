@@ -17,9 +17,9 @@ echo "Copy checkout files to temp..."
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /r:2 /w:1 >> copy.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
-if (-Not(test-path "${RootDeploy}\logs\Logs.template.mdf")) {
-	cp "${RootBuild}\src\Logs_log.template.ldf" "${RootDeploy}\logs\Logs_log.template.ldf"
-	cp "${RootBuild}\src\Logs.template.mdf" "${RootDeploy}\logs\Logs.template.mdf"
+if (-Not(test-path "${RootDeploy}\logs\Logs.mdf")) {
+	cp "${RootBuild}\src\Logs_log.ldf" "${RootDeploy}\logs\Logs_log.ldf"
+	cp "${RootBuild}\src\Logs.mdf" "${RootDeploy}\logs\Logs.mdf"
 }
 Push-Location "${RootBuild}"
 echo "Restoring packages..."
