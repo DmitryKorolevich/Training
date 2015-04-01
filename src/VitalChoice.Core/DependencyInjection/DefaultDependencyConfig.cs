@@ -33,38 +33,46 @@ using VitalChoice.Business.Services.Impl.ContentProcessors;
 namespace VitalChoice.Core.DependencyInjection
 {
 	public class DefaultDependencyConfig : IDependencyConfig
-    {
+	{
+	    private static bool _called = false;
+
 		public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services)
 		{
-			// Add EF services to the services container.
-			services.AddEntityFramework()//.AddMigrations()
-				.AddSqlServer()
-				.AddDbContext<VitalChoiceContext>();
+		    if (!_called)
+		    {
+		        _called = true;
+                // Add EF services to the services container.
+                services.AddEntityFramework() //.AddMigrations()
+		            .AddSqlServer()
+		            .AddDbContext<VitalChoiceContext>();
 
-			// Add Identity services to the services container.
-			//services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
-			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
+		        // Add Identity services to the services container.
+		        //services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
+		        services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
 
-            //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
-            services.TryAdd(ServiceDescriptor.Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());
+		        //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
+		        services.TryAdd(
+		            ServiceDescriptor
+		                .Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());
 
-            // Add MVC services to the services container.
-			services.AddMvc();//.Configure<MvcOptions>(options =>
-			//{
-               
-		//	});
-			
-            services.AddOptions();
+		        // Add MVC services to the services container.
+		        services.AddMvc(); //.Configure<MvcOptions>(options =>
+		        //{
 
-            services.Configure<AppOptions>(options =>
-            {
-                options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
-                options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
-                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
-                options.EnableBundlingAndMinification = Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
-                options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
-                options.LogPath = configuration.Get("App:LogPath");
-            });
+		        //	});
+
+		        services.AddOptions();
+
+		        services.Configure<AppOptions>(options =>
+		        {
+		            options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
+		            options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
+		            options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+		            options.EnableBundlingAndMinification =
+		                Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+		            options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
+		            options.LogPath = configuration.Get("App:LogPath");
+		        });
 
 #if DNX451
             var builder = new ContainerBuilder();
@@ -99,10 +107,11 @@ namespace VitalChoice.Core.DependencyInjection
             return container.Resolve<IServiceProvider>();
 #else
 
-		    return null;
+		        return null;
 #endif
 
-
-        }
+		    }
+		    return null;
+		}
     }
 }
