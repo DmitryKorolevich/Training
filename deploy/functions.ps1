@@ -11,7 +11,7 @@ function GetTargets() {
 }
 function CopyTarget($targetName) {
 	echo "Replace with target files..."
-	robocopy "${targetName}\" ".." /e /ndl /nfl /njh /is /it >> copy.log
+	robocopy "${targetName}\" ".." /e /njh /is /it >> copy.log
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
