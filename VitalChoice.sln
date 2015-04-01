@@ -69,6 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{BEC47A
 		deploy\exclude_projects.ps1 = deploy\exclude_projects.ps1
 		deploy\functions.ps1 = deploy\functions.ps1
 		deploy\global-deploy.ps1 = deploy\global-deploy.ps1
+		deploy\run-all-published.ps1 = deploy\run-all-published.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "update-dnx", "update-dnx", "{82696B3D-EE83-49A0-B389-BC86ECF43930}"

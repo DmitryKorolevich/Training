@@ -15,7 +15,7 @@ function CopyTarget($targetName) {
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
-	echo "Restoring project pacakges..."
+	echo "Restoring project packages..."
 	dnu restore --parallel >> restore.log
 	echo "Publishing project..."
 	dnu publish -o "${deployPath}" >> publish.log
