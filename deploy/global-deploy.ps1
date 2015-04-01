@@ -15,10 +15,10 @@ if ($Src.Equals("")) {
 $RootBuild = "C:\Temp\vc"
 echo "Copy checkout files to temp..."
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /is /it /r:2 /w:1 >> copy.log
-ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 echo "Clean deploy directory..."
 ni -itemtype directory -path "empty" -Force
 robocopy "empty\" "${RootDeploy}\" /mir /nfl /ndl /njh >> clean.log
+ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 if (-Not(test-path "${RootDeploy}\logs\Logs.mdf")) {
 	cp "${RootBuild}\src\Logs_log.ldf" "${RootDeploy}\logs\Logs_log.ldf"
