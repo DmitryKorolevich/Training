@@ -13,11 +13,13 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = "C:\Temp\vc"
+ni -itemtype directory -path "empty" -Force
+echo "Clean temp..."
+robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh >> clean.log
+echo "Clean deploy directory..."
+robocopy "empty\" "${RootDeploy}\" /mir /nfl /ndl /njh >> clean.log
 echo "Copy checkout files to temp..."
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /is /it /r:2 /w:1 >> copy.log
-echo "Clean deploy directory..."
-ni -itemtype directory -path "empty" -Force
-robocopy "empty\" "${RootDeploy}\" /mir /nfl /ndl /njh >> clean.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 if (-Not(test-path "${RootDeploy}\logs\Logs.mdf")) {

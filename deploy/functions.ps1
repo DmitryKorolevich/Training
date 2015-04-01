@@ -11,7 +11,7 @@ function GetTargets() {
 }
 function CopyTarget($targetName) {
 	echo "Replace with target files..."
-	robocopy "${targetName}\" ".." /e /njh /is /it >> copy.log
+	cp "${targetName}\*" -Destination ".." -Recurse -Force
 }
 function DnuAll($deployPath) {
 	Push-Location ".."
@@ -35,7 +35,7 @@ function BowerInstall() {
 }
 function NpmCopy($projectPath) {
 	echo "Copying npm..."
-	robocopy "c:\inetpub\temp\npm\" ".." /e /ndl /nfl /njh /is /it >> copy-npm.log
+	robocopy "c:\inetpub\temp\npm\" ".." /e /ndl /nfl /njh /is >> copy-npm.log
 	Push-Location ".."
 	echo "Installing missed packages..."
 	npm install >> npm.log
