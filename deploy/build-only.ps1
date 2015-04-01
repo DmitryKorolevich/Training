@@ -8,7 +8,7 @@ if ($Src.Equals("")) {
 	$Src = ".."
 }
 $RootBuild = "C:\Temp\vc"
-robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /e /purge /nfl /ndl /njh /r:2 /w:1
+robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /is /it /nfl /ndl /njh /r:2 /w:1
 dnu restore "${RootBuild}\" --parallel >> restore.log
 ls -Path "${RootBuild}\src" | `
 foreach{
