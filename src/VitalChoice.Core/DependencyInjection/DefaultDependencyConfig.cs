@@ -20,6 +20,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Core.Infrastructure;
+using Templates;
 
 #if DNX451
 using Autofac;
@@ -93,6 +94,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CommentService>().As<ICommentService>();
             builder.RegisterType<ContentService>().As<IContentService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
+            builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
             builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();

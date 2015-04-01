@@ -19,6 +19,8 @@ using System.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.Localization;
 using System;
+using Microsoft.Framework.Logging;
+using Templates;
 using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Impl
@@ -30,17 +32,21 @@ namespace VitalChoice.Business.Services.Impl
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<Recipe> recipeRepository;
         private readonly IContentProcessorsService contentProcessorsService;
+	    private readonly ITtlGlobalCache _templatesCache;
+	    private readonly ILogger _logger;
 
         public ContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<Recipe> recipeRepository,
-            IContentProcessorsService contentProcessorsService)
+            IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
 		{
             this.masterContentItemRepository = masterContentItemRepository;
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentProcessorsService = contentProcessorsService;
             this.recipeRepository = recipeRepository;
-        }
+            _templatesCache = templatesCache;
+            _logger = LoggerService.GetDefault();
+		}
 
         #region Public
 
@@ -67,7 +73,7 @@ namespace VitalChoice.Business.Services.Impl
 
             if (category == null)
             {
-                //TO DO - write to log. No a certain category
+                _logger.LogInformation("The category {0} could not be found", categoryUrl);
                 return toReturn;
             }
 
@@ -77,17 +83,17 @@ namespace VitalChoice.Business.Services.Impl
                 category = await TryLoadParentTemplate(category);
             }
 
-            //TODO: - check complining templates valid date, and recompile if needed
-
             if (category.ContentItem == null)
             {
-                //TODO: - write to log. Category without a template
+                _logger.LogInformation("The category {0} have no content template", categoryUrl);
                 return toReturn;
             }
 
             dynamic model = new ExpandoObject();
-            Dictionary<string, object> queryDate = new Dictionary<string, object>();
-            queryDate.Add(ContentConstants.CATEGORY_ID, category.Id);
+            Dictionary<string, object> queryDate = new Dictionary<string, object>
+            {
+                {ContentConstants.CATEGORY_ID, category.Id}
+            };
             foreach(var contentItemsToContentItemProcessor in category.ContentItem.ContentItemsToContentItemProcessors)
             {
                 var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentItemProcessor.Type);
