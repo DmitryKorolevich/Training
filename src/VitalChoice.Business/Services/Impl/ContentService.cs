@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Impl
 
         #region Public
 
-        public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, string categoryUrl = null)
+        public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null)
         {
             ExecutedContentItem toReturn = null;
             ContentCategory category = null;
@@ -90,14 +90,11 @@ namespace VitalChoice.Business.Services.Impl
             }
 
             dynamic model = new ExpandoObject();
-            Dictionary<string, object> queryDate = new Dictionary<string, object>
-            {
-                {ContentConstants.CATEGORY_ID, category.Id}
-            };
+            parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
             foreach(var contentItemsToContentItemProcessor in category.ContentItem.ContentItemsToContentItemProcessors)
             {
                 var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentItemProcessor.Type);
-                model = await processor.ExecuteAsync(model, queryDate);
+                model = await processor.ExecuteAsync(model, parameters);
             }
 
             //TO DO - execute a certain template
@@ -113,7 +110,7 @@ namespace VitalChoice.Business.Services.Impl
             return toReturn;
         }
         
-        public async Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, string contentDataItemUrl)
+        public async Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl)
         {
             ExecutedContentItem toReturn = null;
             ContentDataItem contentDataItem = null;
@@ -132,6 +129,13 @@ namespace VitalChoice.Business.Services.Impl
             }
 
             //TO DO - check complining templates valid date, and recompile if needed
+
+            dynamic model = new ExpandoObject();
+            foreach (var contentItemsToContentItemProcessor in contentDataItem.ContentItem.ContentItemsToContentItemProcessors)
+            {
+                var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentItemProcessor.Type);
+                model = await processor.ExecuteAsync(model, parameters);
+            }
 
             //TO DO - execute a certain template
 

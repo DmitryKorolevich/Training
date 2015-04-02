@@ -18,6 +18,28 @@ namespace VitalChoice.Public.Content.Controllers
             this.contentService = contentService;
         }
 
+        //Get params fron action params and all aditional query params
+        protected Dictionary<string, object> GetParameters()
+        {
+            Dictionary<string, object> toReturn = new Dictionary<string, object>();
+            foreach (var actionParam in ActionContext.ActionDescriptor.Parameters)
+            {
+                var valueItem = BindingContext.ValueProvider.GetValueAsync(actionParam.Name).Result;
+                if (valueItem != null)
+                {
+                    toReturn.Add(actionParam.Name, valueItem.RawValue);
+                }
+            }
+            foreach (var queryParam in Request.Query)
+            {
+                if (!toReturn.ContainsKey(queryParam.Key))
+                {
+                    toReturn.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
+                }
+            }
+            return toReturn;
+        }
+
         public virtual ViewResult BaseView(ContentPageViewModel model)
         {
             return View("~/Views/Content/ContentPage.cshtml", model);

@@ -8,8 +8,8 @@ namespace VitalChoice.Business.Services.Contracts
 {
 	public interface IContentService
 	{
-        Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type,string categoryUrl = null);
+        Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null);
 
-        Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, string contentDataItemUrl);
+        Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl);
     }
 }

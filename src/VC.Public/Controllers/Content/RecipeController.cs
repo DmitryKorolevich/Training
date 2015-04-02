@@ -25,13 +25,7 @@ namespace VitalChoice.Public.Content.Controllers
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var logger = LoggerService.GetDefault();
-            logger.LogError("test");
-
-            //var pagedList = logViewService.GetCommonItems();
-            //var pagedList2 = logViewService.GetCommonItems(logLevel: "fatal");
-
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe);
+            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -45,7 +39,7 @@ namespace VitalChoice.Public.Content.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, url);
+            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -59,7 +53,7 @@ namespace VitalChoice.Public.Content.Controllers
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetContentItemContentAsync(ContentType.Recipe, url);
+            ExecutedContentItem toReturn = await contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
