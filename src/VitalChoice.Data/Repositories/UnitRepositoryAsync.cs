@@ -48,6 +48,19 @@ namespace VitalChoice.Data.Repositories
             Context.SetState(entity, EntityState.Modified);
         }
 
+        public virtual async Task<bool> UpdateAsync(TEntity entity)
+        {
+            return await UpdateAsync(CancellationToken.None, entity);
+        }
+
+        public async Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            DbSet.Attach(entity);
+            DbSet.Update(entity);
+            Context.SetState(entity, EntityState.Modified);
+            return true;
+        }
+
         public virtual void Delete(int id)
 		{
 			var entity = DbSet.FirstOrDefault(x => x.Id == id);

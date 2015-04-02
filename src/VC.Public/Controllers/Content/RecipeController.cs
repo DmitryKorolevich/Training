@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.WebEncoders;
+using Templates.Strings.Web;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Content;
-using System.Threading.Tasks;
+using VitalChoice.Public.Content.Controllers;
 using VitalChoice.Public.Models;
-using Microsoft.Framework.Logging;
-using VitalChoice.Business.Services.Impl;
-using VitalChoice.Infrastructure.Context;
-using VitalChoice.Domain.Entities.Logs;
 
-namespace VitalChoice.Public.Content.Controllers
+namespace VitalChoice.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
-        private readonly ILogViewService logViewService;
+        private readonly ILogViewService _logViewService;
 
         public RecipeController(IContentService contentService, ILogViewService logViewService) : base(contentService)
         {
-            this.logViewService = logViewService;
+            this._logViewService = logViewService;
         }
 
         [HttpGet]
@@ -62,6 +59,60 @@ namespace VitalChoice.Public.Content.Controllers
             {
                 return BaseNotFoundView();
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditContent(int id) {
+            var item = await contentService.GetContentItemAsync(id);
+            if (item != null)
+            {
+                return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
+                {
+                    Id = item.Id,
+                    Template = item.Template
+                });
+            }
+            return BaseNotFoundView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateContent(int id, ContentEditModel model)
+        {
+            var item = await contentService.GetContentItemAsync(id);
+            if (item != null)
+            {
+                item.Template = model.Template;
+                await contentService.UpdateContentItemAsync(item);
+                return RedirectToAction("EditContent", new {id = id});
+            }
+            return BaseNotFoundView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditMasterContent(int id)
+        {
+            var item = await contentService.GetMasterContentItemAsync(id);
+            if (item != null) {
+                return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
+                {
+                    Id = item.Id,
+                    Template = item.Template,
+                    Master = true
+                });
+            }
+            return BaseNotFoundView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateMasterContent(int id, ContentEditModel model) {
+            var item = await contentService.GetMasterContentItemAsync(id);
+            if (item != null)
+            {
+                item.Template = model.Template;
+                await contentService.UpdateMasterContentItemAsync(item);
+                return RedirectToAction("EditMasterContent", new { id = id });
+            }
+            return BaseNotFoundView();
         }
     }
 }

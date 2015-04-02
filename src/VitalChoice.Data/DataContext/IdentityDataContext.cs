@@ -32,7 +32,7 @@ namespace VitalChoice.Data.DataContext
 
 		public void SetState(object entity, EntityState state)
 		{
-            SetState(entity, state);
+		    base.Entry(entity).State = state;
         }
 	}
 }

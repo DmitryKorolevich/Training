@@ -1,0 +1,338 @@
+﻿@*Start definitions*@
+<%
+<seafood_how_to>
+{{
+	<div>
+		<div class="orange_text_A">Seafood How-To Videos</div>
+		<div style="height:480px;overflow:scroll; overflow-x:hidden; padding:7px;">
+			<table width="250px" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td width="112" valign="top"><a href="javascript:void(0);" data-video-id="MjH2Zfq1uDQ" class="youtube tooltip-v" data-tooltip-id="video13" onclick="showDiv('1');return false"><img src="/shop/pc/catalog/kitchen_portal/broiling-salmon-video-thumb-6-6-14a.jpg" border="0"></a></td>
+					<td width="10" valign="top"><img src="/shop/pc/catalog/Eric-Web-Dev/testimonials/spacer.png" width="10" height="10"></td>
+					<td width="160" valign="top"><div class="captions_dark">How to Broil Salmon</div></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+}}
+<recipes_by_category>
+{{
+	<div class="nav_cat_A" style="width:150px; padding:0px!important;">
+		<br>
+		<span class="orange_text_A" style="padding:0 0 0 5px;">Recipes by Category</span><br>
+		<br>
+		<div id="example5" style="float:none!important;">
+			<ul id="menu5" class="example_menu" style="width:140px!important;">
+				<li>
+					<a href="#" class="collapsed" style="font-size:12px; padding-left:5px; width:138px!important; background:none;">Wild White Fish (Halibut, Tuna, Cod, & More)</a>
+					<ul>
+						<li><a style='margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;' href='/shop/pc/recipes.asp?idCategory=601'>Alaskan Cod</a></li>
+						<li><a style='margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;' href='/shop/pc/recipes.asp?idCategory=602'>Alaskan Halibut</a></li>
+						<li><a style='margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;' href='/shop/pc/recipes.asp?idCategory=603'>Tuna</a></li>
+						<li><a style='margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;' href='/shop/pc/recipes.asp?idCategory=605'>Alaskan Sablefish (Black Cod)</a></li>
+						<li><a style='margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;' href='/shop/pc/recipes.asp?idCategory=853'>Petrale Sole</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+}}
+<chef_videos>
+{{
+	<div class="nav_cat_A" style="width:150px; padding:0px!important;">
+		<br>
+		<span class="orange_text_A" style="padding:0 0 0 5px;">Chef Recipe Videos</span><br>
+		<br>
+		<div style="float:none!important;">
+			<ul class="example_menu" style="width:140px!important;">
+				<li>
+					<a href="#" class="collapsed" style="font-size:12px; padding-left:5px; width:138px!important; background:none;">Becky Selengut</a>
+					<ul>
+						<li><a style="margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;" href="/shop/pc/viewrecipes.asp?RecipeId=1471">Skillet Eggs with Smoked Salmon and Spinach</a></li>
+						<li><a style="margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;" href="/shop/pc/viewrecipes.asp?RecipeId=1472">Crab Salad & Thai Coconut Soup</a></li>
+						<li><a style="margin-bottom: -6px;margin-top: -6px;padding-left: 10px;width: 140px; background:none;" href="/shop/pc/viewrecipes.asp?RecipeId=1473">Wild Pacific Albacore Tuna Tataki</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+}}
+<left>
+{{
+	<div style="float:left">
+		@out()
+	</div>
+}}
+<center>
+{{
+	<div>
+		@out()
+	</div>
+}}
+<right>
+{{
+	<div style="float:right">
+		@out()
+	</div>
+}}
+<default>
+{{
+	<div>
+		@left()
+		{{
+			@chef_videos()
+			@recipes_by_category()
+		}}
+		@center()
+		{{
+			<div style="position:relative;"><!--<div style="position: absolute; left: 0; top: 0;"--><a href="javascript:void(0);" data-video-id="MjH2Zfq1uDQ" class="youtube" onclick="showDiv('1');return false"><img id="maining" src="/shop/pc/catalog/kitchen_portal/main-video-468px-a.jpg" width="468" height="260" border="0"></a>
+				<div id="youtube-container" style="display: none;">
+					<a href="javascript:void(0);" class="youtube-close"><img alt="Close" src="/shop/includes/spry/images/close_button.png" style="margin-right: -25px; margin-top: -15px;"></a>
+					<div id="youtube-player"></div>
+				</div>
+			</div>
+		}}
+		@right()
+		{{
+			@seafood_how_to()
+		}}
+	</div>
+}}
+%>
+<script type="text/javascript">
+    // From: http://www.webdeveloper.com/forum/showthread.php?266743-Switch-Div-Content-Using-Javascript&p=1229155#post1229155
+
+    function showDiv(idInfo) {
+        var sel = document.getElementById('divLinks').getElementsByTagName('div');
+        for (var i = 0; i < sel.length; i++) {
+            sel[i].style.display = 'none';
+        }
+        document.getElementById('container' + idInfo).style.display = 'block';
+    }
+</script>
+<style>
+    .recipe_head_A {
+        color: #333333;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+
+    .nav_cat_A {
+        font-family: Trebuchet MS,Verdana,Arial,sans-serif;
+        color: #333333;
+        font-size: 12px;
+        font-weight: normal;
+        padding: 0px 6px 0px 6px;
+        border: 0px solid #999999;
+        background: #f6f6f6;
+        margin: 0px;
+    }
+
+    .nav_cat_arrow {
+        color: #999999;
+        font-size: 9px;
+        font-weight: normal;
+    }
+
+    .text_recipe_A {
+        color: #e54702;
+        font-weight: normal;
+        font-variant: small-caps;
+    }
+
+
+    .normal_text_A {
+        line-height: 120%;
+    }
+
+    .orange_text_A {
+        font-family: Trebuchet MS,Verdana,Arial,sans-serif;
+        color: #e54702;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 6px 0px 6px 0px;
+    }
+
+    .captions_A {
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: bold;
+        margin: 3px 0 7px 0;
+        line-height: 115%;
+    }
+
+    .captions_dark {
+        font-family: Trebuchet MS,Verdana,Arial,sans-serif;
+        color: #333333;
+        font-size: 11px;
+        font-weight: bold;
+        margin: 3px 0 7px 0;
+        line-height: 115%;
+    }
+
+
+
+    .video_box_A {
+        padding: 0px 0px 0px 0px;
+        border: 1px solid #e1e1e1;
+        background: #f6f6f6;
+        margin: 0px;
+    }
+</style>
+
+<script type="text/javascript">
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var youtubePlayer;
+
+    $(document).ready(function () {
+        $("a.youtube").click(function () {
+            if (youtubePlayer !== undefined) {
+                youtubePlayer.loadVideoById($(this).attr("data-video-id"));
+                //youtubePlayer.playVideo();
+            }
+            else {
+                $("#youtube-container").show();
+
+                youtubePlayer = new YT.Player('youtube-player', {
+                    height: '260',
+                    width: '468',
+                    videoId: $(this).attr("data-video-id"),
+                    playerVars: {
+                        autoplay: 1,
+                        iv_load_policy: 3,
+                        rel: 0,
+                        showinfo: 0,
+                        wmode: "opaque"
+                    },
+                    events: {
+                        'onStateChange': onYouTubePlayerStatusChange
+                    }
+                });
+            }
+            return false;
+        });
+        $("#youtube-container .youtube-close").click(function () {
+            closeYoutubeVideo();
+        });
+    });
+
+    function onYouTubePlayerStatusChange(event) {
+        if (event.data == YT.PlayerState.ENDED) {
+            closeYoutubeVideo();
+        }
+    }
+
+    function destroyPlayer() {
+        if (youtubePlayer !== undefined) {
+            youtubePlayer.destroy();
+            youtubePlayer = undefined;
+        }
+    }
+
+    function closeYoutubeVideo() {
+        destroyPlayer();
+        $("#youtube-container").hide();
+    }
+</script>
+<style>
+    #youtube-container {
+        z-index: 1 !important;
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        max-width: 468px;
+        max-height: 260px;
+        display: none;
+    }
+
+    #mainimg {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .youtube-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 2;
+    }
+</style>
+<script type="text/javascript">
+    var contents = {
+        'video1': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Smoked Salmon & Egg Skillet</strong><br><br>Chef Becky Selengut demonstrates how simple it is to prepare a tasty, nutrient-packed breakfast that will have your family begging for more.</span>',
+        'video2': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Crab Salad & Thai Coconut Soup</strong><br><br>Using canned Dungeness crab as a centerpiece, Chef Becky Selengut shows how a few simple ingredients combine for a showpiece meal.</span>',
+        'video3': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Wild Pacific Albacore Tuna Tataki</strong><br><br>Unbelievably simple yet so delicious, this tuna recipe by Chef Becky Selengut makes an elegant appetizer for health-conscious foodies.</span>',
+        'video4': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Mixed Seafood Snack Plate</strong><br><br>Organic almonds, pickled onions and olives complement a healthful combo of sardines, salmon and sablefish for a simple, crowd-pleasing appetizer.</span>',
+        'video5': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Blueberry & Strawberry Smoothie</strong><br><br>Chef Becky Selengut walks through the simple steps that lead to a frosty, nutrient-packed smoothie with organic berries, spinach and chia seeds.</span>',
+        'video6': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Smoked Nova Lox Sandwiches</strong><br><br>Your family or guests will love Chef Becky Selengut&#8217;s idea for simple, artfully arranged, open-faced sandwiches featuring lox and tomatoes.</span>',
+        'video7': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Pasta with Wild Spot Prawns</strong><br><br>Chef Becky Selengut shows how simple it is to create a mouthwatering meal using wild prawns, pasta, goat cheese, capers, olives and herbs.</span>',
+        'video8': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Lemon Vinaigrette Salad Dressing</strong><br><br>Make your salads come to life with Chef Becky Selengut&#8217;s simple recipe for a classic vinaigrette with fresh lemons, white balsamic and organic olive oil.</span>',
+        'video9': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Canned Wild Sockeye Salad</strong><br><br>Without Chef Becky Selengut&#8217;s easy-to-follow recipe, we might never know how simple it is to prepare such a nutrient-rich, wild salmon pasta salad.</span>',
+        'video10': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Wild Albacore Tuna Salad</strong><br><br>Using wild Pacific albacore tuna loin medallions, Chef Becky Selengut takes us through the simple process of preparing a classic French favorite.</span>',
+        'video11': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Oat Fruit Nut Granola</strong><br><br>Why buy store-bought when even-more delicious and nutritious granola is as simple as this mixing and baking method by Chef Becky Selengut.</span>',
+        'video12': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">An interview with Chef Becky Selengut</strong><br><br>A peak into Chef Becky Selengut&#8217;s passion for good fish and her  philosophy of standing back and letting the flavor of good fish shine.</span>',
+        'video13': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">How to Broil Salmon</strong><br><br>Many don&#8217;t realize how incredibly simple it is to broil wild Alaskan silver salmon perfectly, until seeing this short guide by Chef Becky Selengut.</span>',
+        'video14': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">How to Saut&eacute; Salmon</strong><br><br>Using only seafood marinade and organic olive oil, Chef Becky Selengut shows just how simple it is to cook salmon beautifully in a frying pan.</span>',
+        'video15': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">Steamed Wild Halibut</strong><br><br>A remarkably simple yet highly sophisticated recipe for wild Alaskan halibut using caviar, spinach, carrots and sesame seeds, by Chef Becky Selengut.</span>',
+        'video16': '<span style="color:#fff; font-size:12px;"><strong style="color:#FBC680;">How to Clean Spot Prawns</strong><br /><br />Chef Becky Selengut demystifies the process of cleaning spot prawns, demonstrating how to de-vein and shell these delicacies for cooking.</span>'
+    };
+
+    $(document).ready(function () {
+        var settingsVertical = {
+            content: undefined,
+            contentAsHTML: true,
+            animation: 'grow',
+            delay: 0,
+            theme: 'tooltipster-default',
+            touchDevices: false,
+            trigger: 'hover',
+            interactive: 'true',
+            position: 'right',
+            offsetY: 25,
+            fixedWidth: 250,
+            maxWidth: 250,
+            onlyOne: true
+        };
+
+        var settingsHorizontal = {
+            content: undefined,
+            contentAsHTML: true,
+            animation: 'grow',
+            delay: 0,
+            theme: 'tooltipster-default',
+            touchDevices: false,
+            trigger: 'hover',
+            interactive: 'true',
+            position: 'top',
+            offsetY: 60,
+            fixedWidth: 250,
+            maxWidth: 250,
+            onlyOne: true
+        };
+        $('.tooltip-v').each(function () {
+            settingsVertical.content = $(contents[$(this).attr("data-tooltip-id")]);
+            $(this).tooltipster(settingsVertical);
+        });
+        $('.tooltip-h').each(function () {
+            settingsHorizontal.content = $(contents[$(this).attr("data-tooltip-id")]);
+            $(this).tooltipster(settingsHorizontal);
+        });
+    });
+</script>
+<style type="text/css">
+    #container1, #container2, #container3, #container4 {
+        display: none;
+    }
+
+    .example_menu > li > a > span {
+    }
+</style>
+@*Output default top text*@
+<div><img src="/shop/pc/catalog/kitchen_portal/in-the-kitchen-header-4-24-14a.png" width="955" height="90"></div>

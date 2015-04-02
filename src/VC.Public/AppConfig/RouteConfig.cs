@@ -9,19 +9,28 @@ namespace VitalChoice.Public
         {
             routeBuilder.MapRoute(
                 name: "Recipes_Categories",
-                template: "recipes/categories",
+                template: "recipes/",
                 defaults: new { controller = "Recipe", action = "Categories" });
 
             routeBuilder.MapRoute(
                 name: "Recipes_Category",
-                template: "recipes/category/{url}",
+                template: "recipes/{url}",
                 defaults: new { controller = "Recipe", action = "Category" });
 
             routeBuilder.MapRoute(
                 name: "Recipes_Recipe",
-                template: "recipes/{url}",
+                template: "recipe/{url}",
                 defaults: new { controller = "Recipe", action = "Recipe" });
 
+            routeBuilder.MapRoute(
+                name: "ContentItem_Edit",
+                template: "recipe/edit/{id}",
+                defaults: new { controller = "Recipe", action = "EditContent" });
+
+            routeBuilder.MapRoute(
+                name: "MasterContentItem_Edit",
+                template: "recipe/editmaster/{id}",
+                defaults: new { controller = "Recipe", action = "EditMasterContent" });
 
             routeBuilder.MapRoute(
                 name: "Default",
