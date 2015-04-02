@@ -82,6 +82,7 @@ namespace VitalChoice.Public.Controllers.Content
             if (item != null)
             {
                 item.Template = model.Template;
+                item.Updated = DateTime.Now;
                 await contentService.UpdateContentItemAsync(item);
                 return RedirectToAction("EditContent", new {id = id});
             }
@@ -109,6 +110,7 @@ namespace VitalChoice.Public.Controllers.Content
             if (item != null)
             {
                 item.Template = model.Template;
+                item.Updated = DateTime.Now;
                 await contentService.UpdateMasterContentItemAsync(item);
                 return RedirectToAction("EditMasterContent", new { id = id });
             }
