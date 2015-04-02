@@ -6,12 +6,12 @@ namespace VitalChoice.Domain.Entities.Content
     public class MasterContentItem : Entity
     {
         public string Name { get; set; }
-
         public string Template { get; set; }
-
-        public ContentType Type { get; set; }
-
-        public virtual ICollection<ContentCategory> ContentCategories { get;set; }
-        public virtual ICollection<Recipe> Recipes { get; set; }
+        public int TypeId { get; set; }
+        public ContentTypeEntity Type { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
+        public RecordStatusCode StatusCode { get; set; }
+        public ICollection<MasterContentItemToContentProcessor> MasterContentItemToContentProcessors { get; set; }
     }
 }

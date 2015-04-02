@@ -23,6 +23,8 @@ namespace VitalChoice.Domain.Entities.Content
 
         public int? ContentItemId { get; set; }
 
+        public ContentType Type { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
     }
 }

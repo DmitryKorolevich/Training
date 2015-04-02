@@ -81,7 +81,7 @@
     <None Include="PostDeployment\Scripts\LocalizationItems.sql" />
     <Build Include="dbo\Tables\RecordStatusCodes.sql" />
     <Build Include="dbo\ContentPages\ContentCategories.sql" />
-    <Build Include="dbo\ContentPages\ContentItemProcessors.sql" />
+    <Build Include="dbo\ContentPages\ContentProcessors.sql" />
     <Build Include="dbo\ContentPages\ContentItems.sql" />
     <Build Include="dbo\ContentPages\ContentItemsToContentProcessors.sql" />
     <Build Include="dbo\ContentPages\MasterContentItems.sql" />
@@ -90,11 +90,13 @@
     <Build Include="dbo\ContentPages\RecipesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\ContentTestDataInsert.sql" />
     <None Include="PostDeployment\Scripts\ContentTestDataDelete.sql" />
+    <Build Include="dbo\ContentPages\ContentTypes.sql" />
+    <Build Include="dbo\ContentPages\MasterContentItemsToContentProcessors.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
     <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
-    <None Include="PostDeployment\Scripts\ContentItemsProcessors.sql" />
+    <None Include="PostDeployment\Scripts\ContentProcessors.sql" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Infrastructure.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>

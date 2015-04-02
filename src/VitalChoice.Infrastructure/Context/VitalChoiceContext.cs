@@ -71,22 +71,32 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Contents
 
-            builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
-            builder.Entity<ContentCategory>().ToTable("ContentCategories").Key(p => p.Id);
-            builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection(p=>p.ContentCategories).ForeignKey(p=>p.MasterContentItemId).
-                PrincipalKey(p=>p.Id);
+            builder.Entity<ContentTypeEntity>().ToTable("ContentTypes").Key(p => p.Id);
 
-            builder.Entity<ContentItemToContentItemProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
+            builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
+            builder.Entity<MasterContentItemToContentProcessor>().ToTable("MasterContentItemsToContentProcessors").Key(p => p.Id);
+            builder.Entity<ContentProcessor>().ToTable("ContentProcessors").Key(p => p.Id);
+
+            builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
+            builder.Entity<MasterContentItem>().Reference(p => p.Type).InverseCollection().ForeignKey(p => p.TypeId).PrincipalKey(p => p.Id);
+            builder.Entity<MasterContentItem>().Collection(p => p.MasterContentItemToContentProcessors).InverseReference(p => p.MasterContentItem).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<ContentProcessor>().Collection(p => p.MasterContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
+
             builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
-            builder.Entity<ContentItemProcessor>().ToTable("ContentItemProcessors").Key(p => p.Id);
-            builder.Entity<ContentItem>().Collection(p => p.ContentItemsToContentItemProcessors).InverseReference(p => p.ContentItem).ForeignKey(p=>p.ContentItemId).PrincipalKey(p=>p.Id);
-            builder.Entity<ContentItemProcessor>().Collection(p => p.ContentItemsToContentItemProcessors).InverseReference(p => p.ContentItemProcessor).ForeignKey(p => p.ContentItemProcessorId).PrincipalKey(p => p.Id);
+            builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
+
+            builder.Entity<ContentCategory>().ToTable("ContentCategories").Key(p => p.Id);
+            builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p=>p.MasterContentItemId).
+                PrincipalKey(p=>p.Id);
+            builder.Entity<ContentCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
+                PrincipalKey(p => p.Id);
 
             builder.Entity<Recipe>().ToTable("Recipes").Key(p => p.Id);
-            builder.Entity<Recipe>().Collection(p => p.RecipesToContentCategories).InverseReference(p => p.Recipe).ForeignKey(p => p.RecipeId).PrincipalKey(p => p.Id);
-            builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection(p => p.Recipes).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories").Key(p => p.Id);
-
+            builder.Entity<Recipe>().Collection(p => p.RecipesToContentCategories).InverseReference(p => p.Recipe).ForeignKey(p => p.RecipeId).PrincipalKey(p => p.Id);
+            builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
             #endregion
 

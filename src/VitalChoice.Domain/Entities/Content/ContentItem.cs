@@ -5,8 +5,6 @@ namespace VitalChoice.Domain.Entities.Content
 {
     public class ContentItem : Entity
     {
-        public string Name { get; set; }
-
         public DateTime Created { get; set; }
 
         public DateTime Updated { get; set; }
@@ -19,6 +17,6 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string MetaDescription { get; set; }
 
-        public ICollection<ContentItemToContentItemProcessor> ContentItemsToContentItemProcessors { get; set; }
+        public ICollection<ContentItemToContentProcessor> ContentItemToContentProcessors { get; set; }
     }
 }
