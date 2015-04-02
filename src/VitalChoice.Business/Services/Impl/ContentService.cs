@@ -88,7 +88,9 @@ namespace VitalChoice.Business.Services.Impl
                 _logger.LogInformation("The category {0} have no content template", categoryUrl);
                 return toReturn;
             }
-
+            var template = _templatesCache.GetOrCreateTemplate(category.MasterContentItem.Template,
+                category.ContentItem.Template, category.ContentItem.Updated, category.MasterContentItem.Updated,
+                category.MasterContentItemId, category.ContentItem.Id);
             dynamic model = new ExpandoObject();
             Dictionary<string, object> queryDate = new Dictionary<string, object>
             {
@@ -100,11 +102,11 @@ namespace VitalChoice.Business.Services.Impl
                 model = await processor.ExecuteAsync(model, queryDate);
             }
 
-            //TO DO - execute a certain template
+            var generatedHtml = template.Generate(model);
 
-            toReturn = new ExecutedContentItem()
+            toReturn = new ExecutedContentItem
             {
-                HTML = "<div>Test HTML - Category</div>",
+                HTML = generatedHtml,
                 Title = category.ContentItem.Title,
                 MetaDescription = category.ContentItem.MetaDescription,
                 MetaKeywords = category.ContentItem.MetaKeywords,
@@ -131,9 +133,9 @@ namespace VitalChoice.Business.Services.Impl
                 return toReturn;
             }
 
-            //TO DO - check complining templates valid date, and recompile if needed
-
-            //TO DO - execute a certain template
+            var template = _templatesCache.GetOrCreateTemplate(contentDataItem.MasterContentItem.Template,
+                contentDataItem.ContentItem.Template, contentDataItem.ContentItem.Updated, contentDataItem.MasterContentItem.Updated,
+                contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
 
             toReturn = new ExecutedContentItem()
             {

@@ -11,6 +11,8 @@ namespace VitalChoice.Domain.Entities.Content
 
         public ContentType Type { get; set; }
 
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
         public virtual ICollection<ContentCategory> ContentCategories { get;set; }
         public virtual ICollection<Recipe> Recipes { get; set; }
     }

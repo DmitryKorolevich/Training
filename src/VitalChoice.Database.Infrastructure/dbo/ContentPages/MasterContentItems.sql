@@ -1,7 +1,9 @@
 ﻿CREATE TABLE [dbo].[MasterContentItems]
 (
 	[Id] INT NOT NULL PRIMARY KEY, 
-    [Name] NVARCHAR(250) NOT NULL, 
+    [Name] NVARCHAR(250) NOT NULL UNIQUE, 
     [Type] INT NOT NULL, 
-    [Template] NVARCHAR(MAX) NOT NULL
+    [Template] NVARCHAR(MAX) NOT NULL, 
+    [Created] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [Updated] DATETIME NOT NULL DEFAULT GETDATE()
 )
