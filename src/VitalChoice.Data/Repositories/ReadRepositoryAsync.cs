@@ -71,7 +71,7 @@ namespace VitalChoice.Data.Repositories
 			int? pageSize = null,
             bool tracking = true)
 		{
-			return Select(query, filter, orderBy, page, pageSize, tracking).AsEnumerable();
+			return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
 		}
 	}
 }

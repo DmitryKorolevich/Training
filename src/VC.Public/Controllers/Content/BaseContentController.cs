@@ -11,9 +11,9 @@ namespace VitalChoice.Public.Content.Controllers
 {
     public class BaseContentController : Controller
     {
-        protected readonly IContentService contentService;
+        protected readonly IContentViewService contentService;
 
-        public BaseContentController(IContentService contentService)
+        public BaseContentController(IContentViewService contentService)
         {
             this.contentService = contentService;
         }

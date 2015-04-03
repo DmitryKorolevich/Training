@@ -7,16 +7,16 @@ using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Public.Content.Controllers;
 using VitalChoice.Public.Models;
+using VitalChoice.Data.Repositories;
+using Microsoft.Data.Entity;
+using VitalChoice.Business.Queries.Content;
 
 namespace VitalChoice.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
-        private readonly ILogViewService _logViewService;
-
-        public RecipeController(IContentService contentService, ILogViewService logViewService) : base(contentService)
+        public RecipeController(IContentViewService contentService) : base(contentService)
         {
-            this._logViewService = logViewService;
         }
 
         [HttpGet]

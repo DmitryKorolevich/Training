@@ -70,7 +70,7 @@ namespace VitalChoice.Infrastructure.Context
             #endregion
 
             #region Contents
-
+            
             builder.Entity<ContentTypeEntity>().ToTable("ContentTypes").Key(p => p.Id);
 
             builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);

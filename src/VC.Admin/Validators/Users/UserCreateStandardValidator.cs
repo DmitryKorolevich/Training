@@ -1,9 +1,9 @@
 using FluentValidation;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Models;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Admin.Models;
 
 namespace VitalChoice.Validators.Users
 {

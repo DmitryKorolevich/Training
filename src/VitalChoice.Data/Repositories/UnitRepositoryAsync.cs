@@ -20,75 +20,143 @@ namespace VitalChoice.Data.Repositories
         {
         }
 
-		public virtual void Insert(TEntity entity)
-		{
-			DbSet.Attach(entity);
-			Context.SetState(entity, EntityState.Added);
-		}
-
-		public virtual void InsertRange(IEnumerable<TEntity> entities)
-		{
-			foreach (var entity in entities)
-				Insert(entity);
-		}
-
-		public virtual void InsertGraph(TEntity entity)
-		{
-			DbSet.Add(entity);
-		}
-
-		public virtual void InsertGraphRange(params TEntity[] entities)
-		{
-			DbSet.AddRange(entities);
-		}
-
-        public virtual void Update(TEntity entity)
+        public virtual TEntity Insert(TEntity entity)
         {
+            TEntity toReturn = null;
             DbSet.Attach(entity);
-            Context.SetState(entity, EntityState.Modified);
+            Context.SetState(entity, EntityState.Added);
+            toReturn = entity;
+            return toReturn;
         }
 
-        public virtual async Task<bool> UpdateAsync(TEntity entity)
+        public virtual Task<TEntity> InsertAsync(TEntity entity)
         {
-            return await UpdateAsync(CancellationToken.None, entity);
+            return InsertAsync(CancellationToken.None, entity);
         }
 
-        public async Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
+            TEntity toReturn = null;
             DbSet.Attach(entity);
-            DbSet.Update(entity);
             Context.SetState(entity, EntityState.Modified);
+            toReturn = entity;
+            return Task.FromResult(toReturn);
+        }
+
+        public virtual bool InsertRange(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Added);
+            }
             return true;
         }
 
+        public virtual Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
+        {
+            return InsertRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual Task<bool> InsertRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Added);
+            }
+            return Task.FromResult(true);
+        }
+
+        public virtual TEntity InsertGraph(TEntity entity)
+        {
+            TEntity toReturn = null;
+            DbSet.Add(entity);
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual Task<TEntity> InsertGraphAsync(TEntity entity)
+        {
+            return InsertGraphAsync(CancellationToken.None, entity);
+        }
+
+        public virtual Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            TEntity toReturn = null;
+            DbSet.Add(entity);
+            toReturn = entity;
+            return Task.FromResult(toReturn);
+        }
+
+        public virtual bool InsertGraphRange(params TEntity[] entities)
+        {
+            DbSet.AddRange(entities);
+            return true;
+        }
+
+        public virtual Task<bool> InsertGraphRangeAsync(params TEntity[] entities)
+        {
+            return InsertGraphRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities)
+        {
+            DbSet.AddRange(entities);
+            return Task.FromResult(true);
+        }
+
+        public virtual TEntity Update(TEntity entity)
+        {
+            TEntity toReturn;
+            DbSet.Attach(entity);
+            Context.SetState(entity, EntityState.Modified);
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual Task<TEntity> UpdateAsync(TEntity entity)
+        {
+            return UpdateAsync(CancellationToken.None, entity);
+        }
+
+        public virtual Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            TEntity toReturn;
+            DbSet.Attach(entity);
+            Context.SetState(entity, EntityState.Modified);
+            toReturn = entity;
+            return Task.FromResult(toReturn);
+        }
+
         public virtual void Delete(int id)
-		{
-			var entity = DbSet.FirstOrDefault(x => x.Id == id);
-			if (entity != null)
-			{
-				Delete(entity);
-			}
-		}
+        {
+            var entity = DbSet.FirstOrDefault(x => x.Id == id);
+            if (entity != null)
+            {
+                Delete(entity);
+            }
+        }
 
-		public virtual void Delete(TEntity entity)
-		{
-			DbSet.Attach(entity);
-			Context.SetState(entity, EntityState.Deleted);
-		}
+        public virtual void Delete(TEntity entity)
+        {
+            DbSet.Attach(entity);
+            Context.SetState(entity, EntityState.Deleted);
+        }
 
-		public virtual async Task<bool> DeleteAsync(int id)
-		{
-			return await DeleteAsync(CancellationToken.None, id);
-		}
+        public virtual async Task<bool> DeleteAsync(int id)
+        {
+            return await DeleteAsync(CancellationToken.None, id);
+        }
 
-		public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
-		{
-			var entity = await DbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-			if (entity == null) return false;
+        public virtual Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
+        {
+            var entity = DbSet.FirstOrDefault(x => x.Id == id);
+            if (entity == null) return Task.FromResult(false);
 
-			DbSet.Attach(entity);
-			DbSet.Remove(entity);
-			return true;
-		}
-	}
+            DbSet.Attach(entity);
+            DbSet.Remove(entity);
+            return Task.FromResult(true);
+        }
+    }
 }

@@ -27,7 +27,7 @@ using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Impl
 {
-	public class ContentService : IContentService
+	public class ContentViewService : IContentViewService
     {
         private readonly IRepositoryAsync<MasterContentItem> masterContentItemRepository;
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services.Impl
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
-        public ContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
+        public ContentViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<Recipe> recipeRepository,
             IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
 		{
@@ -185,7 +185,7 @@ namespace VitalChoice.Business.Services.Impl
             return toReturn;
         }
 
-	    public async Task<bool> UpdateContentItemAsync(ContentItem itemToUpdate)
+	    public async Task<ContentItem> UpdateContentItemAsync(ContentItem itemToUpdate)
 	    {
 	        return await contentItemRepository.UpdateAsync(itemToUpdate);
 	    }
@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Impl
 	        return (await contentItemRepository.Query(c => c.Id == id).SelectAsync(false)).FirstOrDefault();
         }
 
-	    public virtual async Task<bool> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate)
+	    public virtual async Task<MasterContentItem> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate)
 	    {
             return await masterContentItemRepository.UpdateAsync(itemToUpdate);
         }

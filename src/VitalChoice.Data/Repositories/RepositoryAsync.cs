@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Infrastructure;
+using System;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -15,49 +16,122 @@ namespace VitalChoice.Data.Repositories
 		{
 		}
 
-		public virtual void Insert(TEntity entity)
-		{
-			DbSet.Attach(entity);
+		public virtual TEntity Insert(TEntity entity)
+        {
+            TEntity toReturn = null;
+            DbSet.Attach(entity);
 			Context.SetState(entity, EntityState.Added);
 			Context.SaveChanges();
-		}
-
-		public virtual void InsertRange(IEnumerable<TEntity> entities)
-		{
-			foreach (var entity in entities)
-				Insert(entity);
-			Context.SaveChanges();
-		}
-
-		public virtual void InsertGraph(TEntity entity)
-		{
-			DbSet.Add(entity);
-			Context.SaveChanges();
-		}
-
-		public virtual void InsertGraphRange(params TEntity[] entities)
-		{
-			DbSet.AddRange(entities);
-			Context.SaveChanges();
-		}
-
-		public virtual void Update(TEntity entity)
-		{
-			DbSet.Attach(entity);
-			Context.SetState(entity, EntityState.Modified);
-			Context.SaveChanges();
-		}
-
-        public virtual async Task<bool> UpdateAsync(TEntity entity) {
-            return await UpdateAsync(CancellationToken.None, entity);
+            toReturn = entity;
+            return toReturn;
         }
 
-	    public virtual async Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
-	    {
+        public virtual async Task<TEntity> InsertAsync(TEntity entity)
+        {
+            return await InsertAsync(CancellationToken.None, entity);
+        }
+
+        public virtual async Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            TEntity toReturn = null;
             DbSet.Attach(entity);
             Context.SetState(entity, EntityState.Modified);
             await Context.SaveChangesAsync(cancellationToken);
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual bool InsertRange(IEnumerable<TEntity> entities)
+		{
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Added);
+            }
+			Context.SaveChanges();
             return true;
+		}
+
+        public virtual async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
+        {
+            return await InsertRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual async Task<bool> InsertRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Added);
+            }
+            await Context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        public virtual TEntity InsertGraph(TEntity entity)
+        {
+            TEntity toReturn = null;
+            DbSet.Add(entity);
+			Context.SaveChanges();
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual async Task<TEntity> InsertGraphAsync(TEntity entity)
+        {
+            return await InsertGraphAsync(CancellationToken.None, entity);
+        }
+
+        public virtual async Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            TEntity toReturn = null;
+            DbSet.Add(entity);
+            await Context.SaveChangesAsync(cancellationToken);
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual bool InsertGraphRange(params TEntity[] entities)
+		{
+			DbSet.AddRange(entities);
+			Context.SaveChanges();
+            return true;
+		}
+
+        public virtual async Task<bool> InsertGraphRangeAsync(params TEntity[] entities)
+        {
+            return await InsertGraphRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities)
+        {
+            DbSet.AddRange(entities);
+            await Context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        
+        public virtual TEntity Update(TEntity entity)
+        {
+            TEntity toReturn;
+            DbSet.Attach(entity);
+			Context.SetState(entity, EntityState.Modified);
+			Context.SaveChanges();
+            toReturn = entity;
+            return toReturn;
+        }
+
+        public virtual async Task<TEntity> UpdateAsync(TEntity entity) {
+            return await UpdateAsync(CancellationToken.None, entity);
+        }
+
+	    public virtual async Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+	    {
+            TEntity toReturn;
+            DbSet.Attach(entity);
+            Context.SetState(entity, EntityState.Modified);
+            await Context.SaveChangesAsync(cancellationToken);
+            toReturn = entity;
+            return toReturn;
         }
 
 	    public virtual void Delete(int id)
@@ -91,5 +165,5 @@ namespace VitalChoice.Data.Repositories
 			await Context.SaveChangesAsync(cancellationToken);
 			return true;
 		}
-	}
+    }
 }

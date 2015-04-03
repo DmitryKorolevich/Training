@@ -10,13 +10,13 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Infrastructure;
 using VitalChoice.Infrastructure;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Models;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Admin.Models;
 
-namespace VitalChoice.Controllers
+namespace VitalChoice.Admin.Controllers
 {
     [Authorize]
     public class AccountController : Controller

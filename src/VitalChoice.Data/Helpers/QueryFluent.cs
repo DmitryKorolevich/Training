@@ -66,6 +66,15 @@ namespace VitalChoice.Data.Helpers
             Query = Query.Include(expression);
             return new IncludableQueryFluent<TEntity, TProperty>(this,true);
         }
+        public async Task<bool> SelectAnyAsync()
+        {
+            return await Repository.Select(Query, _expression, _orderBy).AnyAsync();
+        }
+
+        public async Task<int> SelectCountAsync()
+        {
+            return await Repository.Select(Query, _expression, _orderBy).CountAsync();
+        }
 
         public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)
         {

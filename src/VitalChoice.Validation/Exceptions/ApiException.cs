@@ -18,7 +18,7 @@ namespace VitalChoice.Validation.Exceptions
 
         public static string GetDefaultErrorMessage
         {
-            get { throw new NotImplementedException(); }
+            get { return "Oops something went wrong!"; }
         }
 
         public ApiException() {}

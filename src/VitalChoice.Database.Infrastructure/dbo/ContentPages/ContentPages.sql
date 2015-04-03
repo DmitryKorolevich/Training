@@ -10,3 +10,9 @@
     CONSTRAINT [FK_ContentPages_ToMasterContentItem] FOREIGN KEY (MasterContentItemId) REFERENCES MasterContentItems([Id]),
 	CONSTRAINT [FK_ContentPages_ToRecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes]([StatusCode]),
 )
+
+GO
+
+CREATE INDEX [IX_ContentPages_MasterContentItemId] ON [dbo].[Recipes] ([MasterContentItemId]) WITH (FILLFACTOR = 80); 
+
+GO

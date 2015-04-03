@@ -6,7 +6,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Domain.Entities.Options;
 
-namespace VitalChoice.Components
+namespace VitalChoice.Admin.Components
 {
 	[ViewComponent(Name = "Assets")]
 	public class AssetsViewComponent : ViewComponent

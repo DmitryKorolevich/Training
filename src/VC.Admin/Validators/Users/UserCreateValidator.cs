@@ -1,7 +1,7 @@
 ﻿using System;
-using VitalChoice.Models;
 using VitalChoice.Validation.Logic;
 using FluentValidation;
+using VitalChoice.Admin.Models;
 
 namespace VitalChoice.Validators.Users
 {

@@ -5,7 +5,7 @@ using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
-namespace VitalChoice.Models
+namespace VitalChoice.Admin.Models
 {
     [ApiValidator(typeof(UserCreateValidator))]
     public class UserCreateModel : Model<User, UserCreateSettings>
