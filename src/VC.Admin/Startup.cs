@@ -14,6 +14,7 @@ using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
 using System.IO;
+using VitalChoice.Admin.AppConfig;
 
 namespace VitalChoice
 {
@@ -72,16 +73,9 @@ namespace VitalChoice
 			app.UseIdentity();
 
             app.UseMvc(routes =>
-			{
-				routes.MapRoute(
-					name: "default",
-					template: "{controller}/{action}/{id?}",
-					defaults: new { controller = "Home", action = "Index" });
-
-				 routes.MapRoute(
-					name: "defaultApi",
-					template: "api/{controller}/{action}/{id?}");
-			});
+            {
+                RouteConfig.RegisterRoutes(routes);
+            });
 		}
 	}
 }

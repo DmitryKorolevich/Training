@@ -5,6 +5,8 @@ using Microsoft.Net.Http.Headers;
 using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Business.Services.Impl;
+using Microsoft.Framework.Logging;
 
 namespace VitalChoice.Validation.Helpers.GlobalFilters
 {
@@ -33,6 +35,8 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
                     result.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
             }
+
+            LoggerService.GetDefault().LogError(context.Exception.ToString());
 
             context.Result = result;
         }

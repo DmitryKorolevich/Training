@@ -10,37 +10,42 @@ namespace VitalChoice.Admin.AppConfig
         {
             routeBuilder.MapRoute(
                 name: "MasterContentItems",
-                template: "content/mastercontentitems",
-                defaults: new { controller = "MasterContent", action = "GetMasterContentItems" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new string[] { "GET" }) });
+                template: "api/content/mastercontentitems",
+                defaults: new { controller = "Content", action = "GetMasterContentItemsAsync" });
 
             routeBuilder.MapRoute(
-                name: "MasterContentItem",
-                template: "content/mastercontentitems/{id}",
-                defaults: new { controller = "MasterContent" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new string[] { "GET","POST","DELETE" }) });
+                name: "MasterContentItemGet",
+                template: "api/content/mastercontentitems/{id}",
+                defaults: new { controller = "Content", action = "GetMasterContentItemAsync" });
+
+            routeBuilder.MapRoute(
+                name: "MasterContentItemDelete",
+                template: "api/content/mastercontentitems/{id}",
+                defaults: new { controller = "Content", action = "DeleteMasterContentItemAsync" });
+
+            routeBuilder.MapRoute(
+                name: "MasterContentItemUpdate",
+                template: "api/content/mastercontentitems/{id?}",
+                defaults: new { controller = "Content", action = "UpdateMasterContentItemAsync" });
 
             routeBuilder.MapRoute(
                 name: "ContentTypes",
-                template: "content/contenttypes",
-                defaults: new { controller = "MasterContent", action = "GetContentTypes" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new string[] { "GET" }) });
-
-            //routeBuilder.MapRoute(
-            //    name: "UpdateGetMasterContentItem",
-            //    template: "recipes/{url}",
-            //    defaults: new { controller = "MasterContentItem", action = "UpdateMasterContentItem" });
-
-            //routeBuilder.MapRoute(
-            //    name: "DeleteMasterContentItem",
-            //    template: "recipes/{url}",
-            //    defaults: new { controller = "MasterContentItem", action = "UpdateMasterContentItem" });
-
+                template: "api/content/types",
+                defaults: new { controller = "Content", action = "GetContentTypesAsync" });
 
             routeBuilder.MapRoute(
-                name: "Default",
+                name: "ContentProcessors",
+                template: "api/content/processors",
+                defaults: new { controller = "Content", action = "GetContentProcessorsAsync" });
+
+            routeBuilder.MapRoute(
+                name: "default",
                 template: "{controller}/{action}/{id?}",
                 defaults: new { controller = "Home", action = "Index" });
+
+            routeBuilder.MapRoute(
+               name: "defaultApi",
+               template: "api/{controller}/{action}/{id?}");
             // Uncomment the following line to add a route for porting Web API 2 controllers.
             // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
         }

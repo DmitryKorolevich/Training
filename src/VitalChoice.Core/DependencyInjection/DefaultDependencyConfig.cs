@@ -92,9 +92,10 @@ namespace VitalChoice.Core.DependencyInjection
                     .As(typeof(ILogsRepositoryAsync<>))
                     .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
                 builder.RegisterType<CommentService>().As<ICommentService>();
-                builder.RegisterType<ContentService>().As<IContentService>();
+                builder.RegisterType<ContentViewService>().As<IContentViewService>();
                 builder.RegisterType<LogViewService>().As<ILogViewService>();
                 builder.RegisterType<MasterContentService>().As<IMasterContentService>();
+                builder.RegisterType<GeneralContentService>().As<IGeneralContentService>();
                 builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
                 builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();

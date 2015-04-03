@@ -60,7 +60,7 @@ namespace VitalChoice.Business.Services.Impl
         {
             var query = new MasterContentItemQuery();
             query = query.WithId(id).NotDeleted();
-            var toReturn = (await masterContentItemRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).SelectAsync(false)).FirstOrDefault();
             return toReturn;
         }
 

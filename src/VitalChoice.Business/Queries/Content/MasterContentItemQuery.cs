@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Queries.Content
 
         public MasterContentItemQuery NotDeleted()
         {
-            Add(x => !x.StatusCode.Equals(RecordStatusCode.Deleted));
+            Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));
 
             return this;
         }
