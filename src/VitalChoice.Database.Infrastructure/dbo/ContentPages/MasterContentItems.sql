@@ -10,4 +10,21 @@
     CONSTRAINT [FK_MasterContentItems_ToContentTypes] FOREIGN KEY (TypeId) REFERENCES ContentTypes([Id]),
 )
 
+GO
+
+CREATE TRIGGER TG_MasterContentItems_Update
+   ON MasterContentItems 
+   AFTER UPDATE
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	UPDATE MasterContentItems
+	SET Updated=GETDATE()
+	WHERE Id IN
+	(SELECT Id FROM inserted)
+END
+GO
+
+
 

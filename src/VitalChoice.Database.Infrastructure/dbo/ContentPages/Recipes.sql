@@ -14,3 +14,9 @@
 GO
 
 CREATE INDEX [IX_Recipes_Url] ON [dbo].[Recipes] ([Url]) WITH (FILLFACTOR = 80); 
+
+GO
+
+CREATE INDEX [IX_Recipes_MasterContentItemId] ON [dbo].[Recipes] ([MasterContentItemId]) WITH (FILLFACTOR = 80); 
+
+GO

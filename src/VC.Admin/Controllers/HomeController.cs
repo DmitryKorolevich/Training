@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Business.Services.Contracts;
 
-namespace VitalChoice.Controllers
+namespace VitalChoice.Admin.Controllers
 {
     public class HomeController : Controller
     {

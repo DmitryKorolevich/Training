@@ -17,6 +17,8 @@ namespace VitalChoice.Data.Helpers
         IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression);
         IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>>> expression);
+        Task<bool> SelectAnyAsync();
+        Task<int> SelectCountAsync();
         IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
         IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
         IEnumerable<TEntity> Select(bool tracking = true);

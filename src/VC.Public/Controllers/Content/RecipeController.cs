@@ -10,21 +10,31 @@ using Microsoft.Framework.Logging;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Data.Repositories;
+using Microsoft.Data.Entity;
+using VitalChoice.Business.Queries.Content;
 
 namespace VitalChoice.Public.Content.Controllers
 {
     public class RecipeController : BaseContentController
     {
         private readonly ILogViewService logViewService;
+        private readonly IMasterContentService mast;
+        private readonly IRepositoryAsync<MasterContentItem> masterContentItemRepository;
 
-        public RecipeController(IContentService contentService, ILogViewService logViewService) : base(contentService)
+        public RecipeController(IContentService contentService, ILogViewService logViewService, IMasterContentService mast,
+            IRepositoryAsync<MasterContentItem> masterContentItemRepository) : base(contentService)
         {
             this.logViewService = logViewService;
+            this.mast = mast;
+            this.masterContentItemRepository = masterContentItemRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
+            var res = await mast.DeleteMasterContentItemAsync(4);
+
             ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.Recipe, GetParameters());
             if (toReturn != null)
             {

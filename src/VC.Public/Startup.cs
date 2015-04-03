@@ -16,6 +16,7 @@ using VitalChoice.Business.Services.Impl;
 using Microsoft.Framework.Runtime.Infrastructure;
 using Microsoft.Framework.Runtime;
 using System.IO;
+using VitalChoice.Public.AppConfig;
 
 namespace VitalChoice.Public
 {

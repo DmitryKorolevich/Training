@@ -8,3 +8,19 @@
     [MetaKeywords] NVARCHAR(250) NULL, 
     [MetaDescription] NVARCHAR(250) NULL, 
 )
+
+GO
+
+CREATE TRIGGER TG_ContentItems_Update
+   ON ContentItems 
+   AFTER UPDATE
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	UPDATE ContentItems
+	SET Updated=GETDATE()
+	WHERE Id IN
+	(SELECT Id FROM inserted)
+END
+GO

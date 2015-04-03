@@ -4,6 +4,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Models;
+using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Helpers.GlobalFilters
 {
@@ -11,12 +12,29 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
     {
         public override void OnException(ExceptionContext context)
         {
-            base.OnException(context);
-        }
+            JsonResult result = null;
+            if (context.Exception is ApiException)
+            {
+                var exc = context.Exception as ApiException;
+                result = new JsonResult(Result.CreateErrorResult<object>(exc.Message));
+                result.StatusCode = (int)exc.Status;
+            }
+            else
+            {
+                if (context.Exception is AppValidationException)
+                {
+                    var exc = context.Exception as ApiException;
+                    result = new JsonResult(Result.CreateErrorResult<object>(exc.Message));
+                    result.StatusCode = (int)HttpStatusCode.OK;
+                }
+                else
+                {
+                    result = new JsonResult(Result.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage));
+                    result.StatusCode = (int)HttpStatusCode.InternalServerError;
+                }
+            }
 
-        public override Task OnExceptionAsync(ExceptionContext context)
-        {
-            return base.OnExceptionAsync(context);
+            context.Result = result;
         }
 
         //    {

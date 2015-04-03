@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Routing;
 
-namespace VitalChoice.Public
+namespace VitalChoice.Public.AppConfig
 {
     public class RouteConfig
     {
