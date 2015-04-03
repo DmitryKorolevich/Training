@@ -100,8 +100,6 @@ namespace VitalChoice.Infrastructure.Context
 
             #endregion
 
-            builder.Entity<Comment>().Reference(x => x.Author).InverseCollection(y => y.Comments).ForeignKey(x => x.AuthorId).PrincipalKey(y => y.Id);
-
             base.OnModelCreating(builder);
 		}
 	}

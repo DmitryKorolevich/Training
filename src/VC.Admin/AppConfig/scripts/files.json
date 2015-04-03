@@ -26,8 +26,12 @@
 		'app/app.js',
 		'app/states.js',
 		'app/core/core.js',
+		'app/core/dataAccess/services/userService.js',
 		'app/core/dataAccess/dataAccess.js',
 		'app/core/dataAccess/services/authenticationServices.js',
+		'app/core/utils/modalUtil.js',
+		'app/core/utils/confirmation/confirmController.js',
+		'app/core/utils/confirmation/confirmUtil.js',
 		'app/core/utils/templateOverrides.js',
 		'app/core/utils/utils.js',
 		'app/modules/modules.js',
@@ -51,6 +55,9 @@
 		'app/modules/demo/controllers/customerDetailController.js',
 		'app/modules/demo/controllers/dashboardController.js',
 		'app/modules/demo/controllers/orderDetailController.js',
-		'app/modules/demo/controllers/modalAddSubProductController.js'
+		'app/modules/demo/controllers/modalAddSubProductController.js',
+		'app/modules/users/controllers/userManagementController.js',
+		'app/modules/users/controllers/addEditUserController.js',
+		'app/modules/users/users.js'
 	]
 }
