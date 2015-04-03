@@ -1,0 +1,51 @@
+﻿<div class="modal-header">
+	<h3 class="modal-title">Add New User</h3>
+</div>
+<div class="modal-body">
+	<form class="form-horizontal">
+		<fieldset>
+			<div class="form-group">
+				<label class="col-md-3 control-label">Agent ID</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" placeholder="Agent ID" data-ng-model="user.AgentId">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-3 control-label">First Name</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" placeholder="First Name" data-ng-model="user.FirstName">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-3 control-label">Last Name</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" placeholder="Last Name" data-ng-model="user.LastName">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-3 control-label">Email</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" placeholder="Email" data-ng-model="user.Email">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-3 control-label">Roles</label>
+				<div class="col-md-9">
+					<label class="checkbox-inline checkbox-in-group" data-ng-repeat="role in rolesLookup">
+						<input type="checkbox" value="{{role}}" data-ng-checked="roleNames.indexOf(role) > -1" data-ng-click="toggleRoleSelection(role)" /> {{role}}
+					</label>
+				</div>
+			</div>
+			<div class="form-group" data-ng-if="editMode">
+				<label class="col-md-3 control-label">Status</label>
+				<div class="col-md-9">
+					<select class="form-control" data-ng-model="user.Status" data-ng-options="status for status in ['Active', 'Disabled']"></select> <!--hardcoded for now-->
+				</div>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-success" data-ng-click="save()">Save</button>
+	<button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

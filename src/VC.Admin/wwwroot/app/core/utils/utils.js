@@ -1,6 +1,16 @@
 ﻿'use strict';
 
-angular.module('app.utils', ['textAngular', 'ya.treeview', 'ya.treeview.tpls', 'nvd3ChartDirectives', 'toaster', 'ui.sortable'])
+angular.module('app.utils', [
+	'textAngular',
+	'ya.treeview',
+	'ya.treeview.tpls',
+	'nvd3ChartDirectives',
+	'toaster',
+	'ui.sortable',
+	'app.core.utils.modalUtil',
+	'app.core.utils.confirmation.confirmController',
+	'app.core.utils.confirmation.confirmUtil'
+	])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {
 		taOptions.toolbar = [

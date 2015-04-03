@@ -1,0 +1,48 @@
+﻿<div class="container-fluid">
+	<div class="well">
+		<span class="legend">Manage Users</span>
+		<div class="form-group">
+			<button data-ng-click="open(false);" class="btn btn-primary">Add New User</button>
+		</div>
+		<table class="table table-striped table-hover ">
+			<thead>
+			<tr>
+				<th>Agent ID</th>
+				<th>Full Name</th>
+				<th>Email</th>
+				<th>Roles</th>
+				<th>Status</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr data-ng-repeat="user in users">
+				<td>{{user.AgentId}}</td>
+				<td>{{user.FirstName + " " + user.LastName}}</td>
+				<td>{{user.Email}}</td>
+				<td><span data-ng-repeat="role in user.RoleNames" data-ng-bind="$index < user.RoleNames.length - 1 ? role + ', ' : role">
+					</span>
+				</td>
+				<td>
+					<span data-ng-if="user.Status == 'Disabled'" class="label label-danger font-default">{{user.Status}}</span>
+					<span data-ng-if="user.Status == 'Not Active'" class="label label-warning font-default">{{user.Status}}</span>
+					<span data-ng-if="user.Status == 'Active'" class="label label-info font-default">{{user.Status}}</span>
+				</td>
+				<td>
+					<button class="btn btn-default btn-success" data-ng-click="open(true, user.PublicId);">Details</button>
+					<button class="btn btn-default btn-danger" data-ng-click="delete(user.FirstName, user.LastName, user.PublicId);">Delete</button>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<pagination
+			boundary-links="true"
+			total-items="totalItems"
+			data-ng-model="currentPage"
+			previous-text="&lsaquo;"
+			next-text="&rsaquo;"
+			first-text="&laquo;"
+			last-text="&raquo;"
+			data-ng-change="pageChanged()">
+		</pagination>
+	</div>
+</div>
