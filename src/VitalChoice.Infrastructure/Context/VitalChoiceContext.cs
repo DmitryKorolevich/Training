@@ -70,7 +70,7 @@ namespace VitalChoice.Infrastructure.Context
             #endregion
 
             #region Contents
-
+            
             builder.Entity<ContentTypeEntity>().ToTable("ContentTypes").Key(p => p.Id);
 
             builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
@@ -99,8 +99,6 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
             #endregion
-
-            builder.Entity<Comment>().Reference(x => x.Author).InverseCollection(y => y.Comments).ForeignKey(x => x.AuthorId).PrincipalKey(y => y.Id);
 
             base.OnModelCreating(builder);
 		}

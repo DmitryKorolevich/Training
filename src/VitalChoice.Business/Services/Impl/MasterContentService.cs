@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Impl
                 }
                 else
                 {
-                    masterContentItemRepository.Update(dbItem);
+                    await masterContentItemRepository.UpdateAsync(dbItem);
                 }
             }
 
@@ -126,7 +126,7 @@ namespace VitalChoice.Business.Services.Impl
                 else
                 {
                     dbItem.StatusCode = RecordStatusCode.Deleted;
-                    masterContentItemRepository.Update(dbItem);
+                    await masterContentItemRepository.UpdateAsync(dbItem);
                     toReturn = true;
                 }
             }

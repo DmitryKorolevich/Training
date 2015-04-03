@@ -227,11 +227,6 @@ angular.module('app.modules.demo',
 					url: '/tools/healthWise',
 					template: '<h2>HealthWise</h2>'
 				})
-				/*users*/
-				.state('index.oneCol.manageUsers', {
-					url: '/users/manage',
-					template: '<h2>Manage Users</h2>'
-				})
 				/*settings*/
 				.state('index.oneCol.manageCountries', {
 					url: '/settings/manageCountries',

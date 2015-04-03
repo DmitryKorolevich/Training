@@ -11,5 +11,13 @@ namespace VitalChoice.Business.Services.Contracts
         Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null);
 
         Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl);
+
+	    Task<ContentItem> UpdateContentItemAsync(ContentItem itemToUpdate);
+
+	    Task<ContentItem> GetContentItemAsync(int id);
+
+        Task<MasterContentItem> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate);
+
+        Task<MasterContentItem> GetMasterContentItemAsync(int id);
     }
 }

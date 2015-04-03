@@ -1,0 +1,60 @@
+﻿@model VitalChoice.Public.Models.ContentEditModel
+@section css{
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+        }
+
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        function htmlEncode(html) {
+            return document.createElement('a').appendChild(
+                document.createTextNode(html)).parentNode.innerHTML;
+        };
+
+        function htmlDecode(html) {
+            var a = document.createElement('a'); a.innerHTML = html;
+            return a.textContent;
+        };
+        function SetAceTextToSubmit() {
+            var editor = ace.edit("editor");
+            var code = editor.session.getValue();
+            $("#template").val(code);
+            return true;
+        }
+    </script>
+}
+@section scripts_header{
+    <script src="~/lib/jquery/jquery-1.11.2.min.js"></script>
+    <script src="~/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="~/lib/ace/ext-language_tools.js" charset="utf-8"></script>
+}
+<div>
+    @using (Html.BeginForm(Model.Master ? "UpdateMasterContent" : "UpdateContent", "Recipe", new {id = Model.Id}, FormMethod.Post))
+    {
+        <input type="hidden" name="Template" id="template"/>
+        <input type="submit" value="Save" onclick="SetAceTextToSubmit();"/>
+    }
+</div>
+<div>
+    <pre id="editor">@Model.Template</pre>
+    <script>
+        ace.require("ace/ext/language_tools");
+        var editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/html");
+        editor.setTheme("ace/theme/dawn");
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false
+        });
+    </script>
+</div>

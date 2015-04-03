@@ -19,8 +19,10 @@ using System.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.Localization;
 using System;
+using System.Threading;
 using Microsoft.Framework.Logging;
 using Templates;
+using Templates.Exceptions;
 using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Impl
@@ -52,8 +54,7 @@ namespace VitalChoice.Business.Services.Impl
 
         public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null)
         {
-            ExecutedContentItem toReturn = null;
-            ContentCategory category = null;
+            ContentCategory category;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
@@ -71,15 +72,15 @@ namespace VitalChoice.Business.Services.Impl
             if (category == null)
             {
                 _logger.LogInformation("The category {0} could not be found", categoryUrl);
-                return toReturn;
+                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
+                return null;
             }
-            else
+            if (category.ContentItemId.HasValue)
             {
-                if (category.ContentItemId.HasValue)
-                {
-                    category.ContentItem = (await contentItemRepository.Query(p => p.Id == category.ContentItemId).Include(p => p.ContentItemToContentProcessors).
-                        ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-                }
+                //Added this to prevent possible closure edit in multi-threaded requests
+                var queryParamCategory = category;
+                category.ContentItem = (await contentItemRepository.Query(p => p.Id == queryParamCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
+                    ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
             }
 
             //Try load parent templates if needed
@@ -90,8 +91,8 @@ namespace VitalChoice.Business.Services.Impl
 
             if (category.ContentItem == null)
             {
-                _logger.LogInformation("The category {0} have no content template", categoryUrl);
-                return toReturn;
+                _logger.LogError("The category {0} have no template", categoryUrl);
+                return null;
             }
             var template = _templatesCache.GetOrCreateTemplate(category.MasterContentItem.Template,
                 category.ContentItem.Template, category.ContentItem.Updated, category.MasterContentItem.Updated,
@@ -111,7 +112,7 @@ namespace VitalChoice.Business.Services.Impl
 
             var generatedHtml = template.Generate(model);
 
-            toReturn = new ExecutedContentItem
+            var toReturn = new ExecutedContentItem
             {
                 HTML = generatedHtml,
                 Title = category.ContentItem.Title,
@@ -124,7 +125,6 @@ namespace VitalChoice.Business.Services.Impl
         
         public async Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl)
         {
-            ExecutedContentItem toReturn = null;
             ContentDataItem contentDataItem = null;
             switch(type)
             {
@@ -137,19 +137,29 @@ namespace VitalChoice.Business.Services.Impl
 
             if (contentDataItem == null)
             {
-                //TO DO - write to log. No a certain category
-                return toReturn;
+                _logger.LogInformation("The content item {0} couldn't be found", contentDataItemUrl);
+                return null;
             }
-            else
+            contentDataItem.ContentItem = (await contentItemRepository.Query(p => p.Id == contentDataItem.ContentItemId).Include(p => p.ContentItemToContentProcessors).
+                ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+
+            if (contentDataItem.ContentItem == null) {
+                _logger.LogError("The content item {0} have no template", contentDataItemUrl);
+                return null;
+            }
+            ITtlTemplate template;
+            try
             {
-                contentDataItem.ContentItem = (await contentItemRepository.Query(p => p.Id == contentDataItem.ContentItemId).Include(p => p.ContentItemToContentProcessors).
-                    ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+                template = _templatesCache.GetOrCreateTemplate(contentDataItem.MasterContentItem.Template,
+                    contentDataItem.ContentItem.Template, contentDataItem.ContentItem.Updated,
+                    contentDataItem.MasterContentItem.Updated,
+                    contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
             }
-
-            var template = _templatesCache.GetOrCreateTemplate(contentDataItem.MasterContentItem.Template,
-                contentDataItem.ContentItem.Template, contentDataItem.ContentItem.Updated, contentDataItem.MasterContentItem.Updated,
-                contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
-
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return null;
+            }
             dynamic model = new ExpandoObject();
             foreach (var masterContentItemsToContentItemProcessor in contentDataItem.MasterContentItem.MasterContentItemToContentProcessors)
             {
@@ -162,11 +172,11 @@ namespace VitalChoice.Business.Services.Impl
                 model = await processor.ExecuteAsync(model, parameters);
             }
 
-            //TO DO - execute a certain template
+            var generatedHtml = template.Generate(model);
 
-            toReturn = new ExecutedContentItem()
+            var toReturn = new ExecutedContentItem
             {
-                HTML = "<div>Test HTML - Recipe</div>",
+                HTML = generatedHtml,
                 Title = contentDataItem.ContentItem.Title,
                 MetaDescription = contentDataItem.ContentItem.MetaDescription,
                 MetaKeywords = contentDataItem.ContentItem.MetaKeywords,
@@ -175,7 +185,27 @@ namespace VitalChoice.Business.Services.Impl
             return toReturn;
         }
 
-        #endregion
+	    public async Task<ContentItem> UpdateContentItemAsync(ContentItem itemToUpdate)
+	    {
+	        return await contentItemRepository.UpdateAsync(itemToUpdate);
+	    }
+
+	    public async Task<ContentItem> GetContentItemAsync(int id)
+	    {
+	        return (await contentItemRepository.Query(c => c.Id == id).SelectAsync(false)).FirstOrDefault();
+        }
+
+	    public virtual async Task<MasterContentItem> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate)
+	    {
+            return await masterContentItemRepository.UpdateAsync(itemToUpdate);
+        }
+
+	    public virtual async Task<MasterContentItem> GetMasterContentItemAsync(int id)
+	    {
+	        return (await masterContentItemRepository.Query(m => m.Id == id).SelectAsync(false)).FirstOrDefault();
+	    }
+
+	    #endregion
 
         #region Private
 
@@ -183,13 +213,13 @@ namespace VitalChoice.Business.Services.Impl
         {
             if(category.ParentId.HasValue)
             {
-                ContentCategory parentCategory = null;
+                ContentCategory parentCategory;
                 using (var uof = new VitalChoiceUnitOfWork())
                 {
                     parentCategory = (await uof.RepositoryAsync<ContentCategory>().Query(p => p.Id == category.ParentId.Value).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
                 }
-                if(parentCategory!=null && parentCategory.ContentItemId.HasValue)
+                if(parentCategory?.ContentItemId != null)
                 {
                     parentCategory.ContentItem = (await contentItemRepository.Query(p => p.Id == parentCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
                         ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();

@@ -77,8 +77,10 @@ namespace VitalChoice
 					name: "default",
 					template: "{controller}/{action}/{id?}",
 					defaults: new { controller = "Home", action = "Index" });
-				// Uncomment the following line to add a route for porting Web API 2 controllers.
-				// routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
+
+				 routes.MapRoute(
+					name: "defaultApi",
+					template: "api/{controller}/{action}/{id?}");
 			});
 		}
 	}

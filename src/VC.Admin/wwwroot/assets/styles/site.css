@@ -232,3 +232,13 @@ button.main-button {
 .fixed-accordion-row button {
   margin-left: 15px;
 }
+.font-default {
+  font-size: inherit;
+}
+.font-big {
+  font-size: 18px;
+}
+.checkbox-in-group + .checkbox-in-group {
+  display: block;
+  margin-left: 0px;
+}
