@@ -10,8 +10,10 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
+/*
 :r .\Scripts\LocalizationItems.sql
 :r .\Scripts\ContentTestDataDelete.sql
 :r .\Scripts\ContentProcessors.sql
 :r .\Scripts\RecordStatusCodes.sql
 :r .\Scripts\ContentTestDataInsert.sql
+*/
