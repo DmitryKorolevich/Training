@@ -51,11 +51,11 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 
 	//will be refactored
 	$scope.toggleRoleSelection = function (roleName) {
-		var idx = $scope.user.RoleNames.indexOf(roleName);
-
 		if (!$scope.user.RoleNames) {
 			$scope.user.RoleNames = [];
 		}
+
+		var idx = $scope.user.RoleNames.indexOf(roleName);
 
 		if (idx > -1) {
 			$scope.user.RoleNames.splice(idx, 1);
