@@ -9,15 +9,17 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		} else {
 			toaster.pop('error', "Error!", "Can't save your changes");
 		}
-		$modalInstance.close();
+		data.thenCallback();
 	};
 
 	function errorHandler(result) {
 		toaster.pop('error', "Error!", "Server error occured");
+		data.thenCallback();
 	};
 
 	function initialize() {
 		$scope.rolesLookup = ["Content User", "Product User", "Order User", "Admin User", "Super Admin User"]; //hardcoded for now
+		$scope.roleNames = [];
 
 		$scope.user = data.user;
 		$scope.editMode = data.editMode;
@@ -48,14 +50,18 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 	}
 
 	//will be refactored
-	$scope.toggleSelection = function (roleName) {
-		var idx = $scope.selection.indexOf(roleName);
+	$scope.toggleRoleSelection = function (roleName) {
+		var idx = $scope.user.RoleNames.indexOf(roleName);
+
+		if (!$scope.user.RoleNames) {
+			$scope.user.RoleNames = [];
+		}
 
 		if (idx > -1) {
-			$scope.user.RolesNames.splice(idx, 1);
+			$scope.user.RoleNames.splice(idx, 1);
 		}
 		else {
-			$scope.user.RolesNames.push(roleName);
+			$scope.user.RoleNames.push(roleName);
 		}
 	};
 

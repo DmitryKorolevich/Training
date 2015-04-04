@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Controllers
 {
@@ -23,8 +25,9 @@ namespace VitalChoice.Controllers
 				    LastName = "Gould",
 				    RoleNames = new List<string>() {"Super Admin User"},
 				    Status = "Active",
-				    AgentId = "007"
-			    },
+				    AgentId = "007",
+					LastLoginDate = new DateTime(2015, 3, 2, 7, 5, 45)
+				},
 			    new UserListItemModel()
 			    {
 				    PublicId = Guid.NewGuid(),
@@ -33,7 +36,8 @@ namespace VitalChoice.Controllers
 					LastName = "Admin",
 				    RoleNames = new List<string>() {"Super Admin User"},
 				    Status = "Active",
-				    AgentId = "RW"
+				    AgentId = "RW",
+					LastLoginDate = new DateTime(2015, 2, 2, 2, 35, 45)
 				},
 			    new UserListItemModel()
 			    {
@@ -43,8 +47,9 @@ namespace VitalChoice.Controllers
 					LastName = "Lindemann",
 				    RoleNames = new List<string>() {"Content User", "Product User"},
 				    Status = "Disabled",
-				    AgentId = "009"
-			    },
+				    AgentId = "009",
+					LastLoginDate = new DateTime(2013, 1, 5, 7, 35, 45)
+				},
 				new UserListItemModel()
 				{
 					PublicId = Guid.NewGuid(),
@@ -53,7 +58,8 @@ namespace VitalChoice.Controllers
 					LastName = "Cheryl",
 					RoleNames = new List<string>() {"Content User"},
 					Status = "Not Active",
-					AgentId = "ZHB"
+					AgentId = "ZHB",
+					LastLoginDate = null
 				},
 				new UserListItemModel()
 				{
@@ -63,7 +69,8 @@ namespace VitalChoice.Controllers
 					LastName = "Matney",
 					RoleNames = new List<string>() {"Product User", "Order User"},
 					Status = "Active",
-					AgentId = "SH1"
+					AgentId = "SH1",
+					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
 				},
 				new UserListItemModel()
 				{
@@ -73,7 +80,8 @@ namespace VitalChoice.Controllers
 					LastName = "Kinney",
 					RoleNames = new List<string>() {"Content User", "Product User", "Order User", "Admin User"},
 					Status = "Active",
-					AgentId = "L01"
+					AgentId = "L01",
+					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
 				},
                 new UserListItemModel()
 				{
@@ -83,7 +91,8 @@ namespace VitalChoice.Controllers
 					LastName = "Heal",
 					RoleNames = new List<string>() {"Super Admin User"},
 					Status = "Active",
-					AgentId = "XLA"
+					AgentId = "XLA",
+					LastLoginDate = new DateTime(2015, 1, 12, 17, 35, 45)
 				},
 				new UserListItemModel()
 				{
@@ -93,7 +102,8 @@ namespace VitalChoice.Controllers
 					LastName = "Ward",
 					RoleNames = new List<string>() {"Order User"},
 					Status = "Disabled",
-					AgentId = "K01"
+					AgentId = "K01",
+					LastLoginDate = new DateTime(2015, 4, 2, 7, 35, 45)
 				},
 				new UserListItemModel()
 				{
@@ -103,7 +113,8 @@ namespace VitalChoice.Controllers
 					LastName = "Armstrong",
 					RoleNames = new List<string>() {"Content User", "Product User"},
 					Status = "Active",
-					AgentId = "D01"
+					AgentId = "D01",
+					LastLoginDate = new DateTime(2015, 4, 2, 7, 35, 45)
 				},
                 new UserListItemModel()
 				{
@@ -113,7 +124,8 @@ namespace VitalChoice.Controllers
 					LastName = "Wadsworth",
 					RoleNames = new List<string>() {"Admin User"},
 					Status = "Active",
-					AgentId = "XDK"
+					AgentId = "XDK",
+					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
 				},
 				new UserListItemModel()
 				{
@@ -123,7 +135,8 @@ namespace VitalChoice.Controllers
 					LastName = "Coffey",
 					RoleNames = new List<string>() {"Product User"},
 					Status = "Active",
-					AgentId = "FS1"
+					AgentId = "FS1",
+					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
 				},
 				new UserListItemModel()
 				{
@@ -133,7 +146,8 @@ namespace VitalChoice.Controllers
 					LastName = "Reynolds",
 					RoleNames = new List<string>() {"Product User", "Order User"},
 					Status = "Active",
-					AgentId = "XCR2"
+					AgentId = "XCR2",
+					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
 				}
 			}
 	    };
@@ -144,8 +158,25 @@ namespace VitalChoice.Controllers
 
 		[HttpPost]
 	    public Result<PagedModelList<UserListItemModel>> GetUsers([FromBody]UserManagementFilter filter)
-	    {
-			return _users;
+		{
+			Expression<Func<UserListItemModel, bool>> usersPredicate = x => true;
+
+			if (!string.IsNullOrWhiteSpace(filter.Keyword))
+			{
+				var keyword = filter.Keyword.ToLower().Trim();
+
+				usersPredicate = usersPredicate.And(
+					x =>
+						(x.FirstName + " " + x.LastName).ToLower().Contains(keyword) ||
+						x.Email.ToLower().Contains(keyword));
+			}
+
+			var result = new PagedModelList<UserListItemModel>
+			{
+				Items = _users.Items.Where(usersPredicate.Compile()).ToList()
+			};
+			
+			return result;
 	    }
 
 		[HttpPost]

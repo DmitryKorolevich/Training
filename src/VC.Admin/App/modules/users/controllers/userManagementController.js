@@ -3,7 +3,7 @@
 angular.module('app.modules.users.controllers.userManagementController', [])
 .controller('userManagementController', ['$scope', 'userService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, userService, toaster, modalUtil, confirmUtil) {
 	function refreshUsers() {
-		userService.getUsers({})
+		userService.getUsers($scope.filter)
 			.success(function (result) {
 				if (result.Success) {
 					$scope.users = result.Data.Items;
@@ -17,14 +17,20 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	};
 
 	function openModal(user, editMode) {
-		modalUtil.open('app/modules/users/partials/addEditUser.html', 'addEditUserController', { user: user, editMode: editMode }, function () {
+		modalUtil.open('app/modules/users/partials/addEditUser.html', 'addEditUserController', { user: user, editMode: editMode, thenCallback: function() {
 			refreshUsers();
-		});
+		} });
 	}
 
 	function initialize() {
+		$scope.filter = { Keyword: "" };
+
 		refreshUsers();
 	}
+
+	$scope.filterUsers = function() {
+		refreshUsers();
+	};
 
 	$scope.open = function (editMode, publicId) {
 		var user = {};

@@ -21,5 +21,6 @@ namespace VitalChoice.Models.UserManagement
 	    public string Status { get; set; }
 
 	    public string AgentId { get; set; }
+	    public DateTime? LastLoginDate { get; set; }
 	}
 }
