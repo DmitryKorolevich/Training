@@ -38,5 +38,7 @@ var app = angular
 		function($rootScope, $state, $stateParams) {
 			$rootScope.$state = $state;
 			$rootScope.$stateParams = $stateParams;
+
+			$rootScope.authenticated = true; //temp solution
 		}
 	]);

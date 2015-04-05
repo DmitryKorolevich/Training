@@ -1,0 +1,48 @@
+﻿<div class="container container-left small-container">
+	<div class="well">
+		<form class="form-horizontal">
+			<fieldset>
+				<legend>Activate your Account</legend>
+				<div class="form-group">
+					<label for="agentId" class="col-md-3 control-label">AgentId</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="agentId" data-ng-model="user.AgentId" placeholder="AgentId" disabled="disabled">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="firstName" class="col-md-3 control-label">First Name</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="firstName" data-ng-model="user.FirstName" placeholder="First Name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="lastName" class="col-md-3 control-label">Last Name</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="lastName" data-ng-model="user.LastName" placeholder="Last Name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="email" class="col-md-3 control-label">Email</label>
+					<div class="col-md-9">
+						<input type="text" class="form-control" id="email" data-ng-model="user.Email" placeholder="Email">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="password" class="col-md-3 control-label">Password</label>
+					<div class="col-md-9">
+						<input type="password" class="form-control" id="password" data-ng-model="user.Password" placeholder="Password">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="confirmPassword" class="col-md-3 control-label">Confirm Password</label>
+					<div class="col-md-9">
+						<input type="password" class="form-control" id="confirmPassword" data-ng-model="user.confirmPassword" placeholder="Confirm Pasword">
+					</div>
+				</div>
+			</fieldset>
+			<div class="margin-top-20px">
+				<a data-ng-click="activate();" class="btn btn-success">Activate</a>
+			</div>
+		</form>
+	</div>
+</div>

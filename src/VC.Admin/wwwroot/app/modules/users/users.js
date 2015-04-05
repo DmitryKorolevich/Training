@@ -15,4 +15,4 @@ angular.module('app.modules.users', [
 					controller: 'userManagementController'
 				});
 		}
-]);;
+]);

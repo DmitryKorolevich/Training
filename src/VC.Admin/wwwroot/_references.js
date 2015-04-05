@@ -97,3 +97,5 @@
 /// <reference path="app/modules/users/users.js" />
 /// <reference path="app/modules/users/controllers/addEditUserController.js" />
 /// <reference path="app/modules/users/controllers/userManagementController.js" />
+/// <reference path="../app/modules/authentication/controllers/activationcontroller.js" />
+/// <reference path="app/modules/authentication/controllers/activationcontroller.js" />

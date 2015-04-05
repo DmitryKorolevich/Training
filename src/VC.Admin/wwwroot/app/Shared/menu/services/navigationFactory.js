@@ -39,18 +39,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'addNewProduct', stateName: 'index.oneCol.addNewProduct', stateLabel: 'Add New Product' },
 				{ name: 'manageCategories', stateName: 'index.oneCol.manageCategories', stateLabel: 'Manage Categories' },
 				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews' }
-				//{ name: 'demo', stateName: 'index.oneCol.demo4', stateLabel: 'Manage Categories' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo5', stateLabel: 'Manage Brands' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo6', stateLabel: 'Manage Custom Fields' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo7', stateLabel: 'Manage Gift Certificates' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo8', stateLabel: 'Manage Product Options' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo9', stateLabel: 'Manage Product Reviews' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo10', stateLabel: 'Manage Suppliers' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo11', stateLabel: 'Manage Drop-Shippers' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo12', stateLabel: 'Update Multiple Products' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo13', stateLabel: 'Cart Cross Selling Items' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo14', stateLabel: 'Out of Stock Requests' },
-				//{ name: 'demo', stateName: 'index.oneCol.demo15', stateLabel: 'Perishable Cart Threshold Amount' }
 			]
 		},
 		{

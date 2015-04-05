@@ -37,6 +37,7 @@
 		'app/modules/modules.js',
 		'app/modules/authentication/authentication.js',
 		'app/modules/authentication/controllers/loginController.js',
+		'app/modules/authentication/controllers/activationController.js',
 		'app/modules/demo/demo.js',
 		'app/shared/shared.js',
 		'app/shared/area/area.js',

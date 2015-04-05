@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -28,6 +29,8 @@ namespace VitalChoice.Admin.Controllers
 		    this.commentService = commentService;
 		    UserManager = userManager;
             SignInManager = signInManager;
+
+			
         }
 
         public UserManager<ApplicationUser> UserManager { get; private set; }

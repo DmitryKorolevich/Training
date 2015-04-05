@@ -7,7 +7,7 @@
 			</a>
 		</div>
 		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav navbar-right">
+			<ul class="nav navbar-nav navbar-right" data-ng-if="authenticated"> <!--temp-->
 				<li><a href="#">Gary Gould</a></li>
 				<li><a href="#">View something</a></li>
 			</ul>
@@ -26,7 +26,7 @@
 		</div>
 
 		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
+			<ul class="nav navbar-nav" data-ng-if="authenticated"> <!--temp-->
 				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}" ui-sref-active="active">
 					<!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu != null }"-->
 					<a data-ng-if="!module.subMenu" ui-sref="{{module.stateName}}({name:module.name})">
