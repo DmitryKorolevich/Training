@@ -12,25 +12,6 @@ namespace VitalChoice.Core.Infrastructure.Models
         }
 
 		public IList<TEntity> Items { get; set; }
-
-		public int StartIndex { get; set; }
-
-		public int? PageItemCount
-		{
-			get { return this._pageItemCount; }
-			set
-			{
-				if (value.HasValue && value.Value < 0)
-					throw new InvalidOperationException();
-
-				this._pageItemCount = value;
-			}
-		}
-
-		private int? _pageItemCount = null;
-
-		public int? TotalItemCount { get; set; }
-
-		public int PageIndex => StartIndex/PageItemCount ?? 0;
-	}
+        public int Count { get; set; }
+    }
 }
