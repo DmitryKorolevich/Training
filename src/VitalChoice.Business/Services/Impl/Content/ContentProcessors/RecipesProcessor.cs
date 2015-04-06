@@ -2,14 +2,14 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Business.Services.Contracts.ContentProcessors;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
 
-namespace VitalChoice.Business.Services.Impl.ContentProcessors
+namespace VitalChoice.Business.Services.Impl.Content.ContentProcessors
 {
     public class RecipesProcessor : IContentProcessor
     {

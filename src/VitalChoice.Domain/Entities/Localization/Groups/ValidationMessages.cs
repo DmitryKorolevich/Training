@@ -9,5 +9,6 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         FieldLength=2,
         FieldMin=3,
         FieldMax = 4,
+        FieldContentUrlInvalidFormat = 5,
     }
 }

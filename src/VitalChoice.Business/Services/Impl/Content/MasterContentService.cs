@@ -19,8 +19,9 @@ using VitalChoice.Domain.Entities.Content;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Business.Services.Contracts.Content;
 
-namespace VitalChoice.Business.Services.Impl
+namespace VitalChoice.Business.Services.Impl.Content
 {
     public class MasterContentService : IMasterContentService
     {
@@ -48,10 +49,10 @@ namespace VitalChoice.Business.Services.Impl
             return toReturn;
         }
 
-        public async Task<IEnumerable<MasterContentItem>> GetMasterContentItemsAsync(ContentType? type = null)
+        public async Task<IEnumerable<MasterContentItem>> GetMasterContentItemsAsync(ContentType? type = null, RecordStatusCode? status = null)
         {
             var query = new MasterContentItemQuery();
-            query = query.WithType(type).NotDeleted();
+            query = query.WithType(type).NotDeleted().WithStatus(status);
             var toReturn = (await masterContentItemRepository.Query(query).SelectAsync(false)).ToList();
             return toReturn;
         }
@@ -89,17 +90,23 @@ namespace VitalChoice.Business.Services.Impl
 
             if (dbItem != null && dbItem.StatusCode==RecordStatusCode.Deleted)
             {
+                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id).SelectAnyAsync();
+                if(nameDublicatesExist)
+                {
+                    throw new AppValidationException("Master content item with the same name is already exist.");
+                }
+
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
                 dbItem.MasterContentItemToContentProcessors = model.MasterContentItemToContentProcessors;
 
                 if (model.Id == 0)
                 {
-                    masterContentItemRepository.InsertGraph(dbItem);
+                    dbItem = await masterContentItemRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    await masterContentItemRepository.UpdateAsync(dbItem);
+                    dbItem = await masterContentItemRepository.UpdateAsync(dbItem);
                 }
             }
 

@@ -3,9 +3,9 @@ using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Models.ContentManagement
 {
-    public class MasterContentItemListFilter : FilterModelBase
+    public class CategoryTreeFilter : FilterModelBase
     {
-	    public ContentType? Type { get; set; }
+	    public ContentType Type { get; set; }
         public RecordStatusCode? Status { get; set; }
     }
 }

@@ -21,14 +21,16 @@ using Microsoft.AspNet.Mvc.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Core.Infrastructure;
 using Templates;
+using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Business.Services.Impl.Content;
+using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
+using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
 
 #if DNX451
 using Autofac;
 using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Business.Services.Contracts.ContentProcessors;
-using VitalChoice.Business.Services.Impl.ContentProcessors;
 #endif
 
 namespace VitalChoice.Core.DependencyInjection
@@ -96,6 +98,8 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<LogViewService>().As<ILogViewService>();
                 builder.RegisterType<MasterContentService>().As<IMasterContentService>();
                 builder.RegisterType<GeneralContentService>().As<IGeneralContentService>();
+                builder.RegisterType<RecipeService>().As<IRecipeService>();
+                builder.RegisterType<CategoryService>().As<ICategoryService>();
                 builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
                 builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();

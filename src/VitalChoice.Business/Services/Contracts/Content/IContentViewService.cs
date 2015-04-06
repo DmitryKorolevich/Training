@@ -4,7 +4,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 
-namespace VitalChoice.Business.Services.Contracts
+namespace VitalChoice.Business.Services.Contracts.Content
 {
 	public interface IContentViewService
     {

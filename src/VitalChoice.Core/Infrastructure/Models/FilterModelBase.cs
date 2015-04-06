@@ -11,9 +11,11 @@ namespace VitalChoice.Core.Infrastructure.Models
 
 		public string SearchText { get; set; }
 
-	//	public int StartIndex { get; set; }
+        public Paging Paging { get; set; }
 
-		public SortFilter[] Sortings { get; set; }
+        //	public int StartIndex { get; set; }
+
+        public SortFilter[] Sortings { get; set; }
 
 		//public int? PageItemCount
 		//{

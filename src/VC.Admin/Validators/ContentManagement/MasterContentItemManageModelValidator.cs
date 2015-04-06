@@ -8,15 +8,15 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Validators.ContentManagement
 {
-    public class ManageMasterContentItemModelValidator : ModelValidator<ManageMasterContentItemModel>
+    public class MasterContentItemManageModelValidator : ModelValidator<MasterContentItemManageModel>
     {
-        public override void Validate(ManageMasterContentItemModel value)
+        public override void Validate(MasterContentItemManageModel value)
         {
             ValidationErrors.Clear();
             ParseResults(ValidatorsFactory.GetValidator<MasterContentItemModelValidator>().Validate(value));
         }
 
-        private class MasterContentItemModelValidator : AbstractValidator<ManageMasterContentItemModel>
+        private class MasterContentItemModelValidator : AbstractValidator<MasterContentItemManageModel>
         {
             public MasterContentItemModelValidator()
             {

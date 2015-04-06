@@ -12,8 +12,8 @@ using VitalChoice.Validators.ContentManagement;
 
 namespace VitalChoice.Models.ContentManagement
 {
-    [ApiValidator(typeof(ManageMasterContentItemModelValidator))]
-    public class ManageMasterContentItemModel : Model<MasterContentItem, IMode>
+    [ApiValidator(typeof(MasterContentItemManageModelValidator))]
+    public class MasterContentItemManageModel : Model<MasterContentItem, IMode>
     {
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
@@ -30,7 +30,7 @@ namespace VitalChoice.Models.ContentManagement
 
         public IEnumerable<int> ProcessorIds { get; set; }
 
-        public ManageMasterContentItemModel(MasterContentItem item)
+        public MasterContentItemManageModel(MasterContentItem item)
         {
             if (item != null)
             {

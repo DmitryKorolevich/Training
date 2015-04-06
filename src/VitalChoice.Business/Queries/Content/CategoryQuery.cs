@@ -7,9 +7,9 @@ using VitalChoice.Domain.Entities.Logs;
 
 namespace VitalChoice.Business.Queries.Content
 {
-    public class MasterContentItemQuery : QueryObject<MasterContentItem>
+    public class CategoryQuery : QueryObject<ContentCategory>
     {
-        public MasterContentItemQuery WithType(ContentType? type=null)
+        public CategoryQuery WithType(ContentType? type=null)
         {
             if (type.HasValue)
             {
@@ -19,21 +19,21 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
-        public MasterContentItemQuery WithId(int id)
+        public CategoryQuery WithId(int id)
         {
             Add(x => x.Id.Equals(id));
 
             return this;
         }
 
-        public MasterContentItemQuery NotDeleted()
+        public CategoryQuery NotDeleted()
         {
             Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));
 
             return this;
         }
 
-        public MasterContentItemQuery WithStatus(RecordStatusCode? status)
+        public CategoryQuery WithStatus(RecordStatusCode? status)
         {
             if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
             {

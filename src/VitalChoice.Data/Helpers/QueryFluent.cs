@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Base;
 
 #endregion
 
@@ -76,11 +77,18 @@ namespace VitalChoice.Data.Helpers
             return await Repository.Select(Query, _expression, _orderBy).CountAsync();
         }
 
-        public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true)
+        public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
         {
             totalCount = Repository.Select(Query, _expression).Count();
             return Repository.Select(Query, _expression, _orderBy, page, pageSize, tracking);
         }
+        public async Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false)
+        {
+            var count =await Repository.Select(Query, _expression).CountAsync();
+            var items = await Repository.SelectAsync(Query, _expression, _orderBy, page, pageSize, tracking);
+            return new PagedList<TEntity>(items, count);
+        }
+
         public IEnumerable<TEntity> Select(bool tracking = true)
         {
             return Repository.Select(Query, _expression, _orderBy, tracking: tracking);

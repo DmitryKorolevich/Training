@@ -10,6 +10,7 @@ using VitalChoice.Public.Models;
 using VitalChoice.Data.Repositories;
 using Microsoft.Data.Entity;
 using VitalChoice.Business.Queries.Content;
+using VitalChoice.Business.Services.Contracts.Content;
 
 namespace VitalChoice.Public.Controllers.Content
 {

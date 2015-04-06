@@ -13,7 +13,6 @@ using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Domain.Entities.Content;
 using Microsoft.Data.Entity;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Business.Services.Contracts.ContentProcessors;
 using System.Collections.Generic;
 using System.Dynamic;
 using VitalChoice.Data.Extensions;
@@ -24,8 +23,10 @@ using Microsoft.Framework.Logging;
 using Templates;
 using Templates.Exceptions;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
+using VitalChoice.Business.Services.Contracts.Content;
 
-namespace VitalChoice.Business.Services.Impl
+namespace VitalChoice.Business.Services.Impl.Content
 {
 	public class ContentViewService : IContentViewService
     {

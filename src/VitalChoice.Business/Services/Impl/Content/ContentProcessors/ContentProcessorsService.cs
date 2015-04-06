@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Business.Services.Contracts.ContentProcessors;
+using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 
-namespace VitalChoice.Business.Services.Impl.ContentProcessors
+namespace VitalChoice.Business.Services.Impl.Content.ContentProcessors
 {
 	public class ContentProcessorsService : IContentProcessorsService
 	{
-        private const string PROCESSORS_NAME_SPACE = "VitalChoice.Business.Services.Impl.ContentProcessors.";
+        private const string PROCESSORS_NAME_SPACE = "VitalChoice.Business.Services.Impl.Content.ContentProcessors.";
 
         private Dictionary<string, IContentProcessor> processors;
 

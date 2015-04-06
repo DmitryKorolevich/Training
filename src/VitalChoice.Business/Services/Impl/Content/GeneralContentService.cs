@@ -19,8 +19,9 @@ using VitalChoice.Domain.Entities.Content;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Business.Services.Contracts.Content;
 
-namespace VitalChoice.Business.Services.Impl
+namespace VitalChoice.Business.Services.Impl.Content
 {
     public class GeneralContentService : IGeneralContentService
     {

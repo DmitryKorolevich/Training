@@ -6,6 +6,7 @@ using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Content;
 using System.Threading.Tasks;
 using VitalChoice.Public.Models;
+using VitalChoice.Business.Services.Contracts.Content;
 
 namespace VitalChoice.Public.Content.Controllers
 {

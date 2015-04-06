@@ -19,6 +19,7 @@ using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Business.Queries.Log;
 using VitalChoice.Domain.Constants;
+using System.Threading.Tasks;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -31,17 +32,16 @@ namespace VitalChoice.Business.Services.Impl
             this.commonLogItemsRepository = commonLogItemsRepository;
         }
 
-        public PagedList<CommonLogItem> GetCommonItems(string logLevel = null, string message = null, DateTime? from = null, DateTime? to = null,
+        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, DateTime? from = null, DateTime? to = null,
             int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
         {
             var query = new CommonLogQuery();
             query = query.GetItems(logLevel, message, from, to);
 
-            int count = 0;
-            var items = commonLogItemsRepository.Query(query).OrderBy(x=>x.OrderByDescending(pp=>pp.Date))
-                .SelectPage(page, take, out count, false).ToList();
+            var toRetirn = await commonLogItemsRepository.Query(query).OrderBy(x=>x.OrderByDescending(pp=>pp.Date))
+                .SelectPageAsync(page, take);
 
-            return new PagedList<CommonLogItem>(items, count);
+            return toRetirn;
         }
     }
 }
