@@ -100,7 +100,7 @@ namespace VitalChoice.Admin.Controllers
             var toReturn = new PagedModelList<RecipeListItemModel>
             {
                 Items = result.Items.Select(p=>new RecipeListItemModel(p)).ToList(),
-                TotalItemCount= result.Count,
+                Count= result.Count,
             };
 
             return toReturn;
