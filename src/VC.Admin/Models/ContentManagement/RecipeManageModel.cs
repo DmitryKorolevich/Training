@@ -23,6 +23,10 @@ namespace VitalChoice.Models.ContentManagement
         [Localized(GeneralFieldNames.Name)]
         public string Url { get; set; }
 
+        public string Description { get; set; }
+
+        public string FileUrl { get; set; }
+
         public string Template { get; set; }
 
         public string Title { get; set; }
@@ -46,6 +50,8 @@ namespace VitalChoice.Models.ContentManagement
                 Id = item.Id;
                 Name = item.Name;
                 Url = item.Url;
+                Description = item.Description;
+                FileUrl = item.FileUrl;
                 StatusCode = item.StatusCode;
                 Template = item.ContentItem.Template;
                 Title = item.ContentItem.Title;
@@ -71,6 +77,8 @@ namespace VitalChoice.Models.ContentManagement
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
+            toReturn.Description = Description?.Trim();
+            toReturn.FileUrl = FileUrl?.Trim();
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Template = Template;
             toReturn.ContentItem.Title = Title;

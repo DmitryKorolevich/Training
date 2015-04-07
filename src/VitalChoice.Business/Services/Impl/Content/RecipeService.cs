@@ -96,6 +96,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
+                dbItem.Description = model.Description;
+                dbItem.FileUrl = model.FileUrl;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Title = model.ContentItem.Title;
                 dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;

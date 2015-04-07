@@ -22,6 +22,8 @@ namespace VitalChoice.Models.ContentManagement
         [Localized(GeneralFieldNames.Name)]
         public string Url { get; set; }
 
+        public string FileUrl { get; set; }
+
         public string Template { get; set; }
 
         public string Title { get; set; }
@@ -51,6 +53,7 @@ namespace VitalChoice.Models.ContentManagement
                 Id = item.Id;
                 Name = item.Name;
                 Url = item.Url;
+                FileUrl = item.FileUrl;
                 StatusCode = item.StatusCode;
                 ParentId = item.ParentId;
                 MasterContentItemId = item.MasterContentItemId;
@@ -79,6 +82,7 @@ namespace VitalChoice.Models.ContentManagement
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
+            toReturn.FileUrl = FileUrl?.Trim();
             toReturn.MasterContentItemId = MasterContentItemId.HasValue ? MasterContentItemId.Value : 0;
             toReturn.ParentId = ParentId;
             toReturn.Type = Type;

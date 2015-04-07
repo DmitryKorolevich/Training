@@ -9,6 +9,8 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string Url { get; set; }
 
+        public string FileUrl { get; set; }        
+
         public int? ParentId { get; set; }
 
         public ContentCategory Parent { get; set; }
