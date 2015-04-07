@@ -441,7 +441,7 @@
 					<div class="container container-left">
 						<div class="well row">
 							<span class="legend">Categories</span>
-							<div ui-tree class="ya-treeview">
+							<div ui-tree data-drag-enabled="false" class="ya-treeview">
 								<ol ui-tree-nodes="" data-ng-model="categories">
 									<li ng-repeat="item in categories" ui-tree-node collapsed="true" data-ng-include="'app/modules/demo/partials/productDetailCategories.html'">
 									</li>

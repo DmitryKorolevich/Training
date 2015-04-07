@@ -249,3 +249,16 @@ button.main-button {
 .ace_editor {
   height: 400px;
 }
+.angular-ui-tree-handle {
+  /*border: 1px solid @brand-info;*/
+  /*padding: 10px 10px;*/
+}
+.angular-ui-tree-handle:hover {
+  /*border-color: @brand-primary;*/
+}
+.angular-ui-tree-placeholder {
+  border: 2px dashed #717171;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
