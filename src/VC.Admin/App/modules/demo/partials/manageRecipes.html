@@ -1,0 +1,29 @@
+﻿<div class="container-fluid">
+	<div class="col-md-6">
+		<span class="legend">Ace Angular Editor</span>
+		<div data-ng-model="editorModel" ui-ace="{
+				require: ['ace/ext/language_tools'],
+				advanced: {
+					enableSnippets: true,
+					enableBasicAutocompletion: true,
+					enableLiveAutocompletion: true
+				},
+				theme:'dawn',
+				mode: 'html',
+				onLoad: aceLoaded,
+				onChange: aceChanged
+		}">
+		</div>
+		Output {{editorModel}}
+	</div>
+	<div class="col-md-6">
+		<span class="legend">Draggable Recipes Categories</span>
+		<div ui-tree class="ya-treeview">
+			<ol ui-tree-nodes="" data-ng-model="categories">
+				<li ng-repeat="item in categories" ui-tree-node collapsed="true" data-ng-include="'app/modules/demo/partials/recipesCategories.html'">
+				</li>
+			</ol>
+		</div>
+		Output {{categories}}
+	</div>
+</div>
