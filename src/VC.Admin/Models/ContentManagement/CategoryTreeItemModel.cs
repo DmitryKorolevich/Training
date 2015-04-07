@@ -17,14 +17,12 @@ namespace VitalChoice.Models.ContentManagement
         public string Url { get; set; }
 
         public ContentType Type { get; set; }
-
-	    public DateTime Created { get; set; }
-
-        public DateTime Updated { get; set; }
         
         public RecordStatusCode StatusCode { get; set; }
 
         public IEnumerable<CategoryTreeItemModel> SubItems { get; set; }
+
+        public bool IsSelected { get; set; }
 
         public CategoryTreeItemModel(ContentCategory item)
         {
@@ -35,8 +33,6 @@ namespace VitalChoice.Models.ContentManagement
                 Url = item.Url;
                 Type = item.Type;
                 StatusCode = item.StatusCode;
-                Created = item.ContentItem.Created;
-                Updated = item.ContentItem.Updated;
                 CreateSubCategories(this, item);
             }
         }

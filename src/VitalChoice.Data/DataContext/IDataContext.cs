@@ -9,8 +9,10 @@ namespace VitalChoice.Data.DataContext
     {
         int SaveChanges();
 
-		//void SyncObjectState(object entity);
+        //void SyncObjectState(object entity);
 
-		void SetState(object entity, EntityState state);
+        void TrackGraphForAdd(object entity);
+
+        void SetState(object entity, EntityState state);
     }
 }

@@ -26,9 +26,9 @@ namespace VitalChoice.Validators.ContentManagement
                     .WithMessage(model => model.Name, ValidationMessages.FieldRequired);
 
                 RuleFor(model => model.Url)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
                     .NotEmpty()
-                    .WithMessage(model => model.Url, ValidationMessages.FieldRequired);
-                RuleFor(model => model.Url)
+                    .WithMessage(model => model.Url, ValidationMessages.FieldRequired)
                     .Matches(ValidationPatterns.ContentUrlPattern)
                     .WithMessage(model => model.Url, ValidationMessages.FieldContentUrlInvalidFormat);
             }

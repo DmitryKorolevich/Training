@@ -8,6 +8,10 @@ namespace VitalChoice.Domain.Entities.Content
         public string Name { get; set; }
 
         public string Url { get; set; }
+
+        public string Description { get; set; }
+
+        public string FileUrl { get; set; }
         public MasterContentItem MasterContentItem { get; set; }
 
         public int MasterContentItemId { get; set; }

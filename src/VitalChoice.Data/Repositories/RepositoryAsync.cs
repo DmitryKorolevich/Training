@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.ChangeTracking;
+using Microsoft.Data.Entity.ChangeTracking.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,8 +21,7 @@ namespace VitalChoice.Data.Repositories
 		public virtual TEntity Insert(TEntity entity)
         {
             TEntity toReturn = null;
-            DbSet.Attach(entity);
-			Context.SetState(entity, EntityState.Added);
+            DbSet.Add(entity);
 			Context.SaveChanges();
             toReturn = entity;
             return toReturn;
@@ -34,8 +35,7 @@ namespace VitalChoice.Data.Repositories
         public virtual async Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
             TEntity toReturn = null;
-            DbSet.Attach(entity);
-            Context.SetState(entity, EntityState.Modified);
+            DbSet.Add(entity);
             await Context.SaveChangesAsync(cancellationToken);
             toReturn = entity;
             return toReturn;
@@ -45,8 +45,7 @@ namespace VitalChoice.Data.Repositories
 		{
             foreach (var entity in entities)
             {
-                DbSet.Attach(entity);
-                Context.SetState(entity, EntityState.Added);
+                DbSet.Add(entity);
             }
 			Context.SaveChanges();
             return true;
@@ -61,8 +60,7 @@ namespace VitalChoice.Data.Repositories
         {
             foreach (var entity in entities)
             {
-                DbSet.Attach(entity);
-                Context.SetState(entity, EntityState.Added);
+                DbSet.Add(entity);
             }
             await Context.SaveChangesAsync(cancellationToken);
             return true;
@@ -71,8 +69,8 @@ namespace VitalChoice.Data.Repositories
         public virtual TEntity InsertGraph(TEntity entity)
         {
             TEntity toReturn = null;
-            DbSet.Add(entity);
-			Context.SaveChanges();
+            Context.TrackGraphForAdd(entity);
+            Context.SaveChanges();
             toReturn = entity;
             return toReturn;
         }
@@ -85,7 +83,7 @@ namespace VitalChoice.Data.Repositories
         public virtual async Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
         {
             TEntity toReturn = null;
-            DbSet.Add(entity);
+            Context.TrackGraphForAdd(entity);
             await Context.SaveChangesAsync(cancellationToken);
             toReturn = entity;
             return toReturn;
@@ -93,7 +91,10 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool InsertGraphRange(params TEntity[] entities)
 		{
-			DbSet.AddRange(entities);
+            foreach(var entity in entities)
+            {
+                Context.TrackGraphForAdd(entity);
+            }
 			Context.SaveChanges();
             return true;
 		}
@@ -105,7 +106,10 @@ namespace VitalChoice.Data.Repositories
 
         public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities)
         {
-            DbSet.AddRange(entities);
+            foreach (var entity in entities)
+            {
+                Context.TrackGraphForAdd(entity);
+            }
             await Context.SaveChangesAsync(cancellationToken);
             return true;
         }

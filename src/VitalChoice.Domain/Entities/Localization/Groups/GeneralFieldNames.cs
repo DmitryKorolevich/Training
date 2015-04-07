@@ -7,5 +7,7 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
     {
         Name=1,
         Template=2,
+        Url = 3,
+        Title = 4,
     }
 }

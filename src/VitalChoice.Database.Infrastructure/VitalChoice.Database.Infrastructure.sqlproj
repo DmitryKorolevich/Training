@@ -92,7 +92,6 @@
     <None Include="PostDeployment\Scripts\ContentTestDataDelete.sql" />
     <Build Include="dbo\ContentPages\ContentTypes.sql" />
     <Build Include="dbo\ContentPages\MasterContentItemsToContentProcessors.sql" />
-    <None Include="PostDeployment\Scripts\F_IsContentItemUsed.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
