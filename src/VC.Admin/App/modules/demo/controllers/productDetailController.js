@@ -25,8 +25,12 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 				$scope[property] = !$scope[property];
 			};
 
-			$scope.categoriesContext = {
-				selectedNodes: []
+			$scope.toggle = function (scope) {
+				scope.toggle();
+			};
+
+			$scope.hasChildren = function (scope) {
+				return scope.childNodesCount() > 0;
 			};
 
 		$scope.categories = [
@@ -309,21 +313,6 @@ angular.module('app.modules.demo.controllers.productDetailController', [])
 				checked: true
 			}
 		];
-
-			$scope.categoriesOptions = {
-				onSelect: function ($event, node, context) {
-					if ($event.ctrlKey) {
-						var idx = context.selectedNodes.indexOf(node);
-						if (context.selectedNodes.indexOf(node) === -1) {
-							context.selectedNodes.push(node);
-						} else {
-							context.selectedNodes.splice(idx, 1);
-						}
-					} else {
-						context.selectedNodes = [node];
-					}
-				}
-			};
 
 			$scope.subSkus = [
 				{

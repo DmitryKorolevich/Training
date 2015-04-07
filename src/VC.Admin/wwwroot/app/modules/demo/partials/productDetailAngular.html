@@ -441,12 +441,11 @@
 					<div class="container container-left">
 						<div class="well row">
 							<span class="legend">Categories</span>
-							<div ya-treeview ya-id="categoriesTree" ya-model="categories" ya-options="categoriesOptions" ya-context="categoriesContext">
-								<!--<span ng-class="{selected: categoriesContext.selectedNodes.indexOf(node) > -1}">{{ node.$model.label }}</span>-->
-								<div class="checkbox">
-									<label><input data-ng-checked="node.$model.checked" type="checkbox">{{node.$model.label}}</label>
-									<span data-ng-if="node.$model.status == 2" class="label label-warning category-status">Hidden</span>
-								</div>
+							<div ui-tree class="ya-treeview">
+								<ol ui-tree-nodes="" data-ng-model="categories">
+									<li ng-repeat="item in categories" ui-tree-node collapsed="true" data-ng-include="'app/modules/demo/partials/productDetailCategories.html'">
+									</li>
+								</ol>
 							</div>
 						</div>
 					</div>

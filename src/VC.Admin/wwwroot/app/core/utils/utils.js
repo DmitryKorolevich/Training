@@ -2,11 +2,11 @@
 
 angular.module('app.utils', [
 	'textAngular',
-	'ya.treeview',
-	'ya.treeview.tpls',
+	'ui.tree',
 	'nvd3ChartDirectives',
 	'toaster',
 	'ui.sortable',
+	'ui.ace',
 	'app.core.utils.modalUtil',
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil'
