@@ -1,22 +1,20 @@
 ﻿<div class="container-fluid">
 	<div class="col-md-6">
 		<span class="legend">Ace Angular Editor</span>
-		<div ui-ace="{
-				useWrapMode : true,
-				showGutter: false,
-				theme:'twilight',
-				mode: 'xml',
-				firstLineNumber: 5,
-				onLoad: aceLoaded,
-				onChange: aceChanged
+		<div data-ng-model="editorModel" ui-ace="{
 				require: ['ace/ext/language_tools'],
 				advanced: {
 					enableSnippets: true,
 					enableBasicAutocompletion: true,
 					enableLiveAutocompletion: true
-				}
+				},
+				theme:'dawn',
+				mode: 'html',
+				onLoad: aceLoaded,
+				onChange: aceChanged
 		}">
 		</div>
+		Output {{editorModel}}
 	</div>
 	<div class="col-md-6">
 		<span class="legend">Draggable Recipes Categories</span>
@@ -26,5 +24,6 @@
 				</li>
 			</ol>
 		</div>
+		Output {{categories}}
 	</div>
 </div>

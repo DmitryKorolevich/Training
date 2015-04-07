@@ -11,7 +11,7 @@
 		</div>
 	</div>
 </div>
-<ol ui-tree-nodes="" data-ng-model="item.children" data-ng-if="!collapsed">
+<ol ui-tree-nodes="" data-ng-model="item.children" data-ng-class="{hidden: collapsed}">
 	<li ng-repeat="item in item.children" ui-tree-node collapsed="true" data-ng-include="'app/modules/demo/partials/recipesCategories.html'">
 	</li>
 </ol>
