@@ -1,0 +1,139 @@
+﻿<div class="container-fluid">
+	<div class="left-pane-controls">
+		<div class="well container-fluid">
+			<div class="btn-group">
+			    <button class="btn btn-success width-80px" data-ng-click="save()">Save</button>
+                <button ui-sref="index.oneCol.manageRecipes" class="btn btn-default width-80px">Cancel</button>
+			</div>
+			<div class="btn-group margin-top-10px">
+			    <button ui-sref="index.oneCol.manageRecipes" class="btn btn-info width-160px">Manage master</button>
+			</div>
+		</div>
+	</div>
+	<div ng-if="loaded" class="right-pane-main">
+		<div class="container-fluid">
+			<div class="row">
+				<tabset>
+					<tab heading="Details">
+						<div class="container container-left">
+							<div class="well row">
+								<form class="form-horizontal">
+									<fieldset>
+										<span class="legend">Details</span>
+										<div class="form-group">
+											<label for="name" class="col-md-3 control-label">Title</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" placeholder="Title" data-ng-model="recipe.Name">
+                                            </div>
+										</div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-3 control-label">Url</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" placeholder="Url" data-ng-model="recipe.Url">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="meta_description" class="col-md-3 control-label">Description</label>
+                                            <div class="col-md-9">
+                                                <textarea type="text" class="form-control" placeholder="Description" rows="10" data-ng-model="recipe.Description"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-3 control-label">Image</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" placeholder="Image" data-ng-model="recipe.FileUrl">
+                                            </div>
+                                        </div>
+
+										<span class="legend">SEO</span>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-3 control-label">Meta Title</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="recipe.Title">
+                                            </div>
+                                        </div>
+										<div class="form-group">
+											<label for="meta_description" class="col-md-3 control-label">Meta Description</label>
+											<div class="col-md-9">
+												<textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="recipe.MetaDescription"></textarea>
+											</div>
+										</div>
+									</fieldset>
+								</form>
+							</div>
+						</div>
+					</tab>
+					<tab heading="Categories">
+						<div class="container container-left">
+							<div class="well row">
+								<span class="legend">Categories</span>
+                                <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                    <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
+                                        <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                        </li>
+                                    </ol>
+                                </div>
+							</div>
+						</div>
+					</tab>
+                    <tab heading="Products">
+                        <div class="container container-left big-container">
+                            <div class="well row">
+                                <span class="legend">Assigned Products</span>
+
+                                <table class="table table-striped table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Product Name</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="assignedProduct in recipe.AssignedProducts">
+                                            <td>{{assignedProduct.SKU}}</td>
+                                            <td>{{assignedProduct.Name}}</td>
+                                            <td>
+                                                <button class="btn btn-default btn-danger" data-ng-click="deleteAssignedProduct($index);">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </tab>
+					<tab heading="Template">
+						<div class="container container-left">
+							<div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Manage Template</span>
+
+                                        <div class="form-group">
+                                            <label for="meta_description" class="col-md-3 control-label">Template</label>
+                                            <div class="col-md-9">
+                                                <div data-ng-model="recipe.Template" ui-ace="{
+				                                require: ['ace/ext/language_tools'],
+				                                advanced: {
+					                                enableSnippets: true,
+					                                enableBasicAutocompletion: true,
+					                                enableLiveAutocompletion: true
+				                                },
+				                                theme:'dawn',
+				                                mode: 'html',
+				                                onLoad: aceLoaded,
+				                                onChange: aceChanged
+		                                }">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+							</div>
+						</div>
+					</tab>
+				</tabset>
+			</div>
+		</div>
+	</div>
+</div>

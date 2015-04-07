@@ -30,6 +30,7 @@
 		'app/states.js',
 		'app/core/core.js',
 		'app/core/dataAccess/services/userService.js',
+		'app/core/dataAccess/services/contentService.js',
 		'app/core/dataAccess/dataAccess.js',
 		'app/core/dataAccess/services/authenticationServices.js',
 		'app/core/utils/modalUtil.js',
@@ -63,6 +64,9 @@
 		'app/modules/demo/controllers/manageRecipesController.js',
 		'app/modules/users/controllers/userManagementController.js',
 		'app/modules/users/controllers/addEditUserController.js',
-		'app/modules/users/users.js'
+		'app/modules/users/users.js',
+		'app/modules/content/controllers/recipesController.js',
+		'app/modules/content/controllers/manageRecipeController.js',
+		'app/modules/content/content.js',
 	]
 }

@@ -43,13 +43,13 @@ namespace VitalChoice.Admin.Controllers
         #region Common
 
         [HttpGet]
-        public async Task<Result<IEnumerable<ContentTypeEntity>>> GetContentTypesAsync()
+        public async Task<Result<IEnumerable<ContentTypeEntity>>> GetContentTypes()
         {
             return (await generalContentService.GetContentTypesAsync()).ToList();
         }
 
         [HttpGet]
-        public async Task<Result<IEnumerable<ContentProcessor>>> GetContentProcessorsAsync()
+        public async Task<Result<IEnumerable<ContentProcessor>>> GetContentProcessors()
         {
             return (await generalContentService.GetContentProcessorsAsync()).ToList();
         }
@@ -59,19 +59,19 @@ namespace VitalChoice.Admin.Controllers
         #region MasterContent
 
         [HttpPost]
-        public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItemsAsync([FromBody]MasterContentItemListFilter filter)
+        public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItems([FromBody]MasterContentItemListFilter filter)
         {
             return (await masterContentService.GetMasterContentItemsAsync(filter.Type, filter.Status)).Select(p=>new MasterContentItemListItemModel(p)).ToList();
         }
 
         [HttpGet]
-        public async Task<Result<MasterContentItemManageModel>> GetMasterContentItemAsync(int id)
+        public async Task<Result<MasterContentItemManageModel>> GetMasterContentItem(int id)
         {
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
 
         [HttpPut]
-        public async Task<Result<int?>> UpdateMasterContentItemAsync([FromBody]MasterContentItemManageModel model, int? id = null)
+        public async Task<Result<int?>> UpdateMasterContentItem([FromBody]MasterContentItemManageModel model, int? id = null)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
@@ -84,7 +84,7 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteMasterContentItemAsync(int id)
+        public async Task<Result<bool>> DeleteMasterContentItem(int id)
         {
             return await masterContentService.DeleteMasterContentItemAsync(id);
         }
@@ -94,7 +94,7 @@ namespace VitalChoice.Admin.Controllers
         #region Recipes
 
         [HttpPost]
-        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipesAsync([FromBody]RecipeItemListFilter filter)
+        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeItemListFilter filter)
         {
             var result = await recipeService.GetRecipesAsync(filter.Name, filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var toReturn = new PagedModelList<RecipeListItemModel>
@@ -107,31 +107,26 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<RecipeManageModel>> GetRecipeAsync(int id)
+        public async Task<Result<RecipeManageModel>> GetRecipe(int id)
         {
             return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
         }
 
         [HttpPost]
-        public async Task<Result<int?>> UpdateRecipeAsync([FromBody]RecipeManageModel model)
+        public async Task<Result<int?>> UpdateRecipe([FromBody]RecipeManageModel model)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
             
             item = await recipeService.UpdateRecipeAsync(item);
+            await recipeService.AttachRecipeToCategoriesAsync(item.Id, model.CategoryIds);
 
             return item?.Id;
         }
 
         [HttpPost]
-        public async Task<Result<bool>> AttachRecipeToCategoriesAsync(int id,[FromBody]IEnumerable<int> categoryIds)
-        {
-            return await recipeService.AttachRecipeToCategoriesAsync(id, categoryIds);
-        }
-
-        [HttpPost]
-        public async Task<Result<bool>> DeleteRecipeAsync(int id)
+        public async Task<Result<bool>> DeleteRecipe(int id)
         {
             return await recipeService.DeleteRecipeAsync(id);
         }
@@ -141,7 +136,7 @@ namespace VitalChoice.Admin.Controllers
         #region Categories
 
         [HttpPost]
-        public async Task<Result<CategoryTreeItemModel>> GetCategoriesTreeAsync([FromBody]CategoryTreeFilter filter)
+        public async Task<Result<CategoryTreeItemModel>> GetCategoriesTree([FromBody]CategoryTreeFilter filter)
         {
             var result = await categoryService.GetCategoriesTreeAsync(filter.Type, filter.Status);
 
@@ -149,7 +144,7 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> GetCategoriesTreeAsync([FromBody]CategoryTreeItemModel model)
+        public async Task<Result<bool>> UpdateCategoriesTree([FromBody]CategoryTreeItemModel model)
         {
             var category = ConvertWithValidate(model);
             if (category == null)
@@ -159,13 +154,13 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<CategoryManageModel>> GetCategoryAsync(int id)
+        public async Task<Result<CategoryManageModel>> GetCategory(int id)
         {
             return new CategoryManageModel((await categoryService.GetCategoryAsync(id)));
         }
 
         [HttpPost]
-        public async Task<Result<int?>> UpdateCategoryAsync([FromBody]CategoryManageModel model)
+        public async Task<Result<int?>> UpdateCategory([FromBody]CategoryManageModel model)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
@@ -177,7 +172,7 @@ namespace VitalChoice.Admin.Controllers
         }
         
         [HttpPost]
-        public async Task<Result<bool>> DeleteCategoryAsync(int id)
+        public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await categoryService.DeleteCategoryAsync(id);
         }

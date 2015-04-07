@@ -98,6 +98,8 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.Url = model.Url;
                 dbItem.Description = model.Description;
                 dbItem.FileUrl = model.FileUrl;
+                dbItem.ContentItem.Created = DateTime.Now;
+                dbItem.ContentItem.Updated = dbItem.ContentItem.Created;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Title = model.ContentItem.Title;
                 dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;

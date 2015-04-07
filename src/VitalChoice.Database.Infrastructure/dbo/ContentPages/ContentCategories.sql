@@ -4,7 +4,7 @@
     [ContentItemId] INT NULL, 
 	[MasterContentItemId] INT NOT NULL, 
 	[Name] NVARCHAR(250) NOT NULL,	 
-    [FileUrl] NVARCHAR(250) NOT NULL, 
+    [FileUrl] NVARCHAR(250) NULL, 
     [ParentId] INT NULL, 
     [StatusCode] INT NOT NULL DEFAULT 1, 
 	[Url] NVARCHAR(250) NOT NULL UNIQUE, 
