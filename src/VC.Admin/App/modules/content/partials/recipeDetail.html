@@ -1,14 +1,14 @@
 ﻿<div class="container-fluid">
 	<div class="left-pane-controls">
 		<div class="well container-fluid">
-			<div class="btn-group">
-			    <button class="btn btn-success width-80px" data-ng-click="save()">Save</button>
+            <div>
+                <button class="btn btn-success width-160px" data-ng-click="save()">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button class="btn btn-info width-80px">Preview</button>
                 <button ui-sref="index.oneCol.manageRecipes" class="btn btn-default width-80px">Cancel</button>
-			</div>
-			<div class="btn-group margin-top-10px">
-			    <button ui-sref="index.oneCol.manageRecipes" class="btn btn-info width-160px">Manage master</button>
-			</div>
-		</div>
+            </div>
+		</div> 
 	</div>
 	<div ng-if="loaded" class="right-pane-main">
 		<div class="container-fluid">
@@ -21,25 +21,34 @@
 									<fieldset>
 										<span class="legend">Details</span>
 										<div class="form-group">
-											<label for="name" class="col-md-3 control-label">Title</label>
+											<label for="title" class="col-md-3 control-label">Title</label>
                                             <div class="col-md-9">
                                                 <input type="text" class="form-control" placeholder="Title" data-ng-model="recipe.Name">
                                             </div>
 										</div>
                                         <div class="form-group">
-                                            <label for="name" class="col-md-3 control-label">Url</label>
+                                            <label for="url" class="col-md-3 control-label">Url</label>
                                             <div class="col-md-9">
                                                 <input type="text" class="form-control" placeholder="Url" data-ng-model="recipe.Url">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="meta_description" class="col-md-3 control-label">Description</label>
+                                            <label for="description" class="col-md-3 control-label">Description</label>
                                             <div class="col-md-9">
-                                                <textarea type="text" class="form-control" placeholder="Description" rows="10" data-ng-model="recipe.Description"></textarea>
+                                                <div class="input-group" data-ng-show="!descriptionExpanded">
+                                                    <input type="text" class="form-control" id="short" placeholder="Description" disabled value="{{recipe.Description}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="descriptionExpanded">
+                                                    <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="name" class="col-md-3 control-label">Image</label>
+                                            <label for="Image" class="col-md-3 control-label">Image</label>
                                             <div class="col-md-9">
                                                 <input type="text" class="form-control" placeholder="Image" data-ng-model="recipe.FileUrl">
                                             </div>
@@ -47,7 +56,7 @@
 
 										<span class="legend">SEO</span>
                                         <div class="form-group">
-                                            <label for="name" class="col-md-3 control-label">Meta Title</label>
+                                            <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
                                             <div class="col-md-9">
                                                 <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="recipe.Title">
                                             </div>
@@ -105,13 +114,13 @@
 					<tab heading="Template">
 						<div class="container container-left">
 							<div class="well row">
+                                <button class="btn btn-info width-200px margin-bottom-10px">Manage Master Template</button>
                                 <form class="form-horizontal">
                                     <fieldset>
                                         <span class="legend">Manage Template</span>
 
                                         <div class="form-group">
-                                            <label for="meta_description" class="col-md-3 control-label">Template</label>
-                                            <div class="col-md-9">
+                                            <div class="col-md-12">
                                                 <div data-ng-model="recipe.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {

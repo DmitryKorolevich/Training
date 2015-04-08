@@ -25,7 +25,12 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 	};
 
 	function initialize() {
-		$scope.id = $stateParams.id;
+	    $scope.id = $stateParams.id;
+	    $scope.descriptionExpanded = false;
+
+	    $scope.toogleEditorState = function (property) {
+	        $scope[property] = !$scope[property];
+	    };
 
         $scope.recipe=
         {

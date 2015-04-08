@@ -108,6 +108,9 @@ h2 {
 .width-160px {
   width: 160px;
 }
+.width-200px {
+  width: 200px;
+}
 .tab-content {
   padding-top: 30px;
 }
@@ -125,6 +128,9 @@ h2 {
 }
 .margin-bottom-15px {
   margin-bottom: 15px;
+}
+.margin-bottom-10px {
+  margin-bottom: 10px;
 }
 .margin-top-20px {
   margin-top: 20px;
@@ -247,7 +253,7 @@ button.main-button {
   margin-left: 0px;
 }
 .ace_editor {
-  height: 400px;
+  height: 800px;
 }
 .angular-ui-tree-handle {
   /*border: 1px solid @brand-info;*/
