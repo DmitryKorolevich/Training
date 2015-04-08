@@ -1,0 +1,1 @@
+ace.define("ace/snippets/ttl",["require","exports","module"],function(e,t,n){"use strict";t.snippetText="## STL Collections\n# list\nsnippet list\n	@list(${1}) {{\n\n	}}\n# if\nsnippet if\n	@if(${1}) {{\n\n	}}\n# else\nsnippet else\n	@else(${1}) {{\n\n	}}",t.scope="ttl"})
