@@ -3,7 +3,6 @@
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Url] NVARCHAR(250) NOT NULL, 
     [Name] NVARCHAR(250) NOT NULL, 
-    [Description] NVARCHAR(250) NULL, 
     [FileUrl] NVARCHAR(250) NULL, 
     [ContentItemId] INT NOT NULL, 
     [MasterContentItemId] INT NOT NULL, 

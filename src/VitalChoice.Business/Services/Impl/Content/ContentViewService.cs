@@ -99,6 +99,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 category.ContentItem.Template, category.ContentItem.Updated, category.MasterContentItem.Updated,
                 category.MasterContentItemId, category.ContentItem.Id);
             dynamic model = new ExpandoObject();
+            model.BodyHtml = category.ContentItem.Description;
             parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
             foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)
             {
@@ -162,6 +163,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 return null;
             }
             dynamic model = new ExpandoObject();
+            model.BodyHtml = contentDataItem.ContentItem.Description;
             foreach (var masterContentItemsToContentItemProcessor in contentDataItem.MasterContentItem.MasterContentItemToContentProcessors)
             {
                 var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);

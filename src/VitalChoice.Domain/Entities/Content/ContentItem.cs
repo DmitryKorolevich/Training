@@ -11,6 +11,8 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string Template { get; set; }
 
+        public string Description { get; set; }
+
         public string Title { get; set; }
 
         public string MetaKeywords { get; set; }

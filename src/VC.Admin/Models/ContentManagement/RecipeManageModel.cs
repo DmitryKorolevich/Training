@@ -63,10 +63,10 @@ namespace VitalChoice.Models.ContentManagement
             Id = item.Id;
             Name = item.Name;
             Url = item.Url;
-            Description = item.Description;
             FileUrl = item.FileUrl;
             StatusCode = item.StatusCode;
             Template = item.ContentItem.Template;
+            Description = item.ContentItem.Description;
             Title = item.ContentItem.Title;
             MetaKeywords = item.ContentItem.MetaKeywords;
             MetaDescription = item.ContentItem.MetaDescription;
@@ -105,10 +105,10 @@ namespace VitalChoice.Models.ContentManagement
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
-            toReturn.Description = Description?.Trim();
             toReturn.FileUrl = FileUrl?.Trim();
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Template = Template;
+            toReturn.ContentItem.Description = Description?.Trim();
             toReturn.ContentItem.Title = Title;
             toReturn.ContentItem.MetaKeywords = MetaKeywords;
             toReturn.ContentItem.MetaDescription = MetaDescription;

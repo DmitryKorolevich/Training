@@ -4,6 +4,7 @@
     [Created] DATETIME NOT NULL DEFAULT GETDATE(), 
     [Updated] DATETIME NOT NULL DEFAULT GETDATE(), 
     [Template] NVARCHAR(MAX) NOT NULL, 
+	[Description]  NVARCHAR(MAX) NULL, 
     [Title] NVARCHAR(250) NULL, 
     [MetaKeywords] NVARCHAR(250) NULL, 
     [MetaDescription] NVARCHAR(250) NULL, 
