@@ -19,6 +19,7 @@ namespace VitalChoice.Validation.Controllers
             IControllerFactory controllerFactory,
             ControllerActionDescriptor descriptor,
             IReadOnlyList<IInputFormatter> inputFormatters,
+            IReadOnlyList<IOutputFormatter> outputFormatters,
             IControllerActionArgumentBinder controllerActionArgumentBinder,
             IReadOnlyList<IModelBinder> modelBinders,
             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
@@ -26,17 +27,18 @@ namespace VitalChoice.Validation.Controllers
             IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
             ITempDataDictionary tempData)
             : base(
-                actionContext,
-                filterProviders,
-                controllerFactory,
-                descriptor,
-                inputFormatters,
-                controllerActionArgumentBinder,
-                modelBinders,
-                modelValidatorProviders,
-                valueProviderFactories,
-                actionBindingContextAccessor,
-                tempData)
+            actionContext,
+            filterProviders,
+            controllerFactory,
+            descriptor,
+            inputFormatters,
+            outputFormatters,
+            controllerActionArgumentBinder,
+            modelBinders,
+            modelValidatorProviders,
+            valueProviderFactories,
+            actionBindingContextAccessor,
+            tempData)
         {
 
         }

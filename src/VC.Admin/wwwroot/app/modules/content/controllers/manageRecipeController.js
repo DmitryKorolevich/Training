@@ -36,7 +36,7 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
         {
             Name:'',
             Url:'',
-            Template:'',
+            Template: '@default()',
             Description:null,
             Title:null,
             MetaKeywords:null,
