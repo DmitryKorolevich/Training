@@ -16,7 +16,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 			return $http.post(baseUrl + 'UpdateRecipe', recipeManageModel);
 		},
 		deleteRecipe: function (id) {
-			return $http.post(baseUrl + 'DeleteRecipe/', { id: id });
+			return $http.post(baseUrl + 'DeleteRecipe/'+ id);
 		},
 
         //categories

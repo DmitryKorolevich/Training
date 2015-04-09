@@ -10,20 +10,25 @@ namespace VitalChoice.Data.Helpers
 {
     public abstract class QueryObject<TEntity> : IQueryObject<TEntity>
     {
-        private Expression<Func<TEntity, bool>> query;
+        private Expression<Func<TEntity, bool>> _query;
         public virtual Expression<Func<TEntity, bool>> Query()
         {
-            return query;
+            return _query;
         }
 
+        protected void Add(Expression<Func<TEntity, bool>> predicate)
+        {
+            _query = (_query == null) ? predicate : _query.And(predicate.Expand());
+        }
+        
         public Expression<Func<TEntity, bool>> And(Expression<Func<TEntity, bool>> query)
         {
-            return this.query == null ? query : this.query.And(query.Expand());
+            return _query = _query == null ? query : _query.And(query.Expand());
         }
 
         public Expression<Func<TEntity, bool>> Or(Expression<Func<TEntity, bool>> query)
         {
-            return this.query == null ? query : this.query.Or(query.Expand());
+            return _query = _query == null ? query : _query.Or(query.Expand());
         }
 
         public Expression<Func<TEntity, bool>> And(IQueryObject<TEntity> queryObject)
@@ -34,11 +39,6 @@ namespace VitalChoice.Data.Helpers
         public Expression<Func<TEntity, bool>> Or(IQueryObject<TEntity> queryObject)
         {
             return Or(queryObject.Query());
-        }
-
-        protected void Add(Expression<Func<TEntity, bool>> predicate)
-        {
-            query = (query == null) ? predicate : query.And(predicate.Expand());
         }
     }
 }

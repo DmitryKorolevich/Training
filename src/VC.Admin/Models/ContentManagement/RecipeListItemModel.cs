@@ -15,9 +15,7 @@ namespace VitalChoice.Models.ContentManagement
 
         public string Url { get; set; }
 
-	    public DateTime Created { get; set; }
-
-        public DateTime Updated { get; set; }
+        public string Category { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
 
@@ -28,9 +26,25 @@ namespace VitalChoice.Models.ContentManagement
                 Id = item.Id;
                 Name = item.Name;
                 Url = item.Url;
-                Created = item.ContentItem.Created;
-                Updated = item.ContentItem.Updated;
                 StatusCode = item.StatusCode;
+                if(item.RecipesToContentCategories!=null)
+                {
+                    foreach(var RecipesToContentCategory in item.RecipesToContentCategories)
+                    {
+                        if(RecipesToContentCategory.ContentCategory!=null)
+                        {
+                            Category += RecipesToContentCategory.ContentCategory.Name + ", ";
+                        }
+                    }
+                }
+                if(String.IsNullOrEmpty(Category))
+                {
+                    Category = "No Categories";
+                }
+                else
+                {
+                    Category=Category.Remove(Category.Length - 2, 2);
+                }
             }
         }
     }

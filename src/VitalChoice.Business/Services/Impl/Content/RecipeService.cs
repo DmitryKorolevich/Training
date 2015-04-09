@@ -38,10 +38,16 @@ namespace VitalChoice.Business.Services.Impl.Content
             logger = LoggerService.GetDefault();
         }
         
-        public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
+        public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
         {
-            RecipeQuery query = new RecipeQuery().WithName(name).NotDeleted();
-            var toReturn = await recipeRepository.Query(query).OrderBy(x => x.OrderBy(pp => pp.Name)).
+            RecipeQuery query = new RecipeQuery();
+            if(categoryId.HasValue)
+            {
+                var ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                query = query.WithIds(ids);
+            }
+            query=query.WithName(name).NotDeleted();
+            var toReturn = await recipeRepository.Query(query).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
                 SelectPageAsync(page,take);
             return toReturn;
         }
@@ -189,7 +195,14 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.StatusCode = RecordStatusCode.Deleted;
                 await recipeRepository.UpdateAsync(dbItem);
 
-                templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                try
+                {
+                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                }
+                catch(Exception e)
+                {
+                    logger.LogError(e.ToString());
+                }
                 toReturn = true;
             }
             return toReturn;
