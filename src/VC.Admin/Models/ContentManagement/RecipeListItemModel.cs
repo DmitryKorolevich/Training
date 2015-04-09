@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
@@ -29,7 +30,7 @@ namespace VitalChoice.Models.ContentManagement
                 StatusCode = item.StatusCode;
                 if(item.RecipesToContentCategories!=null)
                 {
-                    foreach(var RecipesToContentCategory in item.RecipesToContentCategories)
+                    foreach(var RecipesToContentCategory in item.RecipesToContentCategories.OrderBy(p=>p.ContentCategory.Name))
                     {
                         if(RecipesToContentCategory.ContentCategory!=null)
                         {

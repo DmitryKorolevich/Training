@@ -5,7 +5,7 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 
 	function successSaveHandler(result) {
 		if (result.Success) {
-			toaster.pop('success', "Success!", "Successfully saved. ID - "+ result.Data);
+			toaster.pop('success', "Success!", "Successfully saved.");
             $scope.id=result.Data;
             $scope.recipe.Id=result.Data;
 		} else {
