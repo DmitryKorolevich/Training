@@ -229,7 +229,7 @@ angular.module('app.modules.demo.controllers.manageRecipesController', [])
 							children: []
 						}
 					]
-				},
+				}
 			]
 		}
 	];

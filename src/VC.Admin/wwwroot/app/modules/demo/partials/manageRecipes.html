@@ -18,9 +18,9 @@
 	</div>
 	<div class="col-md-4">
 		<span class="legend">Draggable Recipes Categories</span>
-		<div ui-tree data-empty-place-holder-enabled="true" class="ya-treeview">
-			<ol ui-tree-nodes="" data-ng-model="categories">
-				<li ng-repeat="item in categories" ui-tree-node collapsed="true" data-ng-include="'app/modules/demo/partials/recipesCategories.html'">
+		<div ui-tree class="ya-treeview">
+			<ol ui-tree-nodes data-ng-model="categories">
+				<li ng-repeat="item in categories" ui-tree-node data-ng-include="'app/modules/demo/partials/recipesCategories.html'">
 				</li>
 			</ol>
 		</div>
