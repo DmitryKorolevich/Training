@@ -59,11 +59,11 @@
 
 	$scope.delete = function (id) {
 		confirmUtil.confirm(function() {
-		    contentService.deleteRecipe(id)
+		    contentService.deleteMasterContentItem(id)
 			    .success(function (result) {
 			        if (result.Success) {
 			            toaster.pop('success', "Success!", "Successfully deleted");
-			            refreshRecipes();
+			            refreshMasters();
 			        } else {
 			            errorHandler(result);
 			        }
