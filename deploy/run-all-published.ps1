@@ -6,7 +6,7 @@ foreach{
 		$target = $_.Name
 		echo "starting ${target}"
 		Push-Location "${rootDeploy}\${target}\"
-		start "kestrel.cmd > ..\..\logs\${target}.log"
+		start kestrel.cmd | tee "..\logs\${target}.log"
 		Pop-Location
 	}
 }
