@@ -26,7 +26,11 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
                 if (context.Exception is AppValidationException)
                 {
                     var exc = context.Exception as AppValidationException;
-                    result = new JsonResult(Result.CreateErrorResult<object>(exc.Message));
+                    result = new JsonResult(Result.CreateErrorResult<object>(new MessageInfo()
+                    {
+                        Field = exc.Field,
+                        Message= exc.Message
+                    }));
                     result.StatusCode = (int)HttpStatusCode.OK;
                 }
                 else

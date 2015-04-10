@@ -60,7 +60,8 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
             IsDefault:false,
             Type:1,
         };
-        $scope.loaded=false;
+        $scope.loaded = false;
+        $scope.forms = {};
 
         if ($scope.id) {
             contentService.getMasterContentItem($scope.id)
@@ -102,15 +103,19 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
         return ids;
     }
 
-	$scope.save = function () {
-        $scope.master.ProcessorIds = getProcessorIds();
-	    contentService.updateMasterContentItem($scope.master).success(function(result) {
-				successSaveHandler(result);
-			}).
-			error(function(result) {
-				errorHandler(result);
-			});
-	};
+    $scope.save = function () {
+        if ($scope.forms.masterForm.$valid) {
+            $scope.master.ProcessorIds = getProcessorIds();
+            contentService.updateMasterContentItem($scope.master).success(function (result) {
+                successSaveHandler(result);
+            }).
+                error(function (result) {
+                    errorHandler(result);
+                });
+        } else {
+            $scope.forms.masterForm.submitted = true;
+        }
+    };
 
 	$scope.cancel = function () {
 	};

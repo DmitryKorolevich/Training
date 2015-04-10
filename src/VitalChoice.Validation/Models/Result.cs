@@ -28,6 +28,13 @@ namespace VitalChoice.Validation.Models
             return result;
         }
 
+        public static Result<T> CreateErrorResult<T>(MessageInfo messageInfo, string command=null, T data = default(T))
+        {
+            var result = new Result<T>(false, data, command);
+            result.AddMessage(messageInfo.Field, messageInfo.Message);
+            return result;
+        }
+
         public static Result<T> CreateErrorResult<T>(IEnumerable<MessageInfo> messages, T data = default(T))
         {
             var result = new Result<T>(false);
