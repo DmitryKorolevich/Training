@@ -3,6 +3,7 @@
 angular.module('app.modules.content', [
 	'app.modules.content.controllers.recipesController',
 	'app.modules.content.controllers.manageRecipeController',
+	'app.modules.content.controllers.mastersController',
 	'app.modules.content.controllers.manageMasterController',
 ])
 .config([
@@ -24,6 +25,11 @@ angular.module('app.modules.content', [
 					url: '/content/recipes/{id:int}',
 					templateUrl: 'app/modules/content/partials/recipeDetail.html',
 					controller: 'manageRecipeController'
+				})
+				.state('index.oneCol.manageMasters', {
+				    url: '/content/masters',
+				    templateUrl: 'app/modules/content/partials/mastersList.html',
+				    controller: 'mastersController'
 				})
 				.state('index.oneCol.addNewMaster', {
 				    url: '/content/masters/add',

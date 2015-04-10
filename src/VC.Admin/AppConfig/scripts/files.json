@@ -71,6 +71,7 @@
 		'app/modules/users/users.js',
 		'app/modules/content/controllers/recipesController.js',
 		'app/modules/content/controllers/manageRecipeController.js',
+		'app/modules/content/controllers/mastersController.js',
 		'app/modules/content/controllers/manageMasterController.js',
 		'app/modules/content/content.js',
 	]

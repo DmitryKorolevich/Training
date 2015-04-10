@@ -23,9 +23,9 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
-            $scope.id=result.Data;
-            $scope.recipe.Id = result.Id;
-            $scope.recipe.MasterContentItemId = result.MasterContentItemId;
+            $scope.id=result.Data.Id;
+            $scope.recipe.Id = result.Data.Id;
+            $scope.recipe.MasterContentItemId = result.Data.MasterContentItemId;
 		} else {
             var messages=""; 
             if(result.Messages)

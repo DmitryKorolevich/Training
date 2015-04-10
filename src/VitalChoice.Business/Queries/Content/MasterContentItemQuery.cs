@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (type.HasValue)
             {
-                Add(x => x.Type.Equals(type));
+                Add(x => x.TypeId.Equals((int)type));
             }
 
             return this;
