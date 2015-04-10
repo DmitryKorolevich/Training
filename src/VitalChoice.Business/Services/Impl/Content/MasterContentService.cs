@@ -74,6 +74,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.TypeId = model.Type.Id;
                 dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.MasterContentItemToContentProcessors = new List<MasterContentItemToContentProcessor>();
+                dbItem.Created = DateTime.Now;
             }
             else
             {
@@ -98,6 +99,7 @@ namespace VitalChoice.Business.Services.Impl.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
+                dbItem.Updated = DateTime.Now;
 
                 if (model.Id == 0)
                 {

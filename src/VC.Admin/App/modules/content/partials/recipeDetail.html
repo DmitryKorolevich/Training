@@ -32,7 +32,7 @@
                                         <div class="form-group">
                                             <label for="url" class="col-md-3 control-label">URL</label>
                                             <div class="col-md-9">
-                                                <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]+[A-Za-z0-9_-]{3}$/' required>
+                                                <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                 <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Url.$invalid">
                                                     <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
                                                     <small class="error" ng-show="forms.recipeForm.Url.$error.required">URL is required</small>

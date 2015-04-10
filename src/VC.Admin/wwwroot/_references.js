@@ -1433,7 +1433,7 @@
 /// <reference path="lib/angular-ladda/angular-ladda.min.js" />
 /// <reference path="lib/ladda/ladda.min.js" />
 /// <reference path="lib/spin.js/spin.js" />
+/// <reference path="app/modules/content/controllers/masterscontroller.js" />
+/// <reference path="../App/modules/content/controllers/mastersController.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
-/// <reference path="../app/modules/content/controllers/recipescontroller - copy.js" />
-/// <reference path="app/modules/content/controllers/masterscontroller.js" />

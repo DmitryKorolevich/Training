@@ -77,6 +77,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem = new Recipe();
                 dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.ContentItem = new ContentItem();
+                dbItem.ContentItem.Created = DateTime.Now;
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
@@ -111,6 +112,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
+                dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;
                 dbItem.ContentItem.Title = model.ContentItem.Title;
