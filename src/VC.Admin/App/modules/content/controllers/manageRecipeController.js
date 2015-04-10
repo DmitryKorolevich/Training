@@ -3,6 +3,23 @@
 angular.module('app.modules.content.controllers.manageRecipeController', [])
 .controller('manageRecipeController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$state,$stateParams, contentService, toaster, confirmUtil) {
 
+    function ServerMessages(data){
+        var self = this;
+        
+        self.Messages = data;
+    };
+
+    ServerMessages.prototype.GetMessage = function(field) {
+        var toReturn = '';
+        $.each(this.Messages, function (index, message) {
+            if (message.Field == field) {
+                toReturn = message.Message;
+                return false;
+            }
+        });
+        return toReturn;
+    };
+
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
@@ -10,10 +27,13 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             $scope.recipe.Id = result.Id;
             $scope.recipe.MasterContentItemId = result.MasterContentItemId;
 		} else {
-            var messages="";
+            var messages=""; 
             if(result.Messages)
-            {   
-                $.each(result.Messages, function( index, value ) {
+            {
+                $scope.forms.recipeForm.submitted = true;
+                $scope.serverMessages = new ServerMessages(result.Messages);
+                $.each(result.Messages, function (index, value) {                    
+                    $scope.forms.recipeForm[value.Field].$setValidity("server", false);
                     messages+=value.Message +"<br />";
                 });
             }
@@ -44,7 +64,32 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             MetaDescription: null,
             MasterContentItemId: 0,
         };
-        $scope.loaded=false;
+        $scope.loaded = false;
+        $scope.forms={};
+
+        $scope.save = function () {
+            $.each($scope.forms.recipeForm, function (index, element) {
+                if (index == 'Url' && element.$name==index)
+                {
+                    element.$setValidity("server", true);
+                }
+            });
+
+            if ($scope.forms.recipeForm.$valid) {
+                var categoryIds = [];
+                getSelected($scope.rootCategory, categoryIds);
+                $scope.recipe.CategoryIds = categoryIds;
+
+                contentService.updateRecipe($scope.recipe).success(function (result) {
+                    successSaveHandler(result);
+                }).
+                    error(function (result) {
+                        errorHandler(result);
+                    });
+            } else {
+                $scope.forms.recipeForm.submitted = true;
+            }
+        };
 
         contentService.getCategoriesTree({Type: 2})//recipes
 			.success(function (result) {
@@ -103,23 +148,6 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 
 	$scope.hasChildren = function (scope) {
 		return scope.childNodesCount() > 0;
-	};
-
-	$scope.save = function () {        
-	    if ($scope.recipeForm.$valid) {
-	        var categoryIds = [];
-	        getSelected($scope.rootCategory, categoryIds);
-	        $scope.recipe.CategoryIds = categoryIds;
-
-            contentService.updateRecipe($scope.recipe).success(function (result) {
-                successSaveHandler(result);
-            }).
-                error(function (result) {
-                    errorHandler(result);
-                });
-        } else {
-            $scope.recipeForm.submitted = true;
-        }
 	};
 
 	$scope.deleteAssignedProduct = function(index) {

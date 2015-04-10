@@ -105,7 +105,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
-                    throw new AppValidationException("Recipe with the same URL already exists, please use a unique URL.");
+                    throw new AppValidationException("Url","Recipe with the same URL already exists, please use a unique URL.");
                 }
 
                 dbItem.Name = model.Name;

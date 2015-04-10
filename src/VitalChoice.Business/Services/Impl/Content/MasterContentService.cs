@@ -93,7 +93,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id).SelectAnyAsync();
                 if (nameDublicatesExist)
                 {
-                    throw new AppValidationException("Master content item with the same name is already exist.");
+                    throw new AppValidationException("Name","Master content item with the same name is already exist.");
                 }
 
                 dbItem.Name = model.Name;

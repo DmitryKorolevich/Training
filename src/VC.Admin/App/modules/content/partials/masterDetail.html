@@ -16,26 +16,29 @@
 					<tab heading="Details">
 						<div class="container container-left">
 							<div class="well row">
-								<form class="form-horizontal">
+								<form class="form-horizontal" name="forms.masterForm" data-ng-submit="save()" data-ng-class="{submitted: forms.masterForm.submitted}" novalidate>
 									<fieldset>
 										<span class="legend">Details</span>
 										<div class="form-group">
 											<label for="name" class="col-md-3 control-label">Name</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" placeholder="Name" data-ng-model="master.Name">
+                                                <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="master.Name" required>
+                                                <div class="error-container" ng-show="forms.masterForm.submitted && forms.masterForm.Name.$invalid">
+                                                    <small class="error" ng-show="forms.masterForm.Name.$error.required">Title is required</small>
+                                                </div>
                                             </div>
 										</div>
                                         <div class="form-group">
                                             <label for="type" class="col-md-3 control-label">Type</label>
                                             <div class="col-md-9">
-                                                <select class="form-control" ng-disabled="id" data-ng-model="master.Type" ng-options="type.Id as type.Name for type in types"></select>
+                                                <select class="form-control" name="Type" ng-disabled="id" data-ng-model="master.Type" ng-options="type.Id as type.Name for type in types"></select>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="is_default" class="col-md-3 control-label">Is Default</label>
                                             <div class="col-md-9">
                                                 <div class="checkbox">
-                                                    <label><input type="checkbox" placeholder="Is Default" checked="checked" ng-disabled="master.IsDefault && id" data-ng-model="master.IsDefault"/></label>
+                                                    <label><input type="checkbox" name="IsDefault" placeholder="Is Default" checked="checked" ng-disabled="master.IsDefault && id" data-ng-model="master.IsDefault"/></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -52,7 +55,7 @@
                                         <span class="legend">Manage Template</span>
                                         <div class="form-group">
                                             <div class="col-md-12">
-                                                <div data-ng-model="recipe.Template" ui-ace="{
+                                                <div data-ng-model="master.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
