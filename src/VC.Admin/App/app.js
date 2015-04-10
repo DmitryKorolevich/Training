@@ -10,7 +10,7 @@ var app = angular
 	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
-		function ($stateProvider, $urlRouterProvider) {
+		function($stateProvider, $urlRouterProvider) {
 			$urlRouterProvider.otherwise('app/shared/partials/404.html');
 		}
 	])
@@ -33,12 +33,25 @@ var app = angular
 //	}
 //	$scope.$on("$destroy", function () { delete $scope.Model.item; })
 //}])
-.run([
-		'$rootScope', '$state', '$stateParams',
-		function($rootScope, $state, $stateParams) {
+	.run([
+		'$rootScope', '$state', '$stateParams', 'ngProgress',
+		function($rootScope, $state, $stateParams, ngProgress) {
 			$rootScope.$state = $state;
 			$rootScope.$stateParams = $stateParams;
 
 			$rootScope.authenticated = true; //temp solution
+
+			$rootScope.$on('$stateChangeStart', function() {
+				ngProgress.start();
+			});
+			$rootScope.$on('$stateChangeSuccess', function() {
+				ngProgress.complete();
+			});
+			$rootScope.$on('$stateChangeError', function() {
+				ngProgress.complete();
+			});
+			$rootScope.$on('$stateNotFound', function() {
+				ngProgress.complete();
+			});
 		}
 	]);

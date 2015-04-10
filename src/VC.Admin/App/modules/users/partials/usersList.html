@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<button data-ng-click="open(false);" class="btn btn-primary">Add New User</button>
+			<button  data-ng-click="open(false);" class="btn btn-primary">Add New User</button><!--ladda="adding"-->
 		</div>
 		<table class="table table-striped table-hover ">
 			<thead>
@@ -40,8 +40,8 @@
 				</td>
 				<td>{{user.LastLoginDate | date:"MM/dd/yy"}}<br/>{{user.LastLoginDate | date:"h:mm a"}}</td>
 				<td>
-					<button class="btn btn-default btn-success" data-ng-click="open(true, user.PublicId);">Details</button>
-					<button class="btn btn-default btn-danger" data-ng-click="delete(user.FirstName, user.LastName, user.PublicId);">Delete</button>
+					<button class="btn btn-default btn-success" data-ng-click="open(true, user.PublicId);">Details</button> <!--ladda="editing"-->
+					<button class="btn btn-default btn-danger" data-ng-click="delete(user.FirstName, user.LastName, user.PublicId);">Delete</button><!--ladda="removing"-->
 				</td>
 			</tr>
 			</tbody>

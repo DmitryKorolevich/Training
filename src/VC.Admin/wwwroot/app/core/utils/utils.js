@@ -7,6 +7,8 @@ angular.module('app.utils', [
 	'toaster',
 	'ui.sortable',
 	'ui.ace',
+	'ngProgress',
+	'angular-ladda',
 	'app.core.utils.modalUtil',
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil'

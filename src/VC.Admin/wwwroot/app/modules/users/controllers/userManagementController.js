@@ -35,6 +35,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	$scope.open = function (editMode, publicId) {
 		var user = {};
 		if (editMode) {
+			$scope.editing = true;
 			userService.getUser(publicId)
 				.success(function (result) {
 					if (result.Success) {
@@ -42,11 +43,14 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 					} else {
 						toaster.pop('error', 'Error!', "Can't get user");
 					}
+					$scope.editing = false;
 				}).
 				error(function(result) {
 					toaster.pop('error', "Error!", "Server error ocurred");
+					$scope.editing = false;
 				});
 		} else {
+			$scope.adding = true;
 			userService.createUserPrototype()
 				.success(function (result) {
 					if (result.Success) {
@@ -55,15 +59,18 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 					} else {
 						toaster.pop('error', 'Error!', "Can't create user");
 					}
+					$scope.adding = false;
 				}).
 				error(function (result) {
 					toaster.pop('error', "Error!", "Server error ocurred");
+					$scope.adding = false;
 				});
 		}
 	};
 
 	$scope.delete = function(firstName, lastName, publicId) {
 		confirmUtil.confirm(function() {
+			$scope.removing = true;
 			userService.deleteUser(publicId)
 				.success(function(result) {
 					if (result.Success) {
@@ -72,10 +79,12 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 						toaster.pop('error', 'Error!', "Can't delete the user");
 					}
 					refreshUsers();
+					$scope.removing = false;
 				})
 				.error(function(result) {
 					toaster.pop('error', "Error!", "Server error ocurred");
 					refreshUsers();
+					$scope.removing = false;
 				});
 		}, 'Are you sure you want to delete ' + firstName + ' ' + lastName + ' user?');
 	};

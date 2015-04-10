@@ -10,11 +10,13 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 			toaster.pop('error', "Error!", "Can't save your changes");
 		}
 		data.thenCallback();
+		$scope.saving = false;
 	};
 
 	function errorHandler(result) {
 		toaster.pop('error', "Error!", "Server error occured");
 		data.thenCallback();
+		$scope.saving = false;
 	};
 
 	function initialize() {
@@ -25,23 +27,32 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		$scope.editMode = data.editMode;
 
 		$scope.save = function () {
-			if ($scope.editMode) {
-				userService.updateUser($scope.user).success(function(result) {
-						successHandler(result);
-					}).
-					error(function(result) {
-						errorHandler(result);
-					});
+			if ($scope.userForm.$valid) {
+				if (!$scope.user.RoleNames || $scope.user.RoleNames.length === 0) {
+					toaster.pop('error', 'Error!', 'At least one role should be selected');
+					return;
+				}
+
+				$scope.saving = true;
+				if ($scope.editMode) {
+					userService.updateUser($scope.user).success(function(result) {
+							successHandler(result);
+						}).
+						error(function(result) {
+							errorHandler(result);
+						});
+				} else {
+					userService.createUser($scope.user).success(function(result) {
+							successHandler(result);
+						}).
+						error(function(result) {
+							errorHandler(result);
+						});
+				}
+				$modalInstance.close();
 			} else {
-				userService.createUser($scope.user).success(function (result) {
-						successHandler(result);
-					}).
-					error(function (result) {
-						errorHandler(result);
-					});
+				$scope.userForm.submitted = true;
 			}
-			
-			$modalInstance.close();
 		};
 
 		$scope.cancel = function () {
