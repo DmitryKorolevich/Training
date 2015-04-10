@@ -1197,7 +1197,8 @@ var XmlHighlightRules = function(normalize) {
 };
 
 
-(function() {
+    (function () {
+        var stackCopy;
     this.embedTagRules = function(HighlightRules, prefix, tag) {
         this.$rules.tag.unshift({
             token: ["meta.tag.punctuation.tag-open.xml", "meta.tag." + tag + ".tag-name.xml"],
@@ -1207,7 +1208,12 @@ var XmlHighlightRules = function(normalize) {
                 {
                     token: "meta.tag.punctuation.tag-close.xml",
                     regex: "/?>",
-                    next: prefix + "start"
+                    next: prefix + "start",
+                    onMatch: function (value, currentState, stack) {
+                        stackCopy = stack.slice();
+                        stack.splice(0);
+                        return this.token;
+                    }
                 }
             ]
         });
@@ -1219,6 +1225,8 @@ var XmlHighlightRules = function(normalize) {
                 regex: "/?>",
                 next: "start",
                 onMatch: function (value, currentState, stack) {
+                    stack.splice(0);
+                    stack.push.apply(stack, stackCopy);
                     return this.token;
                 }
             }
