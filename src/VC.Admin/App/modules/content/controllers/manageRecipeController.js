@@ -105,16 +105,21 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 		return scope.childNodesCount() > 0;
 	};
 
-	$scope.save = function () {
-        var categoryIds=[];
-        getSelected($scope.rootCategory,categoryIds);
-        $scope.recipe.CategoryIds=categoryIds;
-		contentService.updateRecipe($scope.recipe).success(function(result) {
-				successSaveHandler(result);
-			}).
-			error(function(result) {
-				errorHandler(result);
-			});
+	$scope.save = function () {        
+	    if ($scope.recipeForm.$valid) {
+	        var categoryIds = [];
+	        getSelected($scope.rootCategory, categoryIds);
+	        $scope.recipe.CategoryIds = categoryIds;
+
+            contentService.updateRecipe($scope.recipe).success(function (result) {
+                successSaveHandler(result);
+            }).
+                error(function (result) {
+                    errorHandler(result);
+                });
+        } else {
+            $scope.recipeForm.submitted = true;
+        }
 	};
 
 	$scope.deleteAssignedProduct = function(index) {

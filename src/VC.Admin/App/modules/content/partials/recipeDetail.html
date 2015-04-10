@@ -10,33 +10,36 @@
             </div>
 		</div> 
 	</div>
-	<div ng-if="loaded" class="right-pane-main">
+	<div class="right-pane-main">
 		<div class="container-fluid">
 			<div class="row">
 				<tabset>
 					<tab heading="Details">
 						<div class="container container-left">
 							<div class="well row">
-								<form class="form-horizontal">
+								<form class="form-horizontal" name="recipeForm" data-ng-submit="save()" data-ng-class="{submitted: recipeForm.submitted}" novalidate>
 									<fieldset>
 										<span class="legend">Details</span>
 										<div class="form-group">
 											<label for="title" class="col-md-3 control-label">Title</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" placeholder="Title" data-ng-model="recipe.Name">
+                                                <input type="text" name="Name" class="form-control" placeholder="Title" data-ng-model="recipe.Name" required>
+                                                <div class="error-container" ng-show="recipeForm.submitted && recipeForm.Name.$invalid">
+                                                    <small class="error" ng-show="recipeForm.Name.$error.required">Title is required</small>
+                                                </div>
                                             </div>
 										</div>
                                         <div class="form-group">
                                             <label for="url" class="col-md-3 control-label">URL</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" placeholder="URL" data-ng-model="recipe.Url">
+                                                <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" required>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="description" class="col-md-3 control-label">Description</label>
                                             <div class="col-md-9">
                                                 <div class="input-group" data-ng-show="!descriptionExpanded">
-                                                    <input type="text" class="form-control" id="short" placeholder="Description" disabled value="{{recipe.Description}}">
+                                                    <input type="text" name="Description" class="form-control" id="short" placeholder="Description" disabled value="{{recipe.Description}}" required>
                                                     <span class="input-group-btn">
                                                         <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
                                                     </span>
@@ -115,9 +118,7 @@
 						<div class="container container-left">
 							<div class="well row">
                                 <button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
-                                <form class="form-horizontal">
-                                    <fieldset>
-                                        <span class="legend">Manage Template</span>
+                                          <span class="legend">Manage Template</span>
 
                                         <div class="form-group">
                                             <div class="col-md-12">
@@ -135,8 +136,6 @@
 		                                }">
                                                 </div>
                                             </div>
-                                        </div>
-                                    </fieldset>
                                 </form>
 							</div>
 						</div>
