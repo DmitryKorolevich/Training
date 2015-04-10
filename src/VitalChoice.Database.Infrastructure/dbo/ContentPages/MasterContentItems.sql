@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[MasterContentItems]
 (
-	[Id] INT NOT NULL PRIMARY KEY, 
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1), 
     [Name] NVARCHAR(250) NOT NULL UNIQUE, 
     [TypeId] INT NOT NULL, 
     [Template] NVARCHAR(MAX) NOT NULL, 

@@ -29,7 +29,7 @@
     function initialize() {
         //Should be loaded with loockups and basic settings on app opening
 	    $scope.types = [
-            { Id: null, Name: 'Al' },
+            { Id: null, Name: 'All' },
             { Id: 1, Name: 'Category' },
             { Id: 2, Name: 'Recipe' },
 	    ];
