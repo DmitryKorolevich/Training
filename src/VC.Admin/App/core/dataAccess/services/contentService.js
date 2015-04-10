@@ -12,8 +12,8 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		getRecipe: function (id) {
 			return $http.get(baseUrl + 'GetRecipe/' + id);
 		},
-		updateRecipe: function(recipeManageModel) {
-			return $http.post(baseUrl + 'UpdateRecipe', recipeManageModel);
+		updateRecipe: function(model) {
+			return $http.post(baseUrl + 'UpdateRecipe', model);
 		},
 		deleteRecipe: function (id) {
 			return $http.post(baseUrl + 'DeleteRecipe/'+ id);
@@ -22,6 +22,20 @@ angular.module('app.core.dataAccess.services.contentService', [])
         //categories
 		getCategoriesTree: function(filter) {
 			return $http.post(baseUrl + 'GetCategoriesTree', filter);
-		}
+		},
+
+        //master templates
+        getMasterContentItems: function(filter) {
+			return $http.post(baseUrl + 'GetMasterContentItems', filter);
+		},
+        getMasterContentItem: function (id) {
+			return $http.get(baseUrl + 'GetMasterContentItem/' + id);
+		},
+		updateMasterContentItem: function(model) {
+			return $http.post(baseUrl + 'UpdateMasterContentItem', model);
+		},
+		deleteMasterContentItem: function (id) {
+			return $http.post(baseUrl + 'DeleteMasterContentItem/'+ id);
+		},
 	};
 }]);

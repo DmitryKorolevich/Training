@@ -9,5 +9,6 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         Template=2,
         Url = 3,
         Title = 4,
+        Description = 5,
     }
 }

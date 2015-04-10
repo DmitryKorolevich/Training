@@ -1372,5 +1372,7 @@
 /// <reference path="../app/core/utils/ace/snippets/ttl.js" />
 /// <reference path="app/core/utils/ace/mode-ttl.js" />
 /// <reference path="app/core/utils/ace/snippets/ttl.js" />
+/// <reference path="app/modules/content/controllers/managemastercontroller.js" />
+/// <reference path="../App/modules/content/controllers/manageMasterController.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />

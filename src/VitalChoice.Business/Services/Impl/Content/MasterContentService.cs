@@ -61,7 +61,7 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             var query = new MasterContentItemQuery();
             query = query.WithId(id).NotDeleted();
-            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).SelectAsync(false)).FirstOrDefault();
             return toReturn;
         }
 
@@ -71,34 +71,33 @@ namespace VitalChoice.Business.Services.Impl.Content
             if (model.Id == 0)
             {
                 dbItem = new MasterContentItem();
-                dbItem.Type = model.Type;
                 dbItem.TypeId = model.Type.Id;
                 dbItem.StatusCode = RecordStatusCode.Active;
+                dbItem.MasterContentItemToContentProcessors = new List<MasterContentItemToContentProcessor>();
             }
             else
             {
-                dbItem = (await masterContentItemRepository.Query(p => p.Id == model.Id).Include(p=>p.MasterContentItemToContentProcessors).
+                dbItem = (await masterContentItemRepository.Query(p => p.Id == model.Id).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).
                     SelectAsync()).FirstOrDefault();
                 if (dbItem != null)
                 {
-                    foreach(var proccesorRef in dbItem.MasterContentItemToContentProcessors)
+                    foreach (var proccesorRef in dbItem.MasterContentItemToContentProcessors)
                     {
                         await masterContentItemToProcessorsRepository.DeleteAsync(proccesorRef.Id);
                     }
                 }
             }
 
-            if (dbItem != null && dbItem.StatusCode==RecordStatusCode.Deleted)
+            if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
                 var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id).SelectAnyAsync();
-                if(nameDublicatesExist)
+                if (nameDublicatesExist)
                 {
                     throw new AppValidationException("Master content item with the same name is already exist.");
                 }
 
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
-                dbItem.MasterContentItemToContentProcessors = model.MasterContentItemToContentProcessors;
 
                 if (model.Id == 0)
                 {
@@ -107,6 +106,23 @@ namespace VitalChoice.Business.Services.Impl.Content
                 else
                 {
                     dbItem = await masterContentItemRepository.UpdateAsync(dbItem);
+                }
+
+                foreach (var processor in model.MasterContentItemToContentProcessors)
+                {
+                    processor.MasterContentItemId = dbItem.Id;
+                }
+                await masterContentItemToProcessorsRepository.InsertRangeAsync(model.MasterContentItemToContentProcessors);
+
+                if (model.Type.DefaultMasterContentItemId.HasValue)
+                {
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == dbItem.TypeId).SelectAsync()).FirstOrDefault();
+                    if (contentType != null && model.Type.DefaultMasterContentItemId.HasValue && 
+                        contentType.DefaultMasterContentItemId != model.Type.DefaultMasterContentItemId)
+                    {
+                        contentType.DefaultMasterContentItemId = dbItem.Id;
+                        await contentTypeRepository.UpdateAsync(contentType);
+                    }
                 }
             }
 

@@ -45,6 +45,18 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public RecipeQuery NotWithIds(List<int> ids)
+        {
+            if (ids.Count > 0)
+            {
+                foreach (var id in ids)
+                {
+                    And(x => x.Id != id);
+                }
+            }
+            return this;
+        }
+
         public RecipeQuery NotDeleted()
         {
             And(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));

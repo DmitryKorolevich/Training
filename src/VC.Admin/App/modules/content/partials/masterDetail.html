@@ -1,0 +1,95 @@
+﻿<div class="container-fluid">
+	<div class="left-pane-controls">
+		<div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" data-ng-click="save()">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button class="btn btn-default width-80px" data-ng-click="cancel()">Cancel</button>
+            </div>
+		</div> 
+	</div>
+	<div ng-if="loaded" class="right-pane-main">
+		<div class="container-fluid">
+			<div class="row">
+				<tabset>
+					<tab heading="Details">
+						<div class="container container-left">
+							<div class="well row">
+								<form class="form-horizontal">
+									<fieldset>
+										<span class="legend">Details</span>
+										<div class="form-group">
+											<label for="name" class="col-md-3 control-label">Name</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" placeholder="Name" data-ng-model="master.Name">
+                                            </div>
+										</div>
+                                        <div class="form-group">
+                                            <label for="type" class="col-md-3 control-label">Type</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" ng-disabled="id" data-ng-model="master.Type" ng-options="type.Id as type.Name for type in types"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="is_default" class="col-md-3 control-label">Is Default</label>
+                                            <div class="col-md-9">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" placeholder="Is Default" checked="checked" ng-disabled="master.IsDefault && id" data-ng-model="master.IsDefault"/></label>
+                                                </div>
+                                            </div>
+                                        </div>
+									</fieldset>
+								</form>
+							</div>
+						</div>
+					</tab>
+					<tab heading="Template">
+						<div class="container container-left">
+							<div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Manage Template</span>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <div data-ng-model="master.Template" ui-ace="{
+				                                require: ['ace/ext/language_tools'],
+				                                advanced: {
+					                                enableSnippets: true,
+					                                enableBasicAutocompletion: true,
+					                                enableLiveAutocompletion: true
+				                                },
+				                                theme:'github',
+				                                mode: 'ttl',
+				                                onLoad: aceLoaded,
+				                                onChange: aceChanged
+		                                        }">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+							</div>
+						</div>
+					</tab>
+                    <tab heading="Processors">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Manage Processors</span>
+                                        <div ng-repeat="processor in processors">
+                                            <div class="checkbox">
+                                                <label><input data-ng-model="processor.IsSelected" type="checkbox">{{processor.Name}}</label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </tab>
+				</tabset>
+			</div>
+		</div>
+	</div>
+</div>

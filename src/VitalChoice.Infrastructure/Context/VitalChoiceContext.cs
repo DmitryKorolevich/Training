@@ -78,11 +78,15 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentProcessor>().ToTable("ContentProcessors").Key(p => p.Id);
 
             builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
+            builder.Entity<MasterContentItem>().Property(p => p.Created).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
+            builder.Entity<MasterContentItem>().Property(p => p.Updated).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
             builder.Entity<MasterContentItem>().Reference(p => p.Type).InverseCollection().ForeignKey(p => p.TypeId).PrincipalKey(p => p.Id);
             builder.Entity<MasterContentItem>().Collection(p => p.MasterContentItemToContentProcessors).InverseReference(p => p.MasterContentItem).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.MasterContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
+            builder.Entity<ContentItem>().Property(p => p.Created).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
+            builder.Entity<ContentItem>().Property(p => p.Updated).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
             builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
 

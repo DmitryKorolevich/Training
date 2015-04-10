@@ -23,6 +23,7 @@ namespace VitalChoice.Models.ContentManagement
         [Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
+        [Localized(GeneralFieldNames.Description)]
         public string Description { get; set; }
 
         public string FileUrl { get; set; }
@@ -34,6 +35,8 @@ namespace VitalChoice.Models.ContentManagement
         public string MetaKeywords { get; set; }
 
         public string MetaDescription { get; set; }
+
+        public int MasterContentItemId { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -72,6 +75,7 @@ namespace VitalChoice.Models.ContentManagement
             MetaDescription = item.ContentItem.MetaDescription;
             Created = item.ContentItem.Created;
             Updated = item.ContentItem.Updated;
+            MasterContentItemId = item.MasterContentItemId;
             if (item.ContentItem.ContentItemToContentProcessors != null)
             {
                 ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentProcessorId).ToList();
@@ -80,7 +84,10 @@ namespace VitalChoice.Models.ContentManagement
             {
                 ProcessorIds = new List<int>();
             }
-            CategoryIds = item.RecipesToContentCategories.Select(p => p.ContentCategoryId).ToList();
+            if (item.RecipesToContentCategories != null)
+            {
+                CategoryIds = item.RecipesToContentCategories.Select(p => p.ContentCategoryId).ToList();
+            }
             AssignedProducts = new List<AssignedProduct>()
             {
                     new AssignedProduct()

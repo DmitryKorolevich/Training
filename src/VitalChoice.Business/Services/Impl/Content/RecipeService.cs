@@ -43,8 +43,16 @@ namespace VitalChoice.Business.Services.Impl.Content
             RecipeQuery query = new RecipeQuery();
             if(categoryId.HasValue)
             {
-                var ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
-                query = query.WithIds(ids);
+                if (categoryId.Value != -1)
+                {
+                    var ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                    query = query.WithIds(ids);
+                }
+                else
+                {
+                    var ids = (await recipeToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.RecipeId).Distinct().ToList();
+                    query = query.NotWithIds(ids);
+                }
             }
             query=query.WithName(name).NotDeleted();
             var toReturn = await recipeRepository.Query(query).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
@@ -97,14 +105,12 @@ namespace VitalChoice.Business.Services.Impl.Content
                 var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
-                    throw new AppValidationException("Recipe with the same url is already exist.");
+                    throw new AppValidationException("Recipe with the same URL already exists, please use a unique URL.");
                 }
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
-                dbItem.ContentItem.Created = DateTime.Now;
-                dbItem.ContentItem.Updated = dbItem.ContentItem.Created;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;
                 dbItem.ContentItem.Title = model.ContentItem.Title;

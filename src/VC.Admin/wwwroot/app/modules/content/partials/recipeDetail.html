@@ -27,9 +27,9 @@
                                             </div>
 										</div>
                                         <div class="form-group">
-                                            <label for="url" class="col-md-3 control-label">Url</label>
+                                            <label for="url" class="col-md-3 control-label">URL</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" placeholder="Url" data-ng-model="recipe.Url">
+                                                <input type="text" class="form-control" placeholder="URL" data-ng-model="recipe.Url">
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -114,7 +114,7 @@
 					<tab heading="Template">
 						<div class="container container-left">
 							<div class="well row">
-                                <button class="btn btn-info width-200px margin-bottom-10px">Manage Master Template</button>
+                                <button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
                                 <form class="form-horizontal">
                                     <fieldset>
                                         <span class="legend">Manage Template</span>

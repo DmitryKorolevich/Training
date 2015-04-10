@@ -1,13 +1,14 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.manageRecipeController', [])
-.controller('manageRecipeController', ['$scope','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$stateParams, contentService, toaster, confirmUtil) {
+.controller('manageRecipeController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$state,$stateParams, contentService, toaster, confirmUtil) {
 
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
             $scope.id=result.Data;
-            $scope.recipe.Id=result.Data;
+            $scope.recipe.Id = result.Id;
+            $scope.recipe.MasterContentItemId = result.MasterContentItemId;
 		} else {
             var messages="";
             if(result.Messages)
@@ -37,10 +38,11 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             Name:'',
             Url:'',
             Template: '@default()',
-            Description:null,
+            Description:'',
             Title:null,
             MetaKeywords:null,
-            MetaDescription:null,
+            MetaDescription: null,
+            MasterContentItemId: 0,
         };
         $scope.loaded=false;
 
@@ -119,6 +121,10 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 		confirmUtil.confirm(function() {
             $scope.recipe.AssignedProducts.splice(index, 1);
 		}, 'Are you sure you want to delete the given assigned product?');
+	};
+
+	$scope.goToMaster = function (id) {
+	    $state.go('index.oneCol.masterDetail', { id: id });
 	};
 
 	initialize();

@@ -70,14 +70,13 @@ namespace VitalChoice.Admin.Controllers
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
 
-        [HttpPut]
-        public async Task<Result<int?>> UpdateMasterContentItem([FromBody]MasterContentItemManageModel model, int? id = null)
+        [HttpPost]
+        public async Task<Result<int?>> UpdateMasterContentItem([FromBody]MasterContentItemManageModel model)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
 
-            item.Id = id.HasValue ? id.Value : 0;
             item = await masterContentService.UpdateMasterContentItemAsync(item);
 
             return item?.Id;
@@ -113,7 +112,7 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<int?>> UpdateRecipe([FromBody]RecipeManageModel model)
+        public async Task<Result<RecipeManageModel>> UpdateRecipe([FromBody]RecipeManageModel model)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
@@ -122,7 +121,7 @@ namespace VitalChoice.Admin.Controllers
             item = await recipeService.UpdateRecipeAsync(item);
             await recipeService.AttachRecipeToCategoriesAsync(item.Id, model.CategoryIds);
 
-            return item?.Id;
+            return new RecipeManageModel(item);
         }
 
         [HttpPost]

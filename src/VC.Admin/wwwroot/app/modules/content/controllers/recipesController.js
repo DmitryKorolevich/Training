@@ -58,6 +58,7 @@
     function initCategories(rootCategory){
         var categories = [];
         initCategory(rootCategory, categories, 0, true);
+        categories.splice(1,0,new Category({Id: -1, Name: 'Uncategorized'}));
         $scope.categories = categories;
     }
 
@@ -72,7 +73,7 @@
 	    $scope.filter = {
             Name: '',
             CategoryId: null,
-	        Paging: { PageIndex: 1, PageItemCount: 5 }
+	        Paging: { PageIndex: 1, PageItemCount: 100 }
 	    };
         $scope.loaded=false;
 

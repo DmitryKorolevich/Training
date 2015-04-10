@@ -31,6 +31,10 @@ namespace VitalChoice.Validators.ContentManagement
                     .WithMessage(model => model.Url, ValidationMessages.FieldRequired)
                     .Matches(ValidationPatterns.ContentUrlPattern)
                     .WithMessage(model => model.Url, ValidationMessages.FieldContentUrlInvalidFormat);
+
+                RuleFor(model => model.Description)
+                    .NotEmpty()
+                    .WithMessage(model => model.Description, ValidationMessages.FieldRequired);
             }
         }
     }
