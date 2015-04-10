@@ -12,7 +12,9 @@
 	"AngularJS-Toaster": "~0.4.10",
 	"angular-animate": "~1.2.8",
 	"angular-ui-sortable": "~0.13.3",
-	"angular-ui-ace": "~0.2.3"
+	"angular-ui-ace": "~0.2.3",
+	"ngprogress": "~1.0.7",
+	"angular-ladda": "~0.2.2"
   },
   "exportsOverride": {
     "bootstrap": {
