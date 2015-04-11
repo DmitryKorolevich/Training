@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[ContentCategories]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [ContentItemId] INT NULL, 
+    [ContentItemId] INT NOT NULL, 
 	[MasterContentItemId] INT NOT NULL, 
 	[Name] NVARCHAR(250) NOT NULL,	 
     [FileUrl] NVARCHAR(250) NULL, 

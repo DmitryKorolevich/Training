@@ -4,3 +4,9 @@ UPDATE ContentItems
 SET [Description]=''
 ALTER TABLE ContentItems ALTER COLUMN [Description] nvarchar(max) NOT NULL
 END
+
+GO 
+
+UPDATE ContentTypes
+SET Name='Recipe Category'
+WHERE Id=1

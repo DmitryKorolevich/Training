@@ -84,12 +84,6 @@ namespace VitalChoice.Business.Services.Impl.Content
                     ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
             }
 
-            //Try load parent templates if needed
-            if(category.ContentItem==null)
-            {
-                category = await TryLoadParentTemplate(category);
-            }
-
             if (category.ContentItem == null)
             {
                 _logger.LogError("The category {0} have no template", categoryUrl);

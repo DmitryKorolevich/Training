@@ -18,16 +18,17 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
+        private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
         public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
         {
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
+            this.contentTypeRepository = contentTypeRepository;
             logger = LoggerService.GetDefault();
         }
 
@@ -105,14 +106,14 @@ namespace VitalChoice.Business.Services.Impl.Content
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
-                    var parentCategory = (await contentCategoryRepository.Query(p => p.Id == dbItem.ParentId).SelectAsync(false)).FirstOrDefault();
-                    if(parentCategory!=null)
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)dbItem.Type).SelectAsync(false)).FirstOrDefault();
+                    if(contentType != null && contentType.DefaultMasterContentItemId.HasValue)
                     {
-                        model.MasterContentItemId = parentCategory.MasterContentItemId;
+                        model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                     }
                     else
                     {
-                        throw new Exception("The root category for the given content type isn't configurated. Please contact support.");
+                        throw new Exception("The default master template isn't confugurated. Please contact support.");
                     }
                 }
             }

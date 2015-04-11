@@ -30,7 +30,7 @@
         //Should be loaded with loockups and basic settings on app opening
 	    $scope.types = [
             { Id: null, Name: 'All' },
-            { Id: 1, Name: 'Category' },
+            { Id: 1, Name: 'Recipe Category' },
             { Id: 2, Name: 'Recipe' },
 	    ];
 
