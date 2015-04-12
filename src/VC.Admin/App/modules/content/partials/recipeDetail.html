@@ -49,7 +49,7 @@
                                                         <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
                                                     </span>
                                                 </div>
-                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="descriptionExpanded">
+                                                <div class="toogle-editor" data-ng-show="descriptionExpanded">
                                                     <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a> 
                                                 </div>
                                                 <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
@@ -125,12 +125,12 @@
 					<tab heading="Template">
 						<div class="container container-left">
 							<div class="well row">
-                                <button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
-                                          <span class="legend">Manage Template</span>
+								<button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
+								<span class="legend">Manage Template</span>
 
-                                        <div class="form-group">
-                                            <div class="col-md-12">
-                                                <div data-ng-model="recipe.Template" ui-ace="{
+								<div class="form-group">
+									<div class="col-md-12">
+										<div data-ng-model="recipe.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
@@ -142,9 +142,9 @@
 				                                onLoad: aceLoaded,
 				                                onChange: aceChanged
 		                                }">
-                                                </div>
-                                            </div>
-                                </form>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</tab>
