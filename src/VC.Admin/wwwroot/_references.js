@@ -1435,3 +1435,4 @@
 /// <reference path="lib/spin.js/spin.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
+/// <reference path="../app/core/utils/ace/worker-ttl.js" />

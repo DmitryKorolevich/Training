@@ -15,17 +15,7 @@
         }
     </style>
     <script type="text/javascript">
-        function htmlEncode(html) {
-            return document.createElement('a').appendChild(
-                document.createTextNode(html)).parentNode.innerHTML;
-        };
-
-        function htmlDecode(html) {
-            var a = document.createElement('a'); a.innerHTML = html;
-            return a.textContent;
-        };
         function SetAceTextToSubmit() {
-            var editor = ace.edit("editor");
             var code = editor.session.getValue();
             $("#template").val(code);
             return true;
@@ -47,14 +37,16 @@
 <div>
     <pre id="editor">@Model.Template</pre>
     <script>
-        ace.require("ace/ext/language_tools");
-        var editor = ace.edit("editor");
-        editor.session.setMode("ace/mode/ttl");
-        editor.setTheme("ace/theme/cobalt");
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: true
+        $(document).ready(function() {
+            ace.require("ace/ext/language_tools");
+            var editor = ace.edit("editor");
+            editor.session.setMode("ace/mode/ttl");
+            editor.setTheme("ace/theme/cobalt");
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableSnippets: true,
+                enableLiveAutocompletion: true
+            });
         });
     </script>
 </div>
