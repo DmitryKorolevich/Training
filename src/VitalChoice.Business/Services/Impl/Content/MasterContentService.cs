@@ -91,7 +91,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id).SelectAnyAsync();
+                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (nameDublicatesExist)
                 {
                     throw new AppValidationException("Name","Master content item with the same name is already exist.");

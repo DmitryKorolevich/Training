@@ -104,7 +104,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id).SelectAnyAsync();
+                var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
                     throw new AppValidationException("Url","Recipe with the same URL already exists, please use a unique URL.");

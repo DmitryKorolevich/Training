@@ -156,7 +156,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != dbItem.Id).SelectAnyAsync();
+                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != dbItem.Id
+                    && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
                     throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
