@@ -60,12 +60,7 @@
     }
 
     $scope.open = function (id) {
-        if (id) {
-            $state.go('index.oneCol.recipeDetail', { id: id });
-        }
-        else {
-            $state.go('index.oneCol.addNewRecipe');
-        }
+        $state.go('index.oneCol.recipeCategoryDetail', { id: id });
     };
 
     $scope.add = function(id)
