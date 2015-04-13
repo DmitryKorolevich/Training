@@ -95,6 +95,7 @@ namespace VitalChoice.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeItemListFilter filter)
         {
+            logger.LogError("TEEEEEST!");
             var result = await recipeService.GetRecipesAsync(filter.Name,filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var toReturn = new PagedModelList<RecipeListItemModel>
             {
