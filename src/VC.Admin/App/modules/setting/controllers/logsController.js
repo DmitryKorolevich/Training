@@ -1,12 +1,42 @@
 ﻿angular.module('app.modules.setting.controllers.logsController', [])
 .controller('logsController', ['$scope', '$state', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, settingService, toaster, modalUtil, confirmUtil) {
 
+    function Filter() {
+        var self = this;
+
+        self.Message = '';          
+        self.Source = '';                          
+        self.LogLevel = null;
+        var currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        self.ToDateObject = new DateObject(currentDate.shiftDate('+1d'));
+        self.FromDateObject = new DateObject(currentDate.shiftDate('-1m'));
+        self.Paging = { PageIndex: 1, PageItemCount: 100 };
+    }
+
+    Filter.prototype.clean = function () {
+        var tClean = Object.clone(this);
+
+        tClean.To = null;
+        if (tClean.ToDateObject.Date)
+            tClean.To = tClean.ToDateObject.Date.toServerDateTime();
+
+        tClean.From = null;
+        if (tClean.FromDateObject.Date)
+            tClean.From = tClean.FromDateObject.Date.toServerDateTime();
+
+        delete tClean.ToDateObject;
+        delete tClean.FromDateObject;
+        delete tClean.clean;
+        return tClean;
+    };
+
     function errorHandler(result) {
         toaster.pop('error', "Error!", "Server error occured");
     };
 
     function refreshLogs() {
-        settingService.getLogItems($scope.filter)
+        settingService.getLogItems($scope.filter.clean())
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.logs = result.Data.Items;
@@ -42,18 +72,8 @@
             Id: 'Debug', Name: 'Debug'
         },
         ];
-
-        var currentDate = new Date();
-        var dateFormat = '{yyyy}-{MM}-{DD}';
         
-	    $scope.filter = {
-	        Message: '',               
-	        Source: '',                          
-	        LogLevel: null,    
-	        To: new Date((new Date(currentDate)).setDate(currentDate.getDate() + 1)).format(dateFormat),
-	        From: new Date((new Date(currentDate)).setDate(currentDate.getDate() - 30)).format(dateFormat),
-	        Paging: { PageIndex: 1, PageItemCount: 100 }
-	    };
+        $scope.filter = new Filter();
         $scope.loaded=false;
 
 		refreshLogs();
@@ -68,8 +88,9 @@
 	    refreshLogs();
 	};
 
-	$scope.open = function (data) {
-        
+	$scope.open = function (item) {
+	    modalUtil.open('app/modules/setting/partials/logDetails.html', 'logDetailsController', {
+	        item: item });
 	};
 
 	initialize();

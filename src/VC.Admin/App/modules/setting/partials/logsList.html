@@ -5,6 +5,22 @@
             <div class="col-md-3">
                 <select class="form-control" data-ng-model="filter.LogLevel" ng-options="logLevel.Id as logLevel.Name for logLevel in logLevels"></select>
             </div>
+            <div class="col-md-3">
+                <p class="input-group">
+                    <input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.FromDateObject.Date" is-open="filter.FromDateObject.Opened" datepicker-options="dateOptions" ng-required="true" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="filter.FromDateObject.openDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="input-group">
+                    <input type="text" name="test" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="filter.ToDateObject.Date" is-open="filter.ToDateObject.Opened" datepicker-options="dateOptions" ng-required="true" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="filter.ToDateObject.openDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
         </div>
         <div class="row form-group">
             <div class="col-md-3">
@@ -37,7 +53,7 @@
                     <td>{{log.Source}}</td>
                     <td>{{log.ShortMessage}}</td>
                     <td>
-                        <button class="btn btn-default btn-success" data-ng-click="open(log.Message);">Show Full Message</button>
+                        <button class="btn btn-default btn-success" data-ng-click="open(log);">Show Details</button>
                     </td>
                 </tr>
             </tbody>

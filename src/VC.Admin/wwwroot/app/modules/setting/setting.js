@@ -2,6 +2,7 @@
 
 angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.logsController',
+	'app.modules.setting.controllers.logDetailsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

@@ -34,10 +34,36 @@ h2 {
 .centered-text {
   text-align: center;
 }
+.angular-ui-tree-placeholder {
+  border: 2px dashed #717171;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.angular-ui-tree-nodes .angular-ui-tree-nodes {
+  padding-left: 40px;
+}
+.angular-ui-tree-handle .ya-treview-buttons {
+  display: none;
+  float: left;
+  margin-left: 20px;
+}
+.angular-ui-tree-handle:hover .ya-treview-buttons,
+.angular-ui-tree-handle:active .ya-treview-buttons {
+  display: block;
+}
+.angular-ui-tree-handle .ya-treview-buttons a {
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+.ya-treeview-content .checkbox {
+  float: left;
+  min-width: 400px;
+}
 .ya-treeview {
   padding-left: 10px;
 }
-.ya-treeview a {
+.ya-treeview a.btn-link {
   padding-top: 9px;
   padding-left: 0px;
   margin: 0;
@@ -53,6 +79,8 @@ h2 {
   margin-left: 12px;
 }
 .ya-treeview-content .line {
+  float: left;
+  min-height: 400px;
   position: relative;
   display: block;
   margin-top: 10px;
@@ -161,6 +189,9 @@ hr {
 }
 .margin-right-15px {
   margin-right: 15px;
+}
+.margin-right-8px {
+  margin-right: 8px;
 }
 .custom-navbar-bottom {
   border-radius: 0px 0px 3px  3px;
@@ -273,15 +304,6 @@ button.main-button {
 .ace_editor {
   height: 800px;
 }
-.angular-ui-tree-placeholder {
-  border: 2px dashed #717171;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.angular-ui-tree-nodes .angular-ui-tree-nodes {
-  padding-left: 40px;
-}
 form.submitted select.ng-invalid,
 form.submitted input.ng-invalid,
 form.submitted textarea.ng-invalid {
@@ -293,4 +315,8 @@ form .error-container {
 }
 form .error-container small {
   display: block;
+}
+.toogle-editor {
+  text-align: right;
+  margin-bottom: 10px;
 }

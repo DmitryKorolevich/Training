@@ -1,4 +1,36 @@
-﻿String.prototype.format = function () {
+﻿Object.clone = function (fObj) {
+    if (null == fObj || "object" != typeof fObj)
+        return fObj;
+
+    // Handle Date
+    if (fObj instanceof Date) {
+        var tCopy = new Date();
+        tCopy.setTime(fObj.getTime());
+        return tCopy;
+    }
+
+    // Handle Array
+    if (fObj instanceof Array) {
+        var tCopy = [];
+        for (var tI = 0; tI < fObj.length; tI++) {
+            tCopy[tI] = Object.clone(fObj[tI]);
+        }
+        return tCopy;
+    }
+
+    // Handle Object
+    if (fObj instanceof Object) {
+        var tCopy = {};
+        for (var tAttr in fObj) {
+            if (fObj.hasOwnProperty(tAttr)) tCopy[tAttr] = Object.clone(fObj[tAttr]);
+        }
+        return tCopy;
+    }
+
+    throw new Error("Unable to copy object! Its type isn't supported.");
+}
+
+String.prototype.format = function () {
     return String.format(this, arguments.length == 1 ? arguments[0] : arguments);
 };
 
@@ -57,7 +89,7 @@ if (!('endsWith' in String.prototype))
         return this.length > fChars.length && this.lastIndexOf(fChars) == (this.length - fChars.length)
 };
 
-this.doPlaceDate = function (fString, fDate) {
+Date.doPlaceDate = function (fString, fDate) {
 
     var tResult = fString;
     var tDate = fDate || new Date();
@@ -68,18 +100,106 @@ this.doPlaceDate = function (fString, fDate) {
     tResult = tResult.replace("{yy}", tDate.getYear());
     tResult = tResult.replace("{yyyy}", tDate.getFullYear());
     tResult = tResult.replace("{hh}", tDate.getHours());
-    tResult = tResult.replace("{HH}", (tDate.getHours() < 9 ? '0' + (tDate.getHours() + 1) : (tDate.getHours() + 1)));
-    tResult = tResult.replace("{MN}", (tDate.getMinutes() < 9 ? '0' + (tDate.getMinutes() + 1) : (tDate.getMinutes() + 1)));
+    tResult = tResult.replace("{HH}", (tDate.getHours() < 10 ? '0' + tDate.getHours() : tDate.getHours()));
+    tResult = tResult.replace("{MN}", (tDate.getMinutes() < 10 ? '0' + tDate.getMinutes() : tDate.getMinutes()));
+    tResult = tResult.replace("{SS}", (tDate.getSeconds() < 10 ? '0' + tDate.getSeconds() : tDate.getSeconds()));
     tResult = tResult.replace("{AP}", '');
     //tResult = tResult.replace("{AP}", tDate.getHours() >= 12 ? 'AM' : 'PM');
     return tResult;
 };
 
 String.prototype.doPlaceDate = function (fDate) {
-    return self.doPlaceDate(this, fDate);
+    return Date.doPlaceDate(this, fDate);
 };
 
 if (!('format' in Date.prototype))
     Date.prototype.format = function (fFormat) {
-        return self.doPlaceDate(fFormat, this);
+        return Date.doPlaceDate(fFormat, this);
 };
+
+Date.prototype.toServerDateTime = function () {
+    return Date.doPlaceDate("{yyyy}-{MM}-{DD}T{HH}:{MN}:{SS}.000Z", this);
+};
+
+if (!('shiftDate' in Date.prototype)) {
+    var pModifiers = {
+        'y': function (fDate, fSign, fValue) {
+            var tValue = fValue;
+            switch (fSign) {
+                case '!': break;
+                case '+': tValue = fDate.getFullYear() + fValue; break;
+                case '-': tValue = fDate.getFullYear() - fValue; break;
+                default: throw 'UNKNOWN DATE SIGN FOR MODIFIER `Y`'
+            }
+            fDate.setFullYear(tValue);
+        },
+        'm': function (fDate, fSign, fValue) {
+            var tValue = fValue;
+            switch (fSign) {
+                case '!': break;
+                case '+': tValue = fDate.getMonth() + fValue; break;
+                case '-': tValue = fDate.getMonth() - fValue; break;
+                default: throw 'UNKNOWN DATE SIGN FOR MODIFIER `M`'
+            }
+            fDate.setMonth(tValue);
+        },
+        'd': function (fDate, fSign, fValue) {
+            var tValue = fValue;
+            switch (fSign) {
+                case '!': break;
+                case '+': tValue = fDate.getDate() + fValue; break;
+                case '-': tValue = fDate.getDate() - fValue; break;
+                default: throw 'UNKNOWN DATE SIGN FOR MODIFIER `D`'
+            }
+            fDate.setDate(tValue);
+        },
+        'h': function (fDate, fSign, fValue) {
+            var tValue = fValue;
+            switch (fSign) {
+                case '!': break;
+                case '+': tValue = fDate.getHours() + fValue; break;
+                case '-': tValue = fDate.getHours() - fValue; break;
+                default: throw 'UNKNOWN DATE SIGN FOR MODIFIER `H`'
+            }
+            fDate.setHours(tValue);
+        }
+    };
+    Date.prototype.shiftDate = function (fRule) {
+        if (!jQuery.isFunction(fRule.split))
+            throw 'WRONG DATE DATE SHIFT RULE!';
+
+        var tItems = fRule.split(/\s/);
+        if (!tItems || tItems.length < 1)
+            throw 'WRONG DATE DATE SHIFT RULE!';
+
+        var tResult = new Date(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds());
+
+        for (var tC = 0; tC < tItems.length; tC++) {
+            var tItem = tItems[tC];
+            if (tItem.length < 3)
+                throw 'WRONG DATE DATE SHIFT RULE!';
+
+            var tSign = tItem.charAt(0);
+            var tModifier = tItem.charAt(tItem.length - 1);
+            var tLength = tItem.substring(1, tItem.length - 1);
+            if (!(tModifier in pModifiers))
+                throw 'WRONG MODIFIER IN DATE SHIFT RULE!';
+
+            pModifiers[tModifier](tResult, tSign, parseInt(tLength));
+        }
+        return tResult;
+    };
+};
+
+function DateObject(fData) {
+    var self = this;
+    self.Date = fData;
+    self.Opened = false;
+};
+
+DateObject.prototype.openDate = function ($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    this.Opened = true;
+};
+
