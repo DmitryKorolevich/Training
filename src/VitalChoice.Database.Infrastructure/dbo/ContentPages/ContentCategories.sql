@@ -7,7 +7,7 @@
     [FileUrl] NVARCHAR(250) NULL, 
     [ParentId] INT NULL, 
     [StatusCode] INT NOT NULL DEFAULT 1, 
-	[Url] NVARCHAR(250) NOT NULL UNIQUE, 
+	[Url] NVARCHAR(250) NOT NULL, 
     [Type] INT NOT NULL, 
     [Order] INT NOT NULL, 
     CONSTRAINT [FK_ContentCategories_ToContentCategory] FOREIGN KEY ([ParentId]) REFERENCES [ContentCategories]([Id]), 

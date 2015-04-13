@@ -86,21 +86,18 @@ namespace VitalChoice.Models.ContentManagement
             toReturn.MasterContentItemId = MasterContentItemId.HasValue ? MasterContentItemId.Value : 0;
             toReturn.ParentId = ParentId;
             toReturn.Type = Type;
-            if (Template != null)
+            toReturn.ContentItem = new ContentItem();
+            toReturn.ContentItem.Template = Template;
+            toReturn.ContentItem.Description = String.Empty;
+            toReturn.ContentItem.Title = Title;
+            toReturn.ContentItem.MetaKeywords = MetaKeywords;
+            toReturn.ContentItem.MetaDescription = MetaDescription;
+            if (ProcessorIds != null)
             {
-                toReturn.ContentItem = new ContentItem();
-                toReturn.ContentItem.Template = Template;
-                toReturn.ContentItem.Description = String.Empty;
-                toReturn.ContentItem.Title = toReturn.Name;
-                toReturn.ContentItem.MetaKeywords = MetaKeywords;
-                toReturn.ContentItem.MetaDescription = MetaDescription;
-                if (ProcessorIds != null)
+                toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
                 {
-                    toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
-                    {
-                        ContentProcessorId = p,
-                    }).ToList();
-                }
+                    ContentProcessorId = p,
+                }).ToList();
             }
 
             return toReturn;

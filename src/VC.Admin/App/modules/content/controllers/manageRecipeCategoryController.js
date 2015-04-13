@@ -25,6 +25,7 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
 			toaster.pop('success', "Success!", "Successfully saved.");
             $scope.id=result.Data;
             $scope.recipeCategory.Id = result.Data;
+            $scope.previewUrl = $scope.baseUrl + $scope.recipeCategory.Url;
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -49,12 +50,18 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
+	    $scope.baseUrl = 'http://dev2.vitalchoice.com:5010/recipes/';
+	    $scope.previewUrl = null;
+
 	    $scope.recipeCategory =
         {
             Name: '',
             Url: '',
             Type: 1,//recipe category
             Template: '@default()',
+            Title: null,
+            MetaKeywords: null,
+            MetaDescription: null,
         };
 	    if ($stateParams.categoryid) {
 	        $scope.recipeCategory.ParentId = $stateParams.categoryid;
@@ -68,6 +75,7 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
                 .success(function (result) {
                     if (result.Success) {
                         $scope.recipeCategory = result.Data;
+                        $scope.previewUrl = $scope.baseUrl + $scope.recipeCategory.Url;
                         $scope.loaded = true;
                     } else {
                         errorHandler(result);

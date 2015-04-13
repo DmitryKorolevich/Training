@@ -59,7 +59,8 @@ namespace VitalChoice.Business.Services.Impl.Content
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
-                category = (await contentCategoryRepository.Query(p => p.Url == categoryUrl && p.Type==type).Include(p => p.MasterContentItem).
+                category = (await contentCategoryRepository.Query(p => p.Url == categoryUrl && p.Type==type &&
+                    p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
                     ThenInclude(p=>p.MasterContentItemToContentProcessors).ThenInclude(p=>p.ContentProcessor).
                     SelectAsync(false)).FirstOrDefault();
             }
@@ -134,7 +135,8 @@ namespace VitalChoice.Business.Services.Impl.Content
             switch(type)
             {
                 case ContentType.Recipe:
-                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl).Include(p => p.MasterContentItem).
+                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode
+                    !=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
                         SelectAsync(false)).FirstOrDefault();
                     break;

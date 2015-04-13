@@ -27,7 +27,6 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             $scope.recipe.Id = result.Data.Id;
             $scope.recipe.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl=$scope.baseUrl+$scope.recipe.Url;
-            $scope.showPreviewUrl = true;
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -59,7 +58,6 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 
         $scope.baseUrl='http://dev2.vitalchoice.com:5010/recipe/';
         $scope.previewUrl = null;
-        $scope.showPreviewUrl = false;
 
         $scope.recipe=
         {
@@ -109,7 +107,6 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 				                if (result.Success) {
 					                $scope.recipe=result.Data;
 					                $scope.previewUrl = $scope.baseUrl + $scope.recipe.Url;
-					                $scope.showPreviewUrl = true;
                                     setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
                                     $scope.loaded=true;
 				                } else {
