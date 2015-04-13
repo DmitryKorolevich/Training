@@ -22,8 +22,6 @@ namespace VitalChoice.Models.ContentManagement
 
         public IEnumerable<CategoryTreeItemModel> SubItems { get; set; }
 
-        public bool IsSelected { get; set; }
-
         public CategoryTreeItemModel(ContentCategory item)
         {
             if(item!=null)
@@ -66,7 +64,7 @@ namespace VitalChoice.Models.ContentManagement
             {
                 foreach(var subItem in SubItems)
                 {
-                    subItems.Add(Convert(toReturn.Id));
+                    subItems.Add(subItem.Convert(toReturn.Id));
                 }
             }
             toReturn.SubCategories = subItems;

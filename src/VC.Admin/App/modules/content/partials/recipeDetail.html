@@ -5,8 +5,12 @@
                 <button class="btn btn-success width-160px" data-ng-click="save()">Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <button class="btn btn-info width-80px">Preview</button>
+                <a target="_blank" href="{{previewUrl}}" data-ng-hide="!previewUrl" class="btn btn-info width-80px">Preview</a>
+                <a data-ng-hide="previewUrl" class="btn btn-info width-80px">Preview</a>
                 <button ui-sref="index.oneCol.manageRecipes" class="btn btn-default width-80px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-success width-160px" ui-sref="index.oneCol.manageRecipes">Manage All</button>
             </div>
 		</div> 
 	</div>
@@ -32,10 +36,10 @@
                                         <div class="form-group">
                                             <label for="url" class="col-md-3 control-label">URL</label>
                                             <div class="col-md-9">
-                                                <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]+[A-Za-z0-9_-]{3}$/' required>
+                                                <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                 <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Url.$invalid">
-                                                    <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
                                                     <small class="error" ng-show="forms.recipeForm.Url.$error.required">URL is required</small>
+                                                    <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
                                                     <small class="error" ng-show="forms.recipeForm.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
                                                 </div>
                                             </div>
@@ -49,7 +53,7 @@
                                                         <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
                                                     </span>
                                                 </div>
-                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="descriptionExpanded">
+                                                <div class="toogle-editor" data-ng-show="descriptionExpanded">
                                                     <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a> 
                                                 </div>
                                                 <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
@@ -87,6 +91,7 @@
 						<div class="container container-left">
 							<div class="well row">
 								<span class="legend">Categories</span>
+                                <button class="btn btn-info width-160px margin-bottom-10px" ui-sref="index.oneCol.manageRecipeCategories({mode:'edit', id: id})">Manage Categories</button>
                                 <div ui-tree data-drag-enabled="false" class="ya-treeview">
                                     <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
                                         <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
@@ -126,11 +131,11 @@
 						<div class="container container-left">
 							<div class="well row">
                                 <button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
-                                          <span class="legend">Manage Template</span>
+                                <span class="legend">Manage Template</span>
 
-                                        <div class="form-group">
-                                            <div class="col-md-12">
-                                                <div data-ng-model="recipe.Template" ui-ace="{
+								<div class="form-group">
+									<div class="col-md-12">
+										<div data-ng-model="recipe.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
@@ -142,9 +147,9 @@
 				                                onLoad: aceLoaded,
 				                                onChange: aceChanged
 		                                }">
-                                                </div>
-                                            </div>
-                                </form>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</tab>

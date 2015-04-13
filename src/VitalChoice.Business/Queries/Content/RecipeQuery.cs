@@ -42,6 +42,10 @@ namespace VitalChoice.Business.Queries.Content
                     Or(x => x.Id == id);
                 }
             }
+            else
+            {
+                And(x => 1 != 1);
+            }
             return this;
         }
 

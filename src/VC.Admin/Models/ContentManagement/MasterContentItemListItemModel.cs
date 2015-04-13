@@ -15,7 +15,11 @@ namespace VitalChoice.Models.ContentManagement
 
 	    public ContentType Type { get; set; }
 
-	    public DateTime Created { get; set; }
+        public string TypeName { get; set; }
+
+        public bool IsDefault { get; set; }
+
+        public DateTime Created { get; set; }
 
         public DateTime Updated { get; set; }
 
@@ -28,6 +32,14 @@ namespace VitalChoice.Models.ContentManagement
                 Id = item.Id;
                 Name = item.Name;
                 Type = (ContentType)item.TypeId;
+                if(item.Type!=null)
+                {
+                    TypeName = item.Type.Name;
+                    if (item.Type.DefaultMasterContentItemId == item.Id)
+                    {
+                        IsDefault = true;
+                    }
+                }
                 Created = item.Created;
                 Updated = item.Updated;
                 StatusCode = item.StatusCode;

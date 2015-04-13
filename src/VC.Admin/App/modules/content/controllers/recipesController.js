@@ -7,8 +7,8 @@
         if (!root) {
             self.Id = data.Id;
             var namePrefix = '';
-            for (var i = 0; i <= level; i++) {
-                namePrefix += '--';
+            for (var i = 2; i <= level; i++) {
+                namePrefix += '----';
             }
             self.Name = namePrefix + data.Name;
         }
@@ -41,7 +41,7 @@
 	};
 
     function loadCategories(){
-        contentService.getCategoriesTree({ Type : 2})//recipes
+        contentService.getCategoriesTree({ Type : 1})//recipe categories
 			.success(function (result) {
 			    if (result.Success) {
 			        initCategories(result.Data);

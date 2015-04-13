@@ -41,16 +41,17 @@ namespace VitalChoice.Business.Services.Impl.Content
         public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
         {
             RecipeQuery query = new RecipeQuery();
+            List<int> ids = null;
             if(categoryId.HasValue)
             {
                 if (categoryId.Value != -1)
                 {
-                    var ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                    ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
                     query = query.WithIds(ids);
                 }
                 else
                 {
-                    var ids = (await recipeToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.RecipeId).Distinct().ToList();
+                    ids = (await recipeToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.RecipeId).Distinct().ToList();
                     query = query.NotWithIds(ids);
                 }
             }
@@ -77,6 +78,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem = new Recipe();
                 dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.ContentItem = new ContentItem();
+                dbItem.ContentItem.Created = DateTime.Now;
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
@@ -102,7 +104,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id).SelectAnyAsync();
+                var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
                     throw new AppValidationException("Url","Recipe with the same URL already exists, please use a unique URL.");
@@ -111,6 +114,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
+                dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;
                 dbItem.ContentItem.Title = model.ContentItem.Title;
@@ -137,7 +141,7 @@ namespace VitalChoice.Business.Services.Impl.Content
             var dbItem = (await recipeRepository.Query(p => p.Id == id).Include(p=>p.RecipesToContentCategories).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.Recipe && p.StatusCode != RecordStatusCode.Deleted).
+                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.RecipeCategory && p.StatusCode != RecordStatusCode.Deleted).
                                  SelectAsync(false)).ToList();
 
                 List<int> forDelete = new List<int>();

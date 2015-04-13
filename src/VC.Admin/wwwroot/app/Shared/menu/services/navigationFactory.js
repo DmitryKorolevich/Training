@@ -56,7 +56,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'managePages', stateName: 'index.oneCol.managePages', stateLabel: 'Manage Pages' },
 				{ name: 'manageArticles', stateName: 'index.oneCol.manageArticles', stateLabel: 'Manage Articles' },
 				{ name: 'manageRecipes', stateName: 'index.oneCol.manageRecipes', stateLabel: 'Manage Recipes' },
-				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs' }
+				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs' },
+                { name: 'manageMasters', stateName: 'index.oneCol.manageMasters', stateLabel: 'Manage Master Templates' }
 			]
 		},
 		{
@@ -91,7 +92,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Help',
 			subMenu: [
 				{ name: 'submitBug', stateName: 'index.oneCol.submitBug', stateLabel: 'Submit Bug' },
-				{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki' }
+				{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki' },
+				{ name: 'viewLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs' },
 			]
 		}
 	];

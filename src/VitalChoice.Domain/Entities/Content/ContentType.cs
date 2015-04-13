@@ -4,7 +4,7 @@ namespace VitalChoice.Domain.Entities.Content
 {
     public enum ContentType
     {
-        Category= 1,
+        RecipeCategory= 1,
         Recipe = 2,
     }
 }

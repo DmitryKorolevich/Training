@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Impl.Content.ContentProcessors
                 var repository = uof.RepositoryAsync<ContentCategory>();
                 var subCategories = (await repository.Query(p => p.ParentId== categoryId && p.StatusCode == RecordStatusCode.Active).
                     SelectAsync(false)).ToList();
-                model.Categories = subCategories;
+                model.Categories = subCategories.OrderBy(p => p.Order).ToList();
             }
             return model;
         }

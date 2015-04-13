@@ -23,7 +23,9 @@ namespace VitalChoice.Domain.Entities.Content
 
         public virtual ContentItem ContentItem { get; set; }
 
-        public int? ContentItemId { get; set; }
+        public int ContentItemId { get; set; }
+
+        public int Order { get; set; }
 
         public ContentType Type { get; set; }
 

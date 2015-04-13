@@ -18,16 +18,22 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
+        private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory;
+        private readonly IRepositoryAsync<Recipe> recipeRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
         public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository)
         {
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
+            this.contentTypeRepository = contentTypeRepository;
+            this.recipeToContentCategory = recipeToContentCategory;
+            this.recipeRepository = recipeRepository;
             logger = LoggerService.GetDefault();
         }
 
@@ -59,13 +65,15 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             var query = new CategoryQuery().WithType(category.Type).NotDeleted();
             List<ContentCategory> dbCategories = (await contentCategoryRepository.Query(query).SelectAsync()).ToList();
-            
-            foreach(var dbCategory in dbCategories)
+            category.SetSubCategoriesOrder();
+
+            foreach (var dbCategory in dbCategories)
             {
                 ContentCategory uiCategory = FindUICategory(category,dbCategory.Id);
                 if(uiCategory!=null)
                 {
                     dbCategory.ParentId = uiCategory.ParentId;
+                    dbCategory.Order = uiCategory.Order;
                     await contentCategoryRepository.UpdateAsync(dbCategory);
                 }
             }
@@ -92,8 +100,25 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.ParentId = model.ParentId;
                 if(!dbItem.ParentId.HasValue)
                 {
-                    throw new AppValidationException("The root category can't be edited.");
+                    throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
+                else
+                {
+                    var parentExist = await contentCategoryRepository.Query(p => p.Id == dbItem.ParentId.Value && p.Type == model.Type &&
+                        p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
+                    if(!parentExist)
+                    {
+                        throw new AppValidationException("The category with the given parent id doesn't exist.");
+                    }
+
+                    var subCategories = (await contentCategoryRepository.Query(p => p.ParentId == dbItem.ParentId.Value && p.Type == model.Type &&
+                       p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
+                    if (subCategories.Count != 0)
+                    {
+                        dbItem.Order = subCategories.Max(p => p.Order)+1;
+                    }
+                }
+
                 dbItem.Type = model.Type;
                 dbItem.StatusCode = RecordStatusCode.Active;
                 if (model.ContentItem != null)
@@ -105,14 +130,14 @@ namespace VitalChoice.Business.Services.Impl.Content
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
-                    var parentCategory = (await contentCategoryRepository.Query(p => p.Id == dbItem.ParentId).SelectAsync(false)).FirstOrDefault();
-                    if(parentCategory!=null)
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)dbItem.Type).SelectAsync(false)).FirstOrDefault();
+                    if(contentType != null && contentType.DefaultMasterContentItemId.HasValue)
                     {
-                        model.MasterContentItemId = parentCategory.MasterContentItemId;
+                        model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                     }
                     else
                     {
-                        throw new Exception("The root category for the given content type isn't configurated. Please contact support.");
+                        throw new Exception("The default master template isn't confugurated. Please contact support.");
                     }
                 }
             }
@@ -131,16 +156,20 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != dbItem.Id).SelectAnyAsync();
+                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != dbItem.Id
+                    && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
-                    throw new AppValidationException("Category with the same name is already exist.");
+                    throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
                 }
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
-                dbItem.MasterContentItemId = model.MasterContentItemId;
+                if (model.MasterContentItemId != 0)
+                {
+                    dbItem.MasterContentItemId = model.MasterContentItemId;
+                }
                 if (model.ContentItem != null)
                 {
                     dbItem.ContentItem.Created = DateTime.Now;
@@ -172,18 +201,37 @@ namespace VitalChoice.Business.Services.Impl.Content
             if (dbItem != null)
             {
                 //Check sub categories
-                var subCategoriesExist = (await contentCategoryRepository.Query(p => p.ParentId == id).SelectAnyAsync());
+                string message = String.Empty;
+                CategoryQuery query = new CategoryQuery().WithParentId(id).NotDeleted();
+                var subCategoriesExist = (await contentCategoryRepository.Query(query).SelectAnyAsync());
                 if (subCategoriesExist)
                 {
-                    throw new AppValidationException("Category with subcategories can't be deleted.");
+                    message += "Category with subcategories can't be deleted. " + Environment.NewLine;
+                }
+
+                var recipeToContentCategories = (await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
+                RecipeQuery recipeQuery = new RecipeQuery().WithIds(recipeToContentCategories.Select(p=>p.RecipeId).ToList()).NotDeleted();
+                var recipesExist = (await recipeRepository.Query(recipeQuery).SelectAnyAsync());
+                if (recipesExist)
+                {
+                    message += "Category with recipes can't be deleted. " + Environment.NewLine;
+                }
+
+                if (!String.IsNullOrEmpty(message))
+                {
+                    throw new AppValidationException(message);
                 }
 
                 dbItem.StatusCode = RecordStatusCode.Deleted;
                 await contentCategoryRepository.UpdateAsync(dbItem);
 
-                if(dbItem.ContentItemId.HasValue)
+                try
                 {
-                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId.Value);
+                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e.ToString());
                 }
                 toReturn = true;
             }
@@ -195,7 +243,7 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             if (uiRoot.Id == id)
             {
-                if (uiRoot.Parent != null)
+                if (uiRoot.ParentId.HasValue)
                 {
                     return uiRoot;
                 }

@@ -1,7 +1,7 @@
-﻿<div data-ng-show="hasChildren(this)">
-	<a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
-		<i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
-	</a>
+﻿<div data-ng-if="item.SubItems && item.SubItems.length > 0">
+    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    </a>
 </div>
 <div ui-tree-handle class="">
 	<div class="ya-treeview-content clearfix">

@@ -59,7 +59,8 @@ namespace VitalChoice.Business.Services.Impl.Content
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
-                category = (await contentCategoryRepository.Query(p => p.Url == categoryUrl && p.Type==type).Include(p => p.MasterContentItem).
+                category = (await contentCategoryRepository.Query(p => p.Url == categoryUrl && p.Type==type &&
+                    p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
                     ThenInclude(p=>p.MasterContentItemToContentProcessors).ThenInclude(p=>p.ContentProcessor).
                     SelectAsync(false)).FirstOrDefault();
             }
@@ -76,19 +77,12 @@ namespace VitalChoice.Business.Services.Impl.Content
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
                 return null;
             }
-            if (category.ContentItemId.HasValue)
-            {
-                //Added this to prevent possible closure edit in multi-threaded requests
-                var queryParamCategory = category;
-                category.ContentItem = (await contentItemRepository.Query(p => p.Id == queryParamCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
-                    ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-            }
 
-            //Try load parent templates if needed
-            if(category.ContentItem==null)
-            {
-                category = await TryLoadParentTemplate(category);
-            }
+            //Added this to prevent possible closure edit in multi-threaded requests
+            var queryParamCategory = category;
+            category.ContentItem = (await contentItemRepository.Query(p => p.Id == queryParamCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
+                ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+
 
             if (category.ContentItem == null)
             {
@@ -141,7 +135,8 @@ namespace VitalChoice.Business.Services.Impl.Content
             switch(type)
             {
                 case ContentType.Recipe:
-                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl).Include(p => p.MasterContentItem).
+                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode
+                    !=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
                         SelectAsync(false)).FirstOrDefault();
                     break;

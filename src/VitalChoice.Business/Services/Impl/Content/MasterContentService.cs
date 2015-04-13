@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             var query = new MasterContentItemQuery();
             query = query.WithType(type).NotDeleted().WithStatus(status);
-            var toReturn = (await masterContentItemRepository.Query(query).SelectAsync(false)).ToList();
+            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).SelectAsync(false)).ToList();
             return toReturn;
         }
 
@@ -74,6 +74,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.TypeId = model.Type.Id;
                 dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.MasterContentItemToContentProcessors = new List<MasterContentItemToContentProcessor>();
+                dbItem.Created = DateTime.Now;
             }
             else
             {
@@ -90,7 +91,8 @@ namespace VitalChoice.Business.Services.Impl.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id).SelectAnyAsync();
+                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (nameDublicatesExist)
                 {
                     throw new AppValidationException("Name","Master content item with the same name is already exist.");
@@ -98,6 +100,7 @@ namespace VitalChoice.Business.Services.Impl.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
+                dbItem.Updated = DateTime.Now;
 
                 if (model.Id == 0)
                 {

@@ -26,6 +26,13 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
+        public CategoryQuery WithParentId(int id)
+        {
+            Add(x => x.ParentId.Equals(id));
+
+            return this;
+        }
+
         public CategoryQuery NotDeleted()
         {
             Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));

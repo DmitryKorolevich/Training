@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Services.Impl.Content.ContentProcessors
             {
                 //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
                 var repository = uof.RepositoryAsync<ContentCategory>();
-                List<ContentCategory> recipeCategories = (await repository.Query(p => p.Type == ContentType.Recipe && p.StatusCode == RecordStatusCode.Active).
+                List<ContentCategory> recipeCategories = (await repository.Query(p => p.Type == ContentType.RecipeCategory && p.StatusCode == RecordStatusCode.Active).
                     SelectAsync(false)).ToList();
 
                 ContentCategory rootCategory = recipeCategories.FirstOrDefault(p => !p.ParentId.HasValue);

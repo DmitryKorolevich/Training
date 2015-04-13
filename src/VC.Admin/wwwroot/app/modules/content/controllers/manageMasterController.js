@@ -22,7 +22,8 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
             $scope.id=result.Data;
-            $scope.master.Id=result.Data;
+            $scope.master.Id = result.Data;
+            $scope.IsDefaultInDB=$scope.master.IsDefault;
 		} else {
             var messages="";
             if(result.Messages)
@@ -34,7 +35,7 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
     	    toaster.pop('error', "Error!", messages,null,'trustedHtml');
 		}
 	};
-
+    
 	function errorHandler(result) {
 		toaster.pop('error', "Error!", "Server error occured");
 	};
@@ -68,6 +69,7 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
                 .success(function (result) {
                     if (result.Success) {
                         $scope.master = result.Data;
+                        $scope.IsDefaultInDB=$scope.master.IsDefault;
                         setProcessors($scope.master.ProcessorIds);
                         $scope.loaded = true;
                     } else {

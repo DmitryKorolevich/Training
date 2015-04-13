@@ -2,33 +2,6 @@
 
 angular.module('app.modules.demo.controllers.manageRecipesController', [])
 .controller('manageRecipesController', ['$scope', function ($scope) {
-/*Ace Editor*/
-	$scope.editorModel = '@*----Output top misc----*@\n' +
-		'<div style="width:1000px; margin:auto auto;">\n' +
-		'<img src="http://www.vitalchoice.com/shop/pc/catalog/kitchen_portal/in-the-kitchen-header-4-24-14a.png" width="955" height="90">\n' +
-		'</div>\n' +
-		'<%\n' +
-		'<body:body>\n' +
-		'{{\n' +
-		'<strong>This is individual body</strong>\n' +
-		'}}\n' +
-		'<left:left>\n' +
-		'{{\n' +
-		'@left()\n' +
-		'{{\n' +
-		'<strong>This is individual left</strong>\n' +
-		'}}\n' +
-		'}}\n' +
-		'<right:right>\n' +
-		'{{\n' +
-		'@right()\n' +
-		'{{\n' +
-		'<strong>This is individual right</strong>\n' +
-		'}}\n' +
-		'}}\n' +
-		'%>\n' +
-		'@default()';
-
 
 /*Categories*/
 	$scope.toggle = function(scope) {
@@ -233,4 +206,12 @@ angular.module('app.modules.demo.controllers.manageRecipesController', [])
 			]
 		}
 	];
+
+	$scope.testEdit = function() {
+		alert("Test Edit handler");
+	};
+
+	$scope.testDelete = function () {
+		alert("Test Delete handler");
+	};
 }]);

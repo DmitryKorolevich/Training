@@ -10,6 +10,8 @@ namespace VitalChoice.Domain.Entities.Logs
 
 		public string Source { get; set; }
 
-		public string Message { get; set; }
+        public string ShortMessage { get; set; }
+
+        public string Message { get; set; }
 	}
 }

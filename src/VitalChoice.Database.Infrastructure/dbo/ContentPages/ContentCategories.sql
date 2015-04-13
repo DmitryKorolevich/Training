@@ -1,14 +1,15 @@
 ﻿CREATE TABLE [dbo].[ContentCategories]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [ContentItemId] INT NULL, 
+    [ContentItemId] INT NOT NULL, 
 	[MasterContentItemId] INT NOT NULL, 
 	[Name] NVARCHAR(250) NOT NULL,	 
     [FileUrl] NVARCHAR(250) NULL, 
     [ParentId] INT NULL, 
     [StatusCode] INT NOT NULL DEFAULT 1, 
-	[Url] NVARCHAR(250) NOT NULL UNIQUE, 
+	[Url] NVARCHAR(250) NOT NULL, 
     [Type] INT NOT NULL, 
+    [Order] INT NOT NULL, 
     CONSTRAINT [FK_ContentCategories_ToContentCategory] FOREIGN KEY ([ParentId]) REFERENCES [ContentCategories]([Id]), 
     CONSTRAINT [FK_ContentCategories_ToMasterContentItem] FOREIGN KEY ([MasterContentItemId]) REFERENCES [MasterContentItems]([Id]),
     CONSTRAINT [FK_ContentCategories_ToContentItem] FOREIGN KEY ([ContentItemId]) REFERENCES [ContentItems]([Id]),

@@ -17,12 +17,30 @@ namespace VitalChoice.Business.Services.Impl.Content
                 {
                     subCategory.Parent = root;
                 }
-                root.SubCategories = subCategories.ToList();
+                root.SubCategories = subCategories.OrderBy(p=>p.Order).ToList();
             }
 
             foreach (var subCategory in root.SubCategories)
             {
                 CreateSubCategoriesList(subCategory, heapCategories);
+            }
+        }
+
+        internal static void SetSubCategoriesOrder(this ContentCategory root)
+        {
+            if (root.SubCategories != null)
+            {
+                var subCategories = root.SubCategories.ToList();
+                for (int i=0;i< subCategories.Count; i++)
+                {
+                    subCategories[i].Order = i;
+                }
+                root.SubCategories = subCategories;
+            }
+
+            foreach (var subCategory in root.SubCategories)
+            {
+                SetSubCategoriesOrder(subCategory);
             }
         }
     }
