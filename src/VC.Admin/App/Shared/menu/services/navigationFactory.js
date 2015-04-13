@@ -92,7 +92,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Help',
 			subMenu: [
 				{ name: 'submitBug', stateName: 'index.oneCol.submitBug', stateLabel: 'Submit Bug' },
-				{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki' }
+				{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki' },
+				{ name: 'viewLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs' },
 			]
 		}
 	];

@@ -1435,5 +1435,17 @@
 /// <reference path="lib/spin.js/spin.js" />
 /// <reference path="app/modules/content/controllers/masterscontroller.js" />
 /// <reference path="../App/modules/content/controllers/mastersController.js" />
+/// <reference path="app/modules/content/controllers/managerecipecategorycontroller.js" />
+/// <reference path="app/modules/content/controllers/recipescategorycontroller.js" />
+/// <reference path="../App/modules/content/controllers/manageRecipeCategoryController.js" />
+/// <reference path="../App/modules/content/controllers/recipesCategoryController.js" />
+/// <reference path="../app/core/dataaccess/services/settingservice.js" />
+/// <reference path="../app/modules/setting/content.js" />
+/// <reference path="../app/modules/setting/controllers/recipescontroller.js" />
+/// <reference path="app/core/dataaccess/services/settingservice.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
+/// <reference path="app/modules/setting/setting.js" />
+/// <reference path="app/modules/setting/controllers/logsController.js" />
+/// <reference path="../app/app - copy.js" />
+/// <reference path="app/app.common.js" />

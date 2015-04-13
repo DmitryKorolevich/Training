@@ -41,16 +41,17 @@ namespace VitalChoice.Business.Services.Impl.Content
         public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
         {
             RecipeQuery query = new RecipeQuery();
+            List<int> ids = null;
             if(categoryId.HasValue)
             {
                 if (categoryId.Value != -1)
                 {
-                    var ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                    ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
                     query = query.WithIds(ids);
                 }
                 else
                 {
-                    var ids = (await recipeToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.RecipeId).Distinct().ToList();
+                    ids = (await recipeToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.RecipeId).Distinct().ToList();
                     query = query.NotWithIds(ids);
                 }
             }
@@ -139,7 +140,7 @@ namespace VitalChoice.Business.Services.Impl.Content
             var dbItem = (await recipeRepository.Query(p => p.Id == id).Include(p=>p.RecipesToContentCategories).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.Recipe && p.StatusCode != RecordStatusCode.Deleted).
+                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.RecipeCategory && p.StatusCode != RecordStatusCode.Deleted).
                                  SelectAsync(false)).ToList();
 
                 List<int> forDelete = new List<int>();

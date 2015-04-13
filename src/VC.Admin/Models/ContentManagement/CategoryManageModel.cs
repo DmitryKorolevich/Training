@@ -90,7 +90,8 @@ namespace VitalChoice.Models.ContentManagement
             {
                 toReturn.ContentItem = new ContentItem();
                 toReturn.ContentItem.Template = Template;
-                toReturn.ContentItem.Title = Title;
+                toReturn.ContentItem.Description = String.Empty;
+                toReturn.ContentItem.Title = toReturn.Name;
                 toReturn.ContentItem.MetaKeywords = MetaKeywords;
                 toReturn.ContentItem.MetaDescription = MetaDescription;
                 if (ProcessorIds != null)

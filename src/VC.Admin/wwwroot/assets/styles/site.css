@@ -52,6 +52,18 @@ h2 {
   padding-left: 2px;
   margin-left: 12px;
 }
+.ya-treeview-content .line {
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.ya-treeview-content .line label {
+  min-height: 20px;
+  margin-bottom: 0;
+  font-weight: normal;
+  cursor: pointer;
+}
 .legend {
   display: block;
   width: 100%;
@@ -62,6 +74,9 @@ h2 {
   color: #555555;
   border: 0;
   border-bottom: 1px solid #e5e5e5;
+}
+hr {
+  border-top: 1px solid #e5e5e5;
 }
 .category-status {
   font-size: inherit;
@@ -79,6 +94,9 @@ h2 {
 }
 .table .btn:hover {
   color: #ffffff;
+}
+.btn-right {
+  float: right;
 }
 .left-pane {
   position: absolute;

@@ -23,6 +23,18 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		getCategoriesTree: function(filter) {
 			return $http.post(baseUrl + 'GetCategoriesTree', filter);
 		},
+		updateCategoriesTree: function(model) {
+		    return $http.post(baseUrl + 'UpdateCategoriesTree', model);
+		},
+		getCategory: function (id) {
+		    return $http.get(baseUrl + 'GetCategory/' + id);
+		},
+		updateCategory: function (model) {
+		    return $http.post(baseUrl + 'UpdateCategory', model);
+		},
+		deleteCategory: function (id) {
+		    return $http.post(baseUrl + 'DeleteCategory/'+ id);
+		},
 
         //master templates
         getMasterContentItems: function(filter) {

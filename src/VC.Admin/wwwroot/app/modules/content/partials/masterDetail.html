@@ -5,7 +5,7 @@
                 <button class="btn btn-success width-160px" data-ng-click="save()">Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <button ui-sref="index.oneCol.manageMasters" class="btn btn-default width-80px" data-ng-click="cancel()">Cancel</buttonui-sref=">
+                <button ui-sref="index.oneCol.manageMasters" class="btn btn-default width-80px">Cancel</buttonui-sref=">
             </div>
 		</div> 
 	</div>
@@ -38,7 +38,7 @@
                                             <label for="is_default" class="col-md-3 control-label">Is Default</label>
                                             <div class="col-md-9">
                                                 <div class="checkbox">
-                                                    <label><input type="checkbox" name="IsDefault" placeholder="Is Default" checked="checked" ng-disabled="master.IsDefault && id" data-ng-model="master.IsDefault"/></label>
+                                                    <label><input type="checkbox" name="IsDefault" placeholder="Is Default" checked="checked" ng-disabled="IsDefaultInDB && id" data-ng-model="master.IsDefault"/></label>
                                                 </div>
                                             </div>
                                         </div>

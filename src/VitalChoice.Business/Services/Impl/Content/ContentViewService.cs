@@ -76,13 +76,12 @@ namespace VitalChoice.Business.Services.Impl.Content
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
                 return null;
             }
-            if (category.ContentItemId.HasValue)
-            {
-                //Added this to prevent possible closure edit in multi-threaded requests
-                var queryParamCategory = category;
-                category.ContentItem = (await contentItemRepository.Query(p => p.Id == queryParamCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
-                    ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-            }
+
+            //Added this to prevent possible closure edit in multi-threaded requests
+            var queryParamCategory = category;
+            category.ContentItem = (await contentItemRepository.Query(p => p.Id == queryParamCategory.ContentItemId).Include(p => p.ContentItemToContentProcessors).
+                ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+
 
             if (category.ContentItem == null)
             {

@@ -67,6 +67,8 @@
     <Folder Include="PostDeployment\Scripts" />
     <Folder Include="dbo\ContentPages" />
     <Folder Include="deploy" />
+    <Folder Include="PreDeployment" />
+    <Folder Include="PreDeployment\Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\AspNetRoles.sql" />
@@ -93,6 +95,7 @@
     <Build Include="dbo\ContentPages\ContentTypes.sql" />
     <Build Include="dbo\ContentPages\MasterContentItemsToContentProcessors.sql" />
     <None Include="PostDeployment\Scripts\ContentItems.sql" />
+    <None Include="PreDeployment\Scripts\ContentCategories.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
@@ -105,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
+    <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Infrastructure.refactorlog" />

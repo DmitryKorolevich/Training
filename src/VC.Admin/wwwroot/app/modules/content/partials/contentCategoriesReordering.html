@@ -1,0 +1,19 @@
+﻿<div data-ng-if="item.SubItems && item.SubItems.length > 0">
+    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    </a>
+</div>
+<div ui-tree-handle>
+    <div class="ya-treeview-content clearfix">
+        <div class="line">
+            <label>{{item.Name}}</label>
+            <span data-ng-if="item.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+            <button class="btn btn-default width-80px" data-ng-click="add(item.Id)">Add</button>
+            <button class="btn btn-default width-80px" data-ng-if="!item.SubItems || item.SubItems.length == 0" data-ng-click="delete(item.Id)">Delete</button>
+        </div>
+    </div>
+</div>
+<ol ui-tree-nodes="" data-ng-model="item.SubItems" data-ng-class="{hidden: collapsed}">
+    <li ng-repeat="item in item.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">
+    </li>
+</ol>

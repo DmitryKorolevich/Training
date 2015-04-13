@@ -5,6 +5,8 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.manageRecipeController',
 	'app.modules.content.controllers.mastersController',
 	'app.modules.content.controllers.manageMasterController',
+	'app.modules.content.controllers.recipesCategoryController',
+	'app.modules.content.controllers.manageRecipeCategoryController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -40,6 +42,22 @@ angular.module('app.modules.content', [
 					url: '/content/masters/{id:int}',
 					templateUrl: 'app/modules/content/partials/masterDetail.html',
 					controller: 'manageMasterController'
+				})
+				.state('index.oneCol.manageRecipeCategories', {
+				    url: '/content/recipes/categories',
+				    templateUrl: 'app/modules/content/partials/recipeCategoriesTreeView.html',
+				    controller: 'recipesCategoryController',
+				    params: { mode: 'list', id: null },
+				})
+				.state('index.oneCol.addNewRecipeCategory', {
+				    url: '/content/recipes/categories/add?{categoryid:int}',
+				    templateUrl: 'app/modules/content/partials/recipeCategoryDetail.html',
+				    controller: 'manageRecipeCategoryController'
+				})
+				.state('index.oneCol.recipeCategoryDetail', { 
+				    url: '/content/recipes/categories/{id:int}',
+				    templateUrl: 'app/modules/content/partials/recipeCategoryDetail.html',
+				    controller: 'manageRecipeCategoryController'
 				})
 		}
 ]);

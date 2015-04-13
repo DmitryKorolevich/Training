@@ -26,14 +26,18 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             $scope.id=result.Data.Id;
             $scope.recipe.Id = result.Data.Id;
             $scope.recipe.MasterContentItemId = result.Data.MasterContentItemId;
+            $scope.previewUrl=$scope.baseUrl+$scope.recipe.Url;
+            $scope.showPreviewUrl = true;
 		} else {
             var messages=""; 
             if(result.Messages)
             {
                 $scope.forms.recipeForm.submitted = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
-                $.each(result.Messages, function (index, value) {                    
-                    $scope.forms.recipeForm[value.Field].$setValidity("server", false);
+                $.each(result.Messages, function (index, value) {
+                    if (value.Field) {
+                        $scope.forms.recipeForm[value.Field].$setValidity("server", false);
+                    }
                     messages+=value.Message +"<br />";
                 });
             }
@@ -53,6 +57,10 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 	        $scope[property] = !$scope[property];
 	    };
 
+        $scope.baseUrl='http://dev2.vitalchoice.com:5010/recipe/';
+        $scope.previewUrl = null;
+        $scope.showPreviewUrl = false;
+
         $scope.recipe=
         {
             Name:'',
@@ -69,8 +77,7 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 
         $scope.save = function () {
             $.each($scope.forms.recipeForm, function (index, element) {
-                if (index == 'Url' && element.$name==index)
-                {
+                if (element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });
@@ -91,7 +98,7 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             }
         };
 
-        contentService.getCategoriesTree({Type: 2})//recipes
+	    contentService.getCategoriesTree({ Type: 1 })//recipe categories
 			.success(function (result) {
 				if (result.Success) {
 					$scope.rootCategory=result.Data;
@@ -101,6 +108,8 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.recipe=result.Data;
+					                $scope.previewUrl = $scope.baseUrl + $scope.recipe.Url;
+					                $scope.showPreviewUrl = true;
                                     setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
                                     $scope.loaded=true;
 				                } else {
@@ -124,7 +133,8 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
 			});
 	}
 
-    function setSelected(category , ids){
+	function setSelected(category, ids) {
+	    category.IsSelected = false;
         $.each(ids, function( index, id ) {
             if(category.Id==id)
             {
@@ -145,10 +155,6 @@ angular.module('app.modules.content.controllers.manageRecipeController', [])
             getSelected(value,ids)
         });
     }
-
-	$scope.hasChildren = function (scope) {
-		return scope.childNodesCount() > 0;
-	};
 
 	$scope.deleteAssignedProduct = function(index) {
 		confirmUtil.confirm(function() {
