@@ -12,21 +12,20 @@
     <div ng-if="loaded" class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <tabset>
-                    <tab heading="Details">
-                        <div class="container container-left">
-                            <div class="well row">
-                                <span class="legend">Details</span>
-                                <div ui-tree class="ya-treeview">
-                                    <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
-                                        <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">
-                                        </li>
-                                    </ol>
-                                </div>
-                            </div>
+                <div class="container container-left">
+                    <div class="well row">
+                        <span class="legend">Manage Recipe Categories</span>
+                        <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(rootCategory.Id)">
+                            <i class="glyphicon glyphicon-plus"></i>
+                        </a>
+                        <div ui-tree class="ya-treeview">
+                            <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
+                                <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">
+                                </li>
+                            </ol>
                         </div>
-                    </tab>
-                </tabset>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

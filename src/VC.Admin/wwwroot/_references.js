@@ -1447,9 +1447,7 @@
 /// <reference path="../App/app.common.js" />
 /// <reference path="../App/modules/setting/setting.js" />
 /// <reference path="../App/modules/setting/controllers/logsController.js" />
+/// <reference path="app/modules/setting/controllers/logdetailscontroller.js" />
+/// <reference path="../App/modules/setting/controllers/LogDetailsController.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
-/// <reference path="app/modules/setting/controllers/logscontroller - copy.js" />
-/// <reference path="../app/modules/setting/controllers/addeditusercontroller.js" />
-/// <reference path="app/modules/setting/controllers/addeditusercontroller.js" />
-/// <reference path="app/modules/setting/controllers/logdetailscontroller.js" />
