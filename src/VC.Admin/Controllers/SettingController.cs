@@ -37,7 +37,7 @@ namespace VitalChoice.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedModelList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
-            var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To,
+            var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
                 filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var toReturn = new PagedModelList<LogListItemModel>
             {
