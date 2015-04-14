@@ -159,7 +159,7 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<int?>> UpdateCategory([FromBody]CategoryManageModel model)
+        public async Task<Result<CategoryManageModel>> UpdateCategory([FromBody]CategoryManageModel model)
         {
             var item = ConvertWithValidate(model);
             if (item == null)
@@ -167,7 +167,7 @@ namespace VitalChoice.Admin.Controllers
 
             item = await categoryService.UpdateCategoryAsync(item);
 
-            return item?.Id;
+            return new CategoryManageModel(item);
         }
         
         [HttpPost]

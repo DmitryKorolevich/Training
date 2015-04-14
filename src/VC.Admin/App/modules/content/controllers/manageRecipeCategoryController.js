@@ -23,8 +23,9 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
-            $scope.id=result.Data;
-            $scope.recipeCategory.Id = result.Data;
+            $scope.id=result.Data.Id;
+            $scope.recipeCategory.Id = result.Data.Id;
+            $scope.recipeCategory.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl = $scope.baseUrl + $scope.recipeCategory.Url;
 		} else {
             var messages=""; 
@@ -62,6 +63,7 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,
+            MasterContentItemId: 0,
         };
 	    if ($stateParams.categoryid) {
 	        $scope.recipeCategory.ParentId = $stateParams.categoryid;
@@ -108,6 +110,10 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
 	    } else {
 	        $scope.forms.form.submitted = true;
 	    }
+	};
+
+	$scope.goToMaster = function (id) {
+	    $state.go('index.oneCol.masterDetail', { id: id });
 	};
 
 	initialize();

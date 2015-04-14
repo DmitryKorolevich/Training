@@ -46,32 +46,33 @@ namespace VitalChoice.Models.ContentManagement
 
         public IEnumerable<int> ProcessorIds { get; set; }
 
+        public CategoryManageModel()
+        {
+        }
+
         public CategoryManageModel(ContentCategory item)
         {
-            if (item != null)
+            Id = item.Id;
+            Name = item.Name;
+            Url = item.Url;
+            FileUrl = item.FileUrl;
+            StatusCode = item.StatusCode;
+            ParentId = item.ParentId;
+            MasterContentItemId = item.MasterContentItemId;
+            Type = item.Type;
+            Template = item.ContentItem.Template;
+            Title = item.ContentItem.Title;
+            MetaKeywords = item.ContentItem.MetaKeywords;
+            MetaDescription = item.ContentItem.MetaDescription;
+            Created = item.ContentItem.Created;
+            Updated = item.ContentItem.Updated;
+            if (item.ContentItem.ContentItemToContentProcessors != null)
             {
-                Id = item.Id;
-                Name = item.Name;
-                Url = item.Url;
-                FileUrl = item.FileUrl;
-                StatusCode = item.StatusCode;
-                ParentId = item.ParentId;
-                MasterContentItemId = item.MasterContentItemId;
-                Type = item.Type;
-                Template = item.ContentItem.Template;
-                Title = item.ContentItem.Title;
-                MetaKeywords = item.ContentItem.MetaKeywords;
-                MetaDescription = item.ContentItem.MetaDescription;
-                Created = item.ContentItem.Created;
-                Updated = item.ContentItem.Updated;
-                if (item.ContentItem.ContentItemToContentProcessors != null)
-                {
-                    ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentProcessorId).ToList();
-                }
-                else
-                {
-                    ProcessorIds = new List<int>();
-                }
+                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentProcessorId).ToList();
+            }
+            else
+            {
+                ProcessorIds = new List<int>();
             }
         }
 
