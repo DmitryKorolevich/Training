@@ -1,5 +1,7 @@
 ﻿IF (( SELECT Count(*) AS existFlag FROM sys.columns 
-WHERE [name] = N'Order' AND [object_id] = OBJECT_ID(N'ContentCategories')) = 0)
+WHERE [name] = N'Order' AND [object_id] = OBJECT_ID(N'ContentCategories')) = 0
+AND (SELECT Count(*) AS existFlag FROM sys.columns 
+WHERE [object_id] = OBJECT_ID(N'ContentCategories')) = 1)
 BEGIN
 ALTER TABLE ContentCategories ADD [Order] int NULL
 

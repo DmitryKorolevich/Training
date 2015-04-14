@@ -3,12 +3,14 @@
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
 VALUES
-(1,'Category',NULL)
+(1,'Recipe Category',NULL)
 
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
 VALUES
 (2,'Recipe',NULL)
+
+SET IDENTITY_INSERT MasterContentItems ON
 
 INSERT INTO MasterContentItems
 (Id,Name,Template,TypeId)
@@ -24,6 +26,8 @@ INSERT INTO MasterContentItems
 (Id,Name,Template,TypeId)
 VALUES
 (3,'Recipe master template','Template',2)
+
+SET IDENTITY_INSERT MasterContentItems OFF
 
 UPDATE ContentTypes
 SET DefaultMasterContentItemId=1
@@ -49,44 +53,51 @@ VALUES
 (2,3)
 
 INSERT INTO ContentItems
-(MetaDescription,MetaKeywords,Template,Title)
+(MetaDescription,MetaKeywords,Template,Title,[Description])
 VALUES
-(NULL,NULL,'Recipe categories root template', 'Recipe categories')
+(NULL,NULL,'Recipe categories root template', 'Recipe categories','')
 
 SELECT @contentItemId=@@IDENTITY
 
 INSERT INTO ContentCategories
-(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type)
+(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type, [Order])
 VALUES
-(@contentItemId,1,'Recipes',NULL,2,'root',2)
+(@contentItemId,1,'Recipes',NULL,2,'root',1,0)
 
 SELECT @contentCategoryId=@@IDENTITY
 
 INSERT INTO ContentItems
-(MetaDescription,MetaKeywords,Template,Title)
+(MetaDescription,MetaKeywords,Template,Title, [Description])
 VALUES
-(NULL,NULL,'Recipe sub categories template','Recipe categories')
+(NULL,NULL,'','', '')
 
 SELECT @contentItemId=@@IDENTITY
 
 INSERT INTO ContentCategories
-(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type)
+(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type, [Order])
 VALUES
-(@contentItemId,2,'Wild Salmon',@contentCategoryId,2,'wild-salmon',2)
-
-SELECT @contentCategoryId=@@IDENTITY
-
-INSERT INTO ContentCategories
-(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type)
-VALUES
-(NULL,2,'Salmon Portions & Sides',@contentCategoryId,2,'salmon-portions-and-sides',2)
+(@contentItemId,2,'Wild Salmon',@contentCategoryId,2,'wild-salmon',1,0)
 
 SELECT @contentCategoryId=@@IDENTITY
 
 INSERT INTO ContentItems
-(MetaDescription,MetaKeywords,Template,Title)
+(MetaDescription,MetaKeywords,Template,Title, Description)
 VALUES
-(NULL,NULL,'Data template - Grilled Salmon with Blueberry-Horseradish Glaze', 'Grilled Salmon with Blueberry-Horseradish Glaze')
+(NULL,NULL,'','', '')
+
+SELECT @contentItemId=@@IDENTITY
+
+INSERT INTO ContentCategories
+(ContentItemId,MasterContentItemId,Name,ParentId,StatusCode,Url, Type, [Order])
+VALUES
+(@contentItemId,2,'Salmon Portions & Sides',@contentCategoryId,2,'salmon-portions-and-sides',1,0)
+
+SELECT @contentCategoryId=@@IDENTITY
+
+INSERT INTO ContentItems
+(MetaDescription,MetaKeywords,Template,Title,Description)
+VALUES
+(NULL,NULL,'Data template - Grilled Salmon with Blueberry-Horseradish Glaze', 'Grilled Salmon with Blueberry-Horseradish Glaze','')
 
 SELECT @contentItemId=@@IDENTITY
 
@@ -103,9 +114,9 @@ VALUES
 (@contentCategoryId,@recipeId)
 
 INSERT INTO ContentItems
-(MetaDescription,MetaKeywords,Template,Title)
+(MetaDescription,MetaKeywords,Template,Title, Description)
 VALUES
-(NULL,NULL,'Data template - Cedar Plank Salmon; John’s Fish Marinade', 'Cedar Plank Salmon; John’s Fish Marinade')
+(NULL,NULL,'Data template - Cedar Plank Salmon; John’s Fish Marinade', 'Cedar Plank Salmon; John’s Fish Marinade','')
 
 SELECT @contentItemId=@@IDENTITY
 
