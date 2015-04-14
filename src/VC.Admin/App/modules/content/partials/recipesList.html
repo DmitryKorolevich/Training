@@ -27,6 +27,7 @@
                     <th>Title</th>
                     <th>URL</th>
                     <th>Category</th>
+                    <th>Updated</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@
                     <td>{{recipe.Name}}</td>
                     <td>{{recipe.Url}}</td>
                     <td>{{recipe.Category}}</td>
+                    <td>{{recipe.Updated | date:"MM/dd/yy"}}<br />{{recipe.Updated | date:"h:mm a"}}</td>
                     <td>
                         <button class="btn btn-default btn-success" data-ng-click="open(recipe.Id);">Edit</button>
                         <button class="btn btn-default btn-danger" data-ng-click="delete(recipe.Id);">Delete</button>

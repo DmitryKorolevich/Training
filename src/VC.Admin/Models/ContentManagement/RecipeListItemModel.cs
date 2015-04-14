@@ -18,6 +18,10 @@ namespace VitalChoice.Models.ContentManagement
 
         public string Category { get; set; }
 
+        public DateTime Created { get; set; }
+
+        public DateTime Updated { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public RecipeListItemModel(Recipe item)
@@ -45,6 +49,11 @@ namespace VitalChoice.Models.ContentManagement
                 else
                 {
                     Category=Category.Remove(Category.Length - 2, 2);
+                }
+                if(item.ContentItem!=null)
+                {
+                    Created = item.ContentItem.Created;
+                    Updated = item.ContentItem.Updated;
                 }
             }
         }

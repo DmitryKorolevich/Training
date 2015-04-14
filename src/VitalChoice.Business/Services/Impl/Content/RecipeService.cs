@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 }
             }
             query=query.WithName(name).NotDeleted();
-            var toReturn = await recipeRepository.Query(query).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
+            var toReturn = await recipeRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
                 SelectPageAsync(page,take);
             return toReturn;
         }
