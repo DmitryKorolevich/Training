@@ -96,10 +96,10 @@ namespace VitalChoice.Business.Services.Impl.Content
                 category.MasterContentItemId, category.ContentItem.Id);
             }
             catch (Exception e) {
-                _logger.LogError(e.Message);
+                _logger.LogError(e.ToString());
                 return new ExecutedContentItem
                 {
-                    HTML = (e as TemplateCompileException)?.Errors?.FirstOrDefault()?.Exception?.Message
+                    HTML = (e as TemplateCompileException)?.ToString()
                 };
             }
             dynamic model = new ExpandoObject();
@@ -162,12 +162,11 @@ namespace VitalChoice.Business.Services.Impl.Content
                     contentDataItem.MasterContentItem.Updated,
                     contentDataItem.MasterContentItemId, contentDataItem.ContentItemId);
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
+            catch (Exception e) {
+                _logger.LogError(e.ToString());
                 return new ExecutedContentItem
                 {
-                    HTML = (e as TemplateCompileException)?.Errors?.FirstOrDefault()?.Exception?.Message
+                    HTML = (e as TemplateCompileException)?.ToString()
                 };
             }
             dynamic model = new ExpandoObject();
