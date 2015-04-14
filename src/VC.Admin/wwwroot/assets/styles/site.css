@@ -43,10 +43,14 @@ h2 {
 .angular-ui-tree-nodes .angular-ui-tree-nodes {
   padding-left: 40px;
 }
+.angular-ui-tree-handle:hover {
+  background-color: #EDEDED;
+}
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
-  float: left;
+  float: right;
   margin-left: 20px;
+  margin-right: 10px;
 }
 .angular-ui-tree-handle:hover .ya-treview-buttons,
 .angular-ui-tree-handle:active .ya-treview-buttons {

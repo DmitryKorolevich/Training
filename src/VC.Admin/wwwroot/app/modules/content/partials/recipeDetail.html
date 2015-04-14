@@ -5,12 +5,12 @@
                 <button class="btn btn-success width-160px" data-ng-click="save()">Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <a target="_blank" href="{{previewUrl}}" data-ng-hide="!previewUrl" class="btn btn-info width-80px">Preview</a>
-                <a data-ng-hide="previewUrl" class="btn btn-info width-80px">Preview</a>
+                <a target="_blank" href="{{previewUrl}}" data-ng-if="previewUrl" class="btn btn-info width-80px">Preview</a>
+                <a data-ng-if="!previewUrl" class="btn btn-info width-80px">Preview</a>
                 <button ui-sref="index.oneCol.manageRecipes" class="btn btn-default width-80px">Cancel</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-success width-160px" ui-sref="index.oneCol.manageRecipes">Manage All</button>
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageRecipes">Manage All</button>
             </div>
 		</div> 
 	</div>
