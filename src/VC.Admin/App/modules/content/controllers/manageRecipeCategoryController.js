@@ -19,7 +19,7 @@ angular.module('app.modules.content.controllers.manageRecipeCategoryController',
         });
         return toReturn;
     };
-
+    
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
