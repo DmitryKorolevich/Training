@@ -22,10 +22,6 @@ namespace VitalChoice.Public
 {
 	public class Startup
 	{
-		public Startup(IHostingEnvironment env)
-		{
-        }
-
 		public IConfiguration Configuration { get; set; }
 
 

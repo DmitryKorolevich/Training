@@ -15,33 +15,31 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
 using System.IO;
 using System.Net;
+using Microsoft.Framework.Runtime;
 using VitalChoice.Admin.AppConfig;
 
 namespace VitalChoice
 {
 	public class Startup
 	{
-        public Startup(IHostingEnvironment env)
-        {
-            // Setup configuration sources.
-            var configuration = new Configuration()
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
-
-            var path = PathResolver.ResolveAppRelativePath("config.local.json");
-            if (File.Exists(path))
-            {
-                configuration.AddJsonFile("config.local.json");
-            }
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; set; }
 
 
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			var reg = new DefaultDependencyConfig();
+            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+
+            var configuration = new Configuration(applicationEnvironment.ApplicationBasePath)
+                .AddJsonFile("config.json")
+                .AddEnvironmentVariables();
+
+            var path = PathResolver.ResolveAppRelativePath("config.local.json");
+            if (File.Exists(path)) {
+                configuration.AddJsonFile("config.local.json");
+            }
+            Configuration = configuration;
+
+            var reg = new DefaultDependencyConfig();
 
 			return reg.RegisterInfrastructure(Configuration, services);
 		}
