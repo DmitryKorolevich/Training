@@ -36,7 +36,7 @@ namespace VitalChoice
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
             if (File.Exists(path)) {
                 configuration.AddJsonFile("config.local.json");
-            }
+           }
             Configuration = configuration;
 
             var reg = new DefaultDependencyConfig();

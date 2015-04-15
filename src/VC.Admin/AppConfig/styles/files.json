@@ -10,7 +10,7 @@
 		'lib/nvd3/nv.d3.css',
 		'lib/AngularJS-Toaster/toaster.css',
 		'lib/ngProgress/ngProgress.css',
-		'lib/ladda/ladda.min.css',
+		'lib/ladda/ladda-themeless.min.css',
 		'assets/styles/site.css'
 	]
 }

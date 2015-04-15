@@ -88,6 +88,7 @@ module.exports = function (grunt) {
 				  { expand: true, cwd: 'temp/boostrap/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
 				  { expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/lib/fonts/' },
+				  { expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
                   { expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' }
         		]
         	},
@@ -97,6 +98,7 @@ module.exports = function (grunt) {
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 					{ expand: true, cwd: 'temp/boostrap/minified/', src: ['**'], dest: 'wwwroot/lib/bootstrap/css/' },
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
+					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
 					{ expand: true, cwd: 'app/core/utils/ace/', src: ['**'], dest: 'wwwroot/lib/ace-builds/src-min-noconflict/' }
 		        ]
 	        }
@@ -123,7 +125,7 @@ module.exports = function (grunt) {
     });
 
     // This command registers the default task which will install bower packages into wwwroot/lib
-	grunt.registerTask("default", ["bower:install", "watch"]);
+	grunt.registerTask("default", ["bower:install"]);
 
 	grunt.registerTask("bower-install", ["bower:install"]);
 
