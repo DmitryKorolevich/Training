@@ -1,7 +1,7 @@
 ﻿'use strict';
 
-angular.module('app.modules.content.controllers.manageMasterController', [])
-.controller('manageMasterController', ['$scope','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$stateParams, contentService, toaster, confirmUtil) {
+angular.module('app.modules.content.controllers.masterManageController', [])
+.controller('masterManageController', ['$scope','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$stateParams, contentService, toaster, confirmUtil) {
 
     function Processor(data, ids)
     {
@@ -44,10 +44,15 @@ angular.module('app.modules.content.controllers.manageMasterController', [])
 	    $scope.id = $stateParams.id;
 
         //Should be loaded with loockups and basic settings on app opening
-	    $scope.types = [ 
-            {Id:1, Name: 'Category'},
-            {Id:2, Name: 'Recipe'},
-        ];
+	    $scope.types = [
+	        { Id: 1, Name: 'Recipe Category' },
+	        { Id: 2, Name: 'Recipe' },
+	        { Id: 3, Name: 'Article Category' },
+	        { Id: 4, Name: 'Article' },
+	        { Id: 5, Name: 'FAQ Category' },
+	        { Id: 6, Name: 'FAQ' },
+	        { Id: 7, Name: 'Content' },
+	    ];
         $scope.appProcessors = [
             {Id: 1, Name: 'Recipe root category processor'},
             {Id: 2, Name: 'Recipe sub-categories processor'},

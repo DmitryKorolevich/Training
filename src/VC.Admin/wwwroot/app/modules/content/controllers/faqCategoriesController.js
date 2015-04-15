@@ -1,5 +1,5 @@
-﻿angular.module('app.modules.content.controllers.recipesCategoryController', [])
-.controller('recipesCategoryController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, modalUtil, confirmUtil) {
+﻿angular.module('app.modules.content.controllers.faqCategoriesController', [])
+.controller('faqCategoriesController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, modalUtil, confirmUtil) {
 
     function errorHandler(result) {
         var messages = "";
@@ -12,7 +12,7 @@
     };
 
     function loadCategories() {
-        contentService.getCategoriesTree({ Type: 1 })//recipe categories
+        contentService.getCategoriesTree({ Type: 5 })//faq categories
             .success(function (result) {
                 if (result.Success) {
                     $scope.rootCategory = result.Data;
@@ -54,18 +54,18 @@
         }
         else {
             $.each(category.SubItems, function (index, value) {
-                removeCategory(value, id)
+                removeCategory(value, id);
             });
         }
     }
 
     $scope.open = function (id) {
-        $state.go('index.oneCol.recipeCategoryDetail', { id: id });
+        $state.go('index.oneCol.faqCategoryDetail', { id: id });
     };
 
     $scope.add = function(id)
     {
-        $state.go('index.oneCol.addNewRecipeCategory', { categoryid: id });
+        $state.go('index.oneCol.addNewFaqCategory', { categoryid: id });
     }
 
     $scope.delete = function (id) {
@@ -101,14 +101,14 @@
 
     $scope.cancel = function () {
         if ($scope.mode == 'list') {
-            $state.go('index.oneCol.manageRecipes');
+            $state.go('index.oneCol.manageFaqs');
         }
         if ($scope.mode == 'edit') {
             if ($scope.id) {
-                $state.go('index.oneCol.recipeDetail', { id: $scope.id });
+                $state.go('index.oneCol.faqDetail', { id: $scope.id });
             }
             else {
-                $state.go('index.oneCol.addNewRecipe');
+                $state.go('index.oneCol.addNewFaq');
             }
         }
     };

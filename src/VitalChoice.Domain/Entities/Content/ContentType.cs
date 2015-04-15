@@ -6,5 +6,10 @@ namespace VitalChoice.Domain.Entities.Content
     {
         RecipeCategory= 1,
         Recipe = 2,
+        ArticleCategory = 3,
+        Article = 4,
+        FAQCategory = 5,
+        FAQ = 6,
+        Content = 7,
     }
 }

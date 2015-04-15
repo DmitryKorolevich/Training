@@ -26,17 +26,21 @@ namespace VitalChoice.Admin.Controllers
     {
         private readonly IGeneralContentService generalContentService;
         private readonly IMasterContentService masterContentService;
-        private readonly IRecipeService recipeService;
         private readonly ICategoryService categoryService;
+        private readonly IRecipeService recipeService;
+        private readonly IFAQService faqService;
+        private readonly IArticleService articleService;
         private readonly ILogger logger;
 
-        public ContentController(IGeneralContentService generalContentService, IMasterContentService masterContentService, IRecipeService recipeService,
-            ICategoryService categoryService)
+        public ContentController(IGeneralContentService generalContentService, IMasterContentService masterContentService, ICategoryService categoryService,
+            IRecipeService recipeService, IFAQService faqService, IArticleService articleService)
         {
             this.generalContentService = generalContentService;
             this.masterContentService = masterContentService;
-            this.recipeService = recipeService;
             this.categoryService = categoryService;
+            this.recipeService = recipeService;
+            this.faqService = faqService;
+            this.articleService = articleService;
             this.logger = LoggerService.GetDefault();
         }
 
@@ -90,48 +94,6 @@ namespace VitalChoice.Admin.Controllers
 
         #endregion
 
-        #region Recipes
-
-        [HttpPost]
-        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeItemListFilter filter)
-        {
-            var result = await recipeService.GetRecipesAsync(filter.Name,filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<RecipeListItemModel>
-            {
-                Items = result.Items.Select(p=>new RecipeListItemModel(p)).ToList(),
-                Count= result.Count,
-            };
-
-            return toReturn;
-        }
-
-        [HttpGet]
-        public async Task<Result<RecipeManageModel>> GetRecipe(int id)
-        {
-            return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
-        }
-
-        [HttpPost]
-        public async Task<Result<RecipeManageModel>> UpdateRecipe([FromBody]RecipeManageModel model)
-        {
-            var item = ConvertWithValidate(model);
-            if (item == null)
-                return null;
-            
-            item = await recipeService.UpdateRecipeAsync(item);
-            await recipeService.AttachRecipeToCategoriesAsync(item.Id, model.CategoryIds);
-
-            return new RecipeManageModel(item);
-        }
-
-        [HttpPost]
-        public async Task<Result<bool>> DeleteRecipe(int id)
-        {
-            return await recipeService.DeleteRecipeAsync(id);
-        }
-
-        #endregion
-
         #region Categories
 
         [HttpPost]
@@ -176,6 +138,132 @@ namespace VitalChoice.Admin.Controllers
             return await categoryService.DeleteCategoryAsync(id);
         }
 
+
+        #endregion
+
+        #region Recipes
+
+        [HttpPost]
+        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
+        {
+            var result = await recipeService.GetRecipesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = new PagedModelList<RecipeListItemModel>
+            {
+                Items = result.Items.Select(p => new RecipeListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<RecipeManageModel>> GetRecipe(int id)
+        {
+            return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<RecipeManageModel>> UpdateRecipe([FromBody]RecipeManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
+
+            item = await recipeService.UpdateRecipeAsync(item);
+            await recipeService.AttachRecipeToCategoriesAsync(item.Id, model.CategoryIds);
+
+            return new RecipeManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteRecipe(int id)
+        {
+            return await recipeService.DeleteRecipeAsync(id);
+        }
+
+        #endregion
+
+        #region FAQs
+
+        [HttpPost]
+        public async Task<Result<PagedModelList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
+        {
+            var result = await faqService.GetFAQsAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = new PagedModelList<FAQListItemModel>
+            {
+                Items = result.Items.Select(p => new FAQListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<FAQManageModel>> GetFAQ(int id)
+        {
+            return new FAQManageModel((await faqService.GetFAQAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<FAQManageModel>> UpdateFAQ([FromBody]FAQManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
+
+            item = await faqService.UpdateFAQAsync(item);
+            await faqService.AttachFAQToCategoriesAsync(item.Id, model.CategoryIds);
+
+            return new FAQManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteFAQ(int id)
+        {
+            return await faqService.DeleteFAQAsync(id);
+        }
+
+        #endregion
+
+        #region Recipes
+
+        [HttpPost]
+        public async Task<Result<PagedModelList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
+        {
+            var result = await articleService.GetArticlesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = new PagedModelList<ArticleListItemModel>
+            {
+                Items = result.Items.Select(p => new ArticleListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<ArticleManageModel>> GetArticle(int id)
+        {
+            return new ArticleManageModel((await articleService.GetArticleAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<ArticleManageModel>> UpdateArticle([FromBody]ArticleManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
+
+            item = await articleService.UpdateArticleAsync(item);
+            await articleService.AttachArticleToCategoriesAsync(item.Id, model.CategoryIds);
+
+            return new ArticleManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteArticle(int id)
+        {
+            return await articleService.DeleteArticleAsync(id);
+        }
 
         #endregion
     }

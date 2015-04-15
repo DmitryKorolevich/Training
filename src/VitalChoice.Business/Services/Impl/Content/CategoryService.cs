@@ -21,12 +21,18 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory;
         private readonly IRepositoryAsync<Recipe> recipeRepository;
+        private readonly IRepositoryAsync<FAQToContentCategory> faqToContentCategory;
+        private readonly IRepositoryAsync<FAQ> faqRepository;
+        private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategory;
+        private readonly IRepositoryAsync<Article> articleRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
         public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository)
+            IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository,
+            IRepositoryAsync<FAQToContentCategory> faqToContentCategory, IRepositoryAsync<FAQ> faqRepository,
+            IRepositoryAsync<ArticleToContentCategory> articleToContentCategory, IRepositoryAsync<Article> articleRepository)
         {
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
@@ -34,6 +40,10 @@ namespace VitalChoice.Business.Services.Impl.Content
             this.contentTypeRepository = contentTypeRepository;
             this.recipeToContentCategory = recipeToContentCategory;
             this.recipeRepository = recipeRepository;
+            this.faqToContentCategory = faqToContentCategory;
+            this.faqRepository = faqRepository;
+            this.articleToContentCategory = articleToContentCategory;
+            this.articleRepository = articleRepository;
             logger = LoggerService.GetDefault();
         }
 
@@ -209,12 +219,37 @@ namespace VitalChoice.Business.Services.Impl.Content
                     message += "Category with subcategories can't be deleted. " + Environment.NewLine;
                 }
 
-                var recipeToContentCategories = (await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
-                RecipeQuery recipeQuery = new RecipeQuery().WithIds(recipeToContentCategories.Select(p=>p.RecipeId).ToList()).NotDeleted();
-                var recipesExist = (await recipeRepository.Query(recipeQuery).SelectAnyAsync());
-                if (recipesExist)
+                if (dbItem.Type == ContentType.RecipeCategory)
                 {
-                    message += "Category with recipes can't be deleted. " + Environment.NewLine;
+                    var categories = (await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
+                    RecipeQuery innerQuery = new RecipeQuery().WithIds(categories.Select(p => p.RecipeId).ToList()).NotDeleted();
+                    var exist = (await recipeRepository.Query(innerQuery).SelectAnyAsync());
+                    if (exist)
+                    {
+                        message += "Category with recipes can't be deleted. " + Environment.NewLine;
+                    }
+                }
+
+                if (dbItem.Type == ContentType.ArticleCategory)
+                {
+                    var categories = (await articleToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
+                    ArticleQuery innerQuery = new ArticleQuery().WithIds(categories.Select(p => p.ArticleId).ToList()).NotDeleted();
+                    var exist = (await articleRepository.Query(innerQuery).SelectAnyAsync());
+                    if (exist)
+                    {
+                        message += "Category with articles can't be deleted. " + Environment.NewLine;
+                    }
+                }
+
+                if (dbItem.Type == ContentType.FAQCategory)
+                {
+                    var categories = (await faqToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
+                    FAQQuery innerQuery = new FAQQuery().WithIds(categories.Select(p => p.FAQId).ToList()).NotDeleted();
+                    var exist = (await faqRepository.Query(innerQuery).SelectAnyAsync());
+                    if (exist)
+                    {
+                        message += "Category with faqs can't be deleted. " + Environment.NewLine;
+                    }
                 }
 
                 if (!String.IsNullOrEmpty(message))

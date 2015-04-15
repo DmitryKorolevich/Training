@@ -19,6 +19,34 @@ angular.module('app.core.dataAccess.services.contentService', [])
 			return $http.post(baseUrl + 'DeleteRecipe/'+ id);
 		},
 
+	    //faq
+		getFAQs: function(filter) {
+		    return $http.post(baseUrl + 'GetFAQs', filter);
+		},
+		getFAQ: function (id) {
+		    return $http.get(baseUrl + 'GetFAQ/' + id);
+		},
+		updateFAQ: function(model) {
+		    return $http.post(baseUrl + 'UpdateFAQ', model);
+		},
+		deleteFAQ: function (id) {
+		    return $http.post(baseUrl + 'DeleteFAQ/'+ id);
+		},
+
+	    //articles
+		getArticles: function(filter) {
+		    return $http.post(baseUrl + 'GetArticles', filter);
+		},
+		getArticle: function (id) {
+		    return $http.get(baseUrl + 'GetArticle/' + id);
+		},
+		updateArticle: function(model) {
+		    return $http.post(baseUrl + 'UpdateArticle', model);
+		},
+		deleteArticle: function (id) {
+		    return $http.post(baseUrl + 'DeleteArticle/'+ id);
+		},
+
         //categories
 		getCategoriesTree: function(filter) {
 			return $http.post(baseUrl + 'GetCategoriesTree', filter);

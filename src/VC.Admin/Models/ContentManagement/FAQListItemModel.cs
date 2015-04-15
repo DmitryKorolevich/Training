@@ -1,0 +1,62 @@
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Validation.Models;
+using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Constants;
+
+namespace VitalChoice.Models.ContentManagement
+{
+    public class FAQListItemModel : Model<FAQ, IMode>
+	{
+	    public int Id { get; set; }
+
+	    public string Name { get; set; }
+
+        public string Url { get; set; }
+
+        public string Category { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime Updated { get; set; }
+
+        public RecordStatusCode StatusCode { get; set; }
+
+        public FAQListItemModel(FAQ item)
+        {
+            if(item!=null)
+            {
+                Id = item.Id;
+                Name = item.Name;
+                Url = item.Url;
+                StatusCode = item.StatusCode;
+                if(item.FAQsToContentCategories != null)
+                {
+                    foreach(var FAQsToContentCategory in item.FAQsToContentCategories.OrderBy(p=>p.ContentCategory.Name))
+                    {
+                        if(FAQsToContentCategory.ContentCategory!=null)
+                        {
+                            Category += FAQsToContentCategory.ContentCategory.Name + ", ";
+                        }
+                    }
+                }
+                if(String.IsNullOrEmpty(Category))
+                {
+                    Category = ContentConstants.NO_CATEGORIES_LABEL;
+                }
+                else
+                {
+                    Category=Category.Remove(Category.Length - 2, 2);
+                }
+                if(item.ContentItem!=null)
+                {
+                    Created = item.ContentItem.Created;
+                    Updated = item.ContentItem.Updated;
+                }
+            }
+        }
+    }
+}

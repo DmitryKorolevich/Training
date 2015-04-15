@@ -1,4 +1,8 @@
-﻿DECLARE @contentCategoryId int, @contentItemId int, @recipeId int
+﻿IF((SELECT count(*) FROM ContentTypes
+WHERE Id IN (1,2))!=2)
+BEGIN
+
+DECLARE @contentCategoryId int, @contentItemId int, @recipeId int
 
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
@@ -13,19 +17,19 @@ VALUES
 SET IDENTITY_INSERT MasterContentItems ON
 
 INSERT INTO MasterContentItems
-(Id,Name,Template,TypeId)
+(Id,Name,Template,TypeId,StatusCode)
 VALUES
-(1,'Recipe root categories','Template',1)
+(1,'Recipe root categories','Template',1,2)
 
 INSERT INTO MasterContentItems
-(Id,Name,Template,TypeId)
+(Id,Name,Template,TypeId,StatusCode)
 VALUES
-(2,'Recipe sub categories','Template',1)
+(2,'Recipe sub categories','Template',1,2)
 
 INSERT INTO MasterContentItems
-(Id,Name,Template,TypeId)
+(Id,Name,Template,TypeId,StatusCode)
 VALUES
-(3,'Recipe master template','Template',2)
+(3,'Recipe master template','Template',2,2)
 
 SET IDENTITY_INSERT MasterContentItems OFF
 
@@ -131,3 +135,7 @@ INSERT INTO RecipesToContentCategories
 (ContentCategoryId,RecipeId)
 VALUES
 (@contentCategoryId,@recipeId)
+
+END
+
+GO

@@ -1,25 +1,8 @@
 ﻿'use strict';
 
-angular.module('app.modules.content.controllers.manageRecipeCategoryController', [])
-.controller('manageRecipeCategoryController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, confirmUtil) {
-
-    function ServerMessages(data){
-        var self = this;
-        
-        self.Messages = data;
-    };
-
-    ServerMessages.prototype.GetMessage = function(field) {
-        var toReturn = '';
-        $.each(this.Messages, function (index, message) {
-            if (message.Field == field) {
-                toReturn = message.Message;
-                return false;
-            }
-        });
-        return toReturn;
-    };
-    
+angular.module('app.modules.content.controllers.recipeCategoryManageController', [])
+.controller('recipeCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, confirmUtil) {
+   
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");

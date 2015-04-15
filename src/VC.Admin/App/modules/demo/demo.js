@@ -204,10 +204,6 @@ angular.module('app.modules.demo',
 					templateUrl: 'app/modules/demo/partials/manageRecipes.html',
 					controller: 'manageRecipesController'
 				})
-				.state('index.oneCol.manageFaqs', {
-					url: '/content/manageFaqs',
-					template: '<h2>Manage FAQs</h2>'
-				})
 				/*tools*/
 				.state('index.oneCol.productTaxCodes', {
 					url: '/tools/productTaxCodes',

@@ -98,8 +98,10 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<LogViewService>().As<ILogViewService>();
                 builder.RegisterType<MasterContentService>().As<IMasterContentService>();
                 builder.RegisterType<GeneralContentService>().As<IGeneralContentService>();
-                builder.RegisterType<RecipeService>().As<IRecipeService>();
                 builder.RegisterType<CategoryService>().As<ICategoryService>();
+                builder.RegisterType<RecipeService>().As<IRecipeService>();
+                builder.RegisterType<FAQService>().As<IFAQService>();
+                builder.RegisterType<ArticleService>().As<IArticleService>();
                 builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
                 builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();

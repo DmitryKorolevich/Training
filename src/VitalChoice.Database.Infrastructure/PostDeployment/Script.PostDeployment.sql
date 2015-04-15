@@ -13,7 +13,8 @@ Post-Deployment Script Template
 
 :r .\Scripts\LocalizationItems.sql
 :r .\Scripts\ContentItems.sql
---:r .\Scripts\ContentTestDataDelete.sql
---:r .\Scripts\ContentProcessors.sql
---:r .\Scripts\RecordStatusCodes.sql
---:r .\Scripts\ContentTestDataInsert.sql
+:r .\Scripts\ContentProcessors.sql
+:r .\Scripts\RecordStatusCodes.sql
+:r .\Scripts\ContentTestDataInsert.sql
+:r .\Scripts\FAQs.sql
+:r .\Scripts\Articles.sql

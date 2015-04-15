@@ -5,6 +5,7 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Models.ContentManagement
 {
@@ -44,7 +45,7 @@ namespace VitalChoice.Models.ContentManagement
                 }
                 if(String.IsNullOrEmpty(Category))
                 {
-                    Category = "No Categories";
+                    Category = ContentConstants.NO_CATEGORIES_LABEL;
                 }
                 else
                 {

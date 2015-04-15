@@ -29,7 +29,7 @@ namespace VitalChoice.Admin.Controllers
 		    this.commentService = commentService;
 		    UserManager = userManager;
             SignInManager = signInManager;
-
+            
 			
         }
 

@@ -28,10 +28,15 @@
 
     function initialize() {
         //Should be loaded with loockups and basic settings on app opening
-	    $scope.types = [
+        $scope.types = [
             { Id: null, Name: 'All' },
-            { Id: 1, Name: 'Recipe Category' },
-            { Id: 2, Name: 'Recipe' },
+	        { Id: 1, Name: 'Recipe Category' },
+	        { Id: 2, Name: 'Recipe' },
+	        { Id: 3, Name: 'Article Category' },
+	        { Id: 4, Name: 'Article' },
+	        { Id: 5, Name: 'FAQ Category' },
+	        { Id: 6, Name: 'FAQ' },
+	        { Id: 7, Name: 'Content' },
 	    ];
 
 	    $scope.filter = {

@@ -203,3 +203,20 @@ DateObject.prototype.openDate = function ($event) {
     this.Opened = true;
 };
 
+function ServerMessages(data) {
+    var self = this;
+
+    self.Messages = data;
+};
+
+ServerMessages.prototype.GetMessage = function (field) {
+    var toReturn = '';
+    $.each(this.Messages, function (index, message) {
+        if (message.Field == field) {
+            toReturn = message.Message;
+            return false;
+        }
+    });
+    return toReturn;
+};
+

@@ -26,13 +26,6 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
-        public RecipeQuery WithCategoryId(int categoryId)
-        {
-            And(x => x.RecipesToContentCategories.Select(p=>p.ContentCategoryId).Contains(categoryId));
-
-            return this;
-        }
-
         public RecipeQuery WithIds(List<int> ids)
         {
             if (ids.Count>0)

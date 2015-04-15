@@ -3,7 +3,7 @@ using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Models.ContentManagement
 {
-    public class RecipeItemListFilter : FilterModelBase
+    public class RecipeListFilter : FilterModelBase
     {
 	    public string Name { get; set; }
 

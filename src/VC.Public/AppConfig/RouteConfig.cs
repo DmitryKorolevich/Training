@@ -23,6 +23,38 @@ namespace VitalChoice.Public.AppConfig
                 defaults: new { controller = "Recipe", action = "Recipe" });
 
             routeBuilder.MapRoute(
+                name: "FAQs_Categories",
+                template: "faqs/",
+                defaults: new { controller = "FAQ", action = "Categories" });
+
+            routeBuilder.MapRoute(
+                name: "FAQs_Category",
+                template: "faqs/{url}",
+                defaults: new { controller = "FAQ", action = "Category" });
+
+            routeBuilder.MapRoute(
+                name: "FAQs_FAQ",
+                template: "faq/{url}",
+                defaults: new { controller = "FAQ", action = "FAQ" });
+
+            routeBuilder.MapRoute(
+                name: "Articles_Categories",
+                template: "articles/",
+                defaults: new { controller = "Article", action = "Categories" });
+
+            routeBuilder.MapRoute(
+                name: "Articles_Category",
+                template: "articles/{url}",
+                defaults: new { controller = "Article", action = "Category" });
+
+            routeBuilder.MapRoute(
+                name: "Articles_Article",
+                template: "article/{url}",
+                defaults: new { controller = "Article", action = "Article" });
+
+
+
+            routeBuilder.MapRoute(
                 name: "ContentItem_Edit",
                 template: "recipe/edit/{id}",
                 defaults: new { controller = "Recipe", action = "EditContent" });

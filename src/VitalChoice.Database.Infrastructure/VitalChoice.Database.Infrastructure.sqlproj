@@ -96,6 +96,12 @@
     <Build Include="dbo\ContentPages\MasterContentItemsToContentProcessors.sql" />
     <None Include="PostDeployment\Scripts\ContentItems.sql" />
     <None Include="PreDeployment\Scripts\ContentCategories.sql" />
+    <Build Include="dbo\ContentPages\FAQs.sql" />
+    <Build Include="dbo\ContentPages\Articles.sql" />
+    <Build Include="dbo\ContentPages\FAQsToContentCategories.sql" />
+    <Build Include="dbo\ContentPages\ArticlesToContentCategories.sql" />
+    <None Include="PostDeployment\Scripts\FAQs.sql" />
+    <None Include="PostDeployment\Scripts\Articles.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
