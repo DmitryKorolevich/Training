@@ -1,8 +1,8 @@
 ﻿IF((SELECT count(*) FROM ContentTypes
-WHERE Id IN (5,6,7))!=3)
+WHERE Id IN (5,6))!=2)
 BEGIN
 
-DECLARE @contentCategoryId int, @contentItemId int, @articleId int, @masterRootId int,@masterSubId int,@masterLeafId int,@masterContentId int
+DECLARE @contentCategoryId int, @contentItemId int, @articleId int, @masterRootId int,@masterSubId int,@masterLeafId int
 
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
@@ -13,11 +13,6 @@ INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
 VALUES
 (6,'FAQ',NULL)
-
-INSERT INTO ContentTypes
-(Id,Name,DefaultMasterContentItemId)
-VALUES
-(7,'Content',NULL)
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
@@ -39,13 +34,6 @@ VALUES
 ('FAQ master template','default()',6,2)
 
 SELECT @masterLeafId=@@IDENTITY
-
-INSERT INTO MasterContentItems
-(Name,Template,TypeId,StatusCode)
-VALUES
-('Content master template','default()',7,2)
-
-SELECT @masterContentId=@@IDENTITY
 
 UPDATE ContentTypes
 SET DefaultMasterContentItemId=@masterSubId
