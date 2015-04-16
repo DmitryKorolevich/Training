@@ -15,7 +15,8 @@
 		"angular-ui-ace": "~0.2.3",
 		"ngprogress": "~1.0.7",
 		"angular-ladda": "~0.2.2",
-		"angular-promise-tracker": "~2.1.0"
+		"angular-promise-tracker": "~2.1.0",
+		"css-spinners": "~1.0.3"
 	},
 	"exportsOverride": {
 		"bootstrap": {

@@ -3,6 +3,7 @@
 	"minifiedFileName": "style",
 
 	"files": [
+		'lib/css-spinners/ball.css',
 		'lib/bootstrap/css/bootstrap.css',
 		'lib/font-awesome/font-awesome.css',
 		'lib/textAngular/textAngular.css',

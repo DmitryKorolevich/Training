@@ -440,3 +440,23 @@ form .error-container small {
 .relative {
   position: relative;
 }
+.ball:not(:required) {
+  z-index: 1000;
+  position: fixed;
+  background: #f66e21;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.ball:not(:required)::after {
+  background: #717171;
+}
+.fade.ng-enter {
+  transition: 0.5s linear all;
+  opacity: 0;
+}
+.fade.ng-enter.ng-enter-active {
+  opacity: 1;
+}

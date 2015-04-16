@@ -1,5 +1,8 @@
 ﻿<div class="container-fluid">
-	<div class="row">
+	<div class="ball" data-ng-hide="appStarted">
+		Loading...
+	</div>
+	<div class="row" data-ng-show="appStarted"> <!--data-ng-show="appStarted" data-ng-animate="'animate'"-->
 		<div data-ui-view="topMenu"></div>
 		<div data-ui-view="workingPanel"></div>
 	</div>

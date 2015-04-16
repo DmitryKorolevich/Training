@@ -34,13 +34,8 @@ var app = angular
 //	$scope.$on("$destroy", function () { delete $scope.Model.item; })
 //}])
 	.run([
-		'$rootScope', '$state', '$stateParams', 'ngProgress',
-		function($rootScope, $state, $stateParams, ngProgress) {
-			$rootScope.$state = $state;
-			$rootScope.$stateParams = $stateParams;
-
-			$rootScope.authenticated = true; //temp solution
-
+		'$rootScope', '$state', '$stateParams', 'ngProgress', '$timeout',
+		function($rootScope, $state, $stateParams, ngProgress, $timeout) {
 			$rootScope.$on('$stateChangeStart', function() {
 				ngProgress.start();
 			});
@@ -53,5 +48,18 @@ var app = angular
 			$rootScope.$on('$stateNotFound', function() {
 				ngProgress.complete();
 			});
+
+			function initialize() {
+				$rootScope.$state = $state;
+				$rootScope.$stateParams = $stateParams;
+
+				$rootScope.authenticated = true; //temp solution
+
+				//$timeout(function() { //fake timeout to mimic data loading
+					$rootScope.appStarted = true;
+				//}, 3000);
+			};
+
+			initialize();
 		}
 	]);
