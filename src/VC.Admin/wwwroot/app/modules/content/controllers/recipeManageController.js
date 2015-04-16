@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.recipeManageController', [])
-.controller('recipeManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$state,$stateParams, contentService, toaster, confirmUtil) {
+.controller('recipeManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil','promiseTracker',
+    function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
 
 	function successSaveHandler(result) {
 		if (result.Success) {
@@ -68,7 +71,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.recipe.CategoryIds = categoryIds;
 
-                contentService.updateRecipe($scope.recipe).success(function (result) {
+                contentService.updateRecipe($scope.recipe,$scope.editTracker).success(function (result) {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
@@ -79,13 +82,13 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             }
         };
 
-	    contentService.getCategoriesTree({ Type: 1 })//recipe categories
+	    contentService.getCategoriesTree({ Type: 1 }, $scope.refreshTracker)//recipe categories
 			.success(function (result) {
 				if (result.Success) {
 					$scope.rootCategory=result.Data;
                     if($scope.id)
                     {
-                        contentService.getRecipe($scope.id)
+                        contentService.getRecipe($scope.id, $scope.refreshTracker)
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.recipe=result.Data;

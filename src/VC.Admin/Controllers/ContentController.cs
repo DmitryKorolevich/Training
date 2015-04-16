@@ -225,7 +225,7 @@ namespace VitalChoice.Admin.Controllers
 
         #endregion
 
-        #region Recipes
+        #region Articles
 
         [HttpPost]
         public async Task<Result<PagedModelList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)

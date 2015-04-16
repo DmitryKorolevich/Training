@@ -4,19 +4,27 @@ angular.module('app.core.dataAccess.services.contentService', [])
 .service('contentService', ['$http', function ($http) {
 	var baseUrl = '/Api/Content/';
 
+	function getConfig(tracker) {
+	    var config = {};
+	    if (tracker) {
+	        config.tracker = tracker;
+	    }
+	    return config;
+	};
+
 	return {
         //recipes
-		getRecipes: function(filter) {
-			return $http.post(baseUrl + 'GetRecipes', filter);
+		getRecipes: function(filter,tracker) {
+		    return $http.post(baseUrl + 'GetRecipes', filter, getConfig(tracker));
 		},
-		getRecipe: function (id) {
-			return $http.get(baseUrl + 'GetRecipe/' + id);
+		getRecipe: function (id,tracker) {
+			return $http.get(baseUrl + 'GetRecipe/' + id, getConfig(tracker));
 		},
-		updateRecipe: function(model) {
-			return $http.post(baseUrl + 'UpdateRecipe', model);
+		updateRecipe: function(model,tracker) {
+			return $http.post(baseUrl + 'UpdateRecipe', model, getConfig(tracker));
 		},
-		deleteRecipe: function (id) {
-			return $http.post(baseUrl + 'DeleteRecipe/'+ id);
+		deleteRecipe: function (id,tracker) {
+			return $http.post(baseUrl + 'DeleteRecipe/'+ id, getConfig(tracker));
 		},
 
 	    //faq
@@ -48,8 +56,8 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		},
 
         //categories
-		getCategoriesTree: function(filter) {
-			return $http.post(baseUrl + 'GetCategoriesTree', filter);
+		getCategoriesTree: function(filter,tracker) {
+			return $http.post(baseUrl + 'GetCategoriesTree', filter, getConfig(tracker));
 		},
 		updateCategoriesTree: function(model) {
 		    return $http.post(baseUrl + 'UpdateCategoriesTree', model);

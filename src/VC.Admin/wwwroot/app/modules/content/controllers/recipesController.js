@@ -1,5 +1,8 @@
 ﻿angular.module('app.modules.content.controllers.recipesController', [])
-.controller('recipesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, contentService, toaster, modalUtil, confirmUtil) {
+.controller('recipesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil','promiseTracker',
+    function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+	$scope.refreshTracker = promiseTracker("refresh");
+	$scope.deleteTracker = promiseTracker("delete");
 
     function Category(data,level, root)
     {
@@ -25,7 +28,7 @@
     };
 
     function refreshRecipes() {
-        contentService.getRecipes($scope.filter)
+        contentService.getRecipes($scope.filter,$scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.recipes = result.Data.Items;
@@ -41,7 +44,7 @@
 	};
 
     function loadCategories(){
-        contentService.getCategoriesTree({ Type : 1})//recipe categories
+        contentService.getCategoriesTree({ Type : 1},$scope.refreshTracker)//recipe categories
 			.success(function (result) {
 			    if (result.Success) {
 			        initCategories(result.Data);
@@ -65,7 +68,7 @@
     function initCategory(serviceCategory, categories, level, root) {
         categories.push(new Category(serviceCategory, level, root));
         $.each(serviceCategory.SubItems, function (index, category) {
-            initCategory(category, categories,level+1)
+            initCategory(category, categories, level + 1);
         });
     }
 
@@ -102,7 +105,7 @@
 
 	$scope.delete = function (id) {
 		confirmUtil.confirm(function() {
-		    contentService.deleteRecipe(id)
+		    contentService.deleteRecipe(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
 			            toaster.pop('success', "Success!", "Successfully deleted");

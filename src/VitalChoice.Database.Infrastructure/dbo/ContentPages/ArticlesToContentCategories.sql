@@ -4,7 +4,7 @@
     [ContentCategoryId] INT NOT NULL, 	
     [Id] INT NOT NULL IDENTITY, 
     CONSTRAINT [PK_ArticlesToContentCategories] PRIMARY KEY ([Id]), 
-    CONSTRAINT [FK_ArticlesToContentCategories_Recipes] FOREIGN KEY ([ArticleId]) REFERENCES [Recipes]([Id]) ON DELETE CASCADE, 
+    CONSTRAINT [FK_ArticlesToContentCategories_Articles] FOREIGN KEY ([ArticleId]) REFERENCES [Articles]([Id]) ON DELETE CASCADE, 
     CONSTRAINT [FK_ArticlesToContentCategories_ContentCategories] FOREIGN KEY ([ContentCategoryId]) REFERENCES [ContentCategories]([Id]) ON DELETE CASCADE
 )
 
