@@ -195,10 +195,6 @@ angular.module('app.modules.demo',
 					url: '/content/managePages',
 					template: '<h2>Manage Pages</h2>'
 				})
-				.state('index.oneCol.manageArticles', {
-					url: '/content/manageArticles',
-					template: '<h2>Manage Articles</h2>'
-				})
 				.state('index.oneCol.manageRecipesTemp', { 
 					url: '/content/draggablecategories',
 					templateUrl: 'app/modules/demo/partials/manageRecipes.html',

@@ -191,6 +191,42 @@ if (!('shiftDate' in Date.prototype)) {
     };
 };
 
+Date.parseDate = function (fDateString) {
+   if(!String.isString(fDateString))
+      return fDateString;
+
+   var tYMD = fDateString.split('-');
+
+   if(tYMD.length != 3)
+      return null;
+
+   return new Date(tYMD[0], parseInt(tYMD[1], 10) - 1, tYMD[2], 0, 0, 0);
+};
+
+Date.parseDateTime = function (fDateString, fUTC) {
+   if(!String.isString(fDateString))
+      return fDateString;
+
+   var tParts = (fDateString || '').split('T');
+   if(tParts.length != 2)
+      return null;
+
+   var tTimezonePosition = tParts[1].lastIndexOf('+');
+   if(tTimezonePosition > 0)
+      tParts[1] = tParts[1].substr(0, tTimezonePosition);
+
+   var tYMD = tParts[0].split('-');
+   var tHMS = tParts[1].split(':');
+
+   if(tYMD.length != 3 || tHMS.length != 3)
+      return null;
+
+
+   return fUTC ?
+      new Date(Date.UTC(tYMD[0], parseInt(tYMD[1], 10) - 1, tYMD[2], tHMS[0], tHMS[1], tHMS[2])) :
+      new Date(tYMD[0], parseInt(tYMD[1], 10) - 1, tYMD[2], tHMS[0], tHMS[1], tHMS[2]);
+};
+
 function DateObject(fData) {
     var self = this;
     self.Date = fData;

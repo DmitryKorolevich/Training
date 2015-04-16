@@ -324,3 +324,6 @@ form .error-container small {
   text-align: right;
   margin-bottom: 10px;
 }
+form .form-group p {
+  margin: 0;
+}

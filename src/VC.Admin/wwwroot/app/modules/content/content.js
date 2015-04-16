@@ -11,12 +11,17 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.faqManageController',
 	'app.modules.content.controllers.faqCategoriesController',
 	'app.modules.content.controllers.faqCategoryManageController',
+	'app.modules.content.controllers.articlesController',
+	'app.modules.content.controllers.articleManageController',
+	'app.modules.content.controllers.articleCategoriesController',
+	'app.modules.content.controllers.articleCategoryManageController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
 		function ($stateProvider, $urlRouterProvider) {
 
 		    $stateProvider
+                /*masters*/
 		        .state('index.oneCol.manageMasters', {
 		            url: '/content/masters',
 		            templateUrl: 'app/modules/content/partials/mastersList.html',
@@ -32,6 +37,7 @@ angular.module('app.modules.content', [
 		            templateUrl: 'app/modules/content/partials/masterDetail.html',
 		            controller: 'masterManageController'
 		        })
+                /*recipes*/
 		        .state('index.oneCol.manageRecipes', {
 		            url: '/content/recipes',
 		            templateUrl: 'app/modules/content/partials/recipesList.html',
@@ -63,6 +69,7 @@ angular.module('app.modules.content', [
 		            templateUrl: 'app/modules/content/partials/recipeCategoryDetail.html',
 		            controller: 'recipeCategoryManageController'
 		        })
+                /*faqs*/
 		        .state('index.oneCol.manageFaqs', {
 		            url: '/content/faqs',
 		            templateUrl: 'app/modules/content/partials/faqsList.html',
@@ -93,6 +100,38 @@ angular.module('app.modules.content', [
 		            url: '/content/faqs/categories/{id:int}',
 		            templateUrl: 'app/modules/content/partials/faqCategoryDetail.html',
 		            controller: 'faqCategoryManageController'
+		        })
+                /*articles*/
+                .state('index.oneCol.manageArticles', {
+		            url: '/content/articles',
+		            templateUrl: 'app/modules/content/partials/articlesList.html',
+		            controller: 'articlesController'
+		        })
+		        .state('index.oneCol.addNewArticle', {
+		            url: '/content/articles/add',
+		            templateUrl: 'app/modules/content/partials/articleDetail.html',
+		            controller: 'articleManageController'
+		        })
+		        .state('index.oneCol.articleDetail', {
+		            url: '/content/articles/{id:int}',
+		            templateUrl: 'app/modules/content/partials/articleDetail.html',
+		            controller: 'articleManageController'
+		        })
+		        .state('index.oneCol.manageArticleCategories', {
+		            url: '/content/articles/categories',
+		            templateUrl: 'app/modules/content/partials/articleCategoriesTreeView.html',
+		            controller: 'articleCategoriesController',
+		            params: { mode: 'list', id: null },
+		        })
+		        .state('index.oneCol.addNewArticleCategory', {
+		            url: '/content/articles/categories/add?{categoryid:int}',
+		            templateUrl: 'app/modules/content/partials/articleCategoryDetail.html',
+		            controller: 'articleCategoryManageController'
+		        })
+		        .state('index.oneCol.articleCategoryDetail', {
+		            url: '/content/articles/categories/{id:int}',
+		            templateUrl: 'app/modules/content/partials/articleCategoryDetail.html',
+		            controller: 'articleCategoryManageController'
 		        });
 		}
 ]);
