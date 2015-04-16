@@ -176,6 +176,8 @@ namespace VitalChoice.Controllers
 			{
 				Items = _users.Items.Where(usersPredicate.Compile()).ToList()
 			};
+
+			Thread.Sleep(5000);
 			
 			return result;
 	    }
@@ -183,6 +185,7 @@ namespace VitalChoice.Controllers
 		[HttpPost]
 		public Result<ManageUserModel> CreateUserPrototype()
 		{
+			Thread.Sleep(5000);
 			return new ManageUserModel();
 		}
 

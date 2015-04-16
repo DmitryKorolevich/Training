@@ -9,9 +9,11 @@ angular.module('app.utils', [
 	'ui.ace',
 	'ngProgress',
 	'angular-ladda',
+	'ajoslin.promise-tracker',
 	'app.core.utils.modalUtil',
 	'app.core.utils.confirmation.confirmController',
-	'app.core.utils.confirmation.confirmUtil'
+	'app.core.utils.confirmation.confirmUtil',
+	'app.core.utils.loading.overlayDirective'
 	])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {

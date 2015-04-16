@@ -3,6 +3,7 @@
 	"minifiedFileName": "style",
 
 	"files": [
+		'lib/css-spinners/ball.css',
 		'lib/bootstrap/css/bootstrap.css',
 		'lib/font-awesome/font-awesome.css',
 		'lib/textAngular/textAngular.css',
@@ -10,7 +11,7 @@
 		'lib/nvd3/nv.d3.css',
 		'lib/AngularJS-Toaster/toaster.css',
 		'lib/ngProgress/ngProgress.css',
-		'lib/ladda/ladda.min.css',
+		'lib/ladda/ladda-themeless.min.css',
 		'assets/styles/site.css'
 	]
 }
