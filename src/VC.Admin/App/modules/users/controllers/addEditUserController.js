@@ -1,7 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.users.controllers.addEditUserController', [])
-.controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', function ($scope, $modalInstance, data, userService, toaster) {
+.controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', 'promiseTracker', function ($scope, $modalInstance, data, userService, toaster, promiseTracker) {
+	$scope.saveTracker = promiseTracker("save");
 
 	function successHandler(result) {
 		if (result.Success) {
@@ -10,13 +11,11 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 			toaster.pop('error', "Error!", "Can't save your changes");
 		}
 		data.thenCallback();
-		$scope.saving = false;
 	};
 
 	function errorHandler(result) {
 		toaster.pop('error', "Error!", "Server error occured");
 		data.thenCallback();
-		$scope.saving = false;
 	};
 
 	function initialize() {
@@ -35,14 +34,14 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 
 				$scope.saving = true;
 				if ($scope.editMode) {
-					userService.updateUser($scope.user).success(function(result) {
+					userService.updateUser($scope.user,$scope.saveTracker).success(function(result) {
 							successHandler(result);
 						}).
 						error(function(result) {
 							errorHandler(result);
 						});
 				} else {
-					userService.createUser($scope.user).success(function(result) {
+					userService.createUser($scope.user,$scope.saveTracker).success(function(result) {
 							successHandler(result);
 						}).
 						error(function(result) {

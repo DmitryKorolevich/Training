@@ -14,7 +14,8 @@
 		"angular-ui-sortable": "~0.13.3",
 		"angular-ui-ace": "~0.2.3",
 		"ngprogress": "~1.0.7",
-		"angular-ladda": "~0.2.2"
+		"angular-ladda": "~0.2.2",
+		"angular-promise-tracker": "~2.1.0"
 	},
 	"exportsOverride": {
 		"bootstrap": {
@@ -22,10 +23,10 @@
 			"fonts": "dist/fonts/*.*"
 		},
 		"ladda": {
-			".": [
-				"./dist/ladda-themeless.min.css",
-				"./dist/ladda.min.js"
-			]
+			".": [ "./dist/ladda-themeless.min.css", "./dist/ladda.min.js" ]
+		},
+		"angular-promise-tracker": {
+			".": [ "./promise-tracker-http-interceptor.js", "./promise-tracker.js" ]
 		}
 	},
   "resolutions": {

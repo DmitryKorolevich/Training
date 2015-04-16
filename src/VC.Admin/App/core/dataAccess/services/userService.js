@@ -4,24 +4,32 @@ angular.module('app.core.dataAccess.services.userService', [])
 .service('userService', ['$http', function ($http) {
 	var baseUrl = '/Api/UserManagement/';
 
+	function getConfig(tracker) {
+		var config = {  };
+		if (tracker) {
+			config.tracker = tracker;
+		}
+		return config;
+	};
+
 	return {
-		getUsers: function(filter) {
-			return $http.post(baseUrl + 'GetUsers', filter);
+		getUsers: function(filter, tracker) {
+			return $http.post(baseUrl + 'GetUsers', filter, getConfig(tracker));
 		},
-		createUserPrototype: function() {
-			return $http.post(baseUrl + 'CreateUserPrototype');
+		createUserPrototype: function(tracker) {
+			return $http.post(baseUrl + 'CreateUserPrototype', null, getConfig(tracker));
 		},
-		createUser: function(creatUserModel) {
-			return $http.post(baseUrl + 'CreateUser', creatUserModel);
+		createUser: function(creatUserModel, tracker) {
+			return $http.post(baseUrl + 'CreateUser', creatUserModel, getConfig(tracker));
 		},
-		updateUser: function(editUserModel) {
-			return $http.post(baseUrl + 'UpdateUser', editUserModel);
+		updateUser: function(editUserModel, tracker) {
+			return $http.post(baseUrl + 'UpdateUser', editUserModel, getConfig(tracker));
 		},
-		getUser: function (publicId) {
-			return $http.get(baseUrl + 'GetUser/' + publicId);
+		getUser: function (publicId, tracker) {
+			return $http.get(baseUrl + 'GetUser/' + publicId, getConfig(tracker));
 		},
-		deleteUser: function (publicId) {
-			return $http.post(baseUrl + 'DeleteUser', { PublicId: publicId });
+		deleteUser: function (publicId, tracker) {
+			return $http.post(baseUrl + 'DeleteUser', { PublicId: publicId }, getConfig(tracker));
 		}
 	};
 }]);
