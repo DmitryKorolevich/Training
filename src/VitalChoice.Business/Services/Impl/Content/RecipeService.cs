@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity;
 using Templates;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Business.Services.Contracts.Content;
@@ -11,6 +12,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Base;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {
@@ -58,6 +60,10 @@ namespace VitalChoice.Business.Services.Impl.Content
             query=query.WithName(name).NotDeleted();
             var toReturn = await recipeRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
                 SelectPageAsync(page,take);
+
+            //VitalChoiceContext content = new VitalChoiceContext();
+            //var res = content.Set<Recipe>().Include(p => p.ContentItem).OrderByDescending(p => p.ContentItem.Updated).ToList();
+
             return toReturn;
         }
 
