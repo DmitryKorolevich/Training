@@ -49,7 +49,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
         {
             Name:'',
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,

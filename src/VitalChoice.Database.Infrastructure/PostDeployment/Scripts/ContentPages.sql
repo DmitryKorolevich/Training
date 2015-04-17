@@ -17,21 +17,21 @@ VALUES
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Content page root categories','@default()',7,2)
+('Content page root categories','',7,2)
 
 SELECT @masterRootId=@@IDENTITY
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Content page sub categories','@default()',7,2)
+('Content page sub categories','',7,2)
 
 SELECT @masterSubId=@@IDENTITY
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Content page master template','@default()',8,2)
+('Content page master template','',8,2)
 
 SELECT @masterLeafId=@@IDENTITY
 
