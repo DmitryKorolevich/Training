@@ -33,4 +33,3 @@ public class TierDiscountResolver : IActionResolver<int>
 	}
 
 }
-

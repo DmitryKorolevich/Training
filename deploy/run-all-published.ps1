@@ -6,7 +6,7 @@ foreach{
 		$target = $_.Name
 		echo "starting ${target}"
 		Push-Location "${rootDeploy}\${target}\"
-		start kestrel.cmd | tee "..\logs\${target}.log"
+		start .\kestrel -NoNewWindow -RedirectStandardOutput "..\logs\${target}.log" -RedirectStandardError "..\logs\${target}_errors.log"
 		Pop-Location
 	}
 }

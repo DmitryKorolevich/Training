@@ -10,6 +10,7 @@ namespace VitalChoice.Domain.Entities.Content
         Article = 4,
         FAQCategory = 5,
         FAQ = 6,
-        Content = 7,
+        ContentCategory = 7,
+        Content = 8,
     }
 }

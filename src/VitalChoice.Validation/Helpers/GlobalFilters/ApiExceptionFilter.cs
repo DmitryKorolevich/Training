@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Net.Http.Headers;
-using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Business.Services.Impl;

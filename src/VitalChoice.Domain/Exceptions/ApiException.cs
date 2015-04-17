@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace VitalChoice.Validation.Exceptions
+namespace VitalChoice.Domain.Exceptions
 {
     public class ApiException: Exception
     {
@@ -23,8 +23,13 @@ namespace VitalChoice.Validation.Exceptions
 
         public ApiException() {}
 
-        public ApiException(string messageKey,IEnumerable<object> args=null)
+        public ApiException(string messageKey, IEnumerable<object> args=null)
         {
+            _errorMessageKey = messageKey;
+            _args = args;
+        }
+
+        public ApiException(string messageKey, params object[] args) {
             _errorMessageKey = messageKey;
             _args = args;
         }
