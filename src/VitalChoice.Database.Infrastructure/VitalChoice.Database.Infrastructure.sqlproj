@@ -102,6 +102,7 @@
     <Build Include="dbo\ContentPages\ArticlesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\FAQs.sql" />
     <None Include="PostDeployment\Scripts\Articles.sql" />
+    <Build Include="dbo\ContentPages\ContentPagesToContentCategories.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
