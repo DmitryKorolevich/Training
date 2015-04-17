@@ -43,10 +43,6 @@ UPDATE ContentTypes
 SET DefaultMasterContentItemId=@masterLeafId
 WHERE Id=6
 
-UPDATE ContentTypes
-SET DefaultMasterContentItemId=@masterContentId
-WHERE Id=7
-
 
 INSERT INTO ContentItems
 (MetaDescription,MetaKeywords,Template,Title,[Description])
