@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqManageController', [])
-.controller('faqManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$state,$stateParams, contentService, toaster, confirmUtil) {
+.controller('faqManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
 
 	function successSaveHandler(result) {
 		if (result.Success) {
@@ -46,7 +49,7 @@ angular.module('app.modules.content.controllers.faqManageController', [])
         {
             Name:'',
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,
@@ -68,7 +71,7 @@ angular.module('app.modules.content.controllers.faqManageController', [])
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.faq.CategoryIds = categoryIds;
 
-                contentService.updateFAQ($scope.faq).success(function (result) {
+                contentService.updateFAQ($scope.faq,$scope.editTracker).success(function (result) {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
@@ -79,13 +82,13 @@ angular.module('app.modules.content.controllers.faqManageController', [])
             }
         };
 
-	    contentService.getCategoriesTree({ Type: 5 })//faq categories
+	    contentService.getCategoriesTree({ Type: 5 },$scope.refreshTracker)//faq categories
 			.success(function (result) {
 				if (result.Success) {
 					$scope.rootCategory=result.Data;
                     if($scope.id)
                     {
-                        contentService.getFAQ($scope.id)
+                        contentService.getFAQ($scope.id,$scope.refreshTracker)
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.faq=result.Data;

@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.masterManageController', [])
-.controller('masterManageController', ['$scope','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$stateParams, contentService, toaster, confirmUtil) {
+.controller('masterManageController', ['$scope','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
 
     function Processor(data, ids)
     {
@@ -51,7 +54,8 @@ angular.module('app.modules.content.controllers.masterManageController', [])
 	        { Id: 4, Name: 'Article' },
 	        { Id: 5, Name: 'FAQ Category' },
 	        { Id: 6, Name: 'FAQ' },
-	        { Id: 7, Name: 'Content' },
+	        { Id: 7, Name: 'Content Page Category' },
+	        { Id: 8, Name: 'Content Page' },
 	    ];
         $scope.appProcessors = [
             {Id: 1, Name: 'Recipe root category processor'},
@@ -70,7 +74,7 @@ angular.module('app.modules.content.controllers.masterManageController', [])
         $scope.forms = {};
 
         if ($scope.id) {
-            contentService.getMasterContentItem($scope.id)
+            contentService.getMasterContentItem($scope.id,$scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.master = result.Data;
@@ -94,7 +98,7 @@ angular.module('app.modules.content.controllers.masterManageController', [])
     function setProcessors(ids){
         var processors=[];
         $.each($scope.appProcessors, function (index, processor) {
-            processors.push(new Processor(processor,ids))
+            processors.push(new Processor(processor, ids));
         });
         $scope.processors=processors;
     }
@@ -113,7 +117,7 @@ angular.module('app.modules.content.controllers.masterManageController', [])
     $scope.save = function () {
         if ($scope.forms.masterForm.$valid) {
             $scope.master.ProcessorIds = getProcessorIds();
-            contentService.updateMasterContentItem($scope.master).success(function (result) {
+            contentService.updateMasterContentItem($scope.master,$scope.editTracker).success(function (result) {
                 successSaveHandler(result);
             }).
                 error(function (result) {

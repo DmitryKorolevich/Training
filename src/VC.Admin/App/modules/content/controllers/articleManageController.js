@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleManageController', [])
-.controller('articleManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope,$state,$stateParams, contentService, toaster, confirmUtil) {
+.controller('articleManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
 
 	function successSaveHandler(result) {
 		if (result.Success) {
@@ -50,7 +53,7 @@ angular.module('app.modules.content.controllers.articleManageController', [])
             SubTitle: null,
             Author: null,
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,
@@ -76,7 +79,7 @@ angular.module('app.modules.content.controllers.articleManageController', [])
                 if ($scope.article.PublishedDateObject.Date)
                     $scope.article.PublishedDate = $scope.article.PublishedDateObject.Date.toServerDateTime();
 
-                contentService.updateArticle($scope.article).success(function (result) {
+                contentService.updateArticle($scope.article,$scope.editTracker).success(function (result) {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
@@ -87,13 +90,13 @@ angular.module('app.modules.content.controllers.articleManageController', [])
             }
         };
 
-	    contentService.getCategoriesTree({ Type: 3 })//article categories
+	    contentService.getCategoriesTree({ Type: 3 },$scope.refreshTracker)//article categories
 			.success(function (result) {
 				if (result.Success) {
 					$scope.rootCategory=result.Data;
                     if($scope.id)
                     {
-                        contentService.getArticle($scope.id)
+                        contentService.getArticle($scope.id,$scope.refreshTracker)
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.article=result.Data;
@@ -131,7 +134,7 @@ angular.module('app.modules.content.controllers.articleManageController', [])
             }
         });
         $.each(category.SubItems, function( index, value ) {
-            setSelected(value,ids)
+            setSelected(value, ids);
         });
     };
 

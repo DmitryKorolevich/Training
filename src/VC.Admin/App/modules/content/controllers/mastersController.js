@@ -1,5 +1,8 @@
 ﻿angular.module('app.modules.content.controllers.mastersController', [])
-.controller('mastersController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, contentService, toaster, modalUtil, confirmUtil) {
+.controller('mastersController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("refresh");
+    $scope.deleteTracker = promiseTracker("delete");
 
     function errorHandler(result) {
         var messages = "";
@@ -12,7 +15,7 @@
     };
 
     function refreshMasters() {
-        contentService.getMasterContentItems($scope.filter)
+        contentService.getMasterContentItems($scope.filter,$scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.masters = result.Data;
@@ -36,7 +39,8 @@
 	        { Id: 4, Name: 'Article' },
 	        { Id: 5, Name: 'FAQ Category' },
 	        { Id: 6, Name: 'FAQ' },
-	        { Id: 7, Name: 'Content' },
+	        { Id: 7, Name: 'Content Page Category' },
+	        { Id: 8, Name: 'Content Page' },
 	    ];
 
 	    $scope.filter = {
@@ -64,7 +68,7 @@
 
 	$scope.delete = function (id) {
 		confirmUtil.confirm(function() {
-		    contentService.deleteMasterContentItem(id)
+		    contentService.deleteMasterContentItem(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
 			            toaster.pop('success', "Success!", "Successfully deleted");

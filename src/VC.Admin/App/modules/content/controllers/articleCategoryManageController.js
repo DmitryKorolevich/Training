@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleCategoryManageController', [])
-.controller('articleCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, confirmUtil) {
+.controller('articleCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
    
 	function successSaveHandler(result) {
 		if (result.Success) {
@@ -42,7 +45,7 @@ angular.module('app.modules.content.controllers.articleCategoryManageController'
             Name: '',
             Url: '',
             Type: 3,//article category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,
@@ -56,7 +59,7 @@ angular.module('app.modules.content.controllers.articleCategoryManageController'
 	    $scope.forms = {};
 
 	    if ($scope.id) {
-	        contentService.getCategory($scope.id)
+	        contentService.getCategory($scope.id,$scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.articleCategory = result.Data;
@@ -84,7 +87,7 @@ angular.module('app.modules.content.controllers.articleCategoryManageController'
 	    });
 
 	    if ($scope.forms.form.$valid) {
-	        contentService.updateCategory($scope.articleCategory).success(function (result) {
+	        contentService.updateCategory($scope.articleCategory,$scope.editTracker).success(function (result) {
 	            successSaveHandler(result);
 	        }).
                 error(function (result) {

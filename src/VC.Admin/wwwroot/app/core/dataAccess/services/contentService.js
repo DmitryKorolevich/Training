@@ -13,6 +13,37 @@ angular.module('app.core.dataAccess.services.contentService', [])
 	};
 
 	return {
+        //categories
+	    getCategoriesTree: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetCategoriesTree', filter, getConfig(tracker));
+	    },
+	    updateCategoriesTree: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateCategoriesTree', model, getConfig(tracker));
+	    },
+	    getCategory: function (id, tracker) {
+	        return $http.get(baseUrl + 'GetCategory/' + id, getConfig(tracker));
+	    },
+	    updateCategory: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateCategory', model, getConfig(tracker));
+	    },
+	    deleteCategory: function (id, tracker) {
+	        return $http.post(baseUrl + 'DeleteCategory/' + id, getConfig(tracker));
+	    },
+
+	    //master templates
+	    getMasterContentItems: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetMasterContentItems', filter, getConfig(tracker));
+	    },
+	    getMasterContentItem: function (id, tracker) {
+	        return $http.get(baseUrl + 'GetMasterContentItem/' + id, getConfig(tracker));
+	    },
+	    updateMasterContentItem: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateMasterContentItem', model, getConfig(tracker));
+	    },
+	    deleteMasterContentItem: function (id, tracker) {
+	        return $http.post(baseUrl + 'DeleteMasterContentItem/' + id, getConfig(tracker));
+	    },
+
         //recipes
 		getRecipes: function(filter,tracker) {
 		    return $http.post(baseUrl + 'GetRecipes', filter, getConfig(tracker));
@@ -28,62 +59,45 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		},
 
 	    //faq
-		getFAQs: function(filter) {
-		    return $http.post(baseUrl + 'GetFAQs', filter);
+		getFAQs: function (filter, tracker) {
+		    return $http.post(baseUrl + 'GetFAQs', filter, getConfig(tracker));
 		},
-		getFAQ: function (id) {
-		    return $http.get(baseUrl + 'GetFAQ/' + id);
+		getFAQ: function (id, tracker) {
+		    return $http.get(baseUrl + 'GetFAQ/' + id, getConfig(tracker));
 		},
-		updateFAQ: function(model) {
-		    return $http.post(baseUrl + 'UpdateFAQ', model);
+		updateFAQ: function (model, tracker) {
+		    return $http.post(baseUrl + 'UpdateFAQ', model, getConfig(tracker));
 		},
-		deleteFAQ: function (id) {
-		    return $http.post(baseUrl + 'DeleteFAQ/'+ id);
+		deleteFAQ: function (id, tracker) {
+		    return $http.post(baseUrl + 'DeleteFAQ/' + id, getConfig(tracker));
 		},
 
 	    //articles
-		getArticles: function(filter) {
-		    return $http.post(baseUrl + 'GetArticles', filter);
+		getArticles: function (filter, tracker) {
+		    return $http.post(baseUrl + 'GetArticles', filter, getConfig(tracker));
 		},
-		getArticle: function (id) {
-		    return $http.get(baseUrl + 'GetArticle/' + id);
+		getArticle: function (id, tracker) {
+		    return $http.get(baseUrl + 'GetArticle/' + id, getConfig(tracker));
 		},
-		updateArticle: function(model) {
-		    return $http.post(baseUrl + 'UpdateArticle', model);
+		updateArticle: function (model, tracker) {
+		    return $http.post(baseUrl + 'UpdateArticle', model, getConfig(tracker));
 		},
-		deleteArticle: function (id) {
-		    return $http.post(baseUrl + 'DeleteArticle/'+ id);
-		},
-
-        //categories
-		getCategoriesTree: function(filter,tracker) {
-			return $http.post(baseUrl + 'GetCategoriesTree', filter, getConfig(tracker));
-		},
-		updateCategoriesTree: function(model) {
-		    return $http.post(baseUrl + 'UpdateCategoriesTree', model);
-		},
-		getCategory: function (id) {
-		    return $http.get(baseUrl + 'GetCategory/' + id);
-		},
-		updateCategory: function (model) {
-		    return $http.post(baseUrl + 'UpdateCategory', model);
-		},
-		deleteCategory: function (id) {
-		    return $http.post(baseUrl + 'DeleteCategory/'+ id);
+		deleteArticle: function (id, tracker) {
+		    return $http.post(baseUrl + 'DeleteArticle/' + id, getConfig(tracker));
 		},
 
-        //master templates
-        getMasterContentItems: function(filter) {
-			return $http.post(baseUrl + 'GetMasterContentItems', filter);
+	    //recipes
+		getContentPages: function(filter,tracker) {
+		    return $http.post(baseUrl + 'GetContentPages', filter, getConfig(tracker));
 		},
-        getMasterContentItem: function (id) {
-			return $http.get(baseUrl + 'GetMasterContentItem/' + id);
+		getContentPage: function (id,tracker) {
+		    return $http.get(baseUrl + 'GetContentPage/' + id, getConfig(tracker));
 		},
-		updateMasterContentItem: function(model) {
-			return $http.post(baseUrl + 'UpdateMasterContentItem', model);
+		updateContentPage: function(model,tracker) {
+		    return $http.post(baseUrl + 'UpdateContentPage', model, getConfig(tracker));
 		},
-		deleteMasterContentItem: function (id) {
-			return $http.post(baseUrl + 'DeleteMasterContentItem/'+ id);
+		deleteContentPage: function (id, tracker) {
+		    return $http.post(baseUrl + 'DeleteContentPage/'+ id, getConfig(tracker));
 		},
 	};
 }]);

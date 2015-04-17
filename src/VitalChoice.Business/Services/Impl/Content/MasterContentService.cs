@@ -30,16 +30,23 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<Recipe> recipeRepository;
+        private readonly IRepositoryAsync<FAQ> faqRepository;
+        private readonly IRepositoryAsync<Article> articleRepository;
+        private readonly IRepositoryAsync<ContentPage> contentPageRepository;
         private readonly ILogger _logger;
 
         public MasterContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<MasterContentItemToContentProcessor> masterContentItemToProcessorsRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository,
+            IRepositoryAsync<FAQ> faqRepository, IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository)
         {
             this.masterContentItemRepository = masterContentItemRepository;
             this.masterContentItemToProcessorsRepository = masterContentItemToProcessorsRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.contentCategoryRepository = contentCategoryRepository;
             this.recipeRepository = recipeRepository;
+            this.faqRepository = faqRepository;
+            this.articleRepository = articleRepository;
+            this.contentPageRepository = contentPageRepository;
             _logger = LoggerService.GetDefault();
         }
 
@@ -143,6 +150,18 @@ namespace VitalChoice.Business.Services.Impl.Content
                 if (!relations)
                 {
                     relations = await recipeRepository.Query(p => p.MasterContentItemId == id).SelectAnyAsync();
+                }
+                if (!relations)
+                {
+                    relations = await faqRepository.Query(p => p.MasterContentItemId == id).SelectAnyAsync();
+                }
+                if (!relations)
+                {
+                    relations = await articleRepository.Query(p => p.MasterContentItemId == id).SelectAnyAsync();
+                }
+                if (!relations)
+                {
+                    relations = await contentPageRepository.Query(p => p.MasterContentItemId == id).SelectAnyAsync();
                 }
 
                 if (relations)

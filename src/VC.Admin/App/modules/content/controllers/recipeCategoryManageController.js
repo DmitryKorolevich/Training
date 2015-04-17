@@ -1,8 +1,11 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.recipeCategoryManageController', [])
-.controller('recipeCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, confirmUtil) {
-   
+.controller('recipeCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
+
 	function successSaveHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved.");
@@ -42,7 +45,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
             Name: '',
             Url: '',
             Type: 1,//recipe category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,
@@ -56,7 +59,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
 	    $scope.forms = {};
 
 	    if ($scope.id) {
-	        contentService.getCategory($scope.id)
+	        contentService.getCategory($scope.id,$scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.recipeCategory = result.Data;
@@ -84,7 +87,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
 	    });
 
 	    if ($scope.forms.form.$valid) {
-	        contentService.updateCategory($scope.recipeCategory).success(function (result) {
+	        contentService.updateCategory($scope.recipeCategory,$scope.editTracker).success(function (result) {
 	            successSaveHandler(result);
 	        }).
                 error(function (result) {

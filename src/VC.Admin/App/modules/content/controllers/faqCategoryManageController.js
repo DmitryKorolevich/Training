@@ -1,7 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqCategoryManageController', [])
-.controller('faqCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, confirmUtil) {
+.controller('faqCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
    
 	function successSaveHandler(result) {
 		if (result.Success) {
@@ -42,7 +45,7 @@ angular.module('app.modules.content.controllers.faqCategoryManageController', []
             Name: '',
             Url: '',
             Type: 5,//faq category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,
@@ -56,7 +59,7 @@ angular.module('app.modules.content.controllers.faqCategoryManageController', []
 	    $scope.forms = {};
 
 	    if ($scope.id) {
-	        contentService.getCategory($scope.id)
+	        contentService.getCategory($scope.id,$scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.faqCategory = result.Data;
@@ -84,7 +87,7 @@ angular.module('app.modules.content.controllers.faqCategoryManageController', []
 	    });
 
 	    if ($scope.forms.form.$valid) {
-	        contentService.updateCategory($scope.faqCategory).success(function (result) {
+	        contentService.updateCategory($scope.faqCategory,$scope.editTracker).success(function (result) {
 	            successSaveHandler(result);
 	        }).
                 error(function (result) {

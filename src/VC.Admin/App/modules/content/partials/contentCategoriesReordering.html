@@ -16,7 +16,7 @@
             <a class="btn btn-info btn-xs" title="Edit" nodrag data-ng-click="open(item.Id)">
                 <i class="glyphicon glyphicon-edit"></i>
             </a>
-            <a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-if="!item.SubItems || item.SubItems.length == 0" data-ng-click="delete(item.Id)">
+            <a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-if="!item.SubItems || item.SubItems.length == 0" ladda="deleteTracker.active()" data-ng-click="delete(item.Id)">
                 <i class="glyphicon glyphicon-remove"></i>
             </a>
         </div>

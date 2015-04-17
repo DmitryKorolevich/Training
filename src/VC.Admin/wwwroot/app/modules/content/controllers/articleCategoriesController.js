@@ -1,5 +1,9 @@
 ﻿angular.module('app.modules.content.controllers.articleCategoriesController', [])
-.controller('articleCategoriesController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, $stateParams, contentService, toaster, modalUtil, confirmUtil) {
+.controller('articleCategoriesController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $state, $stateParams, contentService, toaster, modalUtil, confirmUtil,promiseTracker) {
+    $scope.refreshTracker = promiseTracker("refresh");
+    $scope.editTracker = promiseTracker("edit");
+    $scope.deleteTracker = promiseTracker("delete");
 
     function errorHandler(result) {
         var messages = "";
@@ -12,7 +16,7 @@
     };
 
     function loadCategories() {
-        contentService.getCategoriesTree({ Type: 3 })//article categories
+        contentService.getCategoriesTree({ Type: 3 },$scope.refreshTracker)//article categories
             .success(function (result) {
                 if (result.Success) {
                     $scope.rootCategory = result.Data;
@@ -70,7 +74,7 @@
 
     $scope.delete = function (id) {
         confirmUtil.confirm(function () {
-            contentService.deleteCategory(id)
+            contentService.deleteCategory(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
 			            toaster.pop('success', "Success!", "Successfully deleted");
@@ -86,7 +90,7 @@
     };
 
     $scope.save = function () {
-        contentService.updateCategoriesTree($scope.rootCategory)
+        contentService.updateCategoriesTree($scope.rootCategory,$scope.editTracker)
             .success(function (result) {
                 if (result.Success) {
                     toaster.pop('success', "Success!", "Successfully deleted");

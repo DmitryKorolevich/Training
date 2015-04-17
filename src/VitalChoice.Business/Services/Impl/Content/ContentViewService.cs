@@ -34,12 +34,16 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<Recipe> recipeRepository;
+        private readonly IRepositoryAsync<FAQ> faqRepository;
+        private readonly IRepositoryAsync<Article> articleRepository;
+        private readonly IRepositoryAsync<ContentPage> contentPageRepository;
         private readonly IContentProcessorsService contentProcessorsService;
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
         public ContentViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<Recipe> recipeRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<FAQ> faqRepository,
+            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository,
             IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
 		{
             this.masterContentItemRepository = masterContentItemRepository;
@@ -47,6 +51,9 @@ namespace VitalChoice.Business.Services.Impl.Content
             this.contentItemRepository = contentItemRepository;
             this.contentProcessorsService = contentProcessorsService;
             this.recipeRepository = recipeRepository;
+            this.faqRepository = faqRepository;
+            this.articleRepository = articleRepository;
+            this.contentPageRepository = contentPageRepository;
             _templatesCache = templatesCache;
             _logger = LoggerService.GetDefault();
 		}
@@ -76,6 +83,14 @@ namespace VitalChoice.Business.Services.Impl.Content
                 _logger.LogInformation("The category {0} could not be found", categoryUrl);
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
                 return null;
+            }
+
+            if (category.StatusCode == RecordStatusCode.NotActive)
+            {
+                if (!parameters.ContainsKey(ContentConstants.PREVIEW_PARAM))
+                {
+                    return null;
+                }
             }
 
             //Added this to prevent possible closure edit in multi-threaded requests
@@ -135,8 +150,22 @@ namespace VitalChoice.Business.Services.Impl.Content
             switch(type)
             {
                 case ContentType.Recipe:
-                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode
-                    !=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
+                    contentDataItem = (await recipeRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
+                        ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
+                        SelectAsync(false)).FirstOrDefault();
+                    break;
+                case ContentType.Article:
+                    contentDataItem = (await articleRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
+                        ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
+                        SelectAsync(false)).FirstOrDefault();
+                    break;
+                case ContentType.FAQ:
+                    contentDataItem = (await faqRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
+                        ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
+                        SelectAsync(false)).FirstOrDefault();
+                    break;
+                case ContentType.ContentPage:
+                    contentDataItem = (await contentPageRepository.Query(p => p.Url == contentDataItemUrl && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
                         SelectAsync(false)).FirstOrDefault();
                     break;
@@ -147,6 +176,14 @@ namespace VitalChoice.Business.Services.Impl.Content
                 _logger.LogInformation("The content item {0} couldn't be found", contentDataItemUrl);
                 return null;
             }
+            if (contentDataItem.StatusCode == RecordStatusCode.NotActive)
+            {
+                if (!parameters.ContainsKey(ContentConstants.PREVIEW_PARAM))
+                {
+                    return null;
+                }
+            }
+
             contentDataItem.ContentItem = (await contentItemRepository.Query(p => p.Id == contentDataItem.ContentItemId).Include(p => p.ContentItemToContentProcessors).
                 ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
 

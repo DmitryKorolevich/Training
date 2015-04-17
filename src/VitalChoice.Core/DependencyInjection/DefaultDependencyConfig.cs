@@ -102,6 +102,7 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<RecipeService>().As<IRecipeService>();
                 builder.RegisterType<FAQService>().As<IFAQService>();
                 builder.RegisterType<ArticleService>().As<IArticleService>();
+                builder.RegisterType<ContentPageService>().As<IContentPageService>();
                 builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
                 builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();

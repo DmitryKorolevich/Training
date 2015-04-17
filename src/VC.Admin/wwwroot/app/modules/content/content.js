@@ -15,6 +15,10 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.articleManageController',
 	'app.modules.content.controllers.articleCategoriesController',
 	'app.modules.content.controllers.articleCategoryManageController',
+	'app.modules.content.controllers.contentPagesController',
+	'app.modules.content.controllers.contentPageManageController',
+	'app.modules.content.controllers.contentPageCategoriesController',
+	'app.modules.content.controllers.contentPageCategoryManageController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -132,6 +136,38 @@ angular.module('app.modules.content', [
 		            url: '/content/articles/categories/{id:int}',
 		            templateUrl: 'app/modules/content/partials/articleCategoryDetail.html',
 		            controller: 'articleCategoryManageController'
+		        })
+		        /*contentpages*/
+                .state('index.oneCol.manageContentPages', {
+		            url: '/content/contentpages',
+		            templateUrl: 'app/modules/content/partials/contentPagesList.html',
+		            controller: 'contentPagesController'
+		        })
+		        .state('index.oneCol.addNewContentPage', {
+		            url: '/content/contentpages/add',
+		            templateUrl: 'app/modules/content/partials/contentPageDetail.html',
+		            controller: 'contentPageManageController'
+		        })
+		        .state('index.oneCol.contentPageDetail', {
+		            url: '/content/contentpages/{id:int}',
+		            templateUrl: 'app/modules/content/partials/contentPageDetail.html',
+		            controller: 'contentPageManageController'
+		        })
+		        .state('index.oneCol.manageContentPageCategories', {
+		            url: '/content/contentpages/categories',
+		            templateUrl: 'app/modules/content/partials/contentPageCategoriesTreeView.html',
+		            controller: 'contentPageCategoriesController',
+		            params: { mode: 'list', id: null },
+		        })
+		        .state('index.oneCol.addNewContentPageCategory', {
+		            url: '/content/articles/contentpages/add?{categoryid:int}',
+		            templateUrl: 'app/modules/content/partials/contentPageCategoryDetail.html',
+		            controller: 'contentPageCategoryManageController'
+		        })
+		        .state('index.oneCol.contentPageCategoryDetail', {
+		            url: '/content/contentpages/categories/{id:int}',
+		            templateUrl: 'app/modules/content/partials/contentPageCategoryDetail.html',
+		            controller: 'contentPageCategoryManageController'
 		        });
 		}
 ]);
