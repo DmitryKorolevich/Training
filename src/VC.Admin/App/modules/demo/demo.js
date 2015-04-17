@@ -191,10 +191,6 @@ angular.module('app.modules.demo',
 					template: '<h2>Add New Affiliate</h2>'
 				})
 				/*content*/
-				.state('index.oneCol.managePages', {
-					url: '/content/managePages',
-					template: '<h2>Manage Pages</h2>'
-				})
 				.state('index.oneCol.manageRecipesTemp', { 
 					url: '/content/draggablecategories',
 					templateUrl: 'app/modules/demo/partials/manageRecipes.html',

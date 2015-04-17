@@ -24,25 +24,25 @@
         <spinner-overlay data-loading="refreshTracker.active()">
             <table class="table table-striped table-hover ">
                 <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>URL</th>
-                        <th>Category</th>
-                        <th>Updated</th>
-                        <th>Actions</th>
-                    </tr>
+                <tr>
+                    <th>Title</th>
+                    <th>URL</th>
+                    <th>Category</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="recipe in recipes">
-                        <td>{{recipe.Name}}</td>
-                        <td>{{recipe.Url}}</td>
-                        <td>{{recipe.Category}}</td>
-                        <td>{{recipe.Updated | date:"MM/dd/yy"}}<br />{{recipe.Updated | date:"h:mm a"}}</td>
-                        <td>
-                            <button class="btn btn-default btn-success" data-ng-click="open(recipe.Id);">Edit</button>
-                            <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(recipe.Id);">Delete</button>
-                        </td>
-                    </tr>
+                <tr data-ng-repeat="recipe in recipes">
+                    <td>{{recipe.Name}}</td>
+                    <td>{{recipe.Url}}</td>
+                    <td>{{recipe.Category}}</td>
+                    <td>{{recipe.Updated | date:"MM/dd/yy"}}<br/>{{recipe.Updated | date:"h:mm a"}}</td>
+                    <td>
+                        <button class="btn btn-default btn-success" data-ng-click="open(recipe.Id);">Edit</button>
+                        <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(recipe.Id);">Delete</button>
+                    </td>
+                </tr>
                 </tbody>
             </table>
             <pagination boundary-links="true"
@@ -55,6 +55,12 @@
                         last-text="&raquo;"
                         data-ng-change="pageChanged()">
             </pagination>
+            <!--<base-pagination 
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        data-page-changed="pageChanged()">
+            </base-pagination>-->
         </spinner-overlay>
 </div>
 </div>

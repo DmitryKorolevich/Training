@@ -25,6 +25,8 @@ namespace VitalChoice.Business.Services.Impl.Content
         private readonly IRepositoryAsync<FAQ> faqRepository;
         private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategory;
         private readonly IRepositoryAsync<Article> articleRepository;
+        private readonly IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategory;
+        private readonly IRepositoryAsync<ContentPage> contentPageRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -249,6 +251,17 @@ namespace VitalChoice.Business.Services.Impl.Content
                     if (exist)
                     {
                         message += "Category with faqs can't be deleted. " + Environment.NewLine;
+                    }
+                }
+
+                if (dbItem.Type == ContentType.ContentPageCategory)
+                {
+                    var categories = (await contentPageToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
+                    ContentPageQuery innerQuery = new ContentPageQuery().WithIds(categories.Select(p => p.ContentPageId).ToList()).NotDeleted();
+                    var exist = (await contentPageRepository.Query(innerQuery).SelectAnyAsync());
+                    if (exist)
+                    {
+                        message += "Category with content pages can't be deleted. " + Environment.NewLine;
                     }
                 }
 

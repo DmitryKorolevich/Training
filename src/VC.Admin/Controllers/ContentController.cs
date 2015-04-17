@@ -30,10 +30,11 @@ namespace VitalChoice.Admin.Controllers
         private readonly IRecipeService recipeService;
         private readonly IFAQService faqService;
         private readonly IArticleService articleService;
+        private readonly IContentPageService contentPageService;
         private readonly ILogger logger;
 
         public ContentController(IGeneralContentService generalContentService, IMasterContentService masterContentService, ICategoryService categoryService,
-            IRecipeService recipeService, IFAQService faqService, IArticleService articleService)
+            IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService)
         {
             this.generalContentService = generalContentService;
             this.masterContentService = masterContentService;
@@ -41,6 +42,7 @@ namespace VitalChoice.Admin.Controllers
             this.recipeService = recipeService;
             this.faqService = faqService;
             this.articleService = articleService;
+            this.contentPageService = contentPageService;
             this.logger = LoggerService.GetDefault();
         }
 
@@ -266,5 +268,48 @@ namespace VitalChoice.Admin.Controllers
         }
 
         #endregion
+
+        #region ContentPages
+
+        [HttpPost]
+        public async Task<Result<PagedModelList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
+        {
+            var result = await contentPageService.GetContentPagesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn = new PagedModelList<ContentPageListItemModel>
+            {
+                Items = result.Items.Select(p => new ContentPageListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<ContentPageManageModel>> GetContentPage(int id)
+        {
+            return new ContentPageManageModel((await contentPageService.GetContentPageAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<ContentPageManageModel>> UpdateContentPage([FromBody]ContentPageManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
+
+            item = await contentPageService.UpdateContentPageAsync(item);
+            await contentPageService.AttachContentPageToCategoriesAsync(item.Id, model.CategoryIds);
+
+            return new ContentPageManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteContentPage(int id)
+        {
+            return await contentPageService.DeleteContentPageAsync(id);
+        }
+
+        #endregion
+
     }
 }

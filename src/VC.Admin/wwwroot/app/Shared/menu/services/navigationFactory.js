@@ -53,7 +53,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'content',
 			stateLabel: 'Content',
 			subMenu: [
-				{ name: 'managePages', stateName: 'index.oneCol.managePages', stateLabel: 'Manage Pages' },
+				{ name: 'managePages', stateName: 'index.oneCol.manageContentPages', stateLabel: 'Manage Pages' },
 				{ name: 'manageArticles', stateName: 'index.oneCol.manageArticles', stateLabel: 'Manage Articles' },
 				{ name: 'manageRecipes', stateName: 'index.oneCol.manageRecipes', stateLabel: 'Manage Recipes' },
 				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs' },

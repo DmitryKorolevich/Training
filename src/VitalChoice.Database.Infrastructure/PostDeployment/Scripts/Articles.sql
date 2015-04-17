@@ -17,21 +17,21 @@ VALUES
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Article root categories','default()',3,2)
+('Article root categories','@default()',3,2)
 
 SELECT @masterRootId=@@IDENTITY
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Article sub categories','default()',3,2)
+('Article sub categories','@default()',3,2)
 
 SELECT @masterSubId=@@IDENTITY
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
 VALUES
-('Article master template','default()',4,2)
+('Article master template','@default()',4,2)
 
 SELECT @masterLeafId=@@IDENTITY
 

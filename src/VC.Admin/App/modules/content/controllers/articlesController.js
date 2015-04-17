@@ -1,5 +1,8 @@
 ﻿angular.module('app.modules.content.controllers.articlesController', [])
-.controller('articlesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, contentService, toaster, modalUtil, confirmUtil) {
+.controller('articlesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+    function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+        $scope.refreshTracker = promiseTracker("refresh");
+        $scope.deleteTracker = promiseTracker("delete");
 
     function Category(data,level, root)
     {
@@ -25,7 +28,7 @@
     };
 
     function refreshArticles() {
-        contentService.getArticles($scope.filter)
+        contentService.getArticles($scope.filter,$scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.articles = result.Data.Items;
@@ -41,7 +44,7 @@
 	};
 
     function loadCategories(){
-        contentService.getCategoriesTree({ Type : 3})//article categories
+        contentService.getCategoriesTree({ Type : 3},$scope.refreshTracker)//article categories
 			.success(function (result) {
 			    if (result.Success) {
 			        initCategories(result.Data);
@@ -102,7 +105,7 @@
 
 	$scope.delete = function (id) {
 		confirmUtil.confirm(function() {
-		    contentService.deleteArticle(id)
+		    contentService.deleteArticle(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
 			            toaster.pop('success', "Success!", "Successfully deleted");
