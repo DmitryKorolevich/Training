@@ -4,8 +4,7 @@ using VitalChoice.Workflow.Core;
 namespace VitalChoice.Workflow.Base
 {
     public abstract class ComputableAction<TContext>: WorkflowAction<TContext, decimal> 
-        where TContext : WorkflowContext<decimal>
-    {
+        where TContext : ComputableContext {
         protected ComputableAction(ComputableActionTree<TContext> tree) : base(tree)
         {
         }
