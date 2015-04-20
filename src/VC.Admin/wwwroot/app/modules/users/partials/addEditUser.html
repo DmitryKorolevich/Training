@@ -50,8 +50,8 @@
 			<div class="form-group">
 				<label class="col-md-3 control-label">Roles</label>
 				<div class="col-md-9">
-					<label class="checkbox-inline checkbox-in-group" data-ng-repeat="role in rolesLookup">
-						<input type="checkbox" value="role" data-ng-checked="user.RoleNames.indexOf(role) > -1" data-ng-click="toggleRoleSelection(role)"/> {{role}}
+					<label class="checkbox-inline checkbox-in-group" data-ng-repeat="role in ReferenceData.Roles">
+						<input type="checkbox" value="role.Text" data-ng-checked="user.RoleNames.indexOf(role.Text) > -1" data-ng-click="toggleRoleSelection(role.Text)"/> {{role.Text}}
 					</label>
 				</div>
 			</div>

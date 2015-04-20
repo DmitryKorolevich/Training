@@ -19,7 +19,6 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 	};
 
 	function initialize() {
-		$scope.rolesLookup = ["Content User", "Product User", "Order User", "Admin User", "Super Admin User"]; //hardcoded for now
 		$scope.roleNames = [];
 
 		$scope.user = data.user;

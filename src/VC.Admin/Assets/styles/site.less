@@ -541,15 +541,21 @@ form .form-group p {
 	right: 0;
 }
 
+.ball:not(:required).ng-hide{
+	/*-moz-animation: ball 0ms none linear;
+  -webkit-animation: ball 0s none linear;
+  animation: ball 0ms none linear;*/
+}
+
 .ball:not(:required)::after{
 	background: @brand-info;
 }
 
-.fade.ng-enter {
-  transition:0.5s linear all;
-  opacity:0;
+.fade.ng-hide {
+	opacity:0;
 }
 
-.fade.ng-enter.ng-enter-active {
-  opacity:1;
+.fade {
+	transition:1s linear all;
+	opacity:1;
 }

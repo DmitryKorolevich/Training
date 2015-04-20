@@ -10,5 +10,6 @@ namespace VitalChoice.Domain.Entities.Options
         public bool EnableBundlingAndMinification { get; set; }
         public string RandomPathPart { get; set; }
         public string LogPath { get; set; }
+		public int DefaultCacheExpirationTermMinutes { get; set; }
     }
 }

@@ -45,7 +45,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
             Name: '',
             Url: '',
             Type: 3,//article category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,

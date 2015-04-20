@@ -49,7 +49,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         {
             Name:'',
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,

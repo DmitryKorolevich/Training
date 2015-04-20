@@ -56,7 +56,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
         {
             Name:'',
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,

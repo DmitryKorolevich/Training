@@ -45,7 +45,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
             Name: '',
             Url: '',
             Type: 7,//contentPage category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,

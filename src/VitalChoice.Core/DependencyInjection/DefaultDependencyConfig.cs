@@ -18,6 +18,7 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
+using Microsoft.Framework.Caching.Memory;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Core.Infrastructure;
 using Templates;
@@ -25,7 +26,7 @@ using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Business.Services.Impl.Content;
 using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
 using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
-
+using VitalChoice.Infrastructure.Cache;
 #if DNX451
 using Autofac;
 using Autofac.Core;
@@ -75,7 +76,8 @@ namespace VitalChoice.Core.DependencyInjection
                         Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
                     options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
                     options.LogPath = configuration.Get("App:LogPath");
-                });
+					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
+				});
 
 #if DNX451
                 var builder = new ContainerBuilder();
@@ -107,9 +109,11 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
                 builder.RegisterInstance(configuration).As<IConfiguration>();
-
-                builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
+				builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
                 builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
+				builder.RegisterType<MemoryCache>().As<IMemoryCache>();
+	            builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
+	            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 
                 IContainer container = builder.Build();
 

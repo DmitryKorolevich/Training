@@ -19,3 +19,4 @@ Post-Deployment Script Template
 :r .\Scripts\FAQs.sql
 :r .\Scripts\Articles.sql
 :r .\Scripts\ContentPages.sql
+:r .\Scripts\SetupIdentity.sql

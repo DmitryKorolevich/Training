@@ -1482,3 +1482,7 @@
 /// <reference path="app/modules/content/controllers/contentpagescontroller.js" />
 /// <reference path="../app/core/utils/parts/basePaginationDirective.js" />
 /// <reference path="app/core/utils/parts/basePaginationDirective.js" />
+/// <reference path="../app/core/utils/appbootstrap.js" />
+/// <reference path="../App/core/dataAccess/services/infrastructureService.js" />
+/// <reference path="app/core/dataaccess/services/infrastructureservice.js" />
+/// <reference path="app/core/utils/appbootstrap.js" />
