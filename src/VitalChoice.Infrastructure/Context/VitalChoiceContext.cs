@@ -24,7 +24,7 @@ namespace VitalChoice.Infrastructure.Context
 			// are supported in ASP.NET 5
 			if (!created)
 			{
-                Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
+                //Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
                 created = true;
 			}
 		}
@@ -54,8 +54,6 @@ namespace VitalChoice.Infrastructure.Context
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            ////builder.Entity<ApplicationUser>().Ignore(x => x.ObjectState);
-
             #region LocalizationItems
 
             builder.Entity<LocalizationItem>().Key(p => new { p.GroupId, p.ItemId });
@@ -63,59 +61,68 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<LocalizationItem>().Collection(p => p.LocalizationItemDatas).InverseReference(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId }).
                 PrincipalKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<LocalizationItem>().Ignore(x => x.Id);
-            //builder.Entity<LocalizationItemData>().HasOne(p => p.LocalizationItem).WithMany(p => p.LocalizationItemDatas).ForeignKey(p => new { p.GroupId, p.ItemId })
-            //    .ReferencedKey(p => new { p.GroupId, p.ItemId });
             builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
 
             #endregion
 
             #region Contents
-            
-            builder.Entity<ContentTypeEntity>().ToTable("ContentTypes").Key(p => p.Id);
 
-            builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors").Key(p => p.Id);
-            builder.Entity<MasterContentItemToContentProcessor>().ToTable("MasterContentItemsToContentProcessors").Key(p => p.Id);
-            builder.Entity<ContentProcessor>().ToTable("ContentProcessors").Key(p => p.Id);
+		    builder.Entity<ContentTypeEntity>().Key(p => p.Id);
+            builder.Entity<ContentTypeEntity>().ForRelational().Table("ContentTypes");
 
-            builder.Entity<MasterContentItem>().ToTable("MasterContentItems").Key(p => p.Id);
-            //builder.Entity<MasterContentItem>().Property(p => p.Created).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
-            //builder.Entity<MasterContentItem>().Property(p => p.Updated).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
+            builder.Entity<ContentItemToContentProcessor>().Key(p => p.Id);
+            builder.Entity<ContentItemToContentProcessor>().ForRelational().Table("ContentItemsToContentProcessors");
+            builder.Entity<MasterContentItemToContentProcessor>().Key(p => p.Id);
+            builder.Entity<MasterContentItemToContentProcessor>().ForRelational().Table("MasterContentItemsToContentProcessors");
+            builder.Entity<ContentProcessor>().Key(p => p.Id);
+            builder.Entity<ContentProcessor>().ForRelational().Table("ContentProcessors");
+
+            builder.Entity<MasterContentItem>().Key(p => p.Id);
+            builder.Entity<MasterContentItem>().ForRelational().Table("MasterContentItems");
             builder.Entity<MasterContentItem>().Reference(p => p.Type).InverseCollection().ForeignKey(p => p.TypeId).PrincipalKey(p => p.Id);
             builder.Entity<MasterContentItem>().Collection(p => p.MasterContentItemToContentProcessors).InverseReference(p => p.MasterContentItem).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.MasterContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
 
-            builder.Entity<ContentItem>().ToTable("ContentItems").Key(p => p.Id);
-            //builder.Entity<ContentItem>().Property(p => p.Created).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
-            //builder.Entity<ContentItem>().Property(p => p.Updated).StoreGeneratedPattern(StoreGeneratedPattern.Computed);
+            builder.Entity<ContentItem>().Key(p => p.Id);
+            builder.Entity<ContentItem>().ForRelational().Table("ContentItems");
             builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
 
-            builder.Entity<ContentCategory>().ToTable("ContentCategories").Key(p => p.Id);
-            builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p=>p.MasterContentItemId).
-                PrincipalKey(p=>p.Id);
+            builder.Entity<ContentCategory>().Key(p => p.Id);
+            builder.Entity<ContentCategory>().ForRelational().Table("ContentCategories");
+            builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
+                PrincipalKey(p => p.Id);
             builder.Entity<ContentCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
                 PrincipalKey(p => p.Id);
 
-            builder.Entity<Recipe>().ToTable("Recipes").Key(p => p.Id);
-            builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories").Key(p => p.Id);
+            builder.Entity<Recipe>().Key(p => p.Id);
+            builder.Entity<Recipe>().ForRelational().Table("Recipes");
+            builder.Entity<RecipeToContentCategory>().Key(p => p.Id);
+            builder.Entity<RecipeToContentCategory>().ForRelational().Table("RecipesToContentCategories");
             builder.Entity<Recipe>().Collection(p => p.RecipesToContentCategories).InverseReference(p => p.Recipe).ForeignKey(p => p.RecipeId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
-            builder.Entity<FAQ>().ToTable("FAQs").Key(p => p.Id);
-            builder.Entity<FAQToContentCategory>().ToTable("FAQsToContentCategories").Key(p => p.Id);
+            builder.Entity<FAQ>().Key(p => p.Id);
+            builder.Entity<FAQ>().ForRelational().Table("FAQs");
+            builder.Entity<FAQToContentCategory>().Key(p => p.Id);
+            builder.Entity<FAQToContentCategory>().ForRelational().Table("FAQsToContentCategories");
             builder.Entity<FAQ>().Collection(p => p.FAQsToContentCategories).InverseReference(p => p.FAQ).ForeignKey(p => p.FAQId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
-            builder.Entity<Article>().ToTable("Articles").Key(p => p.Id);
-            builder.Entity<ArticleToContentCategory>().ToTable("ArticlesToContentCategories").Key(p => p.Id);
+            builder.Entity<Article>().Key(p => p.Id);
+            builder.Entity<Article>().ForRelational().Table("Articles");
+            builder.Entity<ArticleToContentCategory>().Key(p => p.Id);
+            builder.Entity<ArticleToContentCategory>().ForRelational().Table("ArticlesToContentCategories");
             builder.Entity<Article>().Collection(p => p.ArticlesToContentCategories).InverseReference(p => p.Article).ForeignKey(p => p.ArticleId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
-            builder.Entity<ContentPage>().ToTable("ContentPages").Key(p => p.Id);
-            builder.Entity<ContentPageToContentCategory>().ToTable("ContentPagesToContentCategories").Key(p => p.Id);
+            builder.Entity<ContentPage>().Key(p => p.Id);
+            builder.Entity<ContentPage>().ForRelational().Table("ContentPages");
+            builder.Entity<ContentPageToContentCategory>().Key(p => p.Id);
+            builder.Entity<ContentPageToContentCategory>().ForRelational().Table("ContentPagesToContentCategories");
             builder.Entity<ContentPage>().Collection(p => p.ContentPagesToContentCategories).InverseReference(p => p.ContentPage).ForeignKey(p => p.ContentPageId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);

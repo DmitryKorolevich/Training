@@ -53,7 +53,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
             SubTitle: null,
             Author: null,
             Url:'',
-            Template: '@default()',
+            Template: '',
             Description:'',
             Title:null,
             MetaKeywords:null,

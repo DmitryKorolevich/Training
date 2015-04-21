@@ -39,12 +39,12 @@ namespace VitalChoice.Business.Services.Impl.Content
             this.contentTypeRepository = contentTypeRepository;
             logger = LoggerService.GetDefault();
         }
-        
+
         public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
         {
             RecipeQuery query = new RecipeQuery();
             List<int> ids = null;
-            if(categoryId.HasValue)
+            if (categoryId.HasValue)
             {
                 if (categoryId.Value != -1)
                 {
@@ -57,12 +57,20 @@ namespace VitalChoice.Business.Services.Impl.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query=query.WithName(name).NotDeleted();
-            var toReturn = await recipeRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
-                SelectPageAsync(page,take);
+            query = query.WithName(name).NotDeleted();
+            var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
+                SelectPageAsync(page, take);
 
             //VitalChoiceContext content = new VitalChoiceContext();
-            //var res = content.Set<Recipe>().Include(p => p.ContentItem).OrderByDescending(p => p.ContentItem.Updated).ToList();
+            //var res = (from p in content.Set<Recipe>()
+            //           join o in content.Set<ContentItem>().AsNoTracking()
+            //               on p.ContentItemId equals o.Id
+            //           select new Recipe
+            //           {
+            //               Id = p.Id,
+            //               ContentItem = o
+            //           }).OrderBy(p => p.ContentItem.Title).ToList();
+
 
             return toReturn;
         }

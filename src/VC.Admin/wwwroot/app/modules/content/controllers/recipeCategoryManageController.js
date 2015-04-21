@@ -45,7 +45,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
             Name: '',
             Url: '',
             Type: 1,//recipe category
-            Template: '@default()',
+            Template: '',
             Title: null,
             MetaKeywords: null,
             MetaDescription: null,

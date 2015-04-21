@@ -14,7 +14,7 @@ namespace VitalChoice.Domain.Entities.Content
 
         public int MasterContentItemId { get; set; }
 
-        public ContentItem ContentItem { get; set; }
+        public virtual ContentItem ContentItem { get; set; }
 
         public int ContentItemId { get; set; }
 
