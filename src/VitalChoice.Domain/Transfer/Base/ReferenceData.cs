@@ -6,6 +6,6 @@ namespace VitalChoice.Domain.Transfer.Base
     {
 	    public IList<LookupItem<string>> Roles { get; set; }
 
-		public IList<LookupItem<int>> UserStatuses { get; set; }
+		public IList<LookupItem<byte>> UserStatuses { get; set; }
 	}
 }

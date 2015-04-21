@@ -9,11 +9,11 @@ namespace VitalChoice.Infrastructure.Utils
 {
     public static class EnumHelper
     {
-	    public static Dictionary<int, string> GetItems(Type enumType)
+	    public static Dictionary<T, string> GetItems<T>(Type enumType)
 	    {
 		    var values = Enum.GetValues(enumType);
 
-		    return values.Cast<object>().ToDictionary(value => (int) value, value =>
+		    return values.Cast<object>().ToDictionary(value => (T) value, value =>
 		    {
 #if DNX451
 			    return ((Enum) value).GetAttributeOfType<DescriptionAttribute>().Description;

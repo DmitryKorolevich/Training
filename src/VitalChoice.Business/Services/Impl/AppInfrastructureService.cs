@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Impl
 					Text = x.Name
 			    }).ToList(),
 
-				UserStatuses = EnumHelper.GetItems(typeof(UserStatus)).Select(x=>new LookupItem<int>()
+				UserStatuses = EnumHelper.GetItems<byte>(typeof(UserStatus)).Select(x=>new LookupItem<byte>()
 				{
 					Key = x.Key,
 					Text = x.Value

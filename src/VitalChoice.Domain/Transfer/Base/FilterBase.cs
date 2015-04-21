@@ -4,8 +4,9 @@
     {
 		public FilterBase()
 		{
-			
-		}
+			Paging = new Paging();
+			Sorting = new SortFilter();
+        }
 
 		public string SearchText { get; set; }
 

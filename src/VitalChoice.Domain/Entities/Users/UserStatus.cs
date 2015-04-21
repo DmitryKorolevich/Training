@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace VitalChoice.Domain.Entities.Users
 {
-    public enum UserStatus
+    public enum UserStatus :byte
     {
 #if DNX451
 		[Description("Not Active")]

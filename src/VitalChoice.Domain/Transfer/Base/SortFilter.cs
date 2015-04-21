@@ -1,6 +1,4 @@
-﻿using VitalChoice.Domain.Transfer.Base;
-
-namespace VitalChoice.Domain.Transfer
+﻿namespace VitalChoice.Domain.Transfer.Base
 {
     public class SortFilter
     {
