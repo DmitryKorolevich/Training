@@ -42,7 +42,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
 	        $scope[property] = !$scope[property];
 	    };
 
-        $scope.baseUrl='http://dev2.vitalchoice.com:5010/faq/';
+        $scope.baseUrl='http://staging.g2-dg.com/faq/';
         $scope.previewUrl = null;
 
         $scope.faq=

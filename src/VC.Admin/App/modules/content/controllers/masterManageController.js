@@ -54,8 +54,8 @@ function ($scope,$stateParams, contentService, toaster, confirmUtil, promiseTrac
 	        { Id: 4, Name: 'Article' },
 	        { Id: 5, Name: 'FAQ Category' },
 	        { Id: 6, Name: 'FAQ' },
-	        { Id: 7, Name: 'Content Page Category' },
-	        { Id: 8, Name: 'Content Page' },
+	        { Id: 7, Name: 'Content Category' },
+	        { Id: 8, Name: 'Content' },
 	    ];
         $scope.appProcessors = [
             {Id: 1, Name: 'Recipe root category processor'},

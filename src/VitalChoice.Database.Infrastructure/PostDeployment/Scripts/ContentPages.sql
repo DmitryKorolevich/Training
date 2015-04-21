@@ -7,12 +7,12 @@ DECLARE @contentCategoryId int, @contentItemId int, @articleId int, @masterRootI
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
 VALUES
-(7,'Content Page Category',NULL)
+(7,'Content Category',NULL)
 
 INSERT INTO ContentTypes
 (Id,Name,DefaultMasterContentItemId)
 VALUES
-(8,'Content Page',NULL)
+(8,'Content',NULL)
 
 INSERT INTO MasterContentItems
 (Name,Template,TypeId,StatusCode)
