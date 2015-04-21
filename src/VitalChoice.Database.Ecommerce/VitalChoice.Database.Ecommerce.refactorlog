@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="40939123-0b1a-444a-86fc-f59772db1026" ChangeDateTime="04/16/2015 10:13:57">
+    <Property Name="ElementName" Value="[dbo].[FK_WorkflowDependencies_ToWorkflowManagers]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[WorkflowDependencies]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_WorkflowDependencies_ToWorkflowManager]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="60680ee8-9dce-4486-9768-9dd8a8c2fbec" ChangeDateTime="04/16/2015 10:16:28">
+    <Property Name="ElementName" Value="[dbo].[FK_WorkflowManagers_ToDependencies]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[WorkflowManagers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_WorkflowManagers_ToWorkflowDependencies]" />
+  </Operation>
+</Operations>

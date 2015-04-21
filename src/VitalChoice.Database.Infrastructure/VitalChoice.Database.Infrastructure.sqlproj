@@ -113,6 +113,8 @@
     <None Include="VitalChoice.Database.Infrastructure.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+    <None Include="PostDeployment\Scripts\ContentTypes.sql" />
+    <None Include="PostDeployment\Scripts\SetupIdentity.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />

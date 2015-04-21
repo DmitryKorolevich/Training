@@ -453,13 +453,18 @@ form .form-group p {
   bottom: 0;
   right: 0;
 }
+.ball:not(:required).ng-hide {
+  /*-moz-animation: ball 0ms none linear;
+  -webkit-animation: ball 0s none linear;
+  animation: ball 0ms none linear;*/
+}
 .ball:not(:required)::after {
   background: #717171;
 }
-.fade.ng-enter {
-  transition: 0.5s linear all;
+.fade.ng-hide {
   opacity: 0;
 }
-.fade.ng-enter.ng-enter-active {
+.fade {
+  transition: 1s linear all;
   opacity: 1;
 }

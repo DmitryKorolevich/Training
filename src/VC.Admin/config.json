@@ -17,6 +17,7 @@
 		"CdnServerBaseUrl": "not yet ready",
 		"GenerateLowercaseUrls": true,
 		"EnableBundlingAndMinification" : false,
-        "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs"
+		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+		"DefaultCacheExpirationTermMinutes":  1440
 	}
 }

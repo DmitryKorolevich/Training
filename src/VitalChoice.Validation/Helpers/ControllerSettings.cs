@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Validation.Helpers

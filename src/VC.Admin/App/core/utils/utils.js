@@ -10,11 +10,12 @@ angular.module('app.utils', [
 	'ngProgress',
 	'angular-ladda',
 	'ajoslin.promise-tracker',
+	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil',
 	'app.core.utils.loading.overlayDirective',
-	'app.core.utils.parts.basePaginationDirective',
+	'app.core.utils.parts.basePaginationDirective'
 	])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {

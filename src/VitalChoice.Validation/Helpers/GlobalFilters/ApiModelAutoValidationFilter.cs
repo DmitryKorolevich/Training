@@ -3,9 +3,9 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
-using VitalChoice.Validation.Exceptions;
 using VitalChoice.Validation.Models;
 using System.Threading.Tasks;
+using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Helpers.GlobalFilters
 {

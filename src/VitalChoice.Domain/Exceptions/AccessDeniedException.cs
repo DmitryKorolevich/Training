@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace VitalChoice.Validation.Exceptions
+namespace VitalChoice.Domain.Exceptions
 {
     public class AccessDeniedException: ApiException
     {
