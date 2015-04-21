@@ -49,7 +49,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
 	        { Id: "2:2", Name: 'Published - Wholesale Only' },
 	    ];
 
-        $scope.baseUrl='http://dev2.vitalchoice.com:5010/content/{0}?preview=true';
+        $scope.baseUrl='http://staging.g2-dg.com/content/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.contentPage=

@@ -37,7 +37,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://dev2.vitalchoice.com:5010/recipes/';
+	    $scope.baseUrl = 'http://staging.g2-dg.com/recipes/';
 	    $scope.previewUrl = null;
 
 	    $scope.recipeCategory =

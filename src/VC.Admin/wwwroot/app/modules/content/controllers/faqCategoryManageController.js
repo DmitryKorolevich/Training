@@ -37,7 +37,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://dev2.vitalchoice.com:5010/faqs/';
+	    $scope.baseUrl = 'http://staging.g2-dg.com/faqs/';
 	    $scope.previewUrl = null;
 
 	    $scope.faqCategory =

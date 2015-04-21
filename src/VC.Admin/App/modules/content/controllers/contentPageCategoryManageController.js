@@ -37,7 +37,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://dev2.vitalchoice.com:5010/contents/';
+	    $scope.baseUrl = 'http://staging.g2-dg.com/contents/';
 	    $scope.previewUrl = null;
 
 	    $scope.contentPageCategory =

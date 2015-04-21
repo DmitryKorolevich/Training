@@ -50,7 +50,7 @@
     },
 	"commands": {
 		"web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
-		"kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://dev2.vitalchoice.com:5010",//do not change port
+		"kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5010",//do not change port
 		"gen": "Microsoft.Framework.CodeGeneration",
 		"ef": "EntityFramework.Commands"
 	}
