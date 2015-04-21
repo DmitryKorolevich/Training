@@ -1,9 +1,10 @@
 ﻿using System;
 using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Models.Setting
 {
-    public class LogItemListFilter : FilterModelBase
+    public class LogItemListFilter : FilterBase
     {
         public DateTime? From { get; set; }
 

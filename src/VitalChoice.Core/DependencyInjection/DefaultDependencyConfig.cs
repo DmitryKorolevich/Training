@@ -26,6 +26,7 @@ using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Business.Services.Impl.Content;
 using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
 using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Cache;
 #if DNX451
 using Autofac;
@@ -65,7 +66,7 @@ namespace VitalChoice.Core.DependencyInjection
 
                 //	});
 
-                services.AddOptions();
+				services.AddOptions();
 
                 services.Configure<AppOptions>(options =>
                 {
@@ -79,8 +80,19 @@ namespace VitalChoice.Core.DependencyInjection
 					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
 				});
 
+				services.ConfigureIdentity(x =>
+				{
+					x.User.RequireUniqueEmail = true;
+					x.Lockout.MaxFailedAccessAttempts = 5;
+					x.Lockout.EnabledByDefault = true;
+					x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
+					x.Password.RequiredLength = 8;
+					x.Password.RequireDigit = true;
+					x.Password.RequireNonLetterOrDigit = true;
+				});
+
 #if DNX451
-                var builder = new ContainerBuilder();
+				var builder = new ContainerBuilder();
 
                 builder.Populate(services);
 
@@ -95,7 +107,6 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterGeneric(typeof(LogsRepositoryAsync<>))
                     .As(typeof(ILogsRepositoryAsync<>))
                     .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
-                builder.RegisterType<CommentService>().As<ICommentService>();
                 builder.RegisterType<ContentViewService>().As<IContentViewService>();
                 builder.RegisterType<LogViewService>().As<ILogViewService>();
                 builder.RegisterType<MasterContentService>().As<IMasterContentService>();
@@ -114,6 +125,7 @@ namespace VitalChoice.Core.DependencyInjection
 				builder.RegisterType<MemoryCache>().As<IMemoryCache>();
 	            builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
 	            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
+	            builder.RegisterType<UserService>().As<IUserService>();
 
                 IContainer container = builder.Build();
 

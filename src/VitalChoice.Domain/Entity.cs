@@ -1,6 +1,4 @@
-﻿using VitalChoice.Domain.Infrastructure;
-
-namespace VitalChoice.Domain
+﻿namespace VitalChoice.Domain
 {
     public abstract class Entity 
     {

@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using VitalChoice.Models.ContentManagement;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Admin.Controllers
 {
@@ -146,10 +148,10 @@ namespace VitalChoice.Admin.Controllers
         #region Recipes
 
         [HttpPost]
-        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
+        public async Task<Result<PagedList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
         {
             var result = await recipeService.GetRecipesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<RecipeListItemModel>
+            var toReturn = new PagedList<RecipeListItemModel>
             {
                 Items = result.Items.Select(p => new RecipeListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -188,10 +190,10 @@ namespace VitalChoice.Admin.Controllers
         #region FAQs
 
         [HttpPost]
-        public async Task<Result<PagedModelList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
+        public async Task<Result<PagedList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
         {
             var result = await faqService.GetFAQsAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<FAQListItemModel>
+            var toReturn = new PagedList<FAQListItemModel>
             {
                 Items = result.Items.Select(p => new FAQListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -230,10 +232,10 @@ namespace VitalChoice.Admin.Controllers
         #region Articles
 
         [HttpPost]
-        public async Task<Result<PagedModelList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
+        public async Task<Result<PagedList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
         {
             var result = await articleService.GetArticlesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<ArticleListItemModel>
+            var toReturn = new PagedList<ArticleListItemModel>
             {
                 Items = result.Items.Select(p => new ArticleListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -272,10 +274,10 @@ namespace VitalChoice.Admin.Controllers
         #region ContentPages
 
         [HttpPost]
-        public async Task<Result<PagedModelList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
+        public async Task<Result<PagedList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
         {
             var result = await contentPageService.GetContentPagesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<ContentPageListItemModel>
+            var toReturn = new PagedList<ContentPageListItemModel>
             {
                 Items = result.Items.Select(p => new ContentPageListItemModel(p)).ToList(),
                 Count = result.Count,

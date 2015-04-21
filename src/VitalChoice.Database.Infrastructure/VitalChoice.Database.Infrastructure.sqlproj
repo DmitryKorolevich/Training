@@ -77,7 +77,6 @@
     <Build Include="dbo\Tables\AspNetUserLogins.sql" />
     <Build Include="dbo\Tables\AspNetUserRoles.sql" />
     <Build Include="dbo\Tables\AspNetUsers.sql" />
-    <Build Include="dbo\Tables\Comment.sql" />
     <Build Include="dbo\Tables\LocalizationItem.sql" />
     <Build Include="dbo\Tables\LocalizationItemData.sql" />
     <None Include="PostDeployment\Scripts\LocalizationItems.sql" />
@@ -104,6 +103,7 @@
     <None Include="PostDeployment\Scripts\Articles.sql" />
     <Build Include="dbo\ContentPages\ContentPagesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\ContentPages.sql" />
+    <Build Include="dbo\Tables\AdminProfiles.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

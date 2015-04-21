@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Data.DataContext
 {

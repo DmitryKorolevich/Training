@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace VitalChoice.Domain.Entities.Base
+namespace VitalChoice.Domain.Transfer.Base
 {
-    public class PagedList<T> where T : Entity
+    public class PagedList<T> where T : class 
     {
         public IEnumerable<T> Items { get; set; }
         public int Count { get; set; }
@@ -13,5 +12,10 @@ namespace VitalChoice.Domain.Entities.Base
             Count = count;
             Items = items;
         }
+
+	    public PagedList()
+	    {
+
+	    }
     }
 }

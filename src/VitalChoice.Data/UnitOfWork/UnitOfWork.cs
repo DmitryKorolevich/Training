@@ -2,14 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Relational;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Infrastructure;
-using Microsoft.Data.Entity.Relational;
 using VitalChoice.Domain;
 
 #endregion
@@ -81,7 +80,7 @@ namespace VitalChoice.Data.UnitOfWork
 
         public void BeginTransaction()
         {
-			transaction = ((DbContext) dataContext).Database.AsRelational().AsSqlServer().Connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+			transaction = ((DbContext) dataContext).Database.AsRelational().AsSqlServer().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
         }
 
         public bool Commit()

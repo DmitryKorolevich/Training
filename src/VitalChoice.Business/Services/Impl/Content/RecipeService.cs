@@ -9,9 +9,10 @@ using VitalChoice.Business.Queries.Content;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Base;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Impl.Content

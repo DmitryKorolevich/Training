@@ -4,7 +4,6 @@ using System;
 using System.Linq.Expressions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
 
 #endregion
 

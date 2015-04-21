@@ -1,20 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Business.Queries.Comment;
-using VitalChoice.Business.Queries.User;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Data.DataContext;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
-using Microsoft.AspNet.Mvc;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -93,10 +84,10 @@ namespace VitalChoice.Business.Services.Impl
         private static string GetStringFromLocalizationDataItem(int groupId, int itemId, string cultureId, params object[] args)
         {
             string toReturn = null;
-            if (LocalizationService.LocalizationData != null)
+            if (LocalizationData != null)
             {
                 Dictionary <int, List<LocalizationItemData>> group = null;
-                if(LocalizationService.LocalizationData.TryGetValue(groupId, out group))
+                if(LocalizationData.TryGetValue(groupId, out group))
                 {
                     List<LocalizationItemData> items = null;
                     if (group.TryGetValue(itemId, out items))

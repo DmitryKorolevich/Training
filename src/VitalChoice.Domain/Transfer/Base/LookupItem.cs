@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Domain.Entities.Base
+﻿namespace VitalChoice.Domain.Transfer.Base
 {
     public class LookupItem<T>
     {

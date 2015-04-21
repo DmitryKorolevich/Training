@@ -8,6 +8,7 @@ using Microsoft.AspNet.Mvc;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Models.Infrastructure;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
@@ -34,7 +35,7 @@ namespace VitalChoice.Controllers
 
 		    referenceDataModel.ValidationMessages =
 			    LocalizationService.LocalizationData[1].Select(x => x.Value.FirstOrDefault(y => y.CultureId == "en"))
-				    .Select(x=> new LookupItemModel<int>()
+				    .Select(x=> new LookupItem<int>()
 				    {
 					    Key = x.ItemId,
 						Text = x.Value
@@ -44,11 +45,8 @@ namespace VitalChoice.Controllers
 			    referenceDataModel = new FullReferenceDataModel()
 			    {
 					ValidationMessages = referenceDataModel.ValidationMessages,
-				    Roles = referenceData.Roles.Select(x=> new LookupItemModel<string>()
-				    {
-					    Key = x.Key,
-						Text = x.Text
-				    }).ToList()
+				    Roles = referenceData.Roles,
+					UserStatuses = referenceData.UserStatuses
 			    };
 		    }
 

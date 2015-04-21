@@ -4,7 +4,7 @@
 		<div class="row form-group">
 			<div class="col-md-4">
 				<div class="input-group">
-					<input type="text" class="form-control" data-ng-model="filter.Keyword" placeholder="Filter by Name, Email">
+					<input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Name, Email">
 					<span class="input-group-btn">
 						<button class="btn btn-info" data-ng-click="filterUsers();" type="button">Filter</button>
 					</span>
@@ -29,20 +29,20 @@
 				<tbody>
 				<tr data-ng-repeat="user in users">
 					<td>{{user.AgentId}}</td>
-					<td>{{user.FirstName + " " + user.LastName}}</td>
+					<td>{{user.FullName}}</td>
 					<td>{{user.Email}}</td>
-					<td><span data-ng-repeat="role in user.RoleNames track by $index" data-ng-bind="$index < user.RoleNames.length - 1 ? role + ', ' : role">
+					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceText(ReferenceData.Roles, role) + ', ' : getReferenceText(ReferenceData.Roles, role)">
 					</span>
 					</td>
 					<td>
-						<span data-ng-if="user.Status == 'Disabled'" class="label label-danger font-default">{{user.Status}}</span>
-						<span data-ng-if="user.Status == 'Not Active'" class="label label-warning font-default">{{user.Status}}</span>
-						<span data-ng-if="user.Status == 'Active'" class="label label-info font-default">{{user.Status}}</span>
+						<span data-ng-if="user.Status == 2" class="label label-danger font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}</span>
+						<span data-ng-if="user.Status == 0" class="label label-warning font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}<</span>
+						<span data-ng-if="user.Status == 1" class="label label-info font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}<</span>
 					</td>
 					<td>{{user.LastLoginDate | date:"MM/dd/yy"}}<br/>{{user.LastLoginDate | date:"h:mm a"}}</td>
 					<td>
 						<button class="btn btn-default btn-success" ladda="editTracker.active()" data-ng-click="open(true, user.PublicId);">Details</button>
-						<button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(user.FirstName, user.LastName, user.PublicId);">Delete</button>
+						<button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(user.FullName, user.PublicId);">Delete</button>
 					</td>
 				</tr>
 				</tbody>

@@ -51,14 +51,14 @@
 				<label class="col-md-3 control-label">Roles</label>
 				<div class="col-md-9">
 					<label class="checkbox-inline checkbox-in-group" data-ng-repeat="role in ReferenceData.Roles">
-						<input type="checkbox" value="role.Text" data-ng-checked="user.RoleNames.indexOf(role.Text) > -1" data-ng-click="toggleRoleSelection(role.Text)"/> {{role.Text}}
+						<input type="checkbox" value="{{role.Id}}" data-ng-checked="user.RoleIds.indexOf(role.Id) > -1" data-ng-click="toggleRoleSelection(role.Id)"/> {{role.Text}}
 					</label>
 				</div>
 			</div>
 			<div class="form-group" data-ng-if="editMode">
 				<label class="col-md-3 control-label">Status</label>
 				<div class="col-md-9">
-					<select class="form-control" data-ng-model="user.Status" data-ng-options="status for status in ['Active', 'Disabled', 'Not Active']" required></select> <!--hardcoded for now-->
+					<select class="form-control" data-ng-model="user.Status" data-ng-options="status.Key for status in userStatuses" required></select>
 				</div>
 			</div>
 		</fieldset>

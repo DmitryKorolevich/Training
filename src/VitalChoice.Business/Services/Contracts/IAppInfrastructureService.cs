@@ -1,4 +1,5 @@
-﻿using VitalChoice.Domain.Entities.Base;
+﻿using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Services.Contracts
 {

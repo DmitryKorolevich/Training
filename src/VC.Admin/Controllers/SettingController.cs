@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using VitalChoice.Models.ContentManagement;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Models.Setting;
 
 namespace VitalChoice.Admin.Controllers
@@ -35,11 +36,11 @@ namespace VitalChoice.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<PagedModelList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
+        public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
             var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
                 filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<LogListItemModel>
+            var toReturn = new PagedList<LogListItemModel>
             {
                 Items = result.Items.Select(p=>new LogListItemModel(p)).ToList(),
                 Count= result.Count,

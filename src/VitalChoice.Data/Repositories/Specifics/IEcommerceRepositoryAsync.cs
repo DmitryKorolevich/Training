@@ -1,11 +1,4 @@
-﻿using Microsoft.Data.Entity;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using VitalChoice.Data.DataContext;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
+﻿using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Repositories.Specifics
 {

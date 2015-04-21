@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Domain.Entities.Base;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Utils;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -32,8 +36,14 @@ namespace VitalChoice.Business.Services.Impl
 			    {
 				    Key = x.Id,
 					Text = x.Name
-			    }).ToList()
-		    };
+			    }).ToList(),
+
+				UserStatuses = EnumHelper.GetItems(typeof(UserStatus)).Select(x=>new LookupItem<int>()
+				{
+					Key = x.Key,
+					Text = x.Value
+				}).ToList()
+			};
 
 			return referenceData;
 	    }

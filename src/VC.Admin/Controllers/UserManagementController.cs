@@ -3,252 +3,131 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Roles;
+using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Controllers
 {
     public class UserManagementController : BaseApiController
     {
-	    private static PagedModelList<UserListItemModel> _users = new PagedModelList<UserListItemModel>()
-	    {
-		    Items =
-		    {
-			    new UserListItemModel()
-			    {
-				    PublicId = Guid.NewGuid(),
-				    Email = "gary.gould@gmail.com",
-				    FirstName = "Gary",
-				    LastName = "Gould",
-				    RoleNames = new List<string>() {"Super Admin User"},
-				    Status = "Active",
-				    AgentId = "007",
-					LastLoginDate = new DateTime(2015, 3, 2, 7, 5, 45)
-				},
-			    new UserListItemModel()
-			    {
-				    PublicId = Guid.NewGuid(),
-				    Email = "admin@sdsd.com",
-					FirstName = "Admin",
-					LastName = "Admin",
-				    RoleNames = new List<string>() {"Super Admin User"},
-				    Status = "Active",
-				    AgentId = "RW",
-					LastLoginDate = new DateTime(2015, 2, 2, 2, 35, 45)
-				},
-			    new UserListItemModel()
-			    {
-				    PublicId = Guid.NewGuid(),
-				    Email = "robert@gmail.com",
-					FirstName = "Till",
-					LastName = "Lindemann",
-				    RoleNames = new List<string>() {"Content User", "Product User"},
-				    Status = "Disabled",
-				    AgentId = "009",
-					LastLoginDate = new DateTime(2013, 1, 5, 7, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "sarah@gmail.com",
-					FirstName = "Sarah",
-					LastName = "Cheryl",
-					RoleNames = new List<string>() {"Content User"},
-					Status = "Not Active",
-					AgentId = "ZHB",
-					LastLoginDate = null
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "jesse@gmail.com",
-					FirstName = "Jesse",
-					LastName = "Matney",
-					RoleNames = new List<string>() {"Product User", "Order User"},
-					Status = "Active",
-					AgentId = "SH1",
-					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "michele@gmail.com",
-					FirstName = "Michele",
-					LastName = "Kinney",
-					RoleNames = new List<string>() {"Content User", "Product User", "Order User", "Admin User"},
-					Status = "Active",
-					AgentId = "L01",
-					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
-				},
-                new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "kassandra@gmail.com",
-					FirstName = "Kassandra",
-					LastName = "Heal",
-					RoleNames = new List<string>() {"Super Admin User"},
-					Status = "Active",
-					AgentId = "XLA",
-					LastLoginDate = new DateTime(2015, 1, 12, 17, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "heidi@gmail.com",
-					FirstName = "Heidi",
-					LastName = "Ward",
-					RoleNames = new List<string>() {"Order User"},
-					Status = "Disabled",
-					AgentId = "K01",
-					LastLoginDate = new DateTime(2015, 4, 2, 7, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "jennifer@gmail.com",
-					FirstName = "Jennifer",
-					LastName = "Armstrong",
-					RoleNames = new List<string>() {"Content User", "Product User"},
-					Status = "Active",
-					AgentId = "D01",
-					LastLoginDate = new DateTime(2015, 4, 2, 7, 35, 45)
-				},
-                new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "robin@gmail.com",
-					FirstName = "Robin",
-					LastName = "Wadsworth",
-					RoleNames = new List<string>() {"Admin User"},
-					Status = "Active",
-					AgentId = "XDK",
-					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "admin@gmail.com",
-					FirstName = "Krista",
-					LastName = "Coffey",
-					RoleNames = new List<string>() {"Product User"},
-					Status = "Active",
-					AgentId = "FS1",
-					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
-				},
-				new UserListItemModel()
-				{
-					PublicId = Guid.NewGuid(),
-					Email = "christopher@gmail.com",
-					FirstName = "Christopher",
-					LastName = "Reynolds",
-					RoleNames = new List<string>() {"Product User", "Order User"},
-					Status = "Active",
-					AgentId = "XCR2",
-					LastLoginDate = new DateTime(2015, 2, 2, 7, 35, 45)
-				}
-			}
-	    };
+	    private readonly IUserService userService;
 
-		public UserManagementController()
+	    public UserManagementController(IUserService userService)
 	    {
+		    this.userService = userService;
 	    }
 
-		[HttpPost]
-	    public Result<PagedModelList<UserListItemModel>> GetUsers([FromBody]UserManagementFilter filter)
+	    [HttpPost]
+	    public async Task<Result<PagedList<UserListItemModel>>> GetUsers([FromBody]FilterBase filter)
 		{
-			Expression<Func<UserListItemModel, bool>> usersPredicate = x => true;
-
-			if (!string.IsNullOrWhiteSpace(filter.Keyword))
-			{
-				var keyword = filter.Keyword.ToLower().Trim();
-
-				usersPredicate = usersPredicate.And(
-					x =>
-						(x.FirstName + " " + x.LastName).ToLower().Contains(keyword) ||
-						x.Email.ToLower().Contains(keyword));
-			}
-
-			var result = new PagedModelList<UserListItemModel>
-			{
-				Items = _users.Items.Where(usersPredicate.Compile()).ToList()
-			};
-
-			Thread.Sleep(5000);
-			
-			return result;
-	    }
+			var result =  await userService.GetAsync(filter);
+		    return new PagedList<UserListItemModel>()
+		    {
+				Count = result.Count,
+				Items = result.Items.Select(x=> new UserListItemModel()
+				{
+					AgentId = x.Profile.AgentId,
+					Email = x.Email,
+					FullName = $"{x.FirstName} {x.LastName}",
+					LastLoginDate = x.LastLoginDate,
+					PublicId = x.PublicId,
+					RoleIds = x.Roles.Select(y=> (RoleType)Enum.Parse(typeof(RoleType), y.RoleId)).ToList()
+				})
+		    };
+		}
 
 		[HttpPost]
 		public Result<ManageUserModel> CreateUserPrototype()
 		{
-			Thread.Sleep(5000);
 			return new ManageUserModel();
 		}
 
 		[HttpPost]
-		public Result<UserListItemModel> CreateUser([FromBody]ManageUserModel userModel)
+		public async Task<Result<bool>> CreateUser([FromBody]ManageUserModel userModel)
 		{
-			var newUser = new UserListItemModel()
+			var appUser = new ApplicationUser()
 			{
-				PublicId = Guid.NewGuid(),
-				Email = userModel.Email,
-				AgentId = userModel.AgentId,
 				FirstName = userModel.FirstName,
 				LastName = userModel.LastName,
-				Status = "Not Active",
-				RoleNames = userModel.RoleNames
+				Email = userModel.Email,
+				Profile = new AdminProfile()
+				{
+					AgentId = userModel.AgentId
+				}
 			};
 
-			_users.Items.Insert(0, newUser);
+			await userService.CreateAsync(appUser, userModel.RoleIds);
 
-			return newUser;
+			return true;
 		}
 
 		[HttpPost]
-		public Result<UserListItemModel> UpdateUser([FromBody]ManageUserModel userModel)
+		public async Task<Result<bool>> UpdateUser([FromBody]ManageUserModel userModel)
 		{
-			var user = _users.Items.Single(x => x.PublicId == userModel.PublicId);
+			var user = await userService.GetAsync(userModel.PublicId);
+			if (user == null)
+			{
+				throw new ApiException();
+			}
 
-			user.PublicId = userModel.PublicId;
-			user.Email = userModel.Email;
-			user.AgentId = userModel.AgentId;
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
+			user.Profile.AgentId = userModel.AgentId;
 			user.Status = userModel.Status;
-			user.RoleNames = userModel.RoleNames;
+			user.Email = userModel.Email;
 
-			return user;
+			await userService.UpdateAsync(user, userModel.RoleIds);
+
+			return true;
 		}
 
 		[HttpGet]
-	    public Result<ManageUserModel> GetUser(Guid id)
+	    public async Task<Result<ManageUserModel>> GetUser(Guid id)
 		{
-			var user = _users.Items.Single(x => x.PublicId == id);
-
+			var user = await userService.GetAsync(id);
+			if (user == null)
+			{
+				throw new ApiException();
+			}
+			
 			return new ManageUserModel()
 			{
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				PublicId = user.PublicId,
-				AgentId = user.AgentId,
+				AgentId = user.Profile.AgentId,
 				Email = user.Email,
 				Status = user.Status,
-				RoleNames = user.RoleNames
+				RoleIds = user.Roles.Select(y => (RoleType)Enum.Parse(typeof(RoleType), y.RoleId)).ToList()
 			};
 		}
 
 		[HttpPost]
-	    public Result<UserListItemModel> DeleteUser([FromBody]GetUserModel getUserModel)
+	    public async Task<Result<bool>> DeleteUser([FromBody]GetUserModel getUserModel)
 	    {
-		    var user = _users.Items.Single(x => x.PublicId == getUserModel.PublicId);
+			var user = await userService.GetAsync(getUserModel.PublicId);
+			if (user == null)
+			{
+				throw new ApiException();
+			}
 
-		    _users.Items.Remove(user);
+			await userService.DeleteAsync(user);
 
-		    return user;
+			return true;
 	    }
     }
 }

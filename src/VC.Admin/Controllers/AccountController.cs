@@ -1,32 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Infrastructure;
-using VitalChoice.Infrastructure;
-using VitalChoice.Infrastructure.Context;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Business.Services.Impl;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using Microsoft.AspNet.Authorization;
 using VitalChoice.Admin.Models;
+using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Admin.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-	    private readonly ICommentService commentService;
-
-	    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ICommentService commentService)
+		public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-		    this.commentService = commentService;
 		    UserManager = userManager;
             SignInManager = signInManager;
             
@@ -66,8 +51,6 @@ namespace VitalChoice.Admin.Controllers
 				}
             }
 
-			commentService.InsertWithUser(new Comment());
-
 	      /*  var comments = new List<Comment>();
 
 	        var comment = new Comment()
@@ -105,7 +88,7 @@ namespace VitalChoice.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, CustomerId = 1};
+                var user = new ApplicationUser { UserName = model.UserName};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

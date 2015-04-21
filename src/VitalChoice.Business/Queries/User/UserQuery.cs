@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Business.Queries.User
 {

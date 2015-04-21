@@ -28,7 +28,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	}
 
 	function initialize() {
-		$scope.filter = { Keyword: "" };
+		$scope.filter = { SearchText: "" };
 
 		refreshUsers();
 	}

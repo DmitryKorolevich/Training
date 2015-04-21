@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
 
 #endregion
 
