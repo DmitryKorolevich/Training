@@ -10,7 +10,7 @@ angular.module('app.modules.authentication', [
 
 		$stateProvider
 			.state('index.oneCol.activation', {
-				url: '/authentication/activate/demotoken',
+				url: '/authentication/activate/{token}',
 				templateUrl: 'app/modules/authentication/partials/activation.html',
 				controller: 'activationController'
 			});

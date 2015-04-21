@@ -3,8 +3,13 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace VitalChoice.Domain.Entities.Users
 {
-	public class ApplicationUser : IdentityUser
+	public class ApplicationUser : IdentityUser<int>
 	{
+		public ApplicationUser()
+		{
+			Profile = new AdminProfile();
+		}
+
 		public Guid PublicId { get; set; }
 
 		public string FirstName { get; set; }
@@ -21,6 +26,6 @@ namespace VitalChoice.Domain.Entities.Users
 
 		public DateTime? DeletedDate { get; set; }
 
-		public virtual AdminProfile Profile { get; set; }
+		public AdminProfile Profile { get; set; }
 	}
 }

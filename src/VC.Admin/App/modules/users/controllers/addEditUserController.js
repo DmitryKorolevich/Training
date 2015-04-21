@@ -59,18 +59,18 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		};
 	}
 
-	$scope.toggleRoleSelection = function (roleName) {
+	$scope.toggleRoleSelection = function (roleId) {
 		if (!$scope.user.RoleIds) {
 			$scope.user.RoleIds = [];
 		}
 
-		var idx = $scope.user.RoleIds.indexOf(roleName);
+		var idx = $scope.user.RoleIds.indexOf(roleId);
 
 		if (idx > -1) {
 			$scope.user.RoleIds.splice(idx, 1);
 		}
 		else {
-			$scope.user.RoleIds.push(roleName);
+			$scope.user.RoleIds.push(roleId);
 		}
 	};
 

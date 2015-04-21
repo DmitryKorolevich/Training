@@ -15,10 +15,14 @@ namespace VitalChoice.Business.Services.Contracts
 
 	    Task DeleteAsync(ApplicationUser user);
 
-	    Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null);
+	    Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null);
 
 	    Task<ApplicationUser> GetAsync(Guid publicId);
 
 	    Task<PagedList<ApplicationUser>> GetAsync(FilterBase filter);
+
+	    Task<ApplicationUser> GetByTokenAsync(Guid token);
+
+	    Task SignInAsync(ApplicationUser user);
     }
 }

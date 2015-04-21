@@ -1486,3 +1486,4 @@
 /// <reference path="../App/core/dataAccess/services/infrastructureService.js" />
 /// <reference path="app/core/dataaccess/services/infrastructureservice.js" />
 /// <reference path="app/core/utils/appbootstrap.js" />
+/// <reference path="app/core/dataaccess/services/authenticationservice.js" />

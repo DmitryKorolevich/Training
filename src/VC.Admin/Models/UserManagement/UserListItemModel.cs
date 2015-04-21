@@ -18,7 +18,7 @@ namespace VitalChoice.Models.UserManagement
 
 	    public IList<RoleType> RoleIds { get; set; }
 
-	    public string Status { get; set; }
+	    public UserStatus Status { get; set; }
 
 	    public string AgentId { get; set; }
 	    public DateTime? LastLoginDate { get; set; }

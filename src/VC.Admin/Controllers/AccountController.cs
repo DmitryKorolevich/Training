@@ -1,196 +1,70 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Admin.Models;
+using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Models.Account;
+using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Admin.Controllers
+namespace VitalChoice.Controllers
 {
-    [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseApiController
     {
-		public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
-        {
-		    UserManager = userManager;
-            SignInManager = signInManager;
-            
-			
-        }
+	    private readonly IUserService userService;
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
-        public SignInManager<ApplicationUser> SignInManager { get; private set; }
+	    public AccountController(IUserService userService)
+	    {
+		    this.userService = userService;
+	    }
 
-        // GET: /Account/Login
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Login(string returnUrl = null)
-        {
-            ViewBag.ReturnUrl = returnUrl;
-            return View();
-        }
+		[HttpGet]
+	    public async Task<Result<ActivateUserModel>> GetUser(Guid id)
+		{
+			var result = await userService.GetByTokenAsync(id);
+			if (result == null)
+			{
+				throw new ApiException();
+			}
 
-        //
-        // POST: /Account/Login
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
-        {
-            if (!ModelState.IsValid)
-            {
-                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-	            if (signInStatus.Succeeded)
-	            {
-		            return RedirectToLocal(returnUrl);
-	            }
-	            else
-	            {
-					ModelState.AddModelError("", "Invalid username or password.");
-					return View(model);
-				}
-            }
+			return new ActivateUserModel()
+			{
+				AgentId = result.Profile.AgentId,
+				FirstName = result.FirstName,
+				LastName = result.LastName,
+				Email = result.Email,
+				PublicId = result.PublicId
+			};
+		}
 
-	      /*  var comments = new List<Comment>();
+	    [HttpPost]
+		public async Task<Result<UserInfoModel>> Activate([FromBody]CreateAccountModel model)
+	    {
+		    var user = await userService.GetAsync(model.PublicId);
+		    if (user == null)
+		    {
+			    throw new ApiException();
+		    }
 
-	        var comment = new Comment()
-	        {
-		        //Id = (new Random()).Next(1, 10000000),
-		        CreationDate = DateTime.Now,
-		        Text = "atatatatatat",
-		        ObjectState = ObjectState.Added
-	        };
+		    user.FirstName = model.FirstName;
+		    user.LastName = model.LastName;
+		    user.Email = model.Email;
+		    user.Profile.IsConfirmed = true;
+			user.Status = UserStatus.Active;
 
-			comments.Add(comment);
+		    await userService.UpdateAsync(user, null, model.Password);
 
-			var user = new ApplicationUser { UserName = "asdasd" + (new Random()).Next(1, 10000000).ToString(), CustomerId = 1, ObjectState = ObjectState.Added, Comments = comments };
-			var signInStatus1 =  await UserManager.CreateAsync(user, model.Password);*/
+		    await userService.SignInAsync(user);
 
-			// If we got this far, something failed, redisplay form
-			return View(model);
-        }
-
-        //
-        // GET: /Account/Register
-        [AllowAnonymous]
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        //
-        // POST: /Account/Register
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = model.UserName};
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    AddErrors(result);
-                }
-            }
-
-
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        //
-        // GET: /Account/Manage
-        [HttpGet]
-        public IActionResult Manage(ManageMessageId? message = null)
-        {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
-        }
-
-        //
-        // POST: /Account/Manage
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Manage(ManageUserViewModel model)
-        {
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (ModelState.IsValid)
-            {
-                var user = await GetCurrentUserAsync();
-				//user.ObjectState = ObjectState.Modified;
-                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
-                }
-                else
-                {
-                    AddErrors(result);
-                }
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult LogOff()
-        {
-            SignInManager.SignOut();
-            return RedirectToAction("Index", "Home");
-        }
-
-        #region Helpers
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-        }
-
-        private async Task<ApplicationUser> GetCurrentUserAsync()
-        {
-            return await UserManager.FindByNameAsync(Context.User.Identity.Name);
-        }
-
-        public enum ManageMessageId
-        {
-            ChangePasswordSuccess,
-            Error
-        }
-
-        private IActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-
-
-        #endregion
-    }
+		    return new UserInfoModel()
+		    {
+			    FirstName = user.FirstName,
+				LastName = user.LastName
+		    };
+	    }
+	}
 }

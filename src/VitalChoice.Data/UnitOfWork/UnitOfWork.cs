@@ -22,7 +22,6 @@ namespace VitalChoice.Data.UnitOfWork
         private readonly IDataContextAsync dataContext;
         private bool disposed;
         private Dictionary<string, object> repositories;
-        private RelationalTransaction transaction;
 
         #endregion Private Fields
 
@@ -35,8 +34,6 @@ namespace VitalChoice.Data.UnitOfWork
 
         public void Dispose()
         {
-	        transaction?.Dispose();
-
 	        Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -77,22 +74,6 @@ namespace VitalChoice.Data.UnitOfWork
         }
 
         #region Unit of Work Transactions
-
-        public void BeginTransaction()
-        {
-			transaction = ((DbContext) dataContext).Database.AsRelational().AsSqlServer().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
-        }
-
-        public bool Commit()
-        {
-            transaction.Commit();
-            return true;
-        }
-
-        public void Rollback()
-        {
-            transaction.Rollback();
-        }
 
 	    #endregion
     }

@@ -18,6 +18,7 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc.Core;
+using Microsoft.Data.Entity;
 using Microsoft.Framework.Caching.Memory;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Core.Infrastructure;
@@ -28,6 +29,7 @@ using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
 using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Identity;
 #if DNX451
 using Autofac;
 using Autofac.Core;
@@ -53,7 +55,7 @@ namespace VitalChoice.Core.DependencyInjection
 
                 // Add Identity services to the services container.
                 //services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
-                services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<VitalChoiceContext>();
+	            services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<VitalChoiceContext, int>().AddUserStore<ExtendedUserStore>();
 
                 //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
                 services.TryAdd(
@@ -78,6 +80,7 @@ namespace VitalChoice.Core.DependencyInjection
                     options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
                     options.LogPath = configuration.Get("App:LogPath");
 					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
+					options.ActivationTokenExpirationTermDays = Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
 				});
 
 				services.ConfigureIdentity(x =>

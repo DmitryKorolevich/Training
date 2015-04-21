@@ -123,8 +123,8 @@ namespace VitalChoice.Infrastructure.Context
 
 			#region Users
 
-			builder.Entity<AdminProfile>().ToTable("AdminProfiles").Key(x => x.Id);
-			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).Required();
+			builder.Entity<AdminProfile>().ToTable("AdminProfiles").Key(x=>x.Id);
+			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
 
 			#endregion
 

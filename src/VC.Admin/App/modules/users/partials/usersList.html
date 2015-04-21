@@ -31,13 +31,13 @@
 					<td>{{user.AgentId}}</td>
 					<td>{{user.FullName}}</td>
 					<td>{{user.Email}}</td>
-					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceText(ReferenceData.Roles, role) + ', ' : getReferenceText(ReferenceData.Roles, role)">
+					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceItem(ReferenceData.Roles, role).Text + ', ' : getReferenceItem(ReferenceData.Roles, role).Text">
 					</span>
 					</td>
 					<td>
-						<span data-ng-if="user.Status == 2" class="label label-danger font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}</span>
-						<span data-ng-if="user.Status == 0" class="label label-warning font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}<</span>
-						<span data-ng-if="user.Status == 1" class="label label-info font-default">{{getReferenceText(ReferenceData.UserStatuses, user.Status)}}<</span>
+						<span data-ng-if="user.Status == 2" class="label label-danger font-default">{{getReferenceItem(ReferenceData.UserStatuses, user.Status).Text}}</span>
+						<span data-ng-if="user.Status == 0" class="label label-warning font-default">{{getReferenceItem(ReferenceData.UserStatuses, user.Status).Text}}</span>
+						<span data-ng-if="user.Status == 1" class="label label-info font-default">{{getReferenceItem(ReferenceData.UserStatuses, user.Status).Text}}</span>
 					</td>
 					<td>{{user.LastLoginDate | date:"MM/dd/yy"}}<br/>{{user.LastLoginDate | date:"h:mm a"}}</td>
 					<td>

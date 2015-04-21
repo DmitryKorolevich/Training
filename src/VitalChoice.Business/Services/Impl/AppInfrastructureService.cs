@@ -19,9 +19,9 @@ namespace VitalChoice.Business.Services.Impl
     {
 	    private readonly ICacheProvider cache;
 	    private readonly int expirationTerm;
-	    private readonly RoleManager<IdentityRole> roleManager;
+	    private readonly RoleManager<IdentityRole<int>> roleManager;
 
-	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole> roleManager)
+	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager)
 	    {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Impl
 	    {
 		    var referenceData = new ReferenceData
 		    {
-			    Roles = roleManager.Roles.Select(x=>new LookupItem<string>
+			    Roles = roleManager.Roles.Select(x=>new LookupItem<int>
 			    {
 				    Key = x.Id,
 					Text = x.Name

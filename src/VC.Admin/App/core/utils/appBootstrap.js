@@ -2,7 +2,7 @@
 
 angular.module('app.core.utils.appBootstrap', [])
 	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', function (infrastructureService, $rootScope, toaster) {
-			function getReferenceText(lookup, key) {
+			function getReferenceItem(lookup, key) {
 				return $.grep(lookup, function(elem) {
 					return elem.Key === key;
 				})[0];
@@ -24,7 +24,7 @@ angular.module('app.core.utils.appBootstrap', [])
 				});
 
 				$rootScope.authenticated = true; //temp solution
-				$rootScope.getReferenceText = getReferenceText;
+				$rootScope.getReferenceItem = getReferenceItem;
 			}
 
 			return {

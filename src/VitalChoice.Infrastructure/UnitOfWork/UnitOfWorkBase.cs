@@ -17,16 +17,6 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 
 	    protected abstract IUnitOfWorkAsync Init();
 
-	    public void BeginTransaction()
-		{
-			uow.BeginTransaction();
-		}
-
-		public bool Commit()
-		{
-			return uow.Commit();
-		}
-
 		public void Dispose()
 		{
 			uow.Dispose();
@@ -40,11 +30,6 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
 		{
 			return uow.RepositoryAsync<TEntity>();
-		}
-
-		public void Rollback()
-		{
-			uow.Rollback();
 		}
 
 		public int SaveChanges()

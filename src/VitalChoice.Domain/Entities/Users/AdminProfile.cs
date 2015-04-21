@@ -2,12 +2,16 @@
 
 namespace VitalChoice.Domain.Entities.Users
 {
-    public class AdminProfile
+    public class AdminProfile : Entity
     {
-		public string Id { get; set; }
-
 		public string AgentId { get; set; }
 
-		public virtual ApplicationUser User { get; set; }
+	    public Guid ConfirmationToken { get; set; }
+
+		public DateTime TokenExpirationDate { get; set; }
+
+	    public bool IsConfirmed { get; set; }
+
+	    public ApplicationUser User { get; set; }
 	}
 }

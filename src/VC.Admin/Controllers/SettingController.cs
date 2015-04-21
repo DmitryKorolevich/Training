@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNet.Mvc;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Domain.Entities.eCommerce.Users;
-using VitalChoice.Validation.Helpers.GlobalFilters;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validators.Users;
-using VitalChoice.Validation.Logic;
-using VitalChoice.Business.Services.Impl;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Core;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Business.Services.Contracts;
-using Microsoft.Framework.Logging;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Models.ContentManagement;
-using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Core.Infrastructure.Models;
+using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
+using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Models.Setting;
+using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Admin.Controllers
+namespace VitalChoice.Controllers
 {
     public class SettingController : BaseApiController
     {

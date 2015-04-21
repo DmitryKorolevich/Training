@@ -1,34 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Models.UserManagement;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Validation.Models;
-using VitalChoice.Core.Infrastructure.Models;
-using VitalChoice.Data.Extensions;
-using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Models.UserManagement;
+using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Controllers
 {
     public class UserManagementController : BaseApiController
     {
 	    private readonly IUserService userService;
+	    private readonly IOptions<AppOptions> appOptions;
 
-	    public UserManagementController(IUserService userService)
+	    public UserManagementController(IUserService userService, IOptions<AppOptions> appOptions)
 	    {
 		    this.userService = userService;
+		    this.appOptions = appOptions;
 	    }
 
 	    [HttpPost]
@@ -45,7 +40,8 @@ namespace VitalChoice.Controllers
 					FullName = $"{x.FirstName} {x.LastName}",
 					LastLoginDate = x.LastLoginDate,
 					PublicId = x.PublicId,
-					RoleIds = x.Roles.Select(y=> (RoleType)Enum.Parse(typeof(RoleType), y.RoleId)).ToList()
+					RoleIds = x.Roles.Select(y=> (RoleType)y.RoleId).ToList(),
+					Status = x.Status
 				})
 		    };
 		}
@@ -66,7 +62,10 @@ namespace VitalChoice.Controllers
 				Email = userModel.Email,
 				Profile = new AdminProfile()
 				{
-					AgentId = userModel.AgentId
+					AgentId = userModel.AgentId,
+					TokenExpirationDate = DateTime.UtcNow.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
+					IsConfirmed = false,
+					ConfirmationToken = Guid.NewGuid()
 				}
 			};
 
@@ -112,7 +111,7 @@ namespace VitalChoice.Controllers
 				AgentId = user.Profile.AgentId,
 				Email = user.Email,
 				Status = user.Status,
-				RoleIds = user.Roles.Select(y => (RoleType)Enum.Parse(typeof(RoleType), y.RoleId)).ToList()
+				RoleIds = user.Roles.Select(y=> (RoleType)y.RoleId).ToList()
 			};
 		}
 
