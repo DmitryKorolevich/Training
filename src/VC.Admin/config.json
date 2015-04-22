@@ -1,14 +1,4 @@
 {
-    "Data": {
-        "DefaultConnection": {
-            "ConnectionString": "Server=localhost;Database=VitalChoice;Integrated security=True;"
-        }
-    },
-    "EntityFramework": {
-        "VitalChoiceContext": {
-            "ConnectionStringKey": "Data:DefaultConnection:ConnectionString"
-        }
-    },
     "Constants": {
         "DefaultCultureId": "en-US"
     },
@@ -19,6 +9,11 @@
 		"EnableBundlingAndMinification" : false,
 		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
 		"DefaultCacheExpirationTermMinutes": 1440,
-		"ActivationTokenExpirationTermDays": 3
+        "ActivationTokenExpirationTermDays": 3,
+        "Connection": {
+            "UserName": "dev_vc_user",
+            "Password": "VZQCkea2",
+            "Server":  "localhost"
+        }
 	}
 }

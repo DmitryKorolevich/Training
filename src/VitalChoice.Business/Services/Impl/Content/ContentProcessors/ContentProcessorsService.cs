@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Templates.Helpers;
 using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
@@ -23,7 +24,7 @@ namespace VitalChoice.Business.Services.Impl.Content.ContentProcessors
             if (processors.ContainsKey(fullName))
                 return processors[fullName];
 
-            Type type = Type.GetType(fullName);
+            Type type = ReflectionHelper.ResolveType(fullName);
             processors.Add(fullName, (IContentProcessor)Activator.CreateInstance(type));
 
             return processors[fullName];

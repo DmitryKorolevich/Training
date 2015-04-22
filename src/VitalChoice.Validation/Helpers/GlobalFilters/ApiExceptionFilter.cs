@@ -17,8 +17,7 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
             if (context.Exception is ApiException)
             {
                 var exc = context.Exception as ApiException;
-                result = new JsonResult(Result.CreateErrorResult<object>(exc.Message));
-                result.StatusCode = (int)exc.Status;
+                result = new JsonResult(Result.CreateErrorResult<object>(exc.Message)) {StatusCode = (int) exc.Status};
             }
             else
             {
@@ -28,14 +27,15 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
                     result = new JsonResult(Result.CreateErrorResult<object>(new MessageInfo()
                     {
                         Field = exc.Field,
-                        Message= exc.Message
-                    }));
-                    result.StatusCode = (int)HttpStatusCode.OK;
+                        Message = exc.Message
+                    })) {StatusCode = (int) HttpStatusCode.OK};
                 }
                 else
                 {
-                    result = new JsonResult(Result.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage));
-                    result.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    result = new JsonResult(Result.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                    {
+                        StatusCode = (int) HttpStatusCode.InternalServerError
+                    };
                     LoggerService.GetDefault().LogError(context.Exception.ToString());
                 }
             }

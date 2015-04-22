@@ -8,45 +8,28 @@ namespace VitalChoice.Domain.Exceptions
     {
         protected readonly HttpStatusCode HttpStatus = HttpStatusCode.InternalServerError;
 
-        private readonly string _errorMessageKey = "Api.Exception.UserFriendlyError";
-        private IEnumerable<object> _args; 
+        public HttpStatusCode Status => HttpStatus;
 
-        public HttpStatusCode Status
-        {
-            get { return HttpStatus; }
-        }
-
-        public static string GetDefaultErrorMessage
-        {
-            get { return "Oops something went wrong!"; }
-        }
+        public static string GetDefaultErrorMessage => "Oops something went wrong!";
 
         public ApiException() {}
 
-        public ApiException(string messageKey, IEnumerable<object> args=null)
-        {
-            _errorMessageKey = messageKey;
-            _args = args;
+        public ApiException(string message, params object[] args) {
+            Message = string.Format(message, args);
         }
 
-        public ApiException(string messageKey, params object[] args) {
-            _errorMessageKey = messageKey;
-            _args = args;
-        }
-
-        public ApiException(string messageKey, HttpStatusCode status, IEnumerable<object> args = null)
+        public ApiException(string message, HttpStatusCode status, params object[] args)
         {
-            _errorMessageKey = messageKey;
+            Message = string.Format(message, args);
             HttpStatus = status;
-            _args = args;
         }
 
-        public override string Message
+        public ApiException(string message, HttpStatusCode status)
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            Message = message;
+            HttpStatus = status;
         }
+
+        public override string Message { get; }
     }
 }

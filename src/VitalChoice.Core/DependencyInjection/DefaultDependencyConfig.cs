@@ -1,38 +1,28 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using System;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Core;
+using Microsoft.Framework.Caching.Memory;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
-using VitalChoice.Data.DataContext;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Services;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Infrastructure.Context;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Business.Services.Impl;
-using System;
-using Microsoft.AspNet.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Mvc.Core;
-using Microsoft.Data.Entity;
-using Microsoft.Framework.Caching.Memory;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Core.Infrastructure;
 using Templates;
+using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
+using VitalChoice.Business.Services.Impl;
 using VitalChoice.Business.Services.Impl.Content;
 using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
-using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;
 #if DNX451
 using Autofac;
-using Autofac.Core;
 using Microsoft.Framework.DependencyInjection.Autofac;
 using VitalChoice.Data.Repositories.Specifics;
 #endif
@@ -81,7 +71,13 @@ namespace VitalChoice.Core.DependencyInjection
                     options.LogPath = configuration.Get("App:LogPath");
 					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
 					options.ActivationTokenExpirationTermDays = Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
-				});
+                    options.Connection = new Connection
+                    {
+                        UserName = configuration.Get("App:Connection:UserName"),
+                        Password = configuration.Get("App:Connection:Password"),
+                        Server = configuration.Get("App:Connection:Server"),
+                    };
+                });
 
 				services.ConfigureIdentity(x =>
 				{
@@ -129,7 +125,6 @@ namespace VitalChoice.Core.DependencyInjection
 	            builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
 	            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 	            builder.RegisterType<UserService>().As<IUserService>();
-
                 IContainer container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());

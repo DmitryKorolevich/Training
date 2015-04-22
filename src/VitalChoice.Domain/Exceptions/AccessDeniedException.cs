@@ -6,8 +6,8 @@ namespace VitalChoice.Domain.Exceptions
     {
         public AccessDeniedException() : base("Api.Exception.Base.Forbidden", HttpStatusCode.Forbidden) { }
 
-        public AccessDeniedException(string messageKey)
-            : base(messageKey, HttpStatusCode.Forbidden) {}
+        public AccessDeniedException(string message)
+            : base(message, HttpStatusCode.Forbidden) {}
         
     }
 }

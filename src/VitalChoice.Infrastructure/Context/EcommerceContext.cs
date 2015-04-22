@@ -4,22 +4,26 @@ using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Relational.Metadata;
 using System.Data.SqlClient;
 using System.IO;
+using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Domain.Entities.Options;
 
 namespace VitalChoice.Infrastructure.Context
 {
 	public class EcommerceContext : DataContext
     {
-		private static bool created;
+	    private readonly IOptions<AppOptions> _options;
+	    private static bool created;
 
-		public EcommerceContext()
+		public EcommerceContext(IOptions<AppOptions> options)
 		{
-			// Create the database and schema if it doesn't exist
+		    _options = options;
+		    // Create the database and schema if it doesn't exist
 			// This is a temporary workaround to create database until Entity Framework database migrations 
 			// are supported in ASP.NET 5
 			if (!created)
@@ -29,7 +33,7 @@ namespace VitalChoice.Infrastructure.Context
 			}
 		}
 
-	    public EcommerceContext(bool uofScoped = false) : this()
+	    public EcommerceContext(IOptions<AppOptions> options, bool uofScoped = false) : this(options)
 	    {
 	        
 	    }
@@ -38,13 +42,14 @@ namespace VitalChoice.Infrastructure.Context
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
-                DataSource = @"localhost",
+                DataSource = _options.Options.Connection.Server,
                 // TODO: Currently nested queries are run while processing the results of outer queries
                 // This either requires MARS or creation of a new connection for each query. Currently using
                 // MARS since cloning connections is known to be problematic.
                 MultipleActiveResultSets = true,
                 InitialCatalog = "VitalChoice.Ecommerce",
-                IntegratedSecurity = true,
+                UserID = _options.Options.Connection.UserName,
+                Password = _options.Options.Connection.Password,
                 ConnectTimeout = 60
             }).ConnectionString;
             builder.UseSqlServer(connectionString);
