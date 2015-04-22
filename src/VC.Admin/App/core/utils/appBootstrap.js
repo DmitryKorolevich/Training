@@ -8,6 +8,13 @@ angular.module('app.core.utils.appBootstrap', [])
 				})[0];
 			};
 
+			function getValidationMessage(key, field) {
+				var messageFormat = getReferenceItem($rootScope.ReferenceData.Labels, key);
+				var message = messageFormat.format(field);
+
+				return message;
+			}
+
 			function initialize() {
 				$rootScope.appStarted = false;
 
@@ -25,6 +32,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
 				$rootScope.authenticated = true; //temp solution
 				$rootScope.getReferenceItem = getReferenceItem;
+				$rootScope.getValidationMessage = getValidationMessage;
 			}
 
 			return {
