@@ -30,7 +30,7 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Name" class="form-control" placeholder="Title" data-ng-model="faq.Name" required>
                                                     <div class="error-container" ng-show="forms.faqForm.submitted && forms.faqForm.Name.$invalid">
-                                                        <small class="error" ng-show="forms.faqForm.Name.$error.required">Title is required</small>
+                                                        <small class="error" ng-show="forms.faqForm.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -39,8 +39,8 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="faq.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                     <div class="error-container" ng-show="forms.faqForm.submitted && forms.faqForm.Url.$invalid">
-                                                        <small class="error" ng-show="forms.faqForm.Url.$error.required">URL is required</small>
-                                                        <small class="error" ng-show="forms.faqForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
+                                                        <small class="error" ng-show="forms.faqForm.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.faqForm.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.faqForm.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
                                                     </div>
                                                 </div>
@@ -59,7 +59,7 @@
                                                     </div>
                                                     <div data-ng-show="descriptionExpanded" text-angular data-ng-model="faq.Description"></div>
                                                     <div class="error-container" ng-show="forms.faqForm.submitted && forms.faqForm.Description.$invalid">
-                                                        <small class="error" ng-show="forms.faqForm.Description.$error.required">Description is required</small>
+                                                        <small class="error" ng-show="forms.faqForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
                                                     </div>
                                                 </div>
                                             </div>

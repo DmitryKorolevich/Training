@@ -28,7 +28,7 @@
                                                     <div class="col-md-9">
                                                         <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="master.Name" required>
                                                         <div class="error-container" ng-show="forms.masterForm.submitted && forms.masterForm.Name.$invalid">
-                                                            <small class="error" ng-show="forms.masterForm.Name.$error.required">Title is required</small>
+                                                            <small class="error" ng-show="forms.masterForm.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -35,7 +35,7 @@
                                                         </span>
                                                     </p>
                                                     <div class="error-container" ng-show="forms.articleForm.submitted && forms.articleForm.Date.$invalid">
-                                                        <small class="error" ng-show="forms.articleForm.Date.$error.required">Date is required</small>
+                                                        <small class="error" ng-show="forms.articleForm.Date.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Date")}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -44,7 +44,7 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Name" class="form-control" placeholder="Title" data-ng-model="article.Name" required>
                                                     <div class="error-container" ng-show="forms.articleForm.submitted && forms.articleForm.Name.$invalid">
-                                                        <small class="error" ng-show="forms.articleForm.Name.$error.required">Title is required</small>
+                                                        <small class="error" ng-show="forms.articleForm.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Title")}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -65,8 +65,8 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="article.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                     <div class="error-container" ng-show="forms.articleForm.submitted && forms.articleForm.Url.$invalid">
-                                                        <small class="error" ng-show="forms.articleForm.Url.$error.required">URL is required</small>
-                                                        <small class="error" ng-show="forms.articleForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
+                                                        <small class="error" ng-show="forms.articleForm.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.articleForm.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.articleForm.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
                                                     </div>
                                                 </div>
@@ -85,7 +85,7 @@
                                                     </div>
                                                     <div data-ng-show="descriptionExpanded" text-angular data-ng-model="article.Description"></div>
                                                     <div class="error-container" ng-show="forms.articleForm.submitted && forms.articleForm.Description.$invalid">
-                                                        <small class="error" ng-show="forms.articleForm.Description.$error.required">Description is required</small>
+                                                        <small class="error" ng-show="forms.articleForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
                                                     </div>
                                                 </div>
                                             </div>

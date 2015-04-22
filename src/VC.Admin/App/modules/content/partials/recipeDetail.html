@@ -39,8 +39,8 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                     <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Url.$invalid">
-                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.required">URL is required</small>
-                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
+                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.recipeForm.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.recipeForm.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
                                                     </div>
                                                 </div>
@@ -59,7 +59,7 @@
                                                     </div>
                                                     <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
                                                     <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Description.$invalid">
-                                                        <small class="error" ng-show="forms.recipeForm.Description.$error.required">Description is required</small>
+                                                        <small class="error" ng-show="forms.recipeForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
                                                     </div>
                                                 </div>
                                             </div>
