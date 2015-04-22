@@ -18,7 +18,7 @@ function DnuAll($deployPath) {
 	echo "Restoring project packages..."
 	dnu restore --parallel >> restore.log
 	echo "Publishing project..."
-	dnu publish -o "${deployPath}"
+	dnu publish -o "${deployPath}" --runtime active
 	Pop-Location
 }
 function GruntTask($taskName) {
