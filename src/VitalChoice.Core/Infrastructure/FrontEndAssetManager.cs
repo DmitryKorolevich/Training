@@ -36,12 +36,14 @@ namespace VitalChoice.Core.Infrastructure
 
 		private static AssetInfo GetAssetInfo(string filePath)
 		{
-			using (Stream inputStream = new FileStream(filePath, FileMode.Open))
-			using (StreamReader reader = new StreamReader(inputStream))
-			{
-				string jsonValue = reader.ReadToEnd();
-				return JsonConvert.DeserializeObject<AssetInfo>(jsonValue, serializerSettings);
-			}
+		    using (Stream inputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+		    {
+		        using (StreamReader reader = new StreamReader(inputStream))
+		        {
+		            string jsonValue = reader.ReadToEnd();
+		            return JsonConvert.DeserializeObject<AssetInfo>(jsonValue, serializerSettings);
+		        }
+		    }
 		}
 	}
 }
