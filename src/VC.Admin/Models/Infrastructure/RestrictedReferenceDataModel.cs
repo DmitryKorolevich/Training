@@ -7,6 +7,5 @@ namespace VitalChoice.Models.Infrastructure
 {
     public class RestrictedReferenceData
     {
-		public IList<LookupItem<int>> ValidationMessages { get; set; }
 	}
 }

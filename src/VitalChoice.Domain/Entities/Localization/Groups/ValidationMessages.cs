@@ -3,7 +3,7 @@
 namespace VitalChoice.Domain.Entities.Localization.Groups
 {
     [LocalizationGroup(1)]
-    public enum ValidationMessages
+    public enum ValidationMessages : byte
     {
         FieldRequired=1,
         FieldLength=2,

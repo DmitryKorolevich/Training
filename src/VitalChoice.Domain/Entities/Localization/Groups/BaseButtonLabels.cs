@@ -3,7 +3,7 @@
 namespace VitalChoice.Domain.Entities.Localization.Groups
 {
     [LocalizationGroup(2)]
-    public enum BaseButtonLabels
+    public enum BaseButtonLabels : byte
     {
         Save=1,
         Cancel=2,

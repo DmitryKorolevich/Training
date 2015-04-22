@@ -12,6 +12,8 @@ using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Utils;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -20,13 +22,18 @@ namespace VitalChoice.Business.Services.Impl
 	    private readonly ICacheProvider cache;
 	    private readonly int expirationTerm;
 	    private readonly RoleManager<IdentityRole<int>> roleManager;
-
-	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager)
-	    {
+        private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
+        
+        public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
+            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
 		    this.roleManager = roleManager;
-	    }
+            this.contentProcessorRepository = contentProcessorRepository;
+            this.contentTypeRepository = contentTypeRepository;
+        }
 
 	    private ReferenceData Populate()
 	    {
@@ -38,12 +45,22 @@ namespace VitalChoice.Business.Services.Impl
 					Text = x.Name
 			    }).ToList(),
 
-				UserStatuses = EnumHelper.GetItems<byte>(typeof(UserStatus)).Select(x=>new LookupItem<byte>()
+				UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x=>new LookupItem<byte>()
 				{
 					Key = x.Key,
 					Text = x.Value
-				}).ToList()
-			};
+				}).ToList(),
+                 
+                ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
+                {
+                    Key = x.Id,
+                    Text = x.Name
+                }).ToList(),
+
+                ContentProcessors = contentProcessorRepository.Query().Select(false).ToList(),
+
+                Labels = LocalizationService.GetStrings(),
+            };
 
 			return referenceData;
 	    }

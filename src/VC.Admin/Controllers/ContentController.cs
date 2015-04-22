@@ -16,7 +16,6 @@ namespace VitalChoice.Controllers
 {
     public class ContentController : BaseApiController
     {
-        private readonly IGeneralContentService generalContentService;
         private readonly IMasterContentService masterContentService;
         private readonly ICategoryService categoryService;
         private readonly IRecipeService recipeService;
@@ -25,10 +24,9 @@ namespace VitalChoice.Controllers
         private readonly IContentPageService contentPageService;
         private readonly ILogger logger;
 
-        public ContentController(IGeneralContentService generalContentService, IMasterContentService masterContentService, ICategoryService categoryService,
+        public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService)
         {
-            this.generalContentService = generalContentService;
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
             this.recipeService = recipeService;
@@ -37,23 +35,7 @@ namespace VitalChoice.Controllers
             this.contentPageService = contentPageService;
             this.logger = LoggerService.GetDefault();
         }
-
-        #region Common
-
-        [HttpGet]
-        public async Task<Result<IEnumerable<ContentTypeEntity>>> GetContentTypes()
-        {
-            return (await generalContentService.GetContentTypesAsync()).ToList();
-        }
-
-        [HttpGet]
-        public async Task<Result<IEnumerable<ContentProcessor>>> GetContentProcessors()
-        {
-            return (await generalContentService.GetContentProcessorsAsync()).ToList();
-        }
-
-        #endregion
-
+        
         #region MasterContent
 
         [HttpPost]

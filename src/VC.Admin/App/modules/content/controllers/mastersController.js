@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.content.controllers.mastersController', [])
-.controller('mastersController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+.controller('mastersController', ['$scope', '$rootScope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("refresh");
     $scope.deleteTracker = promiseTracker("delete");
 
@@ -30,18 +30,8 @@ function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promi
 	};
 
     function initialize() {
-        //Should be loaded with loockups and basic settings on app opening
-        $scope.types = [
-            { Id: null, Name: 'All' },
-	        { Id: 1, Name: 'Recipe Category' },
-	        { Id: 2, Name: 'Recipe' },
-	        { Id: 3, Name: 'Article Category' },
-	        { Id: 4, Name: 'Article' },
-	        { Id: 5, Name: 'FAQ Category' },
-	        { Id: 6, Name: 'FAQ' },
-	        { Id: 7, Name: 'Content Category' },
-	        { Id: 8, Name: 'Content' },
-	    ];
+        $scope.types = Object.clone($rootScope.ReferenceData.ContentTypes);
+        $scope.types.splice(0, 0, { Key: null, Text: 'All' });
 
 	    $scope.filter = {
             Type: null,
