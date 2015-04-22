@@ -8,6 +8,22 @@ angular.module('app.core.utils.appBootstrap', [])
 				})[0];
 			};
 
+			function getValidationMessage(key, field) {
+			    var messageFormat = getReferenceItem($rootScope.ReferenceData.Labels, key).Text;
+                var message='';
+                if(field)
+                {
+			        var fieldValue = getReferenceItem($rootScope.ReferenceData.Labels, field).Text;
+			        message = messageFormat.format(fieldValue);
+                }
+                else
+                {
+                    message=messageFormat;
+                }
+
+				return message;
+			}
+
 			function initialize() {
 				$rootScope.appStarted = false;
 
@@ -25,6 +41,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
 				$rootScope.authenticated = true; //temp solution
 				$rootScope.getReferenceItem = getReferenceItem;
+				$rootScope.getValidationMessage = getValidationMessage;
 			}
 
 			return {

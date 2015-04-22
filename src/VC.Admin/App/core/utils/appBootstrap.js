@@ -9,8 +9,17 @@ angular.module('app.core.utils.appBootstrap', [])
 			};
 
 			function getValidationMessage(key, field) {
-				var messageFormat = getReferenceItem($rootScope.ReferenceData.Labels, key);
-				var message = messageFormat.format(field);
+			    var messageFormat = getReferenceItem($rootScope.ReferenceData.Labels, key).Text;
+                var message='';
+                if(field)
+                {
+			        var fieldValue = getReferenceItem($rootScope.ReferenceData.Labels, field).Text;
+			        message = messageFormat.format(fieldValue);
+                }
+                else
+                {
+                    message=messageFormat;
+                }
 
 				return message;
 			}
