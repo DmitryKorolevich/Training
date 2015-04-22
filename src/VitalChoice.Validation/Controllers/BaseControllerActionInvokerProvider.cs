@@ -22,14 +22,15 @@ namespace VitalChoice.Validation.Controllers
         private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
         private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
         private readonly ITempDataDictionary _tempData;
+        private readonly int _maxModelValidationErrors;
 
         public ControllerActionInvokerProvider(
-            IControllerFactory controllerFactory,
-            IEnumerable<IFilterProvider> filterProviders,
-            IControllerActionArgumentBinder argumentBinder,
-            IOptions<MvcOptions> optionsAccessor,
-            IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-            ITempDataDictionary tempData)
+                    IControllerFactory controllerFactory,
+                    IEnumerable<IFilterProvider> filterProviders,
+                    IControllerActionArgumentBinder argumentBinder,
+                    IOptions<MvcOptions> optionsAccessor,
+                    IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
+                    ITempDataDictionary tempData)
         {
             _controllerFactory = controllerFactory;
             _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
@@ -41,6 +42,7 @@ namespace VitalChoice.Validation.Controllers
             _valueProviderFactories = optionsAccessor.Options.ValueProviderFactories.ToArray();
             _actionBindingContextAccessor = actionBindingContextAccessor;
             _tempData = tempData;
+            _maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
         }
 
         public int Order
@@ -55,7 +57,7 @@ namespace VitalChoice.Validation.Controllers
 
             if (actionDescriptor != null)
             {
-                context.Result = new ControllerActionInvoker(
+                context.Result = new BaseControllerActionInvoker(
                                     context.ActionContext,
                                     _filterProviders,
                                     _controllerFactory,
@@ -67,7 +69,8 @@ namespace VitalChoice.Validation.Controllers
                                     _modelValidatorProviders,
                                     _valueProviderFactories,
                                     _actionBindingContextAccessor,
-                                    _tempData);
+                                    _tempData,
+                                    _maxModelValidationErrors);
             }
         }
 

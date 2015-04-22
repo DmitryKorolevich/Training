@@ -6,8 +6,5 @@ namespace VitalChoice.Data.UnitOfWork
     {
         int SaveChanges();
         void Dispose(bool disposing);
-        void BeginTransaction();
-        bool Commit();
-        void Rollback();
     }
 }

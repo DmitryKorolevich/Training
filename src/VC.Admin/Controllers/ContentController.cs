@@ -1,30 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Mvc;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Domain.Entities.eCommerce.Users;
-using VitalChoice.Validation.Helpers.GlobalFilters;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validators.Users;
-using VitalChoice.Validation.Logic;
-using VitalChoice.Business.Services.Impl;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Core;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Business.Services.Contracts;
-using Microsoft.Framework.Logging;
 using System.Threading.Tasks;
-using VitalChoice.Models.ContentManagement;
+using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
 using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Business.Services.Impl;
+using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Models.ContentManagement;
+using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Admin.Controllers
+namespace VitalChoice.Controllers
 {
     public class ContentController : BaseApiController
     {
-        private readonly IGeneralContentService generalContentService;
         private readonly IMasterContentService masterContentService;
         private readonly ICategoryService categoryService;
         private readonly IRecipeService recipeService;
@@ -33,10 +24,9 @@ namespace VitalChoice.Admin.Controllers
         private readonly IContentPageService contentPageService;
         private readonly ILogger logger;
 
-        public ContentController(IGeneralContentService generalContentService, IMasterContentService masterContentService, ICategoryService categoryService,
+        public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService)
         {
-            this.generalContentService = generalContentService;
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
             this.recipeService = recipeService;
@@ -45,23 +35,7 @@ namespace VitalChoice.Admin.Controllers
             this.contentPageService = contentPageService;
             this.logger = LoggerService.GetDefault();
         }
-
-        #region Common
-
-        [HttpGet]
-        public async Task<Result<IEnumerable<ContentTypeEntity>>> GetContentTypes()
-        {
-            return (await generalContentService.GetContentTypesAsync()).ToList();
-        }
-
-        [HttpGet]
-        public async Task<Result<IEnumerable<ContentProcessor>>> GetContentProcessors()
-        {
-            return (await generalContentService.GetContentProcessorsAsync()).ToList();
-        }
-
-        #endregion
-
+        
         #region MasterContent
 
         [HttpPost]
@@ -146,10 +120,10 @@ namespace VitalChoice.Admin.Controllers
         #region Recipes
 
         [HttpPost]
-        public async Task<Result<PagedModelList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
+        public async Task<Result<PagedList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
         {
             var result = await recipeService.GetRecipesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<RecipeListItemModel>
+            var toReturn = new PagedList<RecipeListItemModel>
             {
                 Items = result.Items.Select(p => new RecipeListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -188,10 +162,10 @@ namespace VitalChoice.Admin.Controllers
         #region FAQs
 
         [HttpPost]
-        public async Task<Result<PagedModelList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
+        public async Task<Result<PagedList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
         {
             var result = await faqService.GetFAQsAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<FAQListItemModel>
+            var toReturn = new PagedList<FAQListItemModel>
             {
                 Items = result.Items.Select(p => new FAQListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -230,10 +204,10 @@ namespace VitalChoice.Admin.Controllers
         #region Articles
 
         [HttpPost]
-        public async Task<Result<PagedModelList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
+        public async Task<Result<PagedList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
         {
             var result = await articleService.GetArticlesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<ArticleListItemModel>
+            var toReturn = new PagedList<ArticleListItemModel>
             {
                 Items = result.Items.Select(p => new ArticleListItemModel(p)).ToList(),
                 Count = result.Count,
@@ -272,10 +246,10 @@ namespace VitalChoice.Admin.Controllers
         #region ContentPages
 
         [HttpPost]
-        public async Task<Result<PagedModelList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
+        public async Task<Result<PagedList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
         {
             var result = await contentPageService.GetContentPagesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var toReturn = new PagedModelList<ContentPageListItemModel>
+            var toReturn = new PagedList<ContentPageListItemModel>
             {
                 Items = result.Items.Select(p => new ContentPageListItemModel(p)).ToList(),
                 Count = result.Count,

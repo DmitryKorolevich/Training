@@ -27,27 +27,52 @@ namespace VitalChoice.Data.Services
 			Repository.Insert(entity);
         }
 
-        public virtual void InsertRange(IEnumerable<TEntity> entities)
+	    public async Task InsertAsync(TEntity entity)
+	    {
+		    await Repository.InsertAsync(entity);
+	    }
+
+	    public virtual bool InsertRange(IEnumerable<TEntity> entities)
         {
-			Repository.InsertRange(entities);
+			return Repository.InsertRange(entities);
 		}
 
-        public virtual void InsertGraph(TEntity entity)
-        {
-			Repository.Insert(entity);
+	    public virtual async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
+	    {
+			return await Repository.InsertRangeAsync(entities);
 		}
 
-        public virtual void InsertGraphRange(params TEntity[] entities)
+	    public virtual TEntity InsertGraph(TEntity entity)
         {
-			Repository.InsertGraphRange(entities);
+			return Repository.Insert(entity);
 		}
 
-        public virtual void Update(TEntity entity)
-        {
-			Repository.Update(entity);
+	    public virtual async Task<TEntity> InsertGraphAsync(TEntity entity)
+	    {
+			return await Repository.InsertGraphAsync(entity);
 		}
 
-        public virtual void Delete(int id)
+	    public virtual bool InsertGraphRange(params TEntity[] entities)
+        {
+			return Repository.InsertGraphRange(entities);
+		}
+
+	    public virtual async Task<bool> InsertGraphRangeAsync(params TEntity[] entities)
+	    {
+			return await Repository.InsertGraphRangeAsync(entities);
+		}
+
+	    public virtual TEntity Update(TEntity entity)
+        {
+			return Repository.Update(entity);
+		}
+
+	    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+	    {
+		    return await Repository.UpdateAsync(entity);
+	    }
+
+	    public virtual void Delete(int id)
         {
 			Repository.Delete(id);
 		}

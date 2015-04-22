@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Roles;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validators.UserManagement;
 
@@ -14,11 +16,11 @@ namespace VitalChoice.Models.UserManagement
 
 		public string Email { get; set; }
 
-		public IList<string> RoleNames { get; set; }
+		public IList<RoleType> RoleIds { get; set; }
 
 		public string AgentId { get; set; }
 
-	    public string Status { get; set; }
+	    public UserStatus Status { get; set; }
 
 		public Guid PublicId { get; set; }
 	}

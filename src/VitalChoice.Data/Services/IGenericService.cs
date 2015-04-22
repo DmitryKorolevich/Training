@@ -5,17 +5,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Services
 {
     public interface IGenericService<TEntity> where TEntity : Entity
 	{
         void Insert(TEntity entity);
-        void InsertRange(IEnumerable<TEntity> entities);
-        void InsertGraph(TEntity entity);
-        void InsertGraphRange(params TEntity[] entities);
-        void Update(TEntity entity);
+        Task InsertAsync(TEntity entity);
+        bool InsertRange(IEnumerable<TEntity> entities);
+	    Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities);
+        TEntity InsertGraph(TEntity entity);
+		Task<TEntity> InsertGraphAsync(TEntity entity);
+	    bool InsertGraphRange(params TEntity[] entities);
+	    Task<bool> InsertGraphRangeAsync(params TEntity[] entities);
+	    TEntity Update(TEntity entity);
+	    Task<TEntity> UpdateAsync(TEntity entity);
         void Delete(int id);
         void Delete(TEntity entity);
 		IEnumerable<TEntity> Query();

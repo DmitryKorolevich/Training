@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
 
 namespace VitalChoice.Data.Repositories
 {

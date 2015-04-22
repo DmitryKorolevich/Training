@@ -4,11 +4,10 @@ using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Business.Services.Contracts;
 
-namespace VitalChoice.Admin.Controllers
+namespace VitalChoice.Controllers
 {
     public class HomeController : Controller
     {
-	    //public HomeController(ICommentService commentService)
 	    public HomeController()
 	    {
 

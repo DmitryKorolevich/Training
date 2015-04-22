@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Infrastructure;
-using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork
 {
@@ -20,16 +17,6 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 
 	    protected abstract IUnitOfWorkAsync Init();
 
-	    public void BeginTransaction()
-		{
-			uow.BeginTransaction();
-		}
-
-		public bool Commit()
-		{
-			return uow.Commit();
-		}
-
 		public void Dispose()
 		{
 			uow.Dispose();
@@ -43,11 +30,6 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
 		{
 			return uow.RepositoryAsync<TEntity>();
-		}
-
-		public void Rollback()
-		{
-			uow.Rollback();
 		}
 
 		public int SaveChanges()

@@ -28,7 +28,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	}
 
 	function initialize() {
-		$scope.filter = { Keyword: "" };
+		$scope.filter = { SearchText: "" };
 
 		refreshUsers();
 	}
@@ -67,7 +67,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 		}
 	};
 
-	$scope.delete = function(firstName, lastName, publicId) {
+	$scope.delete = function(fullName, publicId) {
 		confirmUtil.confirm(function() {
 			userService.deleteUser(publicId, $scope.deleteTracker)
 				.success(function(result) {
@@ -82,7 +82,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 					toaster.pop('error', "Error!", "Server error ocurred");
 					refreshUsers();
 				});
-		}, 'Are you sure you want to delete ' + firstName + ' ' + lastName + ' user?');
+		}, 'Are you sure you want to delete ' + fullName + ' user?');
 	};
 
 	initialize();

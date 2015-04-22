@@ -1,25 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Business.Queries.Comment;
-using VitalChoice.Business.Queries.User;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Data.DataContext;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Infrastructure.UnitOfWork;
-using System.Threading;
-using Microsoft.Framework.ConfigurationModel;
-using VitalChoice.Domain.Entities.Base;
-using VitalChoice.Domain.Entities.Logs;
-using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Business.Queries.Log;
-using VitalChoice.Domain.Constants;
 using System.Threading.Tasks;
+using VitalChoice.Business.Queries.Log;
+using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Services.Impl
 {

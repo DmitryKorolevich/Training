@@ -6,8 +6,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Base;
-using VitalChoice.Domain.Infrastructure;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 
 #endregion
 

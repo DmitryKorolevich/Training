@@ -42,7 +42,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 	        $scope[property] = !$scope[property];
 	    };
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/recipe/';
+        $scope.baseUrl='http://staging.g2-dg.com/recipe/';
         $scope.previewUrl = null;
 
         $scope.recipe=

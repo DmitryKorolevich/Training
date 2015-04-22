@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Base;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Services.Contracts.Content
 {

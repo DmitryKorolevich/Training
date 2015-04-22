@@ -18,6 +18,7 @@
 		"GenerateLowercaseUrls": true,
 		"EnableBundlingAndMinification" : false,
 		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-		"DefaultCacheExpirationTermMinutes":  1440
+		"DefaultCacheExpirationTermMinutes": 1440,
+		"ActivationTokenExpirationTermDays": 3
 	}
 }

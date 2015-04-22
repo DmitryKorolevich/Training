@@ -8,14 +8,13 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Context
 {
 	public class VitalChoiceContext : IdentityDataContext
     {
 		private static bool created;
-
-		public DbSet<Comment> Comments { get; set; }
 
 		public VitalChoiceContext()
 		{
@@ -24,7 +23,7 @@ namespace VitalChoice.Infrastructure.Context
 			// are supported in ASP.NET 5
 			if (!created)
 			{
-                //Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
+				Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
                 created = true;
 			}
 		}
@@ -127,9 +126,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
-            #endregion
+			#endregion
 
-            base.OnModelCreating(builder);
+			#region Users
+
+			builder.Entity<AdminProfile>().Key(x => x.Id);
+			builder.Entity<AdminProfile>().ForRelational().Table("AdminProfiles");
+			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
+
+			#endregion
+
+			base.OnModelCreating(builder);
 		}
 	}
 }

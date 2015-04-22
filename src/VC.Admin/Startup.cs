@@ -15,6 +15,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
 using System.IO;
 using System.Net;
+using Microsoft.AspNet.Authorization;
 using Microsoft.Framework.Runtime;
 using VitalChoice.Admin.AppConfig;
 

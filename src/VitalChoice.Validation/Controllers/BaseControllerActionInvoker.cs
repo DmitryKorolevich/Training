@@ -25,7 +25,8 @@ namespace VitalChoice.Validation.Controllers
             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
             IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-            ITempDataDictionary tempData)
+            ITempDataDictionary tempData,
+            int maxModelValidationErrors)
             : base(
             actionContext,
             filterProviders,
@@ -38,7 +39,8 @@ namespace VitalChoice.Validation.Controllers
             modelValidatorProviders,
             valueProviderFactories,
             actionBindingContextAccessor,
-            tempData)
+            tempData,
+            maxModelValidationErrors)
         {
 
         }
