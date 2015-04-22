@@ -10,10 +10,10 @@
         </div>
     </div>
     <div class="right-pane-main">
-        <spinner-overlay data-loading="refreshTracker.active()">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="container container-left">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <spinner-overlay data-loading="refreshTracker.active()">
                         <div class="well row">
                             <span class="legend">Manage Article Categories</span>
                             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(rootCategory.Id)">
@@ -26,9 +26,9 @@
                                 </ol>
                             </div>
                         </div>
-                    </div>
+                    </spinner-overlay>
                 </div>
             </div>
-        </spinner-overlay>
+        </div>
     </div>
 </div>

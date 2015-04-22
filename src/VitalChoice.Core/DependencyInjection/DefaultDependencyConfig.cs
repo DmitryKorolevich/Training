@@ -71,12 +71,14 @@ namespace VitalChoice.Core.DependencyInjection
                     options.LogPath = configuration.Get("App:LogPath");
 					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
 					options.ActivationTokenExpirationTermDays = Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
-                    options.Connection = new Connection
+					options.DefaultCultureId= configuration.Get("App:DefaultCultureId");
+					options.Connection = new Connection
                     {
                         UserName = configuration.Get("App:Connection:UserName"),
                         Password = configuration.Get("App:Connection:Password"),
                         Server = configuration.Get("App:Connection:Server"),
                     };
+
                 });
 
 				services.ConfigureIdentity(x =>
@@ -116,7 +118,6 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<ArticleService>().As<IArticleService>();
                 builder.RegisterType<ContentPageService>().As<IContentPageService>();
                 builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
-                builder.RegisterType<SettingService>().As<ISettingService>().SingleInstance();
                 builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
                 builder.RegisterInstance(configuration).As<IConfiguration>();
 				builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
@@ -127,7 +128,7 @@ namespace VitalChoice.Core.DependencyInjection
 	            builder.RegisterType<UserService>().As<IUserService>();
                 IContainer container = builder.Build();
 
-                LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), container.Resolve<ISettingService>());
+                LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
 
                 return container.Resolve<IServiceProvider>();
 #else

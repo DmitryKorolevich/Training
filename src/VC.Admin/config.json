@@ -1,7 +1,4 @@
 {
-    "Constants": {
-        "DefaultCultureId": "en-US"
-    },
 	"App": {
 		"ServeCdnContent": false,
 		"CdnServerBaseUrl": "not yet ready",
@@ -9,7 +6,7 @@
 		"EnableBundlingAndMinification" : false,
 		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
 		"DefaultCacheExpirationTermMinutes": 1440,
-        "ActivationTokenExpirationTermDays": 3,
+		"ActivationTokenExpirationTermDays": 3,
         "Connection": {
             "UserName": "dev_vc_user",
             "Password": "VZQCkea2",

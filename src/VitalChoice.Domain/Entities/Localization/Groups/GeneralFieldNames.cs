@@ -10,5 +10,6 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         Url = 3,
         Title = 4,
         Description = 5,
+        Date = 6,
     }
 }

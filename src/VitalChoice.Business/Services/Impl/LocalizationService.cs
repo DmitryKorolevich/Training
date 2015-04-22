@@ -51,12 +51,12 @@ namespace VitalChoice.Business.Services.Impl
 
         private static IRepositoryAsync<LocalizationItemData> repository;
 
-        private static ISettingService settingService;
+        private static string defaultCultureId;
 
-        public static void Init(IRepositoryAsync<LocalizationItemData> repository, ISettingService settingService)
+        public static void Init(IRepositoryAsync<LocalizationItemData> repository, string defaultCultureId)
         {
             LocalizationService.repository = repository;
-            LocalizationService.settingService = settingService;
+            LocalizationService.defaultCultureId = defaultCultureId;
             CreateLocalizationData();
         }
 
@@ -166,7 +166,7 @@ namespace VitalChoice.Business.Services.Impl
                     //Check default label
                     if (item == null)
                     {
-                        var defaultCulureId = settingService.GetProjectConstant("DefaultCultureId");
+                        var defaultCulureId = LocalizationService.defaultCultureId;
                         if (defaultCulureId != null)
                         {
                             item = items.Where(p => p.CultureId == defaultCulureId).FirstOrDefault();
@@ -202,9 +202,9 @@ namespace VitalChoice.Business.Services.Impl
         private static string GetCultureCode()
         {
 #if DNX451
-            return Thread.CurrentThread.CurrentCulture.Name ?? settingService.GetProjectConstant("DefaultCultureId");
+            return Thread.CurrentThread.CurrentCulture.Name ?? LocalizationService.defaultCultureId;
 #else
-            return settingService.GetProjectConstant("DefaultCultureId");
+            return LocalizationService.defaultCultureId;
 #endif
         }
     }

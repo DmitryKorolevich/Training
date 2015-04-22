@@ -12,7 +12,5 @@ namespace VitalChoice.Domain.Entities.Options
         public string LogPath { get; set; }
 		public int DefaultCacheExpirationTermMinutes { get; set; }
 		public int ActivationTokenExpirationTermDays { get; set; }
-
-       public Connection Connection { get; set; }
-    }
+		public string DefaultCultureId { get; set; }		public Connection Connection { get; set; }    }
 }

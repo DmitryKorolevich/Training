@@ -15,13 +15,13 @@
         </div>
     </div>
     <div class="right-pane-main">
-        <spinner-overlay data-loading="refreshTracker.active()">
-            <div class="container-fluid">
-                <div class="row">
-                    <tabset>
-                        <tab heading="Details">
-                            <div class="container container-left">
-                                <div class="well row">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Details">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
                                     <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
                                         <fieldset>
                                             <span class="legend">Content Page Category Details</span>
@@ -30,7 +30,7 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="contentPageCategory.Name" required>
                                                     <div class="error-container" ng-show="forms.form.submitted && forms.form.Name.$invalid">
-                                                        <small class="error" ng-show="forms.form.Name.$error.required">Name is required</small>
+                                                        <small class="error" ng-show="forms.form.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -39,8 +39,8 @@
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="contentPageCategory.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
                                                     <div class="error-container" ng-show="forms.form.submitted && forms.form.Url.$invalid">
-                                                        <small class="error" ng-show="forms.form.Url.$error.required">URL is required</small>
-                                                        <small class="error" ng-show="forms.form.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small>
+                                                        <small class="error" ng-show="forms.form.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.form.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.form.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
                                                     </div>
                                                 </div>
@@ -61,12 +61,14 @@
                                             </div>
                                         </fieldset>
                                     </form>
-                                </div>
+                                </spinner-overlay>
                             </div>
-                        </tab>
-                        <tab heading="Template">
-                            <div class="container container-left">
-                                <div class="well row">
+                        </div>
+                    </tab>
+                    <tab heading="Template">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
                                     <form class="form-horizontal">
                                         <fieldset>
                                             <button class="btn btn-info width-200px margin-bottom-10px" ng-if="contentPageCategory.MasterContentItemId!=0" data-ng-click="goToMaster(contentPageCategory.MasterContentItemId);">Manage Master Template</button>
@@ -90,12 +92,12 @@
                                             </div>
                                         </fieldset>
                                     </form>
-                                </div>
+                                </spinner-overlay>
                             </div>
-                        </tab>
-                    </tabset>
-                </div>
+                        </div>
+                    </tab>
+                </tabset>
             </div>
-        </spinner-overlay>
+        </div>
     </div>
 </div>
