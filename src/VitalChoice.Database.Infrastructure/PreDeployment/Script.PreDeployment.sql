@@ -10,5 +10,3 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-
-:r .\Scripts\ContentCategories.sql

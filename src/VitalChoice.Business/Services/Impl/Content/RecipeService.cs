@@ -14,6 +14,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {
@@ -41,15 +42,15 @@ namespace VitalChoice.Business.Services.Impl.Content
             logger = LoggerService.GetDefault();
         }
 
-        public async Task<PagedList<Recipe>> GetRecipesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
+        public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)
         {
             RecipeQuery query = new RecipeQuery();
             List<int> ids = null;
-            if (categoryId.HasValue)
+            if (filter.CategoryId.HasValue)
             {
-                if (categoryId.Value != -1)
+                if (filter.CategoryId.Value != -1)
                 {
-                    ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                    ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.RecipeId).ToList();
                     query = query.WithIds(ids);
                 }
                 else
@@ -58,9 +59,9 @@ namespace VitalChoice.Business.Services.Impl.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query = query.WithName(name).NotDeleted();
+            query = query.WithName(filter.Name).NotDeleted();
             var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
-                SelectPageAsync(page, take);
+                SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
 
             //VitalChoiceContext content = new VitalChoiceContext();
             //var res = (from p in content.Set<Recipe>()

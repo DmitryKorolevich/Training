@@ -10,6 +10,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
 using Templates;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {
@@ -49,10 +50,10 @@ namespace VitalChoice.Business.Services.Impl.Content
             logger = LoggerService.GetDefault();
         }
 
-        public async Task<ContentCategory> GetCategoriesTreeAsync(ContentType type, RecordStatusCode? status = null)
+        public async Task<ContentCategory> GetCategoriesTreeAsync(CategoryTreeFilter filter)
         {
             ContentCategory toReturn = null;
-            var query = new CategoryQuery().WithType(type).NotDeleted().WithStatus(status);
+            var query = new CategoryQuery().WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
             List<ContentCategory> categories = (await contentCategoryRepository.Query(query).SelectAsync(false)).ToList();
 
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);

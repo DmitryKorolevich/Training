@@ -11,6 +11,7 @@ Post-Deployment Script Template
 */
 
 
+:r .\Scripts\StartInit.sql
 :r .\Scripts\LocalizationItems.sql
 :r .\Scripts\ContentItems.sql
 :r .\Scripts\ContentProcessors.sql
