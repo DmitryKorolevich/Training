@@ -68,6 +68,17 @@ namespace VitalChoice.Public.AppConfig
                 defaults: new { controller = "ContentPage", action = "ContentPage" });
 
 
+            routeBuilder.MapRoute(
+                name: "Products_Categories",
+                template: "products/",
+                defaults: new { controller = "Product", action = "Categories" });
+
+            routeBuilder.MapRoute(
+                name: "Products_Category",
+                template: "products/{url}",
+                defaults: new { controller = "Product", action = "Category" });
+
+
 
             routeBuilder.MapRoute(
                 name: "ContentItem_Edit",

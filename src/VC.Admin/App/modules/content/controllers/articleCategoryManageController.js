@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleCategoryManageController', [])
-.controller('articleCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('articleCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
    
@@ -12,7 +12,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
             $scope.id=result.Data.Id;
             $scope.articleCategory.Id = result.Data.Id;
             $scope.articleCategory.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl = $scope.baseUrl + $scope.articleCategory.Url;
+            $scope.previewUrl = $scope.baseUrl.format($scope.articleCategory.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -37,7 +37,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/articles/';
+	    $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'articles/{0}?preview=true';
 	    $scope.previewUrl = null;
 
 	    $scope.articleCategory =
@@ -63,7 +63,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
                 .success(function (result) {
                     if (result.Success) {
                         $scope.articleCategory = result.Data;
-                        $scope.previewUrl = $scope.baseUrl + $scope.articleCategory.Url;
+                        $scope.previewUrl = $scope.baseUrl.format($scope.articleCategory.Url);
                         $scope.loaded = true;
                     } else {
                         errorHandler(result);

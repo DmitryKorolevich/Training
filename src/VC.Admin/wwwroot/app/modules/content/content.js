@@ -160,7 +160,7 @@ angular.module('app.modules.content', [
 		            params: { mode: 'list', id: null },
 		        })
 		        .state('index.oneCol.addNewContentPageCategory', {
-		            url: '/content/articles/contentpages/add?{categoryid:int}',
+		            url: '/content/contentpages/categories/add?{categoryid:int}',
 		            templateUrl: 'app/modules/content/partials/contentPageCategoryDetail.html',
 		            controller: 'contentPageCategoryManageController'
 		        })

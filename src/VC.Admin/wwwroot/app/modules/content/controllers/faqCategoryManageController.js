@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqCategoryManageController', [])
-.controller('faqCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('faqCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
    
@@ -12,7 +12,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
             $scope.id=result.Data.Id;
             $scope.faqCategory.Id = result.Data.Id;
             $scope.faqCategory.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl = $scope.baseUrl + $scope.faqCategory.Url;
+            $scope.previewUrl = $scope.baseUrl.format($scope.faqCategory.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -37,7 +37,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/faqs/';
+	    $scope.baseUrl = $rootScope.ReferenceData.PublicHost+'faqs/{0}?preview=true';
 	    $scope.previewUrl = null;
 
 	    $scope.faqCategory =
@@ -63,7 +63,7 @@ function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, pr
                 .success(function (result) {
                     if (result.Success) {
                         $scope.faqCategory = result.Data;
-                        $scope.previewUrl = $scope.baseUrl + $scope.faqCategory.Url;
+                        $scope.previewUrl = $scope.baseUrl.format($scope.faqCategory.Url);
                         $scope.loaded = true;
                     } else {
                         errorHandler(result);

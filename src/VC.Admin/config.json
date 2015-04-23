@@ -7,10 +7,12 @@
 		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
+		"DefaultCultureId": "en-US",
         "Connection": {
             "UserName": "dev_vc_user",
             "Password": "VZQCkea2",
-            "Server":  "localhost"
-        }
+            "Server": "localhost"
+        },
+        PublicHost: "http://dev2.vitalchoice.com:5010/",
 	}
 }

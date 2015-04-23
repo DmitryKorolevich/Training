@@ -11,6 +11,7 @@ using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
 using Templates;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {

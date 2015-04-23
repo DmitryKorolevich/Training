@@ -131,11 +131,22 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
 
-			#endregion
+            #endregion
 
-			#region Users
+            #region Products
 
-			builder.Entity<AdminProfile>().Key(x => x.Id);
+            builder.Entity<ProductCategory>().Key(p => p.Id);
+            builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
+            builder.Entity<ProductCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
+                PrincipalKey(p => p.Id);
+            builder.Entity<ProductCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
+                PrincipalKey(p => p.Id);
+
+            #endregion
+
+            #region Users
+
+            builder.Entity<AdminProfile>().Key(x => x.Id);
 			builder.Entity<AdminProfile>().ForRelational().Table("AdminProfiles");
 			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
 

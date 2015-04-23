@@ -39,6 +39,9 @@ namespace VitalChoice.Controllers
                 ContentTypes = referenceData.ContentTypes,
                 ContentProcessors = referenceData.ContentProcessors,
                 Labels = referenceData.Labels,
+                PublicHost = referenceData.PublicHost,
+                ContentItemStatusNames = referenceData.ContentItemStatusNames,
+                ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
             };
 
             return referenceDataModel;

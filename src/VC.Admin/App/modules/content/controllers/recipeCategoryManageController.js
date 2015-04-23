@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.recipeCategoryManageController', [])
-.controller('recipeCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('recipeCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
             $scope.id=result.Data.Id;
             $scope.recipeCategory.Id = result.Data.Id;
             $scope.recipeCategory.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl = $scope.baseUrl + $scope.recipeCategory.Url;
+            $scope.previewUrl = $scope.baseUrl.format($scope.recipeCategory.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -37,7 +37,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/recipes/';
+	    $scope.baseUrl = $rootScope.ReferenceData.PublicHost+'recipes/{0}?preview=true';
 	    $scope.previewUrl = null;
 
 	    $scope.recipeCategory =
@@ -63,7 +63,7 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
                 .success(function (result) {
                     if (result.Success) {
                         $scope.recipeCategory = result.Data;
-                        $scope.previewUrl = $scope.baseUrl + $scope.recipeCategory.Url;
+                        $scope.previewUrl = $scope.baseUrl.format($scope.recipeCategory.Url);
                         $scope.loaded = true;
                     } else {
                         errorHandler(result);

@@ -21,3 +21,4 @@ Post-Deployment Script Template
 :r .\Scripts\Articles.sql
 :r .\Scripts\ContentPages.sql
 :r .\Scripts\SetupIdentity.sql
+:r .\Scripts\ProductCategories.sql

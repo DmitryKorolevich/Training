@@ -96,4 +96,7 @@
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Infrastructure.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
+  </ItemGroup>
 </Project>

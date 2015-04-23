@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.contentPageManageController', [])
-.controller('contentPageManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil','promiseTracker',
-    function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('contentPageManageController', ['$scope', '$rootScope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil','promiseTracker',
+    function ($scope, $rootScope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -42,14 +42,9 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
 	        $scope[property] = !$scope[property];
 	    };
 
-        //Should be loaded with loockups and basic settings on app opening
-	    $scope.statuses = [
-	        { Id: "1:1", Name: 'Draft' },
-	        { Id: "2:1", Name: 'Published - All' },
-	        { Id: "2:2", Name: 'Published - Wholesale Only' },
-	    ];
+	    $scope.statuses = $rootScope.ReferenceData.ContentItemStatusNames;
 
-        $scope.baseUrl='http://staging.g2-dg.com/content/{0}?preview=true';
+        $scope.baseUrl=$rootScope.ReferenceData.PublicHost+'content/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.contentPage=
