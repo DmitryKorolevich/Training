@@ -108,7 +108,7 @@
 		    contentService.deleteRecipe(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
-			            toaster.pop('success', "Success!", "Successfully deleted");
+			            toaster.pop('success', "Success!", "Successfully deleted.");
 			            refreshRecipes();
 			        } else {
 			            errorHandler(result);

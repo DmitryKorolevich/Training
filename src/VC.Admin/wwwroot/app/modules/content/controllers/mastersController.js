@@ -61,7 +61,7 @@ function ($scope, $rootScope, $state, contentService, toaster, modalUtil, confir
 		    contentService.deleteMasterContentItem(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
-			            toaster.pop('success', "Success!", "Successfully deleted");
+			            toaster.pop('success', "Success!", "Successfully deleted.");
 			            refreshMasters();
 			        } else {
 			            errorHandler(result);

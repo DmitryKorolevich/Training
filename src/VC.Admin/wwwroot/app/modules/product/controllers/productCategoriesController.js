@@ -77,7 +77,7 @@
             productService.deleteCategory(id, $scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
-			            toaster.pop('success', "Success!", "Successfully deleted");
+			            toaster.pop('success', "Success!", "Successfully deleted.");
 			            removeCategoryFromTree(id);
 			        } else {
 			            errorHandler(result);
@@ -93,7 +93,7 @@
         productService.updateCategoriesTree($scope.rootCategory, $scope.editTracker)
             .success(function (result) {
                 if (result.Success) {
-                    toaster.pop('success', "Success!", "Successfully deleted");
+                    toaster.pop('success', "Success!", "Successfully saved.");
                 } else {
                     errorHandler(result);
                 }

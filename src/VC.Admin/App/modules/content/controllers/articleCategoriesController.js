@@ -77,7 +77,7 @@ function ($scope, $state, $stateParams, contentService, toaster, modalUtil, conf
             contentService.deleteCategory(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
-			            toaster.pop('success', "Success!", "Successfully deleted");
+			            toaster.pop('success', "Success!", "Successfully deleted.");
 			            removeCategoryFromTree(id);
 			        } else {
 			            errorHandler(result);
@@ -93,7 +93,7 @@ function ($scope, $state, $stateParams, contentService, toaster, modalUtil, conf
         contentService.updateCategoriesTree($scope.rootCategory,$scope.editTracker)
             .success(function (result) {
                 if (result.Success) {
-                    toaster.pop('success', "Success!", "Successfully deleted");
+                    toaster.pop('success', "Success!", "Successfully saved.");
                 } else {
                     errorHandler(result);
                 }
