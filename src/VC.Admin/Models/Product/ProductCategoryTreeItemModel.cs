@@ -18,6 +18,8 @@ namespace VitalChoice.Models.Product
                 
         public RecordStatusCode StatusCode { get; set; }
 
+        public CustomerTypeCode Assigned { get; set; }
+
         public IEnumerable<ProductCategoryTreeItemModel> SubItems { get; set; }
 
         public ProductCategoryTreeItemModel(ProductCategory item)
@@ -28,6 +30,7 @@ namespace VitalChoice.Models.Product
                 Name = item.Name;
                 Url = item.Url;
                 StatusCode = item.StatusCode;
+                Assigned = item.Assigned;
                 CreateSubCategories(this, item);
             }
         }

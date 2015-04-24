@@ -8,6 +8,7 @@
         <div class="line">
             <label>{{item.Name}}</label>
             <span data-ng-if="item.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+            <span data-ng-if="item.StatusCode == 2 && item.Assigned == 2" class="label label-wholesale category-status">Wholesale</span>
         </div>
         <div class="ya-treview-buttons" data-nodrag>
             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(item.Id)">

@@ -106,6 +106,10 @@ namespace VitalChoice.Models.Product
             toReturn.LongDescriptionBottom = LongDescriptionBottom;
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Description = Description;
+            if(toReturn.ContentItem.Description==null)
+            {
+                toReturn.ContentItem.Description = String.Empty;
+            }
             toReturn.ContentItem.Template = Template;
             toReturn.ContentItem.Title = Title;
             toReturn.ContentItem.MetaKeywords = MetaKeywords;
