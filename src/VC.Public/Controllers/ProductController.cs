@@ -11,19 +11,20 @@ using VitalChoice.Data.Repositories;
 using Microsoft.Data.Entity;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Business.Services.Contracts.Product;
 
 namespace VitalChoice.Public.Controllers.Content
 {
     public class ProductController : BaseContentController
     {
-        public ProductController(IContentViewService contentService) : base(contentService)
+        public ProductController(IProductViewService productViewService) : base(productViewService)
         {
         }
 
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
+            ExecutedContentItem toReturn = await productViewService.GetProductCategoryContentAsync(GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -37,7 +38,7 @@ namespace VitalChoice.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
+            ExecutedContentItem toReturn = await productViewService.GetProductCategoryContentAsync(GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
