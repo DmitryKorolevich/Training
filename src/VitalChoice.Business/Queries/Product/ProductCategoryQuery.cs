@@ -4,6 +4,7 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Domain.Entities.Product;
 
 namespace VitalChoice.Business.Queries.Product
 {

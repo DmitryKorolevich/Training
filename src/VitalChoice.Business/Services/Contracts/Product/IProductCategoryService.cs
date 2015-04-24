@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Domain.Transfer.Product;
 
@@ -18,8 +19,8 @@ namespace VitalChoice.Business.Services.Contracts.Product
         /// <param name="category"></param>
         /// <returns></returns>
         Task<bool> UpdateCategoriesTreeAsync(ProductCategory category);
-        Task<ProductCategory> GetCategoryAsync(int id);
-        Task<ProductCategory> UpdateCategoryAsync(ProductCategory category);
+        Task<ProductCategoryContent> GetCategoryAsync(int id);
+        Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent category);
         Task<bool> DeleteCategoryAsync(int id);
     }
 }

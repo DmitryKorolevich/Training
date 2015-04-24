@@ -14,7 +14,7 @@ using VitalChoice.Validators.Product;
 namespace VitalChoice.Models.Product
 {
     [ApiValidator(typeof(ProductCategoryManageModelValidator))]
-    public class ProductCategoryManageModel : Model<ProductCategory, IMode>
+    public class ProductCategoryManageModel : Model<ProductCategoryContent, IMode>
     {
         public int Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -59,7 +59,7 @@ namespace VitalChoice.Models.Product
         {
         }
 
-        public ProductCategoryManageModel(ProductCategory item)
+        public ProductCategoryManageModel(ProductCategoryContent item)
         {
             Id = item.Id;
             Name = item.Name;
@@ -89,9 +89,9 @@ namespace VitalChoice.Models.Product
             }
         }
 
-        public override ProductCategory Convert()
+        public override ProductCategoryContent Convert()
         {
-            ProductCategory toReturn = new ProductCategory();
+            ProductCategoryContent toReturn = new ProductCategoryContent();
             toReturn.Id = Id;
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();
@@ -106,6 +106,10 @@ namespace VitalChoice.Models.Product
             toReturn.LongDescriptionBottom = LongDescriptionBottom;
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Description = Description;
+            if(toReturn.ContentItem.Description==null)
+            {
+                toReturn.ContentItem.Description = String.Empty;
+            }
             toReturn.ContentItem.Template = Template;
             toReturn.ContentItem.Title = Title;
             toReturn.ContentItem.MetaKeywords = MetaKeywords;

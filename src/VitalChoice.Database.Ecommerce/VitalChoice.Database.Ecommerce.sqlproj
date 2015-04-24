@@ -71,15 +71,12 @@
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\SamplePostDeploy.sql" />
+    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
     <None Include="Local.publish.xml" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Ecommerce.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="dbo\Tables\Sample.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />

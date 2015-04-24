@@ -10,4 +10,4 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r .\Scripts\SamplePostDeploy.sql
+:r .\Scripts\ProductCategories.sql

@@ -19,13 +19,13 @@ namespace VitalChoice.Business.Services.Impl.Product
 	public class ProductViewService : IProductViewService
     {
         private readonly IRepositoryAsync<MasterContentItem> masterContentItemRepository;
-        private readonly IRepositoryAsync<ProductCategory> productCategoryRepository;
+        private readonly IRepositoryAsync<ProductCategoryContent> productCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IContentProcessorsService contentProcessorsService;
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
-        public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ProductCategory> productCategoryRepository,
+        public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
 		{
             this.masterContentItemRepository = masterContentItemRepository;
@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Services.Impl.Product
 
         public async Task<ExecutedContentItem> GetProductCategoryContentAsync(Dictionary<string, object> parameters, string categoryUrl = null)
         {
-            ProductCategory category;
+            ProductCategoryContent category;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
