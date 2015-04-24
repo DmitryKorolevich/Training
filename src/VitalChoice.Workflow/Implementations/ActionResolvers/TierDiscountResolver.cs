@@ -1,13 +1,11 @@
 ﻿using System;
-using VitalChoice.Workflow.Attributes;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
+using VitalChoice.Workflow.Implementations.ActionResolvers;
 using VitalChoice.Workflow.Implementations.Actions;
 using VitalChoice.Workflow.Implementations.Contexts;
 
-namespace VitalChoice.Workflow.Implementations.ActionResolvers
-{
-    [WorkflowExecutorName("TierDiscount")]
+namespace VitalChoice.Workflow.Implementations.ActionResolvers {
     public class TierDiscountResolver: ComputableActionResolver<OrderContext>
     {
         public TierDiscountResolver(IWorkflowActionTree<OrderContext, decimal> tree) : base(tree)

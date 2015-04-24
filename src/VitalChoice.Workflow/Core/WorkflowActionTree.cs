@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Templates.Helpers;
 using VitalChoice.Domain.Exceptions;
-using VitalChoice.Workflow.Attributes;
 
 namespace VitalChoice.Workflow.Core
 {
@@ -16,22 +15,28 @@ namespace VitalChoice.Workflow.Core
 
         private readonly Dictionary<Type, string> _reverseAccessActions;
 
-        protected WorkflowActionTree() : base(null)
+        protected WorkflowActionTree(IWorkflowActionTree<TContext, TResult> actionMapping) : base(null)
+        {
+            
+        }
+
+        protected WorkflowActionTree(HashSet<ActionItem> actionMapping) : base(null)
         {
             _actions = new Dictionary<string, IWorkflowExecutor<TContext, TResult>>();
             _reverseAccessActions = new Dictionary<Type, string>();
-            var types =
-                typeof (IWorkflowExecutor<TContext, TResult>).GetTypeInfo().Assembly.GetTypes()
-                    .Where(type => type.IsImplement(typeof (IWorkflowExecutor<TContext, TResult>)));
-            foreach (var type in types)
+            foreach (var action in actionMapping)
             {
-                var workflowAction = type.GetTypeInfo().GetCustomAttribute<WorkflowExecutorNameAttribute>(false);
-                if (workflowAction != null)
+                IWorkflowExecutor<TContext, TResult> instance;
+                if (action.ActionType.IsImplement<IWorkflowActionTree<TContext, TResult>>())
                 {
-                    _actions.Add(workflowAction.Name,
-                        (IWorkflowExecutor<TContext, TResult>) Activator.CreateInstance(type, this));
-                    _reverseAccessActions.Add(typeof (IWorkflowExecutor<TContext, TResult>), workflowAction.Name);
+                    instance = (IWorkflowExecutor<TContext, TResult>)Activator.CreateInstance(action.ActionType, this);
                 }
+                else
+                {
+                    instance = (IWorkflowExecutor<TContext, TResult>) Activator.CreateInstance(action.ActionType, this);
+                }
+                _actions.Add(action.ActionName, instance);
+                _reverseAccessActions.Add(action.ActionType, action.ActionName);
             }
         }
 

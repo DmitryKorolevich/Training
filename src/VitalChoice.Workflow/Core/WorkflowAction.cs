@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using VitalChoice.Workflow.Attributes;
 
 namespace VitalChoice.Workflow.Core
 {

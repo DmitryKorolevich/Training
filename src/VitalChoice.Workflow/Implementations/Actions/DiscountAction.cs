@@ -1,11 +1,9 @@
 ﻿using System;
-using VitalChoice.Workflow.Attributes;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Implementations.Contexts;
 
 namespace VitalChoice.Workflow.Implementations.Actions
 {
-    [WorkflowExecutorName("Discounts")]
     public class DiscountAction: ComputableAction<OrderContext>
     {
         public DiscountAction(ComputableActionTree<OrderContext> tree) : base(tree)
