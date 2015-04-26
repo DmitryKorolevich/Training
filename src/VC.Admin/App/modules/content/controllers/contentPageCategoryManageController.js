@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.contentPageCategoryManageController', [])
-.controller('contentPageCategoryManageController', ['$scope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('contentPageCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
             $scope.id=result.Data.Id;
             $scope.contentPageCategory.Id = result.Data.Id;
             $scope.contentPageCategory.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl = $scope.baseUrl + $scope.contentPageCategory.Url;
+            $scope.previewUrl = $scope.baseUrl.format($scope.contentPageCategory.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -37,7 +37,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
 	function initialize() {
 	    $scope.id = $stateParams.id;
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/contents/';
+	    $scope.baseUrl = $rootScope.ReferenceData.PublicHost+'contents/{0}?preview=true';
 	    $scope.previewUrl = null;
 
 	    $scope.contentPageCategory =
@@ -63,7 +63,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
                 .success(function (result) {
                     if (result.Success) {
                         $scope.contentPageCategory = result.Data;
-                        $scope.previewUrl = $scope.baseUrl + $scope.contentPageCategory.Url;
+                        $scope.previewUrl = $scope.baseUrl.format($scope.contentPageCategory.Url);
                         $scope.loaded = true;
                     } else {
                         errorHandler(result);

@@ -62,48 +62,21 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="dbo\" />
-    <Folder Include="dbo\Tables\" />
     <Folder Include="PostDeployment" />
     <Folder Include="PostDeployment\Scripts" />
-    <Folder Include="dbo\ContentPages" />
     <Folder Include="deploy" />
     <Folder Include="PreDeployment" />
     <Folder Include="PreDeployment\Scripts" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\AspNetRoles.sql" />
-    <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
-    <Build Include="dbo\Tables\AspNetUserClaims.sql" />
-    <Build Include="dbo\Tables\AspNetUserLogins.sql" />
-    <Build Include="dbo\Tables\AspNetUserRoles.sql" />
-    <Build Include="dbo\Tables\AspNetUsers.sql" />
-    <Build Include="dbo\Tables\LocalizationItem.sql" />
-    <Build Include="dbo\Tables\LocalizationItemData.sql" />
     <None Include="PostDeployment\Scripts\LocalizationItems.sql" />
-    <Build Include="dbo\Tables\RecordStatusCodes.sql" />
-    <Build Include="dbo\ContentPages\ContentCategories.sql" />
-    <Build Include="dbo\ContentPages\ContentProcessors.sql" />
-    <Build Include="dbo\ContentPages\ContentItems.sql" />
-    <Build Include="dbo\ContentPages\ContentItemsToContentProcessors.sql" />
-    <Build Include="dbo\ContentPages\MasterContentItems.sql" />
-    <Build Include="dbo\ContentPages\Recipes.sql" />
-    <Build Include="dbo\ContentPages\ContentPages.sql" />
-    <Build Include="dbo\ContentPages\RecipesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\ContentTestDataInsert.sql" />
     <None Include="PostDeployment\Scripts\ContentTestDataDelete.sql" />
-    <Build Include="dbo\ContentPages\ContentTypes.sql" />
-    <Build Include="dbo\ContentPages\MasterContentItemsToContentProcessors.sql" />
     <None Include="PostDeployment\Scripts\ContentItems.sql" />
-    <None Include="PreDeployment\Scripts\ContentCategories.sql" />
-    <Build Include="dbo\ContentPages\FAQs.sql" />
-    <Build Include="dbo\ContentPages\Articles.sql" />
-    <Build Include="dbo\ContentPages\FAQsToContentCategories.sql" />
-    <Build Include="dbo\ContentPages\ArticlesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\FAQs.sql" />
     <None Include="PostDeployment\Scripts\Articles.sql" />
-    <Build Include="dbo\ContentPages\ContentPagesToContentCategories.sql" />
     <None Include="PostDeployment\Scripts\ContentPages.sql" />
-    <Build Include="dbo\Tables\AdminProfiles.sql" />
+    <None Include="PostDeployment\Scripts\StartInit.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
@@ -122,5 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Infrastructure.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
   </ItemGroup>
 </Project>

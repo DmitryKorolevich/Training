@@ -108,7 +108,7 @@
 		    contentService.deleteContentPage(id,$scope.deleteTracker)
 			    .success(function (result) {
 			        if (result.Success) {
-			            toaster.pop('success', "Success!", "Successfully deleted");
+			            toaster.pop('success', "Success!", "Successfully deleted.");
 			            refreshContentPages();
 			        } else {
 			            errorHandler(result);

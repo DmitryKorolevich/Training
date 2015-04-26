@@ -13,5 +13,8 @@ namespace VitalChoice.Models.Infrastructure
         public IList<LookupItem<int>> ContentTypes { get; set; }
         public IList<ContentProcessor> ContentProcessors { get; set; }
         public IList<LookupItem<string>> Labels { get; set; }
+        public string PublicHost { get; set; }        
+        public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
+        public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
     }
 }

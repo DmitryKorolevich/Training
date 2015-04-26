@@ -7,16 +7,23 @@ using VitalChoice.Domain.Entities.Content;
 using System.Threading.Tasks;
 using VitalChoice.Public.Models;
 using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Business.Services.Contracts.Product;
 
 namespace VitalChoice.Public.Content.Controllers
 {
     public class BaseContentController : Controller
     {
         protected readonly IContentViewService contentService;
+        protected readonly IProductViewService productViewService;
 
         public BaseContentController(IContentViewService contentService)
         {
             this.contentService = contentService;
+        }
+
+        public BaseContentController(IProductViewService productViewService)
+        {
+            this.productViewService = productViewService;
         }
 
         //Get params fron action params and all aditional query params

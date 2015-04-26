@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.recipeManageController', [])
-.controller('recipeManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil','promiseTracker',
-    function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('recipeManageController', ['$scope', '$rootScope', '$state','$stateParams', 'contentService', 'toaster', 'confirmUtil','promiseTracker',
+    function ($scope, $rootScope, $state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.id=result.Data.Id;
             $scope.recipe.Id = result.Data.Id;
             $scope.recipe.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl=$scope.baseUrl+$scope.recipe.Url;
+            $scope.previewUrl=$scope.baseUrl.format($scope.recipe.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -42,7 +42,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 	        $scope[property] = !$scope[property];
 	    };
 
-        $scope.baseUrl='http://staging.g2-dg.com/recipe/';
+	    $scope.baseUrl=$rootScope.ReferenceData.PublicHost + 'recipe/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.recipe=
@@ -92,7 +92,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.recipe=result.Data;
-					                $scope.previewUrl = $scope.baseUrl + $scope.recipe.Url;
+					                $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
                                     setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
                                     $scope.loaded=true;
 				                } else {

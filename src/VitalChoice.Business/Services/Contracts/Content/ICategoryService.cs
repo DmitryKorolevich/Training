@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Contracts.Content
 {
 	public interface ICategoryService
     {
-        Task<ContentCategory> GetCategoriesTreeAsync(ContentType type, RecordStatusCode? status = null);
+        Task<ContentCategory> GetCategoriesTreeAsync(CategoryTreeFilter filter);
         /// <summary>
         /// Allow only update ordering categories in a tree, without ability to add or delete items. Not active status is ignored for this method, but not active categories willn't 
         /// render on the public part.

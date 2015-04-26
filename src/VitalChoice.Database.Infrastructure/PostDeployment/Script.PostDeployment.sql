@@ -11,6 +11,7 @@ Post-Deployment Script Template
 */
 
 
+:r .\Scripts\StartInit.sql
 :r .\Scripts\LocalizationItems.sql
 :r .\Scripts\ContentItems.sql
 :r .\Scripts\ContentProcessors.sql
@@ -20,3 +21,4 @@ Post-Deployment Script Template
 :r .\Scripts\Articles.sql
 :r .\Scripts\ContentPages.sql
 :r .\Scripts\SetupIdentity.sql
+:r .\Scripts\ProductCategories.sql

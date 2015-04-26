@@ -14,6 +14,7 @@ using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Business.Helpers;
 
 namespace VitalChoice.Business.Services.Impl
 {
@@ -24,15 +25,18 @@ namespace VitalChoice.Business.Services.Impl
 	    private readonly RoleManager<IdentityRole<int>> roleManager;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
-        
+        private readonly IOptions<AppOptions> appOptionsAccessor;
+
         public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
-            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
+            IOptions<AppOptions> appOptionsAccessor)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
 		    this.roleManager = roleManager;
             this.contentProcessorRepository = contentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this.appOptionsAccessor = appOptionsAccessor;
         }
 
 	    private ReferenceData Populate()
@@ -60,6 +64,20 @@ namespace VitalChoice.Business.Services.Impl
                 ContentProcessors = contentProcessorRepository.Query().Select(false).ToList(),
 
                 Labels = LocalizationService.GetStrings(),
+
+                PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost) ? appOptionsAccessor.Options.PublicHost : "http://notdefined/",
+
+                ContentItemStatusNames = StatusEnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
+
+                ProductCategoryStatusNames = StatusEnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
             };
 
 			return referenceData;

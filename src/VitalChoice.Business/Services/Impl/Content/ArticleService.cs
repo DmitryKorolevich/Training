@@ -12,6 +12,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {
@@ -39,15 +40,15 @@ namespace VitalChoice.Business.Services.Impl.Content
             logger = LoggerService.GetDefault();
         }
         
-        public async Task<PagedList<Article>> GetArticlesAsync(string name = null, int? categoryId = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
+        public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)
         {
             ArticleQuery query = new ArticleQuery();
             List<int> ids = null;
-            if(categoryId.HasValue)
+            if(filter.CategoryId.HasValue)
             {
-                if (categoryId.Value != -1)
+                if (filter.CategoryId.Value != -1)
                 {
-                    ids = (await articleToContentCategoryRepository.Query(p => p.ContentCategoryId == categoryId).SelectAsync(false)).Select(p => p.ArticleId).ToList();
+                    ids = (await articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.ArticleId).ToList();
                     query = query.WithIds(ids);
                 }
                 else
@@ -56,9 +57,9 @@ namespace VitalChoice.Business.Services.Impl.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query=query.WithName(name).NotDeleted();
+            query=query.WithName(filter.Name).NotDeleted();
             var toReturn = await articleRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.ArticlesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
-                SelectPageAsync(page,take);
+                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return toReturn;
         }
 

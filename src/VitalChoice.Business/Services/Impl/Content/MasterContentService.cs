@@ -8,6 +8,7 @@ using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Impl.Content
 {
@@ -44,10 +45,10 @@ namespace VitalChoice.Business.Services.Impl.Content
             return toReturn;
         }
 
-        public async Task<IEnumerable<MasterContentItem>> GetMasterContentItemsAsync(ContentType? type = null, RecordStatusCode? status = null)
+        public async Task<IEnumerable<MasterContentItem>> GetMasterContentItemsAsync(MasterContentItemListFilter filter)
         {
             var query = new MasterContentItemQuery();
-            query = query.WithType(type).NotDeleted().WithStatus(status);
+            query = query.WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
             var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).SelectAsync(false)).ToList();
             return toReturn;
         }

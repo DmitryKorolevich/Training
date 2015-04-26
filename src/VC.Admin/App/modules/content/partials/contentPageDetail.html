@@ -27,7 +27,7 @@
                                             <div class="form-group">
                                                 <label for="type" class="col-md-3 control-label">Status</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" name="Status" data-ng-model="contentPage.Status" ng-options="status.Id as status.Name for status in statuses"></select>
+                                                    <select class="form-control" name="Status" data-ng-model="contentPage.Status" ng-options="status.Key as status.Text for status in statuses"></select>
                                                 </div>
                                             </div>
                                             <span class="legend">Content Page Details</span>
@@ -109,18 +109,20 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <div class="form-group">
-                                        <label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
-                                        <div class="col-md-9">
-                                            <select class="form-control" name="MasterTemplate" data-ng-model="contentPage.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-info width-200px margin-bottom-10px" ng-if="contentPage.MasterContentItemId!=0" data-ng-click="goToMaster(contentPage.MasterContentItemId);">Manage Master Template</button>
-                                    <span class="legend">Manage Template</span>
+                                    <form class="form-horizontal">
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label for="masterTemplate" class="col-md-3 control-label">Master Template</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="MasterTemplate" data-ng-model="contentPage.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-info width-200px margin-bottom-10px" ng-if="contentPage.MasterContentItemId!=0" data-ng-click="goToMaster(contentPage.MasterContentItemId);">Manage Master Template</button>
+                                            <span class="legend">Manage Template</span>
 
-                                    <div class="form-group">
-                                        <div class="col-md-12">
-                                            <div data-ng-model="contentPage.Template" ui-ace="{
+                                            <div class="form-group">
+                                                <div class="col-md-12">
+                                                    <div data-ng-model="contentPage.Template" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
@@ -132,9 +134,11 @@
 				                                onLoad: aceLoaded,
 				                                onChange: aceChanged
 		                                }">
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        </fieldset>
+                                    </form>
                                 </spinner-overlay>
                             </div>
                         </div>

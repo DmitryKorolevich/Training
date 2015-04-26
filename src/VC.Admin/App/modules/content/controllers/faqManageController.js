@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqManageController', [])
-.controller('faqManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('faqManageController', ['$scope', '$rootScope', '$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
             $scope.id=result.Data.Id;
             $scope.faq.Id = result.Data.Id;
             $scope.faq.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl=$scope.baseUrl+$scope.faq.Url;
+            $scope.previewUrl=$scope.baseUrl.format($scope.faq.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -42,7 +42,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
 	        $scope[property] = !$scope[property];
 	    };
 
-        $scope.baseUrl='http://staging.g2-dg.com/faq/';
+	    $scope.baseUrl=$rootScope.ReferenceData.PublicHost+'faq/{0}?preview=true';
         $scope.previewUrl = null;
 
         $scope.faq=
@@ -92,7 +92,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
 			                .success(function (result) {
 				                if (result.Success) {
 					                $scope.faq=result.Data;
-					                $scope.previewUrl = $scope.baseUrl + $scope.faq.Url;
+					                $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
                                     setSelected($scope.rootCategory, $scope.faq.CategoryIds);
                                     $scope.loaded=true;
 				                } else {

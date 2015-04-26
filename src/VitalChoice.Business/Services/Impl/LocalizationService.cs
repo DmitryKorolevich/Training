@@ -202,7 +202,8 @@ namespace VitalChoice.Business.Services.Impl
         private static string GetCultureCode()
         {
 #if DNX451
-            return Thread.CurrentThread.CurrentCulture.Name ?? LocalizationService.defaultCultureId;
+            //return Thread.CurrentThread.CurrentCulture.Name ?? LocalizationService.defaultCultureId;
+            return LocalizationService.defaultCultureId;
 #else
             return LocalizationService.defaultCultureId;
 #endif

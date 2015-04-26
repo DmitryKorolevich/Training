@@ -173,10 +173,6 @@ angular.module('app.modules.demo',
 					url: '/products/add',
 					template: '<h2>Add New Product</h2>'
 				})
-				.state('index.oneCol.manageCategories', {
-					url: '/products/manageCategories',
-					template: '<h2>Manage Categories</h2>'
-				})
 				.state('index.oneCol.manageProductReviews', {
 					url: '/products/manageProductReviews',
 					template: '<h2>Manage Product Reviews</h2>'

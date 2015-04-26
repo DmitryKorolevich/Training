@@ -19,7 +19,7 @@ namespace VitalChoice.Models.ContentManagement
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
 
-        [Localized(GeneralFieldNames.Name)]
+        [Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
         public string FileUrl { get; set; }

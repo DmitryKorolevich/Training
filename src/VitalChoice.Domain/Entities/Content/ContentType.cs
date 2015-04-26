@@ -12,5 +12,6 @@ namespace VitalChoice.Domain.Entities.Content
         FAQ = 6,
         ContentPageCategory = 7,
         ContentPage = 8,
+        ProductCategory = 9,
     }
 }

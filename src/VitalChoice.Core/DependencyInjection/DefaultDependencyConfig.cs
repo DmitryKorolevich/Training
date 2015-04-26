@@ -21,6 +21,8 @@ using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Business.Services.Impl.Product;
+using VitalChoice.Business.Services.Contracts.Product;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -78,7 +80,7 @@ namespace VitalChoice.Core.DependencyInjection
                         Password = configuration.Get("App:Connection:Password"),
                         Server = configuration.Get("App:Connection:Server"),
                     };
-
+                    options.PublicHost = configuration.Get("App:PublicHost");
                 });
 
 				services.ConfigureIdentity(x =>
@@ -126,6 +128,8 @@ namespace VitalChoice.Core.DependencyInjection
 	            builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
 	            builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 	            builder.RegisterType<UserService>().As<IUserService>();
+                builder.RegisterType<ProductViewService>().As<IProductViewService>();
+                builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
                 IContainer container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));

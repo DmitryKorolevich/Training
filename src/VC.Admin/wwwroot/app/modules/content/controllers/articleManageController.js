@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleManageController', [])
-.controller('articleManageController', ['$scope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('articleManageController', ['$scope', '$rootScope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
@@ -12,7 +12,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
             $scope.id=result.Data.Id;
             $scope.article.Id = result.Data.Id;
             $scope.article.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl=$scope.baseUrl+$scope.article.Url;
+            $scope.previewUrl=$scope.baseUrl.format($scope.article.Url);
 		} else {
             var messages=""; 
             if(result.Messages)
@@ -42,7 +42,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
 	        $scope[property] = !$scope[property];
 	    };
 
-	    $scope.baseUrl = 'http://staging.g2-dg.com/article/';
+	    $scope.baseUrl = $rootScope.ReferenceData.PublicHost+'article/{0}?preview=true';
         $scope.previewUrl = null;
 
         var currentDate = new Date();
@@ -101,7 +101,7 @@ function ($scope,$state,$stateParams, contentService, toaster, confirmUtil, prom
 				                if (result.Success) {
 					                $scope.article=result.Data;
 				                    $scope.article.PublishedDateObject = new DateObject(Date.parseDateTime($scope.article.PublishedDate));
-					                $scope.previewUrl = $scope.baseUrl + $scope.article.Url;
+					                $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
                                     setSelected($scope.rootCategory, $scope.article.CategoryIds);
                                     $scope.loaded=true;
 				                } else {

@@ -41,7 +41,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<IEnumerable<MasterContentItemListItemModel>>> GetMasterContentItems([FromBody]MasterContentItemListFilter filter)
         {
-            return (await masterContentService.GetMasterContentItemsAsync(filter.Type, filter.Status)).Select(p=>new MasterContentItemListItemModel(p)).ToList();
+            return (await masterContentService.GetMasterContentItemsAsync(filter)).Select(p=>new MasterContentItemListItemModel(p)).ToList();
         }
 
         [HttpGet]
@@ -75,7 +75,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<CategoryTreeItemModel>> GetCategoriesTree([FromBody]CategoryTreeFilter filter)
         {
-            var result = await categoryService.GetCategoriesTreeAsync(filter.Type, filter.Status);
+            var result = await categoryService.GetCategoriesTreeAsync(filter);
 
             return new CategoryTreeItemModel(result);
         }
@@ -122,7 +122,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<PagedList<RecipeListItemModel>>> GetRecipes([FromBody]RecipeListFilter filter)
         {
-            var result = await recipeService.GetRecipesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var result = await recipeService.GetRecipesAsync(filter);
             var toReturn = new PagedList<RecipeListItemModel>
             {
                 Items = result.Items.Select(p => new RecipeListItemModel(p)).ToList(),
@@ -164,7 +164,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<PagedList<FAQListItemModel>>> GetFAQs([FromBody]FAQListFilter filter)
         {
-            var result = await faqService.GetFAQsAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var result = await faqService.GetFAQsAsync(filter);
             var toReturn = new PagedList<FAQListItemModel>
             {
                 Items = result.Items.Select(p => new FAQListItemModel(p)).ToList(),
@@ -206,7 +206,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<PagedList<ArticleListItemModel>>> GetArticles([FromBody]ArticleItemListFilter filter)
         {
-            var result = await articleService.GetArticlesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var result = await articleService.GetArticlesAsync(filter);
             var toReturn = new PagedList<ArticleListItemModel>
             {
                 Items = result.Items.Select(p => new ArticleListItemModel(p)).ToList(),
@@ -248,7 +248,7 @@ namespace VitalChoice.Controllers
         [HttpPost]
         public async Task<Result<PagedList<ContentPageListItemModel>>> GetContentPages([FromBody]ContentPageListFilter filter)
         {
-            var result = await contentPageService.GetContentPagesAsync(filter.Name, filter.CategoryId, filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var result = await contentPageService.GetContentPagesAsync(filter);
             var toReturn = new PagedList<ContentPageListItemModel>
             {
                 Items = result.Items.Select(p => new ContentPageListItemModel(p)).ToList(),

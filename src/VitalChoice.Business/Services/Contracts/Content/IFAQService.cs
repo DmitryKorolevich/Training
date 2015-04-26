@@ -6,12 +6,13 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Contracts.Content
 {
 	public interface IFAQService
     {
-        Task<PagedList<FAQ>> GetFAQsAsync(string name=null,int? categoryId =null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT);
+        Task<PagedList<FAQ>> GetFAQsAsync(FAQListFilter filter);
         Task<FAQ> GetFAQAsync(int id);
         Task<FAQ> UpdateFAQAsync(FAQ faq);
         Task<bool> AttachFAQToCategoriesAsync(int id, IEnumerable<int> categoryIds);

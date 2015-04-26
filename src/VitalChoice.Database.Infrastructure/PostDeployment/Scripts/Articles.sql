@@ -1,4 +1,6 @@
-﻿IF((SELECT count(*) FROM ContentTypes
+﻿GO
+
+IF((SELECT count(*) FROM ContentTypes
 WHERE Id IN (3,4))!=2)
 BEGIN
 
