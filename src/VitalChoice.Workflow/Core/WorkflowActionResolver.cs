@@ -8,7 +8,7 @@ namespace VitalChoice.Workflow.Core
         IWorkflowActionResolver<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
-        protected WorkflowActionResolver(IWorkflowActionTree<TContext, TResult> tree) : base(tree)
+        protected WorkflowActionResolver(IWorkflowActionTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
             Actions = new Dictionary<int, string>();
         }

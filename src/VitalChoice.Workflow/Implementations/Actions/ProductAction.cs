@@ -7,7 +7,7 @@ namespace VitalChoice.Workflow.Implementations.Actions
 {
     public class ProductAction: ComputableAction<OrderContext>
     {
-        public ProductAction(ComputableActionTree<OrderContext> tree) : base(tree)
+        public ProductAction(ComputableActionTree<OrderContext> tree, string actionName) : base(tree, actionName)
         {
         }
 

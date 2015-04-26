@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Templates.Helpers;
 
 namespace VitalChoice.Workflow.Core
@@ -36,6 +37,9 @@ namespace VitalChoice.Workflow.Core
 
         public Type ActionType { get; }
         public string ActionName { get; }
+
+        public HashSet<ActionItem> OptionalDependentTree { get; set; }
+
         public bool Equals(ActionItem other)
         {
             if (ReferenceEquals(this, other))

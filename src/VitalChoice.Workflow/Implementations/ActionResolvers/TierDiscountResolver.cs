@@ -8,13 +8,13 @@ using VitalChoice.Workflow.Implementations.Contexts;
 namespace VitalChoice.Workflow.Implementations.ActionResolvers {
     public class TierDiscountResolver: ComputableActionResolver<OrderContext>
     {
-        public TierDiscountResolver(IWorkflowActionTree<OrderContext, decimal> tree) : base(tree)
+        public TierDiscountResolver(IWorkflowActionTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
         {
         }
 
         public override int GetActionKey(OrderContext context)
         {
-            if (ActionTree.GetActionResult<ProductAction>(context) > 100)
+            if (ActionTree.GetActionResult("Products", context) > 100)
                 return (int) TierDiscountType.ApplyDiscount;
             return (int) TierDiscountType.DoNotApply;
         }

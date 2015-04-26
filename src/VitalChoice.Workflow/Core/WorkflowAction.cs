@@ -7,7 +7,7 @@ namespace VitalChoice.Workflow.Core
     public abstract class WorkflowAction<TContext, TResult> : WorkflowExecutor<TContext, TResult>, IWorkflowAction<TContext, TResult> 
         where TContext : WorkflowContext<TResult>
     {
-        protected WorkflowAction(IWorkflowActionTree<TContext, TResult> tree) : base(tree)
+        protected WorkflowAction(IWorkflowActionTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
             DependendActions = new List<string>();
         }

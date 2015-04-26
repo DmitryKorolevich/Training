@@ -15,12 +15,12 @@ namespace VitalChoice.Workflow.Core
 
         private readonly Dictionary<Type, string> _reverseAccessActions;
 
-        protected WorkflowActionTree(IWorkflowActionTree<TContext, TResult> actionMapping) : base(null)
+        protected WorkflowActionTree(IWorkflowActionTree<TContext, TResult> tree, string actionName) : base(null, actionName)
         {
             
         }
 
-        protected WorkflowActionTree(HashSet<ActionItem> actionMapping) : base(null)
+        protected WorkflowActionTree(HashSet<ActionItem> actionMapping, string actionName) : base(null, actionName)
         {
             _actions = new Dictionary<string, IWorkflowExecutor<TContext, TResult>>();
             _reverseAccessActions = new Dictionary<Type, string>();
@@ -29,26 +29,15 @@ namespace VitalChoice.Workflow.Core
                 IWorkflowExecutor<TContext, TResult> instance;
                 if (action.ActionType.IsImplement<IWorkflowActionTree<TContext, TResult>>())
                 {
-                    instance = (IWorkflowExecutor<TContext, TResult>)Activator.CreateInstance(action.ActionType, this);
+                    instance = (IWorkflowExecutor<TContext, TResult>)Activator.CreateInstance(action.ActionType, action.OptionalDependentTree, action.ActionName);
                 }
                 else
                 {
-                    instance = (IWorkflowExecutor<TContext, TResult>) Activator.CreateInstance(action.ActionType, this);
+                    instance = (IWorkflowExecutor<TContext, TResult>) Activator.CreateInstance(action.ActionType, this, action.ActionName);
                 }
                 _actions.Add(action.ActionName, instance);
                 _reverseAccessActions.Add(action.ActionType, action.ActionName);
             }
-        }
-
-        public TResult GetActionResult<TAction>(TContext context) 
-            where TAction : IWorkflowExecutor<TContext, TResult>
-        {
-            TResult result;
-            if (context.DictionaryData.TryGetValue(_reverseAccessActions[typeof (TAction)], out result))
-            {
-                return result;
-            }
-            return GetAction<TAction>().Execute(context);
         }
 
         public TResult GetActionResult(string actionName, TContext context)
