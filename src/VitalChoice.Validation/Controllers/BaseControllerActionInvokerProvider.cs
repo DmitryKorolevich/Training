@@ -7,6 +7,7 @@ using VitalChoice.Validation.Controllers;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
+using Microsoft.Framework.Logging;
 
 namespace VitalChoice.Validation.Controllers
 {
@@ -22,6 +23,7 @@ namespace VitalChoice.Validation.Controllers
         private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
         private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
         private readonly ITempDataDictionary _tempData;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly int _maxModelValidationErrors;
 
         public ControllerActionInvokerProvider(
@@ -30,7 +32,8 @@ namespace VitalChoice.Validation.Controllers
                     IControllerActionArgumentBinder argumentBinder,
                     IOptions<MvcOptions> optionsAccessor,
                     IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-                    ITempDataDictionary tempData)
+                    ITempDataDictionary tempData,
+                    ILoggerFactory loggerFactory)
         {
             _controllerFactory = controllerFactory;
             _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
@@ -42,6 +45,7 @@ namespace VitalChoice.Validation.Controllers
             _valueProviderFactories = optionsAccessor.Options.ValueProviderFactories.ToArray();
             _actionBindingContextAccessor = actionBindingContextAccessor;
             _tempData = tempData;
+            _loggerFactory = loggerFactory;
             _maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
         }
 
@@ -70,6 +74,7 @@ namespace VitalChoice.Validation.Controllers
                                     _valueProviderFactories,
                                     _actionBindingContextAccessor,
                                     _tempData,
+                                    _loggerFactory,
                                     _maxModelValidationErrors);
             }
         }

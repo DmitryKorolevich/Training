@@ -8,6 +8,7 @@ using Microsoft.Framework.Internal;
 using VitalChoice.Validation.Controllers;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
 
 namespace VitalChoice.Validation.Controllers
 {
@@ -26,6 +27,7 @@ namespace VitalChoice.Validation.Controllers
             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
             IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
             ITempDataDictionary tempData,
+            ILoggerFactory logger,
             int maxModelValidationErrors)
             : base(
             actionContext,
@@ -40,6 +42,7 @@ namespace VitalChoice.Validation.Controllers
             valueProviderFactories,
             actionBindingContextAccessor,
             tempData,
+            logger,
             maxModelValidationErrors)
         {
 
