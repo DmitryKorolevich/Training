@@ -96,6 +96,7 @@
         if(!found)
         {
             country.type = "country";
+            country.States = [];
             $scope.countries.push(country);
         }
     };
