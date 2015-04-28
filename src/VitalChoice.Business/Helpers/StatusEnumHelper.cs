@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Helpers
         public static Dictionary<string, string> GetProductCategoryStatusNames()
         {
             Dictionary<string, string> toReturn = new Dictionary<string, string>();
-            toReturn.Add(String.Format("{0}:{1}", (int)RecordStatusCode.NotActive, (int)CustomerTypeCode.All), "Hidden within storefront");
+            toReturn.Add(String.Format("{0}:{1}", (int)RecordStatusCode.NotActive, (int)CustomerTypeCode.All), "Hide within storefront");
             toReturn.Add(String.Format("{0}:{1}", (int)RecordStatusCode.Active, (int)CustomerTypeCode.All), "Active - All Customers");
             toReturn.Add(String.Format("{0}:{1}", (int)RecordStatusCode.Active, (int)CustomerTypeCode.Wholesale), "Active - Wholesale Customers Only");
             return toReturn;

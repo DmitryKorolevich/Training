@@ -99,4 +99,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductCategories.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Countries.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\AppSettings.sql" />
+  </ItemGroup>
 </Project>

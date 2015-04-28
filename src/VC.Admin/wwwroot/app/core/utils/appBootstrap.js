@@ -13,8 +13,11 @@ angular.module('app.core.utils.appBootstrap', [])
                 var message='';
                 if(field)
                 {
-			        var fieldValue = getReferenceItem($rootScope.ReferenceData.Labels, field).Text;
-			        message = messageFormat.format(fieldValue);
+                    var item = getReferenceItem($rootScope.ReferenceData.Labels, field);
+                    if (item) {
+                        field = item.Text;
+                    }
+                    message = messageFormat.format(field);
                 }
                 else
                 {

@@ -22,3 +22,5 @@ Post-Deployment Script Template
 :r .\Scripts\ContentPages.sql
 :r .\Scripts\SetupIdentity.sql
 :r .\Scripts\ProductCategories.sql
+:r .\Scripts\Countries.sql
+:r .\Scripts\AppSettings.sql

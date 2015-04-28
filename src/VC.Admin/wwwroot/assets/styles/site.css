@@ -41,7 +41,11 @@ h2 {
   box-sizing: border-box;
 }
 .angular-ui-tree-nodes .angular-ui-tree-nodes {
-  padding-left: 40px;
+  padding-left: 0px;
+  margin-left: 40px;
+}
+.angular-ui-tree-handle {
+  cursor: pointer;
 }
 .angular-ui-tree-handle:hover {
   background-color: #EDEDED;

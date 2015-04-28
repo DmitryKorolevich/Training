@@ -12,6 +12,76 @@ angular.module('app.modules.demo.controllers.manageRecipesController', [])
 		return scope.childNodesCount() > 0;
 	};
 
+
+	$scope.treeOptions = {
+	    accept: function (sourceNode, destNodes, destIndex) {
+	        var data = sourceNode.$modelValue;
+	        var destType = destNodes.$element.attr('data-type');
+	        return (data.type == destType); // only accept the same type
+	    }
+	};
+
+	$scope.countries = [
+    {
+        Name: 'United',
+        Code: 'US',
+        type: 'country',
+        states: [
+            {
+                Name: 'Alabama',
+                Code: 'AL',
+                type: 'US',
+            },
+            {
+                Name: 'Alabama23',
+                Code: 'AL2',
+                type: 'US',
+            },
+            {
+                Name: 'Alabama24',
+                Code: 'AL2',
+                type: 'US',
+            },
+            {
+                Name: 'Alabama25',
+                Code: 'AL2',
+                type: 'US',
+            }, ]
+    },
+ {
+     Name: 'Candada',
+     Code: 'CA',
+     type: 'country',
+     states: [
+         {
+             Name: 'Alberta',
+             Code: 'AB',
+             type: 'CA',
+         },
+         {
+             Name: 'Alberta2',
+             Code: 'AB2',
+             type: 'CA',
+         }]
+ },
+  {
+      Name: 'USSR',
+      Code: 'USSR',
+      type: 'country',
+      states: [
+          {
+              Name: 'USSRAlberta',
+              Code: 'AB',
+              type: 'USSR',
+          },
+          {
+              Name: 'USSRAlberta2',
+              Code: 'AB2',
+              type: 'USSR',
+          }]
+  },
+	];
+
 	$scope.categories = [
 		{
 			label: 'Canned & Pouched Wild Seafood',

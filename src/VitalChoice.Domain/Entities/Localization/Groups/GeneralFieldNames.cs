@@ -11,5 +11,9 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         Title = 4,
         Description = 5,
         Date = 6,
+        CountryName = 7,
+        CountryCode = 8,
+        StateName = 9,
+        StateCode = 10,
     }
 }

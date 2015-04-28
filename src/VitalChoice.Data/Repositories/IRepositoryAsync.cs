@@ -22,6 +22,9 @@ namespace VitalChoice.Data.Repositories
         TEntity Update(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity);
+        bool UpdateRange(IEnumerable<TEntity> entities);
+        Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities);
+        Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities);
         void Delete(int id);
 		void Delete(TEntity entity);
 		Task<bool> DeleteAsync(int id);

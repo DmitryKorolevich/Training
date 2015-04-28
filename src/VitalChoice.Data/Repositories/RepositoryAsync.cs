@@ -134,7 +134,34 @@ namespace VitalChoice.Data.Repositories
             return toReturn;
         }
 
-	    public virtual void Delete(int id)
+        public virtual bool UpdateRange(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Modified);
+            }
+            Context.SaveChanges();
+            return true;
+        }
+
+        public virtual async Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities)
+        {
+            return await UpdateRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual async Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Modified);
+            }
+            await Context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        public virtual void Delete(int id)
 		{
 			var entity = DbSet.FirstOrDefault(x=>x.Id == id);
 			if (entity!= null)

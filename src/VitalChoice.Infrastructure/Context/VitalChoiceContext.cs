@@ -11,6 +11,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -150,9 +151,23 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<AdminProfile>().ForRelational().Table("AdminProfiles");
 			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
 
-			#endregion
+            #endregion
 
-			base.OnModelCreating(builder);
+            #region Settings
+
+            builder.Entity<Country>().Key(p => p.Id);
+            builder.Entity<Country>().ForRelational().Table("Countries");
+            builder.Entity<Country>().Ignore(p => p.States);
+
+            builder.Entity<State>().Key(p => p.Id);
+            builder.Entity<State>().ForRelational().Table("States");
+
+            builder.Entity<AppSettingItem>().Key(p => p.Id);
+            builder.Entity<AppSettingItem>().ForRelational().Table("AppSettings");
+
+            #endregion
+
+            base.OnModelCreating(builder);
 		}
 	}
 }

@@ -9,7 +9,8 @@ angular.module('app.modules.demo',
 		'app.modules.demo.controllers.dashboardController',
 		'app.modules.demo.controllers.orderDetailController',
 		'app.modules.demo.controllers.modalAddSubProductController',
-		'app.modules.demo.controllers.manageRecipesController'
+		'app.modules.demo.controllers.manageRecipesController',
+		'app.modules.demo.controllers.uploadController',
 	])
 	.config([
 		'$stateProvider', '$urlRouterProvider',
@@ -214,14 +215,6 @@ angular.module('app.modules.demo',
 					template: '<h2>HealthWise</h2>'
 				})
 				/*settings*/
-				.state('index.oneCol.manageCountries', {
-					url: '/settings/manageCountries',
-					template: '<h2>Manage Countries</h2>'
-				})
-				.state('index.oneCol.manageStates', {
-					url: '/settings/manageStates',
-					template: '<h2>Manage States</h2>'
-				})
 				.state('index.oneCol.perishableCartThreshold', {
 					url: '/settings/perishableCartThreshold',
 					template: '<h2>Perishable Cart Threshold</h2>'
@@ -230,6 +223,11 @@ angular.module('app.modules.demo',
 				.state('index.oneCol.submitBug', {
 					url: '/help/submitBug',
 					template: '<h2>Submit Bug</h2>'
+				})
+				.state('index.oneCol.upload', {
+					url: '/help/upload',
+					templateUrl: 'app/modules/demo/partials/upload.html',
+					controller: 'uploadController'
 				})
 				.state('index.oneCol.viewWiki', {
 					url: '/help/viewWiki',

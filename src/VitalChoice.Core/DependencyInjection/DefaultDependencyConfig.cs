@@ -23,6 +23,8 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Business.Services.Impl.Product;
 using VitalChoice.Business.Services.Contracts.Product;
+using VitalChoice.Business.Services.Impl.Settings;
+using VitalChoice.Business.Services.Contracts.Settings;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -130,6 +132,8 @@ namespace VitalChoice.Core.DependencyInjection
 	            builder.RegisterType<UserService>().As<IUserService>();
                 builder.RegisterType<ProductViewService>().As<IProductViewService>();
                 builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
+                builder.RegisterType<CountryService>().As<ICountryService>();
+                builder.RegisterType<SettingService>().As<ISettingService>();
                 IContainer container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));

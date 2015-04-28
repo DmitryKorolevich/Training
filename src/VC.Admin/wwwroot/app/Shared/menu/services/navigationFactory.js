@@ -82,9 +82,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'settings',
 			stateLabel: 'Settings',
 			subMenu: [
-				{ name: 'manageCountries', stateName: 'index.oneCol.manageCountries', stateLabel: 'Manage Countries' },
-				{ name: 'manageStates', stateName: 'index.oneCol.manageStates', stateLabel: 'Manage States' },
-				{ name: 'perishableCartThreshold', stateName: 'index.oneCol.perishableCartThreshold', stateLabel: 'Perishable Cart Threshold' }
+				{ name: 'manageCountries', stateName: 'index.oneCol.manageCountries', stateLabel: 'Manage Countries / States' },
+				{ name: 'manageSettings', stateName: 'index.oneCol.manageSettings', stateLabel: 'Perishable Cart Threshold' }
 			]
 		},
 		{
