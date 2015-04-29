@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Validation.Models
+﻿namespace VitalChoice.Domain.Exceptions
 {
     public class MessageInfo
     {

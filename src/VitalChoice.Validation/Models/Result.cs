@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Models
 {

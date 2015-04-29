@@ -12,9 +12,9 @@ angular.module('app.modules.demo.controllers.uploadController', ['ngFileUpload']
             for (var i = 0; i < files.length; i++) {
                 var file = files[i];
                 Upload.upload({
-                    url: 'http://localhost:5004/api/file/UploadMultiple?folder=7777',
+                    url: 'http://localhost:51805/api/file/AddFiles',
                     fields: {
-                        '777': ''
+                        '/': ''
                     },
                     file: file
                 }).progress(function (evt) {

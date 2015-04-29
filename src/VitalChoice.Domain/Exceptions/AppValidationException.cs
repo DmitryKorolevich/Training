@@ -1,19 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VitalChoice.Domain.Exceptions
 {
     public class AppValidationException : Exception
     {
-        public string Field { get; private set; }
+        public List<MessageInfo> Messages = new List<MessageInfo>();
 
-        public AppValidationException(string field,string message) : base(message)
+        public AppValidationException(IEnumerable<MessageInfo> messages) : base("See messages")
         {
-            this.Field = field;
+            this.Messages.AddRange(messages);
         }
 
-        public AppValidationException(string message) : base(message)
+        public AppValidationException(string field,string message) : base("See messages")
         {
-            this.Field = String.Empty;
+            Messages.Add(new MessageInfo()
+            {
+                Field=field,
+                Message=message,
+            }); 
+        }
+
+        public AppValidationException(string message) : base("See messages")
+        {
+            Messages.Add(new MessageInfo()
+            {
+                Field = String.Empty,
+                Message = message,
+            });
         }
     }
 }

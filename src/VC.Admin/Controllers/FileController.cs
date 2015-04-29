@@ -15,46 +15,57 @@ using Microsoft.AspNet.Http;
 using Microsoft.Net.Http.Headers;
 using System.IO;
 using System;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Business.Helpers;
 
 namespace VitalChoice.Controllers
 {
     public class FileController : BaseApiController
     {
-
+        private readonly IFileService fileService;
         private readonly ILogger logger;
 
-        public FileController()
+        public FileController(IFileService fileService)
         {
+            this.fileService = fileService;
             this.logger = LoggerService.GetDefault();
         }
 
         [HttpPost]
-        public Task<bool> UploadMultiple()
+        public async Task<Result<bool>> AddFiles()
         {
-            //var fileDetailsList = new List<FileDetails>();
-            return Request.ReadFormAsync().ContinueWith<bool>(t=>
+            var form = await Request.ReadFormAsync();
+
+            var fullRelativeUrl = form.Keys.FirstOrDefault();
+
+            List<MessageInfo> messages = new List<MessageInfo>();
+            foreach (var file in form.Files)
+            {
+                var parsedContentDisposition = ContentDispositionHeaderValue.Parse(file.ContentDisposition);
+                using (var stream = file.OpenReadStream())
                 {
-                    if (t.IsFaulted || t.IsCanceled)
-                        throw new ArgumentException();
-                    
-                    var form = t.Result;
-
-                    foreach (var file in form.Files)
+                    var fileContent = StreamsHelper.ReadFully(stream);
+                    try
                     {
-                        var parsedContentDisposition = ContentDispositionHeaderValue.Parse(file.ContentDisposition);
-                        using (var reader = new StreamReader(file.OpenReadStream()))
-                        {
-                            var fileContent = reader.ReadToEnd();
-                            var fileDetails = new
-                            {
-                                Filename = parsedContentDisposition.FileName,
-                                Content = fileContent
-                            };
-                        }
+                        fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
                     }
+                    catch (AppValidationException ex)
+                    {
+                        messages.AddRange(ex.Messages);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(ex.ToString());
+                    }
+                }
+            }
 
-                    return true;
-                });
-        }
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            return true;
+        }        
     }
 }
