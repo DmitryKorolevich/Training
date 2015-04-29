@@ -48,10 +48,6 @@ namespace VitalChoice
             var hostingEnvironment = services.BuildServiceProvider().GetRequiredService<IHostingEnvironment>();
 
             string filesPath = Configuration.Get("App:FilesPath");
-            if(String.IsNullOrEmpty(filesPath))
-            {
-                filesPath =(new DirectoryInfo(hostingEnvironment.WebRootPath)).Parent.Parent.FullName + "\\VC.Public\\wwwroot\\files";
-            }
 
             return reg.RegisterInfrastructure(Configuration, services, filesPath);
 		}

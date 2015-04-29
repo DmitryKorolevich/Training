@@ -20,11 +20,14 @@ namespace VitalChoice.Business.Services.Impl
 
         public static void Init(string rootDir)
         {
-            DirectoryInfo dirInfo =new DirectoryInfo(rootDir);
-            if (!dirInfo.Exists)
+            if (!String.IsNullOrEmpty(rootDir))
             {
-                dirInfo.Create();
-                _rootDir = dirInfo.FullName;
+                DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
+                if (!dirInfo.Exists)
+                {
+                    dirInfo.Create();
+                    _rootDir = dirInfo.FullName;
+                }
             }
         }
 
