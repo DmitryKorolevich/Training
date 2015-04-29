@@ -37,7 +37,7 @@ namespace VitalChoice.Core.DependencyInjection
     {
         private static bool _called = false;
 
-        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services)
+        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, string appPath)
         {
             if (!_called)
             {
@@ -134,9 +134,14 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType<SettingService>().As<ISettingService>();
+                builder.RegisterType<FileService>().As<IFileService>();
                 IContainer container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
+                if (!String.IsNullOrEmpty(appPath))
+                {
+                    FileService.Init(appPath);
+                }
 
                 return container.Resolve<IServiceProvider>();
 #else

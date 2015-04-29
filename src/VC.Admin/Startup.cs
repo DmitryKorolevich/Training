@@ -42,7 +42,7 @@ namespace VitalChoice
 
             var reg = new DefaultDependencyConfig();
 
-			return reg.RegisterInfrastructure(Configuration, services);
+			return reg.RegisterInfrastructure(Configuration, services, applicationEnvironment.ApplicationBasePath);
 		}
 
 		// Configure is called after ConfigureServices is called.

@@ -6,6 +6,6 @@ namespace VitalChoice.Core.DependencyInjection
 {
     public interface IDependencyConfig
     {
-		IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services);
+		IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, string appPath);
     }
 }

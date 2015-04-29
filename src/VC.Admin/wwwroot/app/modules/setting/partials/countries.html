@@ -12,13 +12,13 @@
                 <div class="container container-left">
                     <div class="well row">
                         <spinner-overlay data-loading="refreshTracker.active()">
-                            <span class="legend">Manage Countries</span>
+                            <span class="legend">Manage Countries, States / Provinces</span>
                             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addCountry()">
                                 <i class="glyphicon glyphicon-plus"></i>
                             </a>
                             <div ui-tree="treeOptions" class="ya-treeview">
                                 <ol ui-tree-nodes data-ng-model="countries" data-type="country">
-                                    <li ng-repeat="country in countries" ui-tree-node>
+                                    <li ng-repeat="country in countries" collapsed="true" ui-tree-node>
                                         <div data-ng-if="country.States && country.States.length > 0">
                                             <a class="btn btn-link pull-left" nodrag data-ng-click="toggle(this)">
                                                 <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>

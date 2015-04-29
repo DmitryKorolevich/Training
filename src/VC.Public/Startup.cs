@@ -40,7 +40,7 @@ namespace VitalChoice.Public
             Configuration = configuration;
 
             var reg = new DefaultDependencyConfig();
-            return reg.RegisterInfrastructure(Configuration, services);
+            return reg.RegisterInfrastructure(Configuration, services, null);
 		}
 
 		// Configure is called after ConfigureServices is called.

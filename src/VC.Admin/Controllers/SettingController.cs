@@ -20,13 +20,15 @@ namespace VitalChoice.Controllers
         private readonly ILogViewService logViewService;
         private readonly ICountryService countryService;
         private readonly ISettingService settingService;
+        private readonly IFileService fileService;
         private readonly ILogger logger;
 
-        public SettingController(ILogViewService logViewService, ICountryService countryService, ISettingService settingService)
+        public SettingController(ILogViewService logViewService, ICountryService countryService, ISettingService settingService, IFileService fileService)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
             this.settingService = settingService;
+            this.fileService = fileService;
             this.logger = LoggerService.GetDefault();
         }
 
