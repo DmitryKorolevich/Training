@@ -54,3 +54,16 @@ SET [NormalizedName] = N'Super Admin User'
 WHERE [NormalizedName] = N'SuperAdminUser'
 
 GO
+
+IF(NOT EXISTS (SELECT [Email] FROM [dbo].[AspNetUsers] WHERE [Email] = N'noreplyvitalchoice@gmail.com'))
+BEGIN
+	SET IDENTITY_INSERT [dbo].[AspNetUsers] ON
+
+	INSERT [dbo].[AspNetUsers] ([Id], [PublicId], [AccessFailedCount], [ConcurrencyStamp], [Email], [EmailConfirmed], [UserName], [FirstName], [LastName], [Status], [LockoutEnabled], [LockoutEnd], [NormalizedEmail], [NormalizedUserName], [PasswordHash], [PhoneNumber], [PhoneNumberConfirmed], [LastLoginDate], [CreateDate], [UpdatedDate], [DeletedDate], [SecurityStamp], [TwoFactorEnabled]) VALUES (1012, N'67af9366-76b7-4128-a6a6-5e41bff57ade', 0, N'755be2cd-b77b-4500-9bc0-6cc2e6e55c88', N'noreplyvitalchoice@gmail.com', 0, N'noreplyvitalchoice@gmail.com', N'VC', N'Admin', 1, 1, NULL, N'NOREPLYVITALCHOICE@GMAIL.COM', N'NOREPLYVITALCHOICE@GMAIL.COM', N'AQAAAAEAACcQAAAAEEnZPPKH+gddd5qbtLM8XMRzjqXKVKnobOHoEb0YnONajINxkKmjzhOErfAajwnGQw==', NULL, 0, NULL, CAST(0x07BE3BC97707E4390B AS DateTime2), CAST(0x07F1881DE307E4390B AS DateTime2), NULL, N'339b920f-8ddc-4fd5-976a-aa33e098ae43', 0)
+
+	SET IDENTITY_INSERT [dbo].[AspNetUsers] OFF
+
+	INSERT [dbo].[AdminProfiles] ([Id], [AgentId], [ConfirmationToken], [TokenExpirationDate], [IsConfirmed]) VALUES (1012, N'vc', N'c6f09915-d95d-4513-beb1-f6202a1358cf', CAST(0x0781C6C87707E7390B AS DateTime2), 1)
+
+	INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (1012, 5)
+END

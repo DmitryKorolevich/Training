@@ -71,7 +71,7 @@ namespace VitalChoice.Business.Services.Impl
 
 		private string AggregateIdentityErrors(IEnumerable<IdentityError> errors)
 		{
-			return errors.Aggregate(string.Empty, (current, error) => current + $"{current}. {error.Description}");
+			return errors.Aggregate(string.Empty, (current, error) => current + $"{current} {error.Description}").Trim();
 		}
 
 		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
