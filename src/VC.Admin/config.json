@@ -3,16 +3,25 @@
 		"ServeCdnContent": false,
 		"CdnServerBaseUrl": "not yet ready",
 		"GenerateLowercaseUrls": true,
-		"EnableBundlingAndMinification" : false,
+		"EnableBundlingAndMinification": false,
 		"LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
-        "Connection": {
-            "UserName": "dev_vc_user",
-            "Password": "VZQCkea2",
-            "Server": "localhost"
-        },
-        PublicHost: "http://dev2.vitalchoice.com:5010/",
+		"Connection": {
+			"UserName": "dev_vc_user",
+			"Password": "VZQCkea2",
+			"Server": "localhost"
+		},
+		"PublicHost": "http://dev2.vitalchoice.com:5010/",
+		"AdminHost": "http://dev2.vitalchoice.com:5004/",
+		"Email": {
+			"From": "noreplyvitalchoice@gmail.com",
+			"Host": "smtp.gmail.com",
+			"Port": 587,
+			"Secured": true,
+			"Username": "noreplyvitalchoice@gmail.com",
+			"Password": "vitalchoice123"
+		}
 	}
 }

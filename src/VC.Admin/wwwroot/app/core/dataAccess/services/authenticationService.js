@@ -18,6 +18,15 @@ angular.module('app.core.dataAccess.services.authenticationService', [])
 		},
 		getUser: function (token, tracker) {
 			return $http.get(baseUrl + 'GetUser/' + token, getConfig(tracker));
+		},
+		login: function(login, tracker) {
+			return $http.post(baseUrl + 'Login', login, getConfig(tracker));
+		},
+		getCurrenUser: function () {
+			return $http.get(baseUrl + 'GetCurrentUser');
+		},
+		logout: function() {
+			return $http.post(baseUrl + 'Logout');
 		}
 	};
 }]);

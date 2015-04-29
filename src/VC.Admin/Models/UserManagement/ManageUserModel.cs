@@ -5,10 +5,12 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validators.UserManagement;
+using VitalChoice.Validation.Attributes;
 
 namespace VitalChoice.Models.UserManagement
 {
-    public class ManageUserModel : Model<ApplicationUser, UserManageSettings>
+	[ApiValidator(typeof(UserManageAdminValidator))]
+	public class ManageUserModel : Model<ApplicationUser, UserManageSettings>
 	{
 		public string FirstName { get; set; }
 

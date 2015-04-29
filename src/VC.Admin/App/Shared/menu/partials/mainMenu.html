@@ -1,15 +1,14 @@
 ﻿<nav class="navbar margin-zero custom-navbar-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<!--<a ui-sref="index.oneCol.dashboard">-->
-			<a href="/">
+			<a ui-sref="index.oneCol.dashboard">
 				<img src="/assets/images/logo.png" class="logo">
 			</a>
 		</div>
 		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav navbar-right" data-ng-if="authenticated"> <!--temp-->
-				<li><a href="#">Gary Gould</a></li>
-				<li><a href="#">View something</a></li>
+			<ul class="nav navbar-nav navbar-right navbar-custom-header" data-ng-if="authenticated">
+				<li><p class="login-name">{{currentUser.FirstName}}&nbsp;{{currentUser.LastName}}</p></li>
+				<li><a class="btn btn-link" data-ng-click="logout()">Log Out</a></li>
 			</ul>
 		</div>
 	</div>
@@ -26,20 +25,17 @@
 		</div>
 
 		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav" data-ng-if="authenticated"> <!--temp-->
-				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}" ui-sref-active="active">
-					<!--data-ng-class="{ active: currentModule == module.name, dropdown: module.subMenu != null }"-->
+			<ul class="nav navbar-nav" data-ng-if="authenticated">
+				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}" data-ng-if="validatePermission(module.access)" ui-sref-active="active">
 					<a data-ng-if="!module.subMenu" ui-sref="{{module.stateName}}({name:module.name})">
 						{{module.stateLabel}}
-						<span data-ng-if="currentModule == module.name" class="sr-only">(current)</span><!--refactor this-->
 					</a>
 					<a data-ng-if="module.subMenu != null" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 						{{module.stateLabel}}
 						<span class="caret"></span>
 					</a>
 					<ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
-						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active">
-							<!--data-ng-class="{ active: currentSubModule == subModule.name }"-->
+						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active" data-ng-if="validatePermission(subModule.access)">
 							<a ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
 						</li>
 					</ul>

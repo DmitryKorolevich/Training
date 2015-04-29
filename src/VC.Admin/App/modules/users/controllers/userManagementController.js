@@ -45,7 +45,16 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 					if (result.Success) {
 						openModal(result.Data, editMode);
 					} else {
-						toaster.pop('error', 'Error!', "Can't get user");
+						var messages = "";
+						if (result.Messages) {
+							$.each(result.Messages, function(index, value) {
+								messages += value.Message + "<br />";
+							});
+						} else {
+							messages = "Can't get user";
+						}
+
+						toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
 					}
 				}).
 				error(function(result) {
@@ -74,7 +83,16 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 					if (result.Success) {
 						toaster.pop('success', "Success!", "Successfully deleted.");
 					} else {
-						toaster.pop('error', 'Error!', "Can't delete the user");
+						var messages = "";
+						if (result.Messages) {
+							$.each(result.Messages, function(index, value) {
+								messages += value.Message + "<br />";
+							});
+						} else {
+							messages = "Can't delete user";
+						}
+
+						toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
 					}
 					refreshUsers();
 				})

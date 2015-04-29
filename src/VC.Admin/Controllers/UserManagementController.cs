@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -15,6 +18,7 @@ using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Controllers
 {
+	[AdminAuthorize(PermissionType.Users)]
     public class UserManagementController : BaseApiController
     {
 	    private readonly IUserService userService;
@@ -80,7 +84,7 @@ namespace VitalChoice.Controllers
 			var user = await userService.GetAsync(userModel.PublicId);
 			if (user == null)
 			{
-				throw new ApiException();
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
 			user.FirstName = userModel.FirstName;
@@ -100,7 +104,7 @@ namespace VitalChoice.Controllers
 			var user = await userService.GetAsync(id);
 			if (user == null)
 			{
-				throw new ApiException();
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 			
 			return new ManageUserModel()
@@ -121,7 +125,7 @@ namespace VitalChoice.Controllers
 			var user = await userService.GetAsync(getUserModel.PublicId);
 			if (user == null)
 			{
-				throw new ApiException();
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
 			await userService.DeleteAsync(user);

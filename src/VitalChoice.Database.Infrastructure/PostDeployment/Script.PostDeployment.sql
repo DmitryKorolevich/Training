@@ -24,3 +24,4 @@ Post-Deployment Script Template
 :r .\Scripts\ProductCategories.sql
 :r .\Scripts\Countries.sql
 :r .\Scripts\AppSettings.sql
+:r .\Scripts\UpdateIdentity.sql

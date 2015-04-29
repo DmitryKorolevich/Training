@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities.Roles;
 
 namespace VitalChoice.Business.Services.Impl
 {

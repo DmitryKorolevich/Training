@@ -125,7 +125,7 @@
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <form class="form-horizontal">
                                         <fieldset>
-                                            <button class="btn btn-info width-200px margin-bottom-10px" ng-if="productCategory.MasterContentItemId!=0" data-ng-click="goToMaster(productCategory.MasterContentItemId);">Manage Master Template</button>
+                                            <button class="btn btn-info width-200px margin-bottom-10px" ng-if="validatePermission(7) && productCategory.MasterContentItemId!=0" data-ng-click="goToMaster(productCategory.MasterContentItemId);">Manage Master Template</button>
                                             <span class="legend">Manage Template</span>
                                             <div class="form-group">
                                                 <div class="col-md-12">

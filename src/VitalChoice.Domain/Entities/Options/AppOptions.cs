@@ -15,5 +15,7 @@ namespace VitalChoice.Domain.Entities.Options
 		public string DefaultCultureId { get; set; }
         public Connection Connection { get; set; }
         public string PublicHost { get; set; }
+        public string AdminHost { get; set; }
+		public Email EmailConfiguration { get; set; }
     }
 }

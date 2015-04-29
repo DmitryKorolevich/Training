@@ -12,9 +12,12 @@ using VitalChoice.Business.Services.Contracts.Settings;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Entities.Permissions;
 
 namespace VitalChoice.Controllers
 {
+    [AdminAuthorize(PermissionType.Settings)]
     public class SettingController : BaseApiController
     {
         private readonly ILogViewService logViewService;

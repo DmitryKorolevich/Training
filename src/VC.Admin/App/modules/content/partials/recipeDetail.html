@@ -137,7 +137,7 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <button class="btn btn-info width-200px margin-bottom-10px" ng-if="recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
+                                    <button class="btn btn-info width-200px margin-bottom-10px" ng-if="validatePermission(7) && recipe.MasterContentItemId!=0" data-ng-click="goToMaster(recipe.MasterContentItemId);">Manage Master Template</button>
                                     <span class="legend">Manage Template</span>
 
                                     <div class="form-group">

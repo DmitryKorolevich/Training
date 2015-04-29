@@ -2,10 +2,13 @@
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Validators.Account;
+using VitalChoice.Validation.Attributes;
 
 namespace VitalChoice.Models.Account
 {
-    public class CreateAccountModel : Model<ApplicationUser, IMode>
+	[ApiValidator(typeof(CreateAccountValidator))]
+	public class CreateAccountModel : Model<ApplicationUser, IMode>
 	{
 	    public Guid PublicId { get; set; }
 	    public string FirstName { get;set; }

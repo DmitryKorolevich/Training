@@ -8,7 +8,16 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
 		} else {
-			toaster.pop('error', "Error!", "Can't save your changes");
+			var messages = "";
+			if (result.Messages) {
+				$.each(result.Messages, function(index, value) {
+					messages += value.Message + "<br />";
+				});
+			} else {
+				messages = "Can't save changes";
+			}
+
+			toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
 		}
 		data.thenCallback();
 	};

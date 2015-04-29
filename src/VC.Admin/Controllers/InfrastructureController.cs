@@ -27,24 +27,35 @@ namespace VitalChoice.Controllers
         }
 
         [HttpGet]
-        public Result<FullReferenceDataModel> GetReferenceData()
+        public Result<RestrictedReferenceData> GetReferenceData()
         {
             var referenceData = this.appInfrastructureService.Get();
 
-            // if (contextAccessor.HttpContext.User.Identity.IsAuthenticated)
-            FullReferenceDataModel referenceDataModel = new FullReferenceDataModel()
-            {
-                Roles = referenceData.Roles,
-                UserStatuses = referenceData.UserStatuses,
-                ContentTypes = referenceData.ContentTypes,
-                ContentProcessors = referenceData.ContentProcessors,
-                Labels = referenceData.Labels,
-                PublicHost = referenceData.PublicHost,
-                ContentItemStatusNames = referenceData.ContentItemStatusNames,
-                ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
-            };
+	        RestrictedReferenceData referenceDataModel;
 
-            return referenceDataModel;
+			if (contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+	        {
+		        referenceDataModel = new FullReferenceDataModel()
+		        {
+			        Roles = referenceData.Roles,
+			        UserStatuses = referenceData.UserStatuses,
+			        ContentTypes = referenceData.ContentTypes,
+			        ContentProcessors = referenceData.ContentProcessors,
+			        Labels = referenceData.Labels,
+			        PublicHost = referenceData.PublicHost,
+			        ContentItemStatusNames = referenceData.ContentItemStatusNames,
+			        ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
+		        };
+	        }
+			else
+			{
+				referenceDataModel = new RestrictedReferenceData()
+				{
+					Labels = referenceData.Labels,
+				};
+			}
+
+	        return referenceDataModel;
         }
     }
 }

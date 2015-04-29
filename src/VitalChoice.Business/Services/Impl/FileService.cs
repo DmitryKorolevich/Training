@@ -16,27 +16,25 @@ namespace VitalChoice.Business.Services.Impl
 {
     public class FileService : IFileService
     {
-        private const string ROOT_DIR = "//Files";
-
-        private readonly IApplicationEnvironment applicationEnvironment;
+        private static string _rootDir;
 
         public static void Init(string appFolder)
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(appFolder + ROOT_DIR);
-            if(!dirInfo.Exists)
+            DirectoryInfo dirInfo =new DirectoryInfo((new DirectoryInfo(appFolder)).Parent.Parent.FullName + "\\VC.Public\\wwwroot\\files");
+            if (!dirInfo.Exists)
             {
                 dirInfo.Create();
+                _rootDir = dirInfo.FullName;
             }
         }
 
-        public FileService(IApplicationEnvironment applicationEnvironment)
+        public FileService()
         {
-            this.applicationEnvironment = applicationEnvironment;
         }
 
         public bool GetDirectories()
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(applicationEnvironment.ApplicationBasePath + ROOT_DIR);
+            DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
 
             return false;
