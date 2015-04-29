@@ -1,0 +1,76 @@
+﻿using System.Linq;
+using FluentValidation;
+using VitalChoice.Admin.Models;
+using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Models.UserManagement;
+using VitalChoice.Validation.Logic;
+using VitalChoice.Validation.Helpers;
+
+namespace VitalChoice.Validators.UserManagement
+{
+    public class UserManageAdminValidator: ModelValidator<ManageUserModel>
+    {
+		public override void Validate(ManageUserModel value)
+		{
+			ValidationErrors.Clear();
+
+			var validator = ValidatorsFactory.GetValidator<UserRuleSet>();
+            ParseResults(validator.Validate(value, ruleSet: "Main"));
+			if(value.Mode.Mode == UserManageMode.Update)
+			{
+				ParseResults(validator.Validate(value, ruleSet: "Update"));
+			}
+			
+		}
+
+		private class UserRuleSet :  AbstractValidator<ManageUserModel>
+		{
+		    public UserRuleSet()
+		    {
+			    RuleSet
+				    ("Main",
+					    () =>
+					    {
+						    RuleFor(model => model.AgentId)
+							    .NotEmpty()
+							    .WithMessage(model => model.AgentId, ValidationMessages.FieldRequired);
+						    RuleFor(model => model.AgentId)
+							    .Length(2, 10)
+							    .WithMessage(model => model.AgentId, ValidationMessages.FieldLength);
+
+						    RuleFor(model => model.FirstName)
+							    .NotEmpty()
+							    .WithMessage(model => model.FirstName, ValidationMessages.FieldRequired);
+						    RuleFor(model => model.FirstName)
+							    .Length(0, 100)
+							    .WithMessage(model => model.FirstName, ValidationMessages.FieldLength);
+
+						    RuleFor(model => model.LastName)
+							    .NotEmpty()
+							    .WithMessage(model => model.LastName, ValidationMessages.FieldRequired);
+						    RuleFor(model => model.LastName)
+							    .Length(0, 100)
+							    .WithMessage(model => model.LastName, ValidationMessages.FieldLength);
+
+						    RuleFor(model => model.Email).NotEmpty().WithMessage(model => model.Email, ValidationMessages.FieldRequired);
+						    RuleFor(model => model.Email).Length(3, 100).WithMessage(model => model.Email, ValidationMessages.FieldLength);
+						    RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, "Incorrect email format");
+
+						    RuleFor(model => model.RoleIds)
+							    .Must(x => x.Any())
+							    .WithMessage(model => model.RoleIds, "At least one role should be assigned");
+					    });
+
+				RuleSet
+					("Update",
+						() =>
+						{
+							RuleFor(model => model.Status)
+								.Must(x => x == UserStatus.Active || x == UserStatus.Disabled)
+								.WithMessage(model => model.Status, "User status can be updated to Active or Disabled only");
+						});
+			}
+		}
+    }
+}

@@ -6,12 +6,12 @@ namespace VitalChoice.Domain.Exceptions
     {
         public string Field { get; private set; }
 
-        public AppValidationException(string field,string messageKey) : base(messageKey)
+        public AppValidationException(string field,string message) : base(message)
         {
             this.Field = field;
         }
 
-        public AppValidationException(string messageKey) : base(messageKey)
+        public AppValidationException(string message) : base(message)
         {
             this.Field = String.Empty;
         }

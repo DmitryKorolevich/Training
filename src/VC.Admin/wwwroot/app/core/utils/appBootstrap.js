@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', function (infrastructureService, $rootScope, toaster) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', function (infrastructureService, $rootScope, toaster, authenticationService) {
 			function getReferenceItem(lookup, key) {
 				return $.grep(lookup, function(elem) {
 					return elem.Key === key;
@@ -25,6 +25,25 @@ angular.module('app.core.utils.appBootstrap', [])
                 }
 
 				return message;
+			};
+
+			function validatePermission(permission) {
+				if (!$rootScope.authenticated || !$rootScope.currentUser) {
+					return false;
+				}
+
+				return $rootScope.currentUser.IsSuperAdmin || $rootScope.currentUser.Permissions.indexOf(permission) > -1;
+			};
+
+			function logout() {
+				authenticationService.logout().success(function() {
+					$rootScope.authenticated = false;
+					$rootScope.currentUser = {};
+
+					$rootScope.$state.go("index.oneCol.login");
+				}).error(function() {
+					//handle error
+				});
 			}
 
 			function initialize() {
@@ -34,7 +53,29 @@ angular.module('app.core.utils.appBootstrap', [])
 					if (res.Success) {
 						$rootScope.ReferenceData = res.Data;
 
-						$rootScope.appStarted = true;
+						if (!$rootScope.$state.current.data || !$rootScope.$state.current.data.unauthorizedArea) {
+							authenticationService.getCurrenUser()
+								.success(function(res) {
+									if (res.Success && res.Data) {
+										$rootScope.authenticated = true;
+										$rootScope.currentUser = res.Data;
+
+										$rootScope.$state.go("index.oneCol.dashboard");
+									} else {
+										$rootScope.authenticated = false;
+
+										$rootScope.$state.go("index.oneCol.login");
+									}
+									$rootScope.appStarted = true;
+								}).error(function() {
+									toaster.pop('error', "Error!", "Can't get current user info");
+								});
+
+						} else {
+							$rootScope.authenticated = false;
+							$rootScope.appStarted = true;
+						}
+
 					} else {
 						toaster.pop('error', 'Error!', "Unable to initialize app properly");
 					}
@@ -42,9 +83,10 @@ angular.module('app.core.utils.appBootstrap', [])
 					toaster.pop('error', "Error!", "Server error occured");
 				});
 
-				$rootScope.authenticated = true; //temp solution
 				$rootScope.getReferenceItem = getReferenceItem;
 				$rootScope.getValidationMessage = getValidationMessage;
+				$rootScope.logout = logout;
+				$rootScope.validatePermission = validatePermission;
 			}
 
 			return {

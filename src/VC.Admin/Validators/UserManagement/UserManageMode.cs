@@ -4,6 +4,7 @@ namespace VitalChoice.Validators.UserManagement
 {
     public enum UserManageMode
     {
-		Default
+		Create,
+		Update
     }
 }

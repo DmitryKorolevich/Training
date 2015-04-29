@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
+using Microsoft.Framework.OptionsModel;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.UnitOfWork;
 
 namespace VitalChoice.Business.Services.Impl
@@ -33,12 +42,19 @@ namespace VitalChoice.Business.Services.Impl
 
 		private readonly SignInManager<ApplicationUser> signInManager;
 
-		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager)
+		private readonly IAppInfrastructureService appInfrastructureService;
+		private readonly INotificationService notificationService;
+		private readonly AppOptions options;
+
+		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options)
 		{
 			this.userManager = userManager;
 			this.roleManager = roleManager;
 			this.context = context;
 			this.signInManager = signInManager;
+			this.appInfrastructureService = appInfrastructureService;
+			this.notificationService = notificationService;
+			this.options = options.Options;
 		}
 
 		private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
@@ -48,7 +64,17 @@ namespace VitalChoice.Business.Services.Impl
 						.ToList();
 		}
 
-		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles)
+		private PermissionType RoleClaimValueToPermission(string value)
+		{
+			return (PermissionType) Enum.Parse(typeof (PermissionType), value);
+		}
+
+		private string AggregateIdentityErrors(IEnumerable<IdentityError> errors)
+		{
+			return errors.Aggregate(string.Empty, (current, error) => current + $"{current}. {error.Description}");
+		}
+
+		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
 		{
 			user.CreateDate = DateTime.UtcNow;
 			user.UpdatedDate = DateTime.UtcNow;
@@ -70,12 +96,28 @@ namespace VitalChoice.Business.Services.Impl
 							var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
 							if (!addToRoleResult.Succeeded)
 							{
-								throw new ApiException();
+								throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
 							}
 						}
+
+						if (sendActivation)
+						{
+							var dbUser = await FindAsync(user.Email);
+							await notificationService.SendUserActivationAsync(dbUser.Email, new UserActivation()
+							{
+								FirstName = dbUser.FirstName,
+								LastName = dbUser.LastName,
+								Link = $"{options.AdminHost}#/authentication/activate/{dbUser.Profile.ConfirmationToken}"
+							});
+						}
+
 						transaction.Commit();
 
 						return user;
+					}
+					else
+					{
+						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
 					}
 				}
 				catch (Exception)
@@ -84,8 +126,6 @@ namespace VitalChoice.Business.Services.Impl
 					throw;
 				}
 			}
-
-			throw new ApiException();
 		}
 
 		public async Task DeleteAsync(ApplicationUser user)
@@ -99,7 +139,7 @@ namespace VitalChoice.Business.Services.Impl
 				return;
 			}
 
-			throw new ApiException();
+			throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UpdateUserGeneral]);
 		}
 
 		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
@@ -118,7 +158,7 @@ namespace VitalChoice.Business.Services.Impl
 							var passwordResult = await userManager.AddPasswordAsync(user, password);
 							if (!passwordResult.Succeeded)
 							{
-								throw new ApiException();
+								throw new AppValidationException(AggregateIdentityErrors(passwordResult.Errors));
 							}
 						}
 
@@ -130,7 +170,7 @@ namespace VitalChoice.Business.Services.Impl
 								var deleteResult = await userManager.RemoveFromRolesAsync(user, oldRoleNames);
 								if (!deleteResult.Succeeded)
 								{
-									throw new ApiException();
+									throw new AppValidationException(AggregateIdentityErrors(deleteResult.Errors));
 								}
 							}
 
@@ -139,13 +179,17 @@ namespace VitalChoice.Business.Services.Impl
 							{
 								var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
 								if (!addToRoleResult.Succeeded)
-									throw new ApiException();
+									throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
 							}
 						}
 
 						transaction.Commit();
 
 						return user;
+					}
+					else
+					{
+						throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
 					}
 				}
 				catch (Exception)
@@ -154,8 +198,6 @@ namespace VitalChoice.Business.Services.Impl
 					throw;
 				}
 			}
-
-			throw new ApiException();
 		}
 
 		public async Task<ApplicationUser> GetAsync(Guid publicId)
@@ -171,23 +213,73 @@ namespace VitalChoice.Business.Services.Impl
 
 			if (user == null)
 			{
-				throw new AppValidationException("key"); //can't find user;
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
 			}
 			if (user.Profile.IsConfirmed)
 			{
-				throw new AppValidationException("key"); //already confirmed
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
 			}
 			if (user.Profile.TokenExpirationDate.Subtract(DateTime.UtcNow).Days < 0)
 			{
-				throw new AppValidationException("key"); // expired;
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ActivationTokenExpired]);
 			}
 			 
 			return user;
 		}
 
-		public async Task SignInAsync(ApplicationUser user)
+		public async Task<ApplicationUser> SignInAsync(ApplicationUser user)
 		{
 			await signInManager.SignInAsync(user, false);
+
+			return user;
+		}
+
+		public async Task<ApplicationUser> SignInAsync(string login, string password)
+		{
+			var result = await signInManager.PasswordSignInAsync(login,password, false, true);
+			if (!result.Succeeded)
+			{
+				throw new AppValidationException(result.IsLockedOut ? ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserLockedOut] : ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
+			}
+
+			var user = await FindAsync(login);
+
+			return user;
+		}
+
+		public async Task<IList<PermissionType>> GetUserPermissions(ApplicationUser user)
+		{
+			var permissions = new List<PermissionType>();
+
+			var roles = await userManager.GetRolesAsync(user);
+			foreach (var role in roles)
+			{
+				var roleClaims = await roleManager.GetClaimsAsync(await roleManager.FindByNameAsync(role));
+
+				foreach (var permission in roleClaims.Where(roleClaim => roleClaim.Type == IdentityConstants.PermissionRoleClaimType).Select(roleClaim => RoleClaimValueToPermission(roleClaim.Value)).Where(permission => !permissions.Contains(permission)))
+				{
+					permissions.Add(permission);
+				}
+			}
+
+			return permissions;
+		}
+
+		public async Task<bool> IsSuperAdmin(ApplicationUser user)
+		{
+			return await userManager.IsInRoleAsync(user, appInfrastructureService.Get()
+				.Roles.Single(x => x.Key == (int) RoleType.SuperAdminUser)
+				.Text.Normalize());
+		}
+
+		public void SignOut(ApplicationUser user)
+		{
+			signInManager.SignOut();
+		}
+
+		public async Task<ApplicationUser> FindAsync(string login)
+		{
+			return await userManager.FindByEmailAsync(login);
 		}
 
 		public async Task<PagedList<ApplicationUser>> GetAsync(FilterBase filter)

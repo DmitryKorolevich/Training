@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Admin.Models;
 using VitalChoice.Business.Services.Contracts;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Models.Account;
@@ -13,14 +18,28 @@ using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Controllers
 {
+	[AllowAnonymous]
     public class AccountController : BaseApiController
     {
 	    private readonly IUserService userService;
+		private readonly IHttpContextAccessor contextAccessor;
 
-	    public AccountController(IUserService userService)
-	    {
-		    this.userService = userService;
-	    }
+		public AccountController(IUserService userService, IHttpContextAccessor contextAccessor)
+		{
+			this.userService = userService;
+			this.contextAccessor = contextAccessor;
+		}
+
+		private async Task<UserInfoModel> PopulateUserInfoModel(ApplicationUser user)
+		{
+			return new UserInfoModel()
+			{
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				IsSuperAdmin = await userService.IsSuperAdmin(user),
+				Permissions = await userService.GetUserPermissions(user)
+			};
+		}
 
 		[HttpGet]
 	    public async Task<Result<ActivateUserModel>> GetUser(Guid id)
@@ -28,7 +47,7 @@ namespace VitalChoice.Controllers
 			var result = await userService.GetByTokenAsync(id);
 			if (result == null)
 			{
-				throw new ApiException();
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
 			}
 
 			return new ActivateUserModel()
@@ -41,30 +60,76 @@ namespace VitalChoice.Controllers
 			};
 		}
 
-	    [HttpPost]
+		[HttpPost]
 		public async Task<Result<UserInfoModel>> Activate([FromBody]CreateAccountModel model)
-	    {
-		    var user = await userService.GetAsync(model.PublicId);
-		    if (user == null)
-		    {
-			    throw new ApiException();
-		    }
+		{
+			var user = await userService.GetAsync(model.PublicId);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
 
-		    user.FirstName = model.FirstName;
-		    user.LastName = model.LastName;
-		    user.Email = model.Email;
-		    user.Profile.IsConfirmed = true;
+			user.FirstName = model.FirstName;
+			user.LastName = model.LastName;
+			user.Email = model.Email;
+			user.Profile.IsConfirmed = true;
 			user.Status = UserStatus.Active;
 
-		    await userService.UpdateAsync(user, null, model.Password);
+			await userService.UpdateAsync(user, null, model.Password);
 
-		    await userService.SignInAsync(user);
+			await userService.SignInAsync(user);
 
-		    return new UserInfoModel()
-		    {
-			    FirstName = user.FirstName,
-				LastName = user.LastName
-		    };
-	    }
-	}
+			return await PopulateUserInfoModel(user);
+		}
+
+		[HttpPost]
+		public async Task<Result<UserInfoModel>> Login([FromBody]LoginModel model)
+		{
+			var user = await userService.SignInAsync(model.Email, model.Password);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+			}
+
+			return await PopulateUserInfoModel(user);
+		}
+
+		[HttpGet]
+		public async Task<Result<UserInfoModel>> GetCurrentUser()
+		{
+			var context = contextAccessor.HttpContext;
+
+			if (context.User.Identity.IsAuthenticated)
+			{
+				var user = await userService.FindAsync(context.User.GetUserName());
+				if (user == null)
+				{
+					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				}
+
+				return await PopulateUserInfoModel(user);
+			}
+
+			return null;
+		}
+
+		[HttpPost]
+		public async Task<bool> Logout()
+		{
+			var context = contextAccessor.HttpContext;
+
+			if (context.User.Identity.IsAuthenticated)
+			{
+				var user = await userService.FindAsync(context.User.GetUserName());
+				if (user == null)
+				{
+					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				}
+
+				userService.SignOut(user);
+			}
+
+			return true;
+		}
+    }
 }

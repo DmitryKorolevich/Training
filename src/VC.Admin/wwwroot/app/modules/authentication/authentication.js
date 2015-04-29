@@ -12,7 +12,18 @@ angular.module('app.modules.authentication', [
 			.state('index.oneCol.activation', {
 				url: '/authentication/activate/{token}',
 				templateUrl: 'app/modules/authentication/partials/activation.html',
-				controller: 'activationController'
+				controller: 'activationController',
+				data: {
+					unauthorizedArea: true
+				}
+			})
+			.state('index.oneCol.login', {
+				url: '/authentication/login',
+				templateUrl: 'app/modules/authentication/partials/login.html',
+				controller: 'loginController',
+				data: {
+					unauthorizedArea: true
+				}
 			});
 	}
 ]);

@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Data.DataContext
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, IdentityRole<int>,int>, IDataContext, IDataContextAsync
+	public class IdentityDataContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>, IDataContext, IDataContextAsync
 	{
 		private readonly Guid instanceId;
 

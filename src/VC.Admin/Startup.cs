@@ -15,6 +15,9 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
 using System.IO;
 using System.Net;
+using System.Security.Claims;
+using System.Security.Principal;
+using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Authorization;
 using Microsoft.Framework.Runtime;
 using VitalChoice.Admin.AppConfig;
@@ -56,8 +59,8 @@ namespace VitalChoice
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
 			{
-				app.UseErrorPage(ErrorPageOptions.ShowAll);
-				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+				//app.UseErrorPage(ErrorPageOptions.ShowAll);
+				//app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
 			}
 			else
 			{
@@ -72,7 +75,7 @@ namespace VitalChoice
 			// Add cookie-based authentication to the request pipeline.
 			app.UseIdentity();
 
-            app.UseMvc(routes =>
+			app.UseMvc(routes =>
             {
                 RouteConfig.RegisterRoutes(routes);
             });

@@ -12,7 +12,7 @@ namespace VitalChoice.Validators.Users
             ValidationErrors.Clear();
             switch (value.Mode.Mode) {
                 case UserCreateMode.CreateAdmin:
-                    ParseResults(ValidatorsFactory.GetValidator<UserCreateAdminValidator>().Validate(value));
+                    //ParseResults(ValidatorsFactory.GetValidator<UserCreateAdminValidator>().Validate(value));
                     break;
                 case UserCreateMode.CreateStandardUser:
                     ParseResults(ValidatorsFactory.GetValidator<UserCreateStandardValidator>().Validate(value, ruleSet:"Main"));

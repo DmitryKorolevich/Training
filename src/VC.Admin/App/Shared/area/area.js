@@ -1,6 +1,16 @@
 ﻿'use strict';
 
 angular.module('app.shared.area', [
-    'app.shared.area.controllers.workingPanelController',
-    'app.shared.area.controllers.leftPanelController'
+	'app.shared.area.controllers.workingPanelController',
+	'app.shared.area.controllers.leftPanelController'
+]).config([
+	'$stateProvider', '$urlRouterProvider',
+	function($stateProvider, $urlRouterProvider) {
+
+		$stateProvider
+			.state('index.notFound', {
+				url: '/404',
+				templateUrl: 'app/shared/partials/404.html'
+			});
+	}
 ]);

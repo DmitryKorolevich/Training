@@ -10,6 +10,8 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Entities.Settings;
 

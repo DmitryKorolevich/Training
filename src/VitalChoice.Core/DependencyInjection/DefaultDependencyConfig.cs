@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Net;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.Caching.Memory;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.OptionsModel;
 using Templates;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
@@ -48,8 +52,11 @@ namespace VitalChoice.Core.DependencyInjection
                     .AddDbContext<VitalChoiceContext>();
 
                 // Add Identity services to the services container.
-                //services.AddDefaultIdentity<VitalChoiceContext, ApplicationUser, IdentityRole>(Configuration);
-	            services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<VitalChoiceContext, int>().AddUserStore<ExtendedUserStore>();
+	            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+		            .AddEntityFrameworkStores<VitalChoiceContext, int>()
+		            .AddUserStore<ExtendedUserStore>()
+					.AddUserValidator<ExtendedUserValidator>()
+					.AddUserManager<ExtendedUserManager>();
 
                 //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
                 services.TryAdd(
@@ -57,10 +64,7 @@ namespace VitalChoice.Core.DependencyInjection
                         .Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());
 
                 // Add MVC services to the services container.
-                services.AddMvc(); //.Configure<MvcOptions>(options =>
-                                   //{
-
-                //	});
+                services.AddMvc();
 
 				services.AddOptions();
 
@@ -83,6 +87,16 @@ namespace VitalChoice.Core.DependencyInjection
                         Server = configuration.Get("App:Connection:Server"),
                     };
                     options.PublicHost = configuration.Get("App:PublicHost");
+                    options.AdminHost = configuration.Get("App:AdminHost");
+	                options.EmailConfiguration = new Email
+	                {
+						 From = configuration.Get("App:Email:From"),
+						 Host = configuration.Get("App:Email:Host"),
+						 Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
+						 Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
+						 Username = configuration.Get("App:Email:Username"),
+						 Password = configuration.Get("App:Email:Password")
+	                };
                 });
 
 				services.ConfigureIdentity(x =>
@@ -95,6 +109,16 @@ namespace VitalChoice.Core.DependencyInjection
 					x.Password.RequireDigit = true;
 					x.Password.RequireNonLetterOrDigit = true;
 				});
+
+				services.ConfigureAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
+
+	            services.ConfigureCookieAuthentication(x =>
+	            {
+		            x.AccessDeniedPath = null;
+		            x.LoginPath = null;
+		            x.LogoutPath = null;
+		            x.ReturnUrlParameter = null;
+	            });
 
 #if DNX451
 				var builder = new ContainerBuilder();
@@ -134,7 +158,10 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType<SettingService>().As<ISettingService>();
-                IContainer container = builder.Build();
+                builder.RegisterType<EmailSender>().As<IEmailSender>().WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>()).SingleInstance();
+				builder.RegisterType<NotificationService>().As<INotificationService>();
+				builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
+				var container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
 
