@@ -18,9 +18,9 @@ namespace VitalChoice.Business.Services.Impl
     {
         private static string _rootDir;
 
-        public static void Init(string appFolder)
+        public static void Init(string rootDir)
         {
-            DirectoryInfo dirInfo =new DirectoryInfo((new DirectoryInfo(appFolder)).Parent.Parent.FullName + "\\VC.Public\\wwwroot\\files");
+            DirectoryInfo dirInfo =new DirectoryInfo(rootDir);
             if (!dirInfo.Exists)
             {
                 dirInfo.Create();

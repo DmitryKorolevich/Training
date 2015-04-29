@@ -47,7 +47,13 @@ namespace VitalChoice
 
             var hostingEnvironment = services.BuildServiceProvider().GetRequiredService<IHostingEnvironment>();
 
-            return reg.RegisterInfrastructure(Configuration, services, hostingEnvironment.WebRootPath);
+            string filesPath = Configuration.Get("App:FilesPath");
+            if(String.IsNullOrEmpty(filesPath))
+            {
+                filesPath =(new DirectoryInfo(hostingEnvironment.WebRootPath)).Parent.Parent.FullName + "\\VC.Public\\wwwroot\\files";
+            }
+
+            return reg.RegisterInfrastructure(Configuration, services, filesPath);
 		}
 
 		// Configure is called after ConfigureServices is called.
