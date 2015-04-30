@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Base
