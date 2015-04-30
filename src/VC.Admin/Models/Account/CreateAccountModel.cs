@@ -1,4 +1,5 @@
 ﻿using System;
+using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
@@ -11,10 +12,20 @@ namespace VitalChoice.Models.Account
 	public class CreateAccountModel : Model<ApplicationUser, IMode>
 	{
 	    public Guid PublicId { get; set; }
+
+		[Localized(GeneralFieldNames.FirstName)]
 	    public string FirstName { get;set; }
+
+		[Localized(GeneralFieldNames.LastName)]
 		public string LastName { get;set; }
+
+		[Localized(GeneralFieldNames.Email)]
 		public string Email { get; set; }
+
+		[Localized(GeneralFieldNames.Password)]
 	    public string Password { get; set; }
+
+		[Localized(GeneralFieldNames.ConfirmPassword)]
 	    public string ConfirmPassword { get; set; }
 	}
 }

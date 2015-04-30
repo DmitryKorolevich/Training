@@ -15,6 +15,8 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
+using VitalChoice.Validators.UserManagement;
+using VitalChoice.Validators.Users;
 
 namespace VitalChoice.Controllers
 {
@@ -57,8 +59,12 @@ namespace VitalChoice.Controllers
 		}
 
 		[HttpPost]
+		[ControlMode(UserManageMode.Create, typeof(UserManageSettings))]
 		public async Task<Result<bool>> CreateUser([FromBody]ManageUserModel userModel)
 		{
+			if (ConvertWithValidate(userModel) == null)
+				return false;
+
 			var appUser = new ApplicationUser()
 			{
 				FirstName = userModel.FirstName,
@@ -67,7 +73,7 @@ namespace VitalChoice.Controllers
 				Profile = new AdminProfile()
 				{
 					AgentId = userModel.AgentId,
-					TokenExpirationDate = DateTime.UtcNow.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
+					TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
 					IsConfirmed = false,
 					ConfirmationToken = Guid.NewGuid()
 				}
@@ -79,8 +85,12 @@ namespace VitalChoice.Controllers
 		}
 
 		[HttpPost]
+		[ControlMode(UserManageMode.Update, typeof(UserManageSettings))]
 		public async Task<Result<bool>> UpdateUser([FromBody]ManageUserModel userModel)
 		{
+			if (ConvertWithValidate(userModel) == null)
+				return false;
+
 			var user = await userService.GetAsync(userModel.PublicId);
 			if (user == null)
 			{
@@ -132,5 +142,13 @@ namespace VitalChoice.Controllers
 
 			return true;
 	    }
-    }
+
+		[HttpPost]
+		public async Task<Result<bool>> ResendActivation(Guid id)
+		{
+			await userService.SendActivationAsync(id);
+
+			return true;
+		}
+	}
 }
