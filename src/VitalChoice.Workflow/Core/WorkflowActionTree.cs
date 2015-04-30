@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Templates.Helpers;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Workflow;
 
 namespace VitalChoice.Workflow.Core
 {

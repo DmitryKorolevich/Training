@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Templates.Helpers;
 
-namespace VitalChoice.Workflow.Core
+namespace VitalChoice.Domain.Workflow
 {
     public class ActionItem: IEquatable<ActionItem>
     {
