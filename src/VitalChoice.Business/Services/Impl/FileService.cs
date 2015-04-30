@@ -99,6 +99,11 @@ namespace VitalChoice.Business.Services.Impl
         public bool DeleteDirectory(string fullRelativeName)
         {
             bool toReturn = false;
+            string tempUrl = fullRelativeName;
+            if (tempUrl == "/")
+            {
+                return false;
+            }
             var path = ConvertUrlToPath(fullRelativeName);
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             if (dirInfo.Exists)
@@ -198,7 +203,7 @@ namespace VitalChoice.Business.Services.Impl
 
         private string ConvertUrlToPath(string url)
         {
-            return _rootDir + url.Replace("/", @"\");
+            return _rootDir + url.Replace("/", @"\").Replace(@"\..","");
         }
 
         private string ConvertPathToUrl(string path)

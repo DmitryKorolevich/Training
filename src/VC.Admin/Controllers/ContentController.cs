@@ -13,6 +13,7 @@ using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using System.Security.Claims;
 
 namespace VitalChoice.Controllers
 {
@@ -51,6 +52,8 @@ namespace VitalChoice.Controllers
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
         public async Task<Result<MasterContentItemManageModel>> GetMasterContentItem(int id)
         {
+            var user = Context.Request.HttpContext.User.GetUserId();
+
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }
 

@@ -17,9 +17,13 @@ using System.IO;
 using System;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities.Files;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Entities.Permissions;
 
 namespace VitalChoice.Controllers
 {
+    [AdminAuthorize(PermissionType.Tools)]
     public class FileController : BaseApiController
     {
         private readonly IFileService fileService;
@@ -66,6 +70,37 @@ namespace VitalChoice.Controllers
             }
 
             return true;
-        }        
+        }
+
+        [HttpGet]
+        public Result<DirectoryInfoObject> GetDirectories()
+        {
+            return fileService.GetDirectories();
+        }
+
+        [HttpPost]
+        public Result<DirectoryInfoObject> AddDirectory(string url, string name)
+        {
+            return fileService.AddDirectory(url, name);
+        }
+
+        [HttpPost]
+        public Result<bool> DeleteDirectory(string url)
+        {
+            return fileService.DeleteDirectory(url);
+        }
+
+        [HttpGet]
+        public Result<IEnumerable<FileInfoObject>> GetFiles(string url)
+        {
+            return fileService.GetFiles(url).ToList();
+        }
+        
+
+        [HttpPost]
+        public Result<bool> DeleteFile(string url)
+        {
+            return fileService.DeleteFile(url);
+        }
     }
 }

@@ -10,6 +10,7 @@ angular.module('app.utils', [
 	'ngProgress',
 	'angular-ladda',
 	'ajoslin.promise-tracker',
+    'ngFileUpload',
 	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
 	'app.core.utils.confirmation.confirmController',
