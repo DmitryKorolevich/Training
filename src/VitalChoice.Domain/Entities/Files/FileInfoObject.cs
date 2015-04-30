@@ -9,13 +9,20 @@ namespace VitalChoice.Domain.Entities.Files
 
         public string FullRelativeName { get; set; }
 
+        public string DirectoryFullRelativeName { get; set; }
+
         public string SizeMessage { get; set; }
+
         public long Size { get; set; }
 
-        public FileInfoObject(string name,string fullRelativeName, long sizeBytes)
+        public FileInfoObject()
+        { }
+
+        public FileInfoObject(string name,string fullRelativeName, string directoryFullRelativeName, long sizeBytes)
         {
             Name = name;
             FullRelativeName =fullRelativeName;
+            DirectoryFullRelativeName = directoryFullRelativeName;
             Size = sizeBytes;
             var kBytes = Math.Round((double)sizeBytes / 1024,1);
             if(kBytes<1)

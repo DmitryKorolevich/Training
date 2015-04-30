@@ -14,25 +14,25 @@ angular.module('app.core.dataAccess.services.fileService', [])
 
 	return {
             //directories
-	    getGetDirectories: function (filter, tracker) {
+	    getDirectories: function (tracker) {
 	        return $http.get(baseUrl + 'GetDirectories', getConfig(tracker));
 	    },
-	    addDirectory: function (url, name, tracker) {
-	        return $http.post(baseUrl + 'AddDirectory/?url={0}&name={1}'.format(url, name), getConfig(tracker));
+	    addDirectory: function (model, tracker) {
+	        return $http.post(baseUrl + 'AddDirectory', model, getConfig(tracker));
 	    },
-	    deleteDirectory: function (url, tracker) {
-	        return $http.post(baseUrl + 'DeleteDirectory/'+url, getConfig(tracker));
+	    deleteDirectory: function (model, tracker) {
+	        return $http.post(baseUrl + 'DeleteDirectory', model, getConfig(tracker));
 	    },
 
 	    //files
-	    getFiles: function (url, tracker) {
-	        return $http.get(baseUrl + 'GetFiles/'+url, getConfig(tracker));
+	    getFiles: function (model, tracker) {
+	        return $http.post(baseUrl + 'GetFiles', model, getConfig(tracker));
 	    },
 	    addFilesUrl: function () {
 	        return baseUrl + 'AddFiles';
 	    },
 	    deleteFile: function (url, tracker) {
-	        return $http.post(baseUrl + 'DeleteFile/'+url, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteFile',url, getConfig(tracker));
 	    },
 	};
 }]);

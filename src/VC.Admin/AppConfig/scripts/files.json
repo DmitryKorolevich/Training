@@ -111,6 +111,7 @@
 		'app/modules/product/controllers/productCategoryManageController.js',
 		'app/modules/product/product.js',
 		'app/modules/file/controllers/filesController.js',
+		'app/modules/file/controllers/addFolderController.js',
 		'app/modules/file/file.js',
 	]
 }

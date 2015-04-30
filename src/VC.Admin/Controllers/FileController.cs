@@ -35,9 +35,35 @@ namespace VitalChoice.Controllers
             this.logger = LoggerService.GetDefault();
         }
 
-        [HttpPost]
-        public async Task<Result<bool>> AddFiles()
+        [HttpGet]
+        public Result<DirectoryInfoObject> GetDirectories()
         {
+            return fileService.GetDirectories();
+        }
+
+        [HttpPost]
+        public Result<DirectoryInfoObject> AddDirectory([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.AddDirectory(model.FullRelativeName, model.Name);
+        }
+
+        [HttpPost]
+        public Result<bool> DeleteDirectory([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.DeleteDirectory(model.FullRelativeName);
+        }
+
+        [HttpPost]
+        public Result<IEnumerable<FileInfoObject>> GetFiles([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.GetFiles(model.FullRelativeName).ToList();
+        }
+
+
+        [HttpPost]
+        public async Task<Result<FileInfoObject>> AddFiles()
+        {
+            FileInfoObject toReturn = null;
             var form = await Request.ReadFormAsync();
 
             var fullRelativeUrl = form.Keys.FirstOrDefault();
@@ -51,7 +77,7 @@ namespace VitalChoice.Controllers
                     var fileContent = StreamsHelper.ReadFully(stream);
                     try
                     {
-                        fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
+                        toReturn=fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
                     }
                     catch (AppValidationException ex)
                     {
@@ -69,38 +95,13 @@ namespace VitalChoice.Controllers
                 throw new AppValidationException(messages);
             }
 
-            return true;
-        }
-
-        [HttpGet]
-        public Result<DirectoryInfoObject> GetDirectories()
-        {
-            return fileService.GetDirectories();
+            return toReturn;
         }
 
         [HttpPost]
-        public Result<DirectoryInfoObject> AddDirectory(string url, string name)
+        public Result<bool> DeleteFile([FromBody]FileInfoObject model)
         {
-            return fileService.AddDirectory(url, name);
-        }
-
-        [HttpPost]
-        public Result<bool> DeleteDirectory(string url)
-        {
-            return fileService.DeleteDirectory(url);
-        }
-
-        [HttpGet]
-        public Result<IEnumerable<FileInfoObject>> GetFiles(string url)
-        {
-            return fileService.GetFiles(url).ToList();
-        }
-        
-
-        [HttpPost]
-        public Result<bool> DeleteFile(string url)
-        {
-            return fileService.DeleteFile(url);
+            return fileService.DeleteFile(model.FullRelativeName);
         }
     }
 }
