@@ -35,5 +35,7 @@ namespace VitalChoice.Business.Services.Contracts
 		Task<bool> IsSuperAdmin(ApplicationUser user);
 
 		void SignOut(ApplicationUser user);
+
+	    Task SendActivationAsync(Guid id);
     }
 }

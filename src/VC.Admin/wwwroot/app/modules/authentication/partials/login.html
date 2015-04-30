@@ -6,12 +6,12 @@
 					<div class="form-group">
 						<label class="col-md-3 control-label">Email</label>
 						<div class="col-md-9">
-							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="login.Email" required data-ng-minlength="3" data-ng-maxlength="100">
+							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="login.Email" required data-ng-maxlength="100">
 							<div class="error-container" ng-show="loginForm.submitted && loginForm.email.$invalid">
-								<small class="error" ng-show="loginForm.email.$error.required">Email is required</small>
-								<small class="error" ng-show="loginForm.email.$error.email">Email has wrong format</small>
-								<small class="error" ng-show="loginForm.email.$error.minlength">Email is required to be at least 3 characters</small>
-								<small class="error" ng-show="loginForm.email.$error.maxlength">Email cannot be longer than 100 characters</small>
+								<small class="error" ng-show="loginForm.email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="loginForm.email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="loginForm.email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
+								<small class="error" ng-show="loginForm.email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
 							</div>
 						</div>
 					</div>
@@ -20,13 +20,14 @@
 						<div class="col-md-9">
 							<input type="password" name="password" class="form-control" data-ng-model="login.Password" placeholder="Password" required>
 							<div class="error-container" ng-show="loginForm.submitted && loginForm.password.$invalid">
-								<small class="error" ng-show="loginForm.password.$error.required">Password is required</small>
+								<small class="error" ng-show="loginForm.password.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Password")}}</small>
+								<small class="error" ng-show="loginForm.password.$error.server">{{serverMessages.GetMessage('Password')}}</small>
 							</div>
 						</div>
 					</div>
 				</fieldset>
 				<div class="margin-top-20px">
-					<button type="button" data-ng-click="signIn(loginForm)" ladda="loginTracker.activate()" class="btn btn-success">Login</button>
+					<button type="button" data-ng-click="signIn(loginForm)" ladda="loginTracker.active()" class="btn btn-success">Login</button>
 				</div>
 			</form>
 	</div>

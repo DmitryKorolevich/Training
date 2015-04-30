@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', function (infrastructureService, $rootScope, toaster, authenticationService) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService' , '$location', function (infrastructureService, $rootScope, toaster, authenticationService, $location) {
 			function getReferenceItem(lookup, key) {
 				return $.grep(lookup, function(elem) {
 					return elem.Key === key;
@@ -13,11 +13,15 @@ angular.module('app.core.utils.appBootstrap', [])
                 var message='';
                 if(field)
                 {
-                    var item = getReferenceItem($rootScope.ReferenceData.Labels, field);
+                    var item = getReferenceItem($rootScope.ReferenceData.Labels, Array.isArray(field) ? field[0] : field);
                     if (item) {
-                        field = item.Text;
+	                    if (Array.isArray(field)) {
+							field[0] = item.Text;
+	                    } else {
+							field = item.Text;
+	                    }
                     }
-                    message = messageFormat.format(field);
+	                message = messageFormat.format(field);
                 }
                 else
                 {
@@ -46,21 +50,26 @@ angular.module('app.core.utils.appBootstrap', [])
 				});
 			}
 
+			function unauthorizedArea() {
+				var path = $location.path();
+
+				return path.indexOf(0, "/authentication/activate") > -1 || path === "/authentication/login";
+			};
+
 			function initialize() {
 				$rootScope.appStarted = false;
+				$rootScope.ReferenceData = {};
 
 				infrastructureService.getReferenceData().success(function(res) {
 					if (res.Success) {
 						$rootScope.ReferenceData = res.Data;
 
-						if (!$rootScope.$state.current.data || !$rootScope.$state.current.data.unauthorizedArea) {
+						if (!unauthorizedArea()) {
 							authenticationService.getCurrenUser()
 								.success(function(res) {
 									if (res.Success && res.Data) {
 										$rootScope.authenticated = true;
 										$rootScope.currentUser = res.Data;
-
-										$rootScope.$state.go("index.oneCol.dashboard");
 									} else {
 										$rootScope.authenticated = false;
 

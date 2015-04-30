@@ -63,6 +63,9 @@ namespace VitalChoice.Controllers
 		[HttpPost]
 		public async Task<Result<UserInfoModel>> Activate([FromBody]CreateAccountModel model)
 		{
+			if (ConvertWithValidate(model) == null)
+				return null;
+
 			var user = await userService.GetAsync(model.PublicId);
 			if (user == null)
 			{
@@ -85,6 +88,9 @@ namespace VitalChoice.Controllers
 		[HttpPost]
 		public async Task<Result<UserInfoModel>> Login([FromBody]LoginModel model)
 		{
+			if (ConvertWithValidate(model) == null)
+				return null;
+
 			var user = await userService.SignInAsync(model.Email, model.Password);
 			if (user == null)
 			{

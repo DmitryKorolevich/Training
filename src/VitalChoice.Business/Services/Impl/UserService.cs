@@ -71,13 +71,38 @@ namespace VitalChoice.Business.Services.Impl
 
 		private string AggregateIdentityErrors(IEnumerable<IdentityError> errors)
 		{
-			return errors.Aggregate(string.Empty, (current, error) => current + $"{current} {error.Description}").Trim();
+			return errors.First().Description.Trim();
+		}
+
+		private async Task SendActivationAsync(ApplicationUser dbUser)
+		{
+			if (dbUser.Status != UserStatus.NotActive)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+			}
+
+			await notificationService.SendUserActivationAsync(dbUser.Email, new UserActivation()
+			{
+				FirstName = dbUser.FirstName,
+				LastName = dbUser.LastName,
+				Link = $"{options.AdminHost}#/authentication/activate/{dbUser.Profile.ConfirmationToken}"
+			});
+		}
+
+		public async Task ValidateUserOnSignIn(string login)
+		{
+			var disabled = await userManager.Users.AnyAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login) && !x.DeletedDate.HasValue);
+
+			if (disabled)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
+			}
 		}
 
 		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
 		{
-			user.CreateDate = DateTime.UtcNow;
-			user.UpdatedDate = DateTime.UtcNow;
+			user.CreateDate = DateTime.Now;
+			user.UpdatedDate = DateTime.Now;
 			user.Status = UserStatus.NotActive;
 			user.LastLoginDate = null;
 			user.PublicId = Guid.NewGuid();
@@ -103,12 +128,7 @@ namespace VitalChoice.Business.Services.Impl
 						if (sendActivation)
 						{
 							var dbUser = await FindAsync(user.Email);
-							await notificationService.SendUserActivationAsync(dbUser.Email, new UserActivation()
-							{
-								FirstName = dbUser.FirstName,
-								LastName = dbUser.LastName,
-								Link = $"{options.AdminHost}#/authentication/activate/{dbUser.Profile.ConfirmationToken}"
-							});
+							await SendActivationAsync(dbUser);
 						}
 
 						transaction.Commit();
@@ -130,7 +150,7 @@ namespace VitalChoice.Business.Services.Impl
 
 		public async Task DeleteAsync(ApplicationUser user)
 		{
-			user.DeletedDate = DateTime.UtcNow;
+			user.DeletedDate = DateTime.Now;
 			user.Status = UserStatus.Disabled;
 
 			var result = await UpdateAsync(user);
@@ -144,7 +164,7 @@ namespace VitalChoice.Business.Services.Impl
 
 		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
-			user.UpdatedDate = DateTime.UtcNow;
+			user.UpdatedDate = DateTime.Now;
 
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
@@ -219,7 +239,7 @@ namespace VitalChoice.Business.Services.Impl
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
 			}
-			if (user.Profile.TokenExpirationDate.Subtract(DateTime.UtcNow).Days < 0)
+			if (user.Profile.TokenExpirationDate.Subtract(DateTime.Now).Days < 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ActivationTokenExpired]);
 			}
@@ -229,13 +249,20 @@ namespace VitalChoice.Business.Services.Impl
 
 		public async Task<ApplicationUser> SignInAsync(ApplicationUser user)
 		{
+			await ValidateUserOnSignIn(user.UserName);
+
 			await signInManager.SignInAsync(user, false);
+
+			user.LastLoginDate = DateTime.Now;
+			user = await UpdateAsync(user);
 
 			return user;
 		}
 
 		public async Task<ApplicationUser> SignInAsync(string login, string password)
 		{
+			await ValidateUserOnSignIn(login);
+
 			var result = await signInManager.PasswordSignInAsync(login,password, false, true);
 			if (!result.Succeeded)
 			{
@@ -243,6 +270,9 @@ namespace VitalChoice.Business.Services.Impl
 			}
 
 			var user = await FindAsync(login);
+
+			user.LastLoginDate = DateTime.Now;
+			user = await UpdateAsync(user);
 
 			return user;
 		}
@@ -277,6 +307,18 @@ namespace VitalChoice.Business.Services.Impl
 			signInManager.SignOut();
 		}
 
+		public async Task SendActivationAsync(Guid id)
+		{
+			var dbUser = await GetAsync(id);
+			dbUser.Profile.ConfirmationToken = Guid.NewGuid();
+			dbUser.Profile.TokenExpirationDate = DateTime.Now.AddDays(options.ActivationTokenExpirationTermDays);
+
+			await UpdateAsync(dbUser);
+
+			await SendActivationAsync(dbUser);
+
+		}
+
 		public async Task<ApplicationUser> FindAsync(string login)
 		{
 			return await userManager.FindByEmailAsync(login);
@@ -288,8 +330,10 @@ namespace VitalChoice.Business.Services.Impl
 			if (!string.IsNullOrWhiteSpace(filter.SearchText))
 			{
 				var keyword = filter.SearchText.ToLower();
-				query = query.And(x => (x.FirstName + " " + x.LastName).ToLower().Contains(keyword) ||
-				                       x.Email.ToLower().Contains(keyword));
+				query = query.And(x => x.FirstName.ToLower().Contains(keyword) ||
+										x.LastName.ToLower().Contains(keyword) ||
+									   //(x.FirstName + " " + x.LastName).ToLower().Contains(keyword) || uncomment when stupid ef becomes stable
+									   x.Email.ToLower().Contains(keyword));
 			}
 
 			var queryable = userManager.Users.AsNoTracking().Where(query);

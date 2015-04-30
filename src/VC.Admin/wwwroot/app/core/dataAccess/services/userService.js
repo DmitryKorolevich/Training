@@ -30,6 +30,9 @@ angular.module('app.core.dataAccess.services.userService', [])
 		},
 		deleteUser: function (publicId, tracker) {
 			return $http.post(baseUrl + 'DeleteUser', { PublicId: publicId }, getConfig(tracker));
+		},
+		resendActivation: function (publicId, tracker) {
+			return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
 		}
 	};
 }]);

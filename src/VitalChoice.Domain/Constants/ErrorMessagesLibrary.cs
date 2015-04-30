@@ -15,6 +15,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string IncorrectUserPassword = "IncorrectUserPassword";
 		    public const string CantFindUser = "CantFindUser";
 		    public const string CantSignIn = "CanSignIn";
+		    public const string UserIsDisabled = "UserIsDisabled";
 	    }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -26,7 +27,8 @@ namespace VitalChoice.Domain.Constants
 		    {Keys.UserLockedOut, "User is locked out"},
 		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
 		    {Keys.CantFindUser, "User not found"},
-		    {Keys.CantSignIn, "User cannot be signed in"}
+		    {Keys.CantSignIn, "User cannot be signed in"},
+		    {Keys.UserIsDisabled, "User is disabled by admin"}
 	    };
     }
 }

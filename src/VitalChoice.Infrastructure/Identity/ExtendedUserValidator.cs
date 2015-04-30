@@ -92,11 +92,7 @@ namespace VitalChoice.Infrastructure.Identity
 			{
 				var findByAgentId = await profileRepository.Query(x => x.AgentId == user.Profile.AgentId).Include(x => x.User).SelectAsync(false); //todo: refactor this
 				findByAgentId = findByAgentId.Where(x => !x.User.DeletedDate.HasValue).ToList();
-                var flag = !findByAgentId.Any();
-				if (flag)
-				{
-					flag = findByAgentId.Any(x => x.User.Id != user.Id);
-				}
+				var flag = findByAgentId.Any(x => x.User.Id != user.Id);
 				if (flag)
 					errors.Add(new IdentityError() { Description = "Provided Agent Id is already taken" });
 			}

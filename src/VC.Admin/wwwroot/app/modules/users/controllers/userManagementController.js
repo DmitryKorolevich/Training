@@ -81,7 +81,7 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 			userService.deleteUser(publicId, $scope.deleteTracker)
 				.success(function(result) {
 					if (result.Success) {
-						toaster.pop('success', "Success!", "Successfully deleted.");
+						toaster.pop('success', "Success!", "Successfully deleted");
 					} else {
 						var messages = "";
 						if (result.Messages) {
