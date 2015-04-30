@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 using VitalChoice.Workflow.Implementations.Actions;

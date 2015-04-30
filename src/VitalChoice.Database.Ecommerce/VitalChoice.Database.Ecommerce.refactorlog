@@ -14,46 +14,4 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[FK_WorkflowManagers_ToWorkflowDependencies]" />
   </Operation>
-  <Operation Name="Rename Refactor" Key="4a0e5ab1-cc05-4b96-a81a-c81cd4225617" ChangeDateTime="04/26/2015 19:28:53">
-    <Property Name="ElementName" Value="[dbo].[WorkflowTreeLinkage].[IdAction]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowTreeLinkage]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="IdExecutor" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="1cf0ee5a-7c2f-4ec1-ba01-d326000d3db5" ChangeDateTime="04/26/2015 19:29:33">
-    <Property Name="ElementName" Value="[dbo].[FK_WorkflowTreeLinkage_ToTree]" />
-    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowTreeActions]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="[FK_WorkflowTreeActions_ToTree]" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="87a8f829-f79b-439e-9acc-3eca2842d299" ChangeDateTime="04/26/2015 19:34:53">
-    <Property Name="ElementName" Value="[dbo].[WorkflowExecutors].[Type]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowExecutors]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="ImplementType" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="cf254524-b04d-4e2c-aca5-8fcefdc25036" ChangeDateTime="04/26/2015 19:35:09">
-    <Property Name="ElementName" Value="[dbo].[WorkflowExecutors].[ImplementType]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowExecutors]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="ImplementationType" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="be6f8e2b-ef05-4946-ac4f-03feba9e002d" ChangeDateTime="04/26/2015 19:37:48">
-    <Property Name="ElementName" Value="[dbo].[WorkflowResolverPaths].[IdExecutor]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowResolverPaths]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="IdResolver" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="a860cfdb-c2f7-426c-8bb1-a13acf2eba58" ChangeDateTime="04/26/2015 19:39:09">
-    <Property Name="ElementName" Value="[dbo].[WorkflowResolverPaths].[IdPath]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[WorkflowResolverPaths]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="Path" />
-  </Operation>
 </Operations>

@@ -66,7 +66,6 @@
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
     <Folder Include="deploy" />
-    <Folder Include="dbo\Workflow" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
@@ -81,10 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Sample.sql" />
-    <Build Include="dbo\Workflow\WorkflowTrees.sql" />
-    <Build Include="dbo\Workflow\WorkflowTreeActions.sql" />
-    <Build Include="dbo\Workflow\WorkflowResolverPaths.sql" />
-    <Build Include="dbo\Workflow\WorkflowExecutors.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />

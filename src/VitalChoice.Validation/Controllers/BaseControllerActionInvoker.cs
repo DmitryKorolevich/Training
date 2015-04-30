@@ -51,7 +51,10 @@ namespace VitalChoice.Validation.Controllers
         protected override async Task<IActionResult> InvokeActionAsync(ActionExecutingContext actionExecutingContext)
         {
             var baseController = actionExecutingContext.Controller as BaseController;
-            baseController?.Configure();
+            if (baseController != null)
+            {
+                baseController.Configure();
+            }
             return await base.InvokeActionAsync(actionExecutingContext);
         }
     }
