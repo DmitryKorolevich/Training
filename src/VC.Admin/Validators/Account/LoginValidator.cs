@@ -19,8 +19,8 @@ namespace VitalChoice.Validators.Account
 			public LoginRuleSet()
 			{
 				RuleFor(model => model.Email).NotEmpty().WithMessage(model => model.Email, ValidationMessages.FieldRequired);
-				RuleFor(model => model.Email).Length(3, 100).WithMessage(model => model.Email, ValidationMessages.FieldLength);
-				RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, "Incorrect email format");
+				RuleFor(model => model.Email).Length(0,100).WithMessage(model => model.Email, ValidationMessages.FieldLength, 100);
+				RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
 				RuleFor(model => model.Password).NotEmpty()
 					.WithMessage(model => model.Password, ValidationMessages.FieldRequired);

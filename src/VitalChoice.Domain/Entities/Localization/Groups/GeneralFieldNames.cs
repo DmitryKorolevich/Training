@@ -15,5 +15,13 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         CountryCode = 8,
         StateName = 9,
         StateCode = 10,
-    }
+		Email = 11,
+		Password = 12,
+		FirstName = 13,
+		LastName = 14,
+		ConfirmPassword = 15,
+		Roles = 16,
+		UserStatus = 17,
+		AgentId = 18
+	}
 }

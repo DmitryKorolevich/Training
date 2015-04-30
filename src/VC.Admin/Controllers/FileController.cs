@@ -17,9 +17,13 @@ using System.IO;
 using System;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities.Files;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Entities.Permissions;
 
 namespace VitalChoice.Controllers
 {
+    [AdminAuthorize(PermissionType.Tools)]
     public class FileController : BaseApiController
     {
         private readonly IFileService fileService;
@@ -31,9 +35,35 @@ namespace VitalChoice.Controllers
             this.logger = LoggerService.GetDefault();
         }
 
-        [HttpPost]
-        public async Task<Result<bool>> AddFiles()
+        [HttpGet]
+        public Result<DirectoryInfoObject> GetDirectories()
         {
+            return fileService.GetDirectories();
+        }
+
+        [HttpPost]
+        public Result<DirectoryInfoObject> AddDirectory([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.AddDirectory(model.FullRelativeName, model.Name);
+        }
+
+        [HttpPost]
+        public Result<bool> DeleteDirectory([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.DeleteDirectory(model.FullRelativeName);
+        }
+
+        [HttpPost]
+        public Result<IEnumerable<FileInfoObject>> GetFiles([FromBody]DirectoryInfoObject model)
+        {
+            return fileService.GetFiles(model.FullRelativeName).ToList();
+        }
+
+
+        [HttpPost]
+        public async Task<Result<FileInfoObject>> AddFiles()
+        {
+            FileInfoObject toReturn = null;
             var form = await Request.ReadFormAsync();
 
             var fullRelativeUrl = form.Keys.FirstOrDefault();
@@ -47,7 +77,7 @@ namespace VitalChoice.Controllers
                     var fileContent = StreamsHelper.ReadFully(stream);
                     try
                     {
-                        fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
+                        toReturn=fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
                     }
                     catch (AppValidationException ex)
                     {
@@ -65,7 +95,13 @@ namespace VitalChoice.Controllers
                 throw new AppValidationException(messages);
             }
 
-            return true;
-        }        
+            return toReturn;
+        }
+
+        [HttpPost]
+        public Result<bool> DeleteFile([FromBody]FileInfoObject model)
+        {
+            return fileService.DeleteFile(model.FullRelativeName);
+        }
     }
 }

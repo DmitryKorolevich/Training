@@ -15,8 +15,9 @@
 						<div class="col-md-9">
 							<input type="text" name="firstName" class="form-control" placeholder="First Name" data-ng-model="user.FirstName" required data-ng-maxlength="100">
 							<div class="error-container" ng-show="userForm.submitted && userForm.firstName.$invalid">
-								<small class="error" ng-show="userForm.firstName.$error.required">First Name is required</small>
-								<small class="error" ng-show="userForm.firstName.$error.maxlength">First Name cannot be longer than 100 characters</small>
+								<small class="error" ng-show="userForm.firstName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.FirstName")}}</small>
+								<small class="error" ng-show="userForm.firstName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.FirstName", "100"])}}</small>
+								<small class="error" ng-show="userForm.firstName.$error.server">{{serverMessages.GetMessage('FirstName')}}</small>
 							</div>
 						</div>
 					</div>
@@ -25,20 +26,21 @@
 						<div class="col-md-9">
 							<input type="text" name="lastName" class="form-control" placeholder="Last Name" data-ng-model="user.LastName" required data-ng-maxlength="100">
 							<div class="error-container" ng-show="userForm.submitted && userForm.lastName.$invalid">
-								<small class="error" ng-show="userForm.lastName.$error.required">Last Name is required</small>
-								<small class="error" ng-show="userForm.lastName.$error.maxlength">Last Name cannot be longer than 100 characters</small>
+								<small class="error" ng-show="userForm.lastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
+								<small class="error" ng-show="userForm.lastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>
+								<small class="error" ng-show="userForm.lastName.$error.server">{{serverMessages.GetMessage('LastName')}}</small>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-md-3 control-label">Email</label>
 						<div class="col-md-9">
-							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="user.Email" required data-ng-minlength="3" data-ng-maxlength="100">
+							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="user.Email" required data-ng-maxlength="100">
 							<div class="error-container" ng-show="userForm.submitted && userForm.email.$invalid">
-								<small class="error" ng-show="userForm.email.$error.required">Email is required</small>
-								<small class="error" ng-show="userForm.email.$error.email">Email has wrong format</small>
-								<small class="error" ng-show="userForm.email.$error.minlength">Email is required to be at least 3 characters</small>
-								<small class="error" ng-show="userForm.email.$error.maxlength">Email cannot be longer than 100 characters</small>
+								<small class="error" ng-show="userForm.email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="userForm.email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+								<small class="error" ng-show="userForm.email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
+								<small class="error" ng-show="userForm.email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
 							</div>
 						</div>
 					</div>
@@ -47,7 +49,8 @@
 						<div class="col-md-9">
 							<input type="password" name="password" class="form-control" data-ng-model="user.Password" placeholder="Password" required>
 							<div class="error-container" ng-show="userForm.submitted && userForm.password.$invalid">
-								<small class="error" ng-show="userForm.password.$error.required">Password is required</small>
+								<small class="error" ng-show="userForm.password.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Password")}}</small>
+								<small class="error" ng-show="userForm.password.$error.server">{{serverMessages.GetMessage('Password')}}</small>
 							</div>
 						</div>
 					</div>
@@ -56,7 +59,8 @@
 						<div class="col-md-9">
 							<input type="password" name="confirmPassword" class="form-control" data-ng-model="user.ConfirmPassword" placeholder="Confirm Pasword" required>
 							<div class="error-container" ng-show="userForm.submitted && userForm.confirmPassword.$invalid">
-								<small class="error" ng-show="userForm.confirmPassword.$error.required">Password Confirmation is required</small>
+								<small class="error" ng-show="userForm.confirmPassword.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ConfirmPassword")}}</small>
+								<small class="error" ng-show="userForm.confirmPassword.$error.server">{{serverMessages.GetMessage('ConfirmPassword')}}</small>
 							</div>
 						</div>
 					</div>

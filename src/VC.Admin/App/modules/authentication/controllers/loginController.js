@@ -15,6 +15,12 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 			};
 
 			$scope.signIn = function(loginForm) {
+				$.each(loginForm, function(index, element) {
+					if (element.$name == index) {
+						element.$setValidity("server", true);
+					}
+				});
+
 				if (loginForm.$valid) {
 					authenticationService.login($scope.login, $scope.loginTracker).success(function(res) {
 						if (res.Success) {
@@ -31,18 +37,20 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 								toaster.pop('error', "Error!", "Server error occured");
 							});
 
-							$state.go("index.oneCol.dashboard");
+							$state.go($state.previous != null && $state.previous.name !== 'index.oneCol.login' && $state.previous.name !== '' ? $state.previous.name : "index.oneCol.dashboard");
 						} else {
 							var messages = "";
 							if (res.Messages) {
+								loginForm.submitted = true;
+								$scope.serverMessages = new ServerMessages(res.Messages);
 								$.each(res.Messages, function(index, value) {
+									if (value.Field && loginForm[value.Field.toLowerCase()]) {
+										loginForm[value.Field.toLowerCase()].$setValidity("server", false);
+									}
 									messages += value.Message + "<br />";
 								});
-							} else {
-								messages = "Can't login";
 							}
-
-							toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
+							toaster.pop('error', "Error!", messages, null, 'trustedHtml');
 						}
 					}).error(function(res) {
 						errorHandler();

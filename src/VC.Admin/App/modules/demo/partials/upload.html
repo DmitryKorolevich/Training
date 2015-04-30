@@ -28,9 +28,9 @@
     Username
     <input type="text" ng-model="username"></br></br>
     <input type="checkbox" ng-model="multiple">upload multiple file</br></br>
-    <!--watching model:
-    <div class="button" ngf-select ng-model="files" ngf-multiple="multiple">Select File</div>
-    on file change:
+    watching model:
+    <div class="button" ngf-select ng-model="files" accept=".jpg,.gif,.png,.pdf" ngf-multiple="true">Select File</div>
+    <!--on file change:
     <div class="button" ngf-select ngf-change="upload($files)" ngf-multiple="multiple">Select File</div>-->
     Drop File:
     <div ngf-drop ngf-select ng-model="files" class="drop-box"

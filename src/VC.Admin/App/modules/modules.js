@@ -7,4 +7,5 @@ angular.module('app.modules', [
 	'app.modules.content',
 	'app.modules.setting',
 	'app.modules.product',
+	'app.modules.file',
 ]);

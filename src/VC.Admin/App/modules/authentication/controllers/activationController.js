@@ -42,6 +42,12 @@ angular.module('app.modules.authentication.controllers.activationController', []
 		};
 
 		$scope.activate = function(userForm) {
+				$.each(userForm, function(index, element) {
+					if (element.$name == index) {
+						element.$setValidity("server", true);
+					}
+				});
+
 				if (userForm.$valid) {
 					authenticationService.activate($scope.user, $scope.activationTracker).success(function(res) {
 						if (res.Success) {
@@ -63,14 +69,16 @@ angular.module('app.modules.authentication.controllers.activationController', []
 						} else {
 							var messages = "";
 							if (res.Messages) {
+								userForm.submitted = true;
+								$scope.serverMessages = new ServerMessages(res.Messages);
 								$.each(res.Messages, function(index, value) {
+									if (value.Field && userForm[value.Field.toLowerCase()]) {
+										userForm[value.Field.toLowerCase()].$setValidity("server", false);
+									}
 									messages += value.Message + "<br />";
 								});
-							} else {
-								messages = "Can't activate user";
 							}
-
-							toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
+							toaster.pop('error', "Error!", messages, null, 'trustedHtml');
 						}
 					}).error(function(res) {
 						errorHandler();

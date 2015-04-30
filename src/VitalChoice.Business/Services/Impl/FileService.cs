@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Impl
                 {
                     dirInfo.Create();
                 }
-                _rootDir = dirInfo.FullName;
+                _rootDir = dirInfo.FullName.ToLower();
             }
         }
 
@@ -52,12 +52,7 @@ namespace VitalChoice.Business.Services.Impl
 
         public DirectoryInfoObject GetDirectories()
         {
-            DirectoryInfoObject toReturn = new DirectoryInfoObject()
-            {
-                FullRelativeName = "/",
-                Name = "",
-                Directories = new List<DirectoryInfoObject>(),
-            };
+            DirectoryInfoObject toReturn = new DirectoryInfoObject("/", "/");
             DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories).Select(p => new DirectoryInfoObject()
             {
@@ -86,12 +81,11 @@ namespace VitalChoice.Business.Services.Impl
             if (!dirInfo.Exists)
             {
                 dirInfo.Create();
-                toReturn = new DirectoryInfoObject()
-                {
-                    Name = name,
-                    FullRelativeName = fullRelativeName,
-                    Directories = new List<DirectoryInfoObject>(),
-                };
+                toReturn = new DirectoryInfoObject(name, fullRelativeName + "/" + name);
+            }
+            else
+            {
+                throw new AppValidationException("Directory", "The directory with this name is already exist.");
             }
             return toReturn;
         }
@@ -99,6 +93,11 @@ namespace VitalChoice.Business.Services.Impl
         public bool DeleteDirectory(string fullRelativeName)
         {
             bool toReturn = false;
+            string tempUrl = fullRelativeName;
+            if (tempUrl == "/")
+            {
+                return false;
+            }
             var path = ConvertUrlToPath(fullRelativeName);
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             if (dirInfo.Exists)
@@ -129,7 +128,8 @@ namespace VitalChoice.Business.Services.Impl
             DirectoryInfo dirInfo = new DirectoryInfo(ConvertUrlToPath(fullRelativeName));
             if (dirInfo.Exists)
             {
-                toReturn = dirInfo.GetFiles().Select(p => new FileInfoObject(p.Name, ConvertPathToUrl(p.FullName), p.Length)).ToList();
+                toReturn = dirInfo.GetFiles().Select(p => new FileInfoObject(p.Name, ConvertPathToUrl(p.FullName),
+                    ConvertPathToUrl(dirInfo.FullName), p.Length)).ToList();
             }
 
             return toReturn;
@@ -169,11 +169,13 @@ namespace VitalChoice.Business.Services.Impl
                 tempUrl = String.Empty;
             }
             var path = ConvertUrlToPath(tempUrl);
+            var directory = path;
             path = path + @"\" + name;
-            FileInfo fileInfo = new FileInfo(path.ToLower());
+            path = path.ToLower();
+            FileInfo fileInfo = new FileInfo(path);
 
             SaveToFileSystem(fileInfo.FullName, content);
-            toReturn = new FileInfoObject(name, fullRelativeName, content.Length);
+            toReturn = new FileInfoObject(name.ToLower(), ConvertPathToUrl(path), ConvertPathToUrl(directory), content.Length);
 
             return toReturn;
         }
@@ -198,12 +200,12 @@ namespace VitalChoice.Business.Services.Impl
 
         private string ConvertUrlToPath(string url)
         {
-            return _rootDir + url.Replace("/", @"\");
+            return _rootDir + url.ToLower().Replace("/", @"\").Replace(@"\..","");
         }
 
         private string ConvertPathToUrl(string path)
         {
-            return path.Replace(_rootDir, "").Replace(@"\", "/");
+            return path.ToLower().Replace(_rootDir, "").Replace(@"\", "/");
         }
 
         private static FileStream CreateWriteStream(string currentFileUrl, int numberOfTries, int timeIntervalBetweenTries)
@@ -256,6 +258,10 @@ namespace VitalChoice.Business.Services.Impl
             foreach (var dir in dirs)
             {
                 var forSearch = dir.FullRelativeName.Substring(0, dir.FullRelativeName.LastIndexOf("/"));
+                if(String.IsNullOrEmpty(forSearch))
+                {
+                    forSearch = "/";
+                }
                 if (forSearch == root.FullRelativeName)
                 {
                     root.Directories.Add(dir);

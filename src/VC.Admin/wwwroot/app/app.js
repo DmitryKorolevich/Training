@@ -20,8 +20,9 @@ var app = angular
 			$rootScope.$on('$stateChangeStart', function() {
 				ngProgress.start();
 			});
-			$rootScope.$on('$stateChangeSuccess', function() {
+			$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
 				ngProgress.complete();
+				$state.previous = fromState;
 			});
 			$rootScope.$on('$stateChangeError', function() {
 				ngProgress.complete();

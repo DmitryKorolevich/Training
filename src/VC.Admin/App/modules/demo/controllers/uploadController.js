@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-angular.module('app.modules.demo.controllers.uploadController', ['ngFileUpload'])
+angular.module('app.modules.demo.controllers.uploadController', [])
 .controller('uploadController', ['$scope','Upload', function ($scope, Upload) {
     $scope.$watch('files', function () {
         $scope.upload($scope.files);

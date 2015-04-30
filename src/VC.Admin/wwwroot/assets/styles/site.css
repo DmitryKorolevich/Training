@@ -50,6 +50,9 @@ h2 {
 .angular-ui-tree-handle:hover {
   background-color: #EDEDED;
 }
+.angular-ui-tree-handle.selected {
+  background-color: #facfc8;
+}
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
   float: right;
@@ -483,4 +486,66 @@ form .form-group p {
 ul.navbar-custom-header li > a {
   padding-top: 18px;
   padding-bottom: 19px;
+}
+.file-manager .left-pane {
+  position: absolute;
+  width: 450px;
+}
+.file-manager .left-pane .wrapper {
+  overflow: auto;
+  height: 800px;
+}
+.file-manager .right-pane {
+  margin: 0 0 0 450px;
+  padding: 0 0px 0 30px;
+}
+.file-manager .right-pane .wrapper {
+  overflow: auto;
+  height: 800px;
+}
+.file-manager .bottom-pane .wrapper {
+  overflow: auto;
+  height: 200px;
+}
+.file-manager .ya-treeview-content .line {
+  min-width: initial;
+}
+.file-manager .angular-ui-tree-nodes .angular-ui-tree-nodes {
+  margin-left: 20px;
+}
+.file-manager .top-pane .form-group .right-section .drop-box {
+  background: #F8F8F8;
+  border: 5px dashed #DDD;
+  width: 400px;
+  height: 40px;
+  text-align: center;
+  padding-top: 5px;
+  display: inline-block;
+  margin: 0 10px;
+}
+.file-manager .top-pane .form-group .right-section .drop-box-disabled {
+  display: inline-block;
+}
+.file-manager .top-pane .form-group .right-section .dragover {
+  border: 5px dashed blue;
+}
+.file-manager .top-pane .form-group {
+  margin-bottom: 0;
+}
+.file-manager .top-pane .form-group .right-section {
+  float: right;
+  width: auto;
+}
+.file-manager .top-pane .form-group .breadcrumb {
+  margin-bottom: 0;
+}
+.file-manager .top-pane .form-group .breadcrumb a {
+  text-decoration: none;
+  cursor: pointer;
+}
+.file-manager .top-pane .form-group .breadcrumb i.folder-icon {
+  margin-right: 7px;
+}
+.file-manager .top-pane .form-group .breadcrumb li .space {
+  margin-left: -5px;
 }

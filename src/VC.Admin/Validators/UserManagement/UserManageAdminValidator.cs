@@ -36,39 +36,39 @@ namespace VitalChoice.Validators.UserManagement
 							    .NotEmpty()
 							    .WithMessage(model => model.AgentId, ValidationMessages.FieldRequired);
 						    RuleFor(model => model.AgentId)
-							    .Length(2, 10)
-							    .WithMessage(model => model.AgentId, ValidationMessages.FieldLength);
+							    .Length(0, 10)
+							    .WithMessage(model => model.AgentId, ValidationMessages.FieldLength, 10);
 
 						    RuleFor(model => model.FirstName)
 							    .NotEmpty()
 							    .WithMessage(model => model.FirstName, ValidationMessages.FieldRequired);
 						    RuleFor(model => model.FirstName)
 							    .Length(0, 100)
-							    .WithMessage(model => model.FirstName, ValidationMessages.FieldLength);
+							    .WithMessage(model => model.FirstName, ValidationMessages.FieldLength, 100);
 
 						    RuleFor(model => model.LastName)
 							    .NotEmpty()
 							    .WithMessage(model => model.LastName, ValidationMessages.FieldRequired);
 						    RuleFor(model => model.LastName)
 							    .Length(0, 100)
-							    .WithMessage(model => model.LastName, ValidationMessages.FieldLength);
+							    .WithMessage(model => model.LastName, ValidationMessages.FieldLength, 100);
 
 						    RuleFor(model => model.Email).NotEmpty().WithMessage(model => model.Email, ValidationMessages.FieldRequired);
-						    RuleFor(model => model.Email).Length(3, 100).WithMessage(model => model.Email, ValidationMessages.FieldLength);
-						    RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, "Incorrect email format");
+						    RuleFor(model => model.Email).Length(0, 100).WithMessage(model => model.Email, ValidationMessages.FieldLength, 100);
+						    RuleFor(model => model.Email).EmailAddress().WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
 						    RuleFor(model => model.RoleIds)
 							    .Must(x => x.Any())
-							    .WithMessage(model => model.RoleIds, "At least one role should be assigned");
+							    .WithMessage(model => model.RoleIds, ValidationMessages.AtLeastOneRole);
 					    });
 
 				RuleSet
 					("Update",
 						() =>
 						{
-							RuleFor(model => model.Status)
-								.Must(x => x == UserStatus.Active || x == UserStatus.Disabled)
-								.WithMessage(model => model.Status, "User status can be updated to Active or Disabled only");
+							//RuleFor(model => model.Status)
+							//	.Must(x => x == UserStatus.Active || x == UserStatus.Disabled)
+							//	.WithMessage(model => model.Status, ValidationMessages.UserStatusRestriction);
 						});
 			}
 		}
