@@ -63,28 +63,23 @@
     <Folder Include="Properties" />
     <Folder Include="PostDeployment" />
     <Folder Include="PostDeployment\Scripts" />
-    <Folder Include="dbo\" />
-    <Folder Include="dbo\Tables\" />
     <Folder Include="deploy" />
-    <Folder Include="dbo\Workflow" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\SamplePostDeploy.sql" />
     <None Include="Local.publish.xml" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Ecommerce.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
+    <None Include="PostDeployment\Scripts\WorkflowExecutors.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Sample.sql" />
-    <Build Include="dbo\Workflow\WorkflowTrees.sql" />
-    <Build Include="dbo\Workflow\WorkflowTreeActions.sql" />
-    <Build Include="dbo\Workflow\WorkflowResolverPaths.sql" />
-    <Build Include="dbo\Workflow\WorkflowExecutors.sql" />
+    <None Include="PostDeployment\Scripts\WorkflowResolverPaths.sql" />
+    <None Include="PostDeployment\Scripts\WorkflowTreeActions.sql" />
+    <None Include="PostDeployment\Scripts\WorkflowTrees.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
