@@ -49,10 +49,6 @@ namespace VitalChoice.Business.Services.Impl
                 catch(Exception e)
                 {
                     error += e.ToString();
-
-                    //var locator = CallContextServiceLocator.Locator;
-                    //var appEnv = (IHostingEnvironment)locator.ServiceProvider.GetService(typeof(IHostingEnvironment));
-                    //error += "        "+appEnv.WebRootPath;
                 }
             }
         }
@@ -66,10 +62,11 @@ namespace VitalChoice.Business.Services.Impl
 
         public DirectoryInfoObject GetDirectories()
         {
-            var locator = CallContextServiceLocator.Locator;
-            var appEnv = (IHostingEnvironment)locator.ServiceProvider.GetService(typeof(IHostingEnvironment));
-            error += "        " + appEnv.WebRootPath;
-            return new DirectoryInfoObject() { FullRelativeName = error };
+            if(!String.IsNullOrEmpty(error))
+            {
+                logger.LogError(error);
+            }
+
             DirectoryInfoObject toReturn = new DirectoryInfoObject("/", "/");
             DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories).Select(p => new DirectoryInfoObject()
