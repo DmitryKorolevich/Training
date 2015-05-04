@@ -85,12 +85,11 @@ namespace VitalChoice.Business.Services.Impl
         {
             DirectoryInfoObject toReturn = null;
             name = name.Trim().Replace("/", "");
-            string tempUrl = fullRelativeName;
-            if (tempUrl == "/")
+            if (fullRelativeName == "/")
             {
-                tempUrl = String.Empty;
+                fullRelativeName = String.Empty;
             }
-            var path = ConvertUrlToPath(tempUrl);
+            var path = ConvertUrlToPath(fullRelativeName);
             path = path + @"\" + name;
             DirectoryInfo dirInfo = new DirectoryInfo(path.ToLower());
             if (!dirInfo.Exists)
@@ -190,7 +189,12 @@ namespace VitalChoice.Business.Services.Impl
             FileInfo fileInfo = new FileInfo(path);
 
             SaveToFileSystem(fileInfo.FullName, content);
-            toReturn = new FileInfoObject(name.ToLower(), ConvertPathToUrl(path), ConvertPathToUrl(directory), content.Length);
+            var resDir = ConvertPathToUrl(directory);
+            if(resDir==String.Empty)
+            {
+                resDir = "/";
+            }
+            toReturn = new FileInfoObject(name.ToLower(), ConvertPathToUrl(path), resDir, content.Length);
 
             return toReturn;
         }

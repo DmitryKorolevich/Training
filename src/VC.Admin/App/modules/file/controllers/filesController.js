@@ -69,7 +69,7 @@ angular.module('app.modules.file.controllers.filesController', [])
             $scope.logFiles = [];
 
             $scope.breadCrumbMaxLevels = 5;
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'files/{0}';
+            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'files{0}';
 
             loadDirectories();
         }
