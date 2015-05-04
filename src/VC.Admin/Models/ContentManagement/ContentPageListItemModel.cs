@@ -26,6 +26,8 @@ namespace VitalChoice.Models.ContentManagement
 
         public DateTime Updated { get; set; }
 
+        public string AgentId { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public ContentPageListItemModel(ContentPage item)
@@ -59,6 +61,10 @@ namespace VitalChoice.Models.ContentManagement
                 {
                     Created = item.ContentItem.Created;
                     Updated = item.ContentItem.Updated;
+                }
+                if (item.User != null && item.User.Profile != null)
+                {
+                    AgentId = item.User.Profile.AgentId;
                 }
             }
         }

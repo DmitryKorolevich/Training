@@ -14,6 +14,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 using System.Security.Claims;
+using System;
 
 namespace VitalChoice.Controllers
 {
@@ -64,6 +65,13 @@ namespace VitalChoice.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if(Int32.TryParse(sUserId,out userId))
+            {
+                item.UserId = userId;
+            }
 
             item = await masterContentService.UpdateMasterContentItemAsync(item);
 
@@ -161,6 +169,13 @@ namespace VitalChoice.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+            
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
 
             item = await recipeService.UpdateRecipeAsync(item);
             await recipeService.AttachRecipeToCategoriesAsync(item.Id, model.CategoryIds);
@@ -208,6 +223,13 @@ namespace VitalChoice.Controllers
             if (item == null)
                 return null;
 
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
+
             item = await faqService.UpdateFAQAsync(item);
             await faqService.AttachFAQToCategoriesAsync(item.Id, model.CategoryIds);
 
@@ -254,6 +276,13 @@ namespace VitalChoice.Controllers
             if (item == null)
                 return null;
 
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
+
             item = await articleService.UpdateArticleAsync(item);
             await articleService.AttachArticleToCategoriesAsync(item.Id, model.CategoryIds);
 
@@ -299,6 +328,13 @@ namespace VitalChoice.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
 
             item = await contentPageService.UpdateContentPageAsync(item);
             await contentPageService.AttachContentPageToCategoriesAsync(item.Id, model.CategoryIds);

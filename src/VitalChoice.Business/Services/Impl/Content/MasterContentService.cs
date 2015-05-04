@@ -49,7 +49,8 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             var query = new MasterContentItemQuery();
             query = query.WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
-            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).SelectAsync(false)).ToList();
+            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).Include(p=>p.User).ThenInclude(p => p.Profile).
+                SelectAsync(false)).ToList();
             return toReturn;
         }
 
@@ -57,7 +58,8 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             var query = new MasterContentItemQuery();
             query = query.WithId(id).NotDeleted();
-            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).
+                Include(p => p.User).ThenInclude(p=>p.Profile).SelectAsync(false)).FirstOrDefault();
             return toReturn;
         }
 
@@ -96,6 +98,7 @@ namespace VitalChoice.Business.Services.Impl.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
+                dbItem.UserId = model.UserId;
                 dbItem.Updated = DateTime.Now;
 
                 if (model.Id == 0)
