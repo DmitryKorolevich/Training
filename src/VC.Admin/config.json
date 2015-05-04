@@ -5,7 +5,7 @@
 		"GenerateLowercaseUrls": true,
 		"EnableBundlingAndMinification": false,
         "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-        "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\public\\wwwroot\\files\\",
+        "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\public\\wwwroot\\files",
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
