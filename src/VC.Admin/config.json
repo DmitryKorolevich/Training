@@ -9,13 +9,13 @@
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
-		"Connection": {
-			"UserName": "dev_vc_user",
-			"Password": "VZQCkea2",
-			"Server": "localhost"
-		},
-		"PublicHost": "http://dev2.vitalchoice.com:5010/",
-		"AdminHost": "http://dev2.vitalchoice.com:5004/",
+        "Connection": {
+            "UserName": "dev_vcdb_login",
+            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+            "Server": "oz449vjvis.database.windows.net"
+        },
+        PublicHost: "http://staging.g2-dg.com/",
+		"AdminHost": "http://admin.staging.g2-dg.com/",
 		"Email": {
 			"From": "noreplyvitalchoice@gmail.com",
 			"Host": "smtp.gmail.com",

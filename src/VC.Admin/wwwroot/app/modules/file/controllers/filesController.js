@@ -209,7 +209,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         };
 
         function prepareFile(file) {
-            file.Url = $scope.baseUrl.format(file.Name);
+            file.Url = $scope.baseUrl.format(file.FullRelativeName);
         };
 
         $scope.deleteFile = function (deleteFile) {

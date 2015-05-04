@@ -1,5 +1,6 @@
 ﻿Param(
-	[string]$Src
+	[string]$Src,
+	[string]$RootBuild
 )
 
 . ".\functions.ps1"
@@ -7,9 +8,11 @@
 if ($Src.Equals("")) {
 	$Src = ".."
 }
-$RootBuild = "C:\Temp\vc"
+if ($RootBuild.Equals("")) {
+	$RootBuild = "C:\Temp\vc"
+}
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /is /it /nfl /ndl /njh /r:2 /w:1
-dnu restore "${RootBuild}\" --parallel >> restore.log
+dnu restore "${RootBuild}\" --parallel > restore.log
 ls -Path "${RootBuild}\src" | `
 foreach{
 	if ($_.GetType().Name.Equals("DirectoryInfo")) {

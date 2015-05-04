@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseName>VitalChoice.Infrastructure</TargetDatabaseName>
+    <DeployScriptFileName>VitalChoice.Database.Infrastructure.sql</DeployScriptFileName>
+    <TargetConnectionString>Server=tcp:oz449vjvis.database.windows.net,1433;Database=VitalChoice.Infrastructure;User ID=multiarc@oz449vjvis;Password=EWhd59G8cgwEWvRap5AP3JPq;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</TargetConnectionString>
+    <ProfileVersionNumber>1</ProfileVersionNumber>
+  </PropertyGroup>
+</Project>

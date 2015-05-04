@@ -16,7 +16,7 @@ function CopyTarget($targetName) {
 function DnuAll($deployPath) {
 	Push-Location ".."
 	echo "Restoring project packages..."
-	dnu restore --parallel >> restore.log
+	dnu restore --parallel > restore.log
 	echo "Publishing project..."
 	dnu publish -o "${deployPath}" --runtime active
 	Pop-Location
@@ -24,22 +24,32 @@ function DnuAll($deployPath) {
 function GruntTask($taskName) {
 	Push-Location ".."
 	echo "Running grunt task..."
-	grunt $taskName >> grunt.log
+	grunt $taskName > grunt.log
 	Pop-Location
 }
 function BowerInstall() {
 	Push-Location ".."
 	echo "Running bower install..."
-	bower install >> bower.log
+	bower install > bower.log
 	Pop-Location
 }
-function NpmCopy($projectPath) {
-	echo "Copying npm..."
-	robocopy "c:\inetpub\temp\npm\" ".." /e /ndl /nfl /njh /is >> copy-npm.log
-	Push-Location ".."
-	echo "Installing missed packages..."
-	npm install >> npm.log
-	Pop-Location
+function NpmCopy($npmPath) {
+	if (-Not (test-path $npmPath)) {
+		ni -itemtype directory -path $npmPath -Force
+		Push-Location ".."
+		echo "Installing missed packages..."
+		npm install > npm.log
+		Pop-Location
+		robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
+	}
+	else {
+		echo "Copying npm..."
+		robocopy $npmPath ".." /e /ndl /nfl /njh /is > copy-npm.log
+		Push-Location ".."
+		echo "Installing missed packages..."
+		npm install > npm.log
+		Pop-Location
+	}
 }
 function BuildDbProject() {
 	

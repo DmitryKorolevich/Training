@@ -1,6 +1,7 @@
 ﻿Param(
 	[string]$RootDeploy,
-	[string]$Src
+	[string]$Src,
+	[string]$RootBuild
 )
 
 . ".\functions.ps1"
@@ -12,14 +13,16 @@ if ($RootDeploy.Equals("")) {
 if ($Src.Equals("")) {
 	$Src = ".."
 }
-$RootBuild = "C:\Temp\vc"
+if ($RootBuild.Equals("")) {
+	$RootBuild = "C:\Temp\vc"
+}
 ni -itemtype directory -path "empty" -Force
 echo "Clean temp..."
-robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh >> clean.log
+robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh > clean.log
 echo "Clean deploy directory..."
-robocopy "empty\" "${RootDeploy}\" /xd "logs" /mir /nfl /ndl /njh >> clean.log
+robocopy "empty\" "${RootDeploy}\" /xd "logs" /mir /nfl /ndl /njh > clean.log
 echo "Copy checkout files to temp..."
-robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /is /it /r:2 /w:1 >> copy.log
+robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /is /it /r:2 /w:1 > copy.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
 cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 if (-Not(test-path "${RootDeploy}\logs\Logs.mdf")) {
@@ -45,8 +48,4 @@ foreach{
 			}
 		}
 	}
-}
-if (test-path "D:\Temp\vc_backup\public\wwwroot\files") {
-	echo "Copy old files..."
-	robocopy "D:\Temp\vc_backup\public\wwwroot\files" "${RootDeploy}\public\wwwroot\files" /mir /nfl /ndl /njh /is /it /r:2 /w:1 > copy.log
 }
