@@ -23,6 +23,8 @@ namespace VitalChoice.Models.ContentManagement
 
         public DateTime Updated { get; set; }
 
+        public string AgentId { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public MasterContentItemListItemModel(MasterContentItem item)
@@ -43,6 +45,10 @@ namespace VitalChoice.Models.ContentManagement
                 Created = item.Created;
                 Updated = item.Updated;
                 StatusCode = item.StatusCode;
+                if(item.User!=null && item.User.Profile!=null)
+                {
+                    AgentId = item.User.Profile.AgentId;
+                }
             }
         }
     }

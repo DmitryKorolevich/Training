@@ -46,3 +46,7 @@ foreach{
 		}
 	}
 }
+if (test-path "D:\Temp\vc_backup\public\wwwroot\files") {
+	echo "Copy old files..."
+	robocopy "D:\Temp\vc_backup\public\wwwroot\files" "${RootDeploy}\public\wwwroot\files" /mir /nfl /ndl /njh /is /it /r:2 /w:1 > copy.log
+}

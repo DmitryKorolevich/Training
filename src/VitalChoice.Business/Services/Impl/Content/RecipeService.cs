@@ -60,7 +60,9 @@ namespace VitalChoice.Business.Services.Impl.Content
                 }
             }
             query = query.WithName(filter.Name).NotDeleted();
-            var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
+            var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
+                Include(p => p.User).ThenInclude(p => p.Profile).
+                OrderBy(x => x.OrderBy(pp => pp.Name)).
                 SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
 
             //VitalChoiceContext content = new VitalChoiceContext();
@@ -81,7 +83,7 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             RecipeQuery query = new RecipeQuery().WithId(id).NotDeleted();
             var toReturn = (await recipeRepository.Query(query).Include(p=>p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
-                Include(p=>p.RecipesToContentCategories).
+                Include(p=>p.RecipesToContentCategories).Include(p => p.User).ThenInclude(p => p.Profile).
                 SelectAsync(false)).FirstOrDefault();
             return toReturn;
         }
@@ -130,6 +132,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
+                dbItem.UserId = model.UserId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;

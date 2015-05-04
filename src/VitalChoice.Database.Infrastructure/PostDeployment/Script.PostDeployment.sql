@@ -25,3 +25,4 @@ Post-Deployment Script Template
 :r .\Scripts\Countries.sql
 :r .\Scripts\AppSettings.sql
 :r .\Scripts\UpdateIdentity.sql
+:r .\Scripts\ContentUserReferences.sql

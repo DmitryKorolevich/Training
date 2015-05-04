@@ -105,4 +105,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\AppSettings.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ContentUserReferences.sql" />
+  </ItemGroup>
 </Project>

@@ -3,6 +3,11 @@
 angular.module('app.modules.file.controllers.filesController', [])
 .controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker',
     function ($scope, $rootScope, $state, $stateParams, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker) {
+        var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
+        var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
+        var MAX_FILE_SIZE = 10485760;        
+        var FILE_TYPES = 'image/jpeg,image/png,image/gif,application/pdf';
+
         $scope.refreshDirectoriesTracker = promiseTracker("refreshDirectories");
         $scope.refreshFilesTracker = promiseTracker("refreshFiles");
         $scope.addFileTracker = promiseTracker("addFile");
@@ -244,6 +249,19 @@ angular.module('app.modules.file.controllers.filesController', [])
             if (uploadFiles && uploadFiles.length) {
                 for (var i = 0; i < uploadFiles.length; i++) {
                     var file = uploadFiles[i];
+
+                    var messages = "";
+                    if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
+                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_FORMAT_MESSAGE);
+                    }
+                    if(file.size && file.size>=MAX_FILE_SIZE) {                        
+                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_SIZE_MESSAGE);
+                    }
+                    if (messages) {
+                        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                        continue;
+                    }
+
                     var url=$scope.selectedDir.FullRelativeName;
                     var fields={};
                     fields[url]='';

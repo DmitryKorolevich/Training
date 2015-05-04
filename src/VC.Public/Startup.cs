@@ -13,10 +13,9 @@ using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
-using Microsoft.Framework.Runtime.Infrastructure;
-using Microsoft.Framework.Runtime;
 using System.IO;
 using VitalChoice.Public.AppConfig;
+using Microsoft.Framework.Runtime;
 
 namespace VitalChoice.Public
 {

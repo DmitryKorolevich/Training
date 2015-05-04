@@ -75,71 +75,78 @@ namespace VitalChoice.Infrastructure.Context
             #region Contents
 
 		    builder.Entity<ContentTypeEntity>().Key(p => p.Id);
-            builder.Entity<ContentTypeEntity>().ForRelational().Table("ContentTypes");
+            builder.Entity<ContentTypeEntity>().ForSqlServer().Table("ContentTypes");
 
             builder.Entity<ContentItemToContentProcessor>().Key(p => p.Id);
-            builder.Entity<ContentItemToContentProcessor>().ForRelational().Table("ContentItemsToContentProcessors");
+            builder.Entity<ContentItemToContentProcessor>().ForSqlServer().Table("ContentItemsToContentProcessors");
             builder.Entity<MasterContentItemToContentProcessor>().Key(p => p.Id);
-            builder.Entity<MasterContentItemToContentProcessor>().ForRelational().Table("MasterContentItemsToContentProcessors");
+            builder.Entity<MasterContentItemToContentProcessor>().ForSqlServer().Table("MasterContentItemsToContentProcessors");
             builder.Entity<ContentProcessor>().Key(p => p.Id);
-            builder.Entity<ContentProcessor>().ForRelational().Table("ContentProcessors");
+            builder.Entity<ContentProcessor>().ForSqlServer().Table("ContentProcessors");
 
             builder.Entity<MasterContentItem>().Key(p => p.Id);
-            builder.Entity<MasterContentItem>().ForRelational().Table("MasterContentItems");
+            builder.Entity<MasterContentItem>().ForSqlServer().Table("MasterContentItems");
             builder.Entity<MasterContentItem>().Reference(p => p.Type).InverseCollection().ForeignKey(p => p.TypeId).PrincipalKey(p => p.Id);
             builder.Entity<MasterContentItem>().Collection(p => p.MasterContentItemToContentProcessors).InverseReference(p => p.MasterContentItem).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.MasterContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
+            builder.Entity<MasterContentItem>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentItem>().Key(p => p.Id);
-            builder.Entity<ContentItem>().ForRelational().Table("ContentItems");
+            builder.Entity<ContentItem>().ForSqlServer().Table("ContentItems");
             builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentCategory>().Key(p => p.Id);
-            builder.Entity<ContentCategory>().ForRelational().Table("ContentCategories");
+            builder.Entity<ContentCategory>().ForSqlServer().Table("ContentCategories");
             builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
             builder.Entity<ContentCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
                 PrincipalKey(p => p.Id);
 
             builder.Entity<Recipe>().Key(p => p.Id);
-            builder.Entity<Recipe>().ForRelational().Table("Recipes");
+            builder.Entity<Recipe>().ForSqlServer().Table("Recipes");
             builder.Entity<RecipeToContentCategory>().Key(p => p.Id);
-            builder.Entity<RecipeToContentCategory>().ForRelational().Table("RecipesToContentCategories");
+            builder.Entity<RecipeToContentCategory>().ForSqlServer().Table("RecipesToContentCategories");
             builder.Entity<Recipe>().Collection(p => p.RecipesToContentCategories).InverseReference(p => p.Recipe).ForeignKey(p => p.RecipeId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<Recipe>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 
             builder.Entity<FAQ>().Key(p => p.Id);
-            builder.Entity<FAQ>().ForRelational().Table("FAQs");
+            builder.Entity<FAQ>().ForSqlServer().Table("FAQs");
             builder.Entity<FAQToContentCategory>().Key(p => p.Id);
-            builder.Entity<FAQToContentCategory>().ForRelational().Table("FAQsToContentCategories");
+            builder.Entity<FAQToContentCategory>().ForSqlServer().Table("FAQsToContentCategories");
             builder.Entity<FAQ>().Collection(p => p.FAQsToContentCategories).InverseReference(p => p.FAQ).ForeignKey(p => p.FAQId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<FAQ>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+
 
             builder.Entity<Article>().Key(p => p.Id);
-            builder.Entity<Article>().ForRelational().Table("Articles");
+            builder.Entity<Article>().ForSqlServer().Table("Articles");
             builder.Entity<ArticleToContentCategory>().Key(p => p.Id);
-            builder.Entity<ArticleToContentCategory>().ForRelational().Table("ArticlesToContentCategories");
+            builder.Entity<ArticleToContentCategory>().ForSqlServer().Table("ArticlesToContentCategories");
             builder.Entity<Article>().Collection(p => p.ArticlesToContentCategories).InverseReference(p => p.Article).ForeignKey(p => p.ArticleId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
+            builder.Entity<Article>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+
 
             builder.Entity<ContentPage>().Key(p => p.Id);
-            builder.Entity<ContentPage>().ForRelational().Table("ContentPages");
+            builder.Entity<ContentPage>().ForSqlServer().Table("ContentPages");
             builder.Entity<ContentPageToContentCategory>().Key(p => p.Id);
-            builder.Entity<ContentPageToContentCategory>().ForRelational().Table("ContentPagesToContentCategories");
+            builder.Entity<ContentPageToContentCategory>().ForSqlServer().Table("ContentPagesToContentCategories");
             builder.Entity<ContentPage>().Collection(p => p.ContentPagesToContentCategories).InverseReference(p => p.ContentPage).ForeignKey(p => p.ContentPageId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
-
+            builder.Entity<ContentPage>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+            
             #endregion
 
             #region Products
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
-            builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
+            builder.Entity<ProductCategory>().ForSqlServer().Table("ProductCategories");
             builder.Entity<ProductCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
             builder.Entity<ProductCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
@@ -150,7 +157,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Users
 
             builder.Entity<AdminProfile>().Key(x => x.Id);
-			builder.Entity<AdminProfile>().ForRelational().Table("AdminProfiles");
+			builder.Entity<AdminProfile>().ForSqlServer().Table("AdminProfiles");
 			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
 
             #endregion
@@ -158,14 +165,14 @@ namespace VitalChoice.Infrastructure.Context
             #region Settings
 
             builder.Entity<Country>().Key(p => p.Id);
-            builder.Entity<Country>().ForRelational().Table("Countries");
+            builder.Entity<Country>().ForSqlServer().Table("Countries");
             builder.Entity<Country>().Ignore(p => p.States);
 
             builder.Entity<State>().Key(p => p.Id);
-            builder.Entity<State>().ForRelational().Table("States");
+            builder.Entity<State>().ForSqlServer().Table("States");
 
             builder.Entity<AppSettingItem>().Key(p => p.Id);
-            builder.Entity<AppSettingItem>().ForRelational().Table("AppSettings");
+            builder.Entity<AppSettingItem>().ForSqlServer().Table("AppSettings");
 
             #endregion
 

@@ -1,5 +1,7 @@
-﻿using Microsoft.Framework.Logging;
+﻿using Microsoft.AspNet.Hosting;
+using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
+using Microsoft.Framework.Runtime.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,17 +31,25 @@ namespace VitalChoice.Business.Services.Impl
 
         private static string _rootDir;
         private readonly ILogger logger;
+        private static string error = "";
 
         public static void Init(string rootDir)
         {
             if (!String.IsNullOrEmpty(rootDir))
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
-                if (!dirInfo.Exists)
+                try
                 {
-                    dirInfo.Create();
+                    _rootDir = rootDir.ToLower();
+                    DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
+                    if (!dirInfo.Exists)
+                    {
+                        dirInfo.Create();
+                    }
                 }
-                _rootDir = dirInfo.FullName.ToLower();
+                catch(Exception e)
+                {
+                    error += e.ToString();
+                }
             }
         }
 
@@ -52,6 +62,11 @@ namespace VitalChoice.Business.Services.Impl
 
         public DirectoryInfoObject GetDirectories()
         {
+            if(!String.IsNullOrEmpty(error))
+            {
+                logger.LogError(error);
+            }
+
             DirectoryInfoObject toReturn = new DirectoryInfoObject("/", "/");
             DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories).Select(p => new DirectoryInfoObject()
