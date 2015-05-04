@@ -39,12 +39,12 @@ namespace VitalChoice.Business.Services.Impl
             {
                 try
                 {
+                    _rootDir = rootDir.ToLower();
                     DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
                     if (!dirInfo.Exists)
                     {
                         dirInfo.Create();
                     }
-                    _rootDir = dirInfo.FullName.ToLower();
                 }
                 catch(Exception e)
                 {
