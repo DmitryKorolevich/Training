@@ -66,7 +66,10 @@ namespace VitalChoice.Business.Services.Impl
 
         public DirectoryInfoObject GetDirectories()
         {
-            this.logger.LogError(error);
+            var locator = CallContextServiceLocator.Locator;
+            var appEnv = (IHostingEnvironment)locator.ServiceProvider.GetService(typeof(IHostingEnvironment));
+            error += "        " + appEnv.WebRootPath;
+            return new DirectoryInfoObject() { FullRelativeName = error };
             DirectoryInfoObject toReturn = new DirectoryInfoObject("/", "/");
             DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories).Select(p => new DirectoryInfoObject()
