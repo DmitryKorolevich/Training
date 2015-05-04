@@ -43,8 +43,6 @@ function NpmCopy($npmPath) {
 		robocopy "..\node_modules" $npmPath /e /ndl /nfl /njh /is > copy-npm.log
 	}
 	else {
-		echo "Copying npm..."
-		robocopy $npmPath ".." /e /ndl /nfl /njh /is > copy-npm.log
 		Push-Location ".."
 		echo "Installing missed packages..."
 		npm install > npm.log
