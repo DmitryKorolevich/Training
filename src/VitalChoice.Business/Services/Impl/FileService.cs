@@ -50,9 +50,9 @@ namespace VitalChoice.Business.Services.Impl
                 {
                     error += e.ToString();
 
-                    var locator = CallContextServiceLocator.Locator;
-                    var appEnv = (IHostingEnvironment)locator.ServiceProvider.GetService(typeof(IHostingEnvironment));
-                    error += "        "+appEnv.WebRootPath;
+                    //var locator = CallContextServiceLocator.Locator;
+                    //var appEnv = (IHostingEnvironment)locator.ServiceProvider.GetService(typeof(IHostingEnvironment));
+                    //error += "        "+appEnv.WebRootPath;
                 }
             }
         }
