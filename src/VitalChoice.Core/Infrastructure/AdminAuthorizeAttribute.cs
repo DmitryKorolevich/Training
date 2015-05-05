@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Internal;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime.Infrastructure;
 using VitalChoice.Business.Services.Contracts;
@@ -27,6 +28,18 @@ namespace VitalChoice.Core.Infrastructure
 		public AdminAuthorizeAttribute(params PermissionType[] permissions)
 		{
 			this.permissions = permissions.Select(x => Convert.ToInt32(x)).ToList();
+		}
+
+		protected override void Fail(AuthorizationContext context)
+		{
+			if (context.HttpContext.User.Identity.IsAuthenticated)
+			{
+				context.Result = new HttpForbiddenResult();
+			}
+			else
+			{
+				context.Result = new HttpUnauthorizedResult();
+			}
 		}
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)

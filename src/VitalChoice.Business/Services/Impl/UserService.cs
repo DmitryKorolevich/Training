@@ -358,13 +358,9 @@ namespace VitalChoice.Business.Services.Impl
 			var pageIndex = filter.Paging.PageIndex;
 			var pageItemCount = filter.Paging.PageItemCount;
 
-			queryable = queryable.Include(x => x.Roles).Include(x => x.Profile);
-            if (pageIndex > 1)//stupid ef doesn't work without this
-            {
-	            queryable = queryable.Skip((pageIndex - 1)*pageItemCount);
-            }
+			var materialized = await queryable.Include(x => x.Profile).Include(x => x.Roles).ToListAsync();// remove this bullshit when stupid ef starts working
 
-			var items = await queryable.Take(pageItemCount).ToListAsync();
+			var items = materialized.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
 
 			return new PagedList<ApplicationUser>(items, overallCount);
 		}

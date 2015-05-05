@@ -42,21 +42,21 @@
 					<td>{{user.LastLoginDate | date:"MM/dd/yy"}}<br/>{{user.LastLoginDate | date:"h:mm a"}}</td>
 					<td>
 						<button class="btn btn-default btn-success" ladda="editTracker.active()" data-ng-click="open(true, user.PublicId);">Edit</button>
-						<button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(user.FullName, user.PublicId);">Delete</button>
+						<button data-ng-if="currentUser && currentUser.Email != user.Email" class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(user.FullName, user.PublicId);">Delete</button>
 					</td>
 				</tr>
 				</tbody>
 			</table>
-			<pagination
-				boundary-links="true"
-				total-items="totalItems"
-				data-ng-model="currentPage"
-				previous-text="&lsaquo;"
-				next-text="&rsaquo;"
-				first-text="&laquo;"
-				last-text="&raquo;"
-				data-ng-change="pageChanged()">
-			</pagination>
+            <pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+            </pagination>
 		</spinner-overlay>
 	</div>
 </div>

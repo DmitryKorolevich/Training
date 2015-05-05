@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService' , '$location', function (infrastructureService, $rootScope, toaster, authenticationService, $location) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress) {
 			function getReferenceItem(lookup, key) {
 				return $.grep(lookup, function(elem) {
 					return elem.Key === key;
@@ -72,21 +72,25 @@ angular.module('app.core.utils.appBootstrap', [])
 				});
 			}
 
-			function unauthorizedArea() {
-				var path = $location.path();
+			function unauthorizedArea(path) {
+			    if (!path && path != "") {
+			        path = $location.path();
+			    }
 
-				return path.indexOf(0, "/authentication/activate") > -1 || path === "/authentication/login";
+			    return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1;
 			};
 
 			function initialize() {
-				$rootScope.appStarted = false;
+			    bindRootScope();
+
+			    $rootScope.appStarted = false;
 				$rootScope.ReferenceData = {};
 
 				infrastructureService.getReferenceData().success(function(res) {
 					if (res.Success) {
 						$rootScope.ReferenceData = res.Data;
 
-						if (!unauthorizedArea()) {
+						if (!$rootScope.unauthorizedArea()) {
 							authenticationService.getCurrenUser()
 								.success(function(res) {
 									if (res.Success && res.Data) {
@@ -118,7 +122,31 @@ angular.module('app.core.utils.appBootstrap', [])
 				$rootScope.getValidationMessage = getValidationMessage;
 				$rootScope.logout = logout;
 				$rootScope.validatePermission = validatePermission;
+				$rootScope.unauthorizedArea = unauthorizedArea;
 				$rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
+			}
+
+			function bindRootScope() {
+			    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+			        if ($rootScope.appStarted && !$rootScope.unauthorizedArea($rootScope.$state.href(toState).slice(1)) && !$rootScope.authenticated) {
+			            toaster.pop('warning', "Caution!", "Please log in before access this area.");
+
+			            event.preventDefault();
+			        }
+			        else {
+			            ngProgress.start();
+			        }
+			    });
+			    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState) {
+			        ngProgress.complete();
+			        $rootScope.$state.previous = fromState;
+			    });
+			    $rootScope.$on('$stateChangeError', function () {
+			        ngProgress.complete();
+			    });
+			    $rootScope.$on('$stateNotFound', function () {
+			        ngProgress.complete();
+			    });
 			}
 
 			return {

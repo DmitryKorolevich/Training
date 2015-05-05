@@ -10,7 +10,7 @@ angular.module('app.shared.area', [
 		$stateProvider
 			.state('index.notFound', {
 				url: '/404',
-				templateUrl: 'app/shared/partials/404.html'
+				templateUrl: 'app/shared/area/partials/404.html'
 			});
 	}
 ]);

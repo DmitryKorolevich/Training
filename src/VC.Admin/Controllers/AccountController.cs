@@ -34,6 +34,7 @@ namespace VitalChoice.Controllers
 		{
 			return new UserInfoModel()
 			{
+				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				IsSuperAdmin = await userService.IsSuperAdmin(user),

@@ -16,7 +16,11 @@ namespace VitalChoice.Domain.Constants
 		    public const string CantFindUser = "CantFindUser";
 		    public const string CantSignIn = "CanSignIn";
 		    public const string UserIsDisabled = "UserIsDisabled";
-	    }
+            public const string EmailIsTakenAlready = "EmailTakenAlready";
+            public const string AgentIdIsTakenAlready = "AgentIdIsTakenAlready";
+			public const string CurrentUserRemoval = "CurrentUserRemoval";
+			public const string CurrentUserStatusUpdate = "CurrentUserStatusUpdate";
+		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
@@ -28,7 +32,11 @@ namespace VitalChoice.Domain.Constants
 		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
 		    {Keys.CantFindUser, "User not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
-		    {Keys.UserIsDisabled, "User is disabled by admin"}
-	    };
+		    {Keys.UserIsDisabled, "User is disabled by admin"},
+            {Keys.EmailIsTakenAlready, "Email '{0}' is already in use."},
+            {Keys.AgentIdIsTakenAlready, "Agent ID is already in use."},
+			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted."},
+			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated."}
+		};
     }
 }
