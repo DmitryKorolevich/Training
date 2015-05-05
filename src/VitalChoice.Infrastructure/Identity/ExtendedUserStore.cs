@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -28,12 +29,12 @@ namespace VitalChoice.Infrastructure.Identity
 		    return await Context.Users.Include(x=>x.Profile).Include(x=>x.Roles).FirstOrDefaultAsync(x=>x.NormalizedEmail.Equals(normalizedEmail) && !x.DeletedDate.HasValue,cancellationToken);
 	    }
 
-	    public override async Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken = new CancellationToken())
-	    {
-			return await Context.Users.Include(x => x.Profile).Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(userId) && !x.DeletedDate.HasValue, cancellationToken);
-		}
+        public override async Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken = new CancellationToken())
+        {
+            return await Context.Users.Include(x => x.Profile).Include(x => x.Roles).FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(userId) && !x.DeletedDate.HasValue, cancellationToken);
+        }
 
-	    public override async Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = new CancellationToken())
 	    {
 			return await Context.Users.Include(x => x.Profile).Include(x => x.Roles).FirstOrDefaultAsync(x => x.NormalizedUserName.Equals(normalizedUserName) && !x.DeletedDate.HasValue, cancellationToken);
 		}

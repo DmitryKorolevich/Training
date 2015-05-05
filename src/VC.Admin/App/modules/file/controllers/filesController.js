@@ -82,6 +82,8 @@ angular.module('app.modules.file.controllers.filesController', [])
                 FilteredName: '',
             };
 
+            $scope.logRequests = [];
+
             loadDirectories();
         }
 
@@ -273,33 +275,53 @@ angular.module('app.modules.file.controllers.filesController', [])
 
                     var messages = "";
                     if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
-                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_FORMAT_MESSAGE);
+                        messages += "{0} ".format(INVALID_FILE_FORMAT_MESSAGE);
                     }
                     if(file.size && file.size>=MAX_FILE_SIZE) {                        
-                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_SIZE_MESSAGE);
+                        messages += "{0} ".format(INVALID_FILE_SIZE_MESSAGE);
                     }
+
+                    var logRequest = {};
+                    fileUploadRequestId++;
+                    file.index = fileUploadRequestId;
+                    logRequest.type = "upload";
+                    logRequest.index = file.index;
+                    logRequest.name = file.name;
+                    logRequest.progress = 0;
+                    logRequest.state = "progress";
                     if (messages) {
-                        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                        logRequest.state = "error";
+                        logRequest.messages = messages;
+                    }                  
+
+                    $scope.logRequests.splice(0, 0, logRequest);
+
+                    if (messages) {
                         continue;
                     }
 
                     var url=$scope.selectedDir.FullRelativeName;
                     var fields={};
                     fields[url] = '';
-                    fileUploadRequestId++;
-                    file.index = fileUploadRequestId;
                     Upload.upload({
                         url: '/api/file/AddFiles',
                         fields: fields,
                         file: file
                     }).progress(function (evt) {
                         var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                        var line = '<span>progress: ' + progressPercentage + '% ' + evt.config.file.name + '</span><br/>';
-                        $scope.log = line + $scope.log;
+                        var logRequest = getLogRequestItem(evt.config.file.index);
+                        if(logRequest)
+                        {
+                            logRequest.progress=progressPercentage;
+                        }
                     }).success(function (result, status, headers, config) {                        
-                        if (result.Success) {
-                            var line = '<span>file ' + config.file.name + 'uploaded. Response: ' + JSON.stringify(result) + '</span><br/>';
-                            $scope.log = line + $scope.log;
+                        if (result.Success) {                            
+                            var logRequest = getLogRequestItem(config.file.index);
+                            if(logRequest)
+                            {
+                                logRequest.progress=100;
+                                logRequest.state='done';
+                            }
 
                             if (result.Data.DirectoryFullRelativeName == $scope.selectedDir.FullRelativeName) {
                                 var newFile = result.Data;
@@ -320,13 +342,38 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 $scope.files.push(newFile);
                                 filterFiles();
                             }
-                        } else {
-                            errorHandler(result);
+                        } else {   
+                            var messages = '';
+                            if (result.Messages) {
+                                $.each(result.Messages, function (index, value) {
+                                    messages += "{0} ".format(value.Message);
+                                });         
+                            }                            
+                                                        
+                            var logRequest = getLogRequestItem(config.file.index);
+                            if(logRequest)
+                            {
+                                logRequest.progress=100;
+                                logRequest.messages=messages;
+                                logRequest.state='error';
+                            }
                         }
                     });
                 }
             }
         };
+
+        var getLogRequestItem = function(index) {
+            var toReturn=null;
+            $.each($scope.logRequests, function (i, logRequest) {
+                if(logRequest.index==index)
+                {
+                    toReturn=logRequest;
+                    return false;
+                }
+            });
+            return toReturn;
+        }
 
         $scope.selectFile = function(selectedFile)
         {
@@ -337,11 +384,13 @@ angular.module('app.modules.file.controllers.filesController', [])
             $scope.selectedFile = Object.clone(selectedFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1)
             {                
-                $scope.selectedFile.Url = "";
+                $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
+                $scope.selectedFile.Dimensions = "";
             }
             else
             {
-                $scope.selectedFile.Url = $scope.baseUrl.format(selectedFile.FullRelativeName);
+                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+                $scope.selectedFile.Dimensions = "";
             }
         };
 
@@ -366,6 +415,15 @@ angular.module('app.modules.file.controllers.filesController', [])
                 filterdFiles = $scope.files;
             }
             $scope.filterdFiles = filterdFiles;
+        };
+
+        $scope.selectedFileImgLoad = function(event)
+        {
+            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1 && event.target.naturalWidth!=0 &&
+                event.target.naturalHeight != 0)
+            {                
+                $scope.selectedFile.Dimensions = "{0}x{1}".format(event.target.naturalWidth, event.target.naturalHeight);
+            }
         };
 
         initialize();

@@ -1,85 +1,31 @@
 ﻿<div class="file-manager">
-    <div class="container-fluid">
-        <div class="top-pane">
-            <div class="well">
-                <form class="form-horizontal" novalidate>
-                    <fieldset>
-                        <div class="form-group">
-                            <div class="col-md-4">
-                                <ol class="breadcrumb">
-                                    <li>
-                                        <a href="" data-ng-click="selectDirectory('/')">
-                                            <i class="glyphicon glyphicon-folder-open"></i>
-                                        </a>
-                                    </li>
-                                    <li data-ng-show="selectedDir.ShowSpace">
-                                        <span class="space">...</span>
-                                    </li>
-                                    <li data-ng-repeat="directory in selectedDir.Directories" data-ng-class="{'active':$last}" class="animated fast fadeIn">
-                                        <a href="" data-ng-show="!$last" data-ng-click="selectDirectory(directory.FullRelativeName)">
-                                            <i class="glyphicon glyphicon-folder-open folder-icon"></i>{{directory.Name}}
-                                        </a>
-                                        <span data-ng-show="$last"><i class="glyphicon glyphicon-folder-open folder-icon"></i>{{directory.Name}}</span>
-                                    </li>
-                                </ol>
-                            </div>
-                            <div class="col-md-7 right-section">
-                                <div ngf-drop ngf-select ng-model="uploadFiles" class="drop-box"
-                                     ngf-drag-over-class="dragover" ngf-multiple="true" ngf-allow-dir="true"
-                                     accept=".jpg,.gif,.png,.pdf">Drop images or pdfs here or click to upload</div>
-                                <div class="drop-box-disabled" ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
-                                <button class="btn btn-info btn-right width-160px" ngf-select ng-model="uploadFiles" accept=".jpg,.gif,.png,.pdf" ngf-multiple="true">Select File</button>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
+    <div class="top-area container-fluid">
+        <div class="add-file-pane">
+            <div class="well container-fluid">
+                <div>
+                    <div ngf-drop="" ngf-select="" ng-model="uploadFiles" class="drop-box ng-pristine ng-valid" ngf-drag-over-class="dragover" ngf-multiple="true" ngf-allow-dir="true" accept=".jpg,.gif,.png,.pdf">Drop media here or click to upload</div>
+                    <div class="drop-box-disabled" ngf-no-file-drop="" style="display: none;">File Drag/Drop is not supported for this browser</div>
+                    <!--<button class="btn btn-info btn-right width-160px" ngf-select ng-model="uploadFiles" accept=".jpg,.gif,.png,.pdf" ngf-multiple="true">Select File</button>-->
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container-fluid">
         <div class="status-pane">
-            <div class="well">
+            <div class="well container-fluid">
                 <div class="wrapper">
-                    <div class="row">
-                        <div class="col-md-3"><strong>Upload:</strong>&nbsp;Somepicture.png</div>
-                        <div class="col-md-3">
-                            <progressbar animate="true" value="55" type="success"><b>55%</b></progressbar>
+                    <div data-ng-repeat="request in logRequests">
+                        <div class="row">
+                            <div ng-if="request.type=='upload'" class="col-md-3"><strong>Upload:</strong>&nbsp;{{request.name}}</div>
+                            <div ng-if="request.state=='progress'" class="col-md-3">
+                                <progressbar animate="true" value="request.progress" type="success"><b>{{request.progress}}%</b></progressbar>
+                            </div>
+                            <div ng-if="request.state=='done'" class="col-md-3">
+                                <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                            </div>
+                            <div ng-if="request.state=='error'" class="col-md-3">
+                                <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                            </div>
+                            <div ng-if="request.state=='error'" class="col-md-6 error">{{request.messages}}</div>
                         </div>
-                        <div class="col-md-6"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3"><strong>Upload:</strong>&nbsp;Somepicture.png</div>
-                        <div class="col-md-3">
-                            <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
-                        </div>
-                        <div class="col-md-6"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3"><strong>Upload:</strong>&nbsp;Somepicture.png</div>
-                        <div class="col-md-3">
-                            <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
-                        </div>
-                        <div class="col-md-6">
-                            Some big error message. Some big error message. Some big error message. Some big error message. Some big error message. Some big error message.
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3"><strong>Delete:</strong>&nbsp;Somepicture.png</div>
-                        <div class="col-md-3">
-                            <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
-                        </div>
-                        <div class="col-md-6"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3"><strong>Delete:</strong>&nbsp;Somepicture.png</div>
-                        <div class="col-md-3">
-                            <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
-                        </div>
-                        <div class="col-md-6">
-                            Some big error message. Some big error message. Some big error message. Some big error message. Some big error message. Some big error message. 
-                        </div>
-                    </div>
-                    <div ng-bind-html="log">
                     </div>
                 </div>
             </div>
@@ -157,7 +103,11 @@
             <div class="well container-fluid">
                 <div class="wrapper">
                     <div class="image-box">
-                        <img src="{{selectedFile.Url}}"/>
+                        <a ng-if="selectedFile.Url" target="_blank" href="{{selectedFile.Url}}">
+                            <img img-load="selectedFileImgLoad($event)" src="{{selectedFile.PreviewUrl}}" />
+                        </a>
+                        <div ng-if="selectedFile.Dimensions">{{selectedFile.Dimensions}}</div>
+                        <div>{{selectedFile.SizeMessage}}</div>
                     </div>
                 </div>
             </div>

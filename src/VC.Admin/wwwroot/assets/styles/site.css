@@ -3,11 +3,17 @@
 body {
   min-width: 1100px;
 }
+a.block {
+  display: block;
+}
 .table {
   max-width: 2500px;
 }
 .table > tbody > tr.selected {
   background-color: #ddf0fb;
+}
+.error {
+  color: red;
 }
 .container {
   width: 850px;
@@ -501,22 +507,22 @@ ul.navbar-custom-header li > a {
 }
 .file-manager .work-area .left-pane {
   position: absolute;
-  width: 350px;
+  width: 300px;
 }
 .file-manager .work-area .left-pane .wrapper {
   overflow: auto;
-  height: 320px;
+  height: 420px;
 }
 .file-manager .work-area .center-pane {
-  margin: 0 18% 0 350px;
-  padding: 0 15px 0 15px;
+  margin: 0 18% 0 300px;
+  padding: 0 20px 0 15px;
 }
 .file-manager .work-area .center-pane .table {
-  height: 247px;
+  height: 347px;
 }
 .file-manager .work-area .center-pane .table tbody {
   overflow-y: scroll;
-  height: 230px;
+  height: 330px;
   width: 100%;
   position: absolute;
 }
@@ -534,17 +540,26 @@ ul.navbar-custom-header li > a {
   padding: 0;
 }
 .file-manager .work-area .right-pane .wrapper {
-  height: 320px;
+  height: 420px;
 }
-.file-manager .status-pane .wrapper {
+.file-manager .work-area .right-pane .wrapper .image-box {
+  height: 100%;
+}
+.file-manager .work-area .right-pane .wrapper .image-box img {
+  max-height: 90%;
+}
+.file-manager .top-area .status-pane {
+  margin: 0 0 0 300px;
+  padding: 0 0 0 15px;
+}
+.file-manager .top-area .status-pane .wrapper {
   overflow: auto;
   height: 120px;
 }
-.file-manager .status-pane .row {
-  margin-left: 0px;
+.file-manager .top-area .status-pane .row {
   margin-right: 0px;
 }
-.file-manager .status-pane .row .progress {
+.file-manager .top-area .status-pane .row .progress {
   margin-bottom: 5px;
 }
 .file-manager .ya-treeview-content .line {
@@ -553,41 +568,28 @@ ul.navbar-custom-header li > a {
 .file-manager .angular-ui-tree-nodes .angular-ui-tree-nodes {
   margin-left: 20px;
 }
-.file-manager .top-pane .form-group .right-section .drop-box {
+.file-manager .top-area .add-file-pane {
+  height: 120px;
+  position: absolute;
+  width: 300px;
+}
+.file-manager .top-area .add-file-pane .drop-box {
   background: #F8F8F8;
   border: 5px dashed #DDD;
-  width: 400px;
-  height: 40px;
+  width: 100%;
+  height: 120px;
   text-align: center;
-  padding-top: 5px;
-  display: inline-block;
-  margin: 0 10px;
-}
-.file-manager .top-pane .form-group .right-section .drop-box-disabled {
+  padding-top: 40px;
   display: inline-block;
 }
-.file-manager .top-pane .form-group .right-section .dragover {
+.file-manager .top-area .add-file-pane .drop-box-disabled {
+  display: inline-block;
+}
+.file-manager .top-area .add-file-pane .dragover {
   border: 5px dashed blue;
 }
-.file-manager .top-pane .form-group {
+.file-manager .top-area .add-file-pane .form-group {
   margin-bottom: 0;
-}
-.file-manager .top-pane .form-group .right-section {
-  float: right;
-  width: auto;
-}
-.file-manager .top-pane .form-group .breadcrumb {
-  margin-bottom: 0;
-}
-.file-manager .top-pane .form-group .breadcrumb a {
-  text-decoration: none;
-  cursor: pointer;
-}
-.file-manager .top-pane .form-group .breadcrumb i.folder-icon {
-  margin-right: 7px;
-}
-.file-manager .top-pane .form-group .breadcrumb li .space {
-  margin-left: -5px;
 }
 .file-manager .center-pane .table tbody > tr:hover {
   background-color: #ededed;
@@ -596,8 +598,6 @@ ul.navbar-custom-header li > a {
   background-color: #ddf0fb;
 }
 .image-box {
-  height: 100%;
-  background-color: white;
   border-radius: 4px;
   text-align: center;
 }
