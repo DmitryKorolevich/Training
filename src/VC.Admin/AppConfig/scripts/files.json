@@ -51,6 +51,7 @@
 		'app/core/utils/confirmation/confirmUtil.js',
 		'app/core/utils/loading/overlayDirective.js',
 		'app/core/utils/parts/basePaginationDirective.js',
+		'app/core/utils/parts/imgloadDirective.js',
 		'app/core/utils/templateOverrides.js',
 		'app/core/utils/utils.js',
 		'app/modules/modules.js',

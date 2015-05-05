@@ -16,7 +16,8 @@ angular.module('app.utils', [
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil',
 	'app.core.utils.loading.overlayDirective',
-	'app.core.utils.parts.basePaginationDirective'
+	'app.core.utils.parts.basePaginationDirective',
+	'app.core.utils.parts.imgLoadDirective',
 	])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {

@@ -12,6 +12,7 @@
 		Tools = 8,
 		Users = 9,
 		Settings = 10,
-		Help = 11
-	}
+		Help = 11,
+        Files = 12,
+    }
 }

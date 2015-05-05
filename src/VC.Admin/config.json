@@ -9,7 +9,7 @@
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
-		"Connection": {
+       "Connection": {
 			"UserName": "dev_vc_user",
 			"Password": "VZQCkea2",
 			"Server": "localhost"

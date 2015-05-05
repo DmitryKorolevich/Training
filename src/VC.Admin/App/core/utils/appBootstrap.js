@@ -39,6 +39,28 @@ angular.module('app.core.utils.appBootstrap', [])
 				return $rootScope.currentUser.IsSuperAdmin || $rootScope.currentUser.Permissions.indexOf(permission) > -1;
 			};
 
+			function validatePermissionMenuItem(menuItem) {
+			    if (!$rootScope.authenticated || !$rootScope.currentUser) {
+			        return false;
+			    }
+
+			    return $rootScope.currentUser.IsSuperAdmin;
+			    
+                var result=false;
+                if(menuItem && menuItem.subMenu)
+                {
+                    $.each(menuItem.subMenu, function (index, subMenuItem) {
+                        if($rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1)
+                        {
+                            result=true;
+                            return false;
+                        }
+                    });
+                }
+
+                return result;
+			};
+
 			function logout() {
 				authenticationService.logout().success(function() {
 					$rootScope.authenticated = false;
@@ -101,6 +123,7 @@ angular.module('app.core.utils.appBootstrap', [])
 				$rootScope.logout = logout;
 				$rootScope.validatePermission = validatePermission;
 				$rootScope.unauthorizedArea = unauthorizedArea;
+				$rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
 			}
 
 			function bindRootScope() {

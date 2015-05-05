@@ -3,14 +3,24 @@
 
 @navbar-top-color:  #fff;
 @darker-gray: #EDEDED;
+@selected-light-blue: #DDF0FB;
+@hover-light-gray: #EDEDED;
 
 body{
 	min-width: 1100px;
 }
 
+a.block{ display:block;}
+
 .table{
 	max-width:2500px;
 }
+
+.table  > tbody > tr.selected{
+	background-color: @selected-light-blue;
+}
+
+.error{ color:red;}
 
 .container{
 	width:850px;
@@ -65,11 +75,11 @@ h2{
 }
 
 .angular-ui-tree-handle:hover{
-	background-color:#EDEDED;
+	background-color: @hover-light-gray;
 }
 
 .angular-ui-tree-handle.selected{
-	background-color: #facfc8;
+	background-color: @selected-light-blue;
 }
 
 .angular-ui-tree-handle .ya-treview-buttons{
@@ -203,8 +213,16 @@ hr { border-top: 1px solid #e5e5e5;}
 	margin:0;
 }
 
+.width-70px{
+	width:70px;
+}
+
 .width-80px{
 	width:80px;
+}
+
+.width-140px{
+	width:140px;
 }
 
 .width-160px{
@@ -584,29 +602,81 @@ ul.navbar-custom-header li > a{
 	padding-bottom:19px;
 }
 
-.file-manager .left-pane{
+.file-manager .work-area {
+	position:relative;
+}
+
+.file-manager .work-area .left-pane{
 	position:absolute;
-	width:450px;
+	width:300px;
 }
 
-.file-manager .left-pane .wrapper {
+.file-manager .work-area .left-pane .wrapper {
     overflow: auto;
-    height: 800px;
+    height: 420px;
 }
 
-.file-manager .right-pane{
-	margin: 0 0 0 450px;
-	padding: 0 0px 0 30px;
+.file-manager .work-area .center-pane{
+	margin: 0 18% 0 300px;
+	padding: 0 20px 0 15px;
 }
 
-.file-manager .right-pane .wrapper {
+.file-manager .work-area .center-pane .table {
+    height: 347px;
+}
+
+.file-manager .work-area .center-pane .table tbody {
+  overflow-y: scroll;
+  height: 330px;
+  width: 100%;
+  position: absolute;
+}
+
+.file-manager .work-area .center-pane .table tbody > tr {
+  width: 100%;
+  display: inline-table;
+  cursor: pointer;
+}
+
+.file-manager .work-area .right-pane{
+	position:absolute;
+    top: 0;
+    right: 15px;
+	width:18%;
+    margin: 0;
+    padding: 0;
+}
+
+.file-manager .work-area .right-pane .wrapper {
+    height: 420px;
+}
+
+.file-manager .work-area .right-pane .wrapper .image-box 
+{
+    height: 100%;
+}
+
+.file-manager .work-area .right-pane .wrapper .image-box img
+{
+    max-height: 90%;
+}
+
+.file-manager .top-area .status-pane {
+	margin: 0 0 0 300px;
+	padding: 0 0 0 15px;
+}
+
+.file-manager .top-area .status-pane .wrapper {
     overflow: auto;
-    height: 800px;
+    height: 120px;
 }
 
-.file-manager .bottom-pane .wrapper {
-    overflow: auto;
-    height: 200px;
+.file-manager .top-area .status-pane .row {
+    margin-right: 0px;
+}
+
+.file-manager .top-area .status-pane .row .progress {
+    margin-bottom: 5px;
 }
 
 .file-manager .ya-treeview-content .line{
@@ -618,47 +688,52 @@ ul.navbar-custom-header li > a{
     margin-left: 20px;
 }
 
-.file-manager .top-pane .form-group .right-section .drop-box {
+
+.file-manager .top-area .add-file-pane {
+    height: 120px;    
+	position:absolute;
+	width:300px;
+}
+
+.file-manager .top-area .add-file-pane .drop-box {
     background: #F8F8F8;
     border: 5px dashed #DDD;
-    width: 400px;
-    height: 40px;
+    width: 100%;
+    height: 120px;
     text-align: center;
-    padding-top: 5px;
-    display:inline-block;
-    margin: 0 10px;
-}
-
-.file-manager .top-pane .form-group .right-section .drop-box-disabled {
+    padding-top: 40px;
     display:inline-block;
 }
 
-.file-manager .top-pane .form-group .right-section .dragover {
+.file-manager .top-area .add-file-pane .drop-box-disabled {
+    display:inline-block;
+}
+
+.file-manager .top-area .add-file-pane .dragover {
     border: 5px dashed blue;
 }
 
-.file-manager .top-pane .form-group {
+.file-manager .top-area .add-file-pane .form-group {
     margin-bottom:0;
 }
 
-.file-manager .top-pane .form-group .right-section {
-    float: right;
-    width: auto;
+.file-manager .center-pane .table tbody > tr:hover
+{
+    background-color: @hover-light-gray;
 }
 
-.file-manager .top-pane .form-group .breadcrumb{
-    margin-bottom: 0;
+.file-manager .center-pane .table > tbody > tr.selected{
+	background-color: @selected-light-blue;
 }
 
-.file-manager .top-pane .form-group .breadcrumb a{
-    text-decoration: none;
-    cursor: pointer;
+.image-box 
+{
+    border-radius: 4px;
+    text-align: center;
 }
 
-.file-manager .top-pane .form-group .breadcrumb i.folder-icon{
-    margin-right: 7px;
-}
-
-.file-manager .top-pane .form-group .breadcrumb li .space{
-    margin-left: -5px;
+.image-box img {
+    display: inline;
+    max-height: 100%;
+    max-width: 100%;
 }

@@ -78,6 +78,7 @@
     <None Include="PostDeployment\Scripts\ContentPages.sql" />
     <None Include="PostDeployment\Scripts\StartInit.sql" />
     <None Include="PostDeployment\Scripts\UpdateIdentity.sql" />
+    <None Include="Azure.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
@@ -107,6 +108,9 @@
     <None Include="PostDeployment\Scripts\AppSettings.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ContentUserReferences.sql" />
+    <None Include="PostDeployment\Scripts\CURs.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\FilesPermissions.sql" />
   </ItemGroup>
 </Project>

@@ -1515,3 +1515,5 @@
 /// <reference path="app/modules/file/controllers/addfoldercontroller.js" />
 /// <reference path="../App/modules/file/controllers/addFolderController.js" />
 /// <reference path="app/app.common.js" />
+/// <reference path="../app/core/utils/parts/imgloaddirective.js" />
+/// <reference path="app/core/utils/parts/imgloaddirective.js" />

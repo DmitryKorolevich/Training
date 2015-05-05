@@ -10,4 +10,3 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r .\Scripts\SamplePostDeploy.sql

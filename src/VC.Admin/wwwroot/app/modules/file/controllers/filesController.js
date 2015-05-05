@@ -7,6 +7,9 @@ angular.module('app.modules.file.controllers.filesController', [])
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;        
         var FILE_TYPES = 'image/jpeg,image/png,image/gif,application/pdf';
+        var PDF_FILE_EXT = '.pdf';
+
+        var fileUploadRequestId = 0;
 
         $scope.refreshDirectoriesTracker = promiseTracker("refreshDirectories");
         $scope.refreshFilesTracker = promiseTracker("refreshFiles");
@@ -61,20 +64,37 @@ angular.module('app.modules.file.controllers.filesController', [])
 
             $scope.selectedDir =
             {
-                FullRelativeName: "/",
+                FullRelativeName: '/',
                 Directories: []
             };
             $scope.uploadFiles=[];
             $scope.files=[];
+            $scope.filterdFiles=[];
             $scope.logFiles = [];
 
             $scope.breadCrumbMaxLevels = 5;
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'files/{0}';
+            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'files{0}';
+
+            $scope.selectedFile = {};
+
+            $scope.filter = {
+                Name: '',
+                FilteredName: '',
+            };
+
+            $scope.logRequests = [];
 
             loadDirectories();
         }
 
         $scope.selectDirectory = function (fullRelativeName) {
+            if($scope.selectedDir.FullRelativeName!=fullRelativeName)
+            {
+                $scope.selectedFile = {};
+                $scope.filter.FilteredName = '';
+                $scope.filter.Name = '';
+            }
+
             $scope.selectedDir.FullRelativeName = fullRelativeName;
             $scope.selectedDir.ShowSpace = false;
             var url = fullRelativeName;
@@ -186,7 +206,8 @@ angular.module('app.modules.file.controllers.filesController', [])
         });
 
         function loadFiles() {
-            $scope.files=[];
+            $scope.files = [];
+            filterFiles();
             var url=$scope.selectedDir.FullRelativeName;
             fileService.getFiles({ FullRelativeName: url }, $scope.refreshFilesTracker)
                 .success(function (result) {
@@ -197,7 +218,8 @@ angular.module('app.modules.file.controllers.filesController', [])
                             $.each(result.Data, function (index, file) {
                                 prepareFile(file);
                             });
-                            $scope.files=result.Data;
+                            $scope.files = result.Data;
+                            filterFiles();
                         }
                     } else {
                         errorHandler(result);
@@ -209,7 +231,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         };
 
         function prepareFile(file) {
-            file.Url = $scope.baseUrl.format(file.Name);
+            file.Url = $scope.baseUrl.format(file.FullRelativeName);
         };
 
         $scope.deleteFile = function (deleteFile) {
@@ -229,6 +251,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                             });
                             if (indexForRemove != null) {
                                 $scope.files.splice(indexForRemove, 1);
+                                filterFiles();
                             }
                         } else {
                             errorHandler(result);
@@ -251,32 +274,54 @@ angular.module('app.modules.file.controllers.filesController', [])
                     var file = uploadFiles[i];
 
                     var messages = "";
-                    if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
-                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_FORMAT_MESSAGE);
-                    }
-                    if(file.size && file.size>=MAX_FILE_SIZE) {                        
-                        messages += "{0} - {1}<br/>".format(file.name, INVALID_FILE_SIZE_MESSAGE);
-                    }
+                    //if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
+                    //    messages += "{0} ".format(INVALID_FILE_FORMAT_MESSAGE);
+                    //}
+                    //if(file.size && file.size>=MAX_FILE_SIZE) {                        
+                    //    messages += "{0} ".format(INVALID_FILE_SIZE_MESSAGE);
+                    //}
+
+                    var logRequest = {};
+                    fileUploadRequestId++;
+                    file.index = fileUploadRequestId;
+                    logRequest.type = "upload";
+                    logRequest.index = file.index;
+                    logRequest.name = file.name;
+                    logRequest.progress = 0;
+                    logRequest.state = "progress";
                     if (messages) {
-                        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                        logRequest.state = "error";
+                        logRequest.messages = messages;
+                    }                  
+
+                    $scope.logRequests.splice(0, 0, logRequest);
+
+                    if (messages) {
                         continue;
                     }
 
                     var url=$scope.selectedDir.FullRelativeName;
                     var fields={};
-                    fields[url]='';
+                    fields[url] = '';
                     Upload.upload({
                         url: '/api/file/AddFiles',
                         fields: fields,
                         file: file
                     }).progress(function (evt) {
                         var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                        var line = '<span>progress: ' + progressPercentage + '% ' + evt.config.file.name + '</span><br/>';
-                        $scope.log = line + $scope.log;
+                        var logRequest = getLogRequestItem(evt.config.file.index);
+                        if(logRequest)
+                        {
+                            logRequest.progress=progressPercentage;
+                        }
                     }).success(function (result, status, headers, config) {                        
-                        if (result.Success) {
-                            var line = '<span>file ' + config.file.name + 'uploaded. Response: ' + JSON.stringify(result) + '</span><br/>';
-                            $scope.log = line + $scope.log;
+                        if (result.Success) {                            
+                            var logRequest = getLogRequestItem(config.file.index);
+                            if(logRequest)
+                            {
+                                logRequest.progress=100;
+                                logRequest.state='done';
+                            }
 
                             if (result.Data.DirectoryFullRelativeName == $scope.selectedDir.FullRelativeName) {
                                 var newFile = result.Data;
@@ -295,12 +340,89 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 }
 
                                 $scope.files.push(newFile);
+                                filterFiles();
                             }
-                        } else {
-                            errorHandler(result);
+                        } else {   
+                            var messages = '';
+                            if (result.Messages) {
+                                $.each(result.Messages, function (index, value) {
+                                    messages += "{0} ".format(value.Message);
+                                });         
+                            }                            
+                                                        
+                            var logRequest = getLogRequestItem(config.file.index);
+                            if(logRequest)
+                            {
+                                logRequest.progress=100;
+                                logRequest.messages=messages;
+                                logRequest.state='error';
+                            }
                         }
                     });
                 }
+            }
+        };
+
+        var getLogRequestItem = function(index) {
+            var toReturn=null;
+            $.each($scope.logRequests, function (i, logRequest) {
+                if(logRequest.index==index)
+                {
+                    toReturn=logRequest;
+                    return false;
+                }
+            });
+            return toReturn;
+        }
+
+        $scope.selectFile = function(selectedFile)
+        {
+            $.each($scope.files, function (index, file) {
+                file.selected = file == selectedFile;
+            });
+
+            $scope.selectedFile = Object.clone(selectedFile);
+            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1)
+            {                
+                $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
+                $scope.selectedFile.Dimensions = "";
+            }
+            else
+            {
+                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+                $scope.selectedFile.Dimensions = "";
+            }
+        };
+
+        $scope.filterFilesRequest = function () {
+            $scope.filter.FilteredName = $scope.filter.Name;
+            filterFiles();
+        };
+
+        var filterFiles = function () {
+            var filterdFiles = [];
+            if ($scope.filter.FilteredName)
+            {
+                $.each($scope.files, function (index, file) {
+                    if (file.Name.indexOf($scope.filter.FilteredName) > -1)
+                    {
+                        filterdFiles.push(file);
+                    }
+                });
+            }
+            else
+            {
+                filterdFiles = $scope.files;
+            }
+            $scope.filterdFiles = filterdFiles;
+        };
+
+        $scope.selectedFileImgLoad = function(event)
+        {
+            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1 && event.target.naturalWidth!=0 &&
+                event.target.naturalHeight != 0)
+            {                
+                $scope.selectedFile.Dimensions = "{0}x{1}".format(event.target.naturalWidth, event.target.naturalHeight);
             }
         };
 

@@ -23,7 +23,7 @@ using VitalChoice.Domain.Entities.Permissions;
 
 namespace VitalChoice.Controllers
 {
-    [AdminAuthorize(PermissionType.Tools)]
+    //[AdminAuthorize(PermissionType.Files)]
     public class FileController : BaseApiController
     {
         private readonly IFileService fileService;
