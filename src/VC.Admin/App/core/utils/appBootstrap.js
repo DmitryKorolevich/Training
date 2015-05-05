@@ -51,7 +51,7 @@ angular.module('app.core.utils.appBootstrap', [])
 			}
 
 			function unauthorizedArea(path) {
-			    if (!path) {
+			    if (!path && path != "") {
 			        path = $location.path();
 			    }
 
