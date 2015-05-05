@@ -337,7 +337,7 @@ angular.module('app.modules.file.controllers.filesController', [])
             $scope.selectedFile = Object.clone(selectedFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1)
             {                
-                $scope.selectedFile.Url = null;
+                $scope.selectedFile.Url = "";
             }
             else
             {
