@@ -17,6 +17,8 @@ using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validators.UserManagement;
 using VitalChoice.Validators.Users;
+using Microsoft.AspNet.Hosting;
+using System.Security.Claims;
 
 namespace VitalChoice.Controllers
 {
@@ -25,12 +27,14 @@ namespace VitalChoice.Controllers
     {
 	    private readonly IUserService userService;
 	    private readonly IOptions<AppOptions> appOptions;
+		private readonly IHttpContextAccessor contextAccessor;
 
-	    public UserManagementController(IUserService userService, IOptions<AppOptions> appOptions)
+		public UserManagementController(IUserService userService, IOptions<AppOptions> appOptions, IHttpContextAccessor contextAccessor)
 	    {
 		    this.userService = userService;
 		    this.appOptions = appOptions;
-	    }
+			this.contextAccessor = contextAccessor;
+        }
 
 	    [HttpPost]
 	    public async Task<Result<PagedList<UserListItemModel>>> GetUsers([FromBody]FilterBase filter)
@@ -97,6 +101,12 @@ namespace VitalChoice.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
+			var context = contextAccessor.HttpContext;
+			if (user.Id == Convert.ToInt32(context.User.GetUserId()) && user.Status != userModel.Status)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserStatusUpdate]);
+			}
+
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Profile.AgentId = userModel.AgentId;
@@ -136,6 +146,12 @@ namespace VitalChoice.Controllers
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			var context = contextAccessor.HttpContext;
+			if (user.Id == Convert.ToInt32(context.User.GetUserId()))
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserRemoval]);
 			}
 
 			await userService.DeleteAsync(user);

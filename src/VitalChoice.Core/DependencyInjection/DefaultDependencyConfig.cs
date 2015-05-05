@@ -46,8 +46,18 @@ namespace VitalChoice.Core.DependencyInjection
             if (!_called)
             {
                 _called = true;
-                // Add EF services to the services container.
-                services.AddEntityFramework() //.AddMigrations()
+
+				services.ConfigureIdentityApplicationCookie(x =>
+				{
+					x.AuthenticationScheme = IdentityOptions.ApplicationCookieAuthenticationScheme;
+					x.LogoutPath = null;
+					x.AccessDeniedPath = null;
+					x.LoginPath = null;
+					x.ReturnUrlParameter = null;
+				});
+
+				// Add EF services to the services container.
+				services.AddEntityFramework() //.AddMigrations()
                     .AddSqlServer()
                     .AddDbContext<VitalChoiceContext>();
 
@@ -68,7 +78,9 @@ namespace VitalChoice.Core.DependencyInjection
 
 				services.AddOptions();
 
-                services.Configure<AppOptions>(options =>
+				services.AddAuthorization();
+
+				services.Configure<AppOptions>(options =>
                 {
                     options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
                     options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
@@ -112,13 +124,7 @@ namespace VitalChoice.Core.DependencyInjection
 
 				services.ConfigureAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
-	            services.ConfigureCookieAuthentication(x =>
-	            {
-		            x.AccessDeniedPath = null;
-		            x.LoginPath = null;
-		            x.LogoutPath = null;
-		            x.ReturnUrlParameter = null;
-	            });
+				
 
 #if DNX451
 				var builder = new ContainerBuilder();

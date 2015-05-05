@@ -3,9 +3,9 @@
 		<spinner-overlay data-loading="readTracker.active()">
 			<form class="form-horizontal" name="userForm" data-ng-submit="activate(userForm)" data-ng-class="{submitted: userForm.submitted}" novalidate>
 				<fieldset>
-					<legend>Activate your Account</legend>
+					<legend>Activate Your Account</legend>
 					<div class="form-group">
-						<label for="agentId" class="col-md-3 control-label">AgentId</label>
+						<label for="agentId" class="col-md-3 control-label">Agent ID</label>
 						<div class="col-md-9">
 							<input type="text" class="form-control" id="agentId" data-ng-model="user.AgentId" placeholder="Agent Id" disabled="disabled">
 						</div>
@@ -32,7 +32,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
+				    <div class="form-group">
 						<label class="col-md-3 control-label">Email</label>
 						<div class="col-md-9">
 							<input type="email" name="email" class="form-control" placeholder="Email" data-ng-model="user.Email" required data-ng-maxlength="100">
@@ -44,6 +44,7 @@
 							</div>
 						</div>
 					</div>
+                    <span class="help-block col-md-9 col-md-offset-3">*Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character. Example: Dontuse!@1</span>
 					<div class="form-group">
 						<label class="col-md-3 control-label">Password</label>
 						<div class="col-md-9">

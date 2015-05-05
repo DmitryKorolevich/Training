@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Infrastructure.Identity
 {
@@ -21,6 +22,14 @@ namespace VitalChoice.Infrastructure.Identity
 	    {
 		    this.profileRepository = profileRepository;
 	    }
+
+        private IdentityError DuplicateEmail(string email)
+        {
+            var error = this.Describer.DuplicateUserName(email);
+            error.Description = string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], email);
+
+            return error;
+        }
 
 	    protected async Task ValidateEmail(UserManager<ApplicationUser> manager, ApplicationUser user, List<IdentityError> errors)
 		{
@@ -51,8 +60,8 @@ namespace VitalChoice.Infrastructure.Identity
 					flag = !string.Equals(a, userIdAsync);
 				}
 				if (flag)
-					errors.Add(this.Describer.DuplicateEmail(email));
-			}
+                    errors.Add(DuplicateEmail(email));
+            }
 		}
 
 		protected async Task ValidateUserName(UserManager<ApplicationUser> manager, ApplicationUser user, ICollection<IdentityError> errors)
@@ -74,8 +83,9 @@ namespace VitalChoice.Infrastructure.Identity
 					var userIdAsync = await manager.GetUserIdAsync(user);
 					flag = !string.Equals(a, userIdAsync);
 				}
-				if (flag)
-					errors.Add(this.Describer.DuplicateUserName(userName));
+                if (flag) {
+                    errors.Add(DuplicateEmail(userName));
+                }
 			}
 		}
 
@@ -94,7 +104,7 @@ namespace VitalChoice.Infrastructure.Identity
 				findByAgentId = findByAgentId.Where(x => !x.User.DeletedDate.HasValue).ToList();
 				var flag = findByAgentId.Any(x => x.User.Id != user.Id);
 				if (flag)
-					errors.Add(new IdentityError() { Description = "Provided Agent Id is already taken" });
+					errors.Add(new IdentityError() { Description = ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AgentIdIsTakenAlready] });
 			}
 		}
 

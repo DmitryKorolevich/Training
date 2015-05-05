@@ -9,6 +9,8 @@ namespace VitalChoice.Models.Account
 {
     public class UserInfoModel : Model<ApplicationUser, IMode>
 	{
+		public string Email { get; set; }
+
 	    public string FirstName { get; set; }
 
 		public string LastName { get; set; }

@@ -56,7 +56,7 @@
 					</label>
 				</div>
 			</div>
-			<div class="form-group" data-ng-if="editMode && user.Status != 0">
+			<div class="form-group" data-ng-if="editMode && user.Status != 0 && currentUser && currentUser.Email != user.Email">
 				<label class="col-md-3 control-label">Status</label>
 				<div class="col-md-9">
 					<select class="form-control" data-ng-model="user.Status" data-ng-options="status.Key as status.Text for status in userStatuses" required></select>

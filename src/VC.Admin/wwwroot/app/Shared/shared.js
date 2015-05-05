@@ -35,6 +35,6 @@ angular.module('app.shared', [
 					abstract: true,
 					url: '',
 					templateUrl: 'app/shared/area/partials/twoColumn.html'
-				});;
+				});
 		}
 	]);

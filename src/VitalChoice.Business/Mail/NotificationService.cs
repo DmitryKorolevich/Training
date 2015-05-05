@@ -18,9 +18,9 @@ namespace VitalChoice.Business.Mail
 			//todo:refactor this to user nustache or something
 
 			var body =
-			    $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Please use <a href=\"{activation.Link}\">link</a> to activate your account</p><p></p><p>Best Regards,</p><p>Vital Choice Administration</p>";
+			    $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Please click the following <a href=\"{activation.Link}\">link</a> to activate your account</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
 
-		    var subject = $"Vital Choice admin account activation";
+		    var subject = $"Your Vital Choice User Activation";
 
 		    await emailSender.SendEmailAsync(email, subject, body);
 	    }

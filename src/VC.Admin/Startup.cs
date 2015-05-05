@@ -70,14 +70,13 @@ namespace VitalChoice
 			{
 				// Add Error handling middleware which catches all application specific errors and
 				// send the request to the following path or controller action.
-				app.UseErrorHandler("/Home/Error");
 			}
-
 			// Add static files to the request pipeline.
 			app.UseStaticFiles();
 
-			// Add cookie-based authentication to the request pipeline.
 			app.UseIdentity();
+
+			app.UseCookieAuthentication();
 
 			app.UseMvc(routes =>
             {
