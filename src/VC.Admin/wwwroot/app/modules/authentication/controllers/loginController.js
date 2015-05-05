@@ -37,7 +37,10 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 								toaster.pop('error', "Error!", "Server error occured");
 							});
 
-							$state.go($state.previous != null && $state.previous.name !== 'index.oneCol.login' && $state.previous.name !== '' ? $state.previous.name : "index.oneCol.dashboard");
+							$state.go($state.previous != null
+                                && $state.previous.name !== '' 
+                                && !$rootScope.unauthorizedArea($state.href($state.previous).slice(1))
+                                ? $state.previous.name : "index.oneCol.dashboard");
 						} else {
 							var messages = "";
 							if (res.Messages) {
