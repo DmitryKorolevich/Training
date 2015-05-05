@@ -14,7 +14,7 @@
                 <div class="wrapper">
                     <div data-ng-repeat="request in logRequests">
                         <div class="row">
-                            <div ng-if="request.type=='upload'" class="col-md-3"><strong>Upload:</strong>&nbsp;{{request.name}}</div>
+                            <div ng-if="request.type=='upload'" class="col-md-4"><strong>Upload:</strong>&nbsp;{{request.name}}</div>
                             <div ng-if="request.state=='progress'" class="col-md-3">
                                 <progressbar animate="true" value="request.progress" type="success"><b>{{request.progress}}%</b></progressbar>
                             </div>
@@ -24,7 +24,7 @@
                             <div ng-if="request.state=='error'" class="col-md-3">
                                 <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
                             </div>
-                            <div ng-if="request.state=='error'" class="col-md-6 error">{{request.messages}}</div>
+                            <div ng-if="request.state=='error'" class="col-md-5 error">{{request.messages}}</div>
                         </div>
                     </div>
                 </div>
