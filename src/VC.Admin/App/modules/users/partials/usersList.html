@@ -47,16 +47,16 @@
 				</tr>
 				</tbody>
 			</table>
-			<pagination
-				boundary-links="true"
-				total-items="totalItems"
-				data-ng-model="currentPage"
-				previous-text="&lsaquo;"
-				next-text="&rsaquo;"
-				first-text="&laquo;"
-				last-text="&raquo;"
-				data-ng-change="pageChanged()">
-			</pagination>
+            <pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+            </pagination>
 		</spinner-overlay>
 	</div>
 </div>

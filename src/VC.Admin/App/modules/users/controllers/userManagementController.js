@@ -11,7 +11,8 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 		userService.getUsers($scope.filter, $scope.refreshTracker)
 			.success(function (result) {
 				if (result.Success) {
-					$scope.users = result.Data.Items;
+				    $scope.users = result.Data.Items;
+				    $scope.totalItems = result.Data.Count;
 				} else {
 					toaster.pop('error', 'Error!', "Can't get access to the users");
 				}
@@ -28,12 +29,21 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	}
 
 	function initialize() {
-		$scope.filter = { SearchText: "" };
+	    $scope.filter = {
+	        SearchText: "",
+            Paging: { PageIndex: 1, PageItemCount: 100 }
+	    };
 
 		refreshUsers();
 	}
 
-	$scope.filterUsers = function() {
+	$scope.pageChanged = function () {
+	    refreshUsers();
+	};
+
+	$scope.filterUsers = function () {
+	    $scope.filter.Paging.PageIndex = 1;
+
 		refreshUsers();
 	};
 
