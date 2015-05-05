@@ -7,6 +7,9 @@ angular.module('app.modules.file.controllers.filesController', [])
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;        
         var FILE_TYPES = 'image/jpeg,image/png,image/gif,application/pdf';
+        var PDF_FILE_EXT = '.pdf';
+
+        var fileUploadRequestId = 0;
 
         $scope.refreshDirectoriesTracker = promiseTracker("refreshDirectories");
         $scope.refreshFilesTracker = promiseTracker("refreshFiles");
@@ -61,20 +64,35 @@ angular.module('app.modules.file.controllers.filesController', [])
 
             $scope.selectedDir =
             {
-                FullRelativeName: "/",
+                FullRelativeName: '/',
                 Directories: []
             };
             $scope.uploadFiles=[];
             $scope.files=[];
+            $scope.filterdFiles=[];
             $scope.logFiles = [];
 
             $scope.breadCrumbMaxLevels = 5;
             $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'files{0}';
 
+            $scope.selectedFile = {};
+
+            $scope.filter = {
+                Name: '',
+                FilteredName: '',
+            };
+
             loadDirectories();
         }
 
         $scope.selectDirectory = function (fullRelativeName) {
+            if($scope.selectedDir.FullRelativeName!=fullRelativeName)
+            {
+                $scope.selectedFile = {};
+                $scope.filter.FilteredName = '';
+                $scope.filter.Name = '';
+            }
+
             $scope.selectedDir.FullRelativeName = fullRelativeName;
             $scope.selectedDir.ShowSpace = false;
             var url = fullRelativeName;
@@ -186,7 +204,8 @@ angular.module('app.modules.file.controllers.filesController', [])
         });
 
         function loadFiles() {
-            $scope.files=[];
+            $scope.files = [];
+            filterFiles();
             var url=$scope.selectedDir.FullRelativeName;
             fileService.getFiles({ FullRelativeName: url }, $scope.refreshFilesTracker)
                 .success(function (result) {
@@ -197,7 +216,8 @@ angular.module('app.modules.file.controllers.filesController', [])
                             $.each(result.Data, function (index, file) {
                                 prepareFile(file);
                             });
-                            $scope.files=result.Data;
+                            $scope.files = result.Data;
+                            filterFiles();
                         }
                     } else {
                         errorHandler(result);
@@ -229,6 +249,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                             });
                             if (indexForRemove != null) {
                                 $scope.files.splice(indexForRemove, 1);
+                                filterFiles();
                             }
                         } else {
                             errorHandler(result);
@@ -264,7 +285,9 @@ angular.module('app.modules.file.controllers.filesController', [])
 
                     var url=$scope.selectedDir.FullRelativeName;
                     var fields={};
-                    fields[url]='';
+                    fields[url] = '';
+                    fileUploadRequestId++;
+                    file.index = fileUploadRequestId;
                     Upload.upload({
                         url: '/api/file/AddFiles',
                         fields: fields,
@@ -295,6 +318,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 }
 
                                 $scope.files.push(newFile);
+                                filterFiles();
                             }
                         } else {
                             errorHandler(result);
@@ -302,6 +326,46 @@ angular.module('app.modules.file.controllers.filesController', [])
                     });
                 }
             }
+        };
+
+        $scope.selectFile = function(selectedFile)
+        {
+            $.each($scope.files, function (index, file) {
+                file.selected = file == selectedFile;
+            });
+
+            $scope.selectedFile = Object.clone(selectedFile);
+            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1)
+            {                
+                $scope.selectedFile.Url = null;
+            }
+            else
+            {
+                $scope.selectedFile.Url = $scope.baseUrl.format(selectedFile.FullRelativeName);
+            }
+        };
+
+        $scope.filterFilesRequest = function () {
+            $scope.filter.FilteredName = $scope.filter.Name;
+            filterFiles();
+        };
+
+        var filterFiles = function () {
+            var filterdFiles = [];
+            if ($scope.filter.FilteredName)
+            {
+                $.each($scope.files, function (index, file) {
+                    if (file.Name.indexOf($scope.filter.FilteredName) > -1)
+                    {
+                        filterdFiles.push(file);
+                    }
+                });
+            }
+            else
+            {
+                filterdFiles = $scope.files;
+            }
+            $scope.filterdFiles = filterdFiles;
         };
 
         initialize();

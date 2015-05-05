@@ -6,6 +6,9 @@ body {
 .table {
   max-width: 2500px;
 }
+.table > tbody > tr.selected {
+  background-color: #ddf0fb;
+}
 .container {
   width: 850px;
 }
@@ -48,10 +51,10 @@ h2 {
   cursor: pointer;
 }
 .angular-ui-tree-handle:hover {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 .angular-ui-tree-handle.selected {
-  background-color: #facfc8;
+  background-color: #ddf0fb;
 }
 .angular-ui-tree-handle .ya-treview-buttons {
   display: none;
@@ -162,8 +165,14 @@ hr {
 .margin-zero {
   margin: 0;
 }
+.width-70px {
+  width: 70px;
+}
 .width-80px {
   width: 80px;
+}
+.width-140px {
+  width: 140px;
 }
 .width-160px {
   width: 160px;
@@ -487,25 +496,56 @@ ul.navbar-custom-header li > a {
   padding-top: 18px;
   padding-bottom: 19px;
 }
-.file-manager .left-pane {
+.file-manager .work-area {
+  position: relative;
+}
+.file-manager .work-area .left-pane {
   position: absolute;
-  width: 450px;
+  width: 350px;
 }
-.file-manager .left-pane .wrapper {
+.file-manager .work-area .left-pane .wrapper {
   overflow: auto;
-  height: 800px;
+  height: 320px;
 }
-.file-manager .right-pane {
-  margin: 0 0 0 450px;
-  padding: 0 0px 0 30px;
+.file-manager .work-area .center-pane {
+  margin: 0 18% 0 350px;
+  padding: 0 15px 0 15px;
 }
-.file-manager .right-pane .wrapper {
+.file-manager .work-area .center-pane .table {
+  height: 247px;
+}
+.file-manager .work-area .center-pane .table tbody {
+  overflow-y: scroll;
+  height: 230px;
+  width: 100%;
+  position: absolute;
+}
+.file-manager .work-area .center-pane .table tbody > tr {
+  width: 100%;
+  display: inline-table;
+  cursor: pointer;
+}
+.file-manager .work-area .right-pane {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: 18%;
+  margin: 0;
+  padding: 0;
+}
+.file-manager .work-area .right-pane .wrapper {
+  height: 320px;
+}
+.file-manager .status-pane .wrapper {
   overflow: auto;
-  height: 800px;
+  height: 120px;
 }
-.file-manager .bottom-pane .wrapper {
-  overflow: auto;
-  height: 200px;
+.file-manager .status-pane .row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.file-manager .status-pane .row .progress {
+  margin-bottom: 5px;
 }
 .file-manager .ya-treeview-content .line {
   min-width: initial;
@@ -548,4 +588,21 @@ ul.navbar-custom-header li > a {
 }
 .file-manager .top-pane .form-group .breadcrumb li .space {
   margin-left: -5px;
+}
+.file-manager .center-pane .table tbody > tr:hover {
+  background-color: #ededed;
+}
+.file-manager .center-pane .table > tbody > tr.selected {
+  background-color: #ddf0fb;
+}
+.image-box {
+  height: 100%;
+  background-color: white;
+  border-radius: 4px;
+  text-align: center;
+}
+.image-box img {
+  display: inline;
+  max-height: 100%;
+  max-width: 100%;
 }

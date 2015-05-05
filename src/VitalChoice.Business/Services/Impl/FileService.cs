@@ -74,6 +74,7 @@ namespace VitalChoice.Business.Services.Impl
                 Name = p.Name,
                 FullRelativeName = ConvertPathToUrl(p.FullName),
                 Directories = new List<DirectoryInfoObject>(),
+                Updated = p.LastWriteTime,
             }).ToList();
 
             AssigntDirectories(toReturn, dirs);
@@ -143,7 +144,7 @@ namespace VitalChoice.Business.Services.Impl
             if (dirInfo.Exists)
             {
                 toReturn = dirInfo.GetFiles().Select(p => new FileInfoObject(p.Name, ConvertPathToUrl(p.FullName),
-                    ConvertPathToUrl(dirInfo.FullName), p.Length)).ToList();
+                    ConvertPathToUrl(dirInfo.FullName), p.Length, p.LastWriteTime)).ToList();
             }
 
             return toReturn;
@@ -187,15 +188,36 @@ namespace VitalChoice.Business.Services.Impl
             path = path + @"\" + name;
             path = path.ToLower();
             FileInfo fileInfo = new FileInfo(path);
+            if(fileInfo.Exists)
+            {
+                path=GetAvaliableFilePath(path, 1);
+                fileInfo = new FileInfo(path);
+            }
 
             SaveToFileSystem(fileInfo.FullName, content);
+            fileInfo = new FileInfo(path);
             var resDir = ConvertPathToUrl(directory);
             if(resDir==String.Empty)
             {
                 resDir = "/";
             }
-            toReturn = new FileInfoObject(name.ToLower(), ConvertPathToUrl(path), resDir, content.Length);
+            toReturn = new FileInfoObject(Path.GetFileName(path).ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime);
 
+            return toReturn;
+        }
+
+        private string GetAvaliableFilePath(string path, int index)
+        {
+            string toReturn = path;
+            var ext = Path.GetExtension(toReturn);
+            toReturn = toReturn.Substring(0, toReturn.LastIndexOf(ext));
+            toReturn = String.Format("{0} ({1}){2}",toReturn, index, ext);
+            FileInfo fileInfo = new FileInfo(toReturn);
+            if (fileInfo.Exists)
+            {
+                index++;
+                toReturn = GetAvaliableFilePath(path, index);
+            }
             return toReturn;
         }
 

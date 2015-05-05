@@ -110,4 +110,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\CURs.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\FilesPermissions.sql" />
+  </ItemGroup>
 </Project>

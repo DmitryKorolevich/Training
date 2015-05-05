@@ -26,7 +26,7 @@
 
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav" data-ng-if="authenticated">
-				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}" data-ng-if="validatePermission(module.access)" ui-sref-active="active">
+				<li data-ng-repeat="module in navigation.menu" data-ng-class="{dropdown: module.subMenu != null}" data-ng-if="validatePermissionMenuItem(module)" ui-sref-active="active">
 					<a data-ng-if="!module.subMenu" ui-sref="{{module.stateName}}({name:module.name})">
 						{{module.stateLabel}}
 					</a>

@@ -15,10 +15,12 @@ namespace VitalChoice.Domain.Entities.Files
 
         public long Size { get; set; }
 
+        public DateTime Updated { get; set; }
+
         public FileInfoObject()
         { }
 
-        public FileInfoObject(string name,string fullRelativeName, string directoryFullRelativeName, long sizeBytes)
+        public FileInfoObject(string name,string fullRelativeName, string directoryFullRelativeName, long sizeBytes, DateTime updated)
         {
             Name = name;
             FullRelativeName =fullRelativeName;
@@ -38,6 +40,7 @@ namespace VitalChoice.Domain.Entities.Files
             {
                 SizeMessage = kBytes + " kb";
             }
+            Updated = updated;
         }
     }
 }

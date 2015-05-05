@@ -10,6 +10,8 @@ namespace VitalChoice.Domain.Entities.Files
 
         public string FullRelativeName { get; set; }
 
+        public DateTime Updated { get; set; }
+
         public ICollection<DirectoryInfoObject> Directories { get; set; }
 
         public DirectoryInfoObject()
