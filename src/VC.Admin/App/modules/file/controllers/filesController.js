@@ -440,7 +440,7 @@ angular.module('app.modules.file.controllers.filesController', [])
 
         $scope.selectedFileImgLoad = function(event)
         {
-            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1 && event.target.naturalWidth!=0 &&
+            if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) == -1 && event.target.naturalWidth!=0 &&
                 event.target.naturalHeight != 0)
             {                
                 $scope.selectedFile.Dimensions = "{0}x{1}".format(event.target.naturalWidth, event.target.naturalHeight);
