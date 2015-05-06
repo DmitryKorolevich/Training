@@ -130,7 +130,7 @@ angular.module('app.core.utils.appBootstrap', [])
 			function bindRootScope() {
 			    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 			        if ($rootScope.appStarted && !$rootScope.unauthorizedArea($rootScope.$state.href(toState).slice(1)) && !$rootScope.authenticated) {
-			            toaster.pop('warning', "Caution!", "Please log in before access this area.");
+			            toaster.pop('warning', "Caution!", "You must login before accessing this area.");
 
 			            event.preventDefault();
 			        }

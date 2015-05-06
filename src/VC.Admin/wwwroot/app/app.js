@@ -20,7 +20,7 @@ var app = angular
 		                    case 401: {
 		                        $rootScope.$state.go('index.oneCol.login');
 
-		                        toaster.pop('warning', "Caution!", "Please log in before access this area.");
+		                        toaster.pop('warning', "Caution!", "You must login before accessing this area.");
 		                        return $q.defer().promise;
 
 		                    } break;
