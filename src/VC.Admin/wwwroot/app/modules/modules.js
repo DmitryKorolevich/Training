@@ -2,6 +2,7 @@
 
 angular.module('app.modules', [
 	'app.modules.authentication',
+    'app.modules.profile',
 	'app.modules.demo',
 	'app.modules.users',
 	'app.modules.content',

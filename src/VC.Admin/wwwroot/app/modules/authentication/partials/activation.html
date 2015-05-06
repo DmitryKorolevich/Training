@@ -44,7 +44,7 @@
 							</div>
 						</div>
 					</div>
-                    <span class="help-block col-md-9 col-md-offset-3">*Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character. Example: Dontuse!@1</span>
+                    <span class="help-block small color-red">*Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br/>Example: Dontuse!@1</span>
 					<div class="form-group">
 						<label class="col-md-3 control-label">Password</label>
 						<div class="col-md-9">
@@ -58,7 +58,7 @@
 					<div class="form-group">
 						<label class="col-md-3 control-label">Confirm Password</label>
 						<div class="col-md-9">
-							<input type="password" name="confirmPassword" class="form-control" data-ng-model="user.ConfirmPassword" placeholder="Confirm Pasword" required>
+							<input type="password" name="confirmPassword" class="form-control" data-ng-model="user.ConfirmPassword" placeholder="Confirm Password" required>
 							<div class="error-container" ng-show="userForm.submitted && userForm.confirmPassword.$invalid">
 								<small class="error" ng-show="userForm.confirmPassword.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ConfirmPassword")}}</small>
 								<small class="error" ng-show="userForm.confirmPassword.$error.server">{{serverMessages.GetMessage('ConfirmPassword')}}</small>

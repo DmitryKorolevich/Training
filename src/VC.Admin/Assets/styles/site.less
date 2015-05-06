@@ -591,15 +591,17 @@ form .form-group p {
 	opacity:1;
 }
 
-.login-name{
-	padding-top:19px;
-	font-weight: bold;
-	padding-right:10px;
+ul.navbar-custom-header li > a.dropdown-toggle{
+	padding-bottom:5px;
 }
 
-ul.navbar-custom-header li > a{
-	padding-top:18px;
-	padding-bottom:19px;
+ul.navbar-custom-header li > a.dropdown-toggle,
+ul.navbar-custom-header li > a.dropdown-toggle:hover{
+    background:none;
+}
+
+ul.navbar-custom-header li .dropdown-menu{
+    border-top-width: 0px;
 }
 
 .file-manager .work-area {
@@ -736,4 +738,8 @@ ul.navbar-custom-header li > a{
     display: inline;
     max-height: 100%;
     max-width: 100%;
+}
+
+.color-red{
+    color:red;
 }

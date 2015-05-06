@@ -1517,3 +1517,5 @@
 /// <reference path="app/app.common.js" />
 /// <reference path="../app/core/utils/parts/imgloaddirective.js" />
 /// <reference path="app/core/utils/parts/imgloaddirective.js" />
+/// <reference path="../app/modules/profile/profile.js" />
+/// <reference path="../app/modules/profile/controllers/profilecontroller.js" />
