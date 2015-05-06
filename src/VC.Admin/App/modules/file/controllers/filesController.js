@@ -239,8 +239,14 @@ angular.module('app.modules.file.controllers.filesController', [])
                 fileService.deleteFile(deleteFile, $scope.deleteFileTracker)
                     .success(function (result) {
                         if (result.Success) {
-                            var line = '<span>file ' + deleteFile.Name + ' deleted. Response: ' + JSON.stringify(result) + '</span><br/>';
-                            $scope.log = line + $scope.log;
+                            var logRequest = {};
+                            fileUploadRequestId++;
+                            logRequest.type = "delete";
+                            logRequest.index = fileUploadRequestId;
+                            logRequest.name = deleteFile.Name;
+                            logRequest.progress = 100;
+                            logRequest.state = "done";
+                            $scope.logRequests.splice(0, 0, logRequest);
 
                             var indexForRemove;
                             $.each($scope.files, function (index, file) {
@@ -254,7 +260,22 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 filterFiles();
                             }
                         } else {
-                            errorHandler(result);
+                            var messages = '';
+                            if (result.Messages) {
+                                $.each(result.Messages, function (index, value) {
+                                    messages += "{0} ".format(value.Message);
+                                });
+                            }
+
+                            var logRequest = {};
+                            fileUploadRequestId++;
+                            logRequest.type = "delete";
+                            logRequest.index = fileUploadRequestId;
+                            logRequest.name = deleteFile.Name;
+                            logRequest.progress = 100;
+                            logRequest.state = "error";
+                            logRequest.messages=messages;
+                            $scope.logRequests.splice(0, 0, logRequest);
                         }
                     })
                     .error(function (result) {
