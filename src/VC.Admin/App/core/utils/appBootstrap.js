@@ -44,7 +44,8 @@ angular.module('app.core.utils.appBootstrap', [])
 			        return false;
 			    }
 
-			    return $rootScope.currentUser.IsSuperAdmin;
+			    if ($rootScope.currentUser.IsSuperAdmin)
+			        return true;
 			    
                 var result=false;
                 if(menuItem && menuItem.subMenu)

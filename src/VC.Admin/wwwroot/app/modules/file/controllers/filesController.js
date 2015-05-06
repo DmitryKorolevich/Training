@@ -274,12 +274,12 @@ angular.module('app.modules.file.controllers.filesController', [])
                     var file = uploadFiles[i];
 
                     var messages = "";
-                    //if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
-                    //    messages += "{0} ".format(INVALID_FILE_FORMAT_MESSAGE);
-                    //}
-                    //if(file.size && file.size>=MAX_FILE_SIZE) {                        
-                    //    messages += "{0} ".format(INVALID_FILE_SIZE_MESSAGE);
-                    //}
+                    if (file.type && FILE_TYPES.indexOf(file.type) == -1) {
+                        messages += "{0} ".format(INVALID_FILE_FORMAT_MESSAGE);
+                    }
+                    if(file.size && file.size>=MAX_FILE_SIZE) {                        
+                        messages += "{0} ".format(INVALID_FILE_SIZE_MESSAGE);
+                    }
 
                     var logRequest = {};
                     fileUploadRequestId++;
