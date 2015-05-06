@@ -15,6 +15,7 @@
                     <div data-ng-repeat="request in logRequests">
                         <div class="row">
                             <div ng-if="request.type=='upload'" class="col-md-4"><strong>Upload:</strong>&nbsp;{{request.name}}</div>
+                            <div ng-if="request.type=='delete'" class="col-md-4"><strong>Delete:</strong>&nbsp;{{request.name}}</div>
                             <div ng-if="request.state=='progress'" class="col-md-3">
                                 <progressbar animate="true" value="request.progress" type="success"><b>{{request.progress}}%</b></progressbar>
                             </div>
