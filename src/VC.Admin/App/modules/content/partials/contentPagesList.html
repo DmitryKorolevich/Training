@@ -39,7 +39,7 @@
                     <td>{{contentPage.Url}}</td>
                     <td>{{contentPage.Category}}</td>
                     <td>{{contentPage.Status}}</td>
-                    <td>{{contentPage.Updated | date:"MM/dd/yy"}}<br />{{contentPage.Updated | date:"h:mm a"}}</td><!--<br />{{article.AgentId}}</td>-->
+                    <td>{{contentPage.Updated | date:"MM/dd/yy"}}<br />{{contentPage.Updated | date:"h:mm a"}}<br />{{contentPage.AgentId}}</td>
                     <td>
                         <button class="btn btn-default btn-success" data-ng-click="open(contentPage.Id);">Edit</button>
                         <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(contentPage.Id);">Delete</button>
