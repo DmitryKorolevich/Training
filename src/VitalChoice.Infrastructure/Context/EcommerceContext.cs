@@ -28,7 +28,7 @@ namespace VitalChoice.Infrastructure.Context
 			// are supported in ASP.NET 5
 			if (!created)
 			{
-				Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
+				//Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
                 created = true;
 			}
 		}

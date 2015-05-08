@@ -3,16 +3,22 @@
 angular.module('app.core.utils.modalUtil', [])
 .service('modalUtil', ['$modal', '$log', function ($modal, $log) {
 	return {
-		open: function(templateUrl, controller,data, successCallback, errorCallback) {
+	    open: function (templateUrl, controller, data, options, successCallback, errorCallback) {
+	        var options = $.extend(
+                {
+                    size: 'sm'
+                }, options);
+
 			var modalInstance = $modal.open({
 				templateUrl: templateUrl,
 				controller: controller,
-				size: 'lg',
+				size: options.size,
 				resolve: {
 					data: function () {
 						return data;
 					}
-				}
+				},
+                controllerAs: 'modal',
 			});
 
 			modalInstance.result.then(function (data) {

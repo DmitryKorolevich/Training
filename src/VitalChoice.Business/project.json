@@ -9,7 +9,7 @@
 		"VitalChoice.Infrastructure": "1.0.0-*",
         "VitalChoice.Data": "1.0.0-*",
         "VitalChoice.Domain": "1.0.0-*",
-        "Templates": "2.2.2"
+        "Templates": "2.2.3-beta4"
     },
 
     "frameworks": {

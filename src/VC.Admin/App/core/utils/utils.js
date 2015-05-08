@@ -18,6 +18,7 @@ angular.module('app.utils', [
 	'app.core.utils.loading.overlayDirective',
 	'app.core.utils.parts.basePaginationDirective',
 	'app.core.utils.parts.imgLoadDirective',
+	'app.core.utils.parts.fileFieldDirective',
 	])
 .config(function($provide) {
 	$provide.decorator('taOptions', ['$delegate', function (taOptions) {

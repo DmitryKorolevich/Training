@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.articleManageController', [])
-.controller('articleManageController', ['$scope', '$rootScope','$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope,$state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('articleManageController', ['$scope', '$rootScope','$state','$stateParams', 'appBootstrap', 'modalUtil', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 

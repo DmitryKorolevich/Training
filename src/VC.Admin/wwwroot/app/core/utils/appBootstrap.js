@@ -150,8 +150,20 @@ angular.module('app.core.utils.appBootstrap', [])
 			    });
 			}
 
+			var data = [];
+
+			var setData = function (name,value) {
+			    data[name] = value;
+			};
+
+			var getData = function (name) {
+			    return data[name];
+			};
+
 			return {
-				initialize : initialize
+			    initialize: initialize,
+			    setData: setData,
+                getData: getData,
 			}
 		}
 	]);
