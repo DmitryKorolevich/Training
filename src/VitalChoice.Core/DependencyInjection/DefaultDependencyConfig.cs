@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.Caching.Memory;
 using Microsoft.Framework.ConfigurationModel;
@@ -50,9 +51,9 @@ namespace VitalChoice.Core.DependencyInjection
 				services.ConfigureIdentityApplicationCookie(x =>
 				{
 					x.AuthenticationScheme = IdentityOptions.ApplicationCookieAuthenticationScheme;
-					x.LogoutPath = null;
-					x.AccessDeniedPath = null;
-					x.LoginPath = null;
+					x.LogoutPath = PathString.Empty;
+					x.AccessDeniedPath = PathString.Empty;
+					x.LoginPath = PathString.Empty;
 					x.ReturnUrlParameter = null;
 				});
 

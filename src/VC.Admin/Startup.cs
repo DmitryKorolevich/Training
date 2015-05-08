@@ -33,7 +33,7 @@ namespace VitalChoice
 		{
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new Configuration(applicationEnvironment.ApplicationBasePath)
+            var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 

@@ -9,6 +9,7 @@ using VitalChoice.Validation.Controllers;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
+using Microsoft.AspNet.Mvc.OptionDescriptors;
 
 namespace VitalChoice.Validation.Controllers
 {
@@ -19,31 +20,25 @@ namespace VitalChoice.Validation.Controllers
              IReadOnlyList<IFilterProvider> filterProviders,
              IControllerFactory controllerFactory,
              ControllerActionDescriptor descriptor,
-             IReadOnlyList<IInputFormatter> inputFormatters,
-             IReadOnlyList<IOutputFormatter> outputFormatters,
+             IInputFormattersProvider inputFormatters,
              IControllerActionArgumentBinder controllerActionArgumentBinder,
-             IReadOnlyList<IModelBinder> modelBinders,
-             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
-             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
+             IModelBinderProvider modelBinders,
+             IModelValidatorProviderProvider modelValidatorProviders,
+             IValueProviderFactoryProvider valueProviderFactories,
              IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-             ITempDataDictionary tempData,
-             ILoggerFactory loggerFactory,
-            int maxModelValidationErrors)
+             ITempDataDictionary tempData)
             : base(
              actionContext,
              filterProviders,
              controllerFactory,
              descriptor,
              inputFormatters,
-             outputFormatters,
              controllerActionArgumentBinder,
              modelBinders,
              modelValidatorProviders,
              valueProviderFactories,
              actionBindingContextAccessor,
-             tempData,
-             loggerFactory,
-             maxModelValidationErrors)
+             tempData)
         {
 
         }

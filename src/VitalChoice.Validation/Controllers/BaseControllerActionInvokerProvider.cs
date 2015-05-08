@@ -8,29 +8,47 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Logging;
+using System;
+using Microsoft.AspNet.Mvc.OptionDescriptors;
 
 namespace VitalChoice.Validation.Controllers
 {
+    //public class InputFormattersProvider : IInputFormattersProvider
+    //{
+    //    public InputFormattersProvider(IEnumerable<InputFormatterDescriptor> inputFormatters)
+    //    {
+    //        InputFormatters = inputFormatters.Select(d => d.Instance).ToArray();
+    //    }
+
+    //    public IReadOnlyList<IInputFormatter> InputFormatters
+    //    {
+    //        get;
+    //    }
+    //}
+
     public class ControllerActionInvokerProvider : IActionInvokerProvider
     {
         private readonly IControllerActionArgumentBinder _argumentBinder;
         private readonly IControllerFactory _controllerFactory;
         private readonly IFilterProvider[] _filterProviders;
-        private readonly IReadOnlyList<IInputFormatter> _inputFormatters;
-        private readonly IReadOnlyList<IModelBinder> _modelBinders;
-        private readonly IReadOnlyList<IOutputFormatter> _outputFormatters;
-        private readonly IReadOnlyList<IModelValidatorProvider> _modelValidatorProviders;
-        private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
+        private readonly IInputFormattersProvider _inputFormatters;
+        private readonly IModelBinderProvider _modelBinders;
+        private readonly IModelValidatorProviderProvider _modelValidatorProviders;
+        private readonly IValueProviderFactoryProvider _valueProviderFactories;
         private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
         private readonly ITempDataDictionary _tempData;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly int _maxModelValidationErrors;
+        //private readonly int _maxModelValidationErrors;
 
         public ControllerActionInvokerProvider(
                     IControllerFactory controllerFactory,
                     IEnumerable<IFilterProvider> filterProviders,
                     IControllerActionArgumentBinder argumentBinder,
                     IOptions<MvcOptions> optionsAccessor,
+                    IInputFormattersProvider inputFormattersProvider,
+                    IModelBinderProvider modelBinderProvider,
+                    IModelValidatorProviderProvider modelValidatorProviderProvider,
+                    IValueProviderFactoryProvider valueProviderFactoryProvider,
                     IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
                     ITempDataDictionary tempData,
                     ILoggerFactory loggerFactory)
@@ -38,15 +56,14 @@ namespace VitalChoice.Validation.Controllers
             _controllerFactory = controllerFactory;
             _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
             _argumentBinder = argumentBinder;
-            _inputFormatters = optionsAccessor.Options.InputFormatters.ToArray();
-            _outputFormatters = optionsAccessor.Options.OutputFormatters.ToArray();
-            _modelBinders = optionsAccessor.Options.ModelBinders.ToArray();
-            _modelValidatorProviders = optionsAccessor.Options.ModelValidatorProviders.ToArray();
-            _valueProviderFactories = optionsAccessor.Options.ValueProviderFactories.ToArray();
+            _inputFormatters = inputFormattersProvider;//new InputFormattersProvider(optionsAccessor.Options.InputFormatters);
+            _modelBinders = modelBinderProvider;
+            _modelValidatorProviders = modelValidatorProviderProvider;
+            _valueProviderFactories = valueProviderFactoryProvider;
             _actionBindingContextAccessor = actionBindingContextAccessor;
             _tempData = tempData;
             _loggerFactory = loggerFactory;
-            _maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
+            //_maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
         }
 
         public int Order
@@ -67,15 +84,12 @@ namespace VitalChoice.Validation.Controllers
                                                     _controllerFactory,
                                                     actionDescriptor,
                                                     _inputFormatters,
-                                                    _outputFormatters,
                                                     _argumentBinder,
                                                     _modelBinders,
                                                     _modelValidatorProviders,
                                                     _valueProviderFactories,
                                                     _actionBindingContextAccessor,
-                                                    _tempData,
-                                                    _loggerFactory,
-                                                    _maxModelValidationErrors);
+                                                    _tempData);
             }
         }
 

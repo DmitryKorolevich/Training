@@ -1521,7 +1521,7 @@
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
 /// <reference path="app/app.common.js" />
-/// <reference path="../app/core/utils/parts/imgloaddirective - copy.js" />
+/// <reference path="../app/core/utils/parts/filefielddirective.js" />
+/// <reference path="../app/modules/file/controllers/previewfilecontroller.js" />
 /// <reference path="app/core/utils/parts/filefielddirective.js" />
-/// <reference path="../app/modules/file/controllers/previewcontroller.js" />
 /// <reference path="app/modules/file/controllers/previewfilecontroller.js" />

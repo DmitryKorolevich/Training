@@ -180,3 +180,4 @@ project.lock.json
 config.local.json
 node_modules/
 /src/VC.Public/wwwroot/files
+/.vs/config/applicationhost.config
