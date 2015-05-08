@@ -3,6 +3,7 @@
 angular.module('app.modules.file', [
 	'app.modules.file.controllers.filesController',
 	'app.modules.file.controllers.addFolderController',
+    'app.modules.file.controllers.previewFileController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

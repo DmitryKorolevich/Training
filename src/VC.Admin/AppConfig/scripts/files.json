@@ -52,6 +52,7 @@
 		'app/core/utils/loading/overlayDirective.js',
 		'app/core/utils/parts/basePaginationDirective.js',
 		'app/core/utils/parts/imgloadDirective.js',
+		'app/core/utils/parts/fileFieldDirective.js',
 		'app/core/utils/templateOverrides.js',
 		'app/core/utils/utils.js',
 		'app/modules/modules.js',
@@ -115,6 +116,7 @@
 		'app/modules/product/product.js',
 		'app/modules/file/controllers/filesController.js',
 		'app/modules/file/controllers/addFolderController.js',
+		'app/modules/file/controllers/previewFileController.js',
 		'app/modules/file/file.js',
 	]
 }

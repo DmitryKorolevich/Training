@@ -15,6 +15,18 @@ a.block {
 .error {
   color: red;
 }
+.modal-lg {
+  width: 1150px;
+}
+.modal-sm {
+  width: 900px;
+}
+form.submitted p.ng-invalid input {
+  border: 1px solid red;
+}
+.form-control.disabled {
+  cursor: default;
+}
 .container {
   width: 850px;
 }
@@ -609,4 +621,7 @@ ul.navbar-custom-header li .dropdown-menu {
 }
 .color-red {
   color: red;
+}
+.file-preview .image-box {
+  height: 500px;
 }
