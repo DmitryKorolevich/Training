@@ -62,11 +62,6 @@ namespace VitalChoice.Business.Services.Impl
 
         public DirectoryInfoObject GetDirectories()
         {
-            if(!String.IsNullOrEmpty(error))
-            {
-                logger.LogError(error);
-            }
-
             DirectoryInfoObject toReturn = new DirectoryInfoObject("/", "/");
             DirectoryInfo dirInfo = new DirectoryInfo(_rootDir);
             var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories).Select(p => new DirectoryInfoObject()
