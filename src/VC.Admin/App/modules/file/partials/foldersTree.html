@@ -9,7 +9,7 @@
             <label>{{item.Name}}</label>
         </div>
         <div class="ya-treview-buttons" data-nodrag>
-            <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addDirectory(item.FullRelativeName); $event.stopPropagation();">
+            <a class="btn btn-success btn-xs" title="Download" nodrag data-ng-click="addDirectory(item.FullRelativeName); $event.stopPropagation();">
                 <i class="glyphicon glyphicon-plus"></i>
             </a>
             <a class="btn btn-danger btn-xs" title="Delete" nodrag data-ng-if="item.FullRelativeName!='/' && (!item.Directories || item.Directories.length == 0)" ladda="deleteTracker.active()" data-ng-click="deleteDirectory(item); $event.stopPropagation();">
