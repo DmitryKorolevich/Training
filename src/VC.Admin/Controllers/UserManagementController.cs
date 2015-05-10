@@ -112,6 +112,7 @@ namespace VitalChoice.Controllers
 			user.Profile.AgentId = userModel.AgentId;
 			user.Status = userModel.Status;
 			user.Email = userModel.Email;
+			user.UserName = userModel.Email;
 
 			await userService.UpdateAsync(user, userModel.RoleIds);
 

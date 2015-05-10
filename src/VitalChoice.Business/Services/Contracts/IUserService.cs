@@ -37,5 +37,12 @@ namespace VitalChoice.Business.Services.Contracts
 		void SignOut(ApplicationUser user);
 
 	    Task SendActivationAsync(Guid id);
+
+	    Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword);
+
+	    Task<ApplicationUser> UpdateWithPasswordChangeAsync(ApplicationUser user, string oldPassword,
+		    string newPassword, IList<RoleType> roleIds = null);
+
+	    Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user);
     }
 }

@@ -22,6 +22,9 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
 		ConfirmPassword = 15,
 		Roles = 16,
 		UserStatus = 17,
-		AgentId = 18
-	}
+		AgentId = 18,
+	    OldPassword = 19,
+	    NewPassword = 20,
+	    ConfirmNewPassword = 21,
+    }
 }

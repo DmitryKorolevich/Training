@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
-using VitalChoice.Admin.Models;
+using VC.Admin.Models.Account;
 using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -16,7 +12,7 @@ using VitalChoice.Models.Account;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
 	[AllowAnonymous]
     public class AccountController : BaseApiController

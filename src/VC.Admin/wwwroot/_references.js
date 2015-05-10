@@ -1525,3 +1525,7 @@
 /// <reference path="../app/modules/file/controllers/previewfilecontroller.js" />
 /// <reference path="app/core/utils/parts/filefielddirective.js" />
 /// <reference path="app/modules/file/controllers/previewfilecontroller.js" />
+/// <reference path="../app/core/dataaccess/services/profileservice.js" />
+/// <reference path="app/core/dataaccess/services/profileservice.js" />
+/// <reference path="../app/core/utils/commonactionsutil.js" />
+/// <reference path="app/core/utils/commonactionsutil.js" />

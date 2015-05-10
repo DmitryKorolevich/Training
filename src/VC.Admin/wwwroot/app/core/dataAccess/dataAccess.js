@@ -8,4 +8,5 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.authenticationService',
 	'app.core.dataAccess.services.productService',
 	'app.core.dataAccess.services.fileService',
+	'app.core.dataAccess.services.profileService'
 ]);
