@@ -61,6 +61,7 @@
 		'app/modules/authentication/authentication.js',
 		'app/modules/authentication/controllers/loginController.js',
     'app/modules/authentication/controllers/activationController.js',
+    'app/modules/authentication/controllers/resetPasswordController.js',
     'app/modules/profile/controllers/profileController.js',
     'app/modules/profile/profile.js',
 		'app/modules/demo/demo.js',

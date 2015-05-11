@@ -83,6 +83,25 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
+		public async Task<Result<UserInfoModel>> ResetPassword([FromBody]ResetPasswordModel model)
+		{
+			if (ConvertWithValidate(model) == null)
+				return null;
+
+			await userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+
+			var user = await userService.FindAsync(model.Email);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			await userService.SignInAsync(user);
+
+			return await PopulateUserInfoModel(user);
+		}
+
+		[HttpPost]
 		public async Task<Result<UserInfoModel>> Login([FromBody]LoginModel model)
 		{
 			if (ConvertWithValidate(model) == null)

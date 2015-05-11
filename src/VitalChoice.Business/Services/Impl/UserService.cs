@@ -143,6 +143,15 @@ namespace VitalChoice.Business.Services.Impl
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
 			}
+
+			//stupid ef
+			var temp = await userManager.Users.Include(x => x.Profile).ToListAsync();
+			var notConfirmed = temp.Any(x => !x.Profile.IsConfirmed && x.Email.Equals(login) && !x.DeletedDate.HasValue);
+
+			if (notConfirmed)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+			}
 		}
 
 		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
@@ -412,6 +421,45 @@ namespace VitalChoice.Business.Services.Impl
 			var items = materialized.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
 
 			return new PagedList<ApplicationUser>(items, overallCount);
+		}
+
+		public async Task SendResetPasswordAsync(Guid publicId)
+		{
+			var user = await GetAsync(publicId);
+
+			var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+			await notificationService.SendPasswordResetAsync(user.Email, new PasswordReset()
+			{
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Link = $"{options.AdminHost}#/authentication/passwordreset/{token}"
+			});
+		}
+
+		public async Task ResetPasswordAsync(string email, string token, string newPassword)
+		{
+			var user = await FindAsync(email);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			if (user.Status == UserStatus.Disabled)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
+			}
+
+			var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+			if (!result.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(result.Errors));
+			}
+			else
+			{
+				user.Profile.IsConfirmed = true;
+				await UpdateAsync(user);
+			}
 		}
 	}
 }

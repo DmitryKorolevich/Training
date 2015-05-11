@@ -20,6 +20,8 @@ namespace VitalChoice.Domain.Constants
             public const string AgentIdIsTakenAlready = "AgentIdIsTakenAlready";
 			public const string CurrentUserRemoval = "CurrentUserRemoval";
 			public const string CurrentUserStatusUpdate = "CurrentUserStatusUpdate";
+			public const string GenerateSecurityStampError = "GenerateSecurityStampError";
+			public const string UserIsNotConfirmed = "UserIsNotConfirmed";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -32,11 +34,13 @@ namespace VitalChoice.Domain.Constants
 		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
 		    {Keys.CantFindUser, "User not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
-		    {Keys.UserIsDisabled, "User is disabled by admin"},
+		    {Keys.UserIsDisabled, "User is disabled"},
             {Keys.EmailIsTakenAlready, "Email '{0}' is already in use."},
             {Keys.AgentIdIsTakenAlready, "Agent ID is already in use."},
 			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted."},
-			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated."}
+			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated."},
+			{Keys.GenerateSecurityStampError, "Cannot generate security token."},
+			{Keys.UserIsNotConfirmed, "User not confirmed."}
 		};
     }
 }

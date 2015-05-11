@@ -44,5 +44,9 @@ namespace VitalChoice.Business.Services.Contracts
 		    string newPassword, IList<RoleType> roleIds = null);
 
 	    Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user);
+
+	    Task SendResetPasswordAsync(Guid publicId);
+
+	    Task ResetPasswordAsync(string email, string token, string newPassword);
     }
 }

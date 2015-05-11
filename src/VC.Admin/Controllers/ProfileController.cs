@@ -24,7 +24,7 @@ using VC.Admin.Validators.Profile;
 
 namespace VC.Admin.Controllers
 {
-	//[AdminAuthorize(PermissionType.Users)]
+	[AdminAuthorize]
     public class ProfileController : BaseApiController
     {
 	    private readonly IUserService userService;

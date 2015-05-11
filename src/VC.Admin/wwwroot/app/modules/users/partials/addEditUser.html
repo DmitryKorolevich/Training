@@ -56,7 +56,7 @@
 					</label>
 				</div>
 			</div>
-			<div class="form-group" data-ng-if="editMode && user.Status != 0 && currentUser && currentUser.Email != user.Email">
+			<div class="form-group" data-ng-if="editMode && user.Status != 0 && !signedInUser">
 				<label class="col-md-3 control-label">Status</label>
 				<div class="col-md-9">
 					<select class="form-control" data-ng-model="user.Status" data-ng-options="status.Key as status.Text for status in userStatuses" required></select>
@@ -66,7 +66,8 @@
 	</form>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-info" data-ng-if="editMode && user.Status == 0" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
-	<button class="btn btn-success" ladda="saveTracker.active()" data-ng-click="save()">Save</button>
-	<button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+    <button class="btn btn-info" data-ng-if="editMode && user.Status != 0 && !signedInUser" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+    <button class="btn btn-info" data-ng-if="editMode && user.Status == 0" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
+    <button class="btn btn-success" ladda="saveTracker.active()" data-ng-click="save()">Save</button>
+    <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
 </div>

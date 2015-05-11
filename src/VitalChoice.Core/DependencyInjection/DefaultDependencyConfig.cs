@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
@@ -67,9 +68,10 @@ namespace VitalChoice.Core.DependencyInjection
 		            .AddEntityFrameworkStores<VitalChoiceContext, int>()
 		            .AddUserStore<ExtendedUserStore>()
 					.AddUserValidator<ExtendedUserValidator>()
-					.AddUserManager<ExtendedUserManager>();
-
-                //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
+					.AddUserManager<ExtendedUserManager>()
+					.AddTokenProvider<UserTokenProvider>();
+				
+				//Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
                 services.TryAdd(
                     ServiceDescriptor
                         .Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());

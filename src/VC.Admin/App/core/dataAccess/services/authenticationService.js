@@ -27,6 +27,9 @@ angular.module('app.core.dataAccess.services.authenticationService', [])
 		},
 		logout: function() {
 			return $http.post(baseUrl + 'Logout');
-		}
+		},
+		resetPassword: function (reset, tracker) {
+		    return $http.post(baseUrl + 'ResetPassword', reset, getConfig(tracker));
+		},
 	};
 }]);

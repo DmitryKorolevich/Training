@@ -107,6 +107,8 @@ namespace VitalChoice.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CurrentUserStatusUpdate]);
 			}
 
+			var isCurrentUser = user.Email.Equals(contextAccessor.HttpContext.User.GetUserName());
+
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
 			user.Profile.AgentId = userModel.AgentId;
@@ -115,6 +117,11 @@ namespace VitalChoice.Controllers
 			user.UserName = userModel.Email;
 
 			await userService.UpdateAsync(user, userModel.RoleIds);
+
+			if (isCurrentUser)
+			{
+				await userService.RefreshSignInAsync(user);
+			}
 
 			return true;
 		}
@@ -167,5 +174,13 @@ namespace VitalChoice.Controllers
 
 			return true;
 		}
-	}
+
+		[HttpPost]
+		public async Task<Result<bool>> ResetPassword(Guid id)
+		{
+			await userService.SendResetPasswordAsync(id);
+
+			return true;
+		}
+    }
 }
