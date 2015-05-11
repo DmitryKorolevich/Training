@@ -182,3 +182,4 @@ node_modules/
 /src/VC.Public/wwwroot/files
 /.vs
 artifacts
+/src/files

@@ -6,7 +6,8 @@
         template: '<p class="input-group">' +
                     '<input type="text" placeholder="{{placeHolder}}" class="form-control disabled" ng-model="inputValue" disabled/>' +
                     '<span class="input-group-btn">' +
-                        '<button type="button" class="btn btn-default" data-ng-click="openPreview()"><i class="glyphicon glyphicon-eye-open"></i></button>' +
+                        '<button type="button" class="btn btn-default" data-ng-show="inputValue" data-ng-click="openPreview()"><i class="glyphicon glyphicon-eye-open"></i></button>' +
+                        '<button type="button" class="btn btn-default" data-ng-show="inputValue" data-ng-click="clear()"><i class="glyphicon glyphicon-remove-circle"></i></button>' +
                         '<button type="button" class="btn btn-default" data-ng-click="openFileManagement()"><i class="glyphicon glyphicon-folder-open"></i></button>' +
                     '</span>' +
                   '</p>',
@@ -25,8 +26,8 @@
     };
 }])
 
-.controller('fileFieldController', ['$scope', '$rootScope', '$attrs', '$parse', '$timeout', '$log', 'modalUtil', 'appBootstrap', 'filesConfig',
-    function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, filesConfig) {
+.controller('fileFieldController', ['$scope', '$rootScope', '$attrs', '$parse', '$timeout', '$log', 'modalUtil', 'appBootstrap', 'filesConfig', 'confirmUtil',
+    function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, filesConfig, confirmUtil) {
         var self = this;
 
         this.init = function (ngModelCtrl_) {
@@ -42,6 +43,10 @@
         this.render = function () {
             if (ngModelCtrl.$viewValue) {
                 $scope.inputValue = self.baseUrl.format(ngModelCtrl.$viewValue);
+            }
+            else
+            {
+                $scope.inputValue = null;
             }
             if ($attrs.required) {
                 ngModelCtrl.$setValidity('required', ngModelCtrl.$viewValue);
@@ -76,5 +81,12 @@
                 };
                 popup = modalUtil.open('app/modules/file/partials/previewFile.html', 'previewFileController', data, { size: 'sm' });
             };
+        };
+
+        $scope.clear = function () {
+            confirmUtil.confirm(function () {
+                ngModelCtrl.$setViewValue(null);
+                ngModelCtrl.$render();
+            }, 'Are you sure you want to clear this image input field?');
         };
 }])
