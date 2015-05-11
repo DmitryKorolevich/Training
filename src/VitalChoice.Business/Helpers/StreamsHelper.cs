@@ -5,7 +5,7 @@ namespace VitalChoice.Business.Helpers
 {
     public static class StreamsHelper
     {
-        public static string ToString(Stream fStream)
+        public static string ToString(this Stream fStream)
         {
             if (fStream == null)
                 return string.Empty;
@@ -14,11 +14,9 @@ namespace VitalChoice.Business.Helpers
             {
                 return tReader.ReadToEnd();
             }
-
-            return string.Empty;
         }
 
-        public static byte[] ReadFully(Stream stream, int? initialLength = null)
+        public static byte[] ReadFully(this Stream stream, int? initialLength = null)
         {
             if (!initialLength.HasValue)
             {

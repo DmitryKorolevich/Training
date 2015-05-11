@@ -22,7 +22,13 @@
 			"Port": 587,
 			"Secured": true,
 			"Username": "admin.staging@g2designgroup.com",
-			"Password": "vcstaging123"
-		}
-	}
+			"Password": "vcstaging123"*/
+      "From": "noreplyvitalchoice@gmail.com",
+			"Host": "smtp.gmail.com",
+			"Port": 587,
+			"Secured": true,
+			"Username": "noreplyvitalchoice@gmail.com",
+			"Password": "vitalchoice123"
+    }
+  }
 }

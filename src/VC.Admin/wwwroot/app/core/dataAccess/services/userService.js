@@ -33,6 +33,9 @@ angular.module('app.core.dataAccess.services.userService', [])
 		},
 		resendActivation: function (publicId, tracker) {
 			return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
+		},
+        resetPassword: function (publicId, tracker) {
+			return $http.post(baseUrl + 'ResetPassword/' + publicId, null, getConfig(tracker));
 		}
 	};
 }]);

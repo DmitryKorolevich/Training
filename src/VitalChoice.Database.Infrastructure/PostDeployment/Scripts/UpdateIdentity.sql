@@ -67,3 +67,11 @@ BEGIN
 
 	INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (1012, 5)
 END
+
+GO
+
+UPDATE [dbo].[AspNetUsers] 
+SET [EmailConfirmed] = 1
+WHERE [Email] = N'noreplyvitalchoice@gmail.com'
+
+GO

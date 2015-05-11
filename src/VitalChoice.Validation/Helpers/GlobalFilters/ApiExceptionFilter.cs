@@ -1,11 +1,9 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Net.Http.Headers;
-using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Business.Services.Impl;
 using Microsoft.Framework.Logging;
+using VitalChoice.Business.Services.Impl;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Validation.Helpers.GlobalFilters
 {
@@ -13,22 +11,22 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
     {
         public override void OnException(ExceptionContext context)
         {
-            JsonResult result = null;
-            if (context.Exception is ApiException)
+            JsonResult result;
+            var apiException = context.Exception as ApiException;
+            if (apiException != null)
             {
-                var exc = context.Exception as ApiException;
-                result = new JsonResult(Result.CreateErrorResult<object>(exc.Message)) {StatusCode = (int) exc.Status};
+                result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message)) {StatusCode = (int)apiException.Status};
             }
             else
             {
-                if (context.Exception is AppValidationException)
+                var exception = context.Exception as AppValidationException;
+                if (exception != null)
                 {
-                    var exc = context.Exception as AppValidationException;
-                    result = new JsonResult(Result.CreateErrorResult<object>(exc.Messages)) {StatusCode = (int) HttpStatusCode.OK};
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(exception.Messages)) {StatusCode = (int) HttpStatusCode.OK};
                 }
                 else
                 {
-                    result = new JsonResult(Result.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
                     {
                         StatusCode = (int) HttpStatusCode.InternalServerError
                     };

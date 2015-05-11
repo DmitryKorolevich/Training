@@ -206,7 +206,7 @@ namespace VitalChoice.Data.Extensions
             }
             if (list != null)
             {
-                return list.AsReadOnly();
+                return new ReadOnlyCollection<Expression>(list);
             }
             return original;
         }

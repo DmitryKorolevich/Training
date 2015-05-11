@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
 
-namespace VitalChoice.Models.Account
+namespace VC.Admin.Models.Account
 {
     public class UserInfoModel : Model<ApplicationUser, IMode>
 	{

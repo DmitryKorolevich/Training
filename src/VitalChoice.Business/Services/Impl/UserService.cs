@@ -89,6 +89,52 @@ namespace VitalChoice.Business.Services.Impl
 			});
 		}
 
+		private async Task<ApplicationUser> UpdateInternalAsync(ApplicationUser user, IList<RoleType> roleIds = null,
+			string password = null)
+		{
+			user.UpdatedDate = DateTime.Now;
+
+			var updateResult = await userManager.UpdateAsync(user);
+			if (updateResult.Succeeded)
+			{
+				if (password != null)
+				{
+					var passwordResult = await userManager.AddPasswordAsync(user, password);
+					if (!passwordResult.Succeeded)
+					{
+						throw new AppValidationException(AggregateIdentityErrors(passwordResult.Errors));
+					}
+				}
+
+				if (roleIds != null)
+				{
+					var oldRoleNames = await userManager.GetRolesAsync(user);
+					if (oldRoleNames.Any())
+					{
+						var deleteResult = await userManager.RemoveFromRolesAsync(user, oldRoleNames);
+						if (!deleteResult.Succeeded)
+						{
+							throw new AppValidationException(AggregateIdentityErrors(deleteResult.Errors));
+						}
+					}
+
+					var roleNames = GetRoleNamesByIds(roleIds);
+					if (roleNames.Any())
+					{
+						var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
+						if (!addToRoleResult.Succeeded)
+							throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
+					}
+				}
+
+				return user;
+			}
+			else
+			{
+				throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
+			}
+		}
+
 		public async Task ValidateUserOnSignIn(string login)
 		{
 			var disabled = await userManager.Users.AnyAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login) && !x.DeletedDate.HasValue);
@@ -96,6 +142,15 @@ namespace VitalChoice.Business.Services.Impl
 			if (disabled)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
+			}
+
+			//stupid ef
+			var temp = await userManager.Users.Include(x => x.Profile).ToListAsync();
+			var notConfirmed = temp.Any(x => !x.Profile.IsConfirmed && x.Email.Equals(login) && !x.DeletedDate.HasValue);
+
+			if (notConfirmed)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
 			}
 		}
 
@@ -164,53 +219,15 @@ namespace VitalChoice.Business.Services.Impl
 
 		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
-			user.UpdatedDate = DateTime.Now;
-
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try
 				{
-					var updateResult = await userManager.UpdateAsync(user);
-					if (updateResult.Succeeded)
-					{
-						if (password != null)
-						{
-							var passwordResult = await userManager.AddPasswordAsync(user, password);
-							if (!passwordResult.Succeeded)
-							{
-								throw new AppValidationException(AggregateIdentityErrors(passwordResult.Errors));
-							}
-						}
+					user = await UpdateInternalAsync(user, roleIds, password);
 
-						if (roleIds != null)
-						{
-							var oldRoleNames = await userManager.GetRolesAsync(user);
-							if (oldRoleNames.Any())
-							{
-								var deleteResult = await userManager.RemoveFromRolesAsync(user, oldRoleNames);
-								if (!deleteResult.Succeeded)
-								{
-									throw new AppValidationException(AggregateIdentityErrors(deleteResult.Errors));
-								}
-							}
+					transaction.Commit();
 
-							var roleNames = GetRoleNamesByIds(roleIds);
-							if (roleNames.Any())
-							{
-								var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
-								if (!addToRoleResult.Succeeded)
-									throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
-							}
-						}
-
-						transaction.Commit();
-
-						return user;
-					}
-					else
-					{
-						throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
-					}
+					return user;
 				}
 				catch (Exception)
 				{
@@ -277,6 +294,13 @@ namespace VitalChoice.Business.Services.Impl
 			return user;
 		}
 
+		public async Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user)
+		{
+			await signInManager.SignInAsync(user, false);
+
+			return user;
+		}
+
 		public async Task<IList<PermissionType>> GetUserPermissions(ApplicationUser user)
 		{
 			var permissions = new List<PermissionType>();
@@ -317,6 +341,40 @@ namespace VitalChoice.Business.Services.Impl
 
 			await SendActivationAsync(dbUser);
 
+		}
+
+		public async Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword)
+		{
+			var result = await userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+			if (!result.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(result.Errors));
+			}
+
+			return user;
+		}
+
+		public async Task<ApplicationUser> UpdateWithPasswordChangeAsync(ApplicationUser user, string oldPassword,
+			string newPassword, IList<RoleType> roleIds = null)
+		{
+			using (var transaction = new TransactionManager(context).BeginTransaction())
+			{
+				try
+				{
+					user = await UpdateInternalAsync(user, roleIds);
+
+					user = await ChangePasswordAsync(user, oldPassword, newPassword);
+
+					transaction.Commit();
+
+					return user;
+				}
+				catch (Exception)
+				{
+					transaction.Rollback();
+					throw;
+				}
+			}
 		}
 
 		public async Task<ApplicationUser> FindAsync(string login)
@@ -363,6 +421,45 @@ namespace VitalChoice.Business.Services.Impl
 			var items = materialized.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
 
 			return new PagedList<ApplicationUser>(items, overallCount);
+		}
+
+		public async Task SendResetPasswordAsync(Guid publicId)
+		{
+			var user = await GetAsync(publicId);
+
+			var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+			await notificationService.SendPasswordResetAsync(user.Email, new PasswordReset()
+			{
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Link = $"{options.AdminHost}#/authentication/passwordreset/{token}"
+			});
+		}
+
+		public async Task ResetPasswordAsync(string email, string token, string newPassword)
+		{
+			var user = await FindAsync(email);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			if (user.Status == UserStatus.Disabled)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
+			}
+
+			var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+			if (!result.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(result.Errors));
+			}
+			else
+			{
+				user.Profile.IsConfirmed = true;
+				await UpdateAsync(user);
+			}
 		}
 	}
 }

@@ -543,6 +543,10 @@ ul.navbar-custom-header li .dropdown-menu {
   width: 100%;
   display: inline-table;
   cursor: pointer;
+  word-break: break-all;
+}
+.file-manager .work-area .center-pane .table tbody > tr .btn-danger {
+  margin-left: 4px;
 }
 .file-manager .work-area .right-pane {
   position: absolute;
