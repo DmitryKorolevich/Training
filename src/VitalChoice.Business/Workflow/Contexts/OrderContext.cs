@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Core;
 
-namespace VitalChoice.Workflow.Implementations.Contexts
+namespace VitalChoice.Business.Workflow.Contexts
 {
     public class OrderContext: ComputableContext {
         public ICollection<decimal> ProductCosts { get; set; }

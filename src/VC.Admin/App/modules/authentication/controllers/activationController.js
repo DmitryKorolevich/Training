@@ -4,7 +4,6 @@ angular.module('app.modules.authentication.controllers.activationController', []
 .controller('activationController', ['$scope', '$state', '$rootScope','$stateParams', 'authenticationService', 'promiseTracker', 'toaster', 'infrastructureService', function ($scope, $state, $rootScope, $stateParams, authenticationService, promiseTracker, toaster, infrastructureService) {
 		var token = $stateParams.token;
 		$scope.activationTracker = promiseTracker("activation");
-		$scope.readTracker = promiseTracker("read");
 
 		function errorHandler() {
 			toaster.pop('error', "Error!", "Server error occured");
@@ -15,7 +14,7 @@ angular.module('app.modules.authentication.controllers.activationController', []
 				$rootScope.authenticated = false;
 				$rootScope.currentUser = {};
 
-				authenticationService.getUser(token, $scope.readTracker).success(function(res) {
+			    authenticationService.getUser(token, $scope.activationTracker).success(function (res) {
 					if (res.Success) {
 						$scope.user = res.Data;
 					} else {

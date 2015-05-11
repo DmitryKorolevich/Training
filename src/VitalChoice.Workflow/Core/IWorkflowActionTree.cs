@@ -19,8 +19,6 @@ namespace VitalChoice.Workflow.Core
 
         TResult GetActionResult(string actionName, TContext context);
 
-        bool TryGetActionResult<TAction>(TContext context, out TResult result) where TAction : IWorkflowExecutor<TContext, TResult>;
-
         bool TryGetActionResult(string actionName, TContext context, out TResult result);
     }
 }

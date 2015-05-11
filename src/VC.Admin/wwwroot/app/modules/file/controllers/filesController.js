@@ -11,6 +11,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         var MAX_FILE_SIZE = 10485760;
         var FILE_TYPES = 'image/jpeg,image/png,image/gif,application/pdf';
         var PDF_FILE_EXT = '.pdf';
+        var FILES_PAGE_PRERENDERCOUNT = 5;
 
         var fileUploadRequestId = 0;
         var data = null;
@@ -504,7 +505,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         };
 
         var scrollTBodyHandler = function (event) {
-            if (event.target.scrollHeight == $(event.target).scrollTop() + $(event.target).height()) {
+            if (event.target.scrollHeight - FILES_PAGE_PRERENDERCOUNT *$(event.target).height() < $(event.target).scrollTop()) {
                 renderFiles();
             };
         };

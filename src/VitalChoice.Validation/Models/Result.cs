@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -6,89 +5,31 @@ using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Models
 {
-    public static class Result
-    {
-        public static Result<T> CreateErrorResult<T>(Exception error, T data = default(T))
-        {
-            var result = new Result<T>(false);
-            result.AddMessage(error.GetType().Name, error.Message);
-            return result;
-        }        
-
-        public static Result<T> CreateErrorResult<T>(string errorMessage, T data = default(T))
-        {
-            var result = new Result<T>(false);
-            result.AddMessage("", errorMessage );
-            return result;
-        }
-
-        public static Result<T> CreateErrorResult<T>(string errorMessage,string command, T data = default(T))
-        {
-            var result = new Result<T>(false, data,command);
-            result.AddMessage("", errorMessage);
-            return result;
-        }
-
-        public static Result<T> CreateErrorResult<T>(MessageInfo messageInfo, string command=null, T data = default(T))
-        {
-            var result = new Result<T>(false, data, command);
-            result.AddMessage(messageInfo.Field, messageInfo.Message);
-            return result;
-        }
-
-        public static Result<T> CreateErrorResult<T>(IEnumerable<MessageInfo> messages, T data = default(T))
-        {
-            var result = new Result<T>(false);
-            foreach (var messageInfo in messages)
-            {
-                result.AddMessage(messageInfo.Field,messageInfo.Message);
-            }
-            return result;
-        }
-
-        public static Result<T> CreateSuccessResult<T>(T data = default(T))
-        {
-            return new Result<T>(true, data);
-        }
-    }
-
     public struct Result<T>
     {
         private readonly List<MessageInfo> _messages;
-        private readonly T _data;
-        private readonly bool _success;
-        private readonly string _command;
 
         public Result(bool status, T data = default(T),string command=null)
         {
             _messages = new List<MessageInfo>();
-            _data = data;
-            _success = status;
-            _command = command;
+            Data = data;
+            Success = status;
+            Command = command;
         }
 
-        public T Data
-        {
-            get { return _data; }
-        }
+        public T Data { get; }
 
-        public bool Success
-        {
-            get { return _success; }
-        }
+        public bool Success { get; }
 
-        public string Command
-        {
-            get { return _command; }
-        }
+        public string Command { get; }
 
         public void AddMessage(string field, string message)
         {
             _messages.Add(new MessageInfo
-                {
-                    Field = field,
-                    Message = message
-                });
+            {
+                Field = field,
+                Message = message
+            });
         }
 
         public void AddMessages(IEnumerable<MessageInfo> messages)
@@ -107,10 +48,7 @@ namespace VitalChoice.Validation.Models
         }
 
         [DataMember]
-        public IEnumerable<MessageInfo> Messages
-        {
-            get { return _messages.AsEnumerable(); }
-        }
+        public IEnumerable<MessageInfo> Messages => _messages.AsEnumerable();
 
         ///Default to success upon implicit conversion
         public static implicit operator Result<T>(T value)

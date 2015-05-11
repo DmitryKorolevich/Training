@@ -1,8 +1,7 @@
-﻿using System;
+﻿using VitalChoice.Business.Workflow.Contexts;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Implementations.Contexts;
 
-namespace VitalChoice.Workflow.Implementations.Actions
+namespace VitalChoice.Business.Workflow.Actions
 {
     public class TotalAction: ComputableAction<OrderContext>
     {

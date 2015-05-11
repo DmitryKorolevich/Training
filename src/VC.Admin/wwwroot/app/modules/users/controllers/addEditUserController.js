@@ -4,11 +4,18 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 .controller('addEditUserController', ['$scope', '$modalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $modalInstance, data, userService, toaster, promiseTracker, $rootScope) {
 	$scope.saveTracker = promiseTracker("save");
 	$scope.resendTracker = promiseTracker("resend");
+	$scope.resetTracker = promiseTracker("reset");
 
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
 			$modalInstance.close();
+
+			if ($scope.editMode && $scope.signedInUser) {
+			    $rootScope.currentUser.Email = $scope.user.Email;
+			    $rootScope.currentUser.FirstName = $scope.user.FirstName;
+			    $rootScope.currentUser.LastName = $scope.user.LastName;
+			}
 		} else {
 			var messages = "";
 			if (result.Messages) {
@@ -32,7 +39,10 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 	};
 
 	function initialize() {
-		$scope.user = data.user;
+	    $scope.user = data.user;
+
+	    $scope.signedInUser = $scope.user.Email === $rootScope.currentUser.Email;
+
 		$scope.editMode = data.editMode;
 		$scope.userStatuses = $.grep($rootScope.ReferenceData.UserStatuses, function(elem) {
 			return elem.Key !== 0;
@@ -92,6 +102,28 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 				}).error(function() {
 					toaster.pop('error', "Error!", "Server error occured");
 					data.thenCallback();
+				});
+		};
+
+		$scope.resetPassword = function () {
+		    userService.resetPassword($scope.user.PublicId, $scope.resetTracker)
+				.success(function (result) {
+				    if (result.Success) {
+				        toaster.pop('success', "Success!", "Successfully reset");
+				        $modalInstance.close();
+				    } else {
+				        var messages = "";
+				        if (result.Messages) {
+				            $.each(result.Messages, function (index, value) {
+				                messages += value.Message + "<br />";
+				            });
+				        }
+				        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+				    }
+				    data.thenCallback();
+				}).error(function () {
+				    toaster.pop('error', "Error!", "Server error occured");
+				    data.thenCallback();
 				});
 		};
 

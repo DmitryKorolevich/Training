@@ -1,9 +1,8 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
 using Templates.Helpers;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Workflow;
 
 namespace VitalChoice.Workflow.Core
 {
@@ -47,12 +46,6 @@ namespace VitalChoice.Workflow.Core
                 return result;
             }
             return GetAction(actionName).Execute(context);
-        }
-
-        public bool TryGetActionResult<TAction>(TContext context, out TResult result) 
-            where TAction : IWorkflowExecutor<TContext, TResult>
-        {
-            return context.DictionaryData.TryGetValue(_reverseAccessActions[typeof(TAction)], out result);
         }
 
         public bool TryGetActionResult(string actionName, TContext context, out TResult result)

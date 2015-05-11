@@ -1,28 +1,34 @@
 {
-	"App": {
-		"ServeCdnContent": false,
-		"CdnServerBaseUrl": "not yet ready",
-		"GenerateLowercaseUrls": true,
-		"EnableBundlingAndMinification": false,
-        "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-        "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
-		"DefaultCacheExpirationTermMinutes": 1440,
-		"ActivationTokenExpirationTermDays": 3,
-		"DefaultCultureId": "en-US",
-       "Connection": {
-			"UserName": "dev_vc_user",
-			"Password": "VZQCkea2",
-			"Server": "localhost"
-		},
-		"PublicHost": "http://dev2.vitalchoice.com:5010/",
-		"AdminHost": "http://dev2.vitalchoice.com:5004/",
-		"Email": {
-			"From": "admin.staging@g2designgroup.com",
+  "App": {
+    "ServeCdnContent": false,
+    "CdnServerBaseUrl": "not yet ready",
+    "GenerateLowercaseUrls": true,
+    "EnableBundlingAndMinification": false,
+    "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
+    "DefaultCacheExpirationTermMinutes": 1440,
+    "ActivationTokenExpirationTermDays": 3,
+    "DefaultCultureId": "en-US",
+    "Connection": {
+      "UserName": "dev_vc_user",
+      "Password": "VZQCkea2",
+      "Server": "localhost"
+    },
+    "PublicHost": "http://dev2.vitalchoice.com:5010/",
+    "AdminHost": "http://dev2.vitalchoice.com:5004/",
+    "Email": {
+      /*"From": "admin.staging@g2designgroup.com",
 			"Host": "smtp.1and1.com",
 			"Port": 587,
 			"Secured": true,
 			"Username": "admin.staging@g2designgroup.com",
-			"Password": "vcstaging123"
-		}
-	}
+			"Password": "vcstaging123"*/
+      "From": "noreplyvitalchoice@gmail.com",
+			"Host": "smtp.gmail.com",
+			"Port": 587,
+			"Secured": true,
+			"Username": "noreplyvitalchoice@gmail.com",
+			"Password": "vitalchoice123"
+    }
+  }
 }

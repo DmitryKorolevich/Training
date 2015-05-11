@@ -74,7 +74,7 @@ namespace VitalChoice.Controllers
                 var parsedContentDisposition = ContentDispositionHeaderValue.Parse(file.ContentDisposition);
                 using (var stream = file.OpenReadStream())
                 {
-                    var fileContent = StreamsHelper.ReadFully(stream);
+                    var fileContent = stream.ReadFully();
                     try
                     {
                         toReturn=fileService.AddFile(fullRelativeUrl, parsedContentDisposition.FileName.Replace("\"", ""), fileContent);
