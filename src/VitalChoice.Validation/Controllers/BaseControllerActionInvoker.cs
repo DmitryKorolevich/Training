@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
-using Microsoft.Framework.Internal;
-using VitalChoice.Validation.Controllers;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
-using Microsoft.AspNet.Mvc.OptionDescriptors;
 
 namespace VitalChoice.Validation.Controllers
 {

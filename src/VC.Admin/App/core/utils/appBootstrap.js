@@ -78,7 +78,7 @@ angular.module('app.core.utils.appBootstrap', [])
 			        path = $location.path();
 			    }
 
-			    return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1;
+			    return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1 || path.indexOf("/authentication/passwordreset") > -1;
 			};
 
 			function initialize() {

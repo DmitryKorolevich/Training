@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Workflow.Implementations.ActionResolvers
+﻿namespace VitalChoice.Business.Workflow.ActionResolvers
 {
     public enum TierDiscountType
     {
