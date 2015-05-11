@@ -79,16 +79,12 @@ angular.module('app.modules.file.controllers.filesController', [])
             $scope.breadCrumbMaxLevels = 5;
             $scope.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
 
-            $scope.selectedFile = {};
+            $scope.selectedFile = null;
 
             $scope.filter = {
                 Name: '',
                 FilteredName: '',
-            };
-
-            $scope.renderFilesSettings = {
-                Count: 500,
-                Start: 0,
+                Paging: { PageIndex: 1, PageItemCount: 500 }
             };
 
             $scope.logRequests = [];
@@ -213,7 +209,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         function loadFiles() {
             $scope.files = [];
             filterFiles();
-            $scope.renderFilesSettings.Start = 0;
+            $scope.filter.Paging.PageIndex = 1;
             var table = $('.table .wrapper');
             table.empty();
             var url = $scope.selectedDir.FullRelativeName;
@@ -227,6 +223,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 prepareFile(file);
                             });
                             $scope.files = result.Data;
+                            $scope.filter.Paging.PageIndex = 1;
                             filterFiles();
                             renderFiles();
                         }
@@ -401,8 +398,7 @@ angular.module('app.modules.file.controllers.filesController', [])
             var resFile;
             $.each($scope.files, function (index, file) {
                 file.selected = file.Name == selectedFileName;
-                if(file.selected)
-                {
+                if (file.selected) {
                     resFile = file;
                 }
             });
@@ -437,9 +433,9 @@ angular.module('app.modules.file.controllers.filesController', [])
 
         $scope.filterFilesRequest = function () {
             $scope.filter.FilteredName = $scope.filter.Name;
-            $scope.renderFilesSettings.Start = 0;
             var table = $('.table .wrapper');
             table.empty();
+            $scope.filter.Paging.PageIndex = 1;
             filterFiles();
             renderFiles();
         };
@@ -457,40 +453,39 @@ angular.module('app.modules.file.controllers.filesController', [])
                 filterdFiles = $scope.files;
             }
             $scope.filterdFiles = filterdFiles;
+            $scope.totalItems = filterdFiles.length;
         };
 
         var renderFiles = function () {
-            if ($scope.renderFilesSettings.Start < $scope.filterdFiles.length) {
-                var table = $('.table .wrapper');
-                var data = '';
-                var row;
-                var max = $scope.renderFilesSettings.Start + $scope.renderFilesSettings.Count > $scope.filterdFiles.length ? $scope.filterdFiles.length
-                    : $scope.renderFilesSettings.Start + $scope.renderFilesSettings.Count;
-                for (var i = $scope.renderFilesSettings.Start; i < max; i++) {
-                    data += renderRow($scope.filterdFiles[i]);
-                }
-                table.append(data);
-                $scope.renderFilesSettings.Start += $scope.renderFilesSettings.Count;
+            var table = $('.table .wrapper');
+            table.empty();
+            var data = '';
+            var row;
+            var from = ($scope.filter.Paging.PageIndex - 1) * $scope.filter.Paging.PageItemCount;
+            var max = from + $scope.filter.Paging.PageItemCount > $scope.filterdFiles.length ? $scope.filterdFiles.length
+                : from + $scope.filter.Paging.PageItemCount;
+            for (var i = from; i < max; i++) {
+                data += renderRow($scope.filterdFiles[i]);
             }
+            table.append(data);
         };
 
-        var renderRow = function (file)
-        {
+        $scope.pageChanged = function () {
+            renderFiles();
+        };
+
+        var renderRow = function (file) {
             return '<tr data-name="' + file.Name + '" data-full-url="' + file.FullRelativeName + '"><td>' + file.Name + '</td><td class="width-140px">' + Date.parseDateTime(file.Updated).format('{MM}/{DD}/{yy} {HH}:{MN} {AP}') + '</td><td class="width-80px">' + file.SizeMessage + '</td><td class="width-70px">' +
                 '<div class="ya-treview-buttons"><a class="btn btn-success btn-xs" title="Download" target="_blank" href="' + file.Url + '"><i class="glyphicon glyphicon-download"></i></a><a class="btn btn-danger btn-xs" title="Delete"><i class="glyphicon glyphicon-remove"></i></a></div></td></tr>';
         };
 
-        var addFileToTable = function (file)
-        {
-            if (file) {
-                var table = $('.table .wrapper');
-                table.append(renderRow(file));
-            }
+        var addFileToTable = function (file) {
+            renderFiles();
         };
 
         var removeFileFormTable = function (FullRelativeName) {
             if (FullRelativeName) {
-                var tr = $('.table .wrapper tr[data-full-url="'+FullRelativeName+'"]');
+                var tr = $('.table .wrapper tr[data-full-url="' + FullRelativeName + '"]');
                 tr.remove();
             }
         };
@@ -500,14 +495,6 @@ angular.module('app.modules.file.controllers.filesController', [])
             $('.file-manager .work-area .center-pane .table tbody').on("click", "tr", selectTtHandler);
             $('.file-manager .work-area .center-pane .table tbody').off("click", deleteTtHandler);
             $('.file-manager .work-area .center-pane .table tbody').on("click", "tr .btn-danger", deleteTtHandler);
-            $('.file-manager .work-area .center-pane .table tbody').off("scroll", scrollTBodyHandler);
-            $('.file-manager .work-area .center-pane .table tbody').on("scroll", scrollTBodyHandler);
-        };
-
-        var scrollTBodyHandler = function (event) {
-            if (event.target.scrollHeight - FILES_PAGE_PRERENDERCOUNT *$(event.target).height() < $(event.target).scrollTop()) {
-                renderFiles();
-            };
         };
 
         var selectTtHandler = function () {
