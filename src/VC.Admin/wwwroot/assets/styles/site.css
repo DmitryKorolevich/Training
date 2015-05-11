@@ -587,11 +587,27 @@ ul.navbar-custom-header li .dropdown-menu {
 .file-manager .top-area .status-pane .row .progress {
   margin-bottom: 5px;
 }
+.file-manager .ya-treeview {
+  float: left;
+  min-width: 100%;
+}
+.file-manager .ya-treeview-content {
+  white-space: nowrap;
+}
 .file-manager .ya-treeview-content .line {
   min-width: initial;
+  float: none;
+  display: inline-block;
 }
 .file-manager .angular-ui-tree-nodes .angular-ui-tree-nodes {
   margin-left: 20px;
+}
+.file-manager .angular-ui-tree-handle .wrapper-ya-treview-buttons {
+  width: 82px;
+  display: inline-block;
+}
+.file-manager .angular-ui-tree-handle .wrapper-ya-treview-buttons .ya-treview-buttons {
+  float: none;
 }
 .file-manager .top-area .add-file-pane {
   height: 120px;
