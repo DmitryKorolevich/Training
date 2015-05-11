@@ -532,12 +532,17 @@ ul.navbar-custom-header li .dropdown-menu {
 }
 .file-manager .work-area .center-pane .table {
   height: 347px;
+  position: relative;
+}
+.file-manager .work-area .center-pane .table thead {
+  height: 30px;
 }
 .file-manager .work-area .center-pane .table tbody {
   overflow-y: scroll;
   height: 330px;
   width: 100%;
   position: absolute;
+  top: 30px;
 }
 .file-manager .work-area .center-pane .table tbody > tr {
   width: 100%;
