@@ -97,14 +97,13 @@ Date.doPlaceDate = function (fString, fDate) {
     tResult = tResult.replace("{DD}", (tDate.getDate() < 10 ? '0' + tDate.getDate() : tDate.getDate()));
     tResult = tResult.replace("{mm}", tDate.getMonth() + 1);
     tResult = tResult.replace("{MM}", (tDate.getMonth() < 9 ? '0' + (tDate.getMonth() + 1) : (tDate.getMonth() + 1)));
-    tResult = tResult.replace("{yy}", tDate.getYear());
+    tResult = tResult.replace("{yy}", tDate.getYear() > 100 ? tDate.getYear() - 100 : tDate.getYear());
     tResult = tResult.replace("{yyyy}", tDate.getFullYear());
     tResult = tResult.replace("{hh}", tDate.getHours());
     tResult = tResult.replace("{HH}", (tDate.getHours() < 10 ? '0' + tDate.getHours() : tDate.getHours()));
     tResult = tResult.replace("{MN}", (tDate.getMinutes() < 10 ? '0' + tDate.getMinutes() : tDate.getMinutes()));
     tResult = tResult.replace("{SS}", (tDate.getSeconds() < 10 ? '0' + tDate.getSeconds() : tDate.getSeconds()));
-    tResult = tResult.replace("{AP}", '');
-    //tResult = tResult.replace("{AP}", tDate.getHours() >= 12 ? 'AM' : 'PM');
+    tResult = tResult.replace("{AP}", tDate.getHours() >= 12 ? 'AM' : 'PM');
     return tResult;
 };
 

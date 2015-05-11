@@ -85,6 +85,11 @@ angular.module('app.modules.file.controllers.filesController', [])
                 FilteredName: '',
             };
 
+            $scope.renderFilesSettings = {
+                Count: 500,
+                Start: 0,
+            };
+
             $scope.logRequests = [];
 
             loadDirectories();
@@ -207,9 +212,13 @@ angular.module('app.modules.file.controllers.filesController', [])
         function loadFiles() {
             $scope.files = [];
             filterFiles();
+            $scope.renderFilesSettings.Start = 0;
+            var table = $('.table .wrapper');
+            table.empty();
             var url = $scope.selectedDir.FullRelativeName;
             fileService.getFiles({ FullRelativeName: url }, $scope.refreshFilesTracker)
                 .success(function (result) {
+                    tableHandlers();
                     if (result.Success) {
                         //Show only in the same folder
                         if (url == $scope.selectedDir.FullRelativeName) {
@@ -218,6 +227,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                             });
                             $scope.files = result.Data;
                             filterFiles();
+                            renderFiles();
                         }
                     } else {
                         errorHandler(result);
@@ -256,6 +266,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                             if (indexForRemove != null) {
                                 $scope.files.splice(indexForRemove, 1);
                                 filterFiles();
+                                removeFileFormTable(deleteFile.FullRelativeName);
                             }
                         } else {
                             var messages = '';
@@ -352,6 +363,7 @@ angular.module('app.modules.file.controllers.filesController', [])
 
                                 $scope.files.push(newFile);
                                 filterFiles();
+                                addFileToTable(newFile)
                             }
                         } else {
                             var messages = '';
@@ -384,25 +396,51 @@ angular.module('app.modules.file.controllers.filesController', [])
             return toReturn;
         }
 
-        $scope.selectFile = function (selectedFile) {
+        $scope.selectFile = function (selectedFileName) {
+            var resFile;
             $.each($scope.files, function (index, file) {
-                file.selected = file == selectedFile;
+                file.selected = file.Name == selectedFileName;
+                if(file.selected)
+                {
+                    resFile = file;
+                }
             });
 
-            $scope.selectedFile = Object.clone(selectedFile);
+            $scope.selectedFile = Object.clone(resFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
                 $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
                 $scope.selectedFile.Dimensions = "";
             }
             else {
-                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(resFile.FullRelativeName);
                 $scope.selectedFile.Dimensions = "";
             }
+            $scope.$apply();
         };
+
+        //$scope.selectFile = function (selectedFile) {
+        //    $.each($scope.files, function (index, file) {
+        //        file.selected = file == selectedFile;
+        //    });
+
+        //    $scope.selectedFile = Object.clone(selectedFile);
+        //    if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
+        //        $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
+        //        $scope.selectedFile.Dimensions = "";
+        //    }
+        //    else {
+        //        $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+        //        $scope.selectedFile.Dimensions = "";
+        //    }
+        //};
 
         $scope.filterFilesRequest = function () {
             $scope.filter.FilteredName = $scope.filter.Name;
+            $scope.renderFilesSettings.Start = 0;
+            var table = $('.table .wrapper');
+            table.empty();
             filterFiles();
+            renderFiles();
         };
 
         var filterFiles = function () {
@@ -418,6 +456,71 @@ angular.module('app.modules.file.controllers.filesController', [])
                 filterdFiles = $scope.files;
             }
             $scope.filterdFiles = filterdFiles;
+        };
+
+        var renderFiles = function () {
+            if ($scope.renderFilesSettings.Start < $scope.filterdFiles.length) {
+                var table = $('.table .wrapper');
+                var data = '';
+                var row;
+                var max = $scope.renderFilesSettings.Start + $scope.renderFilesSettings.Count > $scope.filterdFiles.length ? $scope.filterdFiles.length
+                    : $scope.renderFilesSettings.Start + $scope.renderFilesSettings.Count;
+                for (var i = $scope.renderFilesSettings.Start; i < max; i++) {
+                    data += renderRow($scope.filterdFiles[i]);
+                }
+                table.append(data);
+                $scope.renderFilesSettings.Start += $scope.renderFilesSettings.Count;
+            }
+        };
+
+        var renderRow = function (file)
+        {
+            return '<tr data-name="' + file.Name + '" data-full-url="' + file.FullRelativeName + '"><td>' + file.Name + '</td><td class="width-140px">' + Date.parseDateTime(file.Updated).format('{MM}/{DD}/{yy} {HH}:{MN} {AP}') + '</td><td class="width-80px">' + file.SizeMessage + '</td><td class="width-70px">' +
+                '<div class="ya-treview-buttons"><a class="btn btn-success btn-xs" title="Download" target="_blank" href="' + file.Url + '"><i class="glyphicon glyphicon-download"></i></a><a class="btn btn-danger btn-xs" title="Delete"><i class="glyphicon glyphicon-remove"></i></a></div></td></tr>';
+        };
+
+        var addFileToTable = function (file)
+        {
+            if (file) {
+                var table = $('.table .wrapper');
+                table.append(renderRow(file));
+            }
+        };
+
+        var removeFileFormTable = function (FullRelativeName) {
+            if (FullRelativeName) {
+                var tr = $('.table .wrapper tr[data-full-url="'+FullRelativeName+'"]');
+                tr.remove();
+            }
+        };
+
+        var tableHandlers = function () {
+            $('.file-manager .work-area .center-pane .table tbody').off("click", selectTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').on("click", "tr", selectTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').off("click", deleteTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').on("click", "tr .btn-danger", deleteTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').off("scroll", scrollTBodyHandler);
+            $('.file-manager .work-area .center-pane .table tbody').on("scroll", scrollTBodyHandler);
+        };
+
+        var scrollTBodyHandler = function (event) {
+            if (event.target.scrollHeight == $(event.target).scrollTop() + $(event.target).height()) {
+                renderFiles();
+            };
+        };
+
+        var selectTtHandler = function () {
+            $('.file-manager .work-area .center-pane .table tbody tr').removeClass('selected');
+            $(this).addClass('selected');
+            $scope.selectFile($(this).data('name'));
+        };
+
+        var deleteTtHandler = function (event) {
+            var tr = $(this).parent().parent().parent();
+            var Name = tr.data('name');
+            var FullRelativeName = tr.data('full-url');
+            $scope.deleteFile({ Name: Name, FullRelativeName: FullRelativeName });
+            event.stopPropagation();
         };
 
         $scope.selectedFileImgLoad = function (event) {
