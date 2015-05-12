@@ -5,7 +5,6 @@ using Microsoft.Framework.Logging;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Models.Setting;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Business.Services.Contracts.Settings;
@@ -16,7 +15,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
     [AdminAuthorize(PermissionType.Settings)]
     public class SettingController : BaseApiController

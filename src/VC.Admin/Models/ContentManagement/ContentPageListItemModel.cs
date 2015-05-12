@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
 
-namespace VitalChoice.Models.ContentManagement
+namespace VC.Admin.Models.ContentManagement
 {
     public class ContentPageListItemModel : Model<ContentPage, IMode>
 	{

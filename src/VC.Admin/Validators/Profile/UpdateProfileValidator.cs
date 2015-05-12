@@ -3,7 +3,6 @@ using FluentValidation;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Models.Account;
 using VitalChoice.Validation.Helpers;
 
 namespace VC.Admin.Validators.Profile

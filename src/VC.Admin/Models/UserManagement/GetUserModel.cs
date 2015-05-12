@@ -1,8 +1,6 @@
 ﻿using System;
-using VitalChoice.Domain;
-using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Models.UserManagement
+namespace VC.Admin.Models.UserManagement
 {
     public class GetUserModel //: Model<ApplicationUser,UserManageSettings>
     {

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using FluentValidation;
+using VC.Admin.Models.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 

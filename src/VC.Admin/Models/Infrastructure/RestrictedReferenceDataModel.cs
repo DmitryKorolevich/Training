@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Localization;
+﻿using System.Collections.Generic;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Models.Infrastructure
+namespace VC.Admin.Models.Infrastructure
 {
     public class RestrictedReferenceData
     {

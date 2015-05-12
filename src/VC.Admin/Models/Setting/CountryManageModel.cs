@@ -10,7 +10,7 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Domain.Entities.Settings;
 
-namespace VitalChoice.Models.Setting
+namespace VC.Admin.Models.Setting
 {
     [ApiValidator(typeof(CountryManageModelValidator))]
     public class CountryManageModel : Model<Country, IMode>

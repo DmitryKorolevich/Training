@@ -8,7 +8,7 @@ using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 
-namespace VitalChoice.Models.UserManagement
+namespace VC.Admin.Models.UserManagement
 {
 	[ApiValidator(typeof(UserManageAdminValidator))]
 	public class ManageUserModel : Model<ApplicationUser, UserManageSettings>

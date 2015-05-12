@@ -20,7 +20,7 @@ using System.Security.Principal;
 using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Authorization;
 using Microsoft.Framework.Runtime;
-using VitalChoice.Admin.AppConfig;
+using VC.Admin.AppConfig;
 
 namespace VitalChoice
 {

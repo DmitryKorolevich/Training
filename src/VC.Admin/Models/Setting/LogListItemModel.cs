@@ -3,7 +3,7 @@ using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Models.Setting
+namespace VC.Admin.Models.Setting
 {
     public class LogListItemModel : Model<CommonLogItem, IMode>
     {

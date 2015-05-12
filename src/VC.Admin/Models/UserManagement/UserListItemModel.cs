@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Models.UserManagement
+namespace VC.Admin.Models.UserManagement
 {
     public class UserListItemModel : Model<ApplicationUser, UserManageSettings>
 	{

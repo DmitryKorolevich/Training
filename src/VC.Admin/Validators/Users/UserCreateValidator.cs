@@ -1,10 +1,10 @@
 ﻿using System;
 using VitalChoice.Validation.Logic;
 using FluentValidation;
+using VC.Admin.Models;
 using VC.Admin.Validators.Users;
-using VitalChoice.Admin.Models;
 
-namespace VitalChoice.Validators.Users
+namespace VC.Admin.Validators.Users
 {
     public class UserCreateValidator: ModelValidator<UserCreateModel>
     {

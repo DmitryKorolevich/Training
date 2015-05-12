@@ -6,7 +6,7 @@ using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Attributes;
 
-namespace VitalChoice.Models.Account
+namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(CreateAccountValidator))]
 	public class CreateAccountModel : Model<ApplicationUser, IMode>

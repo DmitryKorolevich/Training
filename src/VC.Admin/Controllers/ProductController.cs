@@ -9,16 +9,14 @@ using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
-using VitalChoice.Models.ContentManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Business.Services.Contracts.Product;
 using VitalChoice.Domain.Transfer.Product;
-using VitalChoice.Models.Product;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
     [AdminAuthorize(PermissionType.Products)]
     public class ProductController : BaseApiController

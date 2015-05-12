@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Models.Product
+namespace VC.Admin.Models.Product
 {
     public class ProductCategoryTreeItemModel : Model<ProductCategory, IMode>
 	{

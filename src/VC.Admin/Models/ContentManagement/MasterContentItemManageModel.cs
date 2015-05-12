@@ -9,7 +9,7 @@ using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 
-namespace VitalChoice.Models.ContentManagement
+namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(MasterContentItemManageModelValidator))]
     public class MasterContentItemManageModel : Model<MasterContentItem, IMode>

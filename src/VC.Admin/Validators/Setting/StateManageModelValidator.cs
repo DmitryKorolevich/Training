@@ -2,7 +2,6 @@
 using VC.Admin.Models.Setting;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Models.Setting;
 
 namespace VC.Admin.Validators.Setting
 {

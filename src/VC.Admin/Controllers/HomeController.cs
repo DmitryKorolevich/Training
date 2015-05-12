@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNet.Mvc;
-using VitalChoice.Business.Services.Contracts;
+﻿using Microsoft.AspNet.Mvc;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
     public class HomeController : Controller
     {

@@ -3,7 +3,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
 
-namespace VitalChoice.Models.Account
+namespace VC.Admin.Models.Account
 {
     public class ActivateUserModel : Model<ApplicationUser, IMode>
 	{

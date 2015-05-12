@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.Account;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Models.Account;
 using VitalChoice.Validation.Logic;
 
 namespace VC.Admin.Validators.Account

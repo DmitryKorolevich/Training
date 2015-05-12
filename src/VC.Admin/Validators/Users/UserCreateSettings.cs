@@ -1,5 +1,4 @@
-﻿using VitalChoice.Validators.Users;
-using VitalChoice.Validation.Models;
+﻿using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Validators.Users
 {

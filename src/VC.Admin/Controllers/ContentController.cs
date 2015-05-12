@@ -1,23 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
+using VC.Admin.Models.ContentManagement;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Business.Services.Impl;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.ContentManagement;
-using VitalChoice.Models.ContentManagement;
-using VitalChoice.Validation.Controllers;
-using VitalChoice.Validation.Models;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Models;
 using System.Security.Claims;
-using System;
-using VC.Admin.Models.ContentManagement;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
     public class ContentController : BaseApiController
     {
