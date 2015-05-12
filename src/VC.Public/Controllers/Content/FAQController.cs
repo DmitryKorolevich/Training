@@ -1,65 +1,48 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.WebEncoders;
-using Templates.Strings.Web;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Public.Content.Controllers;
-using VitalChoice.Public.Models;
-using VitalChoice.Data.Repositories;
-using Microsoft.Data.Entity;
-using VitalChoice.Business.Queries.Content;
+using VC.Public.Models;
 using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Domain.Entities.Content;
 
-namespace VitalChoice.Public.Controllers.Content
+namespace VC.Public.Controllers.Content
 {
-    public class FAQController : BaseContentController
+    public class FaqController : BaseContentController
     {
-        public FAQController(IContentViewService contentService) : base(contentService)
+        public FaqController(IContentViewService contentService) : base(contentService)
         {
         }
 
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters());
+            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters(), url);
+            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> FAQ(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetContentItemContentAsync(ContentType.FAQ, GetParameters(), url);
+            ExecutedContentItem toReturn = await ContentService.GetContentItemContentAsync(ContentType.FAQ, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
     }
 }

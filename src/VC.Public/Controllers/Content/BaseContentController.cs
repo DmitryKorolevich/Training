@@ -1,51 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Domain.Entities.Content;
-using System.Threading.Tasks;
-using VitalChoice.Public.Models;
+using VC.Public.Models;
 using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Business.Services.Contracts.Product;
 
-namespace VitalChoice.Public.Content.Controllers
+namespace VC.Public.Controllers.Content
 {
     public class BaseContentController : Controller
     {
-        protected readonly IContentViewService contentService;
-        protected readonly IProductViewService productViewService;
+        protected readonly IContentViewService ContentService;
+        protected readonly IProductViewService ProductViewService;
 
         public BaseContentController(IContentViewService contentService)
         {
-            this.contentService = contentService;
+            this.ContentService = contentService;
         }
 
         public BaseContentController(IProductViewService productViewService)
         {
-            this.productViewService = productViewService;
+            this.ProductViewService = productViewService;
         }
 
         //Get params fron action params and all aditional query params
         protected Dictionary<string, object> GetParameters()
         {
-            Dictionary<string, object> toReturn = new Dictionary<string, object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             foreach (var actionParam in ActionContext.ActionDescriptor.Parameters)
             {
                 var valueItem = BindingContext.ValueProvider.GetValueAsync(actionParam.Name).Result;
                 if (valueItem != null)
                 {
-                    toReturn.Add(actionParam.Name, valueItem.RawValue);
+                    result.Add(actionParam.Name, valueItem.RawValue);
                 }
             }
             foreach (var queryParam in Request.Query)
             {
-                if (!toReturn.ContainsKey(queryParam.Key))
+                if (!result.ContainsKey(queryParam.Key))
                 {
-                    toReturn.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
+                    result.Add(queryParam.Key, queryParam.Value.FirstOrDefault());
                 }
             }
-            return toReturn;
+            return result;
         }
 
         public virtual ViewResult BaseView(ContentPageViewModel model)

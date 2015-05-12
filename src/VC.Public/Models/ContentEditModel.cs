@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Public.Models
+﻿namespace VC.Public.Models
 {
     public class ContentEditModel
     {

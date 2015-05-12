@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.WebEncoders;
-using Templates.Strings.Web;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Public.Content.Controllers;
-using VitalChoice.Public.Models;
-using VitalChoice.Data.Repositories;
-using Microsoft.Data.Entity;
-using VitalChoice.Business.Queries.Content;
+using VC.Public.Models;
 using VitalChoice.Business.Services.Contracts.Content;
+using VitalChoice.Domain.Entities.Content;
 
-namespace VitalChoice.Public.Controllers.Content
+namespace VC.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
@@ -23,48 +16,39 @@ namespace VitalChoice.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
+            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
+            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            ExecutedContentItem toReturn = await contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
+            ExecutedContentItem toReturn = await ContentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
-            else
-            {
-                return BaseNotFoundView();
-            }
+            return BaseNotFoundView();
         }
 
         [HttpGet]
         public async Task<IActionResult> EditContent(int id) {
-            var item = await contentService.GetContentItemAsync(id);
+            var item = await ContentService.GetContentItemAsync(id);
             if (item != null)
             {
                 return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
@@ -79,12 +63,12 @@ namespace VitalChoice.Public.Controllers.Content
         [HttpPost]
         public async Task<IActionResult> UpdateContent(int id, ContentEditModel model)
         {
-            var item = await contentService.GetContentItemAsync(id);
+            var item = await ContentService.GetContentItemAsync(id);
             if (item != null)
             {
                 item.Template = model.Template;
                 item.Updated = DateTime.Now;
-                await contentService.UpdateContentItemAsync(item);
+                await ContentService.UpdateContentItemAsync(item);
                 return RedirectToAction("EditContent", new {id = id});
             }
             return BaseNotFoundView();
@@ -93,7 +77,7 @@ namespace VitalChoice.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> EditMasterContent(int id)
         {
-            var item = await contentService.GetMasterContentItemAsync(id);
+            var item = await ContentService.GetMasterContentItemAsync(id);
             if (item != null) {
                 return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
                 {
@@ -107,12 +91,12 @@ namespace VitalChoice.Public.Controllers.Content
 
         [HttpPost]
         public async Task<IActionResult> UpdateMasterContent(int id, ContentEditModel model) {
-            var item = await contentService.GetMasterContentItemAsync(id);
+            var item = await ContentService.GetMasterContentItemAsync(id);
             if (item != null)
             {
                 item.Template = model.Template;
                 item.Updated = DateTime.Now;
-                await contentService.UpdateMasterContentItemAsync(item);
+                await ContentService.UpdateMasterContentItemAsync(item);
                 return RedirectToAction("EditMasterContent", new { id = id });
             }
             return BaseNotFoundView();
