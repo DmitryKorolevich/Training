@@ -1,14 +1,10 @@
-﻿using System;
-using VitalChoice.Validation.Logic;
-using FluentValidation;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Models.ContentManagement;
+﻿using FluentValidation;
+using VC.Admin.Models.Setting;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Helpers;
+using VitalChoice.Validation.Logic;
 using VitalChoice.Models.Setting;
 
-namespace VitalChoice.Validators.Setting
+namespace VC.Admin.Validators.Setting
 {
     public class StateManageModelValidator : ModelValidator<StateManageModel>
     {

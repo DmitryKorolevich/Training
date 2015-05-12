@@ -1,12 +1,11 @@
-﻿using System;
+﻿using VC.Admin.Validators.Account;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validators.Account;
+using VitalChoice.Validation.Models;
+using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Models.Account
+namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(LoginValidator))]
 	public class LoginModel : Model<ApplicationUser, IMode>

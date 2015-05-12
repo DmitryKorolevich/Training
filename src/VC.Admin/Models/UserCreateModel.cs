@@ -1,4 +1,5 @@
-﻿using VitalChoice.Validation.Models;
+﻿using VC.Admin.Validators.Users;
+using VitalChoice.Validation.Models;
 using VitalChoice.Validators.Users;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Business.Services.Contracts;

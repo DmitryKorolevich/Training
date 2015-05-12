@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using VitalChoice.Domain;
+using System.Linq;
+using VC.Admin.Validators.ContentManagement;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validators.UserManagement;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validators.ContentManagement;
 
-namespace VitalChoice.Models.ContentManagement
+namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(RecipeManageModelValidator))]
     public class RecipeManageModel : Model<Recipe, IMode>

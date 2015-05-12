@@ -1,15 +1,12 @@
-﻿using System;
-using VitalChoice.Validation.Logic;
-using FluentValidation;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Models.ContentManagement;
+﻿using FluentValidation;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Models.ContentManagement;
+using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 
-namespace VitalChoice.Validators.ContentManagement
+namespace VC.Admin.Validators.ContentManagement
 {
-    public class FAQManageModelValidator : ModelValidator<FAQManageModel>
+    public class FaqManageModelValidator : ModelValidator<FAQManageModel>
     {
         public override void Validate(FAQManageModel value)
         {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using VC.Admin.Validators.UserManagement;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validators.UserManagement;
 
 namespace VitalChoice.Models.UserManagement
 {

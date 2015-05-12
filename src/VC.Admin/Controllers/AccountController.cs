@@ -6,6 +6,7 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using VC.Admin.Models.Account;
 using VitalChoice.Admin.Models;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Core.Infrastructure;

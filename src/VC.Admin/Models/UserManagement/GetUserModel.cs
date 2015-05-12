@@ -1,7 +1,6 @@
 ﻿using System;
 using VitalChoice.Domain;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validators.UserManagement;
 
 namespace VitalChoice.Models.UserManagement
 {

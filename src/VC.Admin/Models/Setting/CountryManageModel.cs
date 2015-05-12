@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using VC.Admin.Validators.Setting;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validators.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validators.ContentManagement;
 using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Validators.Setting;
 
 namespace VitalChoice.Models.Setting
 {

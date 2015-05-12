@@ -10,6 +10,7 @@ using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Business.Services.Contracts.Settings;
 using System.Collections.Generic;
+using VC.Admin.Models.Setting;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Core.Infrastructure;

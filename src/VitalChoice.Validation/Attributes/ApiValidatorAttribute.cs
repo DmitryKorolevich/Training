@@ -11,7 +11,7 @@ namespace VitalChoice.Validation.Attributes
         public ApiValidatorAttribute(Type validatorType)
         {
             if (validatorType == null)
-                throw new ArgumentNullException("validatorType");
+                throw new ArgumentNullException(nameof(validatorType));
             var baseType = validatorType.GetTypeInfo().BaseType;
             while (baseType != null && (!baseType.GetTypeInfo().IsGenericType || !typeof(ModelValidator<>).IsAssignableFrom(baseType.GetGenericTypeDefinition()))) {
                 baseType = baseType.GetTypeInfo().BaseType;

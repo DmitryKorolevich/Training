@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Validation.Logic;
 using FluentValidation;
+using VC.Admin.Validators.Users;
 using VitalChoice.Admin.Models;
 
 namespace VitalChoice.Validators.Users

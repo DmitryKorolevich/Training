@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using VC.Admin.Validators.UserManagement;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validators.UserManagement;
 using VitalChoice.Validation.Attributes;
 
 namespace VitalChoice.Models.UserManagement

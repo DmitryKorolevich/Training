@@ -1,10 +1,9 @@
-﻿using VitalChoice.Validation.Logic;
-using FluentValidation;
+﻿using FluentValidation;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Models.Account;
-using VitalChoice.Validation.Helpers;
+using VitalChoice.Validation.Logic;
 
-namespace VitalChoice.Validators.Account
+namespace VC.Admin.Validators.Account
 {
     public class CreateAccountValidator : ModelValidator<CreateAccountModel>
 	{

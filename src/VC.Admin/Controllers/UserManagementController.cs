@@ -15,10 +15,10 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validators.UserManagement;
 using VitalChoice.Validators.Users;
 using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
+using VC.Admin.Validators.UserManagement;
 
 namespace VitalChoice.Controllers
 {

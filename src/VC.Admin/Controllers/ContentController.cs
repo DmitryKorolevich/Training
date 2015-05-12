@@ -15,6 +15,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 using System.Security.Claims;
 using System;
+using VC.Admin.Models.ContentManagement;
 
 namespace VitalChoice.Controllers
 {

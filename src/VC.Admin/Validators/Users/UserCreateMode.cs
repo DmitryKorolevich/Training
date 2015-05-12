@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Validators.Users
+﻿namespace VC.Admin.Validators.Users
 {
     public enum UserCreateMode
     {
