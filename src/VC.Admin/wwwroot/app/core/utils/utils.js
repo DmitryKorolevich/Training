@@ -13,6 +13,7 @@ angular.module('app.utils', [
     'ngFileUpload',
 	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
+	'app.core.utils.commonActionsUtil',
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil',
 	'app.core.utils.loading.overlayDirective',

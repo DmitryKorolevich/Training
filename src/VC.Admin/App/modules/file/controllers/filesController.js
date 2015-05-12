@@ -11,6 +11,7 @@ angular.module('app.modules.file.controllers.filesController', [])
         var MAX_FILE_SIZE = 10485760;
         var FILE_TYPES = 'image/jpeg,image/png,image/gif,application/pdf';
         var PDF_FILE_EXT = '.pdf';
+        var FILES_PAGE_PRERENDERCOUNT = 5;
 
         var fileUploadRequestId = 0;
         var data = null;
@@ -78,11 +79,12 @@ angular.module('app.modules.file.controllers.filesController', [])
             $scope.breadCrumbMaxLevels = 5;
             $scope.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
 
-            $scope.selectedFile = {};
+            $scope.selectedFile = null;
 
             $scope.filter = {
                 Name: '',
                 FilteredName: '',
+                Paging: { PageIndex: 1, PageItemCount: 500 }
             };
 
             $scope.logRequests = [];
@@ -207,9 +209,13 @@ angular.module('app.modules.file.controllers.filesController', [])
         function loadFiles() {
             $scope.files = [];
             filterFiles();
+            $scope.filter.Paging.PageIndex = 1;
+            var table = $('.table .wrapper');
+            table.empty();
             var url = $scope.selectedDir.FullRelativeName;
             fileService.getFiles({ FullRelativeName: url }, $scope.refreshFilesTracker)
                 .success(function (result) {
+                    tableHandlers();
                     if (result.Success) {
                         //Show only in the same folder
                         if (url == $scope.selectedDir.FullRelativeName) {
@@ -217,7 +223,9 @@ angular.module('app.modules.file.controllers.filesController', [])
                                 prepareFile(file);
                             });
                             $scope.files = result.Data;
+                            $scope.filter.Paging.PageIndex = 1;
                             filterFiles();
+                            renderFiles();
                         }
                     } else {
                         errorHandler(result);
@@ -256,6 +264,7 @@ angular.module('app.modules.file.controllers.filesController', [])
                             if (indexForRemove != null) {
                                 $scope.files.splice(indexForRemove, 1);
                                 filterFiles();
+                                removeFileFormTable(deleteFile.FullRelativeName);
                             }
                         } else {
                             var messages = '';
@@ -352,6 +361,7 @@ angular.module('app.modules.file.controllers.filesController', [])
 
                                 $scope.files.push(newFile);
                                 filterFiles();
+                                addFileToTable(newFile)
                             }
                         } else {
                             var messages = '';
@@ -384,25 +394,50 @@ angular.module('app.modules.file.controllers.filesController', [])
             return toReturn;
         }
 
-        $scope.selectFile = function (selectedFile) {
+        $scope.selectFile = function (selectedFileName) {
+            var resFile;
             $.each($scope.files, function (index, file) {
-                file.selected = file == selectedFile;
+                file.selected = file.Name == selectedFileName;
+                if (file.selected) {
+                    resFile = file;
+                }
             });
 
-            $scope.selectedFile = Object.clone(selectedFile);
+            $scope.selectedFile = Object.clone(resFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
                 $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
                 $scope.selectedFile.Dimensions = "";
             }
             else {
-                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(resFile.FullRelativeName);
                 $scope.selectedFile.Dimensions = "";
             }
+            $scope.$apply();
         };
+
+        //$scope.selectFile = function (selectedFile) {
+        //    $.each($scope.files, function (index, file) {
+        //        file.selected = file == selectedFile;
+        //    });
+
+        //    $scope.selectedFile = Object.clone(selectedFile);
+        //    if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
+        //        $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
+        //        $scope.selectedFile.Dimensions = "";
+        //    }
+        //    else {
+        //        $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
+        //        $scope.selectedFile.Dimensions = "";
+        //    }
+        //};
 
         $scope.filterFilesRequest = function () {
             $scope.filter.FilteredName = $scope.filter.Name;
+            var table = $('.table .wrapper');
+            table.empty();
+            $scope.filter.Paging.PageIndex = 1;
             filterFiles();
+            renderFiles();
         };
 
         var filterFiles = function () {
@@ -418,6 +453,62 @@ angular.module('app.modules.file.controllers.filesController', [])
                 filterdFiles = $scope.files;
             }
             $scope.filterdFiles = filterdFiles;
+            $scope.totalItems = filterdFiles.length;
+        };
+
+        var renderFiles = function () {
+            var table = $('.table .wrapper');
+            table.empty();
+            var data = '';
+            var row;
+            var from = ($scope.filter.Paging.PageIndex - 1) * $scope.filter.Paging.PageItemCount;
+            var max = from + $scope.filter.Paging.PageItemCount > $scope.filterdFiles.length ? $scope.filterdFiles.length
+                : from + $scope.filter.Paging.PageItemCount;
+            for (var i = from; i < max; i++) {
+                data += renderRow($scope.filterdFiles[i]);
+            }
+            table.append(data);
+        };
+
+        $scope.pageChanged = function () {
+            renderFiles();
+        };
+
+        var renderRow = function (file) {
+            return '<tr data-name="' + file.Name + '" data-full-url="' + file.FullRelativeName + '"><td>' + file.Name + '</td><td class="width-140px">' + Date.parseDateTime(file.Updated).format('{MM}/{DD}/{yy} {HH}:{MN} {AP}') + '</td><td class="width-80px">' + file.SizeMessage + '</td><td class="width-70px">' +
+                '<div class="ya-treview-buttons"><a class="btn btn-success btn-xs" title="Download" target="_blank" href="' + file.Url + '"><i class="glyphicon glyphicon-download"></i></a><a class="btn btn-danger btn-xs" title="Delete"><i class="glyphicon glyphicon-remove"></i></a></div></td></tr>';
+        };
+
+        var addFileToTable = function (file) {
+            renderFiles();
+        };
+
+        var removeFileFormTable = function (FullRelativeName) {
+            if (FullRelativeName) {
+                var tr = $('.table .wrapper tr[data-full-url="' + FullRelativeName + '"]');
+                tr.remove();
+            }
+        };
+
+        var tableHandlers = function () {
+            $('.file-manager .work-area .center-pane .table tbody').off("click", selectTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').on("click", "tr", selectTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').off("click", deleteTtHandler);
+            $('.file-manager .work-area .center-pane .table tbody').on("click", "tr .btn-danger", deleteTtHandler);
+        };
+
+        var selectTtHandler = function () {
+            $('.file-manager .work-area .center-pane .table tbody tr').removeClass('selected');
+            $(this).addClass('selected');
+            $scope.selectFile($(this).data('name'));
+        };
+
+        var deleteTtHandler = function (event) {
+            var tr = $(this).parent().parent().parent();
+            var Name = tr.data('name');
+            var FullRelativeName = tr.data('full-url');
+            $scope.deleteFile({ Name: Name, FullRelativeName: FullRelativeName });
+            event.stopPropagation();
         };
 
         $scope.selectedFileImgLoad = function (event) {

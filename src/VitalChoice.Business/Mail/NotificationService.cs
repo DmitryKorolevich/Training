@@ -24,5 +24,17 @@ namespace VitalChoice.Business.Mail
 
 		    await emailSender.SendEmailAsync(email, subject, body);
 	    }
+
+	    public async Task SendPasswordResetAsync(string email, PasswordReset passwordReset)
+	    {
+			//todo:refactor this to user nustache or something
+
+			var body =
+				$"<p>Dear {passwordReset.FirstName} {passwordReset.LastName},</p><p>Please click the following <a href=\"{passwordReset.Link}\">link</a> to reset your password</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+			var subject = $"Your Vital Choice User Password Reset";
+
+			await emailSender.SendEmailAsync(email, subject, body);
+		}
     }
 }

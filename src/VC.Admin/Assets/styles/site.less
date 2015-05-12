@@ -148,7 +148,7 @@ h2{
     position: relative;
     display: block;
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 11px;
 }
 
 .ya-treeview-content .line label {
@@ -632,7 +632,7 @@ ul.navbar-custom-header li .dropdown-menu{
 
 .file-manager .work-area .left-pane .wrapper {
     overflow: auto;
-    height: 420px;
+    height: 463px;
 }
 
 .file-manager .work-area .center-pane{
@@ -642,6 +642,11 @@ ul.navbar-custom-header li .dropdown-menu{
 
 .file-manager .work-area .center-pane .table {
     height: 347px;
+    position: relative;
+}
+
+.file-manager .work-area .center-pane .table thead {
+    height: 30px;
 }
 
 .file-manager .work-area .center-pane .table tbody {
@@ -649,12 +654,23 @@ ul.navbar-custom-header li .dropdown-menu{
   height: 330px;
   width: 100%;
   position: absolute;
+  top:30px;
 }
 
 .file-manager .work-area .center-pane .table tbody > tr {
   width: 100%;
   display: inline-table;
   cursor: pointer;
+  word-break: break-all;
+}
+
+.file-manager .work-area .center-pane .table tbody > tr .btn-danger {
+    margin-left: 4px;
+}
+
+.file-manager .work-area .center-pane .pagination
+{
+    margin: 0px;
 }
 
 .file-manager .work-area .right-pane{
@@ -667,7 +683,7 @@ ul.navbar-custom-header li .dropdown-menu{
 }
 
 .file-manager .work-area .right-pane .wrapper {
-    height: 420px;
+    height: 463px;
 }
 
 .file-manager .work-area .right-pane .wrapper .image-box 
@@ -698,15 +714,39 @@ ul.navbar-custom-header li .dropdown-menu{
     margin-bottom: 5px;
 }
 
+.file-manager .ya-treeview
+{
+    float:left;
+    min-width: 100%;
+}
+
+.file-manager .ya-treeview-content
+{   
+    white-space: nowrap;
+}
+
 .file-manager .ya-treeview-content .line{
     min-width: initial;
+    float: none;
+    display: inline-block;
 }
+
 
 .file-manager .angular-ui-tree-nodes .angular-ui-tree-nodes
 {
     margin-left: 20px;
 }
 
+.file-manager .angular-ui-tree-handle .wrapper-ya-treview-buttons
+{    
+    width: 82px;
+    display:inline-block;
+}
+
+.file-manager .angular-ui-tree-handle .wrapper-ya-treview-buttons .ya-treview-buttons
+{    
+    float: none;
+}
 
 .file-manager .top-area .add-file-pane {
     height: 120px;    

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Account;
 using VitalChoice.Admin.Models;
 using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -17,7 +13,7 @@ using VitalChoice.Models.Account;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
 	[AllowAnonymous]
     public class AccountController : BaseApiController
@@ -81,6 +77,25 @@ namespace VitalChoice.Controllers
 			user.Status = UserStatus.Active;
 
 			await userService.UpdateAsync(user, null, model.Password);
+
+			await userService.SignInAsync(user);
+
+			return await PopulateUserInfoModel(user);
+		}
+
+		[HttpPost]
+		public async Task<Result<UserInfoModel>> ResetPassword([FromBody]ResetPasswordModel model)
+		{
+			if (ConvertWithValidate(model) == null)
+				return null;
+
+			await userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+
+			var user = await userService.FindAsync(model.Email);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
 
 			await userService.SignInAsync(user);
 
