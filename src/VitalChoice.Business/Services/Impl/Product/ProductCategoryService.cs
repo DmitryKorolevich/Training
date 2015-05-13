@@ -15,22 +15,26 @@ using VitalChoice.Business.Services.Contracts.Product;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities.Product;
 
 namespace VitalChoice.Business.Services.Impl.Product
 {
     public class ProductCategoryService : IProductCategoryService
     {
-        private readonly IRepositoryAsync<ProductCategory> productCategoryRepository;
+        private readonly IRepositoryAsync<ProductCategoryContent> productCategoryRepository;
+        private readonly IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ProductCategoryService(IRepositoryAsync<ProductCategory> productCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        public ProductCategoryService(IRepositoryAsync<ProductCategoryContent> productCategoryRepository, IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
         {
             this.productCategoryRepository = productCategoryRepository;
+            this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
@@ -41,8 +45,7 @@ namespace VitalChoice.Business.Services.Impl.Product
         {
             ProductCategory toReturn = null;
             var query = new ProductCategoryQuery().NotDeleted().WithStatus(filter.Status);
-            List<ProductCategory> categories = (await productCategoryRepository.Query(query).SelectAsync(false)).ToList();
-
+            List<ProductCategory> categories = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).ToList();
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);
             if (toReturn == null)
             {
@@ -64,7 +67,7 @@ namespace VitalChoice.Business.Services.Impl.Product
             }
 
             var query = new ProductCategoryQuery().NotDeleted();
-            List<ProductCategory> dbCategories = (await productCategoryRepository.Query(query).SelectAsync()).ToList();
+            List<ProductCategory> dbCategories = (await productCategoryEcommerceRepository.Query(query).SelectAsync()).ToList();
             category.SetSubCategoriesOrder();
 
             foreach (var dbCategory in dbCategories)
@@ -74,7 +77,7 @@ namespace VitalChoice.Business.Services.Impl.Product
                 {
                     dbCategory.ParentId = uiCategory.ParentId;
                     dbCategory.Order = uiCategory.Order;
-                    await productCategoryRepository.UpdateAsync(dbCategory);
+                    await productCategoryEcommerceRepository.UpdateAsync(dbCategory);
                 }
             }
             
@@ -83,20 +86,29 @@ namespace VitalChoice.Business.Services.Impl.Product
             return toReturn;
         }
 
-        public async Task<ProductCategory> GetCategoryAsync(int id)
+        public async Task<ProductCategoryContent> GetCategoryAsync(int id)
         {
+            ProductCategoryContent toReturn = null;
             ProductCategoryQuery query = new ProductCategoryQuery().WithId(id).NotDeleted();
-            var toReturn = (await productCategoryRepository.Query(query).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
-                SelectAsync(false)).FirstOrDefault();
+            var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            if(categoryEcommerce!=null)
+            {
+                toReturn = (await productCategoryRepository.Query(p=>p.Id== categoryEcommerce.Id).Include(p => p.ContentItem).
+                    SelectAsync(false)).FirstOrDefault();
+                if (toReturn != null)
+                {
+                    toReturn.Set(categoryEcommerce);
+                }
+            }
             return toReturn;
         }
 
-        public async Task<ProductCategory> UpdateCategoryAsync(ProductCategory model)
+        public async Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent model)
         {
-            ProductCategory dbItem = null;
+            ProductCategoryContent dbItem = null;
             if (model.Id == 0)
             {
-                dbItem = new ProductCategory();
+                dbItem = new ProductCategoryContent();
                 dbItem.ParentId = model.ParentId;
                 if(!dbItem.ParentId.HasValue)
                 {
@@ -104,14 +116,14 @@ namespace VitalChoice.Business.Services.Impl.Product
                 }
                 else
                 {
-                    var parentExist = await productCategoryRepository.Query(p => p.Id == dbItem.ParentId.Value && 
+                    var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == dbItem.ParentId.Value && 
                         p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
                     if(!parentExist)
                     {
                         throw new AppValidationException("The category with the given parent id doesn't exist.");
                     }
 
-                    var subCategories = (await productCategoryRepository.Query(p => p.ParentId == dbItem.ParentId.Value && 
+                    var subCategories = (await productCategoryEcommerceRepository.Query(p => p.ParentId == dbItem.ParentId.Value && 
                        p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
                     if (subCategories.Count != 0)
                     {
@@ -123,7 +135,7 @@ namespace VitalChoice.Business.Services.Impl.Product
                 if (model.ContentItem != null)
                 {
                     dbItem.ContentItem = new ContentItem();
-                    dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
+                    dbItem.ContentItem.Created = DateTime.Now;
                 }
 
                 if (model.MasterContentItemId == 0)
@@ -142,20 +154,12 @@ namespace VitalChoice.Business.Services.Impl.Product
             }
             else
             {
-                dbItem = (await productCategoryRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
-                if (dbItem != null)
-                {
-                    foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)
-                    {
-                        await contentItemToContentProcessorRepository.DeleteAsync(proccesorRef.Id);
-                    }
-                }
+                dbItem = await GetCategoryAsync(model.Id);
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await productCategoryRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+                var urlDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
                     && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
@@ -169,6 +173,21 @@ namespace VitalChoice.Business.Services.Impl.Product
                     dbItem.StatusCode = model.StatusCode;
                 }
                 dbItem.Assigned = model.Assigned;
+
+
+                if (model.Id == 0)
+                {
+                    var ecommerceProduct = await productCategoryEcommerceRepository.InsertAsync(new ProductCategory(dbItem));
+                    if(ecommerceProduct!=null)
+                    {
+                        dbItem.Id = ecommerceProduct.Id;
+                    }
+                }
+                else
+                {
+                    await productCategoryEcommerceRepository.UpdateAsync(new ProductCategory(dbItem));
+                }
+
                 dbItem.FileImageSmallUrl = model.FileImageSmallUrl;
                 dbItem.FileImageLargeUrl = model.FileImageLargeUrl;
                 dbItem.LongDescription = model.LongDescription;
@@ -178,15 +197,13 @@ namespace VitalChoice.Business.Services.Impl.Product
                     dbItem.MasterContentItemId = model.MasterContentItemId;
                 }
                 if (model.ContentItem != null)
-                {
-                    dbItem.ContentItem.Created = DateTime.Now;
-                    dbItem.ContentItem.Updated = dbItem.ContentItem.Created;
+                { 
+                    dbItem.ContentItem.Updated = DateTime.Now;
                     dbItem.ContentItem.Template = model.ContentItem.Template;
                     dbItem.ContentItem.Description = model.ContentItem.Description;
                     dbItem.ContentItem.Title = model.ContentItem.Title;
                     dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
                     dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
-                    dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
                 }
 
                 if (model.Id == 0)
@@ -196,6 +213,10 @@ namespace VitalChoice.Business.Services.Impl.Product
                 else
                 {
                     dbItem = await productCategoryRepository.UpdateAsync(dbItem);
+                    if (dbItem.ContentItem != null)
+                    {
+                        await contentItemRepository.UpdateAsync(dbItem.ContentItem);
+                    }
                 }
             }
 
@@ -204,13 +225,13 @@ namespace VitalChoice.Business.Services.Impl.Product
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await productCategoryRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await productCategoryEcommerceRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 //Check sub categories
                 string message = String.Empty;
                 ProductCategoryQuery query = new ProductCategoryQuery().WithParentId(id).NotDeleted();
-                var subCategoriesExist = (await productCategoryRepository.Query(query).SelectAnyAsync());
+                var subCategoriesExist = (await productCategoryEcommerceRepository.Query(query).SelectAnyAsync());
                 if (subCategoriesExist)
                 {
                     message += "Category with subcategories can't be deleted. " + Environment.NewLine;
@@ -224,16 +245,8 @@ namespace VitalChoice.Business.Services.Impl.Product
                 }
 
                 dbItem.StatusCode = RecordStatusCode.Deleted;
-                await productCategoryRepository.UpdateAsync(dbItem);
+                await productCategoryEcommerceRepository.UpdateAsync(dbItem);
 
-                try
-                {
-                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.ToString());
-                }
                 toReturn = true;
             }
             return toReturn;

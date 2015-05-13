@@ -64,11 +64,13 @@
     <Folder Include="PostDeployment" />
     <Folder Include="dbo\" />
     <Folder Include="deploy" />
+    <Folder Include="PostDeployment\Scripts\" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
     <None Include="Local.publish.xml" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Ecommerce.publish.xml">
@@ -78,5 +80,11 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Countries.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
   </ItemGroup>
 </Project>

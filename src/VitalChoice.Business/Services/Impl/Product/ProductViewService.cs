@@ -13,23 +13,28 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Business.Services.Contracts.Product;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities.Product;
 
 namespace VitalChoice.Business.Services.Impl.Product
 {
 	public class ProductViewService : IProductViewService
     {
         private readonly IRepositoryAsync<MasterContentItem> masterContentItemRepository;
-        private readonly IRepositoryAsync<ProductCategory> productCategoryRepository;
+        private readonly IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository;
+        private readonly IRepositoryAsync<ProductCategoryContent> productCategoryRepository;
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IContentProcessorsService contentProcessorsService;
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
-        public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ProductCategory> productCategoryRepository,
+        public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
+            IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
             IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
 		{
             this.masterContentItemRepository = masterContentItemRepository;
             this.productCategoryRepository = productCategoryRepository;
+            this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentProcessorsService = contentProcessorsService;
             _templatesCache = templatesCache;
@@ -40,20 +45,34 @@ namespace VitalChoice.Business.Services.Impl.Product
 
         public async Task<ExecutedContentItem> GetProductCategoryContentAsync(Dictionary<string, object> parameters, string categoryUrl = null)
         {
-            ProductCategory category;
+            ProductCategoryContent category=null;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
             if (!String.IsNullOrEmpty(categoryUrl))
             {
-                category = (await productCategoryRepository.Query(p => p.Url == categoryUrl && 
-                    p.StatusCode!=RecordStatusCode.Deleted).Include(p => p.MasterContentItem).
-                    ThenInclude(p=>p.MasterContentItemToContentProcessors).ThenInclude(p=>p.ContentProcessor).
-                    SelectAsync(false)).FirstOrDefault();
+                var categoryEcommerce = (await productCategoryEcommerceRepository.Query(p => p.Url == categoryUrl &&
+                    p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+                if (categoryEcommerce != null)
+                {
+                    category = (await productCategoryRepository.Query(p=>p.Id== categoryEcommerce.Id).Include(p => p.MasterContentItem).
+                        ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+                    if(category!=null)
+                    {
+                        category.Set(categoryEcommerce);
+                    }
+                }
             }
             else
             {
-                category = (await productCategoryRepository.Query(p => !p.ParentId.HasValue).Include(p => p.MasterContentItem).
-                    ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).
-                    SelectAsync(false)).FirstOrDefault();
+                var categoryEcommerce = (await productCategoryEcommerceRepository.Query(p => !p.ParentId.HasValue).SelectAsync(false)).FirstOrDefault();
+                if (categoryEcommerce != null)
+                {
+                    category = (await productCategoryRepository.Query(p => p.Id == categoryEcommerce.Id).Include(p => p.MasterContentItem).
+                        ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
+                    if (category != null)
+                    {
+                        category.Set(categoryEcommerce);
+                    }
+                }
             }
 
             if (category == null)

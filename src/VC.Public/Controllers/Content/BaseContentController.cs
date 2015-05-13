@@ -11,6 +11,7 @@ namespace VC.Public.Controllers.Content
     {
         protected readonly IContentViewService ContentService;
         protected readonly IProductViewService ProductViewService;
+        protected readonly IProductViewService productViewService;
 
         public BaseContentController(IContentViewService contentService)
         {

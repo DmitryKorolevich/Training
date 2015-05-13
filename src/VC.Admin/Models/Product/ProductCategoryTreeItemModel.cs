@@ -5,6 +5,7 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Entities.Product;
 
 namespace VC.Admin.Models.Product
 {
