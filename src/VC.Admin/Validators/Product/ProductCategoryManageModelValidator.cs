@@ -1,14 +1,10 @@
-﻿using System;
-using VitalChoice.Validation.Logic;
-using FluentValidation;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Models.ContentManagement;
+﻿using FluentValidation;
+using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
-using VitalChoice.Models.Product;
 
-namespace VitalChoice.Validators.Product
+namespace VC.Admin.Validators.Product
 {
     public class ProductCategoryManageModelValidator : ModelValidator<ProductCategoryManageModel>
     {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Validators.UserManagement
+﻿namespace VC.Admin.Validators.UserManagement
 {
     public enum UserManageMode
     {

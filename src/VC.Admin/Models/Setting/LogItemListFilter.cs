@@ -1,8 +1,7 @@
 ﻿using System;
-using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Models.Setting
+namespace VC.Admin.Models.Setting
 {
     public class LogItemListFilter : FilterBase
     {

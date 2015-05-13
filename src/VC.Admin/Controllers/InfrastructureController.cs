@@ -5,15 +5,15 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using VC.Admin.Models.Infrastructure;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Models.Infrastructure;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
     public class InfrastructureController : BaseApiController
     {

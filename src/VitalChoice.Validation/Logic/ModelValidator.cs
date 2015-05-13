@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentValidation.Results;
-using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Validation.Logic.Interfaces;
+using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Validation.Logic
 {
     public abstract class ModelValidator<T> : IModelValidator
         where T: IModel
     {
-        private bool _isValid = true;
-
         protected readonly Dictionary<string, string> ValidationErrors;
         protected ModelValidator()
         {
@@ -32,17 +29,17 @@ namespace VitalChoice.Validation.Logic
             IsValid = IsValid && validationResult.IsValid;
             if (!IsValid)
             {
-                if (!String.IsNullOrEmpty(propertyPrefixPath))
+                if (!string.IsNullOrEmpty(propertyPrefixPath))
                 {
                     propertyPrefixPath += ".";
                 }
                 else
                 {
-                    propertyPrefixPath = String.Empty;
+                    propertyPrefixPath = string.Empty;
                 }
                 foreach (var validationError in validationResult.Errors)
                 {
-                    ValidationErrors.Add(String.Format("{0}.{1}.{3}{2}", collectionName, index, validationError.PropertyName, propertyPrefixPath), validationError.ErrorMessage);
+                    ValidationErrors.Add(string.Format("{0}.{1}.{3}{2}", collectionName, index, validationError.PropertyName, propertyPrefixPath), validationError.ErrorMessage);
                 }
             }
         }
@@ -54,11 +51,8 @@ namespace VitalChoice.Validation.Logic
 
         public abstract void Validate(T value);
 
-        public virtual bool IsValid
-        {
-            get { return _isValid; }
-            private set { _isValid = value; }
-        }
-        public virtual IEnumerable<KeyValuePair<string, string>> Errors { get { return ValidationErrors; } }
+        public virtual bool IsValid { get; private set; } = true;
+
+        public virtual IEnumerable<KeyValuePair<string, string>> Errors => ValidationErrors;
     }
 }

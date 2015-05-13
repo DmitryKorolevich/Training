@@ -14,8 +14,8 @@ using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Business.Services.Impl;
 using System.IO;
-using VitalChoice.Public.AppConfig;
 using Microsoft.Framework.Runtime;
+using VC.Public.AppConfig;
 
 namespace VitalChoice.Public
 {

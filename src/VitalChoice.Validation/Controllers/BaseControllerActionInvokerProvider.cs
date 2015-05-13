@@ -44,7 +44,6 @@ namespace VitalChoice.Validation.Controllers
                     IControllerFactory controllerFactory,
                     IEnumerable<IFilterProvider> filterProviders,
                     IControllerActionArgumentBinder argumentBinder,
-                    IOptions<MvcOptions> optionsAccessor,
                     IInputFormattersProvider inputFormattersProvider,
                     IModelBinderProvider modelBinderProvider,
                     IModelValidatorProviderProvider modelValidatorProviderProvider,
@@ -66,10 +65,7 @@ namespace VitalChoice.Validation.Controllers
             //_maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
         }
 
-        public int Order
-        {
-            get { return DefaultOrder.DefaultFrameworkSortOrder; }
-        }
+        public int Order => DefaultOrder.DefaultFrameworkSortOrder;
 
         /// <inheritdoc />
         public void OnProvidersExecuting(ActionInvokerProviderContext context)

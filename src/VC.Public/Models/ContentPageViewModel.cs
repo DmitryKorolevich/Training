@@ -1,7 +1,6 @@
-﻿using System;
-using VitalChoice.Domain.Entities.Content;
+﻿using VitalChoice.Domain.Entities.Content;
 
-namespace VitalChoice.Public.Models
+namespace VC.Public.Models
 {
     public class ContentPageViewModel
     {

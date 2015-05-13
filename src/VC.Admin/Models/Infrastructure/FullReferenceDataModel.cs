@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Models.Infrastructure
+namespace VC.Admin.Models.Infrastructure
 {
     public class FullReferenceDataModel : RestrictedReferenceData
     {

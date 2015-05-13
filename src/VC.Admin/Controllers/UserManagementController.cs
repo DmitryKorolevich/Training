@@ -12,15 +12,14 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validators.UserManagement;
-using VitalChoice.Validators.Users;
 using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
+using VC.Admin.Models.UserManagement;
+using VC.Admin.Validators.UserManagement;
 
-namespace VitalChoice.Controllers
+namespace VC.Admin.Controllers
 {
 	[AdminAuthorize(PermissionType.Users)]
     public class UserManagementController : BaseApiController

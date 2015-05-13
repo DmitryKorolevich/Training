@@ -1,11 +1,9 @@
 using FluentValidation;
-using VitalChoice.Business.Services.Impl;
+using VC.Admin.Models;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Admin.Models;
 
-namespace VitalChoice.Validators.Users
+namespace VC.Admin.Validators.Users
 {
     public class UserCreateStandardValidator : AbstractValidator<UserCreateModel>
     {

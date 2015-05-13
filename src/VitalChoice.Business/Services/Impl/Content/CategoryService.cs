@@ -138,6 +138,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 if (model.ContentItem != null)
                 {
                     dbItem.ContentItem = new ContentItem();
+                    dbItem.ContentItem.Created = DateTime.Now;
                     dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
                 }
 
@@ -186,8 +187,7 @@ namespace VitalChoice.Business.Services.Impl.Content
                 }
                 if (model.ContentItem != null)
                 {
-                    dbItem.ContentItem.Created = DateTime.Now;
-                    dbItem.ContentItem.Updated = dbItem.ContentItem.Created;
+                    dbItem.ContentItem.Updated = DateTime.Now;
                     dbItem.ContentItem.Template = model.ContentItem.Template;
                     dbItem.ContentItem.Description = model.ContentItem.Description;
                     dbItem.ContentItem.Title = model.ContentItem.Title;

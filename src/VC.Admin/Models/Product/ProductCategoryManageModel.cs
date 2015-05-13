@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using VitalChoice.Domain;
+using System.Linq;
+using VC.Admin.Validators.Product;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validators.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validators.ContentManagement;
-using VitalChoice.Validators.Product;
+using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Models.Product
+namespace VC.Admin.Models.Product
 {
     [ApiValidator(typeof(ProductCategoryManageModelValidator))]
-    public class ProductCategoryManageModel : Model<ProductCategory, IMode>
+    public class ProductCategoryManageModel : Model<ProductCategoryContent, IMode>
     {
         public int Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -59,7 +56,7 @@ namespace VitalChoice.Models.Product
         {
         }
 
-        public ProductCategoryManageModel(ProductCategory item)
+        public ProductCategoryManageModel(ProductCategoryContent item)
         {
             Id = item.Id;
             Name = item.Name;
@@ -89,9 +86,9 @@ namespace VitalChoice.Models.Product
             }
         }
 
-        public override ProductCategory Convert()
+        public override ProductCategoryContent Convert()
         {
-            ProductCategory toReturn = new ProductCategory();
+            ProductCategoryContent toReturn = new ProductCategoryContent();
             toReturn.Id = Id;
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();

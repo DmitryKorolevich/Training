@@ -1,9 +1,8 @@
-﻿using System;
-using VitalChoice.Validation.Models;
+﻿using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Validators.UserManagement
+namespace VC.Admin.Validators.UserManagement
 {
-    public class UserManageSettings : AbstractMode<UserManageMode>
+    public class UserManageSettings : AbstractModeContainer<UserManageMode>
     {
 
     }

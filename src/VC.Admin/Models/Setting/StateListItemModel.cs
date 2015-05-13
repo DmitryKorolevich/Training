@@ -9,7 +9,7 @@ using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Settings;
 
-namespace VitalChoice.Models.Setting
+namespace VC.Admin.Models.Setting
 {
     public class StateListItemModel : Model<State, IMode>
     {

@@ -2,7 +2,7 @@
 
 namespace VC.Admin.Validators.Profile
 {
-    public class UpdateProfileSettings : AbstractMode<UpdateProfileMode>
+    public class UpdateProfileSettings : AbstractModeContainer<UpdateProfileMode>
     {
 
     }

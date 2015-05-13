@@ -145,11 +145,17 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Products
 
-            builder.Entity<ProductCategory>().Key(p => p.Id);
-            builder.Entity<ProductCategory>().ForSqlServer().Table("ProductCategories");
-            builder.Entity<ProductCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
+            builder.Entity<ProductCategoryContent>().Key(p => p.Id);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.Name);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.Url);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.ParentId);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.StatusCode);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.Assigned);
+            builder.Entity<ProductCategoryContent>().Ignore(x => x.Order);
+            builder.Entity<ProductCategoryContent>().ForRelational().Table("ProductCategories");
+            builder.Entity<ProductCategoryContent>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
-            builder.Entity<ProductCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
+            builder.Entity<ProductCategoryContent>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
                 PrincipalKey(p => p.Id);
 
             #endregion

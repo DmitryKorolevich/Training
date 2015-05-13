@@ -6,35 +6,35 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Domain.Entities.Options;
 
-namespace VitalChoice.Admin.Components
+namespace VC.Admin.Components
 {
 	[ViewComponent(Name = "Assets")]
 	public class AssetsViewComponent : ViewComponent
 	{
-		private readonly IOptions<AppOptions> appOptionsAccessor;
-		private readonly FrontEndAssetManager assetManager;
-		private readonly IUrlHelper urlHelper;
+		private readonly IOptions<AppOptions> _appOptionsAccessor;
+		private readonly FrontEndAssetManager _assetManager;
+		private readonly IUrlHelper _urlHelper;
 
 		public AssetsViewComponent(FrontEndAssetManager assetManager, IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
 		{
 			if (assetManager == null)
 			{
-				throw new ArgumentNullException("assetManager");
+				throw new ArgumentNullException(nameof(assetManager));
 			}
 
 			if (urlHelper == null)
 			{
-				throw new ArgumentNullException("urlHelper");
+				throw new ArgumentNullException(nameof(urlHelper));
 			}
 
 			if (appOptionsAccessor == null)
 			{
-				throw new ArgumentNullException("appOptionsAccessor");
+				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
 
-			this.assetManager = assetManager;
-			this.urlHelper = urlHelper;
-			this.appOptionsAccessor = appOptionsAccessor;
+			_assetManager = assetManager;
+			_urlHelper = urlHelper;
+			_appOptionsAccessor = appOptionsAccessor;
 		}
 
 		public IViewComponentResult Invoke(string assetType)
@@ -45,38 +45,40 @@ namespace VitalChoice.Admin.Components
 			if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";
-				AssetInfo assetInfo = assetManager.GetScripts();
-				if (appOptionsAccessor.Options.EnableBundlingAndMinification)
+				AssetInfo assetInfo = _assetManager.GetScripts();
+				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
 				{
-					filePaths.Add(urlHelper.Content(string.Format("~/{0}.min-{1}.js", assetInfo.MinifiedFileName, appOptionsAccessor.Options.RandomPathPart)));
+					filePaths.Add(_urlHelper.Content(
+					    $"~/{assetInfo.MinifiedFileName}.min-{_appOptionsAccessor.Options.RandomPathPart}.js"));
 				}
 				else
 				{
 					foreach (var assetFileInfo in assetInfo.Files)
 					{
-						filePaths.Add(urlHelper.Content(string.Format("~/{0}", assetFileInfo)));
+						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}"));
 					}
 				}
 			}
 			else if (assetType.Equals("styles", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Styles";
-				AssetInfo assetInfo = assetManager.GetStyles();
-				if (appOptionsAccessor.Options.EnableBundlingAndMinification)
+				AssetInfo assetInfo = _assetManager.GetStyles();
+				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
 				{
-					filePaths.Add(urlHelper.Content(string.Format("~{0}.min-{1}.css", assetInfo.MinifiedFileName, appOptionsAccessor.Options.RandomPathPart)));
+					filePaths.Add(_urlHelper.Content(
+					    $"~{assetInfo.MinifiedFileName}.min-{_appOptionsAccessor.Options.RandomPathPart}.css"));
 				}
 				else
 				{
 					foreach (var assetFileInfo in assetInfo.Files)
 					{
-						filePaths.Add(urlHelper.Content(string.Format("~/{0}", assetFileInfo)));
+						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}"));
 					}
 				}
 			}
 			else
 			{
-				throw new InvalidOperationException(string.Format("Asset type '{0}' is not recognized."));
+				throw new InvalidOperationException($"Asset type '{assetType}' is not recognized.");
 			}
 
 			return View(viewName, filePaths);

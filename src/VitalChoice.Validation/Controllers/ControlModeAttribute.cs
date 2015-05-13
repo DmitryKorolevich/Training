@@ -5,7 +5,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Validation.Controllers
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public sealed class ControlModeAttribute: Attribute
     {
         public object Mode { get; private set; }

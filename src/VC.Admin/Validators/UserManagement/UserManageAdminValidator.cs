@@ -1,13 +1,11 @@
 ﻿using System.Linq;
 using FluentValidation;
-using VitalChoice.Admin.Models;
+using VC.Admin.Models.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Models.UserManagement;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 
-namespace VitalChoice.Validators.UserManagement
+namespace VC.Admin.Validators.UserManagement
 {
     public class UserManageAdminValidator: ModelValidator<ManageUserModel>
     {

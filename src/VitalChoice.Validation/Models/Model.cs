@@ -4,9 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Logic.Interfaces;
+using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Validation.Models
 {
@@ -35,16 +34,11 @@ namespace VitalChoice.Validation.Models
 
         public virtual void Validate(IModel value)
         {
-            if (Validator != null) {
-                Validator.Validate(value);
-            }
+            Validator?.Validate(value);
         }
 
         [JsonIgnore]
-        public virtual bool IsValid
-        {
-            get { return Validator == null || Validator.IsValid; }
-        }
+        public virtual bool IsValid => Validator == null || Validator.IsValid;
 
         [JsonIgnore]
         public virtual IEnumerable<KeyValuePair<string, string>> Errors
@@ -59,13 +53,11 @@ namespace VitalChoice.Validation.Models
         }
 
         [JsonIgnore]
-        public IModelValidator Validator { get; private set; }
+        public IModelValidator Validator { get; }
 
         public virtual void Validate()
         {
-            if (Validator != null) {
-                Validator.Validate(this);
-            }
+            Validator?.Validate(this);
         }
 
         [JsonIgnore]

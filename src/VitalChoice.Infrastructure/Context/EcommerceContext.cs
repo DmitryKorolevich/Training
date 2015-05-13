@@ -12,6 +12,8 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -59,8 +61,27 @@ namespace VitalChoice.Infrastructure.Context
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
+            builder.ForSqlServer().UseIdentity();
 
-			base.OnModelCreating(builder);
+            #region Products
+
+            builder.Entity<ProductCategory>().Key(p => p.Id);
+            builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
+
+            #endregion
+
+            #region Settings
+
+            builder.Entity<Country>().Key(p => p.Id);
+            builder.Entity<Country>().ForSqlServer().Table("Countries");
+            builder.Entity<Country>().Ignore(p => p.States);
+
+            builder.Entity<State>().Key(p => p.Id);
+            builder.Entity<State>().ForSqlServer().Table("States");
+
+            #endregion
+
+            base.OnModelCreating(builder);
 		}
 	}
 }

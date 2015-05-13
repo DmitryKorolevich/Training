@@ -8,6 +8,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Data.Repositories.Specifics;
 
 namespace VitalChoice.Business.Services.Impl.Settings
 {
@@ -15,11 +16,11 @@ namespace VitalChoice.Business.Services.Impl.Settings
     {
         private const int CODE_MAX_SYMBOLS_COUNT= 3;
 
-        private readonly IRepositoryAsync<Country> countryRepository;
-        private readonly IRepositoryAsync<State> stateRepository;
+        private readonly IEcommerceRepositoryAsync<Country> countryRepository;
+        private readonly IEcommerceRepositoryAsync<State> stateRepository;
         private readonly ILogger logger;
 
-        public CountryService(IRepositoryAsync<Country> countryRepository, IRepositoryAsync<State> stateRepository)
+        public CountryService(IEcommerceRepositoryAsync<Country> countryRepository, IEcommerceRepositoryAsync<State> stateRepository)
         {
             this.countryRepository = countryRepository;
             this.stateRepository = stateRepository;

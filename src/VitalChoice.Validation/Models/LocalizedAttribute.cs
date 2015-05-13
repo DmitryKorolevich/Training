@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using VitalChoice.Domain.Entities.Localization;
 
 namespace VitalChoice.Validation.Models
 {
@@ -21,7 +20,7 @@ namespace VitalChoice.Validation.Models
                 LocalizedAttribute;
             if (attribute == null)
             {
-                throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", propertyInfo.Name),
+                throw new ArgumentException($"LocalizedAttribute not set on property {propertyInfo.Name}.",
                     propertyInfo.Name);
             }
             return attribute.EnumValue;

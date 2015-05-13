@@ -4,7 +4,6 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Validators.Account;
 using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Models.Account

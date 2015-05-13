@@ -1,12 +1,12 @@
 ﻿using System;
+using VC.Admin.Validators.Account;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Validators.Account;
 using VitalChoice.Validation.Attributes;
 
-namespace VitalChoice.Models.Account
+namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(CreateAccountValidator))]
 	public class CreateAccountModel : Model<ApplicationUser, IMode>

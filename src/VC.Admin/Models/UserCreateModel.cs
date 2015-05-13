@@ -1,11 +1,11 @@
-﻿using VitalChoice.Validation.Models;
-using VitalChoice.Validators.Users;
+﻿using VC.Admin.Validators.Users;
+using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
-namespace VitalChoice.Admin.Models
+namespace VC.Admin.Models
 {
     [ApiValidator(typeof(UserCreateValidator))]
     public class UserCreateModel : Model<User, UserCreateSettings>

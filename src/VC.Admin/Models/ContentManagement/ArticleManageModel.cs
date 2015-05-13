@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using VC.Admin.Validators.ContentManagement;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Validators.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validators.ContentManagement;
 
-namespace VitalChoice.Models.ContentManagement
+namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(ArticleManageModelValidator))]
     public class ArticleManageModel : Model<Article, IMode>

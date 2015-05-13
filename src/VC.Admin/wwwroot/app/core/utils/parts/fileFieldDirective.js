@@ -29,6 +29,7 @@
 .controller('fileFieldController', ['$scope', '$rootScope', '$attrs', '$parse', '$timeout', '$log', 'modalUtil', 'appBootstrap', 'filesConfig', 'confirmUtil',
     function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, filesConfig, confirmUtil) {
         var self = this;
+        var ngModelCtrl = { $setViewValue: angular.noop };
 
         this.init = function (ngModelCtrl_) {
             ngModelCtrl = ngModelCtrl_;

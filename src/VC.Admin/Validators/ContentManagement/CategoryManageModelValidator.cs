@@ -1,13 +1,10 @@
-﻿using System;
-using VitalChoice.Validation.Logic;
-using FluentValidation;
-using VitalChoice.Admin.Models;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Models.ContentManagement;
+﻿using FluentValidation;
+using VC.Admin.Models.ContentManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 
-namespace VitalChoice.Validators.ContentManagement
+namespace VC.Admin.Validators.ContentManagement
 {
     public class CategoryManageModelValidator : ModelValidator<CategoryManageModel>
     {
