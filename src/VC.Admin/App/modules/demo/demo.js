@@ -178,6 +178,10 @@ angular.module('app.modules.demo',
 					url: '/products/manageProductReviews',
 					template: '<h2>Manage Product Reviews</h2>'
 				})
+				.state('index.oneCol.manageDCs', {
+				    url: '/dcs',
+				    template: '<h2>Manage Discount Code</h2>'
+				})
 				/*affiliates*/
 				.state('index.oneCol.locateAffiliate', {
 					url: '/affiliates/locate',
