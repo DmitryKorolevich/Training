@@ -87,4 +87,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\GiftCertificates.sql" />
+  </ItemGroup>
 </Project>

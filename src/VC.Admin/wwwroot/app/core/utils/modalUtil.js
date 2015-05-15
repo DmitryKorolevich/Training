@@ -32,6 +32,8 @@ angular.module('app.core.utils.modalUtil', [])
 					errorCallback();
 				}
 			});
+
+            return modalInstance;
 		}
 	};
 }]);

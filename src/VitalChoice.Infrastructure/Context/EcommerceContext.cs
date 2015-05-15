@@ -68,6 +68,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductCategory>().Key(p => p.Id);
             builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
 
+            builder.Entity<GiftCertificate>().Key(p => p.Id);
+            builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
+
             #endregion
 
             #region Settings

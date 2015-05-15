@@ -44,5 +44,33 @@ namespace VitalChoice.Business.Helpers
             toReturn.Add(String.Format("{0}:{1}", (int)RecordStatusCode.Active, (int)CustomerTypeCode.Wholesale), "Active - Wholesale Customers Only");
             return toReturn;
         }
+
+        public static string GetGCTypeName(GCType type)
+        {
+            string toReturn = null;
+            if (type == GCType.ManualGC)
+            {
+                toReturn = "Manually Created Gift Certificate";
+            }
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetGCTypeNames()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>();
+            toReturn.Add((int)GCType.ManualGC, "Manually Created Gift Certificate");
+            //toReturn.Add(String.Format("{0}:{1}", (int)GCType.EGC, (int)CustomerTypeCode.All), "Not set");
+            //toReturn.Add(String.Format("{0}:{1}", (int)GCType.GC, (int)CustomerTypeCode.Wholesale), "Not set");
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetRecordStatuses()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>();
+            toReturn.Add((int)RecordStatusCode.Active, "Active");
+            toReturn.Add((int)RecordStatusCode.NotActive, "Not Active");
+            toReturn.Add((int)RecordStatusCode.Deleted, "Deleted");
+            return toReturn;
+        }
     }
 }

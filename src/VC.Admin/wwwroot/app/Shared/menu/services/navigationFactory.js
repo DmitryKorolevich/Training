@@ -21,6 +21,24 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			]
 		},
 		{
+			name: 'products',
+			stateLabel: 'Products',
+			subMenu: [
+				{ name: 'locateProduct', stateName: 'index.oneCol.locateProduct', stateLabel: 'Locate a Product', access: 4 },
+				{ name: 'addNewProduct', stateName: 'index.oneCol.addNewProduct', stateLabel: 'Add New Product', access: 4 },
+				{ name: 'manageCategories', stateName: 'index.oneCol.manageProductCategories', stateLabel: 'Manage Categories', access: 4 },
+				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews', access: 4 },
+			]
+		},
+        {
+            name: 'marketing',
+        	stateLabel: 'Marketing',
+        	subMenu: [
+                { name: 'manageDCs', stateName: 'index.oneCol.manageDCs', stateLabel: 'Manage Discount Codes', access: 14 },
+                { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
+        	]
+        },
+		{
 			name: 'reports',
 			stateLabel: 'Reports',
 			subMenu: [
@@ -29,16 +47,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'affiliates', stateName: 'index.oneCol.affiliates', stateLabel: 'Affiliates', access: 3 },
 				{ name: 'operations', stateName: 'index.twoCols.operations.vitalGreen', stateLabel: 'Operations', access: 3 },
 				{ name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis', access: 3 }
-			]
-		},
-		{
-			name: 'products',
-			stateLabel: 'Products',
-			subMenu: [
-				{ name: 'locateProduct', stateName: 'index.oneCol.locateProduct', stateLabel: 'Locate a Product', access: 4 },
-				{ name: 'addNewProduct', stateName: 'index.oneCol.addNewProduct', stateLabel: 'Add New Product', access: 4 },
-				{ name: 'manageCategories', stateName: 'index.oneCol.manageProductCategories', stateLabel: 'Manage Categories', access: 4 },
-				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews', access: 4 }
 			]
 		},
 		{

@@ -79,6 +79,18 @@ namespace VitalChoice.Business.Services.Impl
                     Key = x.Key,
                     Text = x.Value
                 }).ToList(),
+
+                GCTypes = StatusEnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
+
+                RecordStatuses = StatusEnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
             };
 
 			return referenceData;

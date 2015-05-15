@@ -20,5 +20,9 @@ namespace VitalChoice.Domain.Transfer.Base
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
 
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
+
+        public IList<LookupItem<int>> GCTypes { get; set; }
+
+        public IList<LookupItem<int>> RecordStatuses { get; set; }
     }
 }

@@ -170,7 +170,9 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<FileService>().As<IFileService>();
                 builder.RegisterType<EmailSender>().As<IEmailSender>().WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>()).SingleInstance();
 				builder.RegisterType<NotificationService>().As<INotificationService>();
-				builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
+                builder.RegisterType<GCService>().As<IGCService>();
+                builder.RegisterType<CountryService>().As<ICountryService>();
+                builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
 				var container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));

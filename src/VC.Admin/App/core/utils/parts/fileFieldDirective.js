@@ -30,8 +30,9 @@
     function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, filesConfig, confirmUtil) {
         var self = this;
         var ngModelCtrl = { $setViewValue: angular.noop };
+        self.fileManagementPopup = null;
 
-        this.init = function (ngModelCtrl_) {
+        self.init = function (ngModelCtrl_) {
             ngModelCtrl = ngModelCtrl_;
             self.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
             $scope.placeHolder = $attrs.placeholder;
@@ -41,7 +42,7 @@
             };
         };        
 
-        this.render = function () {
+        self.render = function () {
             if (ngModelCtrl.$viewValue) {
                 $scope.inputValue = self.baseUrl.format(ngModelCtrl.$viewValue);
             }
@@ -68,10 +69,14 @@
                         ngModelCtrl.$setViewValue(data);
                         ngModelCtrl.$render();
                     }
+                    if (self.fileManagementPopup)
+                    {
+                        self.fileManagementPopup.close();
+                    }
                 }
             };
             appBootstrap.setData('FILES_POPUP_DATA', data);
-            popup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
+            self.fileManagementPopup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
         };
 
         $scope.openPreview = function () {

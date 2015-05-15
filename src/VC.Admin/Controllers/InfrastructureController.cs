@@ -45,7 +45,9 @@ namespace VC.Admin.Controllers
 			        PublicHost = referenceData.PublicHost,
 			        ContentItemStatusNames = referenceData.ContentItemStatusNames,
 			        ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
-		        };
+                    GCTypes = referenceData.GCTypes,
+                    RecordStatuses = referenceData.RecordStatuses,
+                };
 	        }
 			else
 			{

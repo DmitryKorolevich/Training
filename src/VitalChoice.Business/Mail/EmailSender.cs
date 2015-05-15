@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
+using System;
 
 namespace VitalChoice.Business.Mail
 {
@@ -31,18 +32,18 @@ namespace VitalChoice.Business.Mail
 #endif
 		}
 
-		public async Task SendEmailAsync(string email, string subject, string message)
+		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= "Vital Choice", string toDisplayName = "")
 		{
 #if DNX451
-			var fromAddr = new MailAddress(configuration.From);
-			var toAddr = new MailAddress(email);
-			var mailmsg = new MailMessage(fromAddr, toAddr)
+			var fromAddr = new MailAddress(configuration.From, fromDisplayName, Encoding.UTF8);
+			var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);
+            var mailmsg = new MailMessage(fromAddr, toAddr)
 			{
 				IsBodyHtml = true,
 				Body = message,
 				BodyEncoding = Encoding.UTF8,
 				Subject = subject,
-				SubjectEncoding = Encoding.UTF8
+				SubjectEncoding = Encoding.UTF8,
 			};
 
 			await client.SendMailAsync(mailmsg);

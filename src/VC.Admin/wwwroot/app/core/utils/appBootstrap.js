@@ -8,7 +8,7 @@ angular.module('app.core.utils.appBootstrap', [])
 				})[0];
 			};
 
-			function getValidationMessage(key, field) {
+			function getValidationMessage(key, field, arg) {
 			    var messageFormat = getReferenceItem($rootScope.ReferenceData.Labels, key).Text;
                 var message='';
                 if(field)
@@ -21,7 +21,7 @@ angular.module('app.core.utils.appBootstrap', [])
 							field = item.Text;
 	                    }
                     }
-	                message = messageFormat.format(field);
+                    message = messageFormat.format(field, arg);
                 }
                 else
                 {
