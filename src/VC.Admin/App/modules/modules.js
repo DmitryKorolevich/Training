@@ -9,4 +9,5 @@ angular.module('app.modules', [
 	'app.modules.setting',
 	'app.modules.product',
 	'app.modules.file',
+	'app.modules.gc',
 ]);

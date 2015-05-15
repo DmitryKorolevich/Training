@@ -11,6 +11,7 @@ angular.module('app.utils', [
 	'angular-ladda',
 	'ajoslin.promise-tracker',
     'ngFileUpload',
+    'fiestah.money',
 	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
 	'app.core.utils.commonActionsUtil',

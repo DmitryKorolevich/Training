@@ -120,9 +120,10 @@ namespace VitalChoice.Validation.Logic
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TEnum, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessage<TModel, TEnum, TEnum2, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            TEnum messageKey, TEnum fieldKey, params object[] args) where TEnum : IComparable
+            TEnum messageKey, TEnum2 fieldKey, params object[] args) where TEnum : IComparable
+                                                                     where TEnum2: IComparable
         {
             List<object> parameters = new List<object> { GetFieldName(fieldKey) };
             if (args != null)
@@ -142,9 +143,10 @@ namespace VitalChoice.Validation.Logic
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithCustomFieldLabel<TModel, TEnum, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithCustomFieldLabel<TModel, TEnum, TEnum2, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            TEnum messageKey, TEnum fieldKey, params object[] args) where TEnum : IComparable
+            TEnum messageKey, TEnum2 fieldKey, params object[] args) where TEnum : IComparable
+                                                                     where TEnum2 : IComparable
         {
             List<object> parameters = new List<object> { fieldKey };
             if (args != null)
@@ -163,9 +165,10 @@ namespace VitalChoice.Validation.Logic
         /// <param name="messageKey">Message key, local name in Validation.Global.Messages. No need to write full name.</param>
         /// <param name="args">Additional parameters</param>
         /// <returns>Validation chain</returns>
-        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithParams<TModel, TEnum, TResult>(
+        public static IRuleBuilderOptions<TModel, TResult> WithMessageWithParams<TModel, TEnum, TEnum2, TResult>(
             this IRuleBuilderOptions<TModel, TResult> optionsChain,
-            TEnum messageKey, params object[] args) where TEnum : IComparable
+            TEnum2 messageKey, params object[] args) where TEnum : IComparable
+                                                     where TEnum2 : IComparable
         {
             if (args == null)
             {

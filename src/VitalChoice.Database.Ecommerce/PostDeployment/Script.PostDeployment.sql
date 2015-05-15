@@ -13,3 +13,4 @@ Post-Deployment Script Template
 :r .\Scripts\RecordStatusCodes.sql
 :r .\Scripts\ProductCategories.sql
 :r .\Scripts\Countries.sql
+:r .\Scripts\GiftCertificates.sql

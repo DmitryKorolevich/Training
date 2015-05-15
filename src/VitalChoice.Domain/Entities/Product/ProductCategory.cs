@@ -21,6 +21,7 @@ namespace VitalChoice.Domain.Entities.Product
         public CustomerTypeCode Assigned { get; set; }
 
         public int Order { get; set; }
+
         public ProductCategory()
         {
         }

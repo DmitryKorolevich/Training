@@ -4,8 +4,8 @@ angular.module('app.modules.file.controllers.filesController', [])
 .constant('filesConfig', {
     urlPrefix: 'files',
 })
-.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modalStack', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
-    function ($scope, $rootScope, $state, $stateParams, $modalStack, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
+.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
+    function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;
@@ -526,12 +526,13 @@ angular.module('app.modules.file.controllers.filesController', [])
                 if (data) {
                     data.thenCallback($scope.selectedFile.FullRelativeName);
                 }
-                $modalStack.dismissAll();
             }
         };
 
         $scope.cancel = function () {
-            $modalStack.dismissAll();
+            if (data) {
+                data.thenCallback();
+            }
         };
 
         initialize();

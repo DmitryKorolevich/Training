@@ -113,4 +113,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\FilesPermissions.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\MarketingPermissions.sql" />
+  </ItemGroup>
 </Project>

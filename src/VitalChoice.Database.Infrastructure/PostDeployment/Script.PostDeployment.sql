@@ -26,3 +26,4 @@ Post-Deployment Script Template
 :r .\Scripts\UpdateIdentity.sql
 :r .\Scripts\CURs.sql
 :r .\Scripts\FilesPermissions.sql
+:r .\Scripts\MarketingPermissions.sql
