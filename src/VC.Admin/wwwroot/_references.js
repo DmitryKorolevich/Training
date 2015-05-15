@@ -1609,3 +1609,4 @@
 /// <reference path="app/core/utils/parts/angular-money-directive.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
+/// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
