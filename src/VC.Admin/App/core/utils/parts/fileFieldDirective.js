@@ -12,7 +12,8 @@
                     '</span>' +
                   '</p>',
         scope: {
-            Name: '=?'
+        	Name: '=?',
+        	onSelected: '&'
         },
         require: ['filefield', '?^ngModel'],
         controller: 'fileFieldController',
@@ -20,7 +21,7 @@
             var fileFieldCtrl = ctrls[0], ngModelCtrl = ctrls[1];
 
             if (ngModelCtrl) {
-                fileFieldCtrl.init(ngModelCtrl);
+            	fileFieldCtrl.init(ngModelCtrl, scope);
             }
         }
     };
@@ -66,8 +67,14 @@
                 thenCallback: function (data) {
                     if(data)
                     {
-                        ngModelCtrl.$setViewValue(data);
-                        ngModelCtrl.$render();
+                    	if (data.FullRelativeName) {
+                    		ngModelCtrl.$setViewValue(data.FullRelativeName);
+                    		ngModelCtrl.$render();
+	                    }
+
+                    	if ($scope.onSelected) {
+                    		$scope.onSelected({ file: data });
+	                    }
                     }
                     if (self.fileManagementPopup)
                     {

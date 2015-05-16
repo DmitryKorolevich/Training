@@ -82,6 +82,8 @@ namespace VitalChoice
             {
                 RouteConfig.RegisterRoutes(routes);
             });
+
+			
 		}
 	}
 }

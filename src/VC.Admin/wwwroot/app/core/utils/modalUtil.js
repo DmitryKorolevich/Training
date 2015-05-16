@@ -18,7 +18,7 @@ angular.module('app.core.utils.modalUtil', [])
 						return data;
 					}
 				},
-                controllerAs: 'modal',
+                controllerAs: 'modal'
 			});
 
 			modalInstance.result.then(function (data) {

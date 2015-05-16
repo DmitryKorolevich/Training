@@ -4,8 +4,8 @@ angular.module('app.modules.file.controllers.filesController', [])
 .constant('filesConfig', {
     urlPrefix: 'files',
 })
-.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
-    function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
+.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modalStack', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig', '$modalInstance',
+function ($scope, $rootScope, $state, $stateParams, $modalStack, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig,$modalInstance) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;
@@ -514,7 +514,10 @@ angular.module('app.modules.file.controllers.filesController', [])
         $scope.selectedFileImgLoad = function (event) {
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) == -1 && event.target.naturalWidth != 0 &&
                 event.target.naturalHeight != 0) {
-                $scope.selectedFile.Dimensions = "{0}x{1}".format(event.target.naturalWidth, event.target.naturalHeight);
+
+            	$scope.selectedFile.Width = event.target.naturalWidth;
+	            $scope.selectedFile.Height = event.target.naturalHeight;
+	            $scope.selectedFile.Dimensions = "{0}x{1}".format($scope.selectedFile.Width, $scope.selectedFile.Height);
             }
         };
 
@@ -524,7 +527,7 @@ angular.module('app.modules.file.controllers.filesController', [])
             }
             else {
                 if (data) {
-                    data.thenCallback($scope.selectedFile.FullRelativeName);
+                    data.thenCallback($scope.selectedFile);
                 }
             }
         };
