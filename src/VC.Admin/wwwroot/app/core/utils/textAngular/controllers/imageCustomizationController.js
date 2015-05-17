@@ -1,11 +1,9 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.textAngular.controllers.imageCustomizationController', [])
-.controller('imageCustomizationController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+.controller('imageCustomizationController', ['$scope', '$modalInstance', 'data', function ($scope, $modalInstance, data) {
 
 		function intitialize() {
-			$scope.image = {};
-
 			$scope.alignmentLookup = [
 				{ Text: 'Baseline', Value: 'baseline' },
 				{ Text: 'Top', Value: 'top' },
@@ -16,10 +14,15 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 				{ Text: 'Left', Value: 'left'},
 				{ Text: 'Right', Value: 'right'}
 			];
+
+			if (data) {
+				$scope.image = data;
+			} else {
+				$scope.image = { Alignment: 'baseline' };
+			}
 		};
 
 		$scope.selected = function (file) {
-			$scope.image.Original = file;
 			$scope.image.Src = file.PreviewUrl;
 			$scope.image.Width = file.Width;
 			$scope.image.Height = file.Height;

@@ -59,6 +59,8 @@
     'app/core/utils/parts/angular-money-directive.js',
 		'app/core/utils/templateOverrides.js',
 		'app/core/utils/textAngular/controllers/imageCustomizationController.js',
+		'app/core/utils/textAngular/services/imageCustomizationService.js',
+		'app/core/utils/textAngular/textAngular.js',
 		'app/core/utils/utils.js',
 		'app/modules/modules.js',
 		'app/modules/authentication/authentication.js',

@@ -1726,3 +1726,7 @@
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
+/// <reference path="../app/core/utils/textangular/textangular.js" />
+/// <reference path="app/core/utils/textangular/textangular.js" />
+/// <reference path="../app/core/utils/textangular/services/imagecustomizationservice.js" />
+/// <reference path="app/core/utils/textangular/services/imageCustomizationService.js" />
