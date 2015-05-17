@@ -62,7 +62,6 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="PostDeployment" />
-    <Folder Include="dbo\" />
     <Folder Include="deploy" />
     <Folder Include="PostDeployment\Scripts\" />
   </ItemGroup>
@@ -77,10 +76,12 @@
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
     <None Include="Azure.publish.xml" />
+    <None Include="PostDeployment\Scripts\WorkflowExecutors.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
-  </ItemGroup>
+    <None Include="PostDeployment\Scripts\WorkflowTreeActions.sql" />
+    <None Include="PostDeployment\Scripts\WorkflowTrees.sql" />  </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Countries.sql" />
   </ItemGroup>
