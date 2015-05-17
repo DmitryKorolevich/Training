@@ -21,9 +21,6 @@ namespace VitalChoice.Data.Extensions
             return Task.FromResult(_inner.MoveNext());
         }
 
-        public T Current
-        {
-            get { return _inner.Current; }
-        }
+        public T Current => _inner.Current;
     }
 }

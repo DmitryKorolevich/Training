@@ -81,7 +81,8 @@
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
     <None Include="PostDeployment\Scripts\WorkflowTreeActions.sql" />
-    <None Include="PostDeployment\Scripts\WorkflowTrees.sql" />  </ItemGroup>
+    <None Include="PostDeployment\Scripts\WorkflowTrees.sql" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Countries.sql" />
   </ItemGroup>
@@ -90,5 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\GiftCertificates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\WorkflowResolverPaths.sql" />
   </ItemGroup>
 </Project>

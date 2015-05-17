@@ -12,39 +12,33 @@ namespace VitalChoice.Data.Helpers
     public sealed class IncludableQueryFluent<TEntity, TPreviousProperty>: QueryFluent<TEntity>, IIncludableQueryFluent<TEntity, TPreviousProperty>
         where TEntity : Entity 
     {
-        private bool forCollection;
+        private readonly bool _forICollection;
 
         public IIncludableQueryFluent<TEntity, TProperty> ThenInclude<TProperty>(Expression<Func<TPreviousProperty, ICollection<TProperty>>> expression)
         {
-            if (forCollection)
+            if (_forICollection)
             {
                 Query = ((IIncludableQueryable<TEntity, ICollection<TPreviousProperty>>)Query).ThenInclude(expression);
                 return new IncludableQueryFluent<TEntity, TProperty>(this, true);
             }
-            else
-            {
-                Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
-                return new IncludableQueryFluent<TEntity, TProperty>(this, true);
-            }
+            Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
+            return new IncludableQueryFluent<TEntity, TProperty>(this, true);
         }
 
         public IIncludableQueryFluent<TEntity, TProperty> ThenInclude<TProperty>(Expression<Func<TPreviousProperty, TProperty>> expression)
         {
-            if (forCollection)
+            if (_forICollection)
             {
                 Query = ((IIncludableQueryable<TEntity, ICollection<TPreviousProperty>>)Query).ThenInclude(expression);
                 return new IncludableQueryFluent<TEntity, TProperty>(this);
             }
-            else
-            {
-                Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
-                return new IncludableQueryFluent<TEntity, TProperty>(this);
-            }
+            Query = ((IIncludableQueryable<TEntity, TPreviousProperty>)Query).ThenInclude(expression);
+            return new IncludableQueryFluent<TEntity, TProperty>(this);
         }
 
-        internal IncludableQueryFluent(QueryFluent<TEntity> queryFluent,bool forCollection=false) : base(queryFluent)
+        internal IncludableQueryFluent(QueryFluent<TEntity> queryFluent,bool forICollection=false) : base(queryFluent)
         {
-            this.forCollection = forCollection;
+            this._forICollection = forICollection;
         }
 
         public IncludableQueryFluent(ReadRepositoryAsync<TEntity> repository) : base(repository)

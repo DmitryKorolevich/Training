@@ -8,16 +8,16 @@ namespace VitalChoice.Data.Transaction
 {
     public class TransactionManager
     {
-	    private readonly DbContext dataContext;
+	    private readonly DbContext _dataContext;
 
 	    public TransactionManager(IDataContextAsync dataContext)
 	    {
-		    this.dataContext = (DbContext)dataContext;
+		    this._dataContext = (DbContext)dataContext;
 	    }
 
 	    public RelationalTransaction BeginTransaction()
 	    {
-			return dataContext.Database.AsRelational().AsSqlServer().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+			return _dataContext.Database.AsRelational().AsSqlServer().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
 		}
     }
 }
