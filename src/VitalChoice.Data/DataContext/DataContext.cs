@@ -9,22 +9,20 @@ namespace VitalChoice.Data.DataContext
 {
 	public class DataContext : DbContext, IDataContext, IDataContextAsync
 	{
-		private readonly Guid instanceId;
-
-		public DataContext()
+	    public DataContext()
 		{
-			instanceId = Guid.NewGuid();
+			InstanceId = Guid.NewGuid();
         }
 
-		public Guid InstanceId => instanceId;
+		public Guid InstanceId { get; }
 
-		public override int SaveChanges()
+	    public override int SaveChanges()
 		{
 			var changes = base.SaveChanges();
 			return changes;
 		}
 
-		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var changesAsync = await base.SaveChangesAsync(cancellationToken);
 			return changesAsync;
