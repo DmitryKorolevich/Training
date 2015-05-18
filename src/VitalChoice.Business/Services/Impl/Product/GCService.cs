@@ -46,9 +46,13 @@ namespace VitalChoice.Business.Services.Impl.Product
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)
         {
-            var query = new GCQuery().NotDeleted().WithType(filter.GCType).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
-            PagedList<GiftCertificate> toReturn = await giftCertificateRepository.Query(query).OrderBy(x => x.OrderByDescending(pp => pp.Created)).
-                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var query = giftCertificateRepository.Query();
+
+            var conditions = new GCConditions();
+            conditions.Init(query);
+            conditions = conditions.NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
+
+            PagedList<GiftCertificate> toReturn = await query.OrderBy(x => x.OrderByDescending(pp => pp.Created)).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var users = await userManager.Users.Where(p=>toReturn.Items.Select(pp=>pp.UserId).Contains(p.Id)).Include(x => x.Profile).ToListAsync();
             foreach(var item in toReturn.Items)
             {
@@ -67,14 +71,24 @@ namespace VitalChoice.Business.Services.Impl.Product
 
         public async Task<GiftCertificate> GetGiftCertificateAsync(int id)
         {
-            GCQuery query = new GCQuery().WithId(id).NotDeleted();
-            return (await giftCertificateRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var query = giftCertificateRepository.Query();
+
+            var conditions = new GCConditions();
+            conditions.Init(query);
+            conditions = conditions.WithId(id).NotDeleted();
+
+            return (await query.SelectAsync(false)).FirstOrDefault();
         }
 
         public async Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model)
         {
-            GCQuery query = new GCQuery().WithId(model.Id).NotDeleted();
-            GiftCertificate dbItem = (await giftCertificateRepository.Query(query).SelectAsync()).FirstOrDefault();
+            var query = giftCertificateRepository.Query();
+
+            var conditions = new GCConditions();
+            conditions.Init(query);
+            conditions = conditions.WithId(model.Id).NotDeleted();
+
+            GiftCertificate dbItem = (await query.SelectAsync()).FirstOrDefault();
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {

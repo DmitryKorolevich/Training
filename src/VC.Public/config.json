@@ -7,9 +7,9 @@
         "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
 		"DefaultCultureId": "en-US",
         "Connection": {
-            "UserName": "dev_vc_user",
-            "Password": "VZQCkea2",
-            "Server":  "localhost"
-        },
+            "UserName": "dev_vcdb_login",
+            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+            "Server": "oz449vjvis.database.windows.net"
+        }
 	}
 }

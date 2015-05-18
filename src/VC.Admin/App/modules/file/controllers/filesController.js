@@ -4,8 +4,8 @@ angular.module('app.modules.file.controllers.filesController', [])
 .constant('filesConfig', {
     urlPrefix: 'files',
 })
-.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
-function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
+.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', '$timeout', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
+function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;
@@ -90,6 +90,10 @@ function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload
             $scope.logRequests = [];
 
             loadDirectories();
+
+            $scope.$watch('selectedDir.FullRelativeName', function () {
+                loadFiles();
+            });
         }
 
         $scope.selectDirectory = function (fullRelativeName) {
@@ -201,10 +205,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload
                 }
             });
         };
-
-        $scope.$watch('selectedDir.FullRelativeName', function () {
-            loadFiles();
-        });
 
         function loadFiles() {
             $scope.files = [];
@@ -537,8 +537,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload
                 data.thenCallback();
             }
         };
-    
-        $('.table .wrapper').ready(function () {
-            initialize();
-        });
+
+        $timeout(initialize, 50);
     }]);

@@ -11,6 +11,6 @@ namespace VitalChoice.Domain.Transfer.Product
 
         public string Email { get; set; }
 
-        public GCType? GCType { get; set; }
+        public GCType? Type { get; set; }
     }
 }

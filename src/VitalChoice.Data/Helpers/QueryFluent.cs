@@ -48,6 +48,12 @@ namespace VitalChoice.Data.Helpers
             _expression = expression;
         }
 
+        public IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+        {
+            Query = Query.Where(predicate);
+            return this;
+        }
+
         public IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy)
         {
             _orderBy = orderBy;

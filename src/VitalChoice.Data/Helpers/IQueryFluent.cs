@@ -21,5 +21,6 @@ namespace VitalChoice.Data.Helpers
         IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
         IEnumerable<TEntity> Select(bool tracking = true);
         Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true);
+        IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
     }
 }
