@@ -537,6 +537,8 @@ function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload
                 data.thenCallback();
             }
         };
-
-        initialize();
+    
+        $('.table .wrapper').ready(function () {
+            initialize();
+        });
     }]);
