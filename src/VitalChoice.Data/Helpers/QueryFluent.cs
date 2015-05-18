@@ -1,5 +1,4 @@
-﻿#region
-
+﻿
 using Microsoft.Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,6 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
-
-#endregion
 
 namespace VitalChoice.Data.Helpers
 {

@@ -5,7 +5,7 @@
     "GenerateLowercaseUrls": true,
     "EnableBundlingAndMinification": false,
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-    "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
+    "FilesPath": "g:\\projects\\VC\\VitalChoice\\src\\VC.Admin\\files",
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
@@ -14,8 +14,8 @@
       "Password": "VZQCkea2",
       "Server": "localhost"
     },
-    "PublicHost": "http://dev2.vitalchoice.com:5010/",
-    "AdminHost": "http://dev2.vitalchoice.com:5004/",
+    "PublicHost": "http://localhost:51805/",
+    "AdminHost": "http://localhost:51805/",
     "Email": {
       /*"From": "admin.staging@g2designgroup.com",
 			"Host": "smtp.1and1.com",

@@ -69,33 +69,36 @@ namespace VitalChoice.Business.Services.Impl
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
 #if DNX451
-            string label = null;
             if (localizationData != null)
             {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(p => p.GetName().Name == LocalizationService.DOMAIN_ASSEMBLY_NAME).FirstOrDefault();
-                var types = assembly.GetTypes().Where(p => p.IsEnum && p.Namespace == LocalizationService.LOCALIZATION_GROUPS_NAMESPACE).ToList();
-                foreach (var type in types)
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(p => p.GetName().Name == DOMAIN_ASSEMBLY_NAME);
+                if (assembly != null)
                 {
-                    var typeInfo = type.GetTypeInfo();
-                    var localizationGroupAttribute = typeInfo.GetCustomAttributes(typeof(LocalizationGroupAttribute), true).SingleOrDefault() as
-                        LocalizationGroupAttribute;
-                    if (localizationGroupAttribute == null)
+                    var types = assembly.GetTypes().Where(p => p.IsEnum && p.Namespace == LocalizationService.LOCALIZATION_GROUPS_NAMESPACE).ToList();
+                    foreach (var type in types)
                     {
-                        throw new ArgumentException(string.Format("LocalizationGroupAttribute isn't set on the given enum property {0}.", typeInfo.FullName));
-                    }
-
-                    Dictionary<int, List<LocalizationItemData>> group = null;
-                    if (localizationData.TryGetValue(localizationGroupAttribute.GroupId, out group))
-                    {
-                        var items = EnumHelper.GetItems<byte>(type);
-                        foreach (var item in items)
+                        var typeInfo = type.GetTypeInfo();
+                        var localizationGroupAttribute = typeInfo.GetCustomAttributes(typeof(LocalizationGroupAttribute), true).SingleOrDefault() as
+                            LocalizationGroupAttribute;
+                        if (localizationGroupAttribute == null)
                         {
-                            label = GetItemValue(group, item.Key, cultureId);
-                            toReturn.Add(new LookupItem<string>()
+                            throw new ArgumentException(
+                                $"LocalizationGroupAttribute isn't set on the given enum property {typeInfo.FullName}.");
+                        }
+
+                        Dictionary<int, List<LocalizationItemData>> group = null;
+                        if (localizationData.TryGetValue(localizationGroupAttribute.GroupId, out @group))
+                        {
+                            var items = EnumHelper.GetItems<byte>(type);
+                            foreach (var item in items)
                             {
-                                Key= String.Format("{0}.{1}", type.Name,item.Value),
-                                Text = label,
-                            });
+                                var label = GetItemValue(@group, item.Key, cultureId);
+                                toReturn.Add(new LookupItem<string>
+                                {
+                                    Key= $"{type.Name}.{item.Value}",
+                                    Text = label,
+                                });
+                            }
                         }
                     }
                 }
@@ -120,13 +123,14 @@ namespace VitalChoice.Business.Services.Impl
 
             if (!enumType.IsEnum)
             {
-                throw new ArgumentException(string.Format("Not enum type {0}.", enumType.FullName));
+                throw new ArgumentException($"Not enum type {enumType.FullName}.");
             }
             var localizationGroupAttribute = enumType.GetCustomAttributes(typeof(LocalizationGroupAttribute), true).SingleOrDefault() as
                 LocalizationGroupAttribute;
             if (localizationGroupAttribute == null)
             {
-                throw new ArgumentException(string.Format("LocalizationGroupAttribute isn't set on the given enum property {0}.", enumType.FullName));
+                throw new ArgumentException(
+                    $"LocalizationGroupAttribute isn't set on the given enum property {enumType.FullName}.");
             }
 
             return GetStringFromLocalizationDataItem(localizationGroupAttribute.GroupId, Convert.ToInt32(enumValue), cultureId, args);
@@ -154,13 +158,13 @@ namespace VitalChoice.Business.Services.Impl
                 List<LocalizationItemData> items = null;
                 if (group.TryGetValue(itemId, out items))
                 {
-                    var item = items.Where(p => p.CultureId == cultureId).FirstOrDefault();
+                    var item = items.FirstOrDefault(p => p.CultureId == cultureId);
                     //Check language part
                     if (item == null)
                     {
                         if (cultureId != null && cultureId.Length > 2)
                         {
-                            item = items.Where(p => p.CultureId == cultureId.Substring(0, 2)).FirstOrDefault();
+                            item = items.FirstOrDefault(p => p.CultureId == cultureId.Substring(0, 2));
                         }
                     }
                     //Check default label
@@ -169,13 +173,13 @@ namespace VitalChoice.Business.Services.Impl
                         var defaultCulureId = LocalizationService.defaultCultureId;
                         if (defaultCulureId != null)
                         {
-                            item = items.Where(p => p.CultureId == defaultCulureId).FirstOrDefault();
+                            item = items.FirstOrDefault(p => p.CultureId == defaultCulureId);
                         }
                         if (item == null)
                         {
                             if (defaultCulureId != null && defaultCulureId.Length > 2)
                             {
-                                item = items.Where(p => p.CultureId == defaultCulureId.Substring(0, 2)).FirstOrDefault();
+                                item = items.FirstOrDefault(p => p.CultureId == defaultCulureId.Substring(0, 2));
                             }
                         }
                     }

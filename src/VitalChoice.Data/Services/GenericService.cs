@@ -104,7 +104,7 @@ namespace VitalChoice.Data.Services
 
         public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
         {
-            return await DeleteAsync(cancellationToken, id);
+            return await Repository.DeleteAsync(cancellationToken, id);
         }
     }
 }

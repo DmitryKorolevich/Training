@@ -41,7 +41,8 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	    $scope.email.Message = 'These are your Vital Choice gift certificate(s):\r\n\r\n';
 
 	    $.each($scope.email.Codes, function (index, code) {
-	        $scope.email.Message += '{0} (${1} available)\r\n'.format(code.Code, code.Balance);
+	        $scope.email.Message += '{0} (${1} available)\r\n'.format(code.Code, code.Balance.toFixed(2)
+            );
 	    });
 
 	    $scope.save = function () {
