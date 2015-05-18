@@ -12,7 +12,11 @@ angular.module('app.core.utils.textAngular', [
 			action: function (promise, restoreSelection) {
 				var textAngular = this;
 
-				imageCustomizationService.customizeImage(textAngular, restoreSelection, promise, null, null);
+				imageCustomizationService.customizeImage(null, function(markup) {
+					textAngular.$editor().wrapSelection('insertHTML', markup, true);
+					promise.resolve();
+					return false;
+				});
 
 				return false;
 			},
@@ -21,7 +25,6 @@ angular.module('app.core.utils.textAngular', [
 				action: function (event, $element, editorScope) {
 					var finishEdit = function () {
 						editorScope.updateTaBindtaTextElement();
-						editorScope.hidePopover();
 					};
 					event.preventDefault();
 
@@ -29,9 +32,11 @@ angular.module('app.core.utils.textAngular', [
 
 					var initialData = angular.fromJson($element.data('restore'));
 
-					imageCustomizationService.customizeImage(textAngular, null, null, initialData, $element);
-
-					finishEdit();
+					imageCustomizationService.customizeImage(initialData, function(markup) {
+						$element.replaceWith(markup);
+						finishEdit();
+						return false;
+					});
 
 					return false;
 				}

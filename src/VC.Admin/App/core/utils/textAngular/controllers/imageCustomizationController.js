@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.textAngular.controllers.imageCustomizationController', [])
-.controller('imageCustomizationController', ['$scope', '$modalInstance', 'data', function ($scope, $modalInstance, data) {
+.controller('imageCustomizationController', ['$scope', '$modalInstance', 'data', 'toaster', function ($scope, $modalInstance, data, toaster) {
 
 		function intitialize() {
 			$scope.alignmentLookup = [
@@ -28,7 +28,10 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 			$scope.image.Height = file.Height;
 		};
 
-		$scope.ok = function() {
+		$scope.ok = function () {
+			if (!$scope.image || !$scope.image.FileUrl) {
+				toaster.pop('error', "Error!", 'Please select an image first.', null, 'trustedHtml');
+			}
 			$modalInstance.close($scope.image);
 		};
 

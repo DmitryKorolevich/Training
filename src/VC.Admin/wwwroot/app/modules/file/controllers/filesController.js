@@ -522,7 +522,7 @@ function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload
         };
 
         $scope.save = function () {
-            if (!$scope.selectedFile.FullRelativeName) {
+        	if (!$scope.selectedFile || !$scope.selectedFile.FullRelativeName) {
                 toaster.pop('error', "Error!", 'Please select a file first.', null, 'trustedHtml');
             }
             else {

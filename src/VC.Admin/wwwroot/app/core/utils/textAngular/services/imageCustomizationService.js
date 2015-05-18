@@ -4,7 +4,9 @@ angular.module('app.core.utils.textAngular.services.imageCustomizationService', 
 .service('imageCustomizationService', ['modalUtil', function (modalUtil) {
 	
 	return {
-		customizeImage: function (textAngular, restoreSelection, promise, initialData, element) {
+		customizeImage: function (initialData, finishSelection) {
+			var savedSelection = rangy.saveSelection();
+
 			var modalInstance = modalUtil.open('app/core/utils/textAngular/partials/imageCustomization.html', 'imageCustomizationController', initialData, null, function (image) {
 
 				image.Title = image.Title ? image.Title : "";
@@ -17,8 +19,8 @@ angular.module('app.core.utils.textAngular.services.imageCustomizationService', 
 							+ "; margin-right: " + (image.Right ? (image.Right + "px") : "auto")
 							+ "; margin-top: " + (image.Top ? (image.Top + "px") : "auto")
 							+ "; margin-bottom: " + (image.Bottom ? (image.Bottom + "px") : "auto")
-							+ "; height: " + (image.Height ? (image.Height + "px") : "auto")
-							+ "; width: " + (image.Width ? (image.Width + "px") : "auto")
+							+ (image.KeepRatio ? "; max-height: " : "; height: ") + (image.Height ? (image.Height + "px") : "auto")
+							+ (image.KeepRatio ? "; max-width: " : "; width: ") + (image.Width ? (image.Width + "px") : "auto")
 							+ "; vertical-align: " + (!(image.Alignment == 'left' || image.Alignment == 'right') ? image.Alignment : 'baseline')
 							+ "; float:" + ((image.Alignment == 'left' || image.Alignment == 'right') ? image.Alignment : 'none') + ";' />";
 
@@ -26,18 +28,10 @@ angular.module('app.core.utils.textAngular.services.imageCustomizationService', 
 					markup = "<a href='" + image.Hyperlink + "'>" + markup + "</a>"
 				}
 
-				if (restoreSelection) {
-					restoreSelection();
-				}
+				rangy.restoreSelection(savedSelection);
 
-				if (element) {
-					element.replaceWith(markup);
-				} else {
-					textAngular.$editor().wrapSelection('insertHTML', markup, true);
-				}
-
-				if (promise) {
-					promise.resolve();
+				if (finishSelection) {
+					finishSelection(markup);
 				}
 			});
 		}
