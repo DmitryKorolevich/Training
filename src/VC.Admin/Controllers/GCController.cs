@@ -15,6 +15,8 @@ using VitalChoice.Business.Services.Contracts.Product;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using System.Security.Claims;
+using System;
 
 namespace VC.Admin.Controllers
 {
@@ -56,6 +58,13 @@ namespace VC.Admin.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.UserId = userId;
+            }
 
             return (await GCService.AddGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
         }

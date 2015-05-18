@@ -7,7 +7,7 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 
 	function successSaveHandler(result) {
 	    if (result.Success) {
-	        toaster.pop('success', "Success!", "Successfully saved.");
+	        toaster.pop('success', "Success!", "Successfully sent.");
 
 	        if (data.thenCallback) {
 	            data.thenCallback(result.Data);
@@ -38,6 +38,11 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	    $scope.forms = {};
 
 	    $scope.email = data;
+	    $scope.email.Message = 'These are your Vital Choice gift certificate(s):\r\n\r\n';
+
+	    $.each($scope.email.Codes, function (index, code) {
+	        $scope.email.Message += '{0} (${1} available)\r\n'.format(code.Code, code.Balance);
+	    });
 
 	    $scope.save = function () {
 	        $.each($scope.forms.form, function (index, element) {

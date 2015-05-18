@@ -21,6 +21,7 @@
                         <spinner-overlay data-loading="refreshTracker.active()">
                             <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
                                 <fieldset>
+                                    <span class="legend">Gift Certificate Details</span>
                                     <div class="form-group">
                                         <label for="type" class="col-md-3 control-label">Active</label>
                                         <div class="col-md-9">
@@ -40,11 +41,12 @@
                                         <div class="col-md-9">
                                             <div class="input-group">
                                                 <span class="input-group-addon">$</span>
-                                                <input type="text" name="Balance" class="form-control" placeholder="Amount" money max="100000" data-ng-model="gc.Balance" required>
+                                                <input type="text" name="Balance" class="form-control" placeholder="Amount" money max="100000" min="0.01" data-ng-model="gc.Balance" required>
                                             </div>
                                             <div class="error-container" ng-show="forms.form.submitted && forms.form.Balance.$invalid">
                                                 <small class="error" ng-show="forms.form.Balance.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                 <small class="error" ng-show="forms.form.Balance.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
+                                                <small class="error" ng-show="forms.form.Balance.$error.min">{{getValidationMessage("ValidationMessages.FieldMinOrEqual","GeneralFieldNames.Amount",0)}}</small>
                                                 <small class="error" ng-show="forms.form.Balance.$error.server">{{serverMessages.GetMessage('Balance')}}</small>
                                             </div>
                                         </div>

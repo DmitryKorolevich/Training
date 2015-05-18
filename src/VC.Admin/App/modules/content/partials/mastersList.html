@@ -3,14 +3,15 @@
         <span class="legend">Manage Master Templates</span>
         <div class="row form-group">
             <div class="col-md-4">
-                <div class="input-group">
-                    <select class="form-control" data-ng-model="filter.Type" ng-options="type.Key as type.Text for type in types"></select>
-                    <span class="input-group-btn">
-                        <button class="btn btn-info" data-ng-click="filterMasters();" type="button">Filter</button>
-                    </span>
-                </div>
+                <select class="form-control" data-ng-model="filter.Type" ng-options="type.Key as type.Text for type in types"></select>
             </div>
         </div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterMasters();" type="button">Filter</button>
+            </div>
+        </div>
+        <hr />
         <div class="form-group">
             <button data-ng-click="open();" class="btn btn-primary">Add New Master Template</button>
         </div>

@@ -27,6 +27,34 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public GCQuery WithEmail(string email)
+        {
+            if (!String.IsNullOrEmpty(email))
+            {
+                Add(x => x.Email.Contains(email));
+            }
+
+            return this;
+        }
+
+        public GCQuery WithName(string name)
+        {
+            if (!String.IsNullOrEmpty(name))
+            { 
+                var items = name.Split(' ');
+                if(items.Length==1)
+                {
+                    Add(x => x.FirstName.Contains(items[0]) || x.LastName.Contains(items[0]));
+                }
+                else
+                {
+                    Add(x => x.FirstName.Contains(items[0]) && x.LastName.Contains(items[1]));
+                }
+            }
+
+            return this;
+        }
+
         public GCQuery NotDeleted()
         {
             Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));

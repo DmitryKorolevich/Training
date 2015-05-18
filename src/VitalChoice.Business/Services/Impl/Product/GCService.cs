@@ -19,6 +19,8 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Business.Mail;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Entities.Users;
+using Microsoft.AspNet.Identity;
 
 namespace VitalChoice.Business.Services.Impl.Product
 {
@@ -30,21 +32,35 @@ namespace VitalChoice.Business.Services.Impl.Product
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'T', 'U', 'V', 'W', 'X','Y','Z' };
 
         private readonly IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender emailSender;
         private readonly ILogger logger;
 
-        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository, IEmailSender emailSender)
+        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             this.giftCertificateRepository = giftCertificateRepository;
+            this.userManager = userManager;
             this.emailSender = emailSender;
             logger = LoggerService.GetDefault();
         }
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)
         {
-            var query = new GCQuery().NotDeleted().WithType(filter.GCType).WithCode(filter.Code);
+            var query = new GCQuery().NotDeleted().WithType(filter.GCType).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
             PagedList<GiftCertificate> toReturn = await giftCertificateRepository.Query(query).OrderBy(x => x.OrderByDescending(pp => pp.Created)).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var users = await userManager.Users.Where(p=>toReturn.Items.Select(pp=>pp.UserId).Contains(p.Id)).Include(x => x.Profile).ToListAsync();
+            foreach(var item in toReturn.Items)
+            {
+                foreach(var user in users)
+                {
+                    if(item.UserId==user.Id)
+                    {
+                        item.User = user;
+                        break;
+                    }
+                }
+            }
 
             return toReturn;
         }
@@ -99,7 +115,7 @@ namespace VitalChoice.Business.Services.Impl.Product
 
         public async Task<bool> SendGiftCertificateEmailAsync(GiftCertificateEmail model)
         {
-            await emailSender.SendEmailAsync(model.ToEmail, model.ToName, model.Message, model.FromName, model.ToName);
+            await emailSender.SendEmailAsync(model.ToEmail, "Your Vital Choice Gift Certificate(s)", model.Message, model.FromName, model.ToName, false);
             return true;
         }
 

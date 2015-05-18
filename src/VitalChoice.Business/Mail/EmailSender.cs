@@ -32,14 +32,15 @@ namespace VitalChoice.Business.Mail
 #endif
 		}
 
-		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= "Vital Choice", string toDisplayName = "")
+		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= "Vital Choice", string toDisplayName = "",
+            bool isBodyHtml=true)
 		{
 #if DNX451
 			var fromAddr = new MailAddress(configuration.From, fromDisplayName, Encoding.UTF8);
 			var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);
             var mailmsg = new MailMessage(fromAddr, toAddr)
 			{
-				IsBodyHtml = true,
+				IsBodyHtml = isBodyHtml,
 				Body = message,
 				BodyEncoding = Encoding.UTF8,
 				Subject = subject,

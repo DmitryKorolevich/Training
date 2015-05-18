@@ -21,7 +21,7 @@ namespace VC.Admin.Validators.Product
             {
                 RuleFor(model => model.Balance)
                     .Cascade(CascadeMode.StopOnFirstFailure)
-                    .GreaterThanOrEqualTo(0)
+                    .GreaterThan(0)
                     .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 0)
                     .LessThanOrEqualTo(100000)
                     .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 100000)

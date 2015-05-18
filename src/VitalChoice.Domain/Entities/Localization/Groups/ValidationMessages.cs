@@ -16,5 +16,7 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
 		UserStatusRestriction = 9,
 		PasswordMustMatch = 10,
         FieldNameInvalidFormat =11,
+        FieldMinOrEqual = 12,
+        FieldMaxOrEqual = 14,
     }
 }

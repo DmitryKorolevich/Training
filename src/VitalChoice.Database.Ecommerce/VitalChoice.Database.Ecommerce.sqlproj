@@ -90,4 +90,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\GiftCertificates.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\GiftCetfificatesUpdate.sql" />
+  </ItemGroup>
 </Project>

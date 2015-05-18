@@ -66,7 +66,7 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
                 ToName: item.FirstName || item.LastName ? item.FirstName + ' ' + item.LastName : null,
                 ToEmail: item.Email,
                 FromName: 'Vital Choice',
-                Message: item.Code,
+                Codes: [ item ],
             };
 	    modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', data);
 	};

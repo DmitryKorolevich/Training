@@ -27,9 +27,13 @@ namespace VC.Admin.Models.Product
 
         public string Email { get; set; }
 
-        public string Recipient { get; set; }
+        public string RecipientName { get; set; }
+
+        public string RecipientEmail { get; set; }
 
         public string ProductName { get; set; }
+
+        public string AgentId { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
 
@@ -48,12 +52,19 @@ namespace VC.Admin.Models.Product
                 Email = item.Email;
                 StatusCode = item.StatusCode;
                 GCType = item.GCType;
-                if (!String.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName) ||
-                    !String.IsNullOrEmpty(item.Email))
+                if (!String.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName))
                 {
-                    Recipient = $"{item.FirstName} {item.LastName}({item.Email})";
+                    RecipientName = $"{item.FirstName} {item.LastName} ";
+                }
+                if (!String.IsNullOrEmpty(item.Email))
+                {
+                    RecipientEmail = $"({item.Email})";
                 }
                 ProductName = StatusEnumHelper.GetGCTypeName(item.GCType);
+                if (item.User != null && item.User.Profile != null)
+                {
+                    AgentId = item.User.Profile.AgentId;
+                }
             }
         }
     }

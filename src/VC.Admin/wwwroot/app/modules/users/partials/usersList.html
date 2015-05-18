@@ -3,14 +3,15 @@
 		<span class="legend">Manage Users</span>
 		<div class="row form-group">
 			<div class="col-md-4">
-				<div class="input-group">
-					<input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Name, Email">
-					<span class="input-group-btn">
-						<button class="btn btn-info" data-ng-click="filterUsers();" type="button">Filter</button>
-					</span>
-				</div>
+                <input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Name, Email">
 			</div>
 		</div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <button class="btn btn-info" data-ng-click="filterUsers();" type="button">Filter</button>
+            </div>
+        </div>
+        <hr />
 		<div class="form-group">
 			<button data-ng-click="open(false);" ladda="addTracker.active()" class="btn btn-primary">Add New User</button>
 		</div>
