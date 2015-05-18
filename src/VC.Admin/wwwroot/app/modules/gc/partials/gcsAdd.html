@@ -47,7 +47,7 @@
                                                 <div class="error-container" ng-show="forms.form.submitted && forms.form.Balance.$invalid">
                                                     <small class="error" ng-show="forms.form.Balance.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                     <small class="error" ng-show="forms.form.Balance.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
-                                                    <small class="error" ng-show="forms.form.Balance.$error.min">{{getValidationMessage("ValidationMessages.FieldMinOrEqual","GeneralFieldNames.Amount",0)}}</small>
+                                                    <small class="error" ng-show="forms.form.Balance.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.Amount")}}</small>
                                                     <small class="error" ng-show="forms.form.Balance.$error.server">{{serverMessages.GetMessage('Balance')}}</small>
                                                 </div>
                                             </div>
