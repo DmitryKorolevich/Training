@@ -15,8 +15,9 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 				{ Text: 'Right', Value: 'right'}
 			];
 
-			if (data) {
-				$scope.image = data;
+			if (data.Image) {
+				$scope.image = data.Image;
+				$scope.availableForRemoval = true;
 			} else {
 				$scope.image = { Alignment: 'baseline' };
 			}
@@ -31,8 +32,17 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 		$scope.ok = function () {
 			if (!$scope.image || !$scope.image.FileUrl) {
 				toaster.pop('error', "Error!", 'Please select an image first.', null, 'trustedHtml');
+			} else {
+				$modalInstance.close($scope.image);
 			}
-			$modalInstance.close($scope.image);
+		};
+
+		$scope.remove = function() {
+			$modalInstance.dismiss();
+
+			if (data.Remove) {
+				data.Remove();
+			}
 		};
 
 		$scope.cancel = function() {

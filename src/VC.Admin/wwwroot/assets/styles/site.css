@@ -665,3 +665,6 @@ ul.navbar-custom-header li .dropdown-menu {
   overflow-y: auto;
   overflow-x: auto;
 }
+.navbar-custom-header.navbar-nav > li > a {
+  text-shadow: none;
+}

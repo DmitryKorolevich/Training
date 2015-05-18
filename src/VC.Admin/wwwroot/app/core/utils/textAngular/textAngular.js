@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.textAngular', [
+	'ngSanitize',
 	'textAngular',
 	'app.core.utils.textAngular.controllers.imageCustomizationController',
 	'app.core.utils.textAngular.services.imageCustomizationService'
@@ -32,8 +33,27 @@ angular.module('app.core.utils.textAngular', [
 
 					var initialData = angular.fromJson($element.data('restore'));
 
-					imageCustomizationService.customizeImage(initialData, function(markup) {
-						$element.replaceWith(markup);
+					var detectActiveElement = function () {
+						var toReplace = null;
+
+						if ($element.parent().hasClass('custom-image-link')) {
+							toReplace = $element.parent();
+						} else {
+							toReplace = $element;
+						}
+						return toReplace;
+					};
+
+					imageCustomizationService.customizeImage(initialData, function (markup) {
+						var toReplace = detectActiveElement();
+						toReplace.replaceWith(markup);
+
+						finishEdit();
+						return false;
+					}, function () {
+						var toReplace = detectActiveElement();
+						toReplace.remove();
+
 						finishEdit();
 						return false;
 					});

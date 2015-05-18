@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Keep ratio</label>
+                <label class="col-md-2 control-label">Keep Ratio</label>
                 <div class="col-md-3">
                     <div class="checkbox">
                         <label>
@@ -50,6 +50,10 @@
                 <label class="col-md-2 control-label">Hyperlink</label>
                 <div class="col-md-10">
                     <input type="text" class="form-control" placeholder="Hyperlink" data-ng-model="image.Hyperlink">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" data-ng-model="image.NewWindow">
+                        Open in a New Window
+                    </label>
                 </div>
             </div>
             <span class="legend">Spacing</span>
@@ -102,5 +106,6 @@
 </div>
 <div class="modal-footer">
     <button class="btn btn-success" data-ng-click="ok()">Ok</button>
+    <button class="btn btn-danger" data-ng-if="availableForRemoval" data-ng-click="remove()">Delete</button>
     <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
 </div>
