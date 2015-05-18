@@ -7,7 +7,11 @@ angular.module('app.core.utils.textAngular.services.imageCustomizationService', 
 		customizeImage: function (initialData, finishSelection, removeCallback) {
 			var savedSelection = rangy.saveSelection();
 
-			var modalInstance = modalUtil.open('app/core/utils/textAngular/partials/imageCustomization.html', 'imageCustomizationController', { Image: initialData, Remove: removeCallback }, null, function (image) {
+			var modalInstance = modalUtil.open('app/core/utils/textAngular/partials/imageCustomization.html', 'imageCustomizationController', { Image: initialData, Remove: function() {
+				rangy.restoreSelection(savedSelection);
+
+				removeCallback();
+			}}, null, function (image) {
 
 				image.Title = image.Title ? image.Title : "";
 				image.Src = image.Src ? image.Src : "";
