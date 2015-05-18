@@ -25,7 +25,7 @@ REFERENCES [dbo].[RecordStatusCodes] ([StatusCode])
 
 ALTER TABLE [dbo].[GiftCertificates] CHECK CONSTRAINT [FK_GiftCertificates_RecordStatusCodes]
 
-CREATE NONCLUSTERED INDEX [IX_GiftCertificates_ParentId] ON [dbo].[GiftCertificates]
+CREATE NONCLUSTERED INDEX [IX_GiftCertificates_Code] ON [dbo].[GiftCertificates]
 (
 	[Code] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80)

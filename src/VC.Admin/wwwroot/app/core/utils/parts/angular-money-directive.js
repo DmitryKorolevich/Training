@@ -37,8 +37,8 @@ angular.module('fiestah.money', [])
 
     function minValidator(value) {
       if (!ngModelCtrl.$isEmpty(value) && value < min) {
-        ngModelCtrl.$setValidity('min', false);
-        return undefined;
+          ngModelCtrl.$setValidity('min', false);
+          return value == 0 ? value : undefined;
       } else {
         ngModelCtrl.$setValidity('min', true);
         return value;

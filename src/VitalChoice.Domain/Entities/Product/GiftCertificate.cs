@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Domain.Entities.Product
 {
@@ -18,6 +19,10 @@ namespace VitalChoice.Domain.Entities.Product
 
         public string Email { get; set; }
 
+        public int? UserId { get; set; }
+
+        public ApplicationUser User { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public GCType GCType { get; set; }
@@ -34,6 +39,7 @@ namespace VitalChoice.Domain.Entities.Product
             toReturn.Email = this.Email;
             toReturn.StatusCode = this.StatusCode;
             toReturn.GCType = this.GCType;
+            toReturn.UserId = this.UserId;
             return toReturn;
         }
     }

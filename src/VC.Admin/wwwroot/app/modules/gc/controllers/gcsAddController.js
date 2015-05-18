@@ -9,6 +9,9 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, gcService, toaster
     function successSaveHandler(result) {
         if (result.Success) {
             $scope.codes = result.Data;
+            $.each($scope.codes, function (index, code) {
+                code.Balance = code.Balance.toFixed(2);
+            });
             $scope.state = 2;
             toaster.pop('success', "Success!", "Successfully saved.");
         } else {
@@ -75,11 +78,8 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, gcService, toaster
                 ToName: $scope.gc.FirstName || $scope.gc.LastName ? $scope.gc.FirstName + ' ' + $scope.gc.LastName: null,
                 ToEmail: $scope.gc.Email,
                 FromName: 'Vital Choice',
-                Message: '',
+                Codes: $scope.codes,
             };
-        $.each($scope.codes, function (index, code) {
-            data.Message += code.Code + '\r\n';
-        });
         modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', data);
     };
 

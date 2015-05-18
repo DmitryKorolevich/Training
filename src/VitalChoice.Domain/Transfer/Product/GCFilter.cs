@@ -7,6 +7,10 @@ namespace VitalChoice.Domain.Transfer.Product
     {
         public string Code { get; set; }
 
+        public string Name { get; set; }
+
+        public string Email { get; set; }
+
         public GCType? GCType { get; set; }
     }
 }

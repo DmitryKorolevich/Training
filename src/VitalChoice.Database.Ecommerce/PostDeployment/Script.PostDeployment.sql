@@ -19,3 +19,4 @@ Post-Deployment Script Template
 :r .\Scripts\ProductCategories.sql
 :r .\Scripts\Countries.sql
 :r .\Scripts\GiftCertificates.sql
+:r .\Scripts\GiftCetfificatesUpdate.sql
