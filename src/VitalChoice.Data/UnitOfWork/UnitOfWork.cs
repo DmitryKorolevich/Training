@@ -19,9 +19,9 @@ namespace VitalChoice.Data.UnitOfWork
     {
         #region Private Fields
 
-        private readonly IDataContextAsync dataContext;
-        private bool disposed;
-        private Dictionary<string, object> repositories;
+        private readonly IDataContextAsync _dataContext;
+        private bool _disposed;
+        private Dictionary<string, object> _repositories;
 
         #endregion Private Fields
 
@@ -29,7 +29,7 @@ namespace VitalChoice.Data.UnitOfWork
 
         public UnitOfWork(IDataContextAsync dataContext)
         {
-            this.dataContext = dataContext;
+            this._dataContext = dataContext;
         }
 
         public void Dispose()
@@ -40,37 +40,37 @@ namespace VitalChoice.Data.UnitOfWork
 
         public virtual void Dispose(bool disposing)
         {
-            if (!disposed && disposing)
-                dataContext.Dispose();
-            disposed = true;
+            if (!_disposed && disposing)
+                _dataContext.Dispose();
+            _disposed = true;
         }
 
         #endregion Constuctor/Dispose
 
         public int SaveChanges()
         {
-            return dataContext.SaveChanges();
+            return _dataContext.SaveChanges();
         }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return dataContext.SaveChangesAsync(cancellationToken);
+            return _dataContext.SaveChangesAsync(cancellationToken);
         }
 
         public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
         {
-            if (repositories == null)
-                repositories = new Dictionary<string, object>();
+            if (_repositories == null)
+                _repositories = new Dictionary<string, object>();
 
             var type = typeof (TEntity).Name;
 
-            if (repositories.ContainsKey(type))
-                return (IUnitRepositoryAsync<TEntity>) repositories[type];
+            if (_repositories.ContainsKey(type))
+                return (IUnitRepositoryAsync<TEntity>) _repositories[type];
 
             var repositoryType = typeof (UnitRepositoryAsync<>);
-            repositories.Add(type, Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity)), dataContext));
+            _repositories.Add(type, Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity)), _dataContext));
 
-            return (IUnitRepositoryAsync<TEntity>) repositories[type];
+            return (IUnitRepositoryAsync<TEntity>) _repositories[type];
         }
 
         #region Unit of Work Transactions

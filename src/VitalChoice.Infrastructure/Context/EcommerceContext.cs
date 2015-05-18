@@ -14,6 +14,7 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Domain.Entities.Workflow;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -62,6 +63,22 @@ namespace VitalChoice.Infrastructure.Context
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
             builder.ForSqlServer().UseIdentity();
+
+            #region Workflow
+
+		    builder.Entity<WorkflowExecutor>().Key(w => w.Id);
+		    builder.Entity<WorkflowExecutor>().ForRelational().Table("WorkflowExecutors");
+
+            builder.Entity<WorkflowResolverPath>().Key(w => w.Id);
+            builder.Entity<WorkflowResolverPath>().ForRelational().Table("WorkflowResolverPaths");
+
+            builder.Entity<WorkflowTree>().Key(w => w.Id);
+            builder.Entity<WorkflowTree>().ForRelational().Table("WorkflowTrees");
+
+            builder.Entity<WorkflowTreeAction>().Key(w => w.Id);
+            builder.Entity<WorkflowTreeAction>().ForRelational().Table("WorkflowTreeActions");
+
+            #endregion
 
             #region Products
 

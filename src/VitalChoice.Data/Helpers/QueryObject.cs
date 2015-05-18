@@ -1,10 +1,7 @@
-﻿#region
-
+﻿
 using System;
 using System.Linq.Expressions;
 using VitalChoice.Data.Extensions;
-
-#endregion
 
 namespace VitalChoice.Data.Helpers
 {

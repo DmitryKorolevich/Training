@@ -5,7 +5,7 @@ angular.module('app.modules.file.controllers.filesController', [])
     urlPrefix: 'files',
 })
 .controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
-    function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
+function ($scope, $rootScope, $state, $stateParams, $modal, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;
@@ -514,17 +514,20 @@ angular.module('app.modules.file.controllers.filesController', [])
         $scope.selectedFileImgLoad = function (event) {
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) == -1 && event.target.naturalWidth != 0 &&
                 event.target.naturalHeight != 0) {
-                $scope.selectedFile.Dimensions = "{0}x{1}".format(event.target.naturalWidth, event.target.naturalHeight);
+
+            	$scope.selectedFile.Width = event.target.naturalWidth;
+	            $scope.selectedFile.Height = event.target.naturalHeight;
+	            $scope.selectedFile.Dimensions = "{0}x{1}".format($scope.selectedFile.Width, $scope.selectedFile.Height);
             }
         };
 
         $scope.save = function () {
-            if (!$scope.selectedFile.FullRelativeName) {
+        	if (!$scope.selectedFile || !$scope.selectedFile.FullRelativeName) {
                 toaster.pop('error', "Error!", 'Please select a file first.', null, 'trustedHtml');
             }
             else {
                 if (data) {
-                    data.thenCallback($scope.selectedFile.FullRelativeName);
+                    data.thenCallback($scope.selectedFile);
                 }
             }
         };

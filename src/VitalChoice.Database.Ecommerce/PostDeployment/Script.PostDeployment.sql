@@ -10,6 +10,11 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
+:r .\Scripts\WorkflowExecutors.sql
+:r .\Scripts\WorkflowTrees.sql
+:r .\Scripts\WorkflowTreeActions.sql
+:r .\Scripts\WorkflowResolverPaths.sql
+
 :r .\Scripts\RecordStatusCodes.sql
 :r .\Scripts\ProductCategories.sql
 :r .\Scripts\Countries.sql
