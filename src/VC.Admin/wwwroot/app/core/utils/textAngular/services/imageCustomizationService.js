@@ -46,7 +46,7 @@ angular.module('app.core.utils.textAngular.services.imageCustomizationService', 
 						}
 					});
 				},
-				restoreImage(element) {
+				restoreImage: function(element) {
 					var image = {};
 
 					var width = parseInt(element.css('width'));
