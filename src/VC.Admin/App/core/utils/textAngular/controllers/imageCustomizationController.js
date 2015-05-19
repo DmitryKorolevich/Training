@@ -24,7 +24,7 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 		};
 
 		$scope.selected = function (file) {
-			$scope.image.Src = file.PreviewUrl;
+			$scope.image.Src = file.PreviewRelativeUrl;
 			$scope.image.Width = file.Width;
 			$scope.image.Height = file.Height;
 		};
@@ -47,6 +47,10 @@ angular.module('app.core.utils.textAngular.controllers.imageCustomizationControl
 
 		$scope.cancel = function() {
 			$modalInstance.dismiss();
+
+			if (data.Cancel) {
+				data.Cancel();
+			}
 		};
 
 		intitialize();

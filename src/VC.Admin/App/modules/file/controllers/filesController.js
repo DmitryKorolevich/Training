@@ -406,10 +406,12 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
             $scope.selectedFile = Object.clone(resFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
                 $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
+                $scope.selectedFile.PreviewRelativeUrl = "/assets/images/pdf.png";
                 $scope.selectedFile.Dimensions = "";
             }
             else {
                 $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(resFile.FullRelativeName);
+                $scope.selectedFile.PreviewRelativeUrl = "/files" + resFile.FullRelativeName;
                 $scope.selectedFile.Dimensions = "";
             }
             $scope.$apply();

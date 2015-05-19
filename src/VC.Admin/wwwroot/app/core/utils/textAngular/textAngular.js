@@ -31,8 +31,6 @@ angular.module('app.core.utils.textAngular', [
 
 					var textAngular = this;
 
-					var initialData = angular.fromJson($element.data('restore'));
-
 					var detectActiveElement = function () {
 						var toReplace = null;
 
@@ -43,6 +41,8 @@ angular.module('app.core.utils.textAngular', [
 						}
 						return toReplace;
 					};
+
+					var initialData = imageCustomizationService.restoreImage($element);
 
 					imageCustomizationService.customizeImage(initialData, function (markup) {
 						var toReplace = detectActiveElement();
