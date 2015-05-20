@@ -1,11 +1,13 @@
 ﻿'use strict';
 
 angular.module('app.modules.file.controllers.previewFileController', [])
-.controller('previewFileController', ['$scope', '$rootScope', '$modalInstance', 'data', 'filesConfig',
-    function ($scope, $rootScope, $modalInstance, data, filesConfig) {
+.controller('previewFileController', ['$scope', '$rootScope', '$modalInstance', 'data',
+    function ($scope, $rootScope, $modalInstance, data) {
 	
     function initialize() {
-        $scope.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
+        if ($rootScope.ReferenceData.PublicHost) {
+            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+        }
         var fileUrl = data.fileUrl;
 
         if (fileUrl) {

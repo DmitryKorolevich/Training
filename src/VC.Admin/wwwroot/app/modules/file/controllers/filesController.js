@@ -1,11 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.file.controllers.filesController', [])
-.constant('filesConfig', {
-    urlPrefix: 'files',
-})
-.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', '$timeout', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker', 'filesConfig',
-function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker, filesConfig) {
+.controller('filesController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', '$timeout', 'appBootstrap', 'Upload', 'modalUtil', 'fileService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstrap, Upload, modalUtil, fileService, toaster, confirmUtil, promiseTracker) {
         var INVALID_FILE_FORMAT_MESSAGE = "The uploaded file must be .jpg, .gif, .png or .pdf.";
         var INVALID_FILE_SIZE_MESSAGE = "The uploaded file must be less than 10 mb.";
         var MAX_FILE_SIZE = 10485760;
@@ -77,7 +74,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
             $scope.logFiles = [];
 
             $scope.breadCrumbMaxLevels = 5;
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
 
             $scope.selectedFile = null;
 
@@ -219,9 +215,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
                     if (result.Success) {
                         //Show only in the same folder
                         if (url == $scope.selectedDir.FullRelativeName) {
-                            $.each(result.Data, function (index, file) {
-                                prepareFile(file);
-                            });
                             $scope.files = result.Data;
                             $scope.filter.Paging.PageIndex = 1;
                             filterFiles();
@@ -236,9 +229,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
                 });
         };
 
-        function prepareFile(file) {
-            file.Url = $scope.baseUrl.format(file.FullRelativeName);
-        };
 
         $scope.deleteFile = function (deleteFile) {
             confirmUtil.confirm(function () {
@@ -346,7 +336,6 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
 
                             if (result.Data.DirectoryFullRelativeName == $scope.selectedDir.FullRelativeName) {
                                 var newFile = result.Data;
-                                prepareFile(newFile);
 
                                 var indexForRemove;
                                 $.each($scope.files, function (index, file) {
@@ -406,32 +395,14 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
             $scope.selectedFile = Object.clone(resFile);
             if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
                 $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
-                $scope.selectedFile.PreviewRelativeUrl = "/assets/images/pdf.png";
                 $scope.selectedFile.Dimensions = "";
             }
             else {
-                $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(resFile.FullRelativeName);
-                $scope.selectedFile.PreviewRelativeUrl = "/files" + resFile.FullRelativeName;
+                $scope.selectedFile.PreviewUrl = resFile.FullRelativeName;
                 $scope.selectedFile.Dimensions = "";
             }
             $scope.$apply();
         };
-
-        //$scope.selectFile = function (selectedFile) {
-        //    $.each($scope.files, function (index, file) {
-        //        file.selected = file == selectedFile;
-        //    });
-
-        //    $scope.selectedFile = Object.clone(selectedFile);
-        //    if ($scope.selectedFile.FullRelativeName.indexOf(PDF_FILE_EXT) > -1) {
-        //        $scope.selectedFile.PreviewUrl = "/assets/images/pdf.png";
-        //        $scope.selectedFile.Dimensions = "";
-        //    }
-        //    else {
-        //        $scope.selectedFile.PreviewUrl = $scope.baseUrl.format(selectedFile.FullRelativeName);
-        //        $scope.selectedFile.Dimensions = "";
-        //    }
-        //};
 
         $scope.filterFilesRequest = function () {
             $scope.filter.FilteredName = $scope.filter.Name;
@@ -478,7 +449,7 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
 
         var renderRow = function (file) {
             return '<tr data-name="' + file.Name + '" data-full-url="' + file.FullRelativeName + '"><td>' + file.Name + '</td><td class="width-140px">' + Date.parseDateTime(file.Updated).format('{MM}/{DD}/{yy} {HH}:{MN} {AP}') + '</td><td class="width-80px">' + file.SizeMessage + '</td><td class="width-70px">' +
-                '<div class="ya-treview-buttons"><a class="btn btn-success btn-xs" title="Download" target="_blank" href="' + file.Url + '"><i class="glyphicon glyphicon-download"></i></a><a class="btn btn-danger btn-xs" title="Delete"><i class="glyphicon glyphicon-remove"></i></a></div></td></tr>';
+                '<div class="ya-treview-buttons"><a class="btn btn-success btn-xs" title="Download" target="_blank" href="' + file.FullRelativeName + '"><i class="glyphicon glyphicon-download"></i></a><a class="btn btn-danger btn-xs" title="Delete"><i class="glyphicon glyphicon-remove"></i></a></div></td></tr>';
         };
 
         var addFileToTable = function (file) {

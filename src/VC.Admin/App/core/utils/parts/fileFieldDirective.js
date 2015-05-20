@@ -27,15 +27,17 @@
     };
 }])
 
-.controller('fileFieldController', ['$scope', '$rootScope', '$attrs', '$parse', '$timeout', '$log', 'modalUtil', 'appBootstrap', 'filesConfig', 'confirmUtil',
-    function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, filesConfig, confirmUtil) {
+.controller('fileFieldController', ['$scope', '$rootScope', '$attrs', '$parse', '$timeout', '$log', 'modalUtil', 'appBootstrap', 'confirmUtil',
+    function ($scope, $rootScope, $attrs, $parse, $timeout, $log, modalUtil, appBootstrap, confirmUtil) {
         var self = this;
         var ngModelCtrl = { $setViewValue: angular.noop };
         self.fileManagementPopup = null;
 
         self.init = function (ngModelCtrl_) {
             ngModelCtrl = ngModelCtrl_;
-            self.baseUrl = $rootScope.ReferenceData.PublicHost + filesConfig.urlPrefix + '{0}';
+            if ($rootScope.ReferenceData.PublicHost) {
+                self.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length-1) + '{0}';
+            }
             $scope.placeHolder = $attrs.placeholder;
 
             ngModelCtrl.$render = function () {

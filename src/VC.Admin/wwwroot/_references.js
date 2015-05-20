@@ -1821,6 +1821,6 @@
 /// <reference path="app/core/utils/textAngular/textAngular.js" />
 /// <reference path="app/core/utils/textAngular/controllers/imageCustomizationController.js" />
 /// <reference path="app/core/utils/textAngular/services/imageCustomizationService.js" />
-/// <reference path="app/app.common.js" />
 /// <reference path="../app/core/utils/textangular/services/custom-textangular-sanitize.js" />
 /// <reference path="app/core/utils/textangular/services/custom-textangular-sanitize.js" />
+/// <reference path="app/app.common.js" />

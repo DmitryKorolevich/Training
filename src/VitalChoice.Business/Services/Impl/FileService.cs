@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Hosting;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Infrastructure;
 using System;
@@ -16,6 +17,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Files;
 using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
@@ -31,6 +33,7 @@ namespace VitalChoice.Business.Services.Impl
 
         private static string _rootDir;
         private readonly ILogger logger;
+        private readonly IOptions<AppOptions> appOptions;
         private static string error = "";
 
         public static void Init(string rootDir)
@@ -53,9 +56,10 @@ namespace VitalChoice.Business.Services.Impl
             }
         }
 
-        public FileService()
+        public FileService(IOptions<AppOptions> appOptions)
         {
             this.logger = LoggerService.GetDefault();
+            this.appOptions = appOptions;
         }
 
         #region Dirs
@@ -139,7 +143,7 @@ namespace VitalChoice.Business.Services.Impl
             if (dirInfo.Exists)
             {
                 toReturn = dirInfo.GetFiles().Select(p => new FileInfoObject(p.Name, ConvertPathToUrl(p.FullName),
-                    ConvertPathToUrl(dirInfo.FullName), p.Length, p.LastWriteTime)).ToList();
+                    ConvertPathToUrl(dirInfo.FullName), p.Length, p.LastWriteTime, appOptions.Options.FilesRelativePath)).ToList();
             }
 
             return toReturn;
@@ -196,7 +200,8 @@ namespace VitalChoice.Business.Services.Impl
             {
                 resDir = "/";
             }
-            toReturn = new FileInfoObject(Path.GetFileName(path).ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime);
+            toReturn = new FileInfoObject(Path.GetFileName(path).ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime,
+                appOptions.Options.FilesRelativePath);
 
             return toReturn;
         }

@@ -20,10 +20,10 @@ namespace VitalChoice.Domain.Entities.Files
         public FileInfoObject()
         { }
 
-        public FileInfoObject(string name,string fullRelativeName, string directoryFullRelativeName, long sizeBytes, DateTime updated)
+        public FileInfoObject(string name,string fullRelativeName, string directoryFullRelativeName, long sizeBytes, DateTime updated, string filesPrefix)
         {
             Name = name;
-            FullRelativeName =fullRelativeName;
+            FullRelativeName = filesPrefix + fullRelativeName;
             DirectoryFullRelativeName = directoryFullRelativeName;
             Size = sizeBytes;
             var kBytes = Math.Round((double)sizeBytes / 1024,1);

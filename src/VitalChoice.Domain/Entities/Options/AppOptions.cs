@@ -16,6 +16,7 @@ namespace VitalChoice.Domain.Entities.Options
         public Connection Connection { get; set; }
         public string PublicHost { get; set; }
         public string AdminHost { get; set; }
-		public Email EmailConfiguration { get; set; }
+        public string FilesRelativePath { get; set; }
+        public Email EmailConfiguration { get; set; }
     }
 }

@@ -103,7 +103,8 @@ namespace VitalChoice.Core.DependencyInjection
                     };
                     options.PublicHost = configuration.Get("App:PublicHost");
                     options.AdminHost = configuration.Get("App:AdminHost");
-	                options.EmailConfiguration = new Email
+                    options.FilesRelativePath = configuration.Get("App:FilesRelativePath");
+                    options.EmailConfiguration = new Email
 	                {
 						 From = configuration.Get("App:Email:From"),
 						 Host = configuration.Get("App:Email:Host"),

@@ -114,7 +114,7 @@
             <div class="well container-fluid">
                 <div class="wrapper">
                     <div class="image-box">
-                        <a ng-if="selectedFile.Url" target="_blank" href="{{selectedFile.Url}}">
+                        <a ng-if="selectedFile.PreviewUrl" target="_blank" href="{{selectedFile.PreviewUrl}}">
                             <img img-load="selectedFileImgLoad($event)" ng-src="{{selectedFile.PreviewUrl}}" />
                         </a>
                         <div ng-if="selectedFile.Dimensions">{{selectedFile.Dimensions}}</div>
