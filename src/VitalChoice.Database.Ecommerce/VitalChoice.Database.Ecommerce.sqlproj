@@ -106,9 +106,6 @@
     <None Include="PostDeployment\Scripts\LookupVariants.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductLookupValues.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>

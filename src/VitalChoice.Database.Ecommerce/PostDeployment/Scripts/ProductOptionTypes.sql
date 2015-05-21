@@ -5,8 +5,10 @@ BEGIN
 		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
 		[Name] NVARCHAR(50) NOT NULL, 
 		[IdFieldType] INT NOT NULL, 
+		[IdLookup] INT NULL, 
 		[IdProductType] INT NULL, 
 		[DefaultValue] NVARCHAR(250) NULL, 
+		CONSTRAINT [FK_ProductOptionTypes_ToLookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
 		CONSTRAINT [FK_ProductOptionTypes_ToFieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id]), 
 		CONSTRAINT [FK_ProductOptionTypes_ToProductType] FOREIGN KEY ([IdProductType]) REFERENCES [ProductTypes]([Id])
 	);
