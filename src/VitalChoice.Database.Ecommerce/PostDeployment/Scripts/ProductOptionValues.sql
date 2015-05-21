@@ -12,5 +12,5 @@ BEGIN
 		CONSTRAINT [FK_ProductOptionValues_ToProduct] FOREIGN KEY ([IdProduct]) REFERENCES [Products]([Id])
 	);
 
-	CREATE INDEX [IX_ProductOptionValues_Value] ON [dbo].[ProductOptionValues] ([Value]) INCLUDE (Id, IdLookup, IdProduct, IdSku, IdOptionType)
+	CREATE INDEX [IX_ProductOptionValues_Value] ON [dbo].[ProductOptionValues] ([Value]) INCLUDE (Id, IdProduct, IdSku, IdOptionType)
 END

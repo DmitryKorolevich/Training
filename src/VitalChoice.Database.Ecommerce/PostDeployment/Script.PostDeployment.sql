@@ -26,7 +26,6 @@ Post-Deployment Script Template
 :r .\Scripts\ProductTypes.sql
 :r .\Scripts\Lookups.sql
 :r .\Scripts\LookupVariants.sql
-:r .\Scripts\ProductLookupValues.sql
 :r .\Scripts\ProductOptionTypes.sql
 :r .\Scripts\Products.sql
 :r .\Scripts\ProductsToCategories.sql
