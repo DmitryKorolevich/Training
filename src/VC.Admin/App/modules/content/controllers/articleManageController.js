@@ -61,7 +61,10 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
             MasterContentItemId: 0,
             PublishedDateObject: new DateObject(currentDate),
         };
-        $scope.loaded = false;
+		$scope.detailsTab = {
+			active: true
+		};
+		$scope.loaded = false;
         $scope.forms={};
 
         $scope.save = function () {
@@ -86,7 +89,8 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.articleForm.submitted = true;
+            	$scope.forms.articleForm.submitted = true;
+	            $scope.detailsTab.active = true;
             }
         };
 
