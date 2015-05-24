@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.users.controllers.userManagementController', [])
-.controller('userManagementController', ['$scope', 'userService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', function ($scope, userService, toaster, modalUtil, confirmUtil, promiseTracker) {
+.controller('userManagementController', ['$scope', 'userService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil', function ($scope, userService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
 	$scope.refreshTracker = promiseTracker("refresh");
 	$scope.deleteTracker = promiseTracker("delete");
 	$scope.editTracker = promiseTracker("edit");
@@ -31,7 +31,8 @@ angular.module('app.modules.users.controllers.userManagementController', [])
 	function initialize() {
 	    $scope.filter = {
 	        SearchText: "",
-            Paging: { PageIndex: 1, PageItemCount: 100 }
+	        Paging: { PageIndex: 1, PageItemCount: 100 },
+	        Sorting: gridSorterUtil.resolve(refreshUsers, 'UpdatedDate', 'Desc')
 	    };
 
 		refreshUsers();

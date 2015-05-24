@@ -1824,3 +1824,5 @@
 /// <reference path="../app/core/utils/textangular/services/custom-textangular-sanitize.js" />
 /// <reference path="app/core/utils/textangular/services/custom-textangular-sanitize.js" />
 /// <reference path="app/app.common.js" />
+/// <reference path="../app/core/utils/modalutil - copy.js" />
+/// <reference path="app/core/utils/gridsorterutil.js" />

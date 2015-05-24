@@ -13,6 +13,7 @@ angular.module('app.utils', [
     'fiestah.money',
 	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
+	'app.core.utils.gridSorterUtil',
 	'app.core.utils.commonActionsUtil',
 	'app.core.utils.confirmation.confirmController',
 	'app.core.utils.confirmation.confirmUtil',
