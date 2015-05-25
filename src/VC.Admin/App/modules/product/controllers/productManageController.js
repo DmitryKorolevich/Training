@@ -463,15 +463,15 @@ angular.module('app.modules.product.controllers.productManageController', [])
             }
         };
 
-        $scope.toggleOpen = function (item)
+        $scope.toggleOpen = function (item, event)
         {
-            if (item.isOpen!=undefined) {
-                item.isOpen = !item.isOpen;
-            }
-            else
-            {
-                item.isOpen = true;
-            }
+            var itemElement = $(event.target).closest('fieldset').find('.panel-collapse').get(0);
+            $.each($('.sortable-accordion .panel-collapse'), function (index, element) {
+                if (itemElement != element && $(element).css('display') == 'block') {
+                    $(element).slideToggle();
+                }
+            });
+            $(itemElement).slideToggle();
         };
 
         function successSaveHandler(result) {

@@ -240,7 +240,7 @@
                                                 <fieldset>
                                                     <div class="panel-heading">
                                                         <h4 class="panel-title">
-                                                            <a class="accordion-toggle" ng-click="toggleOpen(subSku)">
+                                                            <a class="accordion-toggle" ng-click="toggleOpen(subSku, $event)">
                                                                 <div class="form-horizontal">
                                                                     <div class="row">
                                                                         <div class="col-md-1" data-ng-click="$event.stopPropagation()">
@@ -291,7 +291,7 @@
                                                         </h4>
                                                     </div>
                                                     <!--</accordion-heading>-->
-                                                    <div class="panel-collapse" data-ng-class="{collapse: !subSku.isOpen}">
+                                                    <div class="panel-collapse" style="display: none;">
                                                         <div class="panel-body">
                                                             <div class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
                                                                 <div class="form-group">
