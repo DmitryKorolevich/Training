@@ -18,6 +18,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
             if(result.Messages)
             {
                 $scope.forms.form.submitted = true;
+                $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -54,6 +55,9 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
 	    if ($stateParams.categoryid) {
 	        $scope.contentPageCategory.ParentId = $stateParams.categoryid;
 	    }
+	    $scope.detailsTab = {
+	        active: true
+	    };
 
 	    $scope.loaded = false;
 	    $scope.forms = {};
@@ -95,6 +99,7 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
                 });
 	    } else {
 	        $scope.forms.form.submitted = true;
+	        $scope.detailsTab.active = true;
 	    }
 	};
 

@@ -18,6 +18,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
             if(result.Messages)
             {
                 $scope.forms.articleForm.submitted = true;
+                $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {

@@ -17,7 +17,8 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
             var messages=""; 
             if(result.Messages)
             {
-                $scope.forms.contentPageForm.submitted = true;
+                $scope.forms.contentPageForm.submitted = true;                
+	            $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -59,6 +60,9 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
             MasterContentItemId: 0,
             Status: "1:1",
         };
+        $scope.detailsTab = {
+            active: true
+        };
         $scope.loaded = false;
         $scope.forms={};
 
@@ -83,6 +87,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
                     });
             } else {
                 $scope.forms.contentPageForm.submitted = true;
+	            $scope.detailsTab.active = true;
             }
         };
 
