@@ -29,5 +29,10 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    deleteCategory: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteCategory/' + id, getConfig(tracker));
 	    },
+
+	    //products        
+	    updateProduct: function (model, tracker) {
+	        return $http.post(baseUrl + 'updateProduct', model, getConfig(tracker));
+	    },
 	};
 }]);

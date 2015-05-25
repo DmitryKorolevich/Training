@@ -29,7 +29,23 @@ namespace VC.Admin.Controllers
             this.productCategoryService = productCategoryService;
             this.logger = LoggerService.GetDefault();
         }
-        
+
+        #region Products
+
+        [HttpPost]
+        public async Task<Result<ProductManageModel>> UpdateProduct([FromBody]ProductManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
+
+            //item = await productCategoryService.UpdateCategoryAsync(item);
+
+            return new ProductManageModel();
+        }
+
+        #endregion
+
         #region Categories
 
         [HttpPost]

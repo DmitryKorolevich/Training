@@ -3,7 +3,6 @@
 angular.module('app.modules.demo',
 	[
 		'app.modules.demo.controllers.productListController',
-		'app.modules.demo.controllers.productDetailController',
 		'app.modules.demo.controllers.customerListController',
 		'app.modules.demo.controllers.customerDetailController',
 		'app.modules.demo.controllers.dashboardController',
@@ -164,11 +163,6 @@ angular.module('app.modules.demo',
 					url: '/products',
 					templateUrl: 'app/modules/demo/partials/products.html',
 					controller: 'productListController'
-				})
-				.state('index.oneCol.productDetail', {
-					url: '/products/detail/1',
-					templateUrl: 'app/modules/demo/partials/productDetailAngular.html',
-					controller: 'productDetailController'
 				})
 				.state('index.oneCol.addNewProduct', {
 					url: '/products/add',

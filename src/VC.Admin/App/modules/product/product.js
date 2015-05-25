@@ -3,6 +3,7 @@
 angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoriesController',
 	'app.modules.product.controllers.productCategoryManageController',
+	'app.modules.product.controllers.productManageController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -24,6 +25,11 @@ angular.module('app.modules.product', [
 		            url: '/products/categories/{id:int}',
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
-		        });
+		        })
+				.state('index.oneCol.productDetail', {
+				    url: '/products/1',
+				    templateUrl: 'app/modules/product/partials/productDetail.html',
+				    controller: 'productManageController'
+				});
 		}
 ]);

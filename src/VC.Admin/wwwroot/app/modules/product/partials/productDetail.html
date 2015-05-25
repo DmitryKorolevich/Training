@@ -1,0 +1,733 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button ui-sref="index.oneCol.productsList" class="btn btn-info width-80px">Preview</button>
+                <button ui-sref="index.oneCol.productsList" class="btn btn-default width-80px">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Parent Details">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Primary Information</span>
+                                        <div class="form-group">
+                                            <label for="" class="col-md-3 control-label">Product ID</label>
+                                            <div class="col-md-9 form-control-static">
+                                                <span>1431</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="active" class="col-md-3 control-label">Active</label>
+                                            <div class="col-md-9">
+                                                <div class="checkbox">
+                                                    <label><input type="checkbox" class="" id="active" placeholder="Active" checked="checked" /></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="hide" class="col-md-3 control-label">Hide within storefront</label>
+                                            <div class="col-md-9">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" class="" id="hide" placeholder="Hide within storefront">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="perishable" class="col-md-3 control-label">Perishable</label>
+                                            <div class="col-md-9">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" class="" id="perishable" placeholder="Perishable">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name" class="col-md-3 control-label">Name</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="name" placeholder="Name" value="Good Health Gift">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="price" class="col-md-3 control-label">Price</label>
+                                            <div class="col-md-9">
+                                                <input type="number" class="form-control" id="price" placeholder="Price" value="10000"> <!--!!!!-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="wholesale_price" class="col-md-3 control-label">Wholesale Price</label>
+                                            <div class="col-md-9">
+                                                <input type="number" class="form-control" id="wholesale_price" placeholder="Wholesale Price" value="8000"> <!--!!!!-->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description" class="col-md-3 control-label">Description</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!descriptionExpanded">
+                                                    <input type="text" class="form-control" id="description" placeholder="Description" disabled value="{{description}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="descriptionExpanded">
+                                                    <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="descriptionExpanded" text-angular data-ng-model="description"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="servicing" class="col-md-3 control-label">Serving/Storage</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!servicingStorageExpanded">
+                                                    <input type="text" class="form-control" id="servicing" placeholder="Serving/Storage" disabled value="{{servicingStorage}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('servicingStorageExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="servicingStorageExpanded">
+                                                    <a data-ng-click="toogleEditorState('servicingStorageExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="servicingStorageExpanded" text-angular data-ng-model="servicingStorage"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="recipies" class="col-md-3 control-label">Recepies</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!recepiesExpanded">
+                                                    <input type="text" class="form-control" id="recipies" placeholder="Recipies" disabled value="{{recepies}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('recepiesExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="recepiesExpanded">
+                                                    <a data-ng-click="toogleEditorState('recepiesExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="recepiesExpanded" text-angular data-ng-model="recepies"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="ingredients" class="col-md-3 control-label">Ingredients</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!ingredientsExpanded">
+                                                    <input type="text" class="form-control" id="ingredients" placeholder="Ingredients" disabled value="{{ingredients}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('ingredientsExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="ingredientsExpanded">
+                                                    <a data-ng-click="toogleEditorState('ingredientsExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="ingredientsExpanded" text-angular data-ng-model="ingredients"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="short" class="col-md-3 control-label">Short Description</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!shortExpanded">
+                                                    <input type="text" class="form-control" id="short" placeholder="Short Description" disabled value="{{short}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('shortExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="shortExpanded">
+                                                    <a data-ng-click="toogleEditorState('shortExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="shortExpanded" text-angular data-ng-model="short"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="notes" class="col-md-3 control-label">Product Notes</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group" data-ng-show="!notesExpanded">
+                                                    <input type="text" class="form-control" id="notes" placeholder="Product Notes" disabled value="{{notes}}">
+                                                    <span class="input-group-btn">
+                                                        <a data-ng-click="toogleEditorState('notesExpanded')" class="btn btn-default">Expand</a>
+                                                    </span>
+                                                </div>
+                                                <div style="text-align: right; margin-bottom: 10px;" data-ng-show="notesExpanded">
+                                                    <a data-ng-click="toogleEditorState('notesExpanded')" class="btn btn-default">Hide</a>
+                                                </div>
+                                                <div data-ng-show="notesExpanded" text-angular data-ng-model="notes"></div>
+                                            </div>
+                                        </div>
+                                        <span class="legend">SEO</span>
+                                        <div class="form-group">
+                                            <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
+                                            <div class="col-md-9">
+                                                <textarea type="text" class="form-control" id="meta_title" placeholder="Meta Title" rows="10"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
+                                            <div class="col-md-9">
+                                                <textarea type="text" class="form-control" id="meta_description" placeholder="Meta Description" rows="10"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="selectCat" class="col-md-3 control-label">Google Category</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" id="selectCat">
+                                                    <option>Google Category 1</option>
+                                                    <option>Google Category 2</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Tax</span>
+                                        <div class="form-group">
+                                            <label for="tax_code" class="col-md-3 control-label">Tax Code</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="tax_code" placeholder="Tax Code">
+                                            </div>
+                                        </div>
+                                        <span class="legend">Other Settings</span>
+                                        <div class="form-group">
+                                            <label for="special_icon" class="col-md-3 control-label">Special Icon</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" id="special_icon">
+                                                    <option>Option 1</option>
+                                                    <option>Option 2</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Sub Products">
+                        <div class="container container-left big-container">
+                            <div class="well row">
+                                <span class="legend">Sub Product Group Name</span>
+                                <div class="row form-group">
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" id="subProductGroupName" placeholder="Example: Number of Portions" value="">
+                                    </div>
+                                </div>
+                                <span class="legend">Product SKUs</span>
+                                <div class="row form-group">
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Filter by SKU">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info" type="button">Filter</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button data-ng-click="open();" class="btn btn-info">Add New SKU</button>
+                                </div>
+                                <span class="help-block">*Drag and drop using icon to reorder sub products</span>
+                                <!--<accordion class="sortable-accordion">-->
+                                <div class="panel-group sortable-accordion">
+                                    <div ui-sortable="sortableOptions" data-ng-model="product.SKUs">
+                                        <!--<accordion-group>
+                                        <accordion-heading>-->
+                                        <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default">
+                                            <form class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                <fieldset>
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">
+                                                            <a class="accordion-toggle" ng-click="toggleOpen(subSku)">
+                                                                <div class="form-horizontal">
+                                                                    <div class="row">
+                                                                        <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            <div class="sortable-move btn btn-info">
+                                                                                <i class="glyphicon glyphicon-sort"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-11">
+                                                                            <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+                                                                                <label class="control-label">SKU</label>
+                                                                                <div class="col-md-1">
+                                                                                    <input type="text" name="Name" class="form-control" placeholder="SKU" data-ng-model="subSku.Name" required>
+                                                                                    <div class="error-container" ng-show="forms.submitted && forms.SKUs{{$index}}.Name.$invalid">
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                <label for="lblActive{{subSku.Id}}" class="control-label">Active</label>
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input id="lblActive{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Active">
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                <label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideInStorefront">
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                <label class="control-label">ID</label>
+                                                                                <span class="form-control-static">{{subSku.Id}}</span>
+                                                                            </div>
+                                                                            <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                <label class="control-label">Order</label>
+                                                                                <input type="text" class="form-control half-size-input" placeholder="Order" data-ng-model="subSku.Order">
+                                                                                <button ui-sref="index.oneCol.productsList" class="btn btn-danger">Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </h4>
+                                                    </div>
+                                                    <!--</accordion-heading>-->
+                                                    <div class="panel-collapse" data-ng-class="{collapse: !subSku.isOpen}">
+                                                        <div class="panel-body">
+                                                            <div class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-12">
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label class="control-label">Retail Price</label>
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">$</span>
+                                                                                <input type="number" class="form-control" placeholder="" data-ng-model="subSku.RetailPrice">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label class="control-label">Wholesale Price</label>
+                                                                            <div class="input-group">
+                                                                                <span class="input-group-addon">$</span>
+                                                                                <input type="number" class="form-control" placeholder="" data-ng-model="subSku.WholesalePrice">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label class="control-label">Stock</label>
+                                                                            <input type="number" class="form-control half-size-input" placeholder="" data-ng-model="subSku.Stock">
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input id="lblDisregard{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisregardStock">
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-12">
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input id="lblDisallowSingle{{subSku.Id}}" type="checkbox">
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input id="lblNonDiscountable{{subSku.Id}}" type="checkbox">
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-12">
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label class="control-label">Orphan Type</label>
+                                                                            <select class="form-control">
+                                                                                <option>None</option>
+                                                                                <option>Orphan-N</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-12">
+                                                                        <div class="fixed-accordion-row extra-spacing">
+                                                                            <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input id="lblAutoship{{subSku.Id}}" type="checkbox">
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row extra-spacing">
+                                                                            <label class="control-label">Auto-Ship Frequency</label>
+                                                                            <label class="checkbox-inline">
+                                                                                <input type="checkbox">
+                                                                                1
+                                                                            </label>
+                                                                            <label class="checkbox-inline">
+                                                                                <input type="checkbox">
+                                                                                2
+                                                                            </label>
+                                                                            <label class="checkbox-inline">
+                                                                                <input type="checkbox">
+                                                                                3
+                                                                            </label>
+                                                                            <label class="checkbox-inline">
+                                                                                <input type="checkbox">
+                                                                                6
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label class="control-label">% Off</label>
+                                                                            <input type="number" class="form-control half-size-input" placeholder="">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-12">
+                                                                        <div class="fixed-accordion-row extra-spacing">
+                                                                            <label class="control-label">Seller</label>
+                                                                            <select class="form-control">
+                                                                                <option>Seller 1</option>
+                                                                                <option>Seller 2</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="fixed-accordion-row">
+                                                                            <label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
+                                                                            <div class="checkbox">
+                                                                                <label>
+                                                                                    <input id="lblHideFromFeed{{subSku.Id}}" type="checkbox">
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--</accordion-group>-->
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--</accordion>-->
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Nutritional">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <legend>Nutritional</legend>
+                                        <div class="form-group">
+                                            <label for="title" class="col-md-3 control-label">Title</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="title" placeholder="Title" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="serving_size" class="col-md-3 control-label">Serving Size</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="serving_size" placeholder="Serving Size" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="servings" class="col-md-3 control-label">Servings</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="servings" placeholder="Servings" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="calories" class="col-md-3 control-label">Calories</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="calories" placeholder="Calories" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="calories_from_fat" class="col-md-3 control-label">Calories from Fat</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="calories_from_fat" placeholder="Calories from Fat" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="total_fat" class="col-md-3 control-label">Total Fat</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="total_fat" placeholder="Total Fat" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="total_fat_percent" class="col-md-3 control-label">Total Fat Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="total_fat_percent" placeholder="Total Fat Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="saturated_fat" class="col-md-3 control-label">Saturated Fat</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="saturated_fat" placeholder="Saturated Fat" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="saturated_fat_percent" class="col-md-3 control-label">Saturated Fat Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="saturated_fat_percent" placeholder="Saturated Fat Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="trans_fat" class="col-md-3 control-label">Trans Fat</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="trans_fat" placeholder="Trans Fat" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="trans_fat_percent" class="col-md-3 control-label">Trans Fat Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="trans_fat_percent" placeholder="Trans Fat Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cholesterol" class="col-md-3 control-label">Cholesterol</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="cholesterol" placeholder="Cholesterol" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cholesterol_percent" class="col-md-3 control-label">Cholesterol Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="cholesterol_percent" placeholder="Cholesterol Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sodium" class="col-md-3 control-label">Sodium</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sodium" placeholder="Sodium" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sodium_percent" class="col-md-3 control-label">Sodium Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sodium_percent" placeholder="Sodium Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="total_carbohydrate" class="col-md-3 control-label">Total Carbohydrate</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="total_carbohydrate" placeholder="Total Carbohydrate" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="total_carbohydrate_percent" class="col-md-3 control-label">Total Carbohydrate Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="total_carbohydrate_percent" placeholder="Total Carbohydrate Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dietary_fiber" class="col-md-3 control-label">Dietary Fiber</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="dietary_fiber" placeholder="Dietary Fiber" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dietary_fiber_percent" class="col-md-3 control-label">Dietary Fiber Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="dietary_fiber_percent" placeholder="Dietary Fiber Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sugars" class="col-md-3 control-label">Sugars</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sugars" placeholder="Sugars" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sugars_percent" class="col-md-3 control-label">Sugars Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sugars_percent" placeholder="Sugars Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="protein" class="col-md-3 control-label">Protein</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="protein" placeholder="Protein" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="protein_percent" class="col-md-3 control-label">Protein Percent</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="protein_percent" placeholder="Protein Percent" value="">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="nutri_additional_Notes" class="col-md-3 control-label">Additional Notes</label>
+                                            <div class="col-md-9">
+                                                <textarea type="text" class="form-control" id="nutri_additional_Notes" placeholder="Additional Notes" rows="10"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Categories">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <span class="legend">Categories</span>
+                                <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                    <ol ui-tree-nodes="" data-ng-model="categories">
+                                        <li ng-repeat="item in categories" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/productDetailCategories.html'">
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Cross Sell & Videos">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Cross Sell Products</span>
+                                        <div class="form-group">
+                                            <label for="image_1" class="col-md-3 control-label">Cross Sell Image 1</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="image_1" placeholder="Cross Sell Image 1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sell_1" class="col-md-3 control-label">URL Cross Sell 1</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sell_1" placeholder="URL Cross Sell 1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="image_2" class="col-md-3 control-label">Cross Sell Image 2</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="image_2" placeholder="Cross Sell Image 2">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sell_2" class="col-md-3 control-label">URL Cross Sell 2</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sell_2" placeholder="URL Cross Sell 2">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="image_3" class="col-md-3 control-label">Cross Sell Image 3</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="image_3" placeholder="Cross Sell Image 3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sell_3" class="col-md-3 control-label">URL Cross Sell 3</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sell_3" placeholder="URL Cross Sell 3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="image_1" class="col-md-3 control-label">Cross Sell Image 4</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="image_4" placeholder="Cross Sell Image 4">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sell_4" class="col-md-3 control-label">URL Cross Sell 4</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="sell_4" placeholder="URL Cross Sell 4">
+                                            </div>
+                                        </div>
+                                        <span class="legend">Youtube Videos</span>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="youtube_video_1" class="col-md-3 control-label">YouTube Video 1</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_video_1" placeholder="YouTube Video 1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_image_1" class="col-md-3 control-label">YouTube Image 1</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_image_1" placeholder="YouTube Image 1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_text_1" class="col-md-3 control-label">YouTube Text 1</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_text_1" placeholder="YouTube Text 1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="youtube_video_2" class="col-md-3 control-label">YouTube Video 2</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_video_2" placeholder="YouTube Video 2">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_image_2" class="col-md-3 control-label">YouTube Image 2</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_image_2" placeholder="YouTube Image 2">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_text_2" class="col-md-3 control-label">YouTube Text 2</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_text_2" placeholder="YouTube Text 2">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="youtube_video_3" class="col-md-3 control-label">YouTube Video 3</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_video_3" placeholder="YouTube Video 3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_image_3" class="col-md-3 control-label">YouTube Image 3</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_image_3" placeholder="YouTube Image 3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_text_3" class="col-md-3 control-label">YouTube Text 3</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_text_3" placeholder="YouTube Text 3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group margin-top-30px">
+                                            <label for="youtube_video_4" class="col-md-3 control-label">YouTube Video 4</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_video_4" placeholder="YouTube Video 4">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_image_4" class="col-md-3 control-label">YouTube Image 4</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_image_4" placeholder="YouTube Image 4">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="youtube_text_4" class="col-md-3 control-label">YouTube Text 4</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="youtube_text_4" placeholder="YouTube Text 4">
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Inventory & Shipping">
+                        <h3>Inventory & Shipping</h3>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

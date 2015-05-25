@@ -244,14 +244,20 @@ function ServerMessages(data) {
     self.Messages = data;
 };
 
-ServerMessages.prototype.GetMessage = function (field) {
+ServerMessages.prototype.GetMessage = function (field, collectionName, index) {
     var toReturn = '';
+    var fieldName = field;
+    if (collectionName != undefined && index != undefined)
+    {
+        fieldName = '{0}{1}.{2}'.format(collectionName, index, field);
+    }
     $.each(this.Messages, function (index, message) {
-        if (message.Field == field) {
+        if (message.Field == fieldName) {
             toReturn = message.Message;
             return false;
         }
     });
     return toReturn;
 };
+
 
