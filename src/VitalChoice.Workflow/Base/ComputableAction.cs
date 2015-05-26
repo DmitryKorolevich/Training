@@ -5,7 +5,7 @@ namespace VitalChoice.Workflow.Base
 {
     public abstract class ComputableAction<TContext>: WorkflowAction<TContext, decimal> 
         where TContext : ComputableContext {
-        protected ComputableAction(ComputableActionTree<TContext> tree, string actionName) : base(tree, actionName)
+        protected ComputableAction(ComputableTree<TContext> tree, string actionName) : base(tree, actionName)
         {
         }
 

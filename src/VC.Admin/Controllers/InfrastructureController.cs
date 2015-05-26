@@ -6,10 +6,9 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Infrastructure;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 

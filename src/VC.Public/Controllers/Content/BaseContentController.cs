@@ -2,8 +2,8 @@
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
-using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Business.Services.Contracts.Product;
+using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Interfaces.Services.Product;
 
 namespace VC.Public.Controllers.Content
 {
@@ -11,7 +11,6 @@ namespace VC.Public.Controllers.Content
     {
         protected readonly IContentViewService ContentService;
         protected readonly IProductViewService ProductViewService;
-        protected readonly IProductViewService productViewService;
 
         public BaseContentController(IContentViewService contentService)
         {

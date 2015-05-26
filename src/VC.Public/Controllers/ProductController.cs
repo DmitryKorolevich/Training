@@ -2,9 +2,8 @@
 using Microsoft.AspNet.Mvc;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
-using VitalChoice.Business.Services.Contracts.Product;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Business.Services.Contracts.Product;
+using VitalChoice.Interfaces.Services.Product;
 
 namespace VC.Public.Controllers
 {

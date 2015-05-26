@@ -2,18 +2,18 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
-using VitalChoice.Business.Services.Contracts.Settings;
 using System.Collections.Generic;
 using VC.Admin.Models.Setting;
+using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Admin.Controllers
 {

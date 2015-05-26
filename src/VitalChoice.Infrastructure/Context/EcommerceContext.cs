@@ -67,16 +67,40 @@ namespace VitalChoice.Infrastructure.Context
             #region Workflow
 
 		    builder.Entity<WorkflowExecutor>().Key(w => w.Id);
-		    builder.Entity<WorkflowExecutor>().ForRelational().Table("WorkflowExecutors");
+            builder.Entity<WorkflowExecutor>().ForSqlServer().Table("WorkflowExecutors");
 
             builder.Entity<WorkflowResolverPath>().Key(w => w.Id);
-            builder.Entity<WorkflowResolverPath>().ForRelational().Table("WorkflowResolverPaths");
+            builder.Entity<WorkflowResolverPath>().ForSqlServer().Table("WorkflowResolverPaths");
+		    builder.Entity<WorkflowResolverPath>()
+		        .Reference(resolverPath => resolverPath.Executor)
+		        .InverseCollection()
+		        .ForeignKey(resolverPath => resolverPath.IdExecutor)
+                .PrincipalKey(executor => executor.Id);
+            builder.Entity<WorkflowResolverPath>()
+                .Reference(w => w.Resolver)
+                .InverseCollection()
+                .ForeignKey(w => w.IdResolver);
 
             builder.Entity<WorkflowTree>().Key(w => w.Id);
-            builder.Entity<WorkflowTree>().ForRelational().Table("WorkflowTrees");
+            builder.Entity<WorkflowTree>().ForSqlServer().Table("WorkflowTrees");
+		    builder.Entity<WorkflowTree>()
+		        .Collection(tree => tree.Actions)
+		        .InverseReference()
+		        .ForeignKey(action => action.IdTree)
+		        .PrincipalKey(tree => tree.Id);
 
             builder.Entity<WorkflowTreeAction>().Key(w => w.Id);
-            builder.Entity<WorkflowTreeAction>().ForRelational().Table("WorkflowTreeActions");
+            builder.Entity<WorkflowTreeAction>().ForSqlServer().Table("WorkflowTreeActions");
+		    builder.Entity<WorkflowTreeAction>()
+		        .Reference(treeAction => treeAction.Executor)
+		        .InverseCollection()
+		        .ForeignKey(treeAction => treeAction.IdExecutor)
+		        .PrincipalKey(executor => executor.Id);
+		    builder.Entity<WorkflowTreeAction>()
+		        .Reference(action => action.Tree)
+		        .InverseCollection()
+		        .ForeignKey(action => action.IdTree)
+		        .PrincipalKey(tree => tree.Id);
 
             #endregion
 

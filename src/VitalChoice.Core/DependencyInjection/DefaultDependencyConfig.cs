@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net;
-using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
@@ -12,12 +10,12 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using Templates;
 using VitalChoice.Business.Mail;
-using VitalChoice.Business.Services.Contracts;
-using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Business.Services.Contracts.Content.ContentProcessors;
-using VitalChoice.Business.Services.Impl;
-using VitalChoice.Business.Services.Impl.Content;
-using VitalChoice.Business.Services.Impl.Content.ContentProcessors;
+using VitalChoice.Business.Services;
+using VitalChoice.Business.Services.Content;
+using VitalChoice.Business.Services.Content.ContentProcessors;
+using VitalChoice.Business.Services.Product;
+using VitalChoice.Business.Services.Settings;
+using VitalChoice.Business.Services.Workflow;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
@@ -27,10 +25,12 @@ using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;
-using VitalChoice.Business.Services.Impl.Product;
-using VitalChoice.Business.Services.Contracts.Product;
-using VitalChoice.Business.Services.Impl.Settings;
-using VitalChoice.Business.Services.Contracts.Settings;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Interfaces.Services.Content.ContentProcessors;
+using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Workflow.Core;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -140,6 +140,8 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<LogsContext>();
                 builder.RegisterGeneric(typeof(RepositoryAsync<>))
                     .As(typeof(IRepositoryAsync<>));
+                builder.RegisterGeneric(typeof(ReadRepositoryAsync<>))
+                    .As(typeof(IReadRepositoryAsync<>));
                 builder.RegisterGeneric(typeof(EcommerceRepositoryAsync<>))
                     .As(typeof(IEcommerceRepositoryAsync<>))
                     .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
@@ -174,7 +176,9 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<GCService>().As<IGCService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
-				var container = builder.Build();
+                builder.RegisterType<ActionItemProvider>().As<IActionInvokerProvider>().SingleInstance();
+                builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
+                var container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
                 if (!String.IsNullOrEmpty(appPath))

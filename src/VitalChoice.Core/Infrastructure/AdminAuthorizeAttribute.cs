@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.DependencyInjection;
-using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Interfaces.Services;
 using AuthorizationContext = Microsoft.AspNet.Mvc.AuthorizationContext;
 
 namespace VitalChoice.Core.Infrastructure

@@ -12,7 +12,6 @@ using Microsoft.Framework.Logging.Console;
 using VitalChoice.Core.DependencyInjection;
 using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Business.Services.Impl;
 using System.IO;
 using System.Net;
 using System.Security.Claims;
@@ -21,6 +20,7 @@ using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Authorization;
 using Microsoft.Framework.Runtime;
 using VC.Admin.AppConfig;
+using VitalChoice.Business.Services;
 
 namespace VitalChoice
 {

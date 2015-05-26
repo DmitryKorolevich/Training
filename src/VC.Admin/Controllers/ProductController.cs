@@ -4,17 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
 using VC.Admin.Models.Product;
-using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Business.Services.Impl;
+using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
-using VitalChoice.Business.Services.Contracts.Product;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Interfaces.Services.Product;
 
 namespace VC.Admin.Controllers
 {

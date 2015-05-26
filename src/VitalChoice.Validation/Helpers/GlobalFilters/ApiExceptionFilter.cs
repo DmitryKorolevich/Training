@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
-using VitalChoice.Business.Services.Impl;
+using VitalChoice.Business.Services;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
 

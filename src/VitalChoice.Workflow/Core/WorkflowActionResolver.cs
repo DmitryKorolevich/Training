@@ -8,7 +8,7 @@ namespace VitalChoice.Workflow.Core
         IWorkflowActionResolver<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
-        protected WorkflowActionResolver(IWorkflowActionTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
+        protected WorkflowActionResolver(IWorkflowTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
             Actions = new Dictionary<int, string>();
         }
@@ -22,7 +22,7 @@ namespace VitalChoice.Workflow.Core
             {
                 var actionName = Actions[key];
                 context.ActionLock(actionName);
-                var result = ActionTree.GetAction(actionName).Execute(context);
+                var result = Tree.GetAction(actionName).Execute(context);
                 context.ActionUnlock(actionName);
                 context.ActionSetResult(Name, result);
                 return result;

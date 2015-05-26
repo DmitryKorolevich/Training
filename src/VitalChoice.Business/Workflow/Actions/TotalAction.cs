@@ -5,7 +5,7 @@ namespace VitalChoice.Business.Workflow.Actions
 {
     public class TotalAction: ComputableAction<OrderContext>
     {
-        public TotalAction(ComputableActionTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public TotalAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
         {
         }
 

@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
 using VC.Admin.Models.ContentManagement;
-using VitalChoice.Business.Services.Contracts.Content;
-using VitalChoice.Business.Services.Impl;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
@@ -14,6 +12,8 @@ using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
+using VitalChoice.Business.Services;
+using VitalChoice.Interfaces.Services.Content;
 
 namespace VC.Admin.Controllers
 {

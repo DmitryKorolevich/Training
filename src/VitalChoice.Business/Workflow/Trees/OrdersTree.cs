@@ -3,21 +3,18 @@ using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Contexts;
 using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Base;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Trees
 {
-    public class OrdersTree: ComputableActionTree<OrderContext>
+    public class OrdersTree: ComputableTree<OrderContext>
     {
         public override decimal Execute(OrderContext context)
         {
             return Execute<TotalAction>(context);
         }
 
-        public OrdersTree(HashSet<ActionItem> actionMapping, string actionName) : base(actionMapping, actionName)
-        {
-        }
-
-        public OrdersTree(ComputableActionTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public OrdersTree(IActionItemProvider actionProvider, string treeName) : base(actionProvider, treeName)
         {
         }
     }

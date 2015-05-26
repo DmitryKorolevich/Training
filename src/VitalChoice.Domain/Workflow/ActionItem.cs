@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using Templates.Helpers;
 
 namespace VitalChoice.Domain.Workflow
 {
     public class ActionItem: IEquatable<ActionItem>
     {
-        public ActionItem(string actionType, string actionName)
+        public ActionItem(string typeName, string actionName)
         {
-            ReflectionHelper.ResolveType(actionType);
+            ReflectionHelper.ResolveType(typeName);
             ActionName = actionName;
         }
 
@@ -24,7 +23,8 @@ namespace VitalChoice.Domain.Workflow
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
-            return obj.GetType() == GetType() && Equals((ActionItem) obj);
+            var item = obj as ActionItem;
+            return item != null && Equals(item);
         }
 
         public override int GetHashCode()
@@ -37,8 +37,6 @@ namespace VitalChoice.Domain.Workflow
 
         public Type ActionType { get; }
         public string ActionName { get; }
-
-        public HashSet<ActionItem> OptionalDependentTree { get; set; }
 
         public bool Equals(ActionItem other)
         {

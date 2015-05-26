@@ -7,7 +7,7 @@ namespace VitalChoice.Workflow.Core
     public abstract class WorkflowAction<TContext, TResult> : WorkflowExecutor<TContext, TResult>, IWorkflowAction<TContext, TResult> 
         where TContext : WorkflowContext<TResult>
     {
-        protected WorkflowAction(IWorkflowActionTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
+        protected WorkflowAction(IWorkflowTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
             DependendActions = new List<string>();
         }
@@ -18,12 +18,12 @@ namespace VitalChoice.Workflow.Core
         public override TResult Execute(TContext context)
         {
             TResult result;
-            if (ActionTree.TryGetActionResult(Name, context, out result))
+            if (Tree.TryGetActionResult(Name, context, out result))
                 return result;
             foreach (var actionName in DependendActions)
             {
                 context.ActionLock(actionName);
-                result = AggregateResult(ActionTree.GetAction(actionName).Execute(context), result, actionName);
+                result = AggregateResult(Tree.GetAction(actionName).Execute(context), result, actionName);
                 context.ActionUnlock(actionName);
             }
             result = AggregateResult(ExecuteAction(context), result, null);

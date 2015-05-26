@@ -4,8 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
+using VitalChoice.Business.Services;
 using VitalChoice.Validation.Models;
-using VitalChoice.Business.Services.Impl;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Validation.Logic

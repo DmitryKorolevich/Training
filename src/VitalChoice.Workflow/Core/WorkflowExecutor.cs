@@ -6,9 +6,9 @@ namespace VitalChoice.Workflow.Core
     public abstract class WorkflowExecutor<TContext, TResult> : IWorkflowExecutor<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
-        protected WorkflowExecutor(IWorkflowActionTree<TContext, TResult> workflowActionTree, string actionName)
+        protected WorkflowExecutor(IWorkflowTree<TContext, TResult> workflowTree, string actionName)
         {
-            ActionTree = workflowActionTree;
+            Tree = workflowTree;
             Name = actionName;
         }
 
@@ -16,6 +16,6 @@ namespace VitalChoice.Workflow.Core
 
         public string Name { get; }
 
-        protected IWorkflowActionTree<TContext, TResult> ActionTree { get; }
+        protected IWorkflowTree<TContext, TResult> Tree { get; }
     }
 }

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
-using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Options;
@@ -18,6 +17,7 @@ using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
 {

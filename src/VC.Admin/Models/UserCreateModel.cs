@@ -1,7 +1,6 @@
 ﻿using VC.Admin.Validators.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Entities.eCommerce.Users;
-using VitalChoice.Business.Services.Contracts;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
