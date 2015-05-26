@@ -131,7 +131,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
             var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
-                filter.Paging.PageIndex, filter.Paging.PageItemCount);
+                filter.Paging.PageIndex, filter.Paging.PageItemCount, filter.Sorting);
             var toReturn = new PagedList<LogListItemModel>
             {
                 Items = result.Items.Select(p=>new LogListItemModel(p)).ToList(),

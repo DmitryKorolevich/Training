@@ -25,10 +25,28 @@
             <table class="table table-striped table-hover ">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>URL</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Title')">
+                            <span>Title</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Title'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Url')">
+                            <span>URL</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Url'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th>Category</th>
-                        <th>Updated</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Updated')">
+                            <span>Updated</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Updated'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>

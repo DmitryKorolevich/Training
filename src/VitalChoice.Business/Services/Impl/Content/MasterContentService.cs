@@ -8,6 +8,7 @@ using VitalChoice.Business.Services.Contracts.Content;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Impl.Content
@@ -49,7 +50,37 @@ namespace VitalChoice.Business.Services.Impl.Content
         {
             var query = new MasterContentItemQuery();
             query = query.WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
-            var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).Include(p=>p.User).ThenInclude(p => p.Profile).
+
+			Func<IQueryable<MasterContentItem>, IOrderedQueryable<MasterContentItem>> sortable = x => x.OrderBy(y => y.Name);
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
+			{
+				case MasterContentSortPath.Name:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Name)
+								: x.OrderByDescending(y => y.Name);
+					break;
+				case MasterContentSortPath.Type:
+					masterContentItemRepository.EarlyRead = true;
+
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Type != null ? y.Type.Name: null)
+								: x.OrderByDescending(y => y.Type != null ? y.Type.Name : null);
+					break;
+				case MasterContentSortPath.Updated:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Updated)
+								: x.OrderByDescending(y => y.Updated);
+					break;
+			}
+
+			var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).Include(p=>p.User).ThenInclude(p => p.Profile).OrderBy(sortable).
                 SelectAsync(false)).ToList();
             return toReturn;
         }

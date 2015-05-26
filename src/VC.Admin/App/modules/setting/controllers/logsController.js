@@ -1,5 +1,5 @@
 ﻿angular.module('app.modules.setting.controllers.logsController', [])
-.controller('logsController', ['$scope', '$state', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', function ($scope, $state, settingService, toaster, modalUtil, confirmUtil) {
+.controller('logsController', ['$scope', '$state', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'gridSorterUtil', 'promiseTracker', function ($scope, $state, settingService, toaster, modalUtil, confirmUtil, gridSorterUtil, promiseTracker) {
 
     function Filter() {
         var self = this;
@@ -12,6 +12,7 @@
         self.ToDateObject = new DateObject(currentDate.shiftDate('+1d'));
         self.FromDateObject = new DateObject(currentDate.shiftDate('-1m'));
         self.Paging = { PageIndex: 1, PageItemCount: 100 };
+        self.Sorting = gridSorterUtil.resolve(refreshLogs, "Date", "Desc")
     }
 
     Filter.prototype.clean = function () {
@@ -52,6 +53,8 @@
 	};
 
     function initialize() {
+    	$scope.refreshTracker = promiseTracker("refresh");
+
         $scope.logLevels = [
         {
             Id: null, Name: 'All'
