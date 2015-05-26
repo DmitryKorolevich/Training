@@ -37,7 +37,7 @@
     };
 
     function refreshLogs() {
-        settingService.getLogItems($scope.filter.clean())
+    	settingService.getLogItems($scope.filter.clean(), $scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.logs = result.Data.Items;
