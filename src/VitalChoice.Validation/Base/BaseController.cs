@@ -1,11 +1,12 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc;
+using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Validation.Controllers
+namespace VitalChoice.Validation.Base
 {
     public abstract class BaseController: Controller
     {

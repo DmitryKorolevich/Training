@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Validation.Controllers
+namespace VitalChoice.Validation.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public sealed class ControlModeAttribute: Attribute

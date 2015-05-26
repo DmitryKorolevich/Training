@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Settings;
@@ -18,6 +17,7 @@ using VitalChoice.Domain.Entities.Files;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Validation.Base;
 
 namespace VC.Admin.Controllers
 {

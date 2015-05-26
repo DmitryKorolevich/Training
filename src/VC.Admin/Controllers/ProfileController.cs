@@ -11,13 +11,14 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Validation.Controllers;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Base;
 
 namespace VC.Admin.Controllers
 {

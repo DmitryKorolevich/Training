@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
-using Microsoft.AspNet.Mvc.Core;
-using Microsoft.AspNet.Mvc;
 
-namespace VitalChoice.Validation.Controllers
+namespace VitalChoice.Validation.Base
 {
     public class BaseControllerActionInvoker : ControllerActionInvoker
     {

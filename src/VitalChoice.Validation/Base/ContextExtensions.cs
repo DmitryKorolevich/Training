@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Entity.Metadata.Builders;
 using Microsoft.Data.Entity.Relational.Metadata;
 
-namespace VitalChoice.Validation.Controllers
+namespace VitalChoice.Validation.Base
 {
     public static class ContextExtensions
     {

@@ -30,6 +30,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Validation.Base;
 using VitalChoice.Workflow.Core;
 #if DNX451
 using Autofac;
@@ -74,7 +75,7 @@ namespace VitalChoice.Core.DependencyInjection
 				//Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
                 services.TryAdd(
                     ServiceDescriptor
-                        .Transient<IActionInvokerProvider, Validation.Controllers.ControllerActionInvokerProvider>());
+                        .Transient<IActionInvokerProvider, ValidationActionInvokerProvider>());
 
                 // Add MVC services to the services container.
                 services.AddMvc();
@@ -176,7 +177,7 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<GCService>().As<IGCService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
-                builder.RegisterType<ActionItemProvider>().As<IActionInvokerProvider>().SingleInstance();
+                builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();
                 builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
                 var container = builder.Build();
 

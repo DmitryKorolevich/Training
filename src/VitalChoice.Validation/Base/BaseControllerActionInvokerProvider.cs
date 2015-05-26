@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
-using Microsoft.Framework.Internal;
-using VitalChoice.Validation.Controllers;
-using Microsoft.AspNet.Mvc.Core;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Logging;
-using System;
-using Microsoft.AspNet.Mvc.OptionDescriptors;
 
-namespace VitalChoice.Validation.Controllers
+namespace VitalChoice.Validation.Base
 {
     //public class InputFormattersProvider : IInputFormattersProvider
     //{
@@ -26,7 +21,7 @@ namespace VitalChoice.Validation.Controllers
     //    }
     //}
 
-    public class ControllerActionInvokerProvider : IActionInvokerProvider
+    public class ValidationActionInvokerProvider : IActionInvokerProvider
     {
         private readonly IControllerActionArgumentBinder _argumentBinder;
         private readonly IControllerFactory _controllerFactory;
@@ -40,7 +35,7 @@ namespace VitalChoice.Validation.Controllers
         private readonly ILoggerFactory _loggerFactory;
         //private readonly int _maxModelValidationErrors;
 
-        public ControllerActionInvokerProvider(
+        public ValidationActionInvokerProvider(
                     IControllerFactory controllerFactory,
                     IEnumerable<IFilterProvider> filterProviders,
                     IControllerActionArgumentBinder argumentBinder,

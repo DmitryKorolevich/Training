@@ -1,21 +1,29 @@
-{
+﻿{
   "version": "1.0.0-*",
+  "description": "",
+  "authors": [ "" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
   "dependencies": {
-    "FluentValidation": "5.6.0.5-beta4",
     "VitalChoice.Domain": "1.0.0-*",
-    "VitalChoice.Business": "1.0.0-*"
+    "VitalChoice.Business": "1.0.0-*",
+    "FluentValidation": "5.6.0.5-beta4"
   },
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] },
-      "dependencies": {
-      }
+      "compilationOptions": { "define": [ "DNX451" ] }
     },
     "dnxcore50": {
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
-        "System.Runtime": "4.0.20-*"
+        "System.Runtime" :  "4.0.20-*",
+        "System.Collections": "4.0.10-*",
+        "System.Linq": "4.0.0-*",
+        "System.Threading": "4.0.10-*",
+        "Microsoft.CSharp": "4.0.0-*"
       }
     }
   }

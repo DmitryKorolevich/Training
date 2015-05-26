@@ -8,7 +8,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Validation.Controllers;
+using VitalChoice.Validation.Base;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers
