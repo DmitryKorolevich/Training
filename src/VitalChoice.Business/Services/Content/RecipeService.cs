@@ -56,9 +56,39 @@ namespace VitalChoice.Business.Services.Content
                 }
             }
             query = query.WithName(filter.Name).NotDeleted();
-            var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
+
+			Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> sortable = x => x.OrderBy(y => y.Name);
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
+			{
+				case RecipeSortPath.Title:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Name)
+								: x.OrderByDescending(y => y.Name);
+					break;
+				case RecipeSortPath.Url:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Url)
+								: x.OrderByDescending(y => y.Url);
+					break;
+				case RecipeSortPath.Updated:
+					recipeRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.ContentItem.Updated)
+								: x.OrderByDescending(y => y.ContentItem.Updated);
+					break;
+			}
+
+			var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
                 Include(p => p.User).ThenInclude(p => p.Profile).
-                OrderBy(x => x.OrderBy(pp => pp.Name)).
+                OrderBy(sortable).
                 SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
 
             //VitalChoiceContext content = new VitalChoiceContext();

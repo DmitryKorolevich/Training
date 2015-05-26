@@ -385,31 +385,46 @@ namespace VitalChoice.Business.Services
 									   x.Email.ToLower().Contains(keyword));
 			}
 
-			var queryable = userManager.Users.AsNoTracking().Where(query);
-			var overallCount = await queryable.CountAsync();
+			IEnumerable<ApplicationUser> queryable = await userManager.Users.Include(x => x.Profile).Include(x => x.Roles).AsNoTracking().Where(query).ToListAsync();// remove this bullshit when stupid ef starts working
+			var overallCount = queryable.Count();
 
-			var sortOrder = SortOrder.Desc;
-			if (filter.Sorting != null)
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
 			{
-				sortOrder = filter.Sorting.SortOrder;
-				switch (filter.Sorting.Path)
-				{
-					case UserSortPath.AgentId: queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.Profile.AgentId) : queryable.OrderByDescending(x => x.Profile.AgentId); break;
-					case UserSortPath.FullName: queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.FirstName + " " + x.LastName) : queryable.OrderByDescending(x => x.FirstName + " " + x.LastName); break;
-					case UserSortPath.Email: queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.Email) : queryable.OrderByDescending(x => x.Email); break;
-					case UserSortPath.Status: queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.Status) : queryable.OrderByDescending(x => x.Status); break;
-					case UserSortPath.LastLoginDate: queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.LastLoginDate) : queryable.OrderByDescending(x => x.LastLoginDate); break;
-				}
+				case UserSortPath.AgentId:
+					queryable = sortOrder == SortOrder.Asc
+						? queryable.OrderBy(x => x.Profile.AgentId)
+						: queryable.OrderByDescending(x => x.Profile.AgentId);
+					break;
+				case UserSortPath.FullName:
+					queryable = sortOrder == SortOrder.Asc
+						? queryable.OrderBy(x => x.FirstName + " " + x.LastName)
+						: queryable.OrderByDescending(x => x.FirstName + " " + x.LastName);
+					break;
+				case UserSortPath.Email:
+					queryable = sortOrder == SortOrder.Asc
+						? queryable.OrderBy(x => x.Email)
+						: queryable.OrderByDescending(x => x.Email);
+					break;
+				case UserSortPath.Status:
+					queryable = sortOrder == SortOrder.Asc
+						? queryable.OrderBy(x => x.Status)
+						: queryable.OrderByDescending(x => x.Status);
+					break;
+				case UserSortPath.LastLoginDate:
+					queryable = sortOrder == SortOrder.Asc
+						? queryable.OrderBy(x => x.LastLoginDate)
+						: queryable.OrderByDescending(x => x.LastLoginDate);
+					break;
+				default:
+					queryable = queryable.OrderByDescending(x => x.UpdatedDate);
+					break;
 			}
-
-            queryable = sortOrder == SortOrder.Asc ? queryable.OrderBy(x => x.UpdatedDate) : queryable.OrderByDescending(x => x.UpdatedDate);
 
 			var pageIndex = filter.Paging.PageIndex;
 			var pageItemCount = filter.Paging.PageItemCount;
 
-			var materialized = await queryable.Include(x => x.Profile).Include(x => x.Roles).ToListAsync();// remove this bullshit when stupid ef starts working
-
-			var items = materialized.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
+			var items = queryable.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
 
 			return new PagedList<ApplicationUser>(items, overallCount);
 		}

@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.content.controllers.mastersController', [])
-.controller('mastersController', ['$scope', '$rootScope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+.controller('mastersController', ['$scope', '$rootScope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+function ($scope, $rootScope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker,gridSorterUtil) {
     $scope.refreshTracker = promiseTracker("refresh");
     $scope.deleteTracker = promiseTracker("delete");
 
@@ -34,7 +34,8 @@ function ($scope, $rootScope, $state, contentService, toaster, modalUtil, confir
         $scope.types.splice(0, 0, { Key: null, Text: 'All' });
 
 	    $scope.filter = {
-            Type: null,
+	    	Type: null,
+	    	Sorting: gridSorterUtil.resolve(refreshMasters, "Updated", "Desc")
 	    };
         $scope.loaded=false;
 

@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.gc.controllers.gcsController', [])
-.controller('gcsController', ['$scope', '$rootScope', '$state', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil, promiseTracker) {
+.controller('gcsController', ['$scope', '$rootScope', '$state', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
     $scope.refreshTracker = promiseTracker("refresh");
     $scope.deleteTracker = promiseTracker("delete");
 
@@ -37,7 +37,8 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
 	    $scope.filter = {
 	        Type: null,
 	        Code: null,
-	        Paging: { PageIndex: 1, PageItemCount: 100 }
+	        Paging: { PageIndex: 1, PageItemCount: 100 },
+	        Sorting: gridSorterUtil.resolve(refreshItems, "Created", "Desc")
 	    };
 
         refreshItems();

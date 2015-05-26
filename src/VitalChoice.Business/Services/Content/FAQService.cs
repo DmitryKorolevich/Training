@@ -56,7 +56,37 @@ namespace VitalChoice.Business.Services.Content
                 }
             }
             query=query.WithName(filter.Name).NotDeleted();
-            var toReturn = await faqRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.FAQsToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(x => x.OrderBy(pp => pp.Name)).
+
+			Func<IQueryable<FAQ>, IOrderedQueryable<FAQ>> sortable = x => x.OrderBy(y => y.Name);
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
+			{
+				case ArticleSortPath.Title:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Name)
+								: x.OrderByDescending(y => y.Name);
+					break;
+				case ArticleSortPath.Url:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Url)
+								: x.OrderByDescending(y => y.Url);
+					break;
+				case ArticleSortPath.Updated:
+					faqRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.ContentItem.Updated)
+								: x.OrderByDescending(y => y.ContentItem.Updated);
+					break;
+			}
+
+			var toReturn = await faqRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.FAQsToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
                 Include(p => p.User).ThenInclude(p => p.Profile).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return toReturn;

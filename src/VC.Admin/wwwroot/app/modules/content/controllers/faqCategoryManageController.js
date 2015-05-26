@@ -18,6 +18,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
             if(result.Messages)
             {
                 $scope.forms.form.submitted = true;
+                $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -54,6 +55,9 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
 	    if ($stateParams.categoryid) {
 	        $scope.faqCategory.ParentId = $stateParams.categoryid;
 	    }
+        $scope.detailsTab = {
+			active: true
+		};
 
 	    $scope.loaded = false;
 	    $scope.forms = {};
@@ -95,6 +99,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
                 });
 	    } else {
 	        $scope.forms.form.submitted = true;
+	        $scope.detailsTab.active = true;
 	    }
 	};
 

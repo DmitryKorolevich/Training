@@ -18,6 +18,7 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
             if(result.Messages)
             {
                 $scope.forms.faqForm.submitted = true;
+                $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -56,6 +57,9 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
             MetaDescription: null,
             MasterContentItemId: 0,
         };
+        $scope.detailsTab = {
+            active: true
+        };
         $scope.loaded = false;
         $scope.forms={};
 
@@ -79,6 +83,7 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
                     });
             } else {
                 $scope.forms.faqForm.submitted = true;
+	            $scope.detailsTab.active = true;
             }
         };
 

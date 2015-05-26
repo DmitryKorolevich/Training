@@ -44,7 +44,41 @@ namespace VitalChoice.Business.Services.Product
             conditions.Init(query);
             conditions = conditions.NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
 
-            PagedList<GiftCertificate> toReturn = await query.OrderBy(x => x.OrderByDescending(pp => pp.Created)).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+	        Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
+			var sortOrder = filter.Sorting.SortOrder;
+	        switch (filter.Sorting.Path)
+	        {
+		        case GiftCertificateSortPath.Recipient:
+			        sortable =
+				        (x) =>
+					        sortOrder == SortOrder.Asc
+						        ? x.OrderBy(y => y.FirstName).ThenBy(y => y.LastName)
+						        : x.OrderByDescending(y => y.FirstName).ThenByDescending(y => y.LastName);
+			        break;
+		        case GiftCertificateSortPath.Available:
+			        sortable =
+				        (x) =>
+					        sortOrder == SortOrder.Asc
+						        ? x.OrderBy(y => y.Balance)
+						        : x.OrderByDescending(y => y.Balance);
+			        break;
+		        case GiftCertificateSortPath.Status:
+			        sortable =
+				        (x) =>
+					        sortOrder == SortOrder.Asc
+						        ? x.OrderBy(y => y.StatusCode)
+						        : x.OrderByDescending(y => y.StatusCode);
+			        break;
+		        case GiftCertificateSortPath.Created:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.Created)
+								: x.OrderByDescending(y => y.Created);
+			        break;
+	        }
+
+	        PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var users = await userManager.Users.Where(p=>toReturn.Items.Select(pp=>pp.UserId).Contains(p.Id)).Include(x => x.Profile).ToListAsync();
             foreach(var item in toReturn.Items)
             {

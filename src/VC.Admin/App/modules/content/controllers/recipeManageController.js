@@ -17,7 +17,8 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             var messages=""; 
             if(result.Messages)
             {
-                $scope.forms.recipeForm.submitted = true;
+                $scope.forms.recipeForm.submitted = true;                
+	            $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -56,6 +57,9 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             MetaDescription: null,
             MasterContentItemId: 0,
         };
+        $scope.detailsTab = {
+            active: true
+        };
         $scope.loaded = false;
         $scope.forms={};
 
@@ -79,6 +83,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                     });
             } else {
                 $scope.forms.recipeForm.submitted = true;
+                $scope.detailsTab.active = true;
             }
         };
 

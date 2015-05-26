@@ -14,8 +14,8 @@ angular.module('app.core.dataAccess.services.settingService', [])
 
 	return {
         //logs
-		getLogItems: function(filter) {
-		    return $http.post(baseUrl + 'GetLogItems', filter);
+		getLogItems: function (filter, tracker) {
+			return $http.post(baseUrl + 'GetLogItems', filter, getConfig(tracker));
 		},
 
         //countries/states

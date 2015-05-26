@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.content.controllers.articlesController', [])
-.controller('articlesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-    function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker) {
+.controller('articlesController', ['$scope', '$state', 'contentService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker','gridSorterUtil',
+    function ($scope, $state, contentService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
 
@@ -76,7 +76,8 @@
 	    $scope.filter = {
             Name: '',
             CategoryId: null,
-	        Paging: { PageIndex: 1, PageItemCount: 100 }
+            Paging: { PageIndex: 1, PageItemCount: 100 },
+            Sorting: gridSorterUtil.resolve(refreshArticles, "Updated", "Desc")
 	    };
         $scope.loaded=false;
 

@@ -19,16 +19,52 @@ namespace VitalChoice.Business.Services
             this.commonLogItemsRepository = commonLogItemsRepository;
         }
 
-        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? from = null, DateTime? to = null,
-            int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT)
+        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? @from = null, DateTime? to = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT, SortFilter sorting = null)
         {
             var query = new CommonLogQuery();
             query = query.GetItems(logLevel, message, source, from, to);
 
-            var toRetirn = await commonLogItemsRepository.Query(query).OrderBy(x=>x.OrderByDescending(pp=>pp.Date))
+			Func<IQueryable<CommonLogItem>, IOrderedQueryable<CommonLogItem>> sortable = x => x.OrderByDescending(pp => pp.Date);
+			if (sorting != null)
+	        {
+				var sortOrder = sorting.SortOrder;
+				switch (sorting.Path)
+				{
+					case CommonLogItemSortPath.Date:
+						sortable =
+							(x) =>
+								sortOrder == SortOrder.Asc
+									? x.OrderBy(y => y.Date)
+									: x.OrderByDescending(y => y.Date);
+						break;
+					case CommonLogItemSortPath.LogLevel:
+						sortable =
+							(x) =>
+								sortOrder == SortOrder.Asc
+									? x.OrderBy(y => y.LogLevel)
+									: x.OrderByDescending(y => y.LogLevel);
+						break;
+					case CommonLogItemSortPath.Source:
+						sortable =
+							(x) =>
+								sortOrder == SortOrder.Asc
+									? x.OrderBy(y => y.Source)
+									: x.OrderByDescending(y => y.Source);
+						break;
+					case CommonLogItemSortPath.ShortMessage:
+						sortable =
+							(x) =>
+								sortOrder == SortOrder.Asc
+									? x.OrderBy(y => y.ShortMessage)
+									: x.OrderByDescending(y => y.ShortMessage);
+						break;
+				}
+			}
+
+			var toReturn = await commonLogItemsRepository.Query(query).OrderBy(sortable)
                 .SelectPageAsync(page, take);
 
-            return toRetirn;
+            return toReturn;
         }
     }
 }

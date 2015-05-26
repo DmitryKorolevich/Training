@@ -30,7 +30,8 @@ function ($scope, $rootScope, $stateParams, contentService, toaster, confirmUtil
 		} else {
             var messages="";
             if(result.Messages)
-            {   
+            {
+                $scope.detailsTab.active = true;
                 $.each(result.Messages, function( index, value ) {
                     messages+=value.Message +"<br />";
                 });
@@ -55,6 +56,9 @@ function ($scope, $rootScope, $stateParams, contentService, toaster, confirmUtil
             Template: '',
             IsDefault:false,
             Type:1,
+        };
+        $scope.detailsTab = {
+            active: true
         };
         $scope.loaded = false;
         $scope.forms = {};
@@ -111,6 +115,7 @@ function ($scope, $rootScope, $stateParams, contentService, toaster, confirmUtil
                 });
         } else {
             $scope.forms.masterForm.submitted = true;
+            $scope.detailsTab.active = true;
         }
     };
 
