@@ -2,7 +2,6 @@
 
 angular.module('app.modules.demo',
 	[
-		'app.modules.demo.controllers.productListController',
 		'app.modules.demo.controllers.customerListController',
 		'app.modules.demo.controllers.customerDetailController',
 		'app.modules.demo.controllers.dashboardController',
@@ -155,19 +154,6 @@ angular.module('app.modules.demo',
 					}
 				})
 				/*products*/
-				.state('index.oneCol.locateProduct', {
-					url: '/products/locate',
-					templateUrl: 'app/modules/demo/partials/searchProducts.html'
-				})
-				.state('index.oneCol.productsList', {
-					url: '/products',
-					templateUrl: 'app/modules/demo/partials/products.html',
-					controller: 'productListController'
-				})
-				.state('index.oneCol.addNewProduct', {
-					url: '/products/add',
-					template: '<h2>Add New Product</h2>'
-				})
 				.state('index.oneCol.manageProductReviews', {
 					url: '/products/manageProductReviews',
 					template: '<h2>Manage Product Reviews</h2>'

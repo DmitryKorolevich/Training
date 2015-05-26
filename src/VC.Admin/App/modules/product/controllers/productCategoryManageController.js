@@ -18,6 +18,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
             if(result.Messages)
             {
                 $scope.forms.form.submitted = true;
+                $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $.each(result.Messages, function (index, value) {
                     if (value.Field) {
@@ -57,6 +58,9 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
             MasterContentItemId: 0,
             Status: "2:1",
         };
+	    $scope.detailsTab = {
+	        active: true
+	    };
 	    if ($stateParams.categoryid) {
 	        $scope.productCategory.ParentId = $stateParams.categoryid;
 	    }
@@ -104,6 +108,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                 });
 	    } else {
 	        $scope.forms.form.submitted = true;
+	        $scope.detailsTab.active = true;
 	    }
 	};
 

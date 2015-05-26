@@ -26,6 +26,30 @@ namespace VC.Admin.Models.Product
         public ICollection<SKU> SKUs { get; set; }
     }
 
+    public class CrossSellProductModel
+    {
+        public string Image { get; set; }
+
+        public string Url { get; set; }
+
+        public CrossSellProductModel()
+        {
+        }
+    }
+
+    public class VideoModel
+    {
+        public string Image { get; set; }
+
+        public string Video { get; set; }
+
+        public string Text { get; set; }
+
+        public VideoModel()
+        {
+        }
+    }
+
     public class SKUManageModel : Model<SKU, IMode>
     {
         public int Id { get; set; }
@@ -60,7 +84,97 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
 
-        public List<SKUManageModel> SKUs { get; set; }
+        public ProductType Type { get; set; }
+
+        public RecordStatusCode StatusCode { get; set; }
+
+        public bool Hidden { get; set; }
+
+
+        public string Description { get; set; }
+
+        public string Serving { get; set; }
+
+        public string Recepies { get; set; }
+
+        public string Ingredients { get; set; }
+
+        public string ShortDescription { get; set; }
+
+        public string ProductNotes { get; set; }
+
+        public string MetaTitle { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string GoogleCategory { get; set; }
+
+        public string TaxCode { get; set; }
+
+        public string SpecialIcon { get; set; }
+
+
+        public string Thumbnail { get; set; }
+
+        public string MainProduct {get;set;}
+
+
+        public string NutritionalTitle { get; set; }
+
+        public string ServingSize { get; set; }
+
+        public string Servings { get; set; }
+
+        public string Calories { get; set; }
+
+        public string CaloriesFromFat { get; set; }
+
+        public string TotalFat { get; set; }
+
+        public string TotalFatPercent { get; set; }
+
+        public string SaturatedFat { get; set; }
+
+        public string SaturatedFatPercent { get; set; }
+
+        public string TransFat { get; set; }
+
+        public string TransFatPercent { get; set; }
+
+        public string Cholesterol { get; set; }
+
+        public string CholesterolPercent { get; set; }
+
+        public string Sodium { get; set; }
+
+        public string SodiumPercent { get; set; }
+
+        public string TotalCarbohydrate { get; set; }
+
+        public string TotalCarbohydratePercent { get; set; }
+
+        public string DietaryFiber { get; set; }
+
+        public string DietaryFiberPercent { get; set; }
+
+        public string Sugars { get; set; }
+
+        public string SugarsPercent { get; set; }
+
+        public string Protein { get; set; }
+
+        public string ProteinPercent { get; set; }
+
+        public string AdditionalNotes { get; set; }
+
+
+        public IList<int> CategoryIds { get; set; }
+
+        public IList<CrossSellProductModel> CrossSellProducts { get; set; }
+
+        public IList<VideoModel> Videos { get; set; }
+
+        public IList<SKUManageModel> SKUs { get; set; }
 
         public ProductManageModel()
         {

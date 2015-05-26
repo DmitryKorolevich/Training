@@ -3,6 +3,7 @@
 angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoriesController',
 	'app.modules.product.controllers.productCategoryManageController',
+	'app.modules.content.controllers.productsController',
 	'app.modules.product.controllers.productManageController',
 ])
 .config([
@@ -26,8 +27,18 @@ angular.module('app.modules.product', [
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
+		        .state('index.oneCol.manageProducts', {
+		            url: '/products',
+		            templateUrl: 'app/modules/product/partials/productsList.html',
+		            controller: 'productsController'
+		        })
+		        .state('index.oneCol.addNewProduct', {
+		            url: '/products/add',
+		            templateUrl: 'app/modules/product/partials/productDetail.html',
+		            controller: 'productManageController'
+		        })
 				.state('index.oneCol.productDetail', {
-				    url: '/products/1',
+				    url: '/products/{id:int}',
 				    templateUrl: 'app/modules/product/partials/productDetail.html',
 				    controller: 'productManageController'
 				});

@@ -18,11 +18,11 @@
         <div class="container-fluid">
             <div class="row">
                 <tabset>
-                    <tab heading="Details">
+                    <tab heading="Details" active="detailsTab.active">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <form class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                    <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.forms.submitted}" novalidate>
                                         <fieldset>
                                             <div class="form-group">
                                                 <label for="type" class="col-md-3 control-label">Status</label>

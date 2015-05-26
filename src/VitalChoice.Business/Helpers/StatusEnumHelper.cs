@@ -59,8 +59,6 @@ namespace VitalChoice.Business.Helpers
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>();
             toReturn.Add((int)GCType.ManualGC, "Manually Created Gift Certificate");
-            //toReturn.Add(String.Format("{0}:{1}", (int)GCType.EGC, (int)CustomerTypeCode.All), "Not set");
-            //toReturn.Add(String.Format("{0}:{1}", (int)GCType.GC, (int)CustomerTypeCode.Wholesale), "Not set");
             return toReturn;
         }
 
@@ -70,6 +68,16 @@ namespace VitalChoice.Business.Helpers
             toReturn.Add((int)RecordStatusCode.Active, "Active");
             toReturn.Add((int)RecordStatusCode.NotActive, "Not Active");
             toReturn.Add((int)RecordStatusCode.Deleted, "Deleted");
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetProductTypes()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>();
+            toReturn.Add((int)ProductType.Perishable, "Perishable");
+            toReturn.Add((int)ProductType.NonPerishable, "Non Perishable");
+            toReturn.Add((int)ProductType.GC, "Gift Certificate");
+            toReturn.Add((int)ProductType.EGC, "E Gift Certificate");
             return toReturn;
         }
     }

@@ -35,17 +35,18 @@ namespace VC.Admin.Controllers
 			if (contextAccessor.HttpContext.User.Identity.IsAuthenticated)
 	        {
 		        referenceDataModel = new FullReferenceDataModel()
-		        {
-			        Roles = referenceData.Roles,
+                {
+                    Labels = referenceData.Labels,
+                    Roles = referenceData.Roles,
 			        UserStatuses = referenceData.UserStatuses,
 			        ContentTypes = referenceData.ContentTypes,
 			        ContentProcessors = referenceData.ContentProcessors,
-			        Labels = referenceData.Labels,
 			        PublicHost = referenceData.PublicHost,
 			        ContentItemStatusNames = referenceData.ContentItemStatusNames,
 			        ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
                     GCTypes = referenceData.GCTypes,
                     RecordStatuses = referenceData.RecordStatuses,
+                    ProductTypes = referenceData.ProductTypes,
                 };
 	        }
 			else

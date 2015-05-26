@@ -55,6 +55,10 @@ h2 {
 .centered-text {
   text-align: center;
 }
+img.thumb {
+  max-width: 48px;
+  max-height: 48px;
+}
 .angular-ui-tree-placeholder {
   border: 2px dashed #717171;
   -webkit-box-sizing: border-box;

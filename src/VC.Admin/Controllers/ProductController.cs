@@ -32,6 +32,43 @@ namespace VC.Admin.Controllers
         #region Products
 
         [HttpPost]
+        public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]ProductFilter filter)
+        {
+            var items = new List<ProductListItemModel>()
+            {
+                new ProductListItemModel(null)
+                {
+                    Id =1,
+                    ProductName="Test",
+                    StatusCode=RecordStatusCode.Active,
+                    ThumbImage="/some.jpg",
+                    Hidden=true,
+                    Type=ProductType.Perishable,
+                }
+            };
+            var toReturn = new PagedList<ProductListItemModel>();
+            toReturn.Items = items;
+            toReturn.Count = items.Count;
+            return await Task.FromResult<PagedList<ProductListItemModel>>(toReturn);
+        }
+
+        [HttpGet]
+        public async Task<Result<ProductManageModel>> GetProduct(int id)
+        {
+            //item = await productCategoryService.UpdateCategoryAsync(item);
+
+            return await Task.FromResult<ProductManageModel>(new ProductManageModel()
+            {
+                Id =5,
+                Name = "Test",
+                StatusCode=RecordStatusCode.Active,
+                Type = ProductType.GC,
+                Hidden = false,
+                CategoryIds = new List<int>() { 6, 7, 5 },
+            });
+        }
+
+        [HttpPost]
         public async Task<Result<ProductManageModel>> UpdateProduct([FromBody]ProductManageModel model)
         {
             var item = ConvertWithValidate(model);
@@ -40,7 +77,14 @@ namespace VC.Admin.Controllers
 
             //item = await productCategoryService.UpdateCategoryAsync(item);
 
-            return new ProductManageModel();
+            return await Task.FromResult<ProductManageModel>(new ProductManageModel());
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteProduct(int id)
+        {
+            return await Task.FromResult<bool>(false);
+            //return await productCategoryService.DeleteCategoryAsync(id);
         }
 
         #endregion

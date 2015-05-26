@@ -87,6 +87,12 @@ namespace VitalChoice.Business.Services
                     Key = x.Key,
                     Text = x.Value
                 }).ToList(),
+
+                ProductTypes = StatusEnumHelper.GetProductTypes().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
             };
 
 			return referenceData;
