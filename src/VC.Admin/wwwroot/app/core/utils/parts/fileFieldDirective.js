@@ -6,9 +6,9 @@
         template: '<p class="input-group">' +
                     '<input type="text" placeholder="{{placeHolder}}" class="form-control disabled" ng-model="inputValue" disabled/>' +
                     '<span class="input-group-btn">' +
-                        '<button type="button" class="btn btn-default" data-ng-show="inputValue" data-ng-click="clear()"><i class="glyphicon glyphicon-remove-circle"></i></button>' +
+                        '<button type="button" class="btn btn-default" data-ng-class="{disabled: disabled}" data-ng-show="inputValue" data-ng-click="clear()"><i class="glyphicon glyphicon-remove-circle"></i></button>' +
                         '<button type="button" class="btn btn-default" data-ng-show="inputValue" data-ng-click="openPreview()"><i class="glyphicon glyphicon-eye-open"></i></button>' +
-                        '<button type="button" class="btn btn-default" data-ng-click="openFileManagement()"><i class="glyphicon glyphicon-folder-open"></i></button>' +
+                        '<button type="button" class="btn btn-default" data-ng-class="{disabled: disabled}" data-ng-click="openFileManagement()"><i class="glyphicon glyphicon-folder-open"></i></button>' +
                     '</span>' +
                   '</p>',
         scope: {
@@ -55,6 +55,12 @@
             }
             if ($attrs.required) {
                 ngModelCtrl.$setValidity('required', ngModelCtrl.$viewValue);
+            }            
+            if ($attrs.disabled!=undefined) {
+                $scope.disabled = true;
+            }
+            else {
+                $scope.disabled = false;
             }
         };
 

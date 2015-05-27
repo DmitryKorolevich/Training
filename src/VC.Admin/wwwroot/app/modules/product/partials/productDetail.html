@@ -223,23 +223,7 @@
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <!--<span class="legend">Sub Product Group Name</span>
-                                    <div class="row form-group">
-                                        <div class="col-md-12">
-                                            <input type="text" class="form-control" id="subProductGroupName" placeholder="Example: Number of Portions" value="">
-                                        </div>
-                                    </div>
-                                    <span class="legend">Product SKUs</span>
-                                    <div class="row form-group">
-                                        <div class="col-md-4">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Filter by SKU">
-                                                <span class="input-group-btn">
-                                                    <button class="btn btn-info" type="button">Filter</button>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>-->
+                                    <span class="legend">Sub Products</span>
                                     <div class="form-group">
                                         <button data-ng-click="addSKU();" class="btn btn-info">Add New SKU</button>
                                     </div>
@@ -639,132 +623,184 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <form class="form-horizontal">
-                                        <fieldset>
-                                            <span class="legend">Cross Sell Products</span>
-                                            <div class="form-group">
-                                                <label for="image_1" class="col-md-3 control-label">Cross Sell Image 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="image_1" placeholder="Cross Sell Image 1">
-                                                </div>
+                                    <span class="legend">Cross Sell Products</span>
+                                    <div class="form-group">
+                                        <button data-ng-click="addCross();" class="btn btn-info">Add New Cross Sell Product</button>
+                                    </div>
+                                    <div class="panel-group sortable-accordion">
+                                        <div ui-sortable="sortableOptions" data-ng-model="product.CrossSellProducts">
+                                            <div data-ng-repeat="crossSellProduct in product.CrossSellProducts" class="panel panel-default">
+                                                <form class="form-horizontal" name="{{'forms.CrossSellProducts'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.crossessubmitted}" novalidate>
+                                                    <fieldset>
+                                                        <div class="panel-heading">
+                                                            <h4 class="panel-title">
+                                                                <div class="accordion-toggle">
+                                                                    <!--ng-click="toggleOpen(crossSellProduct, $event)">-->
+                                                                    <div class="form-horizontal">
+                                                                        <div class="row">
+                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                <div class="sortable-move btn btn-info">
+                                                                                    <i class="glyphicon glyphicon-sort"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-11">
+                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                    <label class="control-label">Cross Sell Image</label>
+                                                                                    <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
+                                                                                        <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" required></filefield>
+                                                                                        <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts{{$index}}.Image.$invalid">
+                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
+                                                                                        <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSell.Image" disabled></filefield>
+                                                                                    </div>
+                                                                                    <a data-ng-if="!crossSellProduct.ImageUse" data-ng-click="crossSellProduct.ImageUse=true;" class="edit-link">set</a>
+                                                                                    <a data-ng-if="crossSellProduct.ImageUse" data-ng-click="crossSellProduct.ImageUse=false;" class="edit-link">remove</a>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                    <button class="btn btn-danger" data-ng-click="deleteCross($index)">Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>
+                                                                            <div class="col-md-11">
+                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                    <label class="control-label">URL Cross Sell</label>
+                                                                                    <div class="col-md-1" data-ng-if="crossSellProduct.UrlUse">
+                                                                                        <input type="text" name="Url" class="form-control" placeholder="URL Cross Sell" data-ng-model="crossSellProduct.Url" required>
+                                                                                        <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts{{$index}}.Url.$invalid">
+                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Url.$error.server">{{serverMessages.GetMessage('Url','CrossSellProducts',$index)}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-1" data-ng-if="!crossSellProduct.UrlUse">
+                                                                                        <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSell.Url" readonly>
+                                                                                    </div>
+                                                                                    <a data-ng-if="!crossSellProduct.UrlUse" data-ng-click="crossSellProduct.UrlUse=true;" class="edit-link">set</a>
+                                                                                    <a data-ng-if="crossSellProduct.UrlUse" data-ng-click="crossSellProduct.UrlUse=false;" class="edit-link">remove</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </h4>
+                                                        </div>
+                                                        <div class="panel-collapse" data-ng-class="{collapse: !crossSellProduct.IsOpen}">
+                                                            <div class="panel-body">
+                                                                <div class="form-horizontal">
+                                                                    <div class="form-group">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </form>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="sell_1" class="col-md-3 control-label">URL Cross Sell 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="sell_1" placeholder="URL Cross Sell 1">
-                                                </div>
+                                        </div>
+                                    </div>
+
+                                    <span class="legend">YouTube Videos</span>
+                                    <div class="form-group">
+                                        <button data-ng-click="addVideo();" class="btn btn-info">Add New YouTube Video</button>
+                                    </div>
+                                    <div class="panel-group sortable-accordion">
+                                        <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
+                                            <div data-ng-repeat="video in product.Videos" class="panel panel-default">
+                                                <form class="form-horizontal" name="{{'forms.Videos'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate>
+                                                    <fieldset>
+                                                        <div class="panel-heading">
+                                                            <h4 class="panel-title">
+                                                                <div class="accordion-toggle">
+                                                                    <!--ng-click="toggleOpen(video, $event)">-->
+                                                                    <div class="form-horizontal">
+                                                                        <div class="row">
+                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                <div class="sortable-move btn btn-info">
+                                                                                    <i class="glyphicon glyphicon-sort"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-11">
+                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                    <label class="control-label">YouTube Video</label>
+                                                                                    <div class="col-md-1" data-ng-if="video.VideoUse">
+                                                                                        <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
+                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Video.$invalid">
+                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
+                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-1" data-ng-if="!video.VideoUse">
+                                                                                        <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Video.Video" readonly>
+                                                                                    </div>
+                                                                                    <a data-ng-if="!video.VideoUse" data-ng-click="video.VideoUse=true;" class="edit-link">set</a>
+                                                                                    <a data-ng-if="video.VideoUse" data-ng-click="video.VideoUse=false;" class="edit-link">remove</a>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                    <button class="btn btn-danger" data-ng-click="deleteVideo($index)">Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>
+                                                                            <div class="col-md-11">
+                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                    <label class="control-label">YouTube Image</label>
+                                                                                    <div class="col-md-1" data-ng-if="video.ImageUse">
+                                                                                        <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
+                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Image.$invalid">
+                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-1" data-ng-if="!video.ImageUse">
+                                                                                        <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Video.Image" disabled></filefield>
+                                                                                    </div>
+                                                                                    <a data-ng-if="!video.ImageUse" data-ng-click="video.ImageUse=true;" class="edit-link">set</a>
+                                                                                    <a data-ng-if="video.ImageUse" data-ng-click="video.ImageUse=false;" class="edit-link">remove</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>
+                                                                            <div class="col-md-11">
+                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                    <label class="control-label">YouTube Text</label>
+                                                                                    <div class="col-md-1" data-ng-if="video.TextUse">
+                                                                                        <input type="text" name="Text" class="form-control" placeholder="YouTube Text" data-ng-model="video.Text" required>
+                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Text.$invalid">
+                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
+                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-1" data-ng-if="!video.TextUse">
+                                                                                        <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Video.Text" readonly>
+                                                                                    </div>
+                                                                                    <a data-ng-if="!video.TextUse" data-ng-click="video.TextUse=true;" class="edit-link">set</a>
+                                                                                    <a data-ng-if="video.TextUse" data-ng-click="video.TextUse=false;" class="edit-link">remove</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </h4>
+                                                        </div>
+                                                        <div class="panel-collapse" data-ng-class="{collapse: !video.IsOpen}">
+                                                            <div class="panel-body">
+                                                                <div class="form-horizontal">
+                                                                    <div class="form-group">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </form>
                                             </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="image_2" class="col-md-3 control-label">Cross Sell Image 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="image_2" placeholder="Cross Sell Image 2">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="sell_2" class="col-md-3 control-label">URL Cross Sell 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="sell_2" placeholder="URL Cross Sell 2">
-                                                </div>
-                                            </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="image_3" class="col-md-3 control-label">Cross Sell Image 3</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="image_3" placeholder="Cross Sell Image 3">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="sell_3" class="col-md-3 control-label">URL Cross Sell 3</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="sell_3" placeholder="URL Cross Sell 3">
-                                                </div>
-                                            </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="image_1" class="col-md-3 control-label">Cross Sell Image 4</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="image_4" placeholder="Cross Sell Image 4">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="sell_4" class="col-md-3 control-label">URL Cross Sell 4</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="sell_4" placeholder="URL Cross Sell 4">
-                                                </div>
-                                            </div>
-                                            <span class="legend">Youtube Videos</span>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="youtube_video_1" class="col-md-3 control-label">YouTube Video 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_video_1" placeholder="YouTube Video 1">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_image_1" class="col-md-3 control-label">YouTube Image 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_image_1" placeholder="YouTube Image 1">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_text_1" class="col-md-3 control-label">YouTube Text 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_text_1" placeholder="YouTube Text 1">
-                                                </div>
-                                            </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="youtube_video_2" class="col-md-3 control-label">YouTube Video 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_video_2" placeholder="YouTube Video 2">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_image_2" class="col-md-3 control-label">YouTube Image 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_image_2" placeholder="YouTube Image 2">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_text_2" class="col-md-3 control-label">YouTube Text 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_text_2" placeholder="YouTube Text 2">
-                                                </div>
-                                            </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="youtube_video_3" class="col-md-3 control-label">YouTube Video 3</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_video_3" placeholder="YouTube Video 3">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_image_3" class="col-md-3 control-label">YouTube Image 3</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_image_3" placeholder="YouTube Image 3">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_text_3" class="col-md-3 control-label">YouTube Text 3</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_text_3" placeholder="YouTube Text 3">
-                                                </div>
-                                            </div>
-                                            <div class="form-group margin-top-30px">
-                                                <label for="youtube_video_4" class="col-md-3 control-label">YouTube Video 4</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_video_4" placeholder="YouTube Video 4">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_image_4" class="col-md-3 control-label">YouTube Image 4</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_image_4" placeholder="YouTube Image 4">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="youtube_text_4" class="col-md-3 control-label">YouTube Text 4</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="youtube_text_4" placeholder="YouTube Text 4">
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    </form>
+                                        </div>
+                                    </div>
                                 </spinner-overlay>
                             </div>
                         </div>

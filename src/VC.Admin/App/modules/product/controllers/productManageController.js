@@ -16,6 +16,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 if (result.Messages) {
                     $scope.forms.submitted = true;
                     $scope.forms.skussubmitted = true;
+                    $scope.forms.crossessubmitted = true;
+                    $scope.forms.videossubmitted = true;
                     $scope.serverMessages = new ServerMessages(result.Messages);
                     var formForShowing=null;
                     $.each(result.Messages, function (index, value) {
@@ -53,49 +55,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
             toaster.pop('error', "Error!", "Server error occured");
         };
 
-        $scope.deleteSKU = function (index)
-        {
-            $scope.product.SKUs.splice(index, 1);
-        };
-
-        $scope.addSKU = function () {
-
-            additionalSKUsValidatorClean();
-            additionalSKUsValidatorFire();
-            var valid = openSKUs();
-
-            if (!valid) {
-                $scope.forms.skussubmitted = true;
-                return false;
-            }
-
-            var sku = {
-                Id: null,
-                Name: '',
-                Active: true,
-                RetailPrice: 0.00,
-                WholesalePrice: 0.00,
-                Stock: null,
-                DisregardStock: true,
-                NonDiscountable: true,
-                HideFromDataFeed: true,
-                IsOpen: true,
-            };
-            var skus = [];
-            $.each($scope.product.SKUs, function (index, item)
-            {
-                var newItem = {};
-                angular.copy(item, newItem);
-                newItem.IsOpen = false;
-                skus.push(newItem);
-            });
-            skus.splice(0, 0, sku);
-            $scope.product.SKUs = [];
-            $scope.product.SKUs = skus;
-
-            $scope.forms.skussubmitted = false;
-        };
-
         $scope.sortableOptions = {
             handle: ' .sortable-move',
             items: ' .panel:not(.panel-heading)',
@@ -112,13 +71,23 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.id = $stateParams.id;
 
             $scope.forms = {};
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
+            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
+            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
             $scope.previewUrl = null;
             $scope.allTypes = $rootScope.ReferenceData.ProductTypes;
             $scope.googleCategories = [];
             $scope.specialIcons = [];
             $scope.sellers = [];
             $scope.orphanTypes = [];
+
+            $scope.defaults = {};
+            $scope.defaults.CrossSell = {};
+            $scope.defaults.CrossSell.Image = '/some.png';
+            $scope.defaults.CrossSell.Url = 'http://someurl.com/'
+            $scope.defaults.Video = {};
+            $scope.defaults.Video.Video = 'jGwOsFo8TTg';
+            $scope.defaults.Video.Image = '/some.png';
+            $scope.defaults.Video.Text = 'Some text'
             
             $scope.parentDetailsTab = {
                 active: true,
@@ -254,14 +223,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.product.Type = 1;//Perishable
 
             $scope.product.SKUs = [];
+            $scope.product.CrossSellProducts = [];
+            $scope.product.Videos = [];
         };
 
-        function activateTab(formName)
-        {            
-            $.each($scope.tabs, function (index, item)
-            {
-                if (formName.indexOf('SKUs') == 0)
-                {
+        function activateTab(formName) {
+            $.each($scope.tabs, function (index, item) {
+                if (formName.indexOf('SKUs') == 0) {
                     formName = 'SKUs';
                 }
                 if (formName.indexOf('CrossSellProducts') == 0) {
@@ -275,7 +243,140 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     return false;
                 }
             });
-        }
+        };
+
+        $scope.deleteVideo = function (index) {
+            var videos = [];
+            $.each($scope.product.Videos, function (index, item) {
+                var newItem = {};
+                angular.copy(item, newItem);
+                videos.push(newItem);
+            });
+            videos.splice(index, 1);
+            $scope.product.Videos = [];
+            $scope.product.Videos = videos;
+        };
+
+        $scope.addVideo = function () {
+
+            if ($scope.product.Videos.length >= 4) {
+                toaster.pop('error', "Error!", "Can't be added more than 4 YouTube Videos", null, 'trustedHtml');
+                return false;
+            };
+
+            var video = {
+                Video: null,
+                VideoUse: false,
+                Image: null,
+                ImageUse: false,
+                Text: null,
+                TextUse: false,
+            };
+            var videos = [];
+            $.each($scope.product.Videos, function (index, item) {
+                var newItem = {};
+                angular.copy(item, newItem);
+                newItem.IsOpen = false;
+                videos.push(newItem);
+            });
+            videos.splice(0, 0, video);
+            $scope.product.Videos = [];
+            $scope.product.Videos = videos;
+
+            $scope.forms.videossubmitted = false;
+        };
+
+        $scope.deleteCross = function (index)
+        {
+            var crosses = [];
+            $.each($scope.product.CrossSellProducts, function (index, item) {
+                var newItem = {};
+                angular.copy(item, newItem);
+                crosses.push(newItem);
+            });
+            crosses.splice(index, 1);
+            $scope.product.CrossSellProducts = [];
+            $scope.product.CrossSellProducts = crosses;
+        };
+
+        $scope.addCross = function () {
+
+            if ($scope.product.CrossSellProducts.length >= 4) {
+                toaster.pop('error', "Error!", "Can't be added more than 4 Cross Sell Products", null, 'trustedHtml');
+                return false;
+            };
+
+            var cross = {
+                Image: null,
+                ImageUse: false,
+                Url: null,
+                UrlUse: false,
+            };
+            var crosses = [];
+            $.each($scope.product.CrossSellProducts, function (index, item)
+            {
+                var newItem = {};
+                angular.copy(item, newItem);
+                newItem.IsOpen = false;
+                crosses.push(newItem);
+            });
+            crosses.splice(0, 0, cross);
+            $scope.product.CrossSellProducts = [];
+            $scope.product.CrossSellProducts = crosses;
+
+            $scope.forms.crossessubmitted = false;
+        };
+
+        $scope.deleteSKU = function (index)
+        {
+            var skus = [];
+            $.each($scope.product.SKUs, function (index, item) {
+                var newItem = {};
+                angular.copy(item, newItem);
+                skus.push(newItem);
+            });
+            skus.splice(index, 1);
+            $scope.product.SKUs = [];
+            $scope.product.SKUs = skus;
+        };
+
+        $scope.addSKU = function () {
+
+            additionalSKUsValidatorClean();
+            additionalSKUsValidatorFire();
+            var valid = openSKUs();
+
+            if (!valid) {
+                $scope.forms.skussubmitted = true;
+                return false;
+            }
+
+            var sku = {
+                Id: null,
+                Name: '',
+                Active: true,
+                RetailPrice: 0.00,
+                WholesalePrice: 0.00,
+                Stock: null,
+                DisregardStock: true,
+                NonDiscountable: true,
+                HideFromDataFeed: true,
+                IsOpen: true,
+            };
+            var skus = [];
+            $.each($scope.product.SKUs, function (index, item)
+            {
+                var newItem = {};
+                angular.copy(item, newItem);
+                newItem.IsOpen = false;
+                skus.push(newItem);
+            });
+            skus.splice(0, 0, sku);
+            $scope.product.SKUs = [];
+            $scope.product.SKUs = skus;
+
+            $scope.forms.skussubmitted = false;
+        };
 
         var additionalSKUsValidatorFire = function ()
         {
@@ -333,7 +434,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
             var valid = true;
             $.each($scope.forms, function (index, form) {
-                if (!form.$valid && index != 'submitted' && index != 'skussubmitted') {
+                if (!form.$valid && index != 'submitted' && index != 'skussubmitted' && index != 'crossessubmitted' && index != 'videossubmitted') {
                     valid = false;                          
                     activateTab(index);
                     return false;
@@ -344,6 +445,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.product.CategoryIds = categoryIds;
+                updateCrossses();
+                updateVideos();
 
                 productService.updateProduct($scope.product, $scope.editTracker).success(function (result) {
                     successSaveHandler(result);
@@ -352,8 +455,38 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 });
             } else {
                 $scope.forms.submitted = true;
-                $scope.forms.skussubmitted = true;
+                $scope.forms.skussubmitted = true; 
+                $scope.forms.crossessubmitted = true;
+                $scope.forms.videossubmitted = true;
             }
+        };
+
+        var updateCrossses = function ()
+        {
+            $.each($scope.product.CrossSellProducts, function (index, item)
+            {
+                if (!item.ImageUse)
+                {
+                    item.Image = null;
+                }
+                if (!item.UrlUse) {
+                    item.Url = null;
+                }
+            });
+        };
+
+        var updateVideos = function () {
+            $.each($scope.product.Videos, function (index, item) {
+                if (!item.VideoUse) {
+                    item.Video = null;
+                }
+                if (!item.ImageUse) {
+                    item.Image = null;
+                }
+                if (!item.TextUse) {
+                    item.Text = null;
+                }
+            });
         };
 
         $scope.toggleOpen = function (item, event)

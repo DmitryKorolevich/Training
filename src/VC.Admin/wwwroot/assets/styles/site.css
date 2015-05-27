@@ -322,6 +322,27 @@ button.main-button {
   padding-left: 0;
   padding-right: 0;
 }
+.fixed-accordion-row.one-line {
+  margin-bottom: 15px;
+}
+.fixed-accordion-row.one-line > .col-md-1 {
+  width: 400px;
+}
+.fixed-accordion-row.one-line > label {
+  width: 120px;
+}
+.fixed-accordion-row.one-line > .col-md-1 .input-group {
+  width: 100%;
+}
+.fixed-accordion-row.one-line > .col-md-1 input[type=text] {
+  width: 100%;
+  cursor: pointer;
+}
+.fixed-accordion-row.one-line > .edit-link {
+  margin-top: 8px;
+  margin-left: 10px;
+  cursor: pointer;
+}
 .sortable-accordion h4 .fixed-accordion-row small {
   font-size: 85%;
 }
@@ -380,6 +401,9 @@ form .error-container.small-block {
 }
 form .form-group p {
   margin: 0;
+}
+.input-group {
+  margin-bottom: 0px;
 }
 /* Absolute Center CSS Spinner */
 .loading {
