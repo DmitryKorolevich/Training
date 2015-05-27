@@ -325,7 +325,7 @@ button.main-button {
 .sortable-accordion h4 .fixed-accordion-row small {
   font-size: 85%;
 }
-.fixed-accordion-row > .input-group {
+.fixed-accordion-row .col-md-1 > .input-group {
   width: 133px;
 }
 .fixed-accordion-row > .control-label {
@@ -370,6 +370,9 @@ form .error-container {
 }
 form .error-container small {
   display: block;
+}
+form .error-container.small-block {
+  width: 145px;
 }
 .toogle-editor {
   text-align: right;

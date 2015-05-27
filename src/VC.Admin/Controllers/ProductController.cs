@@ -59,12 +59,33 @@ namespace VC.Admin.Controllers
 
             return await Task.FromResult<ProductManageModel>(new ProductManageModel()
             {
-                Id =5,
+                Id = 5,
                 Name = "Test",
-                StatusCode=RecordStatusCode.Active,
+                StatusCode = RecordStatusCode.Active,
                 Type = ProductType.GC,
                 Hidden = false,
                 CategoryIds = new List<int>() { 6, 7, 5 },
+                SKUs = new List<SKUManageModel>()
+                {
+                    new SKUManageModel()
+                    {
+                        Id = 43454,
+                        Name = "FRP006",
+                        Active = true,
+                        Hidden = true,
+                        RetailPrice = 55.00,
+                        WholesalePrice = 9.00,
+                        Stock = 5,
+                        DisregardStock = true,
+                        AutoShipFrequency2=true,
+                        AutoShipFrequency6=true,
+                        DisallowSingle=true,
+                        AutoShipProduct=true,
+                        HideFromDataFeed=true,
+                        OffPercent = 11,
+                        NonDiscountable=true,                        
+                    },
+                },
             });
         }
 
@@ -105,7 +126,7 @@ namespace VC.Admin.Controllers
             var category = ConvertWithValidate(model);
             if (category == null)
                 return false;
-            
+
             return await productCategoryService.UpdateCategoriesTreeAsync(category);
         }
 
@@ -126,13 +147,13 @@ namespace VC.Admin.Controllers
 
             return new ProductCategoryManageModel(item);
         }
-        
+
         [HttpPost]
         public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
         }
-        
+
         #endregion
     }
 }

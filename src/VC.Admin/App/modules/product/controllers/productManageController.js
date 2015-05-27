@@ -9,11 +9,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
         function successSaveHandler(result) {
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
-                $scope.id = result.Data.Id;
+                $scope.product.Id = result.Data.Id;
+                refreshPossiableProductTypes();
             } else {
                 var messages = "";
                 if (result.Messages) {
                     $scope.forms.submitted = true;
+                    $scope.forms.skussubmitted = true;
                     $scope.serverMessages = new ServerMessages(result.Messages);
                     var formForShowing=null;
                     $.each(result.Messages, function (index, value) {
@@ -51,6 +53,49 @@ angular.module('app.modules.product.controllers.productManageController', [])
             toaster.pop('error', "Error!", "Server error occured");
         };
 
+        $scope.deleteSKU = function (index)
+        {
+            $scope.product.SKUs.splice(index, 1);
+        };
+
+        $scope.addSKU = function () {
+
+            additionalSKUsValidatorClean();
+            additionalSKUsValidatorFire();
+            var valid = openSKUs();
+
+            if (!valid) {
+                $scope.forms.skussubmitted = true;
+                return false;
+            }
+
+            var sku = {
+                Id: null,
+                Name: '',
+                Active: true,
+                RetailPrice: 0.00,
+                WholesalePrice: 0.00,
+                Stock: null,
+                DisregardStock: true,
+                NonDiscountable: true,
+                HideFromDataFeed: true,
+                IsOpen: true,
+            };
+            var skus = [];
+            $.each($scope.product.SKUs, function (index, item)
+            {
+                var newItem = {};
+                angular.copy(item, newItem);
+                newItem.IsOpen = false;
+                skus.push(newItem);
+            });
+            skus.splice(0, 0, sku);
+            $scope.product.SKUs = [];
+            $scope.product.SKUs = skus;
+
+            $scope.forms.skussubmitted = false;
+        };
+
         $scope.sortableOptions = {
             handle: ' .sortable-move',
             items: ' .panel:not(.panel-heading)',
@@ -64,15 +109,17 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         function initialize() {
+            $scope.id = $stateParams.id;
+
             $scope.forms = {};
             $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
             $scope.previewUrl = null;
-            $scope.types = $rootScope.ReferenceData.ProductTypes;
+            $scope.allTypes = $rootScope.ReferenceData.ProductTypes;
             $scope.googleCategories = [];
             $scope.specialIcons = [];
-
-            $scope.id = $stateParams.id;
-
+            $scope.sellers = [];
+            $scope.orphanTypes = [];
+            
             $scope.parentDetailsTab = {
                 active: true,
                 formName: 'parentDetails',
@@ -126,6 +173,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                         }
                         else
                         {
+                            $scope.types = $scope.allTypes;
                             createNewProduct();
                         }
                     } else {
@@ -145,6 +193,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            $scope.product = result.Data;                        
 			            $scope.product.StatusCode = "" + $scope.product.StatusCode;
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
+			            refreshPossiableProductTypes();
 			        } else {
 			            errorHandler(result);
 			        }
@@ -152,6 +201,26 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			    error(function (result) {
 			        errorHandler(result);
 			    });
+        };
+
+        var refreshPossiableProductTypes = function()
+        {
+            var types = [];
+            if ($scope.product.Type == 1 || $scope.product.Type == 2) {
+                $.each($scope.allTypes, function (index, item) {
+                    if (item.Key == 1 || item.Key == 2) {
+                        types.push(item);
+                    }
+                });
+            }
+            if ($scope.product.Type == 3 || $scope.product.Type == 4) {
+                $.each($scope.allTypes, function (index, item) {
+                    if (item.Key == 3 || item.Key == 4) {
+                        types.push(item);
+                    }
+                });
+            }
+            $scope.types = types;
         };
 
         function setSelected(category, ids) {
@@ -184,39 +253,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.product.Hidden = false;
             $scope.product.Type = 1;//Perishable
 
-            $scope.product.SKUs = [
-            {
-                Order: 1,
-                Id: '43454',
-                Name: 'FRP006',
-                Active: true,
-                RetailPrice: 55.00,
-                WholesalePrice: 9.00,
-                UnitsToMake: 1,
-                Stock: 5,
-                DisregardStock: true,
-                AllowBackOrder: false,
-                ShipsWithin: true,
-                CrossSellingItem: false
-            },
-            {
-                Order: 2,
-                Id: '12312',
-                Name: 'FRP007',
-                Active: true,
-                RetailPrice: 79.00,
-                WholesalePrice: 79.00,
-                UnitsToMake: 1,
-                Stock: 2,
-                DisregardStock: true,
-                AllowBackOrder: false,
-                ShipsWithin: false,
-                ShipsWithinDuration: 1,
-                CrossSellingItem: false,
-                AutoShipProduct: true,
-                AutoShipFrequencyAllowed: []
-            },
-            ];
+            $scope.product.SKUs = [];
         };
 
         function activateTab(formName)
@@ -240,6 +277,48 @@ angular.module('app.modules.product.controllers.productManageController', [])
             });
         }
 
+        var additionalSKUsValidatorFire = function ()
+        {
+            $.each($scope.forms, function (index, form) {
+                if (index.indexOf('SKUs') == 0 && form.Name != undefined) {
+                    var itemIndex = parseInt(index.replace("SKUs", ""));
+                    if ($scope.product.SKUs[itemIndex]!=undefined && $scope.product.SKUs[itemIndex].Name) {
+                        var name = $scope.product.SKUs[itemIndex].Name;
+                        $.each($scope.product.SKUs, function (index, item)
+                        {
+                            if (itemIndex != index && name.toLowerCase() == item.Name.toLowerCase())
+                            {
+                                form.Name.$setValidity("exist", false);
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        var additionalSKUsValidatorClean = function () {
+            $.each($scope.forms, function (index, form) {
+                if (index.indexOf('SKUs') == 0 && form.Name!=undefined) {
+                    form.Name.$setValidity("exist", true);
+                }
+            });
+        };
+
+        var openSKUs = function ()
+        {
+            var valid = true;
+            $.each($scope.forms, function (index, form) {
+                if (index.indexOf('SKUs') == 0 && !form.$valid) {
+                    var itemIndex = parseInt(index.replace("SKUs", ""));
+                    if ($scope.product.SKUs[itemIndex] != undefined) {
+                        $scope.product.SKUs[itemIndex].IsOpen = true;
+                    }
+                    valid = false;
+                }
+            });
+            return valid;
+        };
+
         $scope.save = function () {
             $.each($scope.forms, function (index, form) {
                 $.each(form, function (index, element) {
@@ -248,10 +327,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     }
                 });
             });
+            additionalSKUsValidatorClean();
+            additionalSKUsValidatorFire();
+            openSKUs();
 
             var valid = true;
             $.each($scope.forms, function (index, form) {
-                if (!form.$valid && index != 'submitted') {
+                if (!form.$valid && index != 'submitted' && index != 'skussubmitted') {
                     valid = false;                          
                     activateTab(index);
                     return false;
@@ -270,18 +352,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 });
             } else {
                 $scope.forms.submitted = true;
+                $scope.forms.skussubmitted = true;
             }
         };
 
         $scope.toggleOpen = function (item, event)
         {
-            var itemElement = $(event.target).closest('fieldset').find('.panel-collapse').get(0);
-            $.each($('.sortable-accordion .panel-collapse'), function (index, element) {
-                if (itemElement != element && $(element).css('display') == 'block') {
-                    $(element).slideToggle();
-                }
-            });
-            $(itemElement).slideToggle();
+            item.IsOpen = !item.IsOpen;
         };
 
         initialize();

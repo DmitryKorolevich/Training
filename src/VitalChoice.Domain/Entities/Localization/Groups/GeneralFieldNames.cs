@@ -29,5 +29,8 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         Quantity = 50,
         Amount = 51,
         Message = 52,
+        SKU = 54,
+        RetailPrice=55,
+        WholesalePrice = 56,
     }
 }

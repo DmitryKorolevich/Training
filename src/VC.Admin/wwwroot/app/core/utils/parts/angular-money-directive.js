@@ -10,7 +10,8 @@ angular.module('fiestah.money', [])
   var NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
   function link(scope, el, attrs, ngModelCtrl) {
-    var min, max, precision, lastValidValue, preRoundValue;
+      var min, max, lastValidValue, preRoundValue;
+      var precision = 2;
 
     /**
      * Returns a rounded number in the precision setup by the directive

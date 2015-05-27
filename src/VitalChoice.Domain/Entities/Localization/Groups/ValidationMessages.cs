@@ -18,5 +18,6 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         FieldNameInvalidFormat =11,
         FieldMinOrEqual = 12,
         FieldMaxOrEqual = 14,
+        Exist = 15,
     }
 }

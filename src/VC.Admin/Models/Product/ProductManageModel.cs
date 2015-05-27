@@ -52,10 +52,45 @@ namespace VC.Admin.Models.Product
 
     public class SKUManageModel : Model<SKU, IMode>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
-        [Localized(GeneralFieldNames.Name)]
+        [Localized(GeneralFieldNames.SKU)]
         public string Name { get; set; }
+
+        public bool Active { get; set; }
+
+        public bool Hidden { get; set; }
+
+
+        public double RetailPrice { get; set; }
+
+        public double WholesalePrice { get; set; }
+
+        public int Stock { get; set; }
+
+        public bool DisregardStock { get; set; }
+
+        public bool DisallowSingle { get; set; }
+
+        public bool NonDiscountable { get; set; }
+
+        public string OrphanType { get; set; }
+
+        public bool AutoShipProduct { get; set; }
+
+        public double OffPercent { get; set; }
+
+        public string Seller { get; set; }
+
+        public bool HideFromDataFeed {get;set; }
+
+        public bool AutoShipFrequency1 { get; set; }
+
+        public bool AutoShipFrequency2 { get; set; }
+
+        public bool AutoShipFrequency3 { get; set; }
+
+        public bool AutoShipFrequency6 { get; set; }
 
         public SKUManageModel()
         {
@@ -70,7 +105,7 @@ namespace VC.Admin.Models.Product
         public override SKU Convert()
         {
             SKU toReturn = new SKU();
-            toReturn.Id = Id;
+            toReturn.Id = Id.HasValue ? Id.Value : 0;
             toReturn.Name = Name?.Trim();
 
             return toReturn;
@@ -80,7 +115,7 @@ namespace VC.Admin.Models.Product
     [ApiValidator(typeof(ProductManageModelValidator))]
     public class ProductManageModel : Model<Product, IMode>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
 
@@ -194,7 +229,7 @@ namespace VC.Admin.Models.Product
         public override Product Convert()
         {
             Product toReturn = new Product();
-            toReturn.Id = Id;
+            toReturn.Id = Id.HasValue ? Id.Value : 0;
             toReturn.Name = Name?.Trim();
             toReturn.SKUs = new List<SKU>();
             if (SKUs != null)

@@ -79,7 +79,7 @@
                                                     <div data-ng-show="DescriptionExpanded" text-angular data-ng-model="product.Description"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Serving" class="col-md-3 control-label">Serving/Storage</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!ServingExpanded">
@@ -94,7 +94,7 @@
                                                     <div data-ng-show="ServingExpanded" text-angular data-ng-model="product.Serving"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Recepies" class="col-md-3 control-label">Recepies</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!RecepiesExpanded">
@@ -109,7 +109,7 @@
                                                     <div data-ng-show="RecepiesExpanded" text-angular data-ng-model="product.Recepies"></div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Ingredients" class="col-md-3 control-label">Ingredients</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!IngredientsExpanded">
@@ -223,7 +223,7 @@
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Sub Product Group Name</span>
+                                    <!--<span class="legend">Sub Product Group Name</span>
                                     <div class="row form-group">
                                         <div class="col-md-12">
                                             <input type="text" class="form-control" id="subProductGroupName" placeholder="Example: Number of Portions" value="">
@@ -239,9 +239,9 @@
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
                                     <div class="form-group">
-                                        <button data-ng-click="open();" class="btn btn-info">Add New SKU</button>
+                                        <button data-ng-click="addSKU();" class="btn btn-info">Add New SKU</button>
                                     </div>
                                     <span class="help-block">*Drag and drop using icon to reorder sub products</span>
                                     <!--<accordion class="sortable-accordion">-->
@@ -250,7 +250,7 @@
                                             <!--<accordion-group>
                                             <accordion-heading>-->
                                             <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default">
-                                                <form class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                <form class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.skussubmitted}" novalidate>
                                                     <fieldset>
                                                         <div class="panel-heading">
                                                             <h4 class="panel-title">
@@ -267,8 +267,9 @@
                                                                                     <label class="control-label">SKU</label>
                                                                                     <div class="col-md-1">
                                                                                         <input type="text" name="Name" class="form-control" placeholder="SKU" data-ng-model="subSku.Name" required>
-                                                                                        <div class="error-container" ng-show="forms.submitted && forms.SKUs{{$index}}.Name.$invalid">
-                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                                                        <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.Name.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.SKU")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.exist">{{getValidationMessage("ValidationMessages.Exist","GeneralFieldNames.SKU")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
                                                                                         </div>
                                                                                     </div>
@@ -285,7 +286,7 @@
                                                                                     <label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
-                                                                                            <input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideInStorefront">
+                                                                                            <input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Hidden">
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
@@ -294,9 +295,7 @@
                                                                                     <span class="form-control-static">{{subSku.Id}}</span>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">Order</label>
-                                                                                    <input type="text" class="form-control half-size-input" placeholder="Order" data-ng-model="subSku.Order">
-                                                                                    <button ui-sref="index.oneCol.productsList" class="btn btn-danger">Delete</button>
+                                                                                    <button class="btn btn-danger" data-ng-click="deleteSKU($index)">Delete</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -305,29 +304,57 @@
                                                             </h4>
                                                         </div>
                                                         <!--</accordion-heading>-->
-                                                        <div class="panel-collapse" style="display: none;">
+                                                        <div class="panel-collapse" data-ng-class="{collapse: !subSku.IsOpen}">
                                                             <div class="panel-body">
-                                                                <div class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                                <div class="form-horizontal">
                                                                     <div class="form-group">
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Retail Price</label>
-                                                                                <div class="input-group">
-                                                                                    <span class="input-group-addon">$</span>
-                                                                                    <input type="number" class="form-control" placeholder="" data-ng-model="subSku.RetailPrice">
+                                                                                <div class="col-md-1">
+                                                                                    <div class="input-group">
+                                                                                        <span class="input-group-addon">$</span>
+                                                                                        <input type="text" name="RetailPrice" class="form-control" placeholder="Retail Price" money max="100000" min="0.01" data-ng-model="subSku.RetailPrice" required>
+                                                                                    </div>
+                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.RetailPrice.$invalid">
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.RetailPrice",1000000)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Wholesale Price</label>
-                                                                                <div class="input-group">
-                                                                                    <span class="input-group-addon">$</span>
-                                                                                    <input type="number" class="form-control" placeholder="" data-ng-model="subSku.WholesalePrice">
+                                                                                <div class="col-md-1">
+                                                                                    <div class="input-group">
+                                                                                        <span class="input-group-addon">$</span>
+                                                                                        <input type="text" name="WholesalePrice" class="form-control" placeholder="Wholesale Price" money max="100000" min="0.01" data-ng-model="subSku.WholesalePrice" required>
+                                                                                    </div>
+                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.WholesalePrice.$invalid">
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.WholesalePrice",1000000)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Stock</label>
-                                                                                <input type="number" class="form-control half-size-input" placeholder="" data-ng-model="subSku.Stock">
+                                                                                <div class="col-md-1">
+                                                                                    <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
+                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.Stock.$invalid">
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",1)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Stock")}}</small>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
                                                                                 <div class="checkbox">
@@ -336,15 +363,11 @@
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
                                                                                 <div class="checkbox">
                                                                                     <label>
-                                                                                        <input id="lblDisallowSingle{{subSku.Id}}" type="checkbox">
+                                                                                        <input id="lblDisallowSingle{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisallowSingle">
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
@@ -352,20 +375,17 @@
                                                                                 <label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
                                                                                 <div class="checkbox">
                                                                                     <label>
-                                                                                        <input id="lblNonDiscountable{{subSku.Id}}" type="checkbox">
+                                                                                        <input id="lblNonDiscountable{{subSku.Id}}" type="checkbox" data-ng-model="subSku.NonDiscountable">
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="form-group">
+                                                                    <div class="form-group" data-ng-hide="product.Type==1">
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Orphan Type</label>
-                                                                                <select class="form-control">
-                                                                                    <option>None</option>
-                                                                                    <option>Orphan-N</option>
-                                                                                </select>
+                                                                                <select class="form-control" name="Seller" data-ng-model="subSku.OrphanType" ng-options="orphanType.Key as orphanType.Text for orphanType in orphanTypes"></select>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -375,32 +395,40 @@
                                                                                 <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
                                                                                 <div class="checkbox">
                                                                                     <label>
-                                                                                        <input id="lblAutoship{{subSku.Id}}" type="checkbox">
+                                                                                        <input id="lblAutoship{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipProduct">
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="fixed-accordion-row extra-spacing">
                                                                                 <label class="control-label">Auto-Ship Frequency</label>
                                                                                 <label class="checkbox-inline">
-                                                                                    <input type="checkbox">
+                                                                                    <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
                                                                                     1
                                                                                 </label>
                                                                                 <label class="checkbox-inline">
-                                                                                    <input type="checkbox">
+                                                                                    <input id="lblAutoShipFrequency2{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency2">
                                                                                     2
                                                                                 </label>
                                                                                 <label class="checkbox-inline">
-                                                                                    <input type="checkbox">
+                                                                                    <input id="lblAutoShipFrequency3{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency3">
                                                                                     3
                                                                                 </label>
                                                                                 <label class="checkbox-inline">
-                                                                                    <input type="checkbox">
+                                                                                    <input id="lblAutoShipFrequency6{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency6">
                                                                                     6
                                                                                 </label>
                                                                             </div>
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">% Off</label>
-                                                                                <input type="number" class="form-control half-size-input" placeholder="">
+                                                                                <div class="col-md-1">
+                                                                                    <input type="number" name="OffPercent" class="form-control" placeholder="% Off" data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
+                                                                                    <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.OffPercent.$invalid">
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","% Off",1)}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","% Off")}}</small>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -408,16 +436,13 @@
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row extra-spacing">
                                                                                 <label class="control-label">Seller</label>
-                                                                                <select class="form-control">
-                                                                                    <option>Seller 1</option>
-                                                                                    <option>Seller 2</option>
-                                                                                </select>
+                                                                                <select class="form-control" name="Seller" data-ng-model="subSku.Seller" ng-options="seller.Key as seller.Text for seller in sellers"></select>
                                                                             </div>
                                                                             <div class="fixed-accordion-row">
                                                                                 <label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
                                                                                 <div class="checkbox">
                                                                                     <label>
-                                                                                        <input id="lblHideFromFeed{{subSku.Id}}" type="checkbox">
+                                                                                        <input id="lblHideFromFeed{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideFromDataFeed">
                                                                                     </label>
                                                                                 </div>
                                                                             </div>
@@ -437,7 +462,7 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Nutritional" active="nutritionalTab.active">
+                    <tab heading="Nutritional" active="nutritionalTab.active" data-ng-hide="product.Type==3 || product.Type==4">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
