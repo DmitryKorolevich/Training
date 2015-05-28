@@ -12,6 +12,12 @@ a.block {
 .table > tbody > tr.selected {
   background-color: #ddf0fb;
 }
+.nav,
+.pagination,
+.carousel,
+.panel-title a {
+  cursor: pointer;
+}
 .error {
   color: red;
 }
