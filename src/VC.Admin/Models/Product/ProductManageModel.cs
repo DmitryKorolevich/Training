@@ -118,6 +118,8 @@ namespace VC.Admin.Models.Product
         public int? Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
+        [Localized(GeneralFieldNames.Url)]
+        public string Url { get; set; }
 
         public ProductType Type { get; set; }
 
