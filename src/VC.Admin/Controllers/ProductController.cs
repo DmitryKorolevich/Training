@@ -86,8 +86,18 @@ namespace VC.Admin.Controllers
                         NonDiscountable=true,                        
                     },
                 },
-                CrossSellProducts = new List<CrossSellProductModel>(),
-                Videos = new List<VideoModel>(),
+                CrossSellProducts = new List<CrossSellProductModel>()
+                {
+                    new CrossSellProductModel(),
+                    new CrossSellProductModel(),
+                    new CrossSellProductModel(),
+                    new CrossSellProductModel(),
+                },
+                Videos = new List<VideoModel>() {
+                    new VideoModel(),
+                    new VideoModel(),
+                    new VideoModel(),
+                },
             });
         }
 

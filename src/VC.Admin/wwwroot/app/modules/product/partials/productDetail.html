@@ -626,9 +626,9 @@
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Cross Sell Products</span>
-                                    <div class="form-group">
+                                    <!--<div class="form-group">
                                         <button data-ng-click="addCross();" class="btn btn-info">Add New Cross Sell Product</button>
-                                    </div>
+                                    </div>-->
                                     <div class="panel-group sortable-accordion">
                                         <div ui-sortable="sortableOptions" data-ng-model="product.CrossSellProducts">
                                             <div data-ng-repeat="crossSellProduct in product.CrossSellProducts" class="panel panel-default">
@@ -640,12 +640,12 @@
                                                                     <!--ng-click="toggleOpen(crossSellProduct, $event)">-->
                                                                     <div class="form-horizontal">
                                                                         <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
                                                                                 <div class="sortable-move btn btn-info">
                                                                                     <i class="glyphicon glyphicon-sort"></i>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="col-md-11">
+                                                                            </div>-->
+                                                                            <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                     <label class="control-label">Cross Sell Image</label>
                                                                                     <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
@@ -655,19 +655,18 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
-                                                                                        <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSell.Image" disabled></filefield>
+                                                                                        <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSells[$index].Image" disabled></filefield>
                                                                                     </div>
-                                                                                    <a data-ng-if="!crossSellProduct.ImageUse" data-ng-click="crossSellProduct.ImageUse=true;" class="edit-link">set</a>
-                                                                                    <a data-ng-if="crossSellProduct.ImageUse" data-ng-click="crossSellProduct.ImageUse=false;" class="edit-link">remove</a>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <button class="btn btn-danger" data-ng-click="deleteCross($index)">Delete</button>
+                                                                                    <button data-ng-if="!crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="setCustomCross(crossSellProduct)">Set</button>
+                                                                                    <button data-ng-if="crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="removeCustomCross(crossSellProduct)">Remove</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>
+                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>-->
                                                                             <div class="col-md-11">
                                                                                 <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                     <label class="control-label">URL Cross Sell</label>
@@ -679,10 +678,8 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-1" data-ng-if="!crossSellProduct.UrlUse">
-                                                                                        <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSell.Url" readonly>
+                                                                                        <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSells[$index].Url" readonly>
                                                                                     </div>
-                                                                                    <a data-ng-if="!crossSellProduct.UrlUse" data-ng-click="crossSellProduct.UrlUse=true;" class="edit-link">set</a>
-                                                                                    <a data-ng-if="crossSellProduct.UrlUse" data-ng-click="crossSellProduct.UrlUse=false;" class="edit-link">remove</a>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -705,9 +702,9 @@
                                     </div>
 
                                     <span class="legend">YouTube Videos</span>
-                                    <div class="form-group">
+                                    <!--<div class="form-group">
                                         <button data-ng-click="addVideo();" class="btn btn-info">Add New YouTube Video</button>
-                                    </div>
+                                    </div>-->
                                     <div class="panel-group sortable-accordion">
                                         <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
                                             <div data-ng-repeat="video in product.Videos" class="panel panel-default">
@@ -719,12 +716,12 @@
                                                                     <!--ng-click="toggleOpen(video, $event)">-->
                                                                     <div class="form-horizontal">
                                                                         <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
                                                                                 <div class="sortable-move btn btn-info">
                                                                                     <i class="glyphicon glyphicon-sort"></i>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="col-md-11">
+                                                                            </div>-->
+                                                                            <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                     <label class="control-label">YouTube Video</label>
                                                                                     <div class="col-md-1" data-ng-if="video.VideoUse">
@@ -735,22 +732,21 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-1" data-ng-if="!video.VideoUse">
-                                                                                        <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Video.Video" readonly>
+                                                                                        <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Videos[$index].Video" readonly>
                                                                                     </div>
-                                                                                    <a data-ng-if="!video.VideoUse" data-ng-click="video.VideoUse=true;" class="edit-link">set</a>
-                                                                                    <a data-ng-if="video.VideoUse" data-ng-click="video.VideoUse=false;" class="edit-link">remove</a>
-                                                                                    <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Video.Video)}}" class="edit-link">view</a>
+                                                                                    <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Videos[$index].Video)}}" class="edit-link">view</a>
                                                                                     <a data-ng-if="video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(video.Video)}}" class="edit-link">view</a>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <button class="btn btn-danger" data-ng-click="deleteVideo($index)">Delete</button>
+                                                                                    <button data-ng-if="!video.VideoUse" class="btn btn-info width-80px" data-ng-click="setCustomVideo(video)">Set</button>
+                                                                                    <button data-ng-if="video.VideoUse" class="btn btn-info width-80px" data-ng-click="removeCustomVideo(video)">Remove</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>
-                                                                            <div class="col-md-11">
+                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>-->
+                                                                            <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                     <label class="control-label">YouTube Image</label>
                                                                                     <div class="col-md-1" data-ng-if="video.ImageUse">
@@ -760,17 +756,15 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-1" data-ng-if="!video.ImageUse">
-                                                                                        <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Video.Image" disabled></filefield>
+                                                                                        <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Videos[$index].Image" disabled></filefield>
                                                                                     </div>
-                                                                                    <a data-ng-if="!video.ImageUse" data-ng-click="video.ImageUse=true;" class="edit-link">set</a>
-                                                                                    <a data-ng-if="video.ImageUse" data-ng-click="video.ImageUse=false;" class="edit-link">remove</a>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>
-                                                                            <div class="col-md-11">
+                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                            </div>-->
+                                                                            <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                     <label class="control-label">YouTube Text</label>
                                                                                     <div class="col-md-1" data-ng-if="video.TextUse">
@@ -781,10 +775,8 @@
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="col-md-1" data-ng-if="!video.TextUse">
-                                                                                        <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Video.Text" readonly>
+                                                                                        <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Videos[$index].Text" readonly>
                                                                                     </div>
-                                                                                    <a data-ng-if="!video.TextUse" data-ng-click="video.TextUse=true;" class="edit-link">set</a>
-                                                                                    <a data-ng-if="video.TextUse" data-ng-click="video.TextUse=false;" class="edit-link">remove</a>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

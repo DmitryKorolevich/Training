@@ -191,7 +191,7 @@ hr {
   width: 70px;
 }
 .width-80px {
-  width: 80px;
+  width: 80px !important;
 }
 .width-140px {
   width: 140px;
@@ -326,7 +326,7 @@ button.main-button {
   margin-bottom: 15px;
 }
 .fixed-accordion-row.one-line > .col-md-1 {
-  width: 360px;
+  width: 450px;
 }
 .fixed-accordion-row.one-line > label {
   width: 120px;
