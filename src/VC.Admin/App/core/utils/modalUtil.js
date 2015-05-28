@@ -13,6 +13,7 @@ angular.module('app.core.utils.modalUtil', [])
 				templateUrl: templateUrl,
 				controller: controller,
 				size: options.size,
+				animation: false, //temp solution until angular-ui-botstrap arrives
 				resolve: {
 					data: function () {
 						return data;
