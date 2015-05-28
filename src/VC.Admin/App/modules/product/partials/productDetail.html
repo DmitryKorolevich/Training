@@ -302,6 +302,7 @@
                                                                                     </div>
                                                                                     <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.RetailPrice.$invalid">
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.RetailPrice",1000000)}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.RetailPrice")}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
@@ -317,6 +318,7 @@
                                                                                     </div>
                                                                                     <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.WholesalePrice.$invalid">
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.WholesalePrice",1000000)}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.WholesalePrice")}}</small>
                                                                                         <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
@@ -737,6 +739,8 @@
                                                                                     </div>
                                                                                     <a data-ng-if="!video.VideoUse" data-ng-click="video.VideoUse=true;" class="edit-link">set</a>
                                                                                     <a data-ng-if="video.VideoUse" data-ng-click="video.VideoUse=false;" class="edit-link">remove</a>
+                                                                                    <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Video.Video)}}" class="edit-link">view</a>
+                                                                                    <a data-ng-if="video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(video.Video)}}" class="edit-link">view</a>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
                                                                                     <button class="btn btn-danger" data-ng-click="deleteVideo($index)">Delete</button>

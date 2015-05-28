@@ -27,15 +27,15 @@ angular.module('app.modules.product.controllers.productManageController', [])
                                 $scope.forms[items[0]][items[1]].$setValidity("server", false);
                             }
                             else {
-                                $.each($scope.forms, function (index, form) {
-                                    if(form[value.Field]!=undefined)
-                                    {                                        
-                                        form[value.Field].$setValidity("server", false);
-                                        if(formForShowing==null)
-                                        {
-                                            formForShowing = index;
+                                $.each($scope.forms, function (index, form) {                                    
+                                    if (form && !(typeof form === 'boolean')) {
+                                        if (form[value.Field] != undefined) {
+                                            form[value.Field].$setValidity("server", false);
+                                            if (formForShowing == null) {
+                                                formForShowing = index;
+                                            }
+                                            return false;
                                         }
-                                        return false;
                                     }
                                 });
                             }
@@ -71,6 +71,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.id = $stateParams.id;
 
             $scope.forms = {};
+            $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
             $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
             $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
             $scope.previewUrl = null;
@@ -163,6 +164,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            $scope.product.StatusCode = "" + $scope.product.StatusCode;
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            refreshPossiableProductTypes();
+			            initCrossses();
+			            initVideos();
 			        } else {
 			            errorHandler(result);
 			        }
@@ -380,27 +383,29 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         var additionalSKUsValidatorFire = function ()
         {
-            $.each($scope.forms, function (index, form) {
-                if (index.indexOf('SKUs') == 0 && form.Name != undefined) {
-                    var itemIndex = parseInt(index.replace("SKUs", ""));
-                    if ($scope.product.SKUs[itemIndex]!=undefined && $scope.product.SKUs[itemIndex].Name) {
-                        var name = $scope.product.SKUs[itemIndex].Name;
-                        $.each($scope.product.SKUs, function (index, item)
-                        {
-                            if (itemIndex != index && name.toLowerCase() == item.Name.toLowerCase())
-                            {
-                                form.Name.$setValidity("exist", false);
-                            }
-                        });
+            $.each($scope.forms, function (index, form) {                
+                if (form && !(typeof form === 'boolean')) {
+                    if (index.indexOf('SKUs') == 0 && form.Name != undefined) {
+                        var itemIndex = parseInt(index.replace("SKUs", ""));
+                        if ($scope.product.SKUs[itemIndex] != undefined && $scope.product.SKUs[itemIndex].Name) {
+                            var name = $scope.product.SKUs[itemIndex].Name;
+                            $.each($scope.product.SKUs, function (index, item) {
+                                if (itemIndex != index && name.toLowerCase() == item.Name.toLowerCase()) {
+                                    form.Name.$setValidity("exist", false);
+                                }
+                            });
+                        }
                     }
                 }
             });
         };
 
         var additionalSKUsValidatorClean = function () {
-            $.each($scope.forms, function (index, form) {
-                if (index.indexOf('SKUs') == 0 && form.Name!=undefined) {
-                    form.Name.$setValidity("exist", true);
+            $.each($scope.forms, function (index, form) {                
+                if (form && !(typeof form === 'boolean')) {
+                    if (index.indexOf('SKUs') == 0 && form.Name != undefined) {
+                        form.Name.$setValidity("exist", true);
+                    }
                 }
             });
         };
@@ -408,13 +413,15 @@ angular.module('app.modules.product.controllers.productManageController', [])
         var openSKUs = function ()
         {
             var valid = true;
-            $.each($scope.forms, function (index, form) {
-                if (index.indexOf('SKUs') == 0 && !form.$valid) {
-                    var itemIndex = parseInt(index.replace("SKUs", ""));
-                    if ($scope.product.SKUs[itemIndex] != undefined) {
-                        $scope.product.SKUs[itemIndex].IsOpen = true;
+            $.each($scope.forms, function (index, form) {                
+                if (form && !(typeof form === 'boolean')) {
+                    if (index.indexOf('SKUs') == 0 && !form.$valid) {
+                        var itemIndex = parseInt(index.replace("SKUs", ""));
+                        if ($scope.product.SKUs[itemIndex] != undefined) {
+                            $scope.product.SKUs[itemIndex].IsOpen = true;
+                        }
+                        valid = false;
                     }
-                    valid = false;
                 }
             });
             return valid;
@@ -422,22 +429,26 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         $scope.save = function () {
             $.each($scope.forms, function (index, form) {
-                $.each(form, function (index, element) {
-                	if (element && element.$name == index) {
-                        element.$setValidity("server", true);
-                    }
-                });
+                if (form && !(typeof form === 'boolean')) {
+                    $.each(form, function (index, element) {
+                        if (element && element.$name == index) {
+                            element.$setValidity("server", true);
+                        }
+                    });
+                }
             });
             additionalSKUsValidatorClean();
             additionalSKUsValidatorFire();
             openSKUs();
 
             var valid = true;
-            $.each($scope.forms, function (index, form) {
-                if (!form.$valid && index != 'submitted' && index != 'skussubmitted' && index != 'crossessubmitted' && index != 'videossubmitted') {
-                    valid = false;                          
-                    activateTab(index);
-                    return false;
+            $.each($scope.forms, function (index, form) {                
+                if (form && !(typeof form === 'boolean')) {
+                    if (!form.$valid && index != 'submitted' && index != 'skussubmitted' && index != 'crossessubmitted' && index != 'videossubmitted') {
+                        valid = false;
+                        activateTab(index);
+                        return false;
+                    }
                 }
             });
 
@@ -461,6 +472,17 @@ angular.module('app.modules.product.controllers.productManageController', [])
             }
         };
 
+        var initCrossses = function () {
+            $.each($scope.product.CrossSellProducts, function (index, item) {
+                if (item.Image) {
+                    item.ImageUse = true;
+                }
+                if (item.Url) {
+                    item.UrlUse = true;
+                }
+            });
+        };
+
         var updateCrossses = function ()
         {
             $.each($scope.product.CrossSellProducts, function (index, item)
@@ -471,6 +493,20 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 }
                 if (!item.UrlUse) {
                     item.Url = null;
+                }
+            });
+        };
+
+        var initVideos = function () {
+            $.each($scope.product.Videos, function (index, item) {
+                if (item.Video) {
+                    item.VideoUse = true;
+                }
+                if (item.Image) {
+                    item.ImageUse = true;
+                }
+                if (item.Text) {
+                    item.TextUse = true;
                 }
             });
         };

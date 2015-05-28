@@ -44,6 +44,7 @@
                                                 <input type="text" name="Balance" class="form-control" placeholder="Amount" money max="100000" min="0.01" data-ng-model="gc.Balance" required>
                                             </div>
                                             <div class="error-container" ng-show="forms.form.submitted && forms.form.Balance.$invalid">
+                                                <small class="error" ng-show="forms.form.Balance.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                 <small class="error" ng-show="forms.form.Balance.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                 <small class="error" ng-show="forms.form.Balance.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
                                                 <small class="error" ng-show="forms.form.Balance.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.Amount")}}</small>
