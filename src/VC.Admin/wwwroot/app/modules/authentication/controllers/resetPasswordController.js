@@ -24,7 +24,7 @@ angular.module('app.modules.authentication.controllers.resetPasswordController',
 
 			$scope.resetPassword = function (resetForm) {
 				$.each(resetForm, function(index, element) {
-					if (element.$name == index) {
+					if (element && element.$name == index) {
 						element.$setValidity("server", true);
 					}
 				});

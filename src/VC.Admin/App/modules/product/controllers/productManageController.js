@@ -423,7 +423,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
         $scope.save = function () {
             $.each($scope.forms, function (index, form) {
                 $.each(form, function (index, element) {
-                    if (element.$name == index) {
+                	if (element && element.$name == index) {
                         element.$setValidity("server", true);
                     }
                 });

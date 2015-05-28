@@ -34,7 +34,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
 
         $scope.save = function() {
             $.each($scope.form.profileForm, function (index, element) {
-                if (element.$name == index) {
+            	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });

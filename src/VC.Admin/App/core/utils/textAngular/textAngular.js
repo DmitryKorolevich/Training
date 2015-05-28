@@ -6,7 +6,7 @@ angular.module('app.core.utils.textAngular', [
 	'app.core.utils.textAngular.controllers.imageCustomizationController',
 	'app.core.utils.textAngular.services.imageCustomizationService'
 ])
-.config(function ($provide) {
+.config(['$provide', function ($provide) {
 	$provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'imageCustomizationService', function (taRegisterTool, taOptions, imageCustomizationService) {
 		taRegisterTool('image', {
 			iconclass: 'fa fa-picture-o',
@@ -70,4 +70,4 @@ angular.module('app.core.utils.textAngular', [
 
 		return taOptions;
 	}]);
-});
+}]);

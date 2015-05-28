@@ -42,7 +42,7 @@ angular.module('app.modules.authentication.controllers.activationController', []
 
 		$scope.activate = function(userForm) {
 				$.each(userForm, function(index, element) {
-					if (element.$name == index) {
+					if (element && element.$name == index) {
 						element.$setValidity("server", true);
 					}
 				});

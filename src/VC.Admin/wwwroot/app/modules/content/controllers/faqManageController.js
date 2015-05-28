@@ -65,7 +65,7 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
 
         $scope.save = function () {
             $.each($scope.forms.faqForm, function (index, element) {
-                if (element.$name == index) {
+            	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });

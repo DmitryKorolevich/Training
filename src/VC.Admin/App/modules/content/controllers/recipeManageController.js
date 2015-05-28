@@ -65,7 +65,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 
         $scope.save = function () {
             $.each($scope.forms.recipeForm, function (index, element) {
-                if (element.$name == index) {
+            	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });

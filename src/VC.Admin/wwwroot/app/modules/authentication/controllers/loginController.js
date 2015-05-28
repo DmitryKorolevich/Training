@@ -16,7 +16,7 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 
 			$scope.signIn = function(loginForm) {
 				$.each(loginForm, function(index, element) {
-					if (element.$name == index) {
+					if (element && element.$name == index) {
 						element.$setValidity("server", true);
 					}
 				});

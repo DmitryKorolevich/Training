@@ -70,7 +70,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
 
         $scope.save = function () {
             $.each($scope.forms.articleForm, function (index, element) {
-                if (element.$name == index) {
+            	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });

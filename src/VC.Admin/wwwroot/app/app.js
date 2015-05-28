@@ -13,7 +13,7 @@ var app = angular
 		function ($stateProvider, $urlRouterProvider, $httpProvider) {
 		    $urlRouterProvider.otherwise('/404');
 
-		    $httpProvider.interceptors.push('$q', '$location', 'toaster', '$rootScope', function ($q, $location, toaster, $rootScope) {
+		    $httpProvider.interceptors.push(['$q', '$location', 'toaster', '$rootScope', function ($q, $location, toaster, $rootScope) {
 		        return {
 		            'responseError': function (response) {
 		                switch (response.status) {
@@ -39,7 +39,7 @@ var app = angular
 		                return $q.reject(response);
 		            }
 		        };
-		    });
+		    }]);
 		}
 	])
 	.run([

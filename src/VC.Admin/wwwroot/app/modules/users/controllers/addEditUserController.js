@@ -50,7 +50,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 
 		$scope.save = function () {
 			$.each($scope.userForm, function(index, element) {
-				if (element.$name == index) {
+				if (element && element.$name == index) {
 					element.$setValidity("server", true);
 				}
 			});

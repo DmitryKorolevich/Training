@@ -1,38 +1,44 @@
 {
-	"name": "VC.Admin",
-	"private": true,
-	"dependencies": {
-		"angular": "~1.3.14",
-		"angular-ui-router": "~0.2.13",
-		"bootstrap": "~3.3.2",
-		"angular-bootstrap": "~0.12.1",
-		"textAngular": "~1.3.11",
-		"angular-ui-tree": "~2.1.5",
-		"angularjs-nvd3-directives": "~0.0.7",
-		"AngularJS-Toaster": "~0.4.10",
-		"angular-animate": "~1.2.8",
-		"angular-ui-sortable": "~0.13.3",
-		"angular-ui-ace": "~0.2.3",
-		"ng-file-upload": "4.0.3",
-		"ngprogress": "~1.0.7",
-		"angular-ladda": "~0.2.2",
-		"angular-promise-tracker": "~2.1.0",
-		"css-spinners": "~1.0.3"
-	},
-	"exportsOverride": {
-		"bootstrap": {
-			"js": "dist/js/*.*",
-			"fonts": "dist/fonts/*.*"
-		},
-		"ladda": {
-			".": [ "./dist/ladda-themeless.min.css", "./dist/ladda.min.js" ]
-		},
-		"angular-promise-tracker": {
-			".": [ "./promise-tracker-http-interceptor.js", "./promise-tracker.js" ]
-		}
-	},
+  "name": "VC.Admin",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.3.15",
+    "angular-ui-router": "~0.2.15",
+    "bootstrap": "~3.3.4",
+    "angular-bootstrap": "~0.13.0",
+    "textAngular": "~1.4.1",
+    "angular-ui-tree": "~2.4.0",
+    "angularjs-nvd3-directives": "~0.0.7",
+    "AngularJS-Toaster": "~0.4.14",
+    "angular-animate": "~1.3.15",
+    "angular-ui-sortable": "~0.13.3",
+    "angular-ui-ace": "~0.2.3",
+    "ng-file-upload": "4.0.3",
+    "ngprogress": "~1.0.7",
+    "angular-ladda": "~0.2.2",
+    "angular-promise-tracker": "~2.1.0",
+    "css-spinners": "~1.0.3"
+  },
+  "exportsOverride": {
+    "bootstrap": {
+      "js": "dist/js/*.*",
+      "fonts": "dist/fonts/*.*"
+    },
+    "ladda": {
+      ".": [
+        "./dist/ladda-themeless.min.css",
+        "./dist/ladda.min.js"
+      ]
+    },
+    "angular-promise-tracker": {
+      ".": [
+        "./promise-tracker-http-interceptor.js",
+        "./promise-tracker.js"
+      ]
+    }
+  },
   "resolutions": {
-    "angular": ">= 1.0.8",
+    "angular": "~1.3.15",
     "d3": "~3.4.1"
   }
 }

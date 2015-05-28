@@ -26,6 +26,9 @@ angular.module('textAngularSetup', [])
 		textEditor: 'form-control',
 		htmlEditor: 'form-control'
 	},
+	defaultTagAttributes : {
+		a: {target:""}
+	},
 	setup: {
 		// wysiwyg mode
 		textEditorSetup: function($element){ /* Do some processing here */ },
@@ -358,6 +361,7 @@ angular.module('textAngularSetup', [])
 	});
 	taRegisterTool('strikeThrough', {
 		iconclass: 'fa fa-strikethrough',
+		tooltiptext: taTranslations.strikeThrough.tooltip,
 		action: function(){
 			return this.$editor().wrapSelection("strikeThrough", null);
 		},
@@ -570,7 +574,7 @@ angular.module('textAngularSetup', [])
 					// create the HTML
 					// for all options see: http://stackoverflow.com/questions/2068344/how-do-i-get-a-youtube-video-thumbnail-from-the-youtube-api
 					// maxresdefault.jpg seems to be undefined on some.
-					var embed = '<img class="ta-insert-video" src="https://img.youtube.com/vi/' + ids[0].substring(3) + '/hqdefault.jpg" ta-insert-video="' + urlLink + '" contenteditable="false" src="" allowfullscreen="true" frameborder="0" />';
+					var embed = '<img class="ta-insert-video" src="https://img.youtube.com/vi/' + ids[0].substring(3) + '/hqdefault.jpg" ta-insert-video="' + urlLink + '" contenteditable="false" allowfullscreen="true" frameborder="0" />';
 					// insert
 					return this.$editor().wrapSelection('insertHTML', embed, true);
 				}
@@ -659,17 +663,24 @@ angular.module('textAngularSetup', [])
 		wordcount: 0,
 		activeState: function(){ // this fires on keyup
 			var textElement = this.$editor().displayElements.text;
-			var workingHTML = textElement[0].innerHTML;
-			var sourceText = workingHTML.replace(/(<[^>]*?>)/ig, ' '); // replace all html tags with spaces
+			/* istanbul ignore next: will default to '' when undefined */
+			var workingHTML = textElement[0].innerHTML || '';
+			var noOfWords = 0;
 
-			// Caculate number of words
-			var sourceTextMatches = sourceText.match(/\S+/g);
-			var noOfWords = sourceTextMatches && sourceTextMatches.length || 0;
+			/* istanbul ignore if: will default to '' when undefined */
+			if (workingHTML.replace(/\s*<[^>]*?>\s*/g, '') !== '') {
+				noOfWords = workingHTML.replace(/<\/?(b|i|em|strong|span|u|strikethrough|a|img|small|sub|sup|label)( [^>*?])?>/gi, '') // remove inline tags without adding spaces
+										.replace(/(<[^>]*?>\s*<[^>]*?>)/ig, ' ') // replace adjacent tags with possible space between with a space
+										.replace(/(<[^>]*?>)/ig, '') // remove any singular tags
+										.replace(/\s+/ig, ' ') // condense spacing
+										.match(/\S+/g).length; // count remaining non-space strings
+			}
 
 			//Set current scope
 			this.wordcount = noOfWords;
 			//Set editor scope
 			this.$editor().wordcount = noOfWords;
+
 			return false;
 		}
 	});
