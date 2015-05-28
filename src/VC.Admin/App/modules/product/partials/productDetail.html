@@ -371,7 +371,11 @@
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Orphan Type</label>
-                                                                                <select class="form-control" name="Seller" data-ng-model="subSku.OrphanType" ng-options="orphanType.Key as orphanType.Text for orphanType in orphanTypes"></select>
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
+                                                                                    </label>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
