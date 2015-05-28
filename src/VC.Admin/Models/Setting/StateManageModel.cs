@@ -1,4 +1,5 @@
 ﻿using VC.Admin.Validators.Setting;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Domain.Entities.Settings;

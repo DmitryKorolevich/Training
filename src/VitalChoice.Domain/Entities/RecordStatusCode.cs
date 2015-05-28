@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Domain.Entities.Content
+﻿namespace VitalChoice.Domain.Entities
 {
     public enum RecordStatusCode
     {

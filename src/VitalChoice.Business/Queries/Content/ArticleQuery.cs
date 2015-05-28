@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Logs;
 

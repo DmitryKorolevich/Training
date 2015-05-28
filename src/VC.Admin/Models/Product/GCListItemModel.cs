@@ -8,6 +8,7 @@ using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Models.Product
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Business.Helpers

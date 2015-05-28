@@ -7,6 +7,7 @@ using Microsoft.Framework.Logging;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Domain.Entities.Users;

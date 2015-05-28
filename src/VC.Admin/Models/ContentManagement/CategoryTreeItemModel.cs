@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;

@@ -31,3 +31,4 @@ Post-Deployment Script Template
 :r .\Scripts\ProductsToCategories.sql
 :r .\Scripts\Skus.sql
 :r .\Scripts\ProductOptionValues.sql
+:r .\Scripts\VProductSkus.sql

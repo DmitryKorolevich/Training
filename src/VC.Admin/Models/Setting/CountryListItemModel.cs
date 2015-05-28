@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Settings;
 
 namespace VC.Admin.Models.Setting

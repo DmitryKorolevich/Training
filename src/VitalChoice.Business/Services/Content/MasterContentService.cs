@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;

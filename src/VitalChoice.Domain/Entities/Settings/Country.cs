@@ -9,7 +9,7 @@ namespace VitalChoice.Domain.Entities.Settings
 
 		public string CountryName { get; set; }
 
-        public Content.RecordStatusCode StatusCode { get; set; }
+        public RecordStatusCode StatusCode { get; set; }
 
         public int Order { get; set; }
 

@@ -16,3 +16,7 @@ BEGIN
 
 	CREATE INDEX [IX_Skus_Code] ON [dbo].[Skus] ([Code], [StatusCode]) INCLUDE (Id, IdProduct, DateCreated, DateEdited, Price, WholesalePrice)
 END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'Hidden' AND [Object_ID] = OBJECT_ID(N'[dbo].Skus', N'U'))
+	ALTER TABLE dbo.Skus
+	ADD Hidden BIT NOT NULL DEFAULT 0

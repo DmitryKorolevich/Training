@@ -13,6 +13,6 @@ namespace VitalChoice.Domain.Entities.Settings
 
         public int Order { get; set; }
 
-        public Content.RecordStatusCode StatusCode { get; set; }
+        public RecordStatusCode StatusCode { get; set; }
     }
 }

@@ -112,6 +112,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<GiftCertificate>().Key(p => p.Id);
             builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
 
+		    builder.Entity<VProductSku>().Key(p => p.Id);
+		    builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
+
             #endregion
 
             #region Settings

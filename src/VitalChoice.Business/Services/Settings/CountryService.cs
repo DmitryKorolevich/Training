@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;

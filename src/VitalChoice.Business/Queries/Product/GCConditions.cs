@@ -8,6 +8,7 @@ using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Business.Queries.Product
 {

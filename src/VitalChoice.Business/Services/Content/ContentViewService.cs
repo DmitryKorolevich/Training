@@ -8,6 +8,7 @@ using Templates;
 using Templates.Exceptions;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Content;

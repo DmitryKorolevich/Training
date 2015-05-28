@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using VC.Admin.Validators.Product;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
@@ -74,7 +75,7 @@ namespace VC.Admin.Models.Product
 
         public bool NonDiscountable { get; set; }
 
-        public string OrphanType { get; set; }
+        public bool OrphanType { get; set; }
 
         public bool AutoShipProduct { get; set; }
 
@@ -151,7 +152,7 @@ namespace VC.Admin.Models.Product
 
         public string Thumbnail { get; set; }
 
-        public string MainProduct {get;set;}
+        public string MainProductImage {get;set;}
 
 
         public string NutritionalTitle { get; set; }

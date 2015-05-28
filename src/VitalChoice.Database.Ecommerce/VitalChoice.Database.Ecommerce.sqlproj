@@ -123,4 +123,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Skus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VProductSkus.sql" />
+  </ItemGroup>
 </Project>

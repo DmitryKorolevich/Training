@@ -16,3 +16,8 @@ BEGIN
 	UNION
 	SELECT 4, 'string'
 END
+IF NOT EXISTS(SELECT * FROM FieldTypes WHERE TypeName = 'bool')
+	INSERT INTO FieldTypes
+	(Id, TypeName)
+	VALUES
+	(5, 'bool')
