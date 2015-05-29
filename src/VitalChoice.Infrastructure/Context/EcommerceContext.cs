@@ -114,6 +114,20 @@ namespace VitalChoice.Infrastructure.Context
 
 		    builder.Entity<VProductSku>().Key(p => p.Id);
 		    builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
+            
+            builder.Entity<ProductOptionType>().Key(p => p.Id);
+            builder.Entity<ProductOptionType>().ForSqlServer().Table("ProductOptionTypes");
+            builder.Entity<ProductOptionType>().Reference(p => p.Lookup).InverseCollection().ForeignKey(p => p.IdLookup).PrincipalKey(p => p.Id);
+
+            #endregion
+
+            #region Lookups
+
+            builder.Entity<Lookup>().Key(p => p.Id);
+            builder.Entity<Lookup>().ForRelational().Table("Lookups");
+            builder.Entity<LookupVariant>().Key(p => new { p.Id, p.IdLookup });
+            builder.Entity<LookupVariant>().ForRelational().Table("LookupVariants");
+            builder.Entity<Lookup>().Collection(p => p.LookupVariants).InverseReference().ForeignKey(p => p.IdLookup).PrincipalKey(p => p.Id);
 
             #endregion
 

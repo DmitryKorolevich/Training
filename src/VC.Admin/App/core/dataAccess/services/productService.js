@@ -34,6 +34,9 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    getProducts: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetProducts', filter, getConfig(tracker));
 	    },
+	    getProductLookups: function (tracker) {
+	        return $http.get(baseUrl + 'GetProductLookups', getConfig(tracker));
+	    },
 	    getProduct: function (id, tracker) {
 	        return $http.get(baseUrl + 'GetProduct/' + id, getConfig(tracker));
 	    },

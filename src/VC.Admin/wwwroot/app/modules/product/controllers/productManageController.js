@@ -152,7 +152,22 @@ angular.module('app.modules.product.controllers.productManageController', [])
             tabs.push($scope.inventoryAndShippingTab);
             $scope.tabs = tabs;
 
-            loadCategories();
+            loadLookups();
+        };
+
+        function loadLookups() {
+            productService.getProductLookups($scope.refreshTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        $scope.lookups = result.Data;
+                        loadCategories();
+                    } else {
+                        errorHandler(result);
+                    }
+                }).
+                error(function (result) {
+                    errorHandler(result);
+                });
         };
 
         function loadCategories() {

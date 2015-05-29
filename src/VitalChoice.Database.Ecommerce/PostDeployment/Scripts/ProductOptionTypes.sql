@@ -95,5 +95,16 @@ BEGIN
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
 	SELECT '1', 2, 1, 'Seller', @IdLookup
 
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT '1', 2, 2, 'Seller', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT '1', 2, 3, 'Seller', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT '1', 2, 4, 'Seller', @IdLookup
 
 END

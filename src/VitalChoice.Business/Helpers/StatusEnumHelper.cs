@@ -77,8 +77,8 @@ namespace VitalChoice.Business.Helpers
             Dictionary<int, string> toReturn = new Dictionary<int, string>();
             toReturn.Add((int)ProductType.NonPerishable, "Non Perishable");
             toReturn.Add((int)ProductType.Perishable, "Perishable");
-            toReturn.Add((int)ProductType.EGC, "E Gift Certificate");
-            toReturn.Add((int)ProductType.GC, "Gift Certificate");
+            toReturn.Add((int)ProductType.EGс, "E Gift Certificate");
+            toReturn.Add((int)ProductType.Gc, "Gift Certificate");
             return toReturn;
         }
     }

@@ -20,12 +20,35 @@ namespace VitalChoice.Business.Services.Product
     public class ProductService : IProductService
     {
         private readonly IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository;
+        private readonly IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository;
+        private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly ILogger logger;
 
-        public ProductService(IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository)
+        public ProductService(IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
+            IEcommerceRepositoryAsync<Lookup> lookupRepository)
         {
             this.vProductSkuRepository = vProductSkuRepository;
+            this.productOptionTypeRepository = productOptionTypeRepository;
+            this.lookupRepository = lookupRepository;
             logger = LoggerService.GetDefault();
+        }
+
+        public async Task<ICollection<ProductOptionType>> GetProductLookupsAsync()
+        {
+            ICollection<ProductOptionType> toReturn = (await productOptionTypeRepository.Query(p => p.IdLookup.HasValue).SelectAsync()).ToList();
+            var lookups = (await lookupRepository.Query(p => toReturn.Select(pp=>pp.IdLookup.Value).Contains(p.Id)).Include(p=>p.LookupVariants).SelectAsync()).ToList();
+            foreach(var item in toReturn)
+            {
+                foreach(var lookup in lookups)
+                {
+                    if(item.IdLookup==lookup.Id)
+                    {
+                        item.Lookup = lookup;
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)

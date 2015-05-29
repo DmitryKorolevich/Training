@@ -34,26 +34,18 @@ namespace VC.Admin.Controllers
 
         #region Products
 
+        [HttpGet]
+        public async Task<Result<ICollection<LookupViewModel>>> GetProductLookups()
+        {
+            return (await productService.GetProductLookupsAsync()).Select(p=>new LookupViewModel(p.Name,
+                p.IdProductType.HasValue ? (int?)p.IdProductType.Value : null
+                ,p.DefaultValue,p.Lookup)).ToList();
+            
+        }
+
         [HttpPost]
         public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]VProductSkuFilter filter)
         {
-            //var items = new List<ProductListItemModel>()
-            //{
-            //    new ProductListItemModel(null)
-            //    {
-            //        Id =1,
-            //        ProductName="Test",
-            //        StatusCode=RecordStatusCode.Active,
-            //        ThumbImage="/some.jpg",
-            //        Hidden=true,
-            //        Type=ProductType.Perishable,
-            //    }
-            //};
-            //var toReturn = new PagedList<ProductListItemModel>();
-            //toReturn.Items = items;
-            //toReturn.Count = items.Count;
-            //return await Task.FromResult<PagedList<ProductListItemModel>>(toReturn);
-
             var result = await productService.GetProductsAsync(filter);
 
             var toReturn = new PagedList<ProductListItemModel>
