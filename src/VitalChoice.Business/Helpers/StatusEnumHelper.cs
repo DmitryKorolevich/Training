@@ -75,10 +75,10 @@ namespace VitalChoice.Business.Helpers
         public static Dictionary<int, string> GetProductTypes()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>();
-            toReturn.Add((int)ProductType.NonPerishable, "Non Perishable");
             toReturn.Add((int)ProductType.Perishable, "Perishable");
-            toReturn.Add((int)ProductType.EGс, "E Gift Certificate");
+            toReturn.Add((int)ProductType.NonPerishable, "Non Perishable");
             toReturn.Add((int)ProductType.Gc, "Gift Certificate");
+            toReturn.Add((int)ProductType.EGс, "E Gift Certificate");
             return toReturn;
         }
     }

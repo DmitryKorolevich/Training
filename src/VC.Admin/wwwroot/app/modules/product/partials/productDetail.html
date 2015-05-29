@@ -182,7 +182,9 @@
                                             <div class="form-group">
                                                 <label for="google_category" class="col-md-3 control-label">Google Category</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" name="GoogleCategory" data-ng-model="product.GoogleCategory" ng-options="googleCategory.Key as googleCategory.Text for googleCategory in googleCategories"></select>
+                                                    <select class="form-control" name="GoogleCategory" data-ng-model="product.GoogleCategory" ng-options="googleCategory.Key as googleCategory.Text for googleCategory in googleCategories">
+                                                        <option value="" ng-if="false"></option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <span class="legend">Tax</span>
@@ -196,7 +198,9 @@
                                             <div class="form-group">
                                                 <label for="special_icon" class="col-md-3 control-label">Special Icon</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" name="SpecialIcon" data-ng-model="product.SpecialIcon" ng-options="specialIcon.Key as specialIcon.Text for specialIcon in specialIcons"></select>
+                                                    <select class="form-control" name="SpecialIcon" data-ng-model="product.SpecialIcon" ng-options="specialIcon.Key as specialIcon.Text for specialIcon in specialIcons">
+                                                        <option value="" ng-if="false"></option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </fieldset>
@@ -378,7 +382,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="form-group" data-ng-hide="product.Type==1">
+                                                                    <div class="form-group" data-ng-hide="product.Type==2">
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Orphan Type</label>

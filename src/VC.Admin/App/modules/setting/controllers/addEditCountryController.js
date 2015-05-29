@@ -39,13 +39,13 @@
                 Id: 0,
                 CountryCode: '',
                 CountryName: '',
-                StatusCode: '2',//Active
+                StatusCode: 2,//Active
             };
 	    }
 	    else
         {               
 	        $scope.country = Object.clone(data.country);
-	        $scope.country.StatusCode = "" + $scope.country.StatusCode;
+	        $scope.country.StatusCode = $scope.country.StatusCode;
         }
 
 	    $scope.save = function () {

@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.shared.menu.services.navigationFactory', [])
-.factory('navigationFactory', [function () {
+.factory('navigationFactory', ['$state', 'modalUtil', function ($state, modalUtil) {
 	var menu = [
 		{
 			name: 'customer',
@@ -25,7 +25,16 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			stateLabel: 'Products',
 			subMenu: [
 				{ name: 'locateProduct', stateName: 'index.oneCol.manageProducts', stateLabel: 'Manage Products', access: 4 },
-				{ name: 'addNewProduct', stateName: 'index.oneCol.addNewProduct', stateLabel: 'Add New Product', access: 4 },
+				{ name: 'addNewProduct', stateLabel: 'Add New Product', access: 4,
+				    handler: function ()
+				    {
+				        modalUtil.open('app/modules/product/partials/addProductPopup.html', 'addProductPopupController', {
+				            thenCallback: function (data) {
+				                $state.go('index.oneCol.addNewProduct', { type: data });
+				            }
+				        });
+				    },
+                },
 				{ name: 'manageCategories', stateName: 'index.oneCol.manageProductCategories', stateLabel: 'Manage Categories', access: 4 },
 				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews', access: 4 },
 			]

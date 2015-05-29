@@ -37,7 +37,11 @@ namespace VitalChoice.Business.Services.Product
         {
             ICollection<ProductOptionType> toReturn = (await productOptionTypeRepository.Query(p => p.IdLookup.HasValue).SelectAsync()).ToList();
             var lookups = (await lookupRepository.Query(p => toReturn.Select(pp=>pp.IdLookup.Value).Contains(p.Id)).Include(p=>p.LookupVariants).SelectAsync()).ToList();
-            foreach(var item in toReturn)
+            foreach(var lookup in lookups)
+            {
+                lookup.LookupVariants = lookup.LookupVariants.OrderBy(p => p.Id).ToList();
+            }
+            foreach (var item in toReturn)
             {
                 foreach(var lookup in lookups)
                 {

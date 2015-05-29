@@ -5,6 +5,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoryManageController',
 	'app.modules.content.controllers.productsController',
 	'app.modules.product.controllers.productManageController',
+	'app.modules.product.controllers.addProductPopupController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -33,7 +34,7 @@ angular.module('app.modules.product', [
 		            controller: 'productsController'
 		        })
 		        .state('index.oneCol.addNewProduct', {
-		            url: '/products/add',
+		            url: '/products/add?{type:int}',
 		            templateUrl: 'app/modules/product/partials/productDetail.html',
 		            controller: 'productManageController'
 		        })

@@ -81,7 +81,7 @@ namespace VC.Admin.Models.Product
 
         public double OffPercent { get; set; }
 
-        public string Seller { get; set; }
+        public int Seller { get; set; }
 
         public bool HideFromDataFeed {get;set; }
 
@@ -145,11 +145,11 @@ namespace VC.Admin.Models.Product
 
         public string MetaDescription { get; set; }
 
-        public int GoogleCategory { get; set; }
+        public int? GoogleCategory { get; set; }
 
         public string TaxCode { get; set; }
 
-        public int SpecialIcon { get; set; }
+        public int? SpecialIcon { get; set; }
 
 
         public string Thumbnail { get; set; }

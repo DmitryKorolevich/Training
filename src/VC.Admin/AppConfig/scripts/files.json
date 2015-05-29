@@ -122,6 +122,7 @@
 		'app/modules/product/controllers/productCategoryManageController.js',
 		'app/modules/product/controllers/productsController.js',
 		'app/modules/product/controllers/productManageController.js',
+		'app/modules/product/controllers/addProductPopupController.js',
 		'app/modules/product/product.js',
 		'app/modules/file/controllers/filesController.js',
 		'app/modules/file/controllers/addFolderController.js',

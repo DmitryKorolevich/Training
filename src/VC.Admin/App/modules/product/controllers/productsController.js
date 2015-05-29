@@ -52,11 +52,15 @@
 	$scope.open = function (id) {
         if(id)
         {
-            $state.go('index.oneCol.productDetail', { id: id });
+            //$state.go('index.oneCol.productDetail', { id: id });
         }
         else
         {
-            $state.go('index.oneCol.addNewProduct');
+            modalUtil.open('app/modules/product/partials/addProductPopup.html', 'addProductPopupController', {
+                thenCallback: function (data) {
+                    $state.go('index.oneCol.addNewProduct', { type: data });
+                }
+            });
         }
 	};
 

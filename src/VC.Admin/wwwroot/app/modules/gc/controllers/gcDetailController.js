@@ -43,7 +43,7 @@ function ($scope, $rootScope, $state, $stateParams, gcService, toaster, modalUti
             .success(function (result) {
                 if (result.Success) {
                     $scope.gc = result.Data;
-                    $scope.gc.StatusCode = "" + $scope.gc.StatusCode;
+                    $scope.gc.StatusCode = $scope.gc.StatusCode;
                 } else {
                     errorHandler(result);
                 }

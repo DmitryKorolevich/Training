@@ -19,7 +19,7 @@ namespace VC.Admin.Models.Product
 
         public int? Type { get; set; }
 
-        public int DefaultValue { get; set; }
+        public int? DefaultValue { get; set; }
 
         public ICollection<LookupItem<int>> Items { get; set; }
 
@@ -28,11 +28,15 @@ namespace VC.Admin.Models.Product
             this.Name = name;
             this.Type = type;
             int res = 1;
-            if(Int32.TryParse(defaultValue, out res))
+            if(!String.IsNullOrEmpty(defaultValue) && Int32.TryParse(defaultValue, out res))
             {
                 DefaultValue = res;
             }
-            if(lookup!=null)
+            else
+            {
+                DefaultValue = null;
+            }
+            if (lookup!=null)
             {
                 Items = lookup.LookupVariants.Select(x => new LookupItem<int>
                 {

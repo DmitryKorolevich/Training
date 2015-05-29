@@ -40,7 +40,8 @@
 					</a>
 					<ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
 						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active" data-ng-if="validatePermission(subModule.access)">
-							<a ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
+							<a ng-if="subModule.stateName" ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
+                            <a ng-if="subModule.handler" ng-click="subModule.handler();">{{subModule.stateLabel}}</a>
 						</li>
 					</ul>
 				</li>

@@ -40,12 +40,12 @@
                 CountryCode: data.countryCode,
                 StateCode: '',
                 StateName: '',
-                StatusCode: '2',//Active
+                StatusCode: 2,//Active
             };
         }
         else {
             $scope.state = Object.clone(data.state);
-            $scope.state.StatusCode = "" + $scope.state.StatusCode;
+            $scope.state.StatusCode = $scope.state.StatusCode;
         }
 
         $scope.save = function () {

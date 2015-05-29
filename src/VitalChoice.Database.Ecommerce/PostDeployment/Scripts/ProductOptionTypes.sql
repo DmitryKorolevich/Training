@@ -38,11 +38,7 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 1, N'MetaDescription'
 	UNION
-	SELECT NULL, 4, 1, N'GoogleCategory'
-	UNION
 	SELECT NULL, 4, 1, N'TaxCode'
-	UNION
-	SELECT NULL, 4, 1, N'SpecialIcon'
 	UNION
 	SELECT NULL, 4, 1, N'Thumbnail'
 	UNION
@@ -106,5 +102,145 @@ BEGIN
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
 	SELECT '1', 2, 4, 'Seller', @IdLookup
+
+
+	INSERT INTO Lookups
+	(LookupValueType)
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO LookupVariants
+	(Id, IdLookup, ValueVariant)
+	SELECT 1, @IdLookup, 'MSC Icon'
+	UNION
+	SELECT 2, @IdLookup, 'USDA Icon'
+	UNION
+	SELECT 3, @IdLookup, 'ASMI Seal'
+	UNION
+	SELECT 4, @IdLookup, 'USDA + Fair Trade'
+	UNION
+	SELECT 5, @IdLookup, 'Certified Humane'
+	UNION
+	SELECT 6, @IdLookup, 'ASMI-W'
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 1, 'SpecialIcon', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 2, 'SpecialIcon', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 3, 'SpecialIcon', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 4, 'SpecialIcon', @IdLookup
+
+
+	INSERT INTO Lookups
+	(LookupValueType)
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO LookupVariants
+	(Id, IdLookup, ValueVariant)
+	SELECT 1, @IdLookup, 'Food, Beverages & Tobacco > Beverages > Tea & Infusions > Tea Bags & Loose Tea Leaves'
+	UNION
+	SELECT 2, @IdLookup, 'Food, Beverages & Tobacco > Food Items'
+	UNION
+	SELECT 3, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Candy & Gum > Candy & Chocolate > Chocolate Bars'
+	UNION
+	SELECT 4, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Condiments & Sauces > Pickles & Relishes'
+	UNION
+	SELECT 5, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Cooking & Baking Ingredients'
+	UNION
+	SELECT 6, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Cooking & Baking Ingredients > Cooking Oil'
+	UNION
+	SELECT 7, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Cooking & Baking Ingredients > Cooking Oil > Olive Oil'
+	UNION
+	SELECT 8, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Food Gift Baskets'
+	UNION
+	SELECT 9, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Dried Fruits'
+	UNION
+	SELECT 10, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Fruits > Berries'
+	UNION
+	SELECT 11, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Vegetables'
+	UNION
+	SELECT 12, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Vegetables > Beets'
+	UNION
+	SELECT 13, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Vegetables > Cabbage'
+	UNION
+	SELECT 14, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Vegetables > Carrots'
+	UNION
+	SELECT 15, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Fruits & Vegetables > Fresh & Frozen Vegetables > Radishes'
+	UNION
+	SELECT 16, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Meat, Seafood & Eggs > Meat > Fresh & Frozen Meats'
+	UNION
+	SELECT 17, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Meat, Seafood & Eggs > Meat > Meat Patties'
+	UNION
+	SELECT 18, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Meat, Seafood & Eggs > Seafood'
+	UNION
+	SELECT 19, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Meat, Seafood & Eggs > Seafood > Canned Seafood'
+	UNION
+	SELECT 20, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Nuts & Seeds > Almonds'
+	UNION
+	SELECT 21, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Nuts & Seeds > Cashews'
+	UNION
+	SELECT 22, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Nuts & Seeds > Hazelnuts'
+	UNION
+	SELECT 23, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Nuts & Seeds > Mixed Nuts'
+	UNION
+	SELECT 24, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Nuts & Seeds > Walnuts'
+	UNION
+	SELECT 25, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Prepared Foods > Sushi'
+	UNION
+	SELECT 26, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Seasonings & Spices > Herbs & Spices'
+	UNION
+	SELECT 27, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Snack Foods > Jerky'
+	UNION
+	SELECT 28, @IdLookup, 'Food, Beverages & Tobacco > Food Items > Soups & Broths'
+	UNION
+	SELECT 29, @IdLookup, 'Health & Beauty > Health Care'
+	UNION
+	SELECT 30, @IdLookup, 'Health & Beauty > Health Care > Fitness & Nutrition > Vitamins & Supplements'
+	UNION
+	SELECT 31, @IdLookup, 'Home & Garden > Kitchen & Dining > Food & Beverage Carriers > Water Bottles'
+	UNION
+	SELECT 32, @IdLookup, 'Home & Garden > Kitchen & Dining > Food Storage > Bowl Covers'
+	UNION
+	SELECT 33, @IdLookup, 'Home & Garden > Kitchen & Dining > Kitchen Tools & Utensils > Aprons'
+	UNION
+	SELECT 34, @IdLookup, 'Home & Garden > Kitchen & Dining > Kitchen Tools & Utensils > Can Openers'
+	UNION
+	SELECT 35, @IdLookup, 'Home & Garden > Kitchen & Dining > Kitchen Tools & Utensils > Tea Strainers'
+	UNION
+	SELECT 36, @IdLookup, 'Media > Books > Non-Fiction > Cooking Books'
+	UNION
+	SELECT 37, @IdLookup, 'Media > Books > Non-Fiction > Health & Fitness Books'
+	UNION
+	SELECT 38, @IdLookup, 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Treats'
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 1, 'GoogleCategory', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 2, 'GoogleCategory', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 3, 'GoogleCategory', @IdLookup
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	SELECT NULL, 2, 4, 'GoogleCategory', @IdLookup
 
 END
