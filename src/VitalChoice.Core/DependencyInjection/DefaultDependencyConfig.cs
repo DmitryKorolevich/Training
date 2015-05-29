@@ -175,6 +175,7 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<EmailSender>().As<IEmailSender>().WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>()).SingleInstance();
 				builder.RegisterType<NotificationService>().As<INotificationService>();
                 builder.RegisterType<GCService>().As<IGCService>();
+                builder.RegisterType<ProductService>().As<IProductService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
                 builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();

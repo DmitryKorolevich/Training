@@ -22,35 +22,47 @@ namespace VC.Admin.Controllers
     public class ProductController : BaseApiController
     {
         private readonly IProductCategoryService productCategoryService;
+        private readonly IProductService productService;
         private readonly ILogger logger;
 
-        public ProductController(IProductCategoryService productCategoryService)
+        public ProductController(IProductCategoryService productCategoryService, IProductService productService)
         {
             this.productCategoryService = productCategoryService;
+            this.productService = productService;
             this.logger = LoggerService.GetDefault();
         }
 
         #region Products
 
         [HttpPost]
-        public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]ProductFilter filter)
+        public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]VProductSkuFilter filter)
         {
-            var items = new List<ProductListItemModel>()
+            //var items = new List<ProductListItemModel>()
+            //{
+            //    new ProductListItemModel(null)
+            //    {
+            //        Id =1,
+            //        ProductName="Test",
+            //        StatusCode=RecordStatusCode.Active,
+            //        ThumbImage="/some.jpg",
+            //        Hidden=true,
+            //        Type=ProductType.Perishable,
+            //    }
+            //};
+            //var toReturn = new PagedList<ProductListItemModel>();
+            //toReturn.Items = items;
+            //toReturn.Count = items.Count;
+            //return await Task.FromResult<PagedList<ProductListItemModel>>(toReturn);
+
+            var result = await productService.GetProductsAsync(filter);
+
+            var toReturn = new PagedList<ProductListItemModel>
             {
-                new ProductListItemModel(null)
-                {
-                    Id =1,
-                    ProductName="Test",
-                    StatusCode=RecordStatusCode.Active,
-                    ThumbImage="/some.jpg",
-                    Hidden=true,
-                    Type=ProductType.Perishable,
-                }
+                Items = result.Items.Select(p => new ProductListItemModel(p)).ToList(),
+                Count = result.Count,
             };
-            var toReturn = new PagedList<ProductListItemModel>();
-            toReturn.Items = items;
-            toReturn.Count = items.Count;
-            return await Task.FromResult<PagedList<ProductListItemModel>>(toReturn);
+
+            return toReturn;
         }
 
         [HttpGet]

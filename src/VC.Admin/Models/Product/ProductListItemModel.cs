@@ -12,25 +12,30 @@ using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Models.Product
 {
-    public class ProductListItemModel : Model<Product, IMode>
+    public class ProductListItemModel : Model<VProductSku, IMode>
     {
         public int Id { get; set; }
 
-        public string ThumbImage { get; set; }
+        public string Thumbnail { get; set; }
 
-        public string ProductName { get; set; }
+        public string Name { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
 
         public bool Hidden { get; set; }
 
-        public ProductType Type { get; set; }
+        public ProductType IdProductType { get; set; }
 
-        public ProductListItemModel(Product item)
+        public ProductListItemModel(VProductSku item)
         {
             if(item!=null)
             {
-                
+                Id = item.Id;
+                Name = item.Name;
+                Thumbnail = item.Thumbnail;
+                StatusCode = item.StatusCode;
+                Hidden = item.Hidden;
+                IdProductType = item.IdProductType;
             }
         }
     }

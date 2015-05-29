@@ -14,8 +14,8 @@
 			    if (result.Success) {
 			        $.each(result.Data.Items, function (index, item)
 			        {
-			            if (item.ThumbImage) {
-			                item.ThumbImageUrl = self.baseUrl.format(item.ThumbImage);
+			            if (item.Thumbnail) {
+			                item.ThumbnailUrl = self.baseUrl.format(item.Thumbnail);
 			            }
 			        });
 			        $scope.products = result.Data.Items;
@@ -36,7 +36,7 @@
 	        SearchText: '',
             CategoryId: null,
             Paging: { PageIndex: 1, PageItemCount: 100 },
-            Sorting: gridSorterUtil.resolve(refreshProducts, "ProductName", "Desc")
+            Sorting: gridSorterUtil.resolve(refreshProducts, "Name", "Desc")
 	    };
 	}
 
