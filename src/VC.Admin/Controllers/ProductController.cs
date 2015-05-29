@@ -91,6 +91,24 @@ namespace VC.Admin.Controllers
                         OffPercent = 11,
                         NonDiscountable=true,                        
                     },
+                    new SKUManageModel()
+                    {
+                        Id = 43454,
+                        Name = "FRP006",
+                        Active = true,
+                        Hidden = true,
+                        RetailPrice = 55.00,
+                        WholesalePrice = 9.00,
+                        Stock = 5,
+                        DisregardStock = true,
+                        AutoShipFrequency2=true,
+                        AutoShipFrequency6=true,
+                        DisallowSingle=true,
+                        AutoShipProduct=true,
+                        HideFromDataFeed=true,
+                        OffPercent = 11,
+                        NonDiscountable=true,
+                    },
                 },
                 CrossSellProducts = new List<CrossSellProductModel>()
                 {

@@ -67,7 +67,7 @@ namespace VC.Admin.Models.Product
 
         public double WholesalePrice { get; set; }
 
-        public int Stock { get; set; }
+        public int? Stock { get; set; }
 
         public bool DisregardStock { get; set; }
 

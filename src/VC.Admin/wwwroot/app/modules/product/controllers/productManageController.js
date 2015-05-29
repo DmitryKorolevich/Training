@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productManageController', [])
-.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $modal, productService, toaster, confirmUtil, promiseTracker) {
+.controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
 
@@ -255,8 +255,12 @@ angular.module('app.modules.product.controllers.productManageController', [])
             handle: ' .sortable-move',
             items: ' .panel:not(.panel-heading)',
             axis: 'y',
-            start: function (e, ui) { $scope.dragging = true; },
-            stop: function (e, ui) { $scope.dragging = false; }
+            start: function (e, ui) {
+                $scope.dragging = true;
+            },
+            stop: function (e, ui) {
+                $scope.dragging = false;
+            }
         }
 
         $scope.toogleEditorState = function (property) {
@@ -529,15 +533,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         $scope.deleteSKU = function (index) {
-            var skus = [];
-            $.each($scope.product.SKUs, function (index, item) {
-                var newItem = {};
-                angular.copy(item, newItem);
-                skus.push(newItem);
-            });
-            skus.splice(index, 1);
-            $scope.product.SKUs = [];
-            $scope.product.SKUs = skus;
+            $scope.product.SKUs.splice(index, 1);
         };
 
         $scope.addSKU = function () {
@@ -564,16 +560,11 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 Seller: $scope.defaultSeller,
                 IsOpen: true,
             };
-            var skus = [];
+
             $.each($scope.product.SKUs, function (index, item) {
-                var newItem = {};
-                angular.copy(item, newItem);
-                newItem.IsOpen = false;
-                skus.push(newItem);
+                item.IsOpen = false;
             });
-            skus.splice(0, 0, sku);
-            $scope.product.SKUs = [];
-            $scope.product.SKUs = skus;
+            $scope.product.SKUs.splice(0, 0, sku);
 
             $scope.forms.skussubmitted = false;
         };
@@ -586,7 +577,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                         if ($scope.product.SKUs[itemIndex] != undefined && $scope.product.SKUs[itemIndex].Name) {
                             var name = $scope.product.SKUs[itemIndex].Name;
                             $.each($scope.product.SKUs, function (index, item) {
-                                if (itemIndex != index && name.toLowerCase() == item.Name.toLowerCase()) {
+                                if (itemIndex != index && item.Name && name.toLowerCase() == item.Name.toLowerCase()) {
                                     form.Name.$setValidity("exist", false);
                                 }
                             });

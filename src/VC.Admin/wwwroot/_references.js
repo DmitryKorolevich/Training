@@ -1503,6 +1503,5 @@
 /// <reference path="../app/shared/area/controllers/leftPanelController.js" />
 /// <reference path="../app/shared/area/area.js" />
 /// <reference path="../app/shared/shared.js" />
-/// <reference path="../app/modules/product/controllers/addeditstatecontroller.js" />
 /// <reference path="app/modules/product/controllers/addproductpopupcontroller.js" />
-/// <reference path="app/app.common.js" />
+/// <reference path="../App/modules/product/controllers/addProductPopupController.js" />
