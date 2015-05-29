@@ -115,6 +115,28 @@ module.exports = function (grunt) {
         		}
         	}
         },
+		html2js: {
+			options: {
+				base: '',
+				module: 'templates',
+				singleModule: true,
+				useStrict: true,
+				htmlmin: {
+					collapseBooleanAttributes: true,
+					collapseWhitespace: true,
+					removeAttributeQuotes: true,
+					removeComments: true,
+					removeEmptyAttributes: true,
+					removeRedundantAttributes: true,
+					removeScriptTypeAttributes: true,
+					removeStyleLinkTypeAttributes: true
+				}
+			},
+			main: {
+				src: ['app/**/*.html'],
+				dest: 'wwwroot/app/templates.js'
+			}
+		},
         watch: {
         	files: ['app/**/*.js', 'app/**/*.html', 'assets/**/*.less'],
         	tasks: ['development'/*, 'test'*/],
@@ -133,9 +155,9 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', ['jshint']);
 
 	// the default task can be run just by typing "grunt" on the command line
-	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp']);
+	grunt.registerTask('development', ['clean:wwwroot', 'less', 'copy:development', 'clean:temp', 'html2js:main']);
 
-	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'clean:temp']);
+	grunt.registerTask('release', ['clean:wwwroot', 'less', 'jshint', 'concat', 'uglify', 'cssmin', 'copy:release', 'clean:temp', 'html2js:main']);
 
 	grunt.registerTask('regularWatch', ['watch']);
 
@@ -150,4 +172,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-html2js');
 };

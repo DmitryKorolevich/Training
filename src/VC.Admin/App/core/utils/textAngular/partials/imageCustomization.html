@@ -13,7 +13,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">Alignment</label>
                 <div class="col-md-4">
-                    <select class="form-control" data-ng-model="image.Alignment" data-ng-options="style.Value as style.Text for style in alignmentLookup"/>
+                    <select class="form-control" data-ng-model="image.Alignment" data-ng-options="style.Value as style.Text for style in alignmentLookup"></select>
                 </div>
                 <label class="col-md-2 control-label">Title</label>
                 <div class="col-md-4">
@@ -41,7 +41,7 @@
                 <div class="col-md-3">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" data-ng-model="image.KeepRatio"><i class="glyphicon glyphicon-info-sign" tooltip="If checked CSS styles 'max-width' and 'max-height' will be used to keep original image ratio"></i>
+                            <input type="checkbox" data-ng-model="image.KeepRatio"><i class="glyphicon glyphicon-info-sign" tooltip="If checked CSS styles 'max-width' and 'max-height' will be used to keep original image ratio" tooltip-animation="false"></i> <!-- tooltip-animation="false" temp solution until angular-ui-botstrap arrives-->
                         </label>
                     </div>
                 </div>

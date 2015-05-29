@@ -62,6 +62,7 @@ namespace VC.Admin.Controllers
             {
                 Id = 5,
                 Name = "Test",
+                Url = "test",
                 StatusCode = RecordStatusCode.Active,
                 Type = ProductType.GC,
                 Hidden = false,

@@ -2,6 +2,7 @@
 
 var app = angular
 	.module('mainApp', [
+		'templates',
 		'ui.router',
 		'ui.bootstrap',
 		'app.core',
@@ -11,7 +12,7 @@ var app = angular
 	.config([
 		'$stateProvider', '$urlRouterProvider','$httpProvider',
 		function ($stateProvider, $urlRouterProvider, $httpProvider) {
-		    $urlRouterProvider.otherwise('/404');
+			$urlRouterProvider.otherwise('/404');
 
 		    $httpProvider.interceptors.push(['$q', '$location', 'toaster', '$rootScope', function ($q, $location, toaster, $rootScope) {
 		        return {

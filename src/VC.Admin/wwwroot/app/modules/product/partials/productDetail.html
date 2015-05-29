@@ -65,6 +65,17 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">URL</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="product.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.Url.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.parentDetails.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
+                                                        <small class="error" ng-show="forms.parentDetails.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="Description" class="col-md-3 control-label">Description</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!DescriptionExpanded">
@@ -371,7 +382,11 @@
                                                                         <div class="col-md-12">
                                                                             <div class="fixed-accordion-row">
                                                                                 <label class="control-label">Orphan Type</label>
-                                                                                <select class="form-control" name="Seller" data-ng-model="subSku.OrphanType" ng-options="orphanType.Key as orphanType.Text for orphanType in orphanTypes"></select>
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
+                                                                                    </label>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>

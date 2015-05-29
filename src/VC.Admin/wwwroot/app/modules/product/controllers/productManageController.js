@@ -78,7 +78,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.googleCategories = [];
             $scope.specialIcons = [];
             $scope.sellers = [];
-            $scope.orphanTypes = [];
 
             $scope.defaults = {};
             $scope.defaults.CrossSells = [

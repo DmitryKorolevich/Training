@@ -25,9 +25,16 @@ namespace VC.Admin.Validators.Product
         {
             public ProductModelValidator()
             {
-                //RuleFor(model => model.Name)
-                //    .NotEmpty()
-                //    .WithMessage(model => model.Name, ValidationMessages.FieldRequired);
+                RuleFor(model => model.Name)
+                    .NotEmpty()
+                    .WithMessage(model => model.Name, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Url)
+                    .NotEmpty()
+                    .WithMessage(model => model.Url, ValidationMessages.FieldRequired);
+                RuleFor(model => model.Url)
+                    .Matches(ValidationPatterns.ContentUrlPattern)
+                    .WithMessage(model => model.Url, ValidationMessages.FieldContentUrlInvalidFormat);
             }
         }
 

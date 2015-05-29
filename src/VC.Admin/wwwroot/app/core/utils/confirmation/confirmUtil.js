@@ -7,6 +7,7 @@ angular.module('app.core.utils.confirmation.confirmUtil', [])
 			var modalInstance = $modal.open({
 				templateUrl: "app/core/utils/confirmation/confirmation.html",
 				controller: "confirmController",
+				animation: false, //temp solution until angular-ui-botstrap arrives
 				resolve: {
 					data: function () {
 						var data = {
