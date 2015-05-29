@@ -6,9 +6,9 @@ angular.module('app.modules.product.controllers.productManageController', [])
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
 
-        const sellerFieldName = 'Seller';
-        const googleCategoryFieldName = 'GoogleCategory';
-        const specialIconFieldName = 'SpecialIcon';
+        var sellerFieldName = 'Seller';
+        var googleCategoryFieldName = 'GoogleCategory';
+        var specialIconFieldName = 'SpecialIcon';
 
         function successSaveHandler(result) {
             if (result.Success) {
