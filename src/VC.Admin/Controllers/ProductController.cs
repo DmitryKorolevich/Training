@@ -64,7 +64,7 @@ namespace VC.Admin.Controllers
                 Name = "Test",
                 Url = "test",
                 StatusCode = RecordStatusCode.Active,
-                Type = ProductType.GC,
+                Type = ProductType.Gc,
                 Hidden = false,
                 CategoryIds = new List<int>() { 6, 7, 5 },
                 SKUs = new List<SKUManageModel>()
