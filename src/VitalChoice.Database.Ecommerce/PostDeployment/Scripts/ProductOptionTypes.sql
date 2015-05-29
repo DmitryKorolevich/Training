@@ -83,7 +83,7 @@ BEGIN
 
 	SET @IdLookup = SCOPE_IDENTITY()
 
-	INSERT INTO LookupsVariants
+	INSERT INTO LookupVariants
 	(Id, IdLookup, ValueVariant)
 	SELECT 1, @IdLookup, 'ModSeller'
 	UNION
