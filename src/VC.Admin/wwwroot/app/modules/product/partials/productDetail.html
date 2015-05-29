@@ -244,224 +244,226 @@
                                     </div>
                                     <span class="help-block">*Drag and drop using icon to reorder sub products</span>
                                     <!--<accordion class="sortable-accordion">-->
-                                    <div class="panel-group sortable-accordion">
-                                        <div ui-sortable="sortableOptions" data-ng-model="product.SKUs">
-                                            <!--<accordion-group>
-                                            <accordion-heading>-->
-                                            <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default">
-                                                <form class="form-horizontal" name="{{'forms.SKUs'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.skussubmitted}" novalidate>
-                                                    <fieldset>
-                                                        <div class="panel-heading">
-                                                            <h4 class="panel-title">
-                                                                <a class="accordion-toggle" ng-click="toggleOpen(subSku, $event)">
-                                                                    <div class="form-horizontal">
-                                                                        <div class="row">
-                                                                            <div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                <div class="sortable-move btn btn-info">
-                                                                                    <i class="glyphicon glyphicon-sort"></i>
+                                    <form name="forms.SKUs" data-ng-submit="save()" data-ng-class="{submitted: forms.skussubmitted}" novalidate>
+                                        <div class="panel-group sortable-accordion">
+                                            <div ui-sortable="sortableOptionsSKU" data-ng-model="product.SKUs">
+                                                <!--<accordion-group>
+                                                <accordion-heading>-->
+                                                <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default">
+                                                    <div class="form-horizontal" ng-form="i{{$index}}" novalidate>
+                                                        <fieldset>
+                                                            <div class="panel-heading">
+                                                                <h4 class="panel-title">
+                                                                    <a class="accordion-toggle" ng-click="toggleOpen(subSku, $event)">
+                                                                        <div class="form-horizontal">
+                                                                            <div class="row">
+                                                                                <div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="sortable-move btn btn-info">
+                                                                                        <i class="glyphicon glyphicon-sort"></i>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">SKU</label>
+                                                                                        <div class="col-md-1">
+                                                                                            <input type="text" name="Name" class="form-control" placeholder="SKU" data-ng-model="subSku.Name" required>
+                                                                                            <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Name.$invalid">
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.SKU")}}</small>
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.exist">{{getValidationMessage("ValidationMessages.Exist","GeneralFieldNames.SKU")}}</small>
+                                                                                                <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                        <label for="lblActive{{subSku.Id}}" class="control-label">Active</label>
+                                                                                        <div class="checkbox">
+                                                                                            <label>
+                                                                                                <input id="lblActive{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Active">
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                        <label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
+                                                                                        <div class="checkbox">
+                                                                                            <label>
+                                                                                                <input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Hidden">
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">ID</label>
+                                                                                        <span class="form-control-static">{{subSku.Id}}</span>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                        <button class="btn btn-danger" data-ng-click="deleteSKU($index)">Delete</button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-md-11">
-                                                                                <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">SKU</label>
+                                                                        </div>
+                                                                    </a>
+                                                                </h4>
+                                                            </div>
+                                                            <!--</accordion-heading>-->
+                                                            <div class="panel-collapse" data-ng-class="{collapse: !subSku.IsOpen}">
+                                                                <div class="panel-body">
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                            <div class="col-md-12">
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label class="control-label">Retail Price</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="text" name="Name" class="form-control" placeholder="SKU" data-ng-model="subSku.Name" required>
-                                                                                        <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.Name.$invalid">
-                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.SKU")}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.exist">{{getValidationMessage("ValidationMessages.Exist","GeneralFieldNames.SKU")}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
+                                                                                        <div class="input-group">
+                                                                                            <span class="input-group-addon">$</span>
+                                                                                            <input type="text" name="RetailPrice" class="form-control" placeholder="Retail Price" money max="100000" min="0.01" data-ng-model="subSku.RetailPrice" required>
+                                                                                        </div>
+                                                                                        <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.RetailPrice.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.RetailPrice",1000000)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.RetailPrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
-                                                                                    <label for="lblActive{{subSku.Id}}" class="control-label">Active</label>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label class="control-label">Wholesale Price</label>
+                                                                                    <div class="col-md-1">
+                                                                                        <div class="input-group">
+                                                                                            <span class="input-group-addon">$</span>
+                                                                                            <input type="text" name="WholesalePrice" class="form-control" placeholder="Wholesale Price" money max="100000" min="0.01" data-ng-model="subSku.WholesalePrice" required>
+                                                                                        </div>
+                                                                                        <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.WholesalePrice.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.WholesalePrice",1000000)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.WholesalePrice")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label class="control-label">Stock</label>
+                                                                                    <div class="col-md-1">
+                                                                                        <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Stock.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",1)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Stock")}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <div class="col-md-12">
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
-                                                                                            <input id="lblActive{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Active">
+                                                                                            <input id="lblDisregard{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisregardStock">
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
-                                                                                    <label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
-                                                                                            <input id="lblHide{{subSku.Id}}" type="checkbox" data-ng-model="subSku.Hidden">
+                                                                                            <input id="lblDisallowSingle{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisallowSingle">
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">ID</label>
-                                                                                    <span class="form-control-static">{{subSku.Id}}</span>
-                                                                                </div>
-                                                                                <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <button class="btn btn-danger" data-ng-click="deleteSKU($index)">Delete</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </h4>
-                                                        </div>
-                                                        <!--</accordion-heading>-->
-                                                        <div class="panel-collapse" data-ng-class="{collapse: !subSku.IsOpen}">
-                                                            <div class="panel-body">
-                                                                <div class="form-horizontal">
-                                                                    <div class="form-group">
-                                                                        <div class="col-md-12">
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label class="control-label">Retail Price</label>
-                                                                                <div class="col-md-1">
-                                                                                    <div class="input-group">
-                                                                                        <span class="input-group-addon">$</span>
-                                                                                        <input type="text" name="RetailPrice" class="form-control" placeholder="Retail Price" money max="100000" min="0.01" data-ng-model="subSku.RetailPrice" required>
-                                                                                    </div>
-                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.RetailPrice.$invalid">
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.RetailPrice",1000000)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.RetailPrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label class="control-label">Wholesale Price</label>
-                                                                                <div class="col-md-1">
-                                                                                    <div class="input-group">
-                                                                                        <span class="input-group-addon">$</span>
-                                                                                        <input type="text" name="WholesalePrice" class="form-control" placeholder="Wholesale Price" money max="100000" min="0.01" data-ng-model="subSku.WholesalePrice" required>
-                                                                                    </div>
-                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.WholesalePrice.$invalid">
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.WholesalePrice",1000000)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.WholesalePrice")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label class="control-label">Stock</label>
-                                                                                <div class="col-md-1">
-                                                                                    <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
-                                                                                    <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.Stock.$invalid">
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",1)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.Stock.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Stock")}}</small>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
+                                                                                    <div class="checkbox">
+                                                                                        <label>
+                                                                                            <input id="lblNonDiscountable{{subSku.Id}}" type="checkbox" data-ng-model="subSku.NonDiscountable">
+                                                                                        </label>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <div class="col-md-12">
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lblDisregard{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisregardStock">
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lblDisallowSingle{{subSku.Id}}" type="checkbox" data-ng-model="subSku.DisallowSingle">
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label for="lblNonDiscountable{{subSku.Id}}" class="control-label">Non-discountable</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lblNonDiscountable{{subSku.Id}}" type="checkbox" data-ng-model="subSku.NonDiscountable">
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group" data-ng-hide="product.Type==2">
-                                                                        <div class="col-md-12">
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label class="control-label">Orphan Type</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <div class="col-md-12">
-                                                                            <div class="fixed-accordion-row extra-spacing">
-                                                                                <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lblAutoship{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipProduct">
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row extra-spacing">
-                                                                                <label class="control-label">Auto-Ship Frequency</label>
-                                                                                <label class="checkbox-inline">
-                                                                                    <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
-                                                                                    1
-                                                                                </label>
-                                                                                <label class="checkbox-inline">
-                                                                                    <input id="lblAutoShipFrequency2{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency2">
-                                                                                    2
-                                                                                </label>
-                                                                                <label class="checkbox-inline">
-                                                                                    <input id="lblAutoShipFrequency3{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency3">
-                                                                                    3
-                                                                                </label>
-                                                                                <label class="checkbox-inline">
-                                                                                    <input id="lblAutoShipFrequency6{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency6">
-                                                                                    6
-                                                                                </label>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label class="control-label">% Off</label>
-                                                                                <div class="col-md-1">
-                                                                                    <input type="number" name="OffPercent" class="form-control" placeholder="% Off" data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
-                                                                                    <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs{{$index}}.OffPercent.$invalid">
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","% Off",1)}}</small>
-                                                                                        <small class="error" ng-show="forms.SKUs{{$index}}.OffPercent.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","% Off")}}</small>
+                                                                        <div class="form-group" data-ng-hide="product.Type==2">
+                                                                            <div class="col-md-12">
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label class="control-label">Orphan Type</label>
+                                                                                    <div class="checkbox">
+                                                                                        <label>
+                                                                                            <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
+                                                                                        </label>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <div class="col-md-12">
-                                                                            <div class="fixed-accordion-row extra-spacing">
-                                                                                <label class="control-label">Seller</label>
-                                                                                <select class="form-control" name="Seller" data-ng-model="subSku.Seller" ng-options="seller.Key as seller.Text for seller in sellers"></select>
-                                                                            </div>
-                                                                            <div class="fixed-accordion-row">
-                                                                                <label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
-                                                                                <div class="checkbox">
-                                                                                    <label>
-                                                                                        <input id="lblHideFromFeed{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideFromDataFeed">
+                                                                        <div class="form-group">
+                                                                            <div class="col-md-12">
+                                                                                <div class="fixed-accordion-row extra-spacing">
+                                                                                    <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
+                                                                                    <div class="checkbox">
+                                                                                        <label>
+                                                                                            <input id="lblAutoship{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipProduct">
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row extra-spacing">
+                                                                                    <label class="control-label">Auto-Ship Frequency</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
+                                                                                        1
                                                                                     </label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input id="lblAutoShipFrequency2{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency2">
+                                                                                        2
+                                                                                    </label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input id="lblAutoShipFrequency3{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency3">
+                                                                                        3
+                                                                                    </label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input id="lblAutoShipFrequency6{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency6">
+                                                                                        6
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label class="control-label">% Off</label>
+                                                                                    <div class="col-md-1">
+                                                                                        <input type="number" name="OffPercent" class="form-control" placeholder="% Off" data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.OffPercent.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","% Off",1)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","% Off")}}</small>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <div class="col-md-12">
+                                                                                <div class="fixed-accordion-row extra-spacing">
+                                                                                    <label class="control-label">Seller</label>
+                                                                                    <select class="form-control" name="Seller" data-ng-model="subSku.Seller" ng-options="seller.Key as seller.Text for seller in sellers"></select>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row">
+                                                                                    <label for="lblHideFromFeed{{subSku.Id}}" class="control-label">Hide From Data Feed</label>
+                                                                                    <div class="checkbox">
+                                                                                        <label>
+                                                                                            <input id="lblHideFromFeed{{subSku.Id}}" type="checkbox" data-ng-model="subSku.HideFromDataFeed">
+                                                                                        </label>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <!--</accordion-group>-->
-                                                    </fieldset>
-                                                </form
+                                                            <!--</accordion-group>-->
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                     <!--</accordion>-->
                                 </spinner-overlay>
                             </div>
@@ -648,174 +650,178 @@
                                     <!--<div class="form-group">
                                         <button data-ng-click="addCross();" class="btn btn-info">Add New Cross Sell Product</button>
                                     </div>-->
-                                    <div class="panel-group sortable-accordion">
-                                        <div ui-sortable="sortableOptions" data-ng-model="product.CrossSellProducts">
-                                            <div data-ng-repeat="crossSellProduct in product.CrossSellProducts" class="panel panel-default">
-                                                <form class="form-horizontal" name="{{'forms.CrossSellProducts'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.crossessubmitted}" novalidate>
-                                                    <fieldset>
-                                                        <div class="panel-heading">
-                                                            <h4 class="panel-title">
-                                                                <div class="accordion-toggle">
-                                                                    <!--ng-click="toggleOpen(crossSellProduct, $event)">-->
-                                                                    <div class="form-horizontal">
-                                                                        <div class="row">
-                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                <div class="sortable-move btn btn-info">
-                                                                                    <i class="glyphicon glyphicon-sort"></i>
-                                                                                </div>
-                                                                            </div>-->
-                                                                            <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">Cross Sell Image</label>
-                                                                                    <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
-                                                                                        <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" required></filefield>
-                                                                                        <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts{{$index}}.Image.$invalid">
-                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                    <form name="forms.CrossSellProducts" data-ng-submit="save()" data-ng-class="{submitted: forms.crossessubmitted}" novalidate>
+                                        <div class="panel-group sortable-accordion">
+                                            <div ui-sortable="sortableOptions" data-ng-model="product.CrossSellProducts">
+                                                <div data-ng-repeat="crossSellProduct in product.CrossSellProducts" class="panel panel-default">
+                                                    <div class="form-horizontal" ng-form="i{{$index}}">
+                                                        <fieldset>
+                                                            <div class="panel-heading">
+                                                                <h4 class="panel-title">
+                                                                    <div class="accordion-toggle">
+                                                                        <!--ng-click="toggleOpen(crossSellProduct, $event)">-->
+                                                                        <div class="form-horizontal">
+                                                                            <div class="row">
+                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="sortable-move btn btn-info">
+                                                                                        <i class="glyphicon glyphicon-sort"></i>
+                                                                                    </div>
+                                                                                </div>-->
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">Cross Sell Image</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
+                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" required></filefield>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts.i{{$index}}.Image.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
+                                                                                            <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSells[$index].Image" disabled></filefield>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
-                                                                                        <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSells[$index].Image" disabled></filefield>
+                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                        <button data-ng-if="!crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="setCustomCross(crossSellProduct)">Set</button>
+                                                                                        <button data-ng-if="crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="removeCustomCross(crossSellProduct)">Remove</button>
                                                                                     </div>
-                                                                                </div>
-                                                                                <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <button data-ng-if="!crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="setCustomCross(crossSellProduct)">Set</button>
-                                                                                    <button data-ng-if="crossSellProduct.UrlUse" class="btn btn-info width-80px" data-ng-click="removeCustomCross(crossSellProduct)">Remove</button>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>-->
-                                                                            <div class="col-md-11">
-                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">URL Cross Sell</label>
-                                                                                    <div class="col-md-1" data-ng-if="crossSellProduct.UrlUse">
-                                                                                        <input type="text" name="Url" class="form-control" placeholder="URL Cross Sell" data-ng-model="crossSellProduct.Url" required>
-                                                                                        <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts{{$index}}.Url.$invalid">
-                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
-                                                                                            <small class="error" ng-show="forms.CrossSellProducts{{$index}}.Url.$error.server">{{serverMessages.GetMessage('Url','CrossSellProducts',$index)}}</small>
+                                                                            <div class="row">
+                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                </div>-->
+                                                                                <div class="col-md-11">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">URL Cross Sell</label>
+                                                                                        <div class="col-md-1" data-ng-if="crossSellProduct.UrlUse">
+                                                                                            <input type="text" name="Url" class="form-control" placeholder="URL Cross Sell" data-ng-model="crossSellProduct.Url" required>
+                                                                                            <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts.i{{$index}}.Url.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Url.$error.server">{{serverMessages.GetMessage('Url','CrossSellProducts',$index)}}</small>
+                                                                                            </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-1" data-ng-if="!crossSellProduct.UrlUse">
-                                                                                        <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSells[$index].Url" readonly>
+                                                                                        <div class="col-md-1" data-ng-if="!crossSellProduct.UrlUse">
+                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSells[$index].Url" readonly>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            </h4>
-                                                        </div>
-                                                        <div class="panel-collapse" data-ng-class="{collapse: !crossSellProduct.IsOpen}">
-                                                            <div class="panel-body">
-                                                                <div class="form-horizontal">
-                                                                    <div class="form-group">
+                                                                </h4>
+                                                            </div>
+                                                            <div class="panel-collapse" data-ng-class="{collapse: !crossSellProduct.IsOpen}">
+                                                                <div class="panel-body">
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </fieldset>
-                                                </form>
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
 
                                     <span class="legend">YouTube Videos</span>
                                     <!--<div class="form-group">
                                         <button data-ng-click="addVideo();" class="btn btn-info">Add New YouTube Video</button>
                                     </div>-->
-                                    <div class="panel-group sortable-accordion">
-                                        <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
-                                            <div data-ng-repeat="video in product.Videos" class="panel panel-default">
-                                                <form class="form-horizontal" name="{{'forms.Videos'+$index}}" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate>
-                                                    <fieldset>
-                                                        <div class="panel-heading">
-                                                            <h4 class="panel-title">
-                                                                <div class="accordion-toggle">
-                                                                    <!--ng-click="toggleOpen(video, $event)">-->
-                                                                    <div class="form-horizontal">
-                                                                        <div class="row">
-                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                                <div class="sortable-move btn btn-info">
-                                                                                    <i class="glyphicon glyphicon-sort"></i>
-                                                                                </div>
-                                                                            </div>-->
-                                                                            <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">YouTube Video</label>
-                                                                                    <div class="col-md-1" data-ng-if="video.VideoUse">
-                                                                                        <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
-                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Video.$invalid">
-                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
-                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
+                                    <form name="forms.Videos" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" novalidate>
+                                        <div class="panel-group sortable-accordion">
+                                            <div ui-sortable="sortableOptions" data-ng-model="product.Videos">
+                                                <div data-ng-repeat="video in product.Videos" class="panel panel-default">
+                                                    <div class="form-horizontal" ng-form="i{{$index}}">
+                                                        <fieldset>
+                                                            <div class="panel-heading">
+                                                                <h4 class="panel-title">
+                                                                    <div class="accordion-toggle">
+                                                                        <!--ng-click="toggleOpen(video, $event)">-->
+                                                                        <div class="form-horizontal">
+                                                                            <div class="row">
+                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="sortable-move btn btn-info">
+                                                                                        <i class="glyphicon glyphicon-sort"></i>
+                                                                                    </div>
+                                                                                </div>-->
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">YouTube Video</label>
+                                                                                        <div class="col-md-1" data-ng-if="video.VideoUse">
+                                                                                            <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Video.$invalid">
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
+                                                                                            </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-1" data-ng-if="!video.VideoUse">
-                                                                                        <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Videos[$index].Video" readonly>
-                                                                                    </div>
-                                                                                    <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Videos[$index].Video)}}" class="edit-link">view</a>
-                                                                                    <a data-ng-if="video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(video.Video)}}" class="edit-link">view</a>
-                                                                                </div>
-                                                                                <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                    <button data-ng-if="!video.VideoUse" class="btn btn-info width-80px" data-ng-click="setCustomVideo(video)">Set</button>
-                                                                                    <button data-ng-if="video.VideoUse" class="btn btn-info width-80px" data-ng-click="removeCustomVideo(video)">Remove</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>-->
-                                                                            <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">YouTube Image</label>
-                                                                                    <div class="col-md-1" data-ng-if="video.ImageUse">
-                                                                                        <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
-                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Image.$invalid">
-                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                        <div class="col-md-1" data-ng-if="!video.VideoUse">
+                                                                                            <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Videos[$index].Video" readonly>
                                                                                         </div>
+                                                                                        <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Videos[$index].Video)}}" class="edit-link">view</a>
+                                                                                        <a data-ng-if="video.VideoUse" target="_blank" data-ng-href="{{video.Video ? youTubeBaseUrl.format(video.Video) : ''}}" class="edit-link">view</a>
                                                                                     </div>
-                                                                                    <div class="col-md-1" data-ng-if="!video.ImageUse">
-                                                                                        <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Videos[$index].Image" disabled></filefield>
+                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
+                                                                                        <button data-ng-if="!video.VideoUse" class="btn btn-info width-80px" data-ng-click="setCustomVideo(video)">Set</button>
+                                                                                        <button data-ng-if="video.VideoUse" class="btn btn-info width-80px" data-ng-click="removeCustomVideo(video)">Remove</button>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
-                                                                            </div>-->
-                                                                            <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                    <label class="control-label">YouTube Text</label>
-                                                                                    <div class="col-md-1" data-ng-if="video.TextUse">
-                                                                                        <input type="text" name="Text" class="form-control" placeholder="YouTube Text" data-ng-model="video.Text" required>
-                                                                                        <div class="error-container" ng-show="forms.videossubmitted && forms.Videos{{$index}}.Text.$invalid">
-                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
-                                                                                            <small class="error" ng-show="forms.Videos{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
+                                                                            <div class="row">
+                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                </div>-->
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">YouTube Image</label>
+                                                                                        <div class="col-md-1" data-ng-if="video.ImageUse">
+                                                                                            <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Image.$invalid">
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!video.ImageUse">
+                                                                                            <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Videos[$index].Image" disabled></filefield>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="col-md-1" data-ng-if="!video.TextUse">
-                                                                                        <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Videos[$index].Text" readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <!--<div class="col-md-1" data-ng-click="$event.stopPropagation()">
+                                                                                </div>-->
+                                                                                <div class="col-md-12">
+                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">YouTube Text</label>
+                                                                                        <div class="col-md-1" data-ng-if="video.TextUse">
+                                                                                            <input type="text" name="Text" class="form-control" placeholder="YouTube Text" data-ng-model="video.Text" required>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Text.$invalid">
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-1" data-ng-if="!video.TextUse">
+                                                                                            <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Videos[$index].Text" readonly>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            </h4>
-                                                        </div>
-                                                        <div class="panel-collapse" data-ng-class="{collapse: !video.IsOpen}">
-                                                            <div class="panel-body">
-                                                                <div class="form-horizontal">
-                                                                    <div class="form-group">
+                                                                </h4>
+                                                            </div>
+                                                            <div class="panel-collapse" data-ng-class="{collapse: !video.IsOpen}">
+                                                                <div class="panel-body">
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </fieldset>
-                                                </form>
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </spinner-overlay>
                             </div>
                         </div>

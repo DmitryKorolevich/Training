@@ -39,7 +39,7 @@ namespace VitalChoice.Validation.Logic
                 }
                 foreach (var validationError in validationResult.Errors)
                 {
-                    ValidationErrors.Add(string.Format("{0}{1}.{3}{2}", collectionName, index, validationError.PropertyName, propertyPrefixPath), validationError.ErrorMessage);
+                    ValidationErrors.Add(string.Format("{0}.i{1}.{3}{2}", collectionName, index, validationError.PropertyName, propertyPrefixPath), validationError.ErrorMessage);
                 }
             }
         }
