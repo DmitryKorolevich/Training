@@ -49,7 +49,7 @@ namespace VC.Public.Components
 				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
 				{
 					filePaths.Add(_urlHelper.Content(
-					    $"~/{assetInfo.MinifiedFileName}.min-{_appOptionsAccessor.Options.RandomPathPart}.js"));
+					    $"~/{assetInfo.MinifiedFileName}.min.js"));
 				}
 				else
 				{
@@ -66,7 +66,7 @@ namespace VC.Public.Components
 				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
 				{
 					filePaths.Add(_urlHelper.Content(
-					    $"~{assetInfo.MinifiedFileName}.min-{_appOptionsAccessor.Options.RandomPathPart}.css"));
+					    $"~{assetInfo.MinifiedFileName}.min.css"));
 				}
 				else
 				{
