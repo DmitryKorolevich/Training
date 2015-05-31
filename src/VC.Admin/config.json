@@ -5,16 +5,17 @@
     "EnableStaticContentVersioning":  true,
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
+    "FilesRelativePath": "/files",
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
         "Connection": {
-            "UserName": "dev_vc_user",
-            "Password": "VZQCkea2",
-            "Server": "localhost"
+           "UserName": "dev_vcdb_login",
+            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+            "Server": "oz449vjvis.database.windows.net"
         },
-		"PublicHost": "http://localhost:51805/",
-		"AdminHost": "http://localhost:51805/",
+		"PublicHost": "http://staging.g2-dg.com/",
+		"AdminHost": "http://admin.staging.g2-dg.com/",
 		"Email": {
 			"From": "admin.staging@g2designgroup.com",
 			"Host": "smtp.1and1.com",
