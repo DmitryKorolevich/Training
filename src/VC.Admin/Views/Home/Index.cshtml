@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
-<html data-ng-app="mainApp" data-ng-strict-di>
+﻿@using VitalChoice.Domain.Entities.Options
+@inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
+<!DOCTYPE html>
+<html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Options.Versioning.BuildNumber'">
 <head>
 	<title>Vital Choice Admin panel</title>
 	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">

@@ -42,7 +42,7 @@ namespace VC.Admin.Components
 			string viewName;
 			IList<string> filePaths = new List<string>();
 
-			var versionQueryString = appOptions.EnableStaticContentVersioning ? $"?v={appOptions.BuildNumber}" : string.Empty;
+			var versionQueryString = appOptions.Versioning.EnableStaticContentVersioning ? $"?v={appOptions.Versioning.BuildNumber}" : string.Empty;
             if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";

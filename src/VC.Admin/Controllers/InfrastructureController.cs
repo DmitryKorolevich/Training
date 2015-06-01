@@ -53,7 +53,7 @@ namespace VC.Admin.Controllers
 			{
 				referenceDataModel = new RestrictedReferenceData()
 				{
-					Labels = referenceData.Labels,
+					Labels = referenceData.Labels
 				};
 			}
 

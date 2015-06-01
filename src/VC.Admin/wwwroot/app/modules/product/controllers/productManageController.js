@@ -109,34 +109,34 @@ angular.module('app.modules.product.controllers.productManageController', [])
             //    Text: 'Some text3',
             //}];
 
-            //$scope.parentDetailsTab = {
-            //    active: true,
-            //    formName: 'parentDetails',
-            //};
-            //$scope.imagesTab = {
-            //    active: false,
-            //    formName: 'images',
-            //};
-            //$scope.subProductsTab = {
-            //    active: false,
-            //    formName: 'SKUs',
-            //};
-            //$scope.nutritionalTab = {
-            //    active: false,
-            //    formName: 'nutritional',
-            //};
-            //$scope.categoriesTab = {
-            //    active: false,
-            //    formName: 'categories',
-            //};
-            //$scope.crossSellProductsAndVideosTab = {
-            //    active: false,
-            //    formName: 'crossSellProductsAndVideos',
-            //};
-            //$scope.inventoryAndShippingTab = {
-            //    active: false,
-            //    formName: 'inventoryAndShipping',
-            //};
+            $scope.parentDetailsTab = {
+                active: true,
+                formName: 'parentDetails',
+            };
+            $scope.imagesTab = {
+                active: false,
+                formName: 'images',
+            };
+            $scope.subProductsTab = {
+                active: false,
+                formName: 'SKUs',
+            };
+            $scope.nutritionalTab = {
+                active: false,
+                formName: 'nutritional',
+            };
+            $scope.categoriesTab = {
+                active: false,
+                formName: 'categories',
+            };
+            $scope.crossSellProductsAndVideosTab = {
+                active: false,
+                formName: 'crossSellProductsAndVideos',
+            };
+            $scope.inventoryAndShippingTab = {
+                active: false,
+                formName: 'inventoryAndShipping',
+            };
             var tabs = [];
             tabs.push($scope.parentDetailsTab);
             tabs.push($scope.imagesTab);
