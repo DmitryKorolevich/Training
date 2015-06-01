@@ -14,6 +14,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services.Product
 {
@@ -32,6 +33,55 @@ namespace VitalChoice.Business.Services.Product
             this.lookupRepository = lookupRepository;
             logger = LoggerService.GetDefault();
         }
+
+        #region ProductOptions
+
+        public async Task<ICollection<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names)
+        {
+            ICollection<ProductOptionType> toReturn = (await productOptionTypeRepository.Query(p => names.Contains(p.Name)).SelectAsync()).ToList();
+            return toReturn;
+        }
+
+        public async Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync()
+        {
+            Dictionary<int, Dictionary<string, string>> toReturn = new Dictionary<int, Dictionary<string, string>>();
+            List<string> names = new List<string>();
+            for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
+            {
+                names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i);
+                names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i);
+            }
+            for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
+            {
+                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i);
+                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i);
+                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i);
+            }
+            var items = await GetProductOptionTypesAsync(names);
+            foreach (var item in items.Where(p => p.IdProductType.HasValue))
+            {
+                Dictionary<string, string> productTypeDefaultValues = null;
+                if (toReturn.ContainsKey((int)item.IdProductType.Value))
+                {
+                    productTypeDefaultValues = toReturn[(int)item.IdProductType.Value];
+                }
+                else
+                {
+                    productTypeDefaultValues = new Dictionary<string, string>();
+                    toReturn.Add((int)item.IdProductType.Value, productTypeDefaultValues);
+                }
+                if (!productTypeDefaultValues.ContainsKey(item.Name))
+                {
+                    productTypeDefaultValues.Add(item.Name, item.DefaultValue);
+                }
+            }
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region Products
 
         public async Task<ICollection<ProductOptionType>> GetProductLookupsAsync()
         {
@@ -80,5 +130,7 @@ namespace VitalChoice.Business.Services.Product
 
             return toReturn;
         }
+
+        #endregion
     }
 }

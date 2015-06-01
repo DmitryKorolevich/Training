@@ -8,6 +8,10 @@ namespace VitalChoice.Interfaces.Services.Product
 {
 	public interface IProductService
     {
+        Task<ICollection<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names);
+
+        Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync();
+
         Task<ICollection<ProductOptionType>> GetProductLookupsAsync();
 
         Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);

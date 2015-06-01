@@ -74,69 +74,69 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.sellers = [];
             $scope.defaultSeller = null;
 
-            $scope.defaults = {};
-            $scope.defaults.CrossSells = [
-            {
-                Image: '/some1.png',
-                Url: 'http://someurl.com/1',
-            },
-            {
-                Image: '/some2.png',
-                Url: 'http://someurl.com/2',
-            },
-            {
-                Image: '/some3.png',
-                Url: 'http://someurl.com/3',
-            },
-            {
-                Image: '/some4.png',
-                Url: 'http://someurl.com/4',
-            }];
-            $scope.defaults.Videos = [
-            {
-                Video: 'jGwOsFo8TTg',
-                Image: '/some1.png',
-                Text: 'Some text1',
-            },
-            {
-                Video: 'btlfoO75kfI',
-                Image: '/some2.png',
-                Text: 'Some text2',
-            },
-            {
-                Video: 'vCsRTamxWuw',
-                Image: '/some3.png',
-                Text: 'Some text3',
-            }];
+            $scope.productTypeDefaults = {};
+            //$scope.defaults.CrossSells = [
+            //{
+            //    Image: '/some1.png',
+            //    Url: 'http://someurl.com/1',
+            //},
+            //{
+            //    Image: '/some2.png',
+            //    Url: 'http://someurl.com/2',
+            //},
+            //{
+            //    Image: '/some3.png',
+            //    Url: 'http://someurl.com/3',
+            //},
+            //{
+            //    Image: '/some4.png',
+            //    Url: 'http://someurl.com/4',
+            //}];
+            //$scope.defaults.Videos = [
+            //{
+            //    Video: 'jGwOsFo8TTg',
+            //    Image: '/some1.png',
+            //    Text: 'Some text1',
+            //},
+            //{
+            //    Video: 'btlfoO75kfI',
+            //    Image: '/some2.png',
+            //    Text: 'Some text2',
+            //},
+            //{
+            //    Video: 'vCsRTamxWuw',
+            //    Image: '/some3.png',
+            //    Text: 'Some text3',
+            //}];
 
-            $scope.parentDetailsTab = {
-                active: true,
-                formName: 'parentDetails',
-            };
-            $scope.imagesTab = {
-                active: false,
-                formName: 'images',
-            };
-            $scope.subProductsTab = {
-                active: false,
-                formName: 'SKUs',
-            };
-            $scope.nutritionalTab = {
-                active: false,
-                formName: 'nutritional',
-            };
-            $scope.categoriesTab = {
-                active: false,
-                formName: 'categories',
-            };
-            $scope.crossSellProductsAndVideosTab = {
-                active: false,
-                formName: 'crossSellProductsAndVideos',
-            };
-            $scope.inventoryAndShippingTab = {
-                active: false,
-                formName: 'inventoryAndShipping',
-            };
+            //$scope.parentDetailsTab = {
+            //    active: true,
+            //    formName: 'parentDetails',
+            //};
+            //$scope.imagesTab = {
+            //    active: false,
+            //    formName: 'images',
+            //};
+            //$scope.subProductsTab = {
+            //    active: false,
+            //    formName: 'SKUs',
+            //};
+            //$scope.nutritionalTab = {
+            //    active: false,
+            //    formName: 'nutritional',
+            //};
+            //$scope.categoriesTab = {
+            //    active: false,
+            //    formName: 'categories',
+            //};
+            //$scope.crossSellProductsAndVideosTab = {
+            //    active: false,
+            //    formName: 'crossSellProductsAndVideos',
+            //};
+            //$scope.inventoryAndShippingTab = {
+            //    active: false,
+            //    formName: 'inventoryAndShipping',
+            //};
             var tabs = [];
             tabs.push($scope.parentDetailsTab);
             tabs.push($scope.imagesTab);
@@ -151,10 +151,11 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         function loadLookups() {
-            productService.getProductLookups($scope.refreshTracker)
+            productService.getProductEditSettings($scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
-                        $scope.lookups = result.Data;
+                        $scope.lookups = result.Data.Lookups;
+                        $scope.defaults = result.Data.DefaultValues;
                         loadCategories();
                     } else {
                         errorHandler(result);
@@ -341,7 +342,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     $scope.specialIcons = getLookupValues(specialIconFieldName, newValue, true);
                     if (!$scope.product.SpecialIcon) {
                         $scope.product.SpecialIcon = getLookupDefaultValue(specialIconFieldName, newValue);
-                    }
+                    }                    
+                    $.each($scope.defaults, function (index, defaultItem) {                        
+                        if (index == newValue) {
+                            $scope.productTypeDefaults = defaultItem;
+                            return false;
+                        };
+                    });
                 }
             });
         };

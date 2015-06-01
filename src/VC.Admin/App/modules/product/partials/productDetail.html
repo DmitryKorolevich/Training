@@ -677,7 +677,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
-                                                                                            <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="defaults.CrossSells[$index].Image" disabled></filefield>
+                                                                                            <filefield name="DefaultImage" placeholder="Cross Sell Image" ng-model="productTypeDefaults['CrossSellImage'+($index+1)]" disabled></filefield>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
@@ -700,7 +700,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!crossSellProduct.UrlUse">
-                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="defaults.CrossSells[$index].Url" readonly>
+                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Cross Sell" data-ng-model="productTypeDefaults['CrossSellUrl'+($index+1)]" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -756,9 +756,9 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.VideoUse">
-                                                                                            <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="defaults.Videos[$index].Video" readonly>
+                                                                                            <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="productTypeDefaults['YouTubeVideo'+($index+1)]" readonly>
                                                                                         </div>
-                                                                                        <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(defaults.Videos[$index].Video)}}" class="edit-link">view</a>
+                                                                                        <a data-ng-if="!video.VideoUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(productTypeDefaults['YouTubeVideo'+($index+1)])}}" class="edit-link">view</a>
                                                                                         <a data-ng-if="video.VideoUse" target="_blank" data-ng-href="{{video.Video ? youTubeBaseUrl.format(video.Video) : ''}}" class="edit-link">view</a>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
@@ -780,7 +780,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.ImageUse">
-                                                                                            <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="defaults.Videos[$index].Image" disabled></filefield>
+                                                                                            <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="productTypeDefaults['YouTubeImage'+($index+1)]" disabled></filefield>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -799,7 +799,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.TextUse">
-                                                                                            <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="defaults.Videos[$index].Text" readonly>
+                                                                                            <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="productTypeDefaults['YouTubeText'+($index+1)]" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

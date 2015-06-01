@@ -35,11 +35,14 @@ namespace VC.Admin.Controllers
         #region Products
 
         [HttpGet]
-        public async Task<Result<ICollection<LookupViewModel>>> GetProductLookups()
+        public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
-            return (await productService.GetProductLookupsAsync()).Select(p=>new LookupViewModel(p.Name,
+            ProductEditSettingsModel toReturn = new ProductEditSettingsModel();
+            toReturn.Lookups = (await productService.GetProductLookupsAsync()).Select(p=>new LookupViewModel(p.Name,
                 p.IdProductType.HasValue ? (int?)p.IdProductType.Value : null
                 ,p.DefaultValue,p.Lookup)).ToList();
+            toReturn.DefaultValues = await productService.GetProductEditDefaultSettingsAsync();
+            return toReturn;
             
         }
 

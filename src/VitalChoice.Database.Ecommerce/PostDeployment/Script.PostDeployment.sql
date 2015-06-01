@@ -32,3 +32,4 @@ Post-Deployment Script Template
 :r .\Scripts\Skus.sql
 :r .\Scripts\ProductOptionValues.sql
 :r .\Scripts\VProductSkus.sql
+:r .\Scripts\YouTubeAndCrossSellsFields.sql

@@ -126,4 +126,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VProductSkus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\YouTubeAndCrossSellsFields.sql" />
+  </ItemGroup>
 </Project>
