@@ -1,17 +1,16 @@
 {
 	"App": {
-		"ServeCdnContent": false,
-		"CdnServerBaseUrl": "not yet ready",
 		"GenerateLowercaseUrls": true,
-		"EnableBundlingAndMinification": false,
+    "EnableBundlingAndMinification": false,
+    "EnableStaticContentVersioning":  true,
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-    "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",    
+    "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
     "FilesRelativePath": "/files",
 		"DefaultCacheExpirationTermMinutes": 1440,
 		"ActivationTokenExpirationTermDays": 3,
 		"DefaultCultureId": "en-US",
         "Connection": {
-            "UserName": "dev_vcdb_login",
+           "UserName": "dev_vcdb_login",
             "Password": "CCQLaskw3pMFU9XqE6CHp28m",
             "Server": "oz449vjvis.database.windows.net"
         },

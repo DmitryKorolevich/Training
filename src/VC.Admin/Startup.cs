@@ -1,53 +1,38 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.StaticFiles;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Logging.Console;
-using VitalChoice.Core.DependencyInjection;
-using Microsoft.AspNet.Mvc;
-using VitalChoice.Core.Infrastructure;
-using System.IO;
-using System.Net;
-using System.Security.Claims;
-using System.Security.Principal;
-using Microsoft.AspNet.Authentication.Cookies;
-using Microsoft.AspNet.Authorization;
 using Microsoft.Framework.Runtime;
 using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.DependencyInjection;
+using VitalChoice.Core.Infrastructure;
 
-namespace VitalChoice
+namespace VC.Admin
 {
 	public class Startup
 	{
         public IConfiguration Configuration { get; set; }
-
-
+		
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-
-            var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
+			var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
-            if (File.Exists(path)) {
-                configuration.AddJsonFile("config.local.json");
-           }
-            Configuration = configuration;
+			if (File.Exists(path))
+			{
+				configuration.AddJsonFile("config.local.json");
+			}
+			Configuration = configuration;
 
             var reg = new DefaultDependencyConfig();
 
-            var hostingEnvironment = services.BuildServiceProvider().GetRequiredService<IHostingEnvironment>();
-
-            string filesPath = Configuration.Get("App:FilesPath");
+			var filesPath = Configuration.Get("App:FilesPath");
 
             return reg.RegisterInfrastructure(Configuration, services, filesPath);
 		}
@@ -78,12 +63,7 @@ namespace VitalChoice
 
 			app.UseCookieAuthentication();
 
-			app.UseMvc(routes =>
-            {
-                RouteConfig.RegisterRoutes(routes);
-            });
-
-			
+			app.UseMvc(RouteConfig.RegisterRoutes);
 		}
 	}
 }

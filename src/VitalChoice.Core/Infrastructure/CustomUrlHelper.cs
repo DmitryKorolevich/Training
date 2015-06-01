@@ -36,14 +36,6 @@ namespace VitalChoice.Core.Infrastructure
 		/// <returns></returns>
 		public override string Content(string contentPath)
 		{
-			if (appOptions.Options.ServeCdnContent
-				&& contentPath.StartsWith("~/", StringComparison.Ordinal))
-			{
-				var segment = new PathString(contentPath.Substring(1));
-
-				return ConvertToLowercaseUrl(appOptions.Options.CdnServerBaseUrl + segment);
-			}
-
 			return ConvertToLowercaseUrl(base.Content(contentPath));
 		}
 

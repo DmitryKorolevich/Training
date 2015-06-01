@@ -86,13 +86,13 @@ namespace VitalChoice.Core.DependencyInjection
 
 				services.Configure<AppOptions>(options =>
                 {
-                    options.ServeCdnContent = Convert.ToBoolean(configuration.Get("App:ServeCdnContent"));
-                    options.CdnServerBaseUrl = configuration.Get("App:CdnServerBaseUrl");
                     options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
                     options.EnableBundlingAndMinification =
                         Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
-                    options.RandomPathPart = new DateTime().ToString("dd-mm-yyyy");
-                    options.LogPath = configuration.Get("App:LogPath");
+					options.EnableStaticContentVersioning =
+						Convert.ToBoolean(configuration.Get("App:EnableStaticContentVersioning"));
+	                options.BuildNumber = Guid.NewGuid().ToString("N");
+					options.LogPath = configuration.Get("App:LogPath");
 					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
 					options.ActivationTokenExpirationTermDays = Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
 					options.DefaultCultureId= configuration.Get("App:DefaultCultureId");

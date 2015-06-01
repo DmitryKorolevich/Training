@@ -151,10 +151,10 @@ angular.module('app.core.utils.appBootstrap', [])
 			        $rootScope.$state.previous = fromState;
 			    });
 			    $rootScope.$on('$stateChangeError', function () {
-			        ngProgress.complete();
+			    	ngProgress.complete();
 			    });
 			    $rootScope.$on('$stateNotFound', function () {
-			        ngProgress.complete();
+			    	ngProgress.complete();
 			    });
 			}
 
