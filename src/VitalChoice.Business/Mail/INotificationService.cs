@@ -10,5 +10,7 @@ namespace VitalChoice.Business.Mail
 	    Task SendUserActivationAsync(string email, UserActivation activation);
 
 	    Task SendPasswordResetAsync(string email, PasswordReset passwordReset);
+
+        Task SendBasicEmailAsync(BasicEmail email);
     }
 }

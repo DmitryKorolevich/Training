@@ -38,5 +38,11 @@ namespace VitalChoice.Business.Mail
 
 			await emailSender.SendEmailAsync(email, subject, body);
 		}
+
+        public async Task SendBasicEmailAsync(BasicEmail email)
+        {
+            //todo:refactor this to user nustache or something
+            await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.ToName, email.IsHTML);
+        }
     }
 }

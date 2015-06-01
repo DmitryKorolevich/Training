@@ -14,6 +14,7 @@ using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Domain.Mail;
 
 namespace VitalChoice.Business.Services.Product
 {
@@ -26,14 +27,14 @@ namespace VitalChoice.Business.Services.Product
 
         private readonly IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IEmailSender emailSender;
+        private readonly INotificationService notificationService;
         private readonly ILogger logger;
 
-        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository, UserManager<ApplicationUser> userManager, INotificationService notificationService)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;
-            this.emailSender = emailSender;
+            this.notificationService = notificationService;
             logger = LoggerService.GetDefault();
         }
 
@@ -156,7 +157,15 @@ namespace VitalChoice.Business.Services.Product
 
         public async Task<bool> SendGiftCertificateEmailAsync(GiftCertificateEmail model)
         {
-            await emailSender.SendEmailAsync(model.ToEmail, "Your Vital Choice Gift Certificate(s)", model.Message, model.FromName, model.ToName, false);
+            await notificationService.SendBasicEmailAsync(new BasicEmail()
+            {
+                FromName=model.FromName,
+                ToEmail=model.ToEmail,
+                ToName=model.ToName,
+                Subject= "Your Vital Choice Gift Certificate(s)",
+                Body =model.Message,
+                IsHTML=false,
+            });
             return true;
         }
 
