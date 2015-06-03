@@ -27,6 +27,8 @@ namespace VitalChoice.Domain.Entities.Product
 
         public GCType GCType { get; set; }
 
+        public Guid PublicId { get; set; }
+
         public GiftCertificate Clone()
         {
             var toReturn = new GiftCertificate();

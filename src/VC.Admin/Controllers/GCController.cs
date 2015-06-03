@@ -52,6 +52,16 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        public async Task<Result<GCAddingModel>> GetGiftCertificatesAdding()
+        {
+            var item = new GCAddingModel();
+            item.Quantity = 1;
+            item.Balance = 0;
+
+            return await Task.FromResult<GCAddingModel>(item);
+        }
+
+        [HttpPost]
         public async Task<Result<ICollection<GCListItemModel>>> AddGiftCertificates(int quantity, [FromBody]GCManageModel model)
         {
             var item = ConvertWithValidate(model);

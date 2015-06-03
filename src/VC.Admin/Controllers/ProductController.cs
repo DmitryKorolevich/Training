@@ -15,6 +15,7 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Validation.Base;
+using System;
 
 namespace VC.Admin.Controllers
 {
@@ -38,12 +39,12 @@ namespace VC.Admin.Controllers
         public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
             ProductEditSettingsModel toReturn = new ProductEditSettingsModel();
-            toReturn.Lookups = (await productService.GetProductLookupsAsync()).Select(p=>new LookupViewModel(p.Name,
+            toReturn.Lookups = (await productService.GetProductLookupsAsync()).Select(p => new LookupViewModel(p.Name,
                 p.IdProductType.HasValue ? (int?)p.IdProductType.Value : null
-                ,p.DefaultValue,p.Lookup)).ToList();
+                , p.DefaultValue, p.Lookup)).ToList();
             toReturn.DefaultValues = await productService.GetProductEditDefaultSettingsAsync();
             return toReturn;
-            
+
         }
 
         [HttpPost]
@@ -63,6 +64,30 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<Result<ProductManageModel>> GetProduct(int id)
         {
+            if (id == 0)
+            {
+                return new ProductManageModel()
+                {
+                    StatusCode = RecordStatusCode.Active,
+                    Hidden = false,
+                    CategoryIds = new List<int>(),
+                    SKUs = new List<SKUManageModel>(),
+                    CrossSellProducts = new List<CrossSellProductModel>()
+                    {
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                    },
+                    Videos = new List<VideoModel>()
+                    {
+                        new VideoModel(),
+                        new VideoModel(),
+                        new VideoModel(),
+                    },
+                };
+            }
+
             //item = await productCategoryService.UpdateCategoryAsync(item);
 
             return await Task.FromResult<ProductManageModel>(new ProductManageModel()
@@ -92,7 +117,7 @@ namespace VC.Admin.Controllers
                         AutoShipProduct=true,
                         HideFromDataFeed=true,
                         OffPercent = 11,
-                        NonDiscountable=true,                        
+                        NonDiscountable=true,
                     },
                     new SKUManageModel()
                     {
@@ -172,6 +197,15 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<Result<ProductCategoryManageModel>> GetCategory(int id)
         {
+            if (id == 0)
+            {
+                return new ProductCategoryManageModel()
+                {
+                    Template = String.Empty,
+                    StatusCode = RecordStatusCode.Active,
+                    Assigned = CustomerTypeCode.All,
+                };
+            }
             return new ProductCategoryManageModel((await productCategoryService.GetCategoryAsync(id)));
         }
 

@@ -34,6 +34,10 @@ namespace VC.Admin.Models.ContentManagement
 
         public IEnumerable<int> ProcessorIds { get; set; }
 
+        public MasterContentItemManageModel()
+        {
+        }
+
         public MasterContentItemManageModel(MasterContentItem item)
         {
             if (item != null)
