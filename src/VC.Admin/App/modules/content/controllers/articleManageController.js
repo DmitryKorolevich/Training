@@ -62,9 +62,9 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.article.CategoryIds = categoryIds;
-                $scope.article.PublishedDate = null;
-                if ($scope.article.PublishedDateObject.Date)
-                    $scope.article.PublishedDate = $scope.article.PublishedDateObject.Date.toServerDateTime();
+                //$scope.article.PublishedDate = null;
+                //if ($scope.article.PublishedDateObject.Date)
+                //    $scope.article.PublishedDate = $scope.article.PublishedDateObject.Date.toServerDateTime();
 
                 contentService.updateArticle($scope.article, $scope.editTracker).success(function (result) {
                     successSaveHandler(result);
@@ -86,7 +86,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         .success(function (result) {
                             if (result.Success) {
                                 $scope.article = result.Data;
-                                $scope.article.PublishedDateObject = new DateObject(Date.parseDateTime($scope.article.PublishedDate));
+                                //$scope.article.PublishedDateObject = new DateObject(Date.parseDateTime($scope.article.PublishedDate));
                                 if ($scope.article.Url) {
                                     $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
                                 }

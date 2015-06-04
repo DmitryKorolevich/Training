@@ -32,6 +32,8 @@ using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Base;
 using VitalChoice.Workflow.Core;
+using System.Linq;
+using Newtonsoft.Json;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -124,7 +126,49 @@ namespace VitalChoice.Core.DependencyInjection
 		            };
 	            });
 
-				services.ConfigureIdentity(x =>
+                services.Configure<MvcOptions>(o =>
+                {
+                    var inputFormatter =
+                        (JsonInputFormatter)
+                            o.InputFormatters.SingleOrDefault(f => f.Instance.GetType()==typeof(JsonInputFormatter))?.Instance;
+                    var outputFormatter =
+                        (JsonOutputFormatter)
+                            o.OutputFormatters.SingleOrDefault(f => f.Instance.GetType() == typeof(JsonOutputFormatter))?.Instance;
+
+                    if (inputFormatter != null)
+                    {
+                        inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                        inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                        inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    }
+                    else
+                    {
+                        // ReSharper disable once UseObjectOrCollectionInitializer
+                        var newFormatter = new JsonInputFormatter();
+                        newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                        newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        o.InputFormatters.Add(newFormatter);
+                    }
+
+                    if (outputFormatter != null)
+                    {
+                        outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                        outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                        outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    }
+                    else
+                    {
+                        // ReSharper disable once UseObjectOrCollectionInitializer
+                        var newFormatter = new JsonOutputFormatter();
+                        newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                        newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        o.OutputFormatters.Add(newFormatter);
+                    }
+                });
+
+                services.ConfigureIdentity(x =>
 				{
 					x.User.RequireUniqueEmail = true;
 					x.Lockout.MaxFailedAccessAttempts = 5;

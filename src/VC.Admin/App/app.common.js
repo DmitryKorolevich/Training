@@ -226,18 +226,6 @@ Date.parseDateTime = function (fDateString, fUTC) {
       new Date(tYMD[0], parseInt(tYMD[1], 10) - 1, tYMD[2], tHMS[0], tHMS[1], tHMS[2]);
 };
 
-function DateObject(fData) {
-    var self = this;
-    self.Date = fData;
-    self.Opened = false;
-};
-
-DateObject.prototype.openDate = function ($event) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    this.Opened = true;
-};
-
 function ServerMessages(data) {
     var self = this;
 

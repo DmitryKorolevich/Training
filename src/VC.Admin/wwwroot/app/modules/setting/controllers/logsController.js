@@ -4,32 +4,15 @@
     function Filter() {
         var self = this;
 
-        self.Message = '';          
-        self.Source = '';                          
+        self.Message = '';
+        self.Source = '';
         self.LogLevel = null;
         var currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
-        self.ToDateObject = new DateObject(currentDate.shiftDate('+1d'));
-        self.FromDateObject = new DateObject(currentDate.shiftDate('-1m'));
+        self.To = currentDate.shiftDate('+1d');
+        self.From = currentDate.shiftDate('-1m');
         self.Paging = { PageIndex: 1, PageItemCount: 100 };
         self.Sorting = gridSorterUtil.resolve(refreshLogs, "Date", "Desc")
-    }
-
-    Filter.prototype.clean = function () {
-        var tClean = Object.clone(this);
-
-        tClean.To = null;
-        if (tClean.ToDateObject.Date)
-            tClean.To = tClean.ToDateObject.Date.toServerDateTime();
-
-        tClean.From = null;
-        if (tClean.FromDateObject.Date)
-            tClean.From = tClean.FromDateObject.Date.toServerDateTime();
-
-        delete tClean.ToDateObject;
-        delete tClean.FromDateObject;
-        delete tClean.clean;
-        return tClean;
     };
 
     function errorHandler(result) {
@@ -37,7 +20,7 @@
     };
 
     function refreshLogs() {
-    	settingService.getLogItems($scope.filter.clean(), $scope.refreshTracker)
+    	settingService.getLogItems($scope.filter, $scope.refreshTracker)
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.logs = result.Data.Items;
