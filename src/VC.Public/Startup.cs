@@ -38,47 +38,47 @@ namespace VC.Public
             }
             Configuration = configuration;
 
-            //services.Configure<MvcOptions>(o =>
-            //{
-            //    var inputFormatter =
-            //        (JsonInputFormatter)
-            //            o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter))?.Instance;
-            //    var outputFormatter =
-            //        (JsonOutputFormatter)
-            //            o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter))?.Instance;
+            services.Configure<MvcOptions>(o =>
+            {
+                var inputFormatter =
+                    (JsonInputFormatter)
+                        o.InputFormatters.SingleOrDefault(f => f.Instance is JsonInputFormatter)?.Instance;
+                var outputFormatter =
+                    (JsonOutputFormatter)
+                        o.OutputFormatters.SingleOrDefault(f => f.Instance is JsonOutputFormatter)?.Instance;
 
-            //    if (inputFormatter != null)
-            //    {
-            //        inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            //        inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-            //        inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            //    }
-            //    else
-            //    {
-            //        // ReSharper disable once UseObjectOrCollectionInitializer
-            //        var newFormatter = new JsonInputFormatter();
-            //        newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            //        newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-            //        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            //        o.InputFormatters.Add(newFormatter);
-            //    }
+                if (inputFormatter != null)
+                {
+                    inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                    inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                    inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                }
+                else
+                {
+                    // ReSharper disable once UseObjectOrCollectionInitializer
+                    var newFormatter = new JsonInputFormatter();
+                    newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                    newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                    newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    o.InputFormatters.Add(newFormatter);
+                }
 
-            //    if (outputFormatter != null)
-            //    {
-            //        outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            //        outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-            //        outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            //    }
-            //    else
-            //    {
-            //        // ReSharper disable once UseObjectOrCollectionInitializer
-            //        var newFormatter = new JsonOutputFormatter();
-            //        newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            //        newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-            //        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            //        o.OutputFormatters.Add(newFormatter);
-            //    }
-            //});
+                if (outputFormatter != null)
+                {
+                    outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                    outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                    outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                }
+                else
+                {
+                    // ReSharper disable once UseObjectOrCollectionInitializer
+                    var newFormatter = new JsonOutputFormatter();
+                    newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                    newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                    newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    o.OutputFormatters.Add(newFormatter);
+                }
+            });
 
             var reg = new DefaultDependencyConfig();
             return reg.RegisterInfrastructure(Configuration, services, null);
