@@ -84,37 +84,45 @@ namespace VitalChoice.Core.DependencyInjection
 
 				services.AddAuthorization();
 
-				services.Configure<AppOptions>(options =>
-                {
-                    options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
-                    options.EnableBundlingAndMinification =
-                        Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
-					options.EnableStaticContentVersioning =
-						Convert.ToBoolean(configuration.Get("App:EnableStaticContentVersioning"));
-	                options.BuildNumber = Guid.NewGuid().ToString("N");
-					options.LogPath = configuration.Get("App:LogPath");
-					options.DefaultCacheExpirationTermMinutes = Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
-					options.ActivationTokenExpirationTermDays = Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
-					options.DefaultCultureId= configuration.Get("App:DefaultCultureId");
-					options.Connection = new Connection
-                    {
-                        UserName = configuration.Get("App:Connection:UserName"),
-                        Password = configuration.Get("App:Connection:Password"),
-                        Server = configuration.Get("App:Connection:Server"),
-                    };
-                    options.PublicHost = configuration.Get("App:PublicHost");
-                    options.AdminHost = configuration.Get("App:AdminHost");
-                    options.FilesRelativePath = configuration.Get("App:FilesRelativePath");
-                    options.EmailConfiguration = new Email
-	                {
-						 From = configuration.Get("App:Email:From"),
-						 Host = configuration.Get("App:Email:Host"),
-						 Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
-						 Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
-						 Username = configuration.Get("App:Email:Username"),
-						 Password = configuration.Get("App:Email:Password")
-	                };
-                });
+	            services.Configure<AppOptions>(options =>
+	            {
+		            options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+		            options.EnableBundlingAndMinification =
+			            Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+		            options.Versioning = new Versioning()
+		            {
+			            EnableStaticContentVersioning =
+				            Convert.ToBoolean(configuration.Get("App:Versioning:EnableStaticContentVersioning")),
+			            BuildNumber =
+				            Convert.ToBoolean(configuration.Get("App:Versioning:AutoGenerateBuildNumber"))
+					            ? Guid.NewGuid().ToString("N")
+					            : configuration.Get("App:Versioning:BuildNumber")
+		            };
+		            options.LogPath = configuration.Get("App:LogPath");
+		            options.DefaultCacheExpirationTermMinutes =
+			            Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
+		            options.ActivationTokenExpirationTermDays =
+			            Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
+		            options.DefaultCultureId = configuration.Get("App:DefaultCultureId");
+		            options.Connection = new Connection
+		            {
+			            UserName = configuration.Get("App:Connection:UserName"),
+			            Password = configuration.Get("App:Connection:Password"),
+			            Server = configuration.Get("App:Connection:Server"),
+		            };
+		            options.PublicHost = configuration.Get("App:PublicHost");
+		            options.AdminHost = configuration.Get("App:AdminHost");
+		            options.FilesRelativePath = configuration.Get("App:FilesRelativePath");
+		            options.EmailConfiguration = new Email
+		            {
+			            From = configuration.Get("App:Email:From"),
+			            Host = configuration.Get("App:Email:Host"),
+			            Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
+			            Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
+			            Username = configuration.Get("App:Email:Username"),
+			            Password = configuration.Get("App:Email:Password")
+		            };
+	            });
 
 				services.ConfigureIdentity(x =>
 				{

@@ -14,6 +14,8 @@ using System.Security.Claims;
 using VitalChoice.Business.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Validation.Base;
+using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -52,6 +54,17 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
         public async Task<Result<MasterContentItemManageModel>> GetMasterContentItem(int id)
         {
+            if (id == 0)
+            {
+                var now = DateTime.Now;
+                return new MasterContentItemManageModel()
+                {
+                    Template = String.Empty,
+                    ProcessorIds = new List<int>(),
+                    Type = ContentType.RecipeCategory,
+                    IsDefault = false,
+                };
+            }
             var user = Context.Request.HttpContext.User.GetUserId();
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
@@ -112,6 +125,13 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<CategoryManageModel>> GetCategory(int id)
         {
+            if (id == 0)
+            {
+                return new CategoryManageModel()
+                {
+                    Template=String.Empty,
+                };
+            }
             return new CategoryManageModel((await categoryService.GetCategoryAsync(id)));
         }
 
@@ -158,6 +178,15 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<RecipeManageModel>> GetRecipe(int id)
         {
+            if (id == 0)
+            {
+                var now = DateTime.Now;
+                return new RecipeManageModel()
+                {
+                    Template = String.Empty,
+                    CategoryIds = new List<int>(),
+                };
+            }
             return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
         }
 
@@ -211,6 +240,15 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<FAQManageModel>> GetFAQ(int id)
         {
+            if (id == 0)
+            {
+                var now = DateTime.Now;
+                return new FAQManageModel()
+                {
+                    Template = String.Empty,
+                    CategoryIds = new List<int>(),
+                };
+            }
             return new FAQManageModel((await faqService.GetFAQAsync(id)));
         }
 
@@ -264,6 +302,16 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<ArticleManageModel>> GetArticle(int id)
         {
+            if(id==0)
+            {
+                var now = DateTime.Now;
+                return new ArticleManageModel()
+                {
+                    PublishedDate = new DateTime(now.Year, now.Month, now.Day),
+                    Template=String.Empty,
+                    CategoryIds=new List<int>(),
+                };
+            }
             return new ArticleManageModel((await articleService.GetArticleAsync(id)));
         }
 
@@ -317,6 +365,17 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<ContentPageManageModel>> GetContentPage(int id)
         {
+            if (id == 0)
+            {
+                var now = DateTime.Now;
+                return new ContentPageManageModel()
+                {
+                    Template = String.Empty,
+                    CategoryIds = new List<int>(),
+                    StatusCode=RecordStatusCode.NotActive,
+                    Assigned=CustomerTypeCode.All,
+                };
+            }
             return new ContentPageManageModel((await contentPageService.GetContentPageAsync(id)));
         }
 

@@ -1506,3 +1506,4 @@
 /// <reference path="app/modules/users/controllers/userManagementController.js" />
 /// <reference path="app/templates.js" />
 /// <reference path="app/app.common.js" />
+/// <reference path="app/core/utils/httpinterceptor.js" />

@@ -61,7 +61,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         function initialize() {
-            $scope.id = $stateParams.id;
+            $scope.id = $stateParams.id ? $stateParams.id : 0;
 
             $scope.forms = {};
             $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
@@ -75,39 +75,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.defaultSeller = null;
 
             $scope.productTypeDefaults = {};
-            //$scope.defaults.CrossSells = [
-            //{
-            //    Image: '/some1.png',
-            //    Url: 'http://someurl.com/1',
-            //},
-            //{
-            //    Image: '/some2.png',
-            //    Url: 'http://someurl.com/2',
-            //},
-            //{
-            //    Image: '/some3.png',
-            //    Url: 'http://someurl.com/3',
-            //},
-            //{
-            //    Image: '/some4.png',
-            //    Url: 'http://someurl.com/4',
-            //}];
-            //$scope.defaults.Videos = [
-            //{
-            //    Video: 'jGwOsFo8TTg',
-            //    Image: '/some1.png',
-            //    Text: 'Some text1',
-            //},
-            //{
-            //    Video: 'btlfoO75kfI',
-            //    Image: '/some2.png',
-            //    Text: 'Some text2',
-            //},
-            //{
-            //    Video: 'vCsRTamxWuw',
-            //    Image: '/some3.png',
-            //    Text: 'Some text3',
-            //}];
 
             $scope.parentDetailsTab = {
                 active: true,
@@ -171,14 +138,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 .success(function (result) {
                     if (result.Success) {
                         $scope.rootCategory = result.Data;
-                        if ($scope.id) {
-                            loadProduct();
-                        }
-                        else {
-                            createNewProduct();
-                            refreshPossiableProductTypes();
-                            setProductTypeWatch();
-                        }
+                        loadProduct();
                     } else {
                         errorHandler(result);
                     }
@@ -194,6 +154,14 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			        if (result.Success) {
 			            $scope.product = result.Data;
 			            $scope.product.StatusCode = $scope.product.StatusCode;
+			            if ($scope.id == 0) {
+			                if ($stateParams.type) {
+			                    $scope.product.Type = $stateParams.type;
+			                }
+			                else {
+			                    $scope.product.Type = 2;//Perishable
+			                }
+			            }
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            refreshPossiableProductTypes();
 			            setProductTypeWatch();
@@ -399,53 +367,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $.each(category.SubItems, function (index, value) {
                 getSelected(value, ids);
             });
-        };
-
-        function createNewProduct() {
-            $scope.product = {};
-            $scope.product.StatusCode = 2;//Active
-            $scope.product.Hidden = false;
-            if ($stateParams.type) {
-                $scope.product.Type = $stateParams.type;
-            }
-            else {
-                $scope.product.Type = 2;//Perishable
-            }
-
-            $scope.product.SKUs = [];
-            $scope.product.CrossSellProducts = [
-            {
-                Image: null, ImageUse: false,
-                Url: null, UrlUse: false,
-            },
-            {
-                Image: null, ImageUse: false,
-                Url: null, UrlUse: false,
-            },
-            {
-                Image: null, ImageUse: false,
-                Url: null, UrlUse: false,
-            },
-            {
-                Image: null, ImageUse: false,
-                Url: null, UrlUse: false,
-            }];
-            $scope.product.Videos = [
-            {
-                Video: null, VideoUse: false,
-                Image: null, ImageUse: false,
-                Text: null, TextUse: false,
-            },
-            {
-                Video: null, VideoUse: false,
-                Image: null, ImageUse: false,
-                Text: null, TextUse: false,
-            },
-            {
-                Video: null, VideoUse: false,
-                Image: null, ImageUse: false,
-                Text: null, TextUse: false,
-            }];
         };
 
         function activateTab(formName) {

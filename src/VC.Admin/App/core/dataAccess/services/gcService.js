@@ -19,6 +19,9 @@ angular.module('app.core.dataAccess.services.gcService', [])
         getGiftCertificate: function (id, tracker) {
             return $http.get(baseUrl + 'GetGiftCertificate/' + id, getConfig(tracker));
         },
+        getGiftCertificatesAdding: function (tracker) {
+            return $http.post(baseUrl + 'GetGiftCertificatesAdding', getConfig(tracker));
+        },
         addGiftCertificates: function (quantity, model, tracker) {
             return $http.post(baseUrl + 'AddGiftCertificates/?quantity=' + quantity, model, getConfig(tracker));
         },

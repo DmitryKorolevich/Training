@@ -35,22 +35,19 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, gcService, toaster
     };
 
     function initialize() {
-        $scope.id = $stateParams.id;
         $scope.state = 1;
 
         $scope.forms = {};
-        $scope.gc =
-        {
-            Quantity: 1,
-            Balance: 0,
-        };
-
-        $timeout(function ()
-        {
-            $scope.gc.Balance = 0;
-        }, 50);
 
         $scope.codes = [];
+
+        gcService.getGiftCertificatesAdding($scope.refreshTracker).success(function (result) {
+            if (result.Success) {
+                $scope.gc = result.Data;
+            };
+        }).error(function (result) {
+            errorHandler(result);
+        });
     };
 
     $scope.save = function () {

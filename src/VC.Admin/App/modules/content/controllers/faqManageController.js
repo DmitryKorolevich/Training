@@ -1,22 +1,21 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.faqManageController', [])
-.controller('faqManageController', ['$scope', '$rootScope', '$state','$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state,$stateParams, contentService, toaster, confirmUtil, promiseTracker) {
+.controller('faqManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker) {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
 
-	function successSaveHandler(result) {
-		if (result.Success) {
-			toaster.pop('success', "Success!", "Successfully saved.");
-            $scope.id=result.Data.Id;
+    function successSaveHandler(result) {
+        if (result.Success) {
+            toaster.pop('success', "Success!", "Successfully saved.");
+            $scope.id = result.Data.Id;
             $scope.faq.Id = result.Data.Id;
             $scope.faq.MasterContentItemId = result.Data.MasterContentItemId;
-            $scope.previewUrl=$scope.baseUrl.format($scope.faq.Url);
-		} else {
-            var messages=""; 
-            if(result.Messages)
-            {
+            $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
+        } else {
+            var messages = "";
+            if (result.Messages) {
                 $scope.forms.faqForm.submitted = true;
                 $scope.detailsTab.active = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
@@ -24,48 +23,37 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
                     if (value.Field) {
                         $scope.forms.faqForm[value.Field].$setValidity("server", false);
                     }
-                    messages+=value.Message +"<br />";
+                    messages += value.Message + "<br />";
                 });
             }
-    	    toaster.pop('error', "Error!", messages,null,'trustedHtml');
-		}
-	};
+            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+        }
+    };
 
-	function errorHandler(result) {
-		toaster.pop('error', "Error!", "Server error occured");
-	};
+    function errorHandler(result) {
+        toaster.pop('error', "Error!", "Server error occured");
+    };
 
-	function initialize() {
-	    $scope.id = $stateParams.id;
-	    $scope.descriptionExpanded = false;
+    function initialize() {
+        $scope.id = $stateParams.id ? $stateParams.id : 0;
+        $scope.descriptionExpanded = false;
 
-	    $scope.toogleEditorState = function (property) {
-	        $scope[property] = !$scope[property];
-	    };
+        $scope.toogleEditorState = function (property) {
+            $scope[property] = !$scope[property];
+        };
 
-	    $scope.baseUrl=$rootScope.ReferenceData.PublicHost+'faq/{0}?preview=true';
+        $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'faq/{0}?preview=true';
         $scope.previewUrl = null;
 
-        $scope.faq=
-        {
-            Name:'',
-            Url:'',
-            Template: '',
-            Description:'',
-            Title:null,
-            MetaKeywords:null,
-            MetaDescription: null,
-            MasterContentItemId: 0,
-        };
         $scope.detailsTab = {
             active: true
         };
         $scope.loaded = false;
-        $scope.forms={};
+        $scope.forms = {};
 
         $scope.save = function () {
             $.each($scope.forms.faqForm, function (index, element) {
-            	if (element && element.$name == index) {
+                if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });
@@ -75,7 +63,7 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.faq.CategoryIds = categoryIds;
 
-                contentService.updateFAQ($scope.faq,$scope.editTracker).success(function (result) {
+                contentService.updateFAQ($scope.faq, $scope.editTracker).success(function (result) {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
@@ -83,70 +71,63 @@ function ($scope, $rootScope, $state,$stateParams, contentService, toaster, conf
                     });
             } else {
                 $scope.forms.faqForm.submitted = true;
-	            $scope.detailsTab.active = true;
+                $scope.detailsTab.active = true;
             }
         };
 
-	    contentService.getCategoriesTree({ Type: 5 },$scope.refreshTracker)//faq categories
+        contentService.getCategoriesTree({ Type: 5 }, $scope.refreshTracker)//faq categories
 			.success(function (result) {
-				if (result.Success) {
-					$scope.rootCategory=result.Data;
-                    if($scope.id)
-                    {
-                        contentService.getFAQ($scope.id,$scope.refreshTracker)
-			                .success(function (result) {
-				                if (result.Success) {
-					                $scope.faq=result.Data;
-					                $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
-                                    setSelected($scope.rootCategory, $scope.faq.CategoryIds);
-                                    $scope.loaded=true;
-				                } else {
-					                errorHandler(result);
-				                }
-			                }).
-			                error(function(result) {
-				                errorHandler(result);
-			                });
-                    }
-                    else
-                    {
-                        $scope.loaded=true;
-                    }
-				} else {
-					errorHandler(result);
-				}
+			    if (result.Success) {
+			        $scope.rootCategory = result.Data;
+			        contentService.getFAQ($scope.id, $scope.refreshTracker)
+                        .success(function (result) {
+                            if (result.Success) {
+                                $scope.faq = result.Data;
+                                if ($scope.faq.Url) {
+                                    $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
+                                };
+                                setSelected($scope.rootCategory, $scope.faq.CategoryIds);
+                                $scope.loaded = true;
+                            } else {
+                                errorHandler(result);
+                            }
+                        }).
+                        error(function (result) {
+                            errorHandler(result);
+                        });
+			    } else {
+			        errorHandler(result);
+			    }
 			}).
-			error(function(result) {
-				errorHandler(result);
+			error(function (result) {
+			    errorHandler(result);
 			});
-	}
+    }
 
-	function setSelected(category, ids) {
-	    category.IsSelected = false;
-        $.each(ids, function( index, id ) {
-            if(category.Id==id)
-            {
-                category.IsSelected=true;
+    function setSelected(category, ids) {
+        category.IsSelected = false;
+        $.each(ids, function (index, id) {
+            if (category.Id == id) {
+                category.IsSelected = true;
             }
         });
-        $.each(category.SubItems, function( index, value ) {
+        $.each(category.SubItems, function (index, value) {
             setSelected(value, ids);
         });
     }
 
-    function getSelected(category , ids){
-        if(category.IsSelected)
-        {
+    function getSelected(category, ids) {
+        if (category.IsSelected) {
             ids.push(category.Id);
         }
-        $.each(category.SubItems, function( index, value ) {
+        $.each(category.SubItems, function (index, value) {
             getSelected(value, ids);
         });
     }
 
-	$scope.goToMaster = function (id) {
-	    $state.go('index.oneCol.masterDetail', { id: id });
-	};
+    $scope.goToMaster = function (id) {
+        $state.go('index.oneCol.masterDetail', { id: id });
+    };
 
-	initialize();
+    initialize();
 }]);

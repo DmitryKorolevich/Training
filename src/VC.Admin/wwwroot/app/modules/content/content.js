@@ -96,7 +96,7 @@ angular.module('app.modules.content', [
 		            params: { mode: 'list', id: null },
 		        })
 		        .state('index.oneCol.addNewFaqCategory', {
-		            url: '/content/recipes/categories/add?{categoryid:int}',
+		            url: '/content/faqs/categories/add?{categoryid:int}',
 		            templateUrl: 'app/modules/content/partials/faqCategoryDetail.html',
 		            controller: 'faqCategoryManageController'
 		        })
