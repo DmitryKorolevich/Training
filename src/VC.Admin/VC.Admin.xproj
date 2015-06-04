@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>709a4f7f-49e0-42eb-ac37-b266d77e0f11</ProjectGuid>
-    <RootNamespace>VitalChoice</RootNamespace>
+    <RootNamespace>VC.Admin</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
@@ -17,6 +17,9 @@
     <AssemblyName>VitalChoice_vNext</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AssemblyName>VC.Admin</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AssemblyName>VC.Admin</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>

@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>0e932c0d-6f22-4866-9771-c4dd79564e3e</ProjectGuid>
-    <RootNamespace>VitalChoice.Public</RootNamespace>
+    <RootNamespace>VC.Public</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
