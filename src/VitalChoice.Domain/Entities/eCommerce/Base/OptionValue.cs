@@ -1,15 +1,12 @@
 ﻿namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
-    public abstract class OptionValue : Entity
+    public abstract class OptionValue<TOptionType> : Entity
+        where TOptionType: OptionType
     {
-	    public string Value { get; set; }
+        public int IdOptionType { get; set; }
 
-	    public Lookup Lookup { get; set; }
+        public string Value { get; set; }
 
-	    public int LookupId { get; set; }
-
-	    public OptionType OptionType { get; set; }
-
-		public int OptionTypeId { get; set; }
+        public TOptionType OptionType { get; set; }
     }
 }

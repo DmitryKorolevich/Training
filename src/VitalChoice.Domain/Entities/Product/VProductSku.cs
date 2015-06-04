@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 
 namespace VitalChoice.Domain.Entities.Product
 {

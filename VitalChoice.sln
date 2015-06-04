@@ -78,6 +78,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Interfaces", "s
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Validation", "src\VitalChoice.Validation\VitalChoice.Validation.xproj", "{E2CA7CD6-71C9-47F1-8BE2-CDC5C368FD3A}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.DynamicData", "src\VitalChoice.DynamicData\VitalChoice.DynamicData.xproj", "{8D005F15-ECDC-415B-817B-ECC919FB36CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -188,6 +190,14 @@ Global
 		{E2CA7CD6-71C9-47F1-8BE2-CDC5C368FD3A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2CA7CD6-71C9-47F1-8BE2-CDC5C368FD3A}.Release|x64.ActiveCfg = Release|Any CPU
 		{E2CA7CD6-71C9-47F1-8BE2-CDC5C368FD3A}.Release|x64.Build.0 = Release|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Debug|x64.Build.0 = Debug|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -207,5 +217,6 @@ Global
 		{040DC8D8-338F-48C0-BFF7-67B6D30F3914} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{6AFF09BC-F32E-4ABC-99B7-5010A4A5CB59} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{E2CA7CD6-71C9-47F1-8BE2-CDC5C368FD3A} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
+		{8D005F15-ECDC-415B-817B-ECC919FB36CC} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 	EndGlobalSection
 EndGlobal

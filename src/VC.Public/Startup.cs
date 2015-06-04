@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
@@ -14,6 +15,7 @@ using Microsoft.AspNet.Mvc;
 using VitalChoice.Core.Infrastructure;
 using System.IO;
 using Microsoft.Framework.Runtime;
+using Newtonsoft.Json;
 using VC.Public.AppConfig;
 using VitalChoice.Business.Services;
 
@@ -24,25 +26,68 @@ namespace VitalChoice.Public
 		public IConfiguration Configuration { get; set; }
 
 
-		public IServiceProvider ConfigureServices(IServiceCollection services)
-		{
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+	    public IServiceProvider ConfigureServices(IServiceCollection services)
+	    {
+	        var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+	        var configuration = new Configuration( /*applicationEnvironment.ApplicationBasePath*/)
+	            .AddJsonFile("config.json")
+	            .AddEnvironmentVariables();
 
-            var path = PathResolver.ResolveAppRelativePath("config.local.json");
-            if (File.Exists(path)) {
-                configuration.AddJsonFile("config.local.json");
-            }
-            Configuration = configuration;
+	        var path = PathResolver.ResolveAppRelativePath("config.local.json");
+	        if (File.Exists(path))
+	        {
+	            configuration.AddJsonFile("config.local.json");
+	        }
+	        Configuration = configuration;
 
-            var reg = new DefaultDependencyConfig();
-            return reg.RegisterInfrastructure(Configuration, services, null);
-		}
+	        services.Configure<MvcOptions>(o =>
+	        {
+	            var inputFormatter =
+	                (JsonInputFormatter)
+	                    o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter))?.Instance;
+	            var outputFormatter =
+	                (JsonOutputFormatter)
+	                    o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter))?.Instance;
 
-		// Configure is called after ConfigureServices is called.
+	            if (inputFormatter != null)
+	            {
+	                inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+	                inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+	                inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+	            }
+	            else
+	            {
+	                // ReSharper disable once UseObjectOrCollectionInitializer
+	                var newFormatter = new JsonInputFormatter();
+	                newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+	                newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+	                newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+	                o.InputFormatters.Add(newFormatter);
+	            }
+
+	            if (outputFormatter != null)
+	            {
+	                outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+	                outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+	                outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+	            }
+	            else
+	            {
+                    // ReSharper disable once UseObjectOrCollectionInitializer
+                    var newFormatter = new JsonOutputFormatter();
+	                newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+	                newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+	                newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+	                o.OutputFormatters.Add(newFormatter);
+	            }
+	        });
+
+	        var reg = new DefaultDependencyConfig();
+	        return reg.RegisterInfrastructure(Configuration, services, null);
+	    }
+
+	    // Configure is called after ConfigureServices is called.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
 		{
             // Configure the HTTP request pipeline.

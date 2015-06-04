@@ -12,6 +12,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Validation.Base;

@@ -1,16 +1,11 @@
-﻿using System;
-using VitalChoice.Domain.Entities.eCommerce.Base;
+﻿using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Product
 {
-    public class ProductOptionValue : OptionValue
+    public class ProductOptionValue : OptionValue<ProductOptionType>
     {
-		public int ProductId { get; set; }
+        public int? IdProduct { get; set; }
 
-		public Product Product { get; set; }
-
-	    public int SkuId { get; set; }
-
-	    public Sku Sku { get; set; }
+        public int? IdSku { get; set; }
     }
 }

@@ -9,7 +9,6 @@ using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Domain.Entities.Options;

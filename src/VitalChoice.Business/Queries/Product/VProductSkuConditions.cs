@@ -4,6 +4,7 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Domain.Entities.Product;
 

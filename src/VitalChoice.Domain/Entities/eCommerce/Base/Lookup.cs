@@ -4,8 +4,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
     public class Lookup : Entity
     {
-	    public string LookupType { get; set; }
+        public string LookupValueType { get; set; }
 
-	    public IList<LookupValue> LookupValues { get; set; }
+        public ICollection<LookupVariant> LookupVariants { get; set; }
     }
 }

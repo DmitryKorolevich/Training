@@ -9,6 +9,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Product;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Transfer.Base;
 
 namespace VC.Admin.Models.Product

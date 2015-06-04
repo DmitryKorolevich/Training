@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 
 namespace VitalChoice.Business.Helpers
 {

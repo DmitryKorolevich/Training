@@ -15,6 +15,8 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Product;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 
 namespace VitalChoice.Business.Services.Product
 {

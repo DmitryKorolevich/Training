@@ -1,10 +1,17 @@
 ﻿namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
-    public class OptionType : Entity
+    public abstract class OptionType : Entity
     {
-	    public string CategoryName { get; set; }
+        public string Name { get; set; }
 
-	    public string Name { get; set; }
+        public int? IdLookup { get; set; }
 
+        public Lookup Lookup { get; set; }
+
+        public int IdFieldType { get; set; }
+
+        public FieldType FieldType { get; set; }
+
+        public string DefaultValue { get; set; }
     }
 }

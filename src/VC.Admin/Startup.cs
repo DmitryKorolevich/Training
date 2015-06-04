@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using Microsoft.AspNet.Authentication.Notifications;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
+using Newtonsoft.Json;
 using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
@@ -34,8 +38,50 @@ namespace VC.Admin
 
 			var filesPath = Configuration.Get("App:FilesPath");
 
+		    services.Configure<MvcOptions>(o =>
+		    {
+		        var inputFormatter =
+		            (JsonInputFormatter)
+		                o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonInputFormatter))?.Instance;
+		        var outputFormatter =
+		            (JsonOutputFormatter)
+		                o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof (JsonOutputFormatter))?.Instance;
+
+		        if (inputFormatter != null)
+		        {
+		            inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+		            inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+		            inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+		        }
+		        else
+		        {
+		            // ReSharper disable once UseObjectOrCollectionInitializer
+		            var newFormatter = new JsonInputFormatter();
+		            newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+		            newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+		            newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+		            o.InputFormatters.Add(newFormatter);
+		        }
+
+		        if (outputFormatter != null)
+		        {
+		            outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+		            outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+		            outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+		        }
+		        else
+		        {
+                    // ReSharper disable once UseObjectOrCollectionInitializer
+                    var newFormatter = new JsonOutputFormatter();
+		            newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+		            newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+		            newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+		            o.OutputFormatters.Add(newFormatter);
+		        }
+		    });
+
             return reg.RegisterInfrastructure(Configuration, services, filesPath);
-		}
+        }
 
 		// Configure is called after ConfigureServices is called.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
