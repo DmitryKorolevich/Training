@@ -8,6 +8,11 @@ angular.module('app.core.utils.appBootstrap', [])
 				})[0];
 			};
 
+			function stopPropagation($event) {
+			    $event.preventDefault();
+			    $event.stopPropagation();
+			};
+
 			function getValidationMessage(key, field, arg) {
 			    var item = getReferenceItem($rootScope.ReferenceData.Labels, key);
 			    var messageFormat;
@@ -133,6 +138,7 @@ angular.module('app.core.utils.appBootstrap', [])
 				$rootScope.validatePermission = validatePermission;
 				$rootScope.unauthorizedArea = unauthorizedArea;
 				$rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
+				$rootScope.stopPropagation = stopPropagation;
 			}
 
 			function bindRootScope() {
