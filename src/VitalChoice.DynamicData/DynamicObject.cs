@@ -89,10 +89,10 @@ namespace VitalChoice.DynamicData
             model.FillDynamic(this);
         }
 
-        public TModel ToModel<TModel>()
+        public TModel ToModel<TModel>(TModel model)
             where TModel : IModelToDynamic<IDynamicEntity<TEntity, TOptionValue, TOptionType>>, new()
         {
-            var result = new TModel();
+            var result = model;
             var objectType = typeof (TModel);
             var cache = GetTypeCache(objectType);
             var data = DynamicData as IDictionary<string, object>;

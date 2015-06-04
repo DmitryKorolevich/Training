@@ -9,6 +9,8 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Business.Entities;
+using VitalChoice.DynamicData;
 
 namespace VC.Admin.Models.Product
 {
@@ -115,7 +117,7 @@ namespace VC.Admin.Models.Product
     }
 
     [ApiValidator(typeof(ProductManageModelValidator))]
-    public class ProductManageModel : Model<Product, IMode>
+    public class ProductManageModel : Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
     {
         public int? Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -219,29 +221,38 @@ namespace VC.Admin.Models.Product
         {
         }
 
-        public ProductManageModel(Product item)
+        public ProductManageModel(ProductDynamic item)
         {
-            Id = item.Id;
-            Name = item.Name;
-            SKUs = new List<SKUManageModel>();
-            if(item.SKUs!=null)
-            {
-                SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
-            }
+            //item.ToModel<ProductManageModel>(this);
+
+            //SKUs = new List<SKUManageModel>();
+            //if(item.SKUs!=null)
+            //{
+            //    SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
+            //}
         }
 
-        public override Product Convert()
+        public override ProductDynamic Convert()
         {
-            Product toReturn = new Product();
-            toReturn.Id = Id.HasValue ? Id.Value : 0;
-            toReturn.Name = Name?.Trim();
-            toReturn.SKUs = new List<SKU>();
-            if (SKUs != null)
-            {
-                toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
-            }
+            ProductDynamic toReturn = new ProductDynamic();
+            //toReturn.FromModel<ProductManageModel>(this);
+            //toReturn.SKUs = new List<SKU>();
+            //if (SKUs != null)
+            //{
+            //    toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
+            //}
 
             return toReturn;
+        }
+
+        public void FillDynamic(ProductDynamic dynamicObject)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void FillSelfFrom(ProductDynamic dynamicObject)
+        {
+            //throw new NotImplementedException();
         }
     }
 }
