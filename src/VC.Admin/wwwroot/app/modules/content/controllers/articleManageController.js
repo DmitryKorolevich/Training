@@ -86,7 +86,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         .success(function (result) {
                             if (result.Success) {
                                 $scope.article = result.Data;
-                                $scope.article.PublishedDateObject = new DateObject(Date.parseDateTime($scope.article.PublishedDate));
+                                //$scope.article.PublishedDateObject = new DateObject($scope.article.PublishedDate);
                                 if ($scope.article.Url) {
                                     $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
                                 }
