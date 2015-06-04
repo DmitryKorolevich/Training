@@ -290,7 +290,7 @@ angular.module('templates', []).run(['$templateCache', function($templateCache) 
   $templateCache.put("app/shared/area/partials/twoColumn.html",
     "<div data-ui-view=left class=\"left-pane container-fluid\"></div><div data-ui-view=\"\" class=right-pane></div>");
   $templateCache.put("app/shared/area/partials/workingPanel.html",
-    "<div data-ui-view=\"\"></div>");
+    "<div data-ui-view=\"\" data-ng-if=appStarted></div>");
   $templateCache.put("app/shared/layout/partials/index.html",
     "<div class=container-fluid><div data-ng-class=\"{ball: !appStarted }\" data-ng-hide=appStarted></div><div class=\"row fade\" data-ng-show=appStarted><div data-ui-view=topMenu></div><div data-ui-view=workingPanel></div></div></div><toaster-container toaster-options=\"{'position-class': 'toast-bottom-right'}\"></toaster-container>");
   $templateCache.put("app/shared/menu/partials/mainMenu.html",
