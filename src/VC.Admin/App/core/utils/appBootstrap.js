@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', 'webStorageUtil', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress, webStorageUtil) {
 			function getReferenceItem(lookup, key) {
 				return $.grep(lookup, function(elem) {
 					return elem.Key === key;
@@ -143,13 +143,18 @@ angular.module('app.core.utils.appBootstrap', [])
 
 			function bindRootScope() {
 			    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-			        if ($rootScope.appStarted && !$rootScope.unauthorizedArea($rootScope.$state.href(toState).slice(1)) && !$rootScope.authenticated) {
+			    	if ($rootScope.appStarted && $rootScope.$state.href(toState) /*todo: needs to be refactored*/ && !$rootScope.unauthorizedArea($rootScope.$state.href(toState).slice(1)) && !$rootScope.authenticated) {
 			            toaster.pop('warning', "Caution!", "You must login before accessing this area.");
 
 			            event.preventDefault();
 			        }
 			        else {
-			            ngProgress.start();
+			    		ngProgress.start();
+
+			    		if ($rootScope.lastRemediationKey) {
+			    			webStorageUtil.removeSession($rootScope.lastRemediationKey);
+			    			$rootScope.lastRemediationKey = null;
+					    }
 			        }
 			    });
 			    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState) {
