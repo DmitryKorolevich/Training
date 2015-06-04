@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Templates.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
@@ -13,8 +14,7 @@ using VitalChoice.DynamicData.Delegates;
 namespace VitalChoice.DynamicData
 {
     public abstract class DynamicObject<TEntity, TOptionValue, TOptionType> :
-        IDynamicEntity<TEntity, TOptionValue, TOptionType>,
-        IDynamicObject<IDynamicEntity<TEntity, TOptionValue, TOptionType>>
+        IDynamicEntity<TEntity, TOptionValue, TOptionType>, IDynamicObject
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TOptionType : OptionType, new()
@@ -22,7 +22,9 @@ namespace VitalChoice.DynamicData
         protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> TypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
-        public ExpandoObject DynamicData { get; } = new ExpandoObject();
+        protected ExpandoObject DynamicData { get; } = new ExpandoObject();
+
+        public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
 
         public dynamic Data => DynamicData;
 
@@ -73,8 +75,9 @@ namespace VitalChoice.DynamicData
             return result;
         }
 
-        public void FromModel<TModel>(TModel model)
-            where TModel : IModelToDynamic<IDynamicEntity<TEntity, TOptionValue, TOptionType>>
+        public void FromModel<TModel, TDynamic>(TModel model)
+            where TModel : IModelToDynamic<TDynamic>
+            where TDynamic: class
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -86,13 +89,14 @@ namespace VitalChoice.DynamicData
                 var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
                 data.Add(mappingName, genericProperty.Value.Get?.Invoke(model));
             }
-            model.FillDynamic(this);
+            model.FillDynamic(this as TDynamic);
         }
 
-        public TModel ToModel<TModel>(TModel model)
-            where TModel : IModelToDynamic<IDynamicEntity<TEntity, TOptionValue, TOptionType>>, new()
+        public TModel ToModel<TModel, TDynamic>()
+            where TModel : IModelToDynamic<TDynamic>, new()
+            where TDynamic: class
         {
-            var result = model;
+            var result = new TModel();
             var objectType = typeof (TModel);
             var cache = GetTypeCache(objectType);
             var data = DynamicData as IDictionary<string, object>;
@@ -105,7 +109,7 @@ namespace VitalChoice.DynamicData
                     genericProperty.Value.Set?.Invoke(result, value);
                 }
             }
-            result.FillSelfFrom(this);
+            result.FillSelfFrom(this as TDynamic);
             return result;
         }
 

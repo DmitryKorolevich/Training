@@ -217,42 +217,29 @@ namespace VC.Admin.Models.Product
 
         public IList<SKUManageModel> SKUs { get; set; }
 
-        public ProductManageModel()
-        {
-        }
-
-        public ProductManageModel(ProductDynamic item)
-        {
-            //item.ToModel<ProductManageModel>(this);
-
-            //SKUs = new List<SKUManageModel>();
-            //if(item.SKUs!=null)
-            //{
-            //    SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
-            //}
-        }
-
-        public override ProductDynamic Convert()
-        {
-            ProductDynamic toReturn = new ProductDynamic();
-            //toReturn.FromModel<ProductManageModel>(this);
-            //toReturn.SKUs = new List<SKU>();
-            //if (SKUs != null)
-            //{
-            //    toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
-            //}
-
-            return toReturn;
-        }
-
         public void FillDynamic(ProductDynamic dynamicObject)
         {
-            //throw new NotImplementedException();
+            if (CrossSellProducts != null && CrossSellProducts.Count > 3)
+            {
+                dynamicObject.Data.CrossSellProduct1 = CrossSellProducts[0];
+                dynamicObject.Data.CrossSellProduct2 = CrossSellProducts[1];
+                dynamicObject.Data.CrossSellProduct3 = CrossSellProducts[2];
+                dynamicObject.Data.CrossSellProduct4 = CrossSellProducts[3];
+            }
         }
 
         public void FillSelfFrom(ProductDynamic dynamicObject)
         {
-            //throw new NotImplementedException();
+            if (dynamicObject.DictionaryData.ContainsKey("CrossSellProduct1"))
+            {
+                CrossSellProducts = new List<CrossSellProductModel>(4)
+                {
+                    dynamicObject.Data.CrossSellProduct1,
+                    dynamicObject.Data.CrossSellProduct2,
+                    dynamicObject.Data.CrossSellProduct3,
+                    dynamicObject.Data.CrossSellProduct4
+                };
+            }
         }
     }
 }
