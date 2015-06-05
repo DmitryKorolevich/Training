@@ -154,17 +154,17 @@ namespace VC.Admin.Controllers
             });
         }
 
-        //[HttpPost]
-        //public async Task<Result<ProductManageModel>> UpdateProduct([FromBody]ProductManageModel model)
-        //{
-        //    var item = ConvertWithValidate(model);
-        //    if (item == null)
-        //        return null;
+        [HttpPost]
+        public async Task<Result<ProductManageModel>> UpdateProduct([FromBody]ProductManageModel model)
+        {
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
 
-        //    //item = await productCategoryService.UpdateCategoryAsync(item);
+            //item = await productCategoryService.UpdateCategoryAsync(item);
 
-        //    return await Task.FromResult<ProductManageModel>(new ProductManageModel());
-        //}
+            return await Task.FromResult<ProductManageModel>(new ProductManageModel());
+        }
 
         [HttpPost]
         public async Task<Result<bool>> DeleteProduct(int id)

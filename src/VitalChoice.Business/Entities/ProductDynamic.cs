@@ -7,10 +7,25 @@ using VitalChoice.DynamicData;
 
 namespace VitalChoice.Business.Entities
 {
-    //public class ProductDynamic : DynamicObject<ProductEntity, ProductOptionValue, ProductOptionType>
-    //{
-    //    public string Name { get; set; }
+    public class ProductDynamic : DynamicObject<ProductEntity, ProductOptionValue, ProductOptionType>
+    {
+        public override ProductEntity ToEntity()
+        {
+            return base.ToEntity();
+        }
 
-    //    public string Url { get; set; }
-    //}
+        public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntity(ProductEntity entity)
+        {
+            return base.FromEntity(entity);
+        }
+
+        public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntityWithDefaults(ProductEntity entity)
+        {
+            return base.FromEntityWithDefaults(entity);
+        }
+
+        public string Name { get; set; }
+
+        public string Url { get; set; }
+    }
 }

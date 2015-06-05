@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Content
         {
             //var items = optionTypeRepository.Query().Select().ToList();
 
-            //ProductEntity product3 = (productRepository.Query(p => p.Id == 1).Include(p => p.OptionValues).Include(p => p.OptionTypes).Include(p=>p.Skus).Select()).FirstOrDefault();
+            //ProductEntity product3 = (productRepository.Query(p => p.Id == 1).Include(p => p.OptionValues).Include(p => p.OptionTypes).Include(p => p.Skus).Select()).FirstOrDefault();
 
             ArticleQuery query = new ArticleQuery();
             List<int> ids = null;

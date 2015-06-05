@@ -1,4 +1,6 @@
-﻿namespace VitalChoice.DynamicData
+﻿using System;
+
+namespace VitalChoice.DynamicData
 {
     public interface IModelToDynamic<in TDynamic>
     {

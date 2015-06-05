@@ -2,12 +2,18 @@
 
 namespace VitalChoice.DynamicData
 {
-    public interface IDynamicObject<out TDynamic>
+    public interface IDynamicObject
     {
-        TModel ToModel<TModel>(TModel model)
-            where TModel : IModelToDynamic<TDynamic>, new();
+        TModel ToModel<TModel, TDynamic>()
+            where TModel : IModelToDynamic<TDynamic>, new()
+            where TDynamic: class;
 
-        void FromModel<TModel>(TModel model)
-            where TModel : IModelToDynamic<TDynamic>;
+        void FromModel<TModel, TDynamic>(TModel model)
+            where TModel : IModelToDynamic<TDynamic>
+            where TDynamic : class;
+
+        object ToModel(Type modelType, Type dynamicType);
+
+        void FromModel(Type modelType, Type dynamicType, dynamic model);
     }
 }
