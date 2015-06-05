@@ -86,7 +86,7 @@ namespace VitalChoice.DynamicData
             var result = new TModel();
             var objectType = typeof(TModel);
             var cache = GetTypeCache(ModelTypeMappingCache, objectType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, GetType());
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic), true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var pair in cache)
             {
@@ -114,7 +114,7 @@ namespace VitalChoice.DynamicData
         {
             dynamic result = Activator.CreateInstance(modelType);
             var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, GetType());
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var pair in cache)
             {
@@ -147,7 +147,7 @@ namespace VitalChoice.DynamicData
                 throw new ArgumentNullException(nameof(model));
             var objectType = typeof(TModel);
             var cache = GetTypeCache(ModelTypeMappingCache, objectType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic));
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic), true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var genericProperty in cache)
             {
@@ -172,7 +172,7 @@ namespace VitalChoice.DynamicData
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
             var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var genericProperty in cache)
             {
@@ -199,7 +199,7 @@ namespace VitalChoice.DynamicData
             return ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) dynamicObject).ToEntity();
         }
 
-        private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType)
+        private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType, bool ignoreMapAttribute = false)
         {
             Dictionary<string, GenericProperty> result;
             if (!cache.TryGetValue(objectType, out result))
@@ -209,7 +209,7 @@ namespace VitalChoice.DynamicData
                     var property in objectType.GetTypeInfo().DeclaredProperties)
                 {
                     var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
-                    if (mapAttribute != null)
+                    if (mapAttribute != null || ignoreMapAttribute)
                     {
                         resultProperties.Add(property.Name, new GenericProperty
                         {
