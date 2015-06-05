@@ -13,7 +13,7 @@ angular.module('app.core.utils.confirmation.confirmUtil', [])
 						var data = {
 							okHandler: okHandler,
 							cancelHandler: optionalCancelHandler,
-							confirmText: optionalConfirmText
+							confirmText: optionalConfirmText,
 						};
 						return data;
 					}
