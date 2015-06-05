@@ -12,6 +12,8 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities.eCommerce.Product;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -23,13 +25,19 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly IEcommerceRepositoryAsync<ProductEntity> productRepository;
+        private readonly IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ArticleService(IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
+        public ArticleService(IEcommerceRepositoryAsync<ProductEntity> productRepository, IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
+            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
         {
+            this.productRepository = productRepository;
+            this.optionTypeRepository = optionTypeRepository;
+
             this.articleRepository = articleRepository;
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
@@ -41,6 +49,10 @@ namespace VitalChoice.Business.Services.Content
         
         public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)
         {
+            //var items = optionTypeRepository.Query().Select().ToList();
+
+            //ProductEntity product3 = (productRepository.Query(p => p.Id == 1).Include(p => p.OptionValues).Include(p => p.OptionTypes).Include(p=>p.Skus).Select()).FirstOrDefault();
+
             ArticleQuery query = new ArticleQuery();
             List<int> ids = null;
             if(filter.CategoryId.HasValue)

@@ -7,10 +7,10 @@ using VitalChoice.DynamicData;
 
 namespace VitalChoice.Business.Entities
 {
-    public class ProductDynamic : DynamicObject<Product, ProductOptionValue, ProductOptionType>
-    {
-        public string Name { get; set; }
+    //public class ProductDynamic : DynamicObject<ProductEntity, ProductOptionValue, ProductOptionType>
+    //{
+    //    public string Name { get; set; }
 
-        public string Url { get; set; }
-    }
+    //    public string Url { get; set; }
+    //}
 }

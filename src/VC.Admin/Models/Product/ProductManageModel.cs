@@ -116,8 +116,8 @@ namespace VC.Admin.Models.Product
         }
     }
 
-    [ApiValidator(typeof(ProductManageModelValidator))]
-    public class ProductManageModel : Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
+    //[ApiValidator(typeof(ProductManageModelValidator))]
+    public class ProductManageModel //: Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
     {
         public int? Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -221,38 +221,38 @@ namespace VC.Admin.Models.Product
         {
         }
 
-        public ProductManageModel(ProductDynamic item)
-        {
-            //item.ToModel<ProductManageModel>(this);
+        //public ProductManageModel(ProductDynamic item)
+        //{
+        //    //item.ToModel<ProductManageModel>(this);
 
-            //SKUs = new List<SKUManageModel>();
-            //if(item.SKUs!=null)
-            //{
-            //    SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
-            //}
-        }
+        //    //SKUs = new List<SKUManageModel>();
+        //    //if(item.SKUs!=null)
+        //    //{
+        //    //    SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
+        //    //}
+        //}
 
-        public override ProductDynamic Convert()
-        {
-            ProductDynamic toReturn = new ProductDynamic();
-            //toReturn.FromModel<ProductManageModel>(this);
-            //toReturn.SKUs = new List<SKU>();
-            //if (SKUs != null)
-            //{
-            //    toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
-            //}
+        //public override ProductDynamic Convert()
+        //{
+        //    ProductDynamic toReturn = new ProductDynamic();
+        //    //toReturn.FromModel<ProductManageModel>(this);
+        //    //toReturn.SKUs = new List<SKU>();
+        //    //if (SKUs != null)
+        //    //{
+        //    //    toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
+        //    //}
 
-            return toReturn;
-        }
+        //    return toReturn;
+        //}
 
-        public void FillDynamic(ProductDynamic dynamicObject)
-        {
-            //throw new NotImplementedException();
-        }
+        //public void FillDynamic(ProductDynamic dynamicObject)
+        //{
+        //    //throw new NotImplementedException();
+        //}
 
-        public void FillSelfFrom(ProductDynamic dynamicObject)
-        {
-            //throw new NotImplementedException();
-        }
+        //public void FillSelfFrom(ProductDynamic dynamicObject)
+        //{
+        //    //throw new NotImplementedException();
+        //}
     }
 }
