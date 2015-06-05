@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
@@ -92,6 +93,25 @@ namespace VitalChoice.DynamicData
             model.FillDynamic(this as TDynamic);
         }
 
+        public object ToModel(Type modelType)
+        {
+            dynamic result = Activator.CreateInstance(modelType);
+            var cache = GetTypeCache(modelType);
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var pair in cache)
+            {
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                object value;
+                if (data.TryGetValue(mappingName, out value))
+                {
+
+                    pair.Value.Set?.Invoke(result, value);
+                }
+            }
+            result.FillSelfFrom(this);
+            return result;
+        }
+
         public TModel ToModel<TModel, TDynamic>()
             where TModel : IModelToDynamic<TDynamic>, new()
             where TDynamic: class
@@ -100,13 +120,13 @@ namespace VitalChoice.DynamicData
             var objectType = typeof (TModel);
             var cache = GetTypeCache(objectType);
             var data = DynamicData as IDictionary<string, object>;
-            foreach (var genericProperty in cache)
+            foreach (var pair in cache)
             {
-                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
                 object value;
                 if (data.TryGetValue(mappingName, out value))
                 {
-                    genericProperty.Value.Set?.Invoke(result, value);
+                    pair.Value.Set?.Invoke(result, ConvertToModelObject(pair.Value.PropertyType, value));
                 }
             }
             result.FillSelfFrom(this as TDynamic);
@@ -136,7 +156,8 @@ namespace VitalChoice.DynamicData
                         {
                             Get = (GenericGetDelegate) property.GetMethod?.CreateDelegate(typeof (GenericGetDelegate)),
                             Set = (GenericSetDelegate) property.SetMethod?.CreateDelegate(typeof (GenericSetDelegate)),
-                            Map = mapAttribute
+                            Map = mapAttribute,
+                            PropertyType = property.PropertyType
                         });
                     }
                 }
@@ -144,6 +165,28 @@ namespace VitalChoice.DynamicData
                 return resultProperties;
             }
             return result;
+        }
+
+        private static object ConvertToModelObject(Type propertyType, object obj)
+        {
+            if (propertyType.GetTypeInfo().IsGenericType)
+            {
+                if (propertyType.IsImplement<IEnumerable>())
+                {
+                    IList results = (IList)Activator.CreateInstance(typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
+                    // ReSharper disable once PossibleNullReferenceException
+                    foreach (IDynamicObject item in obj as IEnumerable)
+                    {
+                        results.Add(item?.ToModel(propertyType.GenericTypeArguments.First()));
+                    }
+                    return results;
+                }
+            }
+            if (typeof (IDynamicObject).IsAssignableFrom(propertyType))
+            {
+                return (obj as IDynamicObject)?.ToModel(propertyType);
+            }
+            return obj;
         }
 
         //crutch
