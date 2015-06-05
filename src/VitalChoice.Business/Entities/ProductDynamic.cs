@@ -9,6 +9,21 @@ namespace VitalChoice.Business.Entities
 {
     public class ProductDynamic : DynamicObject<Product, ProductOptionValue, ProductOptionType>
     {
+        public override Product ToEntity()
+        {
+            return base.ToEntity();
+        }
+
+        public override IDynamicEntity<Product, ProductOptionValue, ProductOptionType> FromEntity(Product entity)
+        {
+            return base.FromEntity(entity);
+        }
+
+        public override IDynamicEntity<Product, ProductOptionValue, ProductOptionType> FromEntityWithDefaults(Product entity)
+        {
+            return base.FromEntityWithDefaults(entity);
+        }
+
         public string Name { get; set; }
 
         public string Url { get; set; }

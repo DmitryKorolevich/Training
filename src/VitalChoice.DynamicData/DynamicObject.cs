@@ -20,7 +20,10 @@ namespace VitalChoice.DynamicData
         where TOptionValue : OptionValue<TOptionType>, new()
         where TOptionType : OptionType, new()
     {
-        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> TypeMappingCache =
+        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
+
+        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
         protected ExpandoObject DynamicData { get; } = new ExpandoObject();
@@ -29,7 +32,7 @@ namespace VitalChoice.DynamicData
 
         public dynamic Data => DynamicData;
 
-        IDynamicEntity<TEntity, TOptionValue, TOptionType> IDynamicEntity<TEntity, TOptionValue, TOptionType>.FromEntity
+        public virtual IDynamicEntity<TEntity, TOptionValue, TOptionType> FromEntity
             (TEntity entity)
         {
             if (entity == null)
@@ -43,7 +46,7 @@ namespace VitalChoice.DynamicData
             return this;
         }
 
-        IDynamicEntity<TEntity, TOptionValue, TOptionType> IDynamicEntity<TEntity, TOptionValue, TOptionType>.
+        public virtual IDynamicEntity<TEntity, TOptionValue, TOptionType>
             FromEntityWithDefaults(TEntity entity)
         {
             if (entity == null)
@@ -58,7 +61,7 @@ namespace VitalChoice.DynamicData
             return this;
         }
 
-        TEntity IDynamicEntity<TEntity, TOptionValue, TOptionType>.ToEntity()
+        public virtual TEntity ToEntity()
         {
             var result = new TEntity {OptionValues = new List<TOptionValue>()};
             foreach (var data in DynamicData)
@@ -76,61 +79,117 @@ namespace VitalChoice.DynamicData
             return result;
         }
 
-        public void FromModel<TModel, TDynamic>(TModel model)
-            where TModel : IModelToDynamic<TDynamic>
-            where TDynamic: class
-        {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-            var objectType = typeof (TModel);
-            var cache = GetTypeCache(objectType);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var genericProperty in cache)
-            {
-                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
-                data.Add(mappingName, genericProperty.Value.Get?.Invoke(model));
-            }
-            model.FillDynamic(this as TDynamic);
-        }
-
-        public object ToModel(Type modelType)
-        {
-            dynamic result = Activator.CreateInstance(modelType);
-            var cache = GetTypeCache(modelType);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var pair in cache)
-            {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                object value;
-                if (data.TryGetValue(mappingName, out value))
-                {
-
-                    pair.Value.Set?.Invoke(result, value);
-                }
-            }
-            result.FillSelfFrom(this);
-            return result;
-        }
-
         public TModel ToModel<TModel, TDynamic>()
             where TModel : IModelToDynamic<TDynamic>, new()
-            where TDynamic: class
+            where TDynamic : class
         {
             var result = new TModel();
-            var objectType = typeof (TModel);
-            var cache = GetTypeCache(objectType);
+            var objectType = typeof(TModel);
+            var cache = GetTypeCache(ModelTypeMappingCache, objectType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, GetType());
             var data = DynamicData as IDictionary<string, object>;
             foreach (var pair in cache)
             {
                 var mappingName = pair.Value.Map.Name ?? pair.Key;
-                object value;
-                if (data.TryGetValue(mappingName, out value))
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    pair.Value.Set?.Invoke(result, ConvertToModelObject(pair.Value.PropertyType, value));
+                    pair.Value.Set?.Invoke(result,
+                        ConvertToModelObject(dynamicProperty.PropertyType, dynamicProperty.Get?.Invoke(this)));
+                }
+                else
+                {
+                    object value;
+                    if (data.TryGetValue(mappingName, out value))
+                    {
+                        pair.Value.Set?.Invoke(result, ConvertToModelObject(pair.Value.PropertyType, value));
+                    }
                 }
             }
             result.FillSelfFrom(this as TDynamic);
             return result;
+        }
+
+        public object ToModel(Type modelType, Type dynamicType)
+        {
+            dynamic result = Activator.CreateInstance(modelType);
+            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, GetType());
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var pair in cache)
+            {
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                {
+                    pair.Value.Set?.Invoke(result,
+                        ConvertToModelObject(dynamicProperty.PropertyType, dynamicProperty.Get?.Invoke(this)));
+                }
+                else
+                {
+                    object value;
+                    if (data.TryGetValue(mappingName, out value))
+                    {
+                        pair.Value.Set?.Invoke(result, ConvertToModelObject(value?.GetType(), value));
+                    }
+                }
+            }
+
+            result.FillSelfFrom(this);
+            return result;
+        }
+
+        public void FromModel<TModel, TDynamic>(TModel model)
+            where TModel : IModelToDynamic<TDynamic>
+            where TDynamic : class
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            var objectType = typeof(TModel);
+            var cache = GetTypeCache(ModelTypeMappingCache, objectType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic));
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var genericProperty in cache)
+            {
+                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                {
+                    dynamicProperty.Set?.Invoke(this,
+                        ConvertFromModelObject(genericProperty.Value.PropertyType,
+                            genericProperty.Value.Get?.Invoke(model)));
+                }
+                else
+                {
+                    data.Add(mappingName, ConvertFromModelObject(genericProperty.Value.PropertyType, genericProperty.Value.Get?.Invoke(model)));
+                }
+            }
+            model.FillDynamic(this as TDynamic);
+        }
+
+        public void FromModel(Type modelType, Type dynamicType, dynamic model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType);
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var genericProperty in cache)
+            {
+                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                {
+                    dynamicProperty.Set?.Invoke(this,
+                        ConvertFromModelObject(genericProperty.Value.PropertyType,
+                            genericProperty.Value.Get?.Invoke(model)));
+                }
+                else
+                {
+                    data.Add(mappingName, ConvertFromModelObject(genericProperty.Value.PropertyType, genericProperty.Value.Get?.Invoke(model)));
+                }
+            }
+            model.FillDynamic(this);
         }
 
         public static explicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)
@@ -140,10 +199,10 @@ namespace VitalChoice.DynamicData
             return ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) dynamicObject).ToEntity();
         }
 
-        private static Dictionary<string, GenericProperty> GetTypeCache(Type objectType)
+        private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType)
         {
             Dictionary<string, GenericProperty> result;
-            if (!TypeMappingCache.TryGetValue(objectType, out result))
+            if (!cache.TryGetValue(objectType, out result))
             {
                 var resultProperties = new Dictionary<string, GenericProperty>();
                 foreach (
@@ -161,30 +220,83 @@ namespace VitalChoice.DynamicData
                         });
                     }
                 }
-                TypeMappingCache.Add(objectType, resultProperties);
+                cache.Add(objectType, resultProperties);
                 return resultProperties;
             }
             return result;
         }
 
-        private static object ConvertToModelObject(Type propertyType, object obj)
+        private static object ConvertFromModelObject(Type propertyType, object obj)
         {
+            if (obj == null)
+                return null;
             if (propertyType.GetTypeInfo().IsGenericType)
             {
                 if (propertyType.IsImplement<IEnumerable>())
                 {
-                    IList results = (IList)Activator.CreateInstance(typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
+                    IList results =
+                        (IList)
+                            Activator.CreateInstance(
+                                typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
+                    // ReSharper disable once PossibleNullReferenceException
+                    foreach (dynamic item in obj as IEnumerable)
+                    {
+                        if (item == null)
+                        {
+                            continue;
+                        }
+                        var itemType = ((object) item).GetType();
+                        var itemInterface =
+                            itemType.GetInterfaces()
+                                .FirstOrDefault(
+                                    i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof (IModelToDynamic<>));
+                        if (itemInterface != null)
+                        {
+                            var dynamicType = itemInterface.GetGenericArguments().First();
+                            IDynamicObject dynamicObject = (IDynamicObject) Activator.CreateInstance(dynamicType);
+                            results.Add(dynamicObject.FromModel(itemType, dynamicType, item));
+                        }
+                    }
+                    return results;
+                }
+            }
+            var objectType = obj.GetType();
+            var objectInterface =
+                objectType.GetInterfaces()
+                    .FirstOrDefault(
+                        i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IModelToDynamic<>));
+            if (objectInterface != null)
+            {
+                var dynamicType = objectInterface.GetGenericArguments().First();
+                IDynamicObject dynamicObject = (IDynamicObject) Activator.CreateInstance(dynamicType);
+                dynamicObject.FromModel(objectType, dynamicType, obj);
+            }
+            return obj;
+        }
+
+        private static object ConvertToModelObject(Type propertyType, object obj)
+        {
+            if (obj == null)
+                return null;
+            if (propertyType.GetTypeInfo().IsGenericType)
+            {
+                if (propertyType.IsImplement<IEnumerable>())
+                {
+                    IList results =
+                        (IList)
+                            Activator.CreateInstance(
+                                typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
                     // ReSharper disable once PossibleNullReferenceException
                     foreach (IDynamicObject item in obj as IEnumerable)
                     {
-                        results.Add(item?.ToModel(propertyType.GenericTypeArguments.First()));
+                        results.Add(item?.ToModel(propertyType.GenericTypeArguments.First(), item.GetType()));
                     }
                     return results;
                 }
             }
             if (typeof (IDynamicObject).IsAssignableFrom(propertyType))
             {
-                return (obj as IDynamicObject)?.ToModel(propertyType);
+                return (obj as IDynamicObject)?.ToModel(propertyType, obj.GetType());
             }
             return obj;
         }

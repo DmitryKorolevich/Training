@@ -12,6 +12,8 @@ namespace VitalChoice.DynamicData
             where TModel : IModelToDynamic<TDynamic>
             where TDynamic : class;
 
-        object ToModel(Type modelType);
+        object ToModel(Type modelType, Type dynamicType);
+
+        void FromModel(Type modelType, Type dynamicType, dynamic model);
     }
 }
