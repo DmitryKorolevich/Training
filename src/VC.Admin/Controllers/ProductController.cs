@@ -17,6 +17,7 @@ using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Validation.Base;
 using System;
+using VitalChoice.Business.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -89,7 +90,9 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            //item = await productCategoryService.UpdateCategoryAsync(item);
+            var item = (ProductDynamic)(await productService.GetProductAsync(id));
+            ProductManageModel toReturn = (ProductManageModel)item.ToModel(typeof(ProductManageModel), typeof(ProductDynamic));
+            return toReturn;
 
             return await Task.FromResult<ProductManageModel>(new ProductManageModel()
             {
@@ -108,8 +111,8 @@ namespace VC.Admin.Controllers
                         Name = "FRP006",
                         Active = true,
                         Hidden = true,
-                        RetailPrice = 55.00,
-                        WholesalePrice = 9.00,
+                        RetailPrice = (decimal)55.00,
+                        WholesalePrice = (decimal)9.00,
                         Stock = 5,
                         DisregardStock = true,
                         AutoShipFrequency2=true,
@@ -126,8 +129,8 @@ namespace VC.Admin.Controllers
                         Name = "FRP006",
                         Active = true,
                         Hidden = true,
-                        RetailPrice = 55.00,
-                        WholesalePrice = 9.00,
+                        RetailPrice = (decimal)55.00,
+                        WholesalePrice = (decimal)9.00,
                         Stock = 5,
                         DisregardStock = true,
                         AutoShipFrequency2=true,

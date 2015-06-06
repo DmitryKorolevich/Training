@@ -15,6 +15,8 @@ namespace VitalChoice.Interfaces.Services.Product
 
         Task<ICollection<ProductOptionType>> GetProductLookupsAsync();
 
+        Task<object> GetProductAsync(int id, bool withDefaults = false);
+
         Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
     }
 }

@@ -159,6 +159,9 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey(s => s.Id);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
 
+            builder.Entity<ProductToCategory>().Key(p => p.Id);
+            builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
+
             builder.Entity<ProductEntity>().Key(p => p.Id);
 		    builder.Entity<ProductEntity>().ForSqlServer().Table("Products");
 		    builder.Entity<ProductEntity>()
@@ -176,11 +179,11 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(t => t.IdProductType)
 		        .PrincipalKey(p => p.IdProductType);
-            //builder.Entity<ProductEntity>()
-            //    .Reference(p => p.ProductTypeEntity)
-            //    .InverseCollection()
-            //    .ForeignKey(t => t.IdProductType)
-            //    .PrincipalKey(p => p.Id);
+            builder.Entity<ProductEntity>()
+                .Collection(p => p.ProductsToCategories)
+                .InverseReference()
+                .ForeignKey(t => t.IdProduct)
+                .PrincipalKey(p => p.Id);
 
             #endregion
 

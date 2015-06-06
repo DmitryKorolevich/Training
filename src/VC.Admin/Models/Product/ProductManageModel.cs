@@ -12,25 +12,10 @@ using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Business.Entities;
 using VitalChoice.DynamicData;
 using VitalChoice.DynamicData.Attributes;
+using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Models.Product
 {
-    public class SKU
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-    }
-
-    public class Product
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public ICollection<SKU> SKUs { get; set; }
-    }
-
     public class CrossSellProductModel
     {
         public string Image { get; set; }
@@ -55,7 +40,7 @@ namespace VC.Admin.Models.Product
         }
     }
 
-    public class SKUManageModel : Model<SKU, IMode>
+    public class SKUManageModel : Model<SkuDynamic, IMode>, IModelToDynamic<SkuDynamic>
     {
         public int? Id { get; set; }
 
@@ -66,54 +51,72 @@ namespace VC.Admin.Models.Product
 
         public bool Hidden { get; set; }
 
+        public decimal RetailPrice { get; set; }
 
-        public double RetailPrice { get; set; }
+        public decimal WholesalePrice { get; set; }
 
-        public double WholesalePrice { get; set; }
-
+        [Map]
         public int? Stock { get; set; }
 
+        [Map]
         public bool DisregardStock { get; set; }
 
+        [Map]
         public bool DisallowSingle { get; set; }
 
+        [Map]
         public bool NonDiscountable { get; set; }
 
+        [Map]
         public bool OrphanType { get; set; }
 
+        [Map]
         public bool AutoShipProduct { get; set; }
 
+        [Map]
         public double OffPercent { get; set; }
 
+        [Map]
         public int Seller { get; set; }
 
-        public bool HideFromDataFeed {get;set; }
+        [Map]
+        public bool HideFromDataFeed { get; set; }
 
+        [Map]
         public bool AutoShipFrequency1 { get; set; }
 
+        [Map]
         public bool AutoShipFrequency2 { get; set; }
 
+        [Map]
         public bool AutoShipFrequency3 { get; set; }
 
+        [Map]
         public bool AutoShipFrequency6 { get; set; }
 
         public SKUManageModel()
         {
         }
 
-        public SKUManageModel(SKU item)
+        public override SkuDynamic Convert()
         {
-            Id = item.Id;
-            Name = item.Name;
-        }
-
-        public override SKU Convert()
-        {
-            SKU toReturn = new SKU();
-            toReturn.Id = Id.HasValue ? Id.Value : 0;
-            toReturn.Name = Name?.Trim();
+            SkuDynamic toReturn = new SkuDynamic();
 
             return toReturn;
+        }
+
+        public void FillDynamic(SkuDynamic dynamicObject)
+        {
+        }
+
+        public void FillSelfFrom(SkuDynamic dynamicObject)
+        {
+            Id = dynamicObject.Id;
+            Name = dynamicObject.Code;
+            Active = dynamicObject.StatusCode==RecordStatusCode.Active;
+            Hidden = dynamicObject.Hidden;
+            RetailPrice = dynamicObject.Price;
+            WholesalePrice = dynamicObject.WholesalePrice;
         }
     }
 
@@ -169,7 +172,7 @@ namespace VC.Admin.Models.Product
         public string Thumbnail { get; set; }
 
         [Map]
-        public string MainProductImage {get;set;}
+        public string MainProductImage { get; set; }
 
         [Map]
         public string NutritionalTitle { get; set; }
@@ -256,17 +259,6 @@ namespace VC.Admin.Models.Product
         {
         }
 
-        public ProductManageModel(ProductDynamic item)
-        {
-            //item.ToModel<ProductManageModel>(this);
-
-            //SKUs = new List<SKUManageModel>();
-            //if(item.SKUs!=null)
-            //{
-            //    SKUs = item.SKUs.Select(p => new SKUManageModel(p)).ToList();
-            //}
-        }
-
         public override ProductDynamic Convert()
         {
             ProductDynamic toReturn = new ProductDynamic();
@@ -282,26 +274,66 @@ namespace VC.Admin.Models.Product
 
         public void FillDynamic(ProductDynamic dynamicObject)
         {
-            if (CrossSellProducts != null && CrossSellProducts.Count > 3)
-            {
-                dynamicObject.Data.CrossSellProduct1 = CrossSellProducts[0];
-                dynamicObject.Data.CrossSellProduct2 = CrossSellProducts[1];
-                dynamicObject.Data.CrossSellProduct3 = CrossSellProducts[2];
-                dynamicObject.Data.CrossSellProduct4 = CrossSellProducts[3];
-            }
+            //if (CrossSellProducts != null && CrossSellProducts.Count > 3)
+            //{
+            //    dynamicObject.Data.CrossSellProduct1 = CrossSellProducts[0];
+            //    dynamicObject.Data.CrossSellProduct2 = CrossSellProducts[1];
+            //    dynamicObject.Data.CrossSellProduct3 = CrossSellProducts[2];
+            //    dynamicObject.Data.CrossSellProduct4 = CrossSellProducts[3];
+            //}
         }
 
         public void FillSelfFrom(ProductDynamic dynamicObject)
         {
-            if (dynamicObject.DictionaryData.ContainsKey("CrossSellProduct1"))
+            Id = dynamicObject.Id;
+            Name = dynamicObject.Name;
+            Url = dynamicObject.Url;
+            Type = dynamicObject.Type;
+            StatusCode = dynamicObject.StatusCode;
+            Hidden = dynamicObject.Hidden;
+            CategoryIds = dynamicObject.CategoryIds.ToList();
+
+            CrossSellProducts = new List<CrossSellProductModel>()
+                    {
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                        new CrossSellProductModel(),
+                    };
+            for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
             {
-                CrossSellProducts = new List<CrossSellProductModel>(4)
+                var crossSellProduct = CrossSellProducts[i];
+                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i))
                 {
-                    dynamicObject.Data.CrossSellProduct1,
-                    dynamicObject.Data.CrossSellProduct2,
-                    dynamicObject.Data.CrossSellProduct3,
-                    dynamicObject.Data.CrossSellProduct4
-                };
+                    crossSellProduct.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i];
+                }
+                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i))
+                {
+                    crossSellProduct.Url = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i];
+                }
+            }
+
+            Videos = new List<VideoModel>()
+                    {
+                        new VideoModel(),
+                        new VideoModel(),
+                        new VideoModel(),
+                    };
+            for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
+            {
+                var video = Videos[i];
+                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i))
+                {
+                    video.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i];
+                }
+                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i))
+                {
+                    video.Text = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i];
+                }
+                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i))
+                {
+                    video.Video = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i];
+                }
             }
         }
     }

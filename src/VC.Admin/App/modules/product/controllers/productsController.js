@@ -38,6 +38,8 @@
             Paging: { PageIndex: 1, PageItemCount: 100 },
             Sorting: gridSorterUtil.resolve(refreshProducts, "Name", "Desc")
 	    };
+
+        refreshProducts();
 	}
 
 	$scope.filterProducts = function () {
@@ -52,7 +54,7 @@
 	$scope.open = function (id) {
         if(id)
         {
-            //$state.go('index.oneCol.productDetail', { id: id });
+            $state.go('index.oneCol.productDetail', { id: id });
         }
         else
         {

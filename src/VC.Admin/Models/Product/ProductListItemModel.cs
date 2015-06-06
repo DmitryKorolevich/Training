@@ -17,6 +17,8 @@ namespace VC.Admin.Models.Product
     {
         public int Id { get; set; }
 
+        public int ProductId { get; set; }
+
         public string Thumbnail { get; set; }
 
         public string Name { get; set; }
@@ -32,6 +34,7 @@ namespace VC.Admin.Models.Product
             if(item!=null)
             {
                 Id = item.Id;
+                ProductId = item.IdProduct;
                 Name = item.Name;
                 Thumbnail = item.Thumbnail;
                 StatusCode = item.StatusCode;

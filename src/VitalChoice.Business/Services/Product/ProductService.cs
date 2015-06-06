@@ -17,6 +17,8 @@ using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Business.Entities;
+using VitalChoice.Data.Helpers;
 
 namespace VitalChoice.Business.Services.Product
 {
@@ -25,14 +27,18 @@ namespace VitalChoice.Business.Services.Product
         private readonly IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
+        private readonly IEcommerceRepositoryAsync<ProductEntity> productRepository;
+        private readonly IEcommerceRepositoryAsync<Sku> skuRepository;
         private readonly ILogger logger;
 
         public ProductService(IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository)
+            IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<ProductEntity> productRepository, IEcommerceRepositoryAsync<Sku> skuRepository)
         {
             this.vProductSkuRepository = vProductSkuRepository;
             this.productOptionTypeRepository = productOptionTypeRepository;
             this.lookupRepository = lookupRepository;
+            this.productRepository = productRepository;
+            this.skuRepository = skuRepository;
             logger = LoggerService.GetDefault();
         }
 
@@ -81,26 +87,49 @@ namespace VitalChoice.Business.Services.Product
             return toReturn;
         }
 
-        #endregion
-
-        #region Products
-
         public async Task<ICollection<ProductOptionType>> GetProductLookupsAsync()
         {
             ICollection<ProductOptionType> toReturn = (await productOptionTypeRepository.Query(p => p.IdLookup.HasValue).SelectAsync()).ToList();
-            var lookups = (await lookupRepository.Query(p => toReturn.Select(pp=>pp.IdLookup.Value).Contains(p.Id)).Include(p=>p.LookupVariants).SelectAsync()).ToList();
-            foreach(var lookup in lookups)
+            var lookups = (await lookupRepository.Query(p => toReturn.Select(pp => pp.IdLookup.Value).Contains(p.Id)).Include(p => p.LookupVariants).SelectAsync()).ToList();
+            foreach (var lookup in lookups)
             {
                 lookup.LookupVariants = lookup.LookupVariants.OrderBy(p => p.Id).ToList();
             }
             foreach (var item in toReturn)
             {
-                foreach(var lookup in lookups)
+                foreach (var lookup in lookups)
                 {
-                    if(item.IdLookup==lookup.Id)
+                    if (item.IdLookup == lookup.Id)
                     {
                         item.Lookup = lookup;
                     }
+                }
+            }
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region Products
+
+        public async Task<object> GetProductAsync(int id, bool withDefaults=false)
+        {
+            IQueryFluent<ProductEntity> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
+                .Include(p=>p.ProductsToCategories).Include(p => p.OptionTypes);
+            var item =(await res.SelectAsync(false)).FirstOrDefault();
+            ProductDynamic toReturn = null;
+            if (item!=null)
+            {
+                item.Skus = (await skuRepository.Query(p=>p.IdProduct==item.Id).Include(p => p.OptionValues).SelectAsync(false)).ToList();
+                toReturn = new ProductDynamic();
+                if(withDefaults)
+                {
+                    toReturn.FromEntityWithDefaults(item);
+                }
+                else
+                {
+                    toReturn.FromEntity(item);
                 }
             }
 

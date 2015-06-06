@@ -14,6 +14,7 @@ using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Business.Services.Product;
 
 namespace VitalChoice.Business.Services.Content
 {

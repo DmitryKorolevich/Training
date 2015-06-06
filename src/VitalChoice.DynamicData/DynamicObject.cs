@@ -38,6 +38,8 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
+            FromEntityInit(entity);
+
             var data = DynamicData as IDictionary<string, object>;
             foreach (var value in entity.OptionValues)
             {
@@ -52,6 +54,8 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
+            FromEntityInit(entity);
+
             var data = DynamicData as IDictionary<string, object>;
             ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) this).FromEntity(entity);
             foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
@@ -59,6 +63,24 @@ namespace VitalChoice.DynamicData
                 data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
             }
             return this;
+        }
+
+        private void FromEntityInit(TEntity entity)
+        {
+            if(entity.OptionValues!=null && entity.OptionTypes!=null)
+            {
+                foreach(var optionValue in entity.OptionValues)
+                {
+                    foreach (var optionType in entity.OptionTypes)
+                    {
+                        if(optionValue.IdOptionType==optionType.Id)
+                        {
+                            optionValue.OptionType = optionType;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         public virtual TEntity ToEntity()

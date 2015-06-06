@@ -18,10 +18,12 @@ namespace VitalChoice.Domain.Entities.eCommerce.Product
 
         public DateTime DateEdited { get; set; }
 
-        public ProductType? IdProductType { get; set; }
+        public ProductType IdProductType { get; set; }
 
         public int? IdExternal { get; set; }
 
         public ICollection<Sku> Skus { get; set; }
+
+        public ICollection<ProductToCategory> ProductsToCategories { get; set; }
     }
 }
