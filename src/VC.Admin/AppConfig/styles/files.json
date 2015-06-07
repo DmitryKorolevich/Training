@@ -1,6 +1,5 @@
 ﻿{
-	"assetsDir": "assets/css",
-	"minifiedFileName": "style",
+	"minifiedFileName": "styles",
 
 	"files": [
 		"lib/css-spinners/ball.css",

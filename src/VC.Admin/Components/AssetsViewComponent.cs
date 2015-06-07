@@ -67,7 +67,7 @@ namespace VC.Admin.Components
 				if (appOptions.EnableBundlingAndMinification)
 				{
 					filePaths.Add(urlHelper.Content(
-					    $"~{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
+					    $"~/{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
 				}
 				else
 				{

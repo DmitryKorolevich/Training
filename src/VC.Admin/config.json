@@ -1,7 +1,7 @@
 {
   "App": {
     "GenerateLowercaseUrls": true,
-    "EnableBundlingAndMinification": false,
+    "EnableBundlingAndMinification": true,
     "Versioning": {
       "EnableStaticContentVersioning": true,
       "AutoGenerateBuildNumber": false,
@@ -13,7 +13,7 @@
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
-    "Connection": {
+   "Connection": {
            "UserName": "dev_vcdb_login",
             "Password": "CCQLaskw3pMFU9XqE6CHp28m",
             "Server": "oz449vjvis.database.windows.net"

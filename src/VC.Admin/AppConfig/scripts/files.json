@@ -1,6 +1,5 @@
 ﻿{
-	"assetsDir": "assets/js",
-	"minifiedFileName": "script",
+	"minifiedFileName": "app",
 
 	"files": [
 		"lib/jquery/jquery.js",
