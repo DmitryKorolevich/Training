@@ -113,29 +113,6 @@ namespace VitalChoice.Business.Services.Product
 
         #region Products
 
-        public async Task<object> GetProductAsync(int id, bool withDefaults=false)
-        {
-            IQueryFluent<ProductEntity> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
-                .Include(p=>p.ProductsToCategories).Include(p => p.OptionTypes);
-            var item =(await res.SelectAsync(false)).FirstOrDefault();
-            ProductDynamic toReturn = null;
-            if (item!=null)
-            {
-                item.Skus = (await skuRepository.Query(p=>p.IdProduct==item.Id).Include(p => p.OptionValues).SelectAsync(false)).ToList();
-                toReturn = new ProductDynamic();
-                if(withDefaults)
-                {
-                    toReturn.FromEntityWithDefaults(item);
-                }
-                else
-                {
-                    toReturn.FromEntity(item);
-                }
-            }
-
-            return toReturn;
-        }
-
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
             var query = vProductSkuRepository.Query();
@@ -159,6 +136,56 @@ namespace VitalChoice.Business.Services.Product
 
             PagedList<VProductSku> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
 
+            return toReturn;
+        }
+
+        public async Task<object> GetProductAsync(int id, bool withDefaults=false)
+        {
+            IQueryFluent<ProductEntity> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
+                .Include(p=>p.ProductsToCategories).Include(p => p.OptionTypes);
+            var item =(await res.SelectAsync(false)).FirstOrDefault();
+            ProductDynamic toReturn = null;
+            if (item!=null)
+            {
+                item.Skus = (await skuRepository.Query(p=>p.IdProduct==item.Id).Include(p => p.OptionValues).SelectAsync(false)).ToList();
+                toReturn = new ProductDynamic();
+                if(withDefaults)
+                {
+                    toReturn.FromEntityWithDefaults(item);
+                }
+                else
+                {
+                    toReturn.FromEntity(item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        public async Task<object> UpdateProductAsync(object modelO)
+        {
+            ProductDynamic model = (ProductDynamic)modelO;
+            ProductDynamic dbItem = null;
+
+            return dbItem;
+        }
+
+        public async Task<bool> DeleteProductAsync(int id)
+        {
+            bool toReturn = false;
+            var dbItem = (await productRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            if (dbItem != null)
+            {
+                var skusCount = await skuRepository.Query(p => p.IdProduct == id && p.StatusCode!=RecordStatusCode.Deleted).SelectCountAsync();
+                if(skusCount>0)
+                {
+                    throw new AppValidationException("The given product contains sub products. Delete sub products first.");
+                }
+                dbItem.StatusCode = RecordStatusCode.Deleted;
+                await productRepository.UpdateAsync(dbItem);
+
+                toReturn = true;
+            }
             return toReturn;
         }
 

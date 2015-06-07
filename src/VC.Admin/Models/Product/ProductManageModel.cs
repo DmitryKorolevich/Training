@@ -40,90 +40,10 @@ namespace VC.Admin.Models.Product
         }
     }
 
-    public class SKUManageModel : Model<SkuDynamic, IMode>, IModelToDynamic<SkuDynamic>
-    {
-        public int? Id { get; set; }
-
-        [Localized(GeneralFieldNames.SKU)]
-        public string Name { get; set; }
-
-        public bool Active { get; set; }
-
-        public bool Hidden { get; set; }
-
-        public decimal RetailPrice { get; set; }
-
-        public decimal WholesalePrice { get; set; }
-
-        [Map]
-        public int? Stock { get; set; }
-
-        [Map]
-        public bool DisregardStock { get; set; }
-
-        [Map]
-        public bool DisallowSingle { get; set; }
-
-        [Map]
-        public bool NonDiscountable { get; set; }
-
-        [Map]
-        public bool OrphanType { get; set; }
-
-        [Map]
-        public bool AutoShipProduct { get; set; }
-
-        [Map]
-        public double OffPercent { get; set; }
-
-        [Map]
-        public int Seller { get; set; }
-
-        [Map]
-        public bool HideFromDataFeed { get; set; }
-
-        [Map]
-        public bool AutoShipFrequency1 { get; set; }
-
-        [Map]
-        public bool AutoShipFrequency2 { get; set; }
-
-        [Map]
-        public bool AutoShipFrequency3 { get; set; }
-
-        [Map]
-        public bool AutoShipFrequency6 { get; set; }
-
-        public SKUManageModel()
-        {
-        }
-
-        public override SkuDynamic Convert()
-        {
-            SkuDynamic toReturn = new SkuDynamic();
-
-            return toReturn;
-        }
-
-        public void FillDynamic(SkuDynamic dynamicObject)
-        {
-        }
-
-        public void FillSelfFrom(SkuDynamic dynamicObject)
-        {
-            Id = dynamicObject.Id;
-            Name = dynamicObject.Code;
-            Active = dynamicObject.StatusCode==RecordStatusCode.Active;
-            Hidden = dynamicObject.Hidden;
-            RetailPrice = dynamicObject.Price;
-            WholesalePrice = dynamicObject.WholesalePrice;
-        }
-    }
-
     [ApiValidator(typeof(ProductManageModelValidator))]
     public class ProductManageModel : Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
         [Localized(GeneralFieldNames.Url)]
@@ -262,25 +182,39 @@ namespace VC.Admin.Models.Product
         public override ProductDynamic Convert()
         {
             ProductDynamic toReturn = new ProductDynamic();
-            //toReturn.FromModel<ProductManageModel>(this);
-            //toReturn.SKUs = new List<SKU>();
-            //if (SKUs != null)
-            //{
-            //    toReturn.SKUs = SKUs.Select(p => p.Convert()).ToList();
-            //}
+            toReturn.FromModel<ProductManageModel, ProductDynamic>(this);
 
             return toReturn;
         }
 
         public void FillDynamic(ProductDynamic dynamicObject)
         {
-            //if (CrossSellProducts != null && CrossSellProducts.Count > 3)
-            //{
-            //    dynamicObject.Data.CrossSellProduct1 = CrossSellProducts[0];
-            //    dynamicObject.Data.CrossSellProduct2 = CrossSellProducts[1];
-            //    dynamicObject.Data.CrossSellProduct3 = CrossSellProducts[2];
-            //    dynamicObject.Data.CrossSellProduct4 = CrossSellProducts[3];
-            //}
+            dynamicObject.Id = Id;
+            dynamicObject.Name = Name;
+            dynamicObject.Url = Url;
+            dynamicObject.Type = Type;
+            dynamicObject.StatusCode = StatusCode;
+            dynamicObject.Hidden = Hidden;
+            dynamicObject.CategoryIds = CategoryIds.ToList();
+
+            if(CrossSellProducts!=null)
+            {
+                for(int i=0;i<CrossSellProducts.Count;i++)
+                {
+                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + (i + 1), CrossSellProducts[i].Image);
+                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + (i + 1), CrossSellProducts[i].Url);
+                }
+            }
+
+            if (Videos != null)
+            {
+                for (int i = 0; i < Videos.Count; i++)
+                {
+                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + (i + 1), Videos[i].Image);
+                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + (i + 1), Videos[i].Text);
+                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + (i + 1), Videos[i].Video);
+                }
+            }
         }
 
         public void FillSelfFrom(ProductDynamic dynamicObject)

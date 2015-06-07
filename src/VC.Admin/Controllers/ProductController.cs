@@ -164,16 +164,16 @@ namespace VC.Admin.Controllers
             if (item == null)
                 return null;
 
-            //item = await productCategoryService.UpdateCategoryAsync(item);
+            item = (ProductDynamic)(await productService.UpdateProductAsync(item));
 
-            return await Task.FromResult<ProductManageModel>(new ProductManageModel());
+            ProductManageModel toReturn = (ProductManageModel)item.ToModel(typeof(ProductManageModel), typeof(ProductDynamic));
+            return toReturn;
         }
 
         [HttpPost]
         public async Task<Result<bool>> DeleteProduct(int id)
         {
-            return await Task.FromResult<bool>(false);
-            //return await productCategoryService.DeleteCategoryAsync(id);
+            return await productService.DeleteProductAsync(id);
         }
 
         #endregion
