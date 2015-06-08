@@ -9,8 +9,8 @@ namespace VitalChoice.DynamicData.Delegates
     public struct GenericProperty
     {
         public Type PropertyType;
-        public GenericGetDelegate Get;
-        public GenericSetDelegate Set;
+        public Func<object, object> Get;
+        public Func<object, object, object> Set;
         public MapAttribute Map;
 
     }

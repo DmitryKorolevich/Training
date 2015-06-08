@@ -9,6 +9,7 @@ using Templates.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
+using Templates.Native;
 
 // ReSharper disable StaticMemberInGenericType
 
@@ -235,8 +236,8 @@ namespace VitalChoice.DynamicData
                     {
                         resultProperties.Add(property.Name, new GenericProperty
                         {
-                            Get = (GenericGetDelegate) property.GetMethod?.CreateDelegate(typeof (GenericGetDelegate)),
-                            Set = (GenericSetDelegate) property.SetMethod?.CreateDelegate(typeof (GenericSetDelegate)),
+                            Get = property.GetMethod?.CompileAccessor<object, object>(),
+                            Set = property.SetMethod?.CompileAccessor<object, object, object>(),
                             Map = mapAttribute,
                             PropertyType = property.PropertyType
                         });
