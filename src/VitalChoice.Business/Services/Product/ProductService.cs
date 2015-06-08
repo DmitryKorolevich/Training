@@ -17,8 +17,8 @@ using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Product;
-using VitalChoice.Business.Entities;
 using VitalChoice.Data.Helpers;
+using VitalChoice.DynamicData.Entities;
 
 namespace VitalChoice.Business.Services.Product
 {
@@ -139,7 +139,7 @@ namespace VitalChoice.Business.Services.Product
             return toReturn;
         }
 
-        public async Task<object> GetProductAsync(int id, bool withDefaults=false)
+        public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults=false)
         {
             IQueryFluent<ProductEntity> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
                 .Include(p=>p.ProductsToCategories).Include(p => p.OptionTypes);
@@ -162,9 +162,8 @@ namespace VitalChoice.Business.Services.Product
             return toReturn;
         }
 
-        public async Task<object> UpdateProductAsync(object modelO)
+        public async Task<ProductDynamic> UpdateProductAsync(ProductDynamic model)
         {
-            ProductDynamic model = (ProductDynamic)modelO;
             ProductDynamic dbItem = null;
 
             return dbItem;

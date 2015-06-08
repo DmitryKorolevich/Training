@@ -8,14 +8,15 @@ using VitalChoice.Domain.Entities.eCommerce.Product;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Business.Entities;
-using VitalChoice.DynamicData;
+using VitalChoice.Validation.Models.Interfaces; 
 using VitalChoice.DynamicData.Attributes;
+using VitalChoice.DynamicData;
+using VitalChoice.DynamicData.Entities;
 using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Models.Product
 {
+using VitalChoice.DynamicData.Entities;
 
     public class SKUManageModel : Model<SkuDynamic, IMode>, IModelToDynamic<SkuDynamic>
     {

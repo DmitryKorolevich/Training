@@ -16,8 +16,8 @@ using VitalChoice.Domain.Entities.eCommerce.Product;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Validation.Base;
+using VitalChoice.DynamicData.Entities;
 using System;
-using VitalChoice.Business.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -90,8 +90,8 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = (ProductDynamic)(await productService.GetProductAsync(id));
-            ProductManageModel toReturn = (ProductManageModel)item.ToModel(typeof(ProductManageModel), typeof(ProductDynamic));
+            var item = await productService.GetProductAsync(id);
+            ProductManageModel toReturn = item.ToModel<ProductManageModel, ProductDynamic>();
             return toReturn;
 
             return await Task.FromResult<ProductManageModel>(new ProductManageModel()

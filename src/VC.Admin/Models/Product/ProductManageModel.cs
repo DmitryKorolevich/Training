@@ -8,11 +8,11 @@ using VitalChoice.Domain.Entities.eCommerce.Product;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Business.Entities;
-using VitalChoice.DynamicData;
+using VitalChoice.Validation.Models.Interfaces; 
 using VitalChoice.DynamicData.Attributes;
+using VitalChoice.DynamicData;
 using VitalChoice.Domain.Constants;
+using VitalChoice.DynamicData.Entities;
 
 namespace VC.Admin.Models.Product
 {
@@ -189,12 +189,6 @@ namespace VC.Admin.Models.Product
 
         public void FillDynamic(ProductDynamic dynamicObject)
         {
-            dynamicObject.Id = Id;
-            dynamicObject.Name = Name;
-            dynamicObject.Url = Url;
-            dynamicObject.Type = Type;
-            dynamicObject.StatusCode = StatusCode;
-            dynamicObject.Hidden = Hidden;
             dynamicObject.CategoryIds = CategoryIds.ToList();
 
             if(CrossSellProducts!=null)
@@ -219,12 +213,6 @@ namespace VC.Admin.Models.Product
 
         public void FillSelfFrom(ProductDynamic dynamicObject)
         {
-            Id = dynamicObject.Id;
-            Name = dynamicObject.Name;
-            Url = dynamicObject.Url;
-            Type = dynamicObject.Type;
-            StatusCode = dynamicObject.StatusCode;
-            Hidden = dynamicObject.Hidden;
             CategoryIds = dynamicObject.CategoryIds.ToList();
 
             CrossSellProducts = new List<CrossSellProductModel>()
