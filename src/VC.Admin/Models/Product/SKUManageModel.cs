@@ -20,17 +20,22 @@ using VitalChoice.DynamicData.Entities;
 
     public class SKUManageModel : Model<SkuDynamic, IMode>, IModelToDynamic<SkuDynamic>
     {
+        [Map]
         public int Id { get; set; }
 
+        [Map]
         [Localized(GeneralFieldNames.SKU)]
         public string Name { get; set; }
 
         public bool Active { get; set; }
 
+        [Map]
         public bool Hidden { get; set; }
 
+        [Map]
         public decimal RetailPrice { get; set; }
 
+        [Map]
         public decimal WholesalePrice { get; set; }
 
         [Map]
@@ -86,22 +91,12 @@ using VitalChoice.DynamicData.Entities;
 
         public void FillDynamic(SkuDynamic dynamicObject)
         {
-            dynamicObject.Id = Id;
-            dynamicObject.Code = Name;
             dynamicObject.StatusCode = Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
-            dynamicObject.Hidden = Hidden;
-            dynamicObject.Price = RetailPrice;
-            dynamicObject.WholesalePrice = WholesalePrice;
         }
 
         public void FillSelfFrom(SkuDynamic dynamicObject)
         {
-            Id = dynamicObject.Id;
-            Name = dynamicObject.Code;
             Active = dynamicObject.StatusCode == RecordStatusCode.Active;
-            Hidden = dynamicObject.Hidden;
-            RetailPrice = dynamicObject.Price;
-            WholesalePrice = dynamicObject.WholesalePrice;
         }
     }
 }

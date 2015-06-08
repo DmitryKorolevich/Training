@@ -43,16 +43,24 @@ namespace VC.Admin.Models.Product
     [ApiValidator(typeof(ProductManageModelValidator))]
     public class ProductManageModel : Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
     {
+        [Map]
         public int Id { get; set; }
+
+        [Map]
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
+
+        [Map]
         [Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
+        [Map]
         public ProductType Type { get; set; }
 
+        [Map]
         public RecordStatusCode StatusCode { get; set; }
 
+        [Map]
         public bool Hidden { get; set; }
 
         [Map]
@@ -224,7 +232,7 @@ namespace VC.Admin.Models.Product
                     };
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
             {
-                var crossSellProduct = CrossSellProducts[i];
+                var crossSellProduct = CrossSellProducts[i-1];
                 if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i))
                 {
                     crossSellProduct.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i];
@@ -243,7 +251,7 @@ namespace VC.Admin.Models.Product
                     };
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
             {
-                var video = Videos[i];
+                var video = Videos[i-1];
                 if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i))
                 {
                     video.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i];
