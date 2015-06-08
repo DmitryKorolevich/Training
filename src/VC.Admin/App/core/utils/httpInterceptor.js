@@ -41,7 +41,7 @@ angular
 										$rootScope.$state.go(
 											$rootScope.$state.previous != null
 											&& $rootScope.$state.previous.name !== ''
-											&& !$rootScope.unauthorizedArea($rootScope.$state.href($rootScope.$state.previous).slice(1))
+											&& !$rootScope.unauthorizedArea($rootScope.$state.href($rootScope.$state.previous))
 											? $rootScope.$state.previous.name : "index.oneCol.dashboard");
 
 										toaster.pop('warning', "Caution!", "Sorry, but you do not have the appropriate permissions to access this area.");

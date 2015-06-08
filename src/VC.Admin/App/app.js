@@ -10,14 +10,16 @@ var app = angular
 		'app.shared'
 	])
 	.config([
-		'$stateProvider', '$urlRouterProvider','$httpProvider',
-		function ($stateProvider, $urlRouterProvider, $httpProvider) {
+		'$stateProvider', '$urlRouterProvider','$httpProvider', '$locationProvider',
+		function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 			$urlRouterProvider.when('/',[ '$state', function($state) {
 				$state.go('index.oneCol.dashboard');
 			}]);
 			$urlRouterProvider.otherwise('/404');
 
 			$httpProvider.interceptors.push("httpInterceptor");
+
+			$locationProvider.html5Mode(true);
 		}
 	])
 	.run([

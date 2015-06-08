@@ -10,7 +10,7 @@ angular.module('app.core.utils.commonActionsUtil', [])
 
                 $rootScope.$state.go($rootScope.$state.previous != null
                     && $rootScope.$state.previous.name !== ''
-                    && !$rootScope.unauthorizedArea($rootScope.$state.href($rootScope.$state.previous).slice(1))
+                    && !$rootScope.unauthorizedArea($rootScope.$state.href($rootScope.$state.previous))
                     ? $rootScope.$state.previous.name : defaultStateToReturn);
             }
         }

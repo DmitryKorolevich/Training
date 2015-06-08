@@ -39,7 +39,7 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 
 							$state.go($state.previous != null
                                 && $state.previous.name !== '' 
-                                && !$rootScope.unauthorizedArea($state.href($state.previous).slice(1))
+                                && !$rootScope.unauthorizedArea($state.href($state.previous))
                                 ? $state.previous.name : "index.oneCol.dashboard");
 						} else {
 							var messages = "";

@@ -76,10 +76,7 @@ module.exports = function (grunt) {
         },
         clean: {
         	wwwroot: ["wwwroot/app", "wwwroot/assets"],
-        	wwwrootFull: {
-        		options: { force: true },
-        		dist:["wwwroot/*", "!wwwroot/bin"]
-	        } ,
+        	wwwrootFull:["wwwroot/*", "!wwwroot/bin"],
 			temp: ["temp"]
         },
         copy: {
