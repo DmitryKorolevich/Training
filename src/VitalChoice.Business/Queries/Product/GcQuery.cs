@@ -44,13 +44,13 @@ namespace VitalChoice.Business.Queries.Product
             if (!String.IsNullOrEmpty(name))
             {
                 var items = name.Split(' ');
-                if (items.Length == 1)
-                {
-                    Add(x => x.FirstName.Contains(items[0]) || x.LastName.Contains(items[0]));
-                }
-                else
+                if (items.Length > 1)
                 {
                     Add(x => x.FirstName.Contains(items[0]) && x.LastName.Contains(items[1]));
+                }
+                else if (items.Length > 0)
+                {
+                    Add(x => x.FirstName.Contains(items[0]) || x.LastName.Contains(items[0]));
                 }
             }
 

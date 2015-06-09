@@ -175,11 +175,11 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 *.user
-/src/VitalChoice.Public/wwwroot
 project.lock.json
 config.local.json
 node_modules/
 /src/VC.Public/wwwroot/files
+/src/VC.Admin/wwwroot
 /.vs
 artifacts
 /src/files
