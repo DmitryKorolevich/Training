@@ -46,6 +46,8 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 1, N'MainProductImage'
 	UNION
+	SELECT NULL, 4, 1, N'NutritionalTitle'
+	UNION
 	SELECT N'0', 3, 1, N'Stock'
 	UNION
 	SELECT N'1', 5, 1, N'DisregardStock'
@@ -242,5 +244,204 @@ BEGIN
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
 	SELECT NULL, 2, 4, 'GoogleCategory', @IdLookup
+
+END
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE IdProductType=2 AND Name='Description')
+BEGIN
+
+--perishable product type
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name)
+	SELECT NULL, 4, 2, N'Description'
+	UNION
+	SELECT NULL, 4, 2, N'Serving'
+	UNION
+	SELECT NULL, 4, 2, N'Recepies'
+	UNION
+	SELECT NULL, 4, 2, N'Ingredients'
+	UNION
+	SELECT NULL, 4, 2, N'ShortDescription'
+	UNION
+	SELECT NULL, 4, 2, N'ProductNotes'
+	UNION
+	SELECT NULL, 4, 2, N'MetaTitle'
+	UNION
+	SELECT NULL, 4, 2, N'MetaDescription'
+	UNION
+	SELECT NULL, 4, 2, N'TaxCode'
+	UNION
+	SELECT NULL, 4, 2, N'Thumbnail'
+	UNION
+	SELECT NULL, 4, 2, N'MainProductImage'
+	UNION
+	SELECT NULL, 4, 2, N'NutritionalTitle'
+	UNION
+	SELECT N'0', 3, 2, N'Stock'
+	UNION
+	SELECT N'2', 5, 2, N'DisregardStock'
+	UNION
+	SELECT N'0', 5, 2, N'DisallowSingle'
+	UNION
+	SELECT N'0', 5, 2, N'NonDiscountable'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipProduct'
+	UNION
+	SELECT N'0', 2, 2, N'OffPercent'
+	UNION
+	SELECT N'0', 5, 2, N'HideFromDataFeed'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency2'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency2'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency3'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency6'
+
+
+	--perishable product type
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name)
+	SELECT NULL, 4, 2, N'Description'
+	UNION
+	SELECT NULL, 4, 2, N'Serving'
+	UNION
+	SELECT NULL, 4, 2, N'Recepies'
+	UNION
+	SELECT NULL, 4, 2, N'Ingredients'
+	UNION
+	SELECT NULL, 4, 2, N'ShortDescription'
+	UNION
+	SELECT NULL, 4, 2, N'ProductNotes'
+	UNION
+	SELECT NULL, 4, 2, N'MetaTitle'
+	UNION
+	SELECT NULL, 4, 2, N'MetaDescription'
+	UNION
+	SELECT NULL, 4, 2, N'TaxCode'
+	UNION
+	SELECT NULL, 4, 2, N'Thumbnail'
+	UNION
+	SELECT NULL, 4, 2, N'NutritionalTitle'
+	UNION
+	SELECT NULL, 4, 2, N'MainProductImage'
+	UNION
+	SELECT N'0', 3, 2, N'Stock'
+	UNION
+	SELECT N'2', 5, 2, N'DisregardStock'
+	UNION
+	SELECT N'0', 5, 2, N'DisallowSingle'
+	UNION
+	SELECT N'0', 5, 2, N'NonDiscountable'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipProduct'
+	UNION
+	SELECT N'0', 2, 2, N'OffPercent'
+	UNION
+	SELECT N'0', 5, 2, N'HideFromDataFeed'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency1'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency2'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency3'
+	UNION
+	SELECT N'0', 5, 2, N'AutoShipFrequency6'
+
+
+	--EGC product type
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name)
+	SELECT NULL, 4, 3, N'Description'
+	UNION
+	SELECT NULL, 4, 3, N'ShortDescription'
+	UNION
+	SELECT NULL, 4, 3, N'ProductNotes'
+	UNION
+	SELECT NULL, 4, 3, N'MetaTitle'
+	UNION
+	SELECT NULL, 4, 3, N'MetaDescription'
+	UNION
+	SELECT NULL, 4, 3, N'TaxCode'
+	UNION
+	SELECT NULL, 4, 3, N'Thumbnail'
+	UNION
+	SELECT NULL, 4, 3, N'MainProductImage'
+	UNION
+	SELECT NULL, 4, 3, N'NutritionalTitle'
+	UNION
+	SELECT N'0', 3, 3, N'Stock'
+	UNION
+	SELECT N'3', 5, 3, N'DisregardStock'
+	UNION
+	SELECT N'0', 5, 3, N'DisallowSingle'
+	UNION
+	SELECT N'0', 5, 3, N'NonDiscountable'
+	UNION
+	SELECT N'0', 5, 3, N'OrphanType'
+	UNION
+	SELECT N'0', 5, 3, N'AutoShipProduct'
+	UNION
+	SELECT N'0', 3, 3, N'OffPercent'
+	UNION
+	SELECT N'0', 5, 3, N'HideFromDataFeed'
+	UNION
+	SELECT N'0', 5, 3, N'AutoShipFrequency1'
+	UNION
+	SELECT N'0', 5, 3, N'AutoShipFrequency2'
+	UNION
+	SELECT N'0', 5, 3, N'AutoShipFrequency3'
+	UNION
+	SELECT N'0', 5, 3, N'AutoShipFrequency6'
+
+	--GC product type
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdProductType, Name)
+	SELECT NULL, 4, 4, N'Description'
+	UNION
+	SELECT NULL, 4, 4, N'ShortDescription'
+	UNION
+	SELECT NULL, 4, 4, N'ProductNotes'
+	UNION
+	SELECT NULL, 4, 4, N'MetaTitle'
+	UNION
+	SELECT NULL, 4, 4, N'MetaDescription'
+	UNION
+	SELECT NULL, 4, 4, N'TaxCode'
+	UNION
+	SELECT NULL, 4, 4, N'Thumbnail'
+	UNION
+	SELECT NULL, 4, 4, N'MainProductImage'
+	UNION
+	SELECT NULL, 4, 4, N'NutritionalTitle'
+	UNION
+	SELECT N'0', 3, 4, N'Stock'
+	UNION
+	SELECT N'5', 5, 4, N'DisregardStock'
+	UNION
+	SELECT N'0', 5, 4, N'DisallowSingle'
+	UNION
+	SELECT N'0', 5, 4, N'NonDiscountable'
+	UNION
+	SELECT N'0', 5, 4, N'OrphanType'
+	UNION
+	SELECT N'0', 5, 4, N'AutoShipProduct'
+	UNION
+	SELECT N'0', 3, 4, N'OffPercent'
+	UNION
+	SELECT N'0', 5, 4, N'HideFromDataFeed'
+	UNION
+	SELECT N'0', 5, 4, N'AutoShipFrequency1'
+	UNION
+	SELECT N'0', 5, 4, N'AutoShipFrequency2'
+	UNION
+	SELECT N'0', 5, 4, N'AutoShipFrequency3'
+	UNION
+	SELECT N'0', 5, 4, N'AutoShipFrequency6'
 
 END
