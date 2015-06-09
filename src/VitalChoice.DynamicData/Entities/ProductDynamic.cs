@@ -7,8 +7,6 @@ namespace VitalChoice.DynamicData.Entities
 {
     public class ProductDynamic : DynamicObject<ProductEntity, ProductOptionValue, ProductOptionType>
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
 
         public string Url { get; set; }
@@ -27,7 +25,9 @@ namespace VitalChoice.DynamicData.Entities
 
         public override ProductEntity ToEntity()
         {
-            return base.ToEntity();
+            var entity = base.ToEntity();
+            //entity.
+            return entity;
         }
 
         public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntity(ProductEntity entity)
@@ -44,11 +44,9 @@ namespace VitalChoice.DynamicData.Entities
 
         private void BaseConvert(ProductEntity entity, bool withDefaults = false)
         {
-            Id = entity.Id;
             Name = entity.Name;
             Url = entity.Url;
             Type = entity.IdProductType;
-            StatusCode = entity.StatusCode;
             Hidden = entity.Hidden;
             IdExternal = entity.IdExternal;
             Skus = new List<SkuDynamic>();

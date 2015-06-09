@@ -1,4 +1,6 @@
-﻿using VitalChoice.Domain.Entities.eCommerce.Base;
+﻿using System;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.DynamicData
 {
@@ -10,5 +12,9 @@ namespace VitalChoice.DynamicData
         IDynamicEntity<TEntity, TOptionValue, TOptionType> FromEntity(TEntity entity);
         IDynamicEntity<TEntity, TOptionValue, TOptionType> FromEntityWithDefaults(TEntity entity);
         TEntity ToEntity();
+        int Id { get; set; }
+        RecordStatusCode StatusCode { get; set; }
+        DateTime DateCreated { get; set; }
+        DateTime DateEdited { get; set; }
     }
 }

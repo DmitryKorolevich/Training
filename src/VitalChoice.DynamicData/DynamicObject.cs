@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Templates.Helpers;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
@@ -21,13 +22,10 @@ namespace VitalChoice.DynamicData
         where TOptionValue : OptionValue<TOptionType>, new()
         where TOptionType : OptionType, new()
     {
-        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
-            new Dictionary<Type, Dictionary<string, GenericProperty>>();
-
-        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
-            new Dictionary<Type, Dictionary<string, GenericProperty>>();
-
-        protected ExpandoObject DynamicData { get; } = new ExpandoObject();
+        public int Id { get; set; }
+        public RecordStatusCode StatusCode { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateEdited { get; set; }
 
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
 
@@ -39,13 +37,17 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            FromEntityInit(entity);
+            MoveDynamicFields(entity);
 
             var data = DynamicData as IDictionary<string, object>;
             foreach (var value in entity.OptionValues)
             {
                 data.Add(value.OptionType.Name, ConvertTo(value.Value, value.OptionType.IdFieldType));
             }
+            Id = entity.Id;
+            DateCreated = entity.DateCreated;
+            DateEdited = entity.DateEdited;
+            StatusCode = entity.StatusCode;
             return this;
         }
 
@@ -55,7 +57,7 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            FromEntityInit(entity);
+            MoveDynamicFields(entity);
 
             var data = DynamicData as IDictionary<string, object>;
             ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) this).FromEntity(entity);
@@ -63,25 +65,11 @@ namespace VitalChoice.DynamicData
             {
                 data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
             }
+            Id = entity.Id;
+            DateCreated = entity.DateCreated;
+            DateEdited = entity.DateEdited;
+            StatusCode = entity.StatusCode;
             return this;
-        }
-
-        private void FromEntityInit(TEntity entity)
-        {
-            if(entity.OptionValues!=null && entity.OptionTypes!=null)
-            {
-                foreach(var optionValue in entity.OptionValues)
-                {
-                    foreach (var optionType in entity.OptionTypes)
-                    {
-                        if(optionValue.IdOptionType==optionType.Id)
-                        {
-                            optionValue.OptionType = optionType;
-                            break;
-                        }
-                    }
-                }
-            }
         }
 
         public virtual TEntity ToEntity()
@@ -99,6 +87,8 @@ namespace VitalChoice.DynamicData
                 };
                 result.OptionValues.Add(option);
             }
+            result.Id = Id;
+            result.StatusCode = StatusCode;
             return result;
         }
 
@@ -220,6 +210,32 @@ namespace VitalChoice.DynamicData
             if ((object) dynamicObject == null)
                 return null;
             return ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) dynamicObject).ToEntity();
+        }
+
+        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
+
+        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
+
+        protected ExpandoObject DynamicData { get; } = new ExpandoObject();
+
+        private static void MoveDynamicFields(TEntity entity)
+        {
+            if (entity.OptionValues != null && entity.OptionTypes != null)
+            {
+                foreach (var optionValue in entity.OptionValues)
+                {
+                    foreach (var optionType in entity.OptionTypes)
+                    {
+                        if (optionValue.IdOptionType == optionType.Id)
+                        {
+                            optionValue.OptionType = optionType;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType, bool ignoreMapAttribute = false)

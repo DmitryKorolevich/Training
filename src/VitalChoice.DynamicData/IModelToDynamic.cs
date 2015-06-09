@@ -1,4 +1,5 @@
 ﻿using System;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.DynamicData
 {

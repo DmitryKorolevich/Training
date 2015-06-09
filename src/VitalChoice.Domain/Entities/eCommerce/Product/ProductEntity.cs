@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Product
@@ -11,12 +12,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Product
         public string Url { get; set; }
 
         public bool Hidden { get; set; }
-
-        public RecordStatusCode StatusCode { get; set; }
-
-        public DateTime DateCreated { get; set; }
-
-        public DateTime DateEdited { get; set; }
 
         public ProductType IdProductType { get; set; }
 

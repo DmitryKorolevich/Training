@@ -152,7 +152,9 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<Sku>().Key(s => s.Id);
 		    builder.Entity<Sku>().ForSqlServer().Table("Skus");
-		    builder.Entity<Sku>()
+		    builder.Entity<Sku>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<Sku>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdSku)
@@ -164,7 +166,9 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<ProductEntity>().Key(p => p.Id);
 		    builder.Entity<ProductEntity>().ForSqlServer().Table("Products");
-		    builder.Entity<ProductEntity>()
+            builder.Entity<ProductEntity>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<ProductEntity>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<ProductEntity>()
 		        .Collection(p => p.Skus)
 		        .InverseReference()
 		        .ForeignKey(s => s.IdProduct)
