@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Queries.Product
                 {
                     Add(x => x.FirstName.Contains(items[0]) && x.LastName.Contains(items[1]));
                 }
-                else
+                else if (items.Length > 0)
                 {
                     Add(x => x.FirstName.Contains(items[0]) || x.LastName.Contains(items[0]));
                 }
