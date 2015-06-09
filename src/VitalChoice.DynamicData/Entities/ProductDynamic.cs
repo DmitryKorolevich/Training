@@ -38,7 +38,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntityWithDefaults(ProductEntity entity)
         {
-            BaseConvert(entity);
+            BaseConvert(entity, true);
             return base.FromEntityWithDefaults(entity);
         }
 
@@ -51,13 +51,22 @@ namespace VitalChoice.DynamicData.Entities
             StatusCode = entity.StatusCode;
             Hidden = entity.Hidden;
             IdExternal = entity.IdExternal;
+            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
             Skus = new List<SkuDynamic>();
-            foreach(var sku in entity.Skus)
+            foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;
                 var skuDynamic = new SkuDynamic();
-                if(withDefaults)
+                if (withDefaults)
                 {
+                    //combine product part in skus
+                    foreach (var productValue in entity.OptionValues)
+                    {
+                        if (sku.OptionValues.FirstOrDefault(p => p.IdOptionType==productValue.IdOptionType) == null)
+                        {
+                            sku.OptionValues.Add(productValue);
+                        }
+                    }
                     skuDynamic.FromEntityWithDefaults(sku);
                 }
                 else
@@ -66,7 +75,6 @@ namespace VitalChoice.DynamicData.Entities
                 }
                 Skus.Add(skuDynamic);
             }
-            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
         }
     }
 }
