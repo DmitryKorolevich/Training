@@ -265,7 +265,7 @@ namespace VitalChoice.DynamicData
             {
                 var resultProperties = new Dictionary<string, GenericProperty>();
                 foreach (
-                    var property in objectType.GetTypeInfo().DeclaredProperties)
+                    var property in objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
                     if (mapAttribute != null || ignoreMapAttribute)
