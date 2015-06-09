@@ -6,10 +6,10 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Product;
-using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product
 {

@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Domain.Entities.Product
+﻿namespace VitalChoice.Domain.Entities.Products
 {
     public static class VProductSkuSortPath
     {

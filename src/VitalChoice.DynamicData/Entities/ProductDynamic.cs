@@ -1,19 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public class ProductDynamic : DynamicObject<ProductEntity, ProductOptionValue, ProductOptionType>
+    public sealed class ProductDynamic : DynamicObject<Product, ProductOptionValue, ProductOptionType>
     {
+        public ProductDynamic()
+        {
+            
+        }
+
+        public ProductDynamic(Product entity, bool withDefaults = false) : base(entity, withDefaults)
+        {
+        }
+
         public string Name { get; set; }
 
         public string Url { get; set; }
 
         public ProductType Type { get; set; }
-
-        public RecordStatusCode StatusCode { get; set; }
 
         public bool Hidden { get; set; }
 
@@ -23,53 +30,65 @@ namespace VitalChoice.DynamicData.Entities
 
         public ICollection<int> CategoryIds { get; set; }
 
-        public override ProductEntity ToEntity()
+        protected override void FillEntity(Product entity)
         {
-            var entity = base.ToEntity();
-            //entity.
-            return entity;
+            entity.Hidden = Hidden;
+            entity.IdExternal = IdExternal;
+            entity.IdProductType = Type;
+            entity.Name = Name;
+            entity.Url = Url;
+            entity.ProductsToCategories = CategoryIds.Select(c => new ProductToCategory
+            {
+                IdCategory = c,
+                IdProduct = Id
+            }).ToArray();
+
+            entity.Skus = Skus.Select(s =>
+            {
+                var sku = s.ToEntity();
+                sku.IdProduct = Id;
+                return sku;
+            }).ToArray();
         }
 
-        public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntity(ProductEntity entity)
+        protected override void FromEntity(Product entity)
         {
             BaseConvert(entity);
-            return base.FromEntity(entity);
         }
 
-        public override IDynamicEntity<ProductEntity, ProductOptionValue, ProductOptionType> FromEntityWithDefaults(ProductEntity entity)
+        protected override void FromEntityWithDefaults(Product entity)
         {
             BaseConvert(entity, true);
-            return base.FromEntityWithDefaults(entity);
         }
 
-        private void BaseConvert(ProductEntity entity, bool withDefaults = false)
+        private void BaseConvert(Product entity, bool withDefaults = false)
         {
             Name = entity.Name;
             Url = entity.Url;
             Type = entity.IdProductType;
             Hidden = entity.Hidden;
             IdExternal = entity.IdExternal;
-            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
+            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToArray();
             Skus = new List<SkuDynamic>();
             foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;
-                var skuDynamic = new SkuDynamic();
+                SkuDynamic skuDynamic;
                 if (withDefaults)
                 {
                     //combine product part in skus
                     foreach (var productValue in entity.OptionValues)
                     {
-                        if (sku.OptionValues.FirstOrDefault(p => p.IdOptionType==productValue.IdOptionType) == null)
+                        if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
                         {
                             sku.OptionValues.Add(productValue);
                         }
                     }
-                    skuDynamic.FromEntityWithDefaults(sku);
+                    skuDynamic = new SkuDynamic(sku, true);
                 }
                 else
                 {
-                    skuDynamic.FromEntity(sku);
+                    skuDynamic = new SkuDynamic(sku);
                 }
                 Skus.Add(skuDynamic);
             }

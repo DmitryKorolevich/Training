@@ -1,15 +1,21 @@
 ﻿using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public class SkuDynamic : DynamicObject<Sku, ProductOptionValue, ProductOptionType>
+    public sealed class SkuDynamic : DynamicObject<Sku, ProductOptionValue, ProductOptionType>
     {
-        public int Id { get; set; }
+        public SkuDynamic()
+        {
+            
+        }
+
+        public SkuDynamic(Sku entity, bool withDefaults = false) : base(entity, withDefaults)
+        {
+            
+        }
 
         public string Code { get; set; }
-
-        public RecordStatusCode StatusCode { get; set; }
 
         public bool Hidden { get; set; }
 
@@ -17,28 +23,27 @@ namespace VitalChoice.DynamicData.Entities
 
         public decimal WholesalePrice { get; set; }
 
-        public override Sku ToEntity()
-        {
-            return base.ToEntity();
-        }
-
-        public override IDynamicEntity<Sku, ProductOptionValue, ProductOptionType> FromEntity(Sku entity)
+        protected override void FromEntity(Sku entity)
         {
             BaseConvert(entity);
-            return base.FromEntity(entity);
         }
 
-        public override IDynamicEntity<Sku, ProductOptionValue, ProductOptionType> FromEntityWithDefaults(Sku entity)
+        protected override void FromEntityWithDefaults(Sku entity)
         {
             BaseConvert(entity);
-            return base.FromEntityWithDefaults(entity);
+        }
+
+        protected override void FillEntity(Sku entity)
+        {
+            entity.Code = Code;
+            entity.Hidden = Hidden;
+            entity.Price = Price;
+            entity.WholesalePrice = WholesalePrice;
         }
 
         private void BaseConvert(Sku entity)
         {
-            Id = entity.Id;
             Code = entity.Code;
-            StatusCode = entity.StatusCode;
             Hidden = entity.Hidden;
             Price = entity.Price;
             WholesalePrice = entity.WholesalePrice;

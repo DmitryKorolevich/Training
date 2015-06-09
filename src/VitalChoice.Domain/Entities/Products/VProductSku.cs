@@ -1,7 +1,7 @@
 ﻿using System;
-using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
-namespace VitalChoice.Domain.Entities.Product
+namespace VitalChoice.Domain.Entities.Products
 {
     public class VProductSku: Entity
     {

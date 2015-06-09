@@ -9,14 +9,14 @@ using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Product;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Mail;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Interfaces.Services.Product;
 
-namespace VitalChoice.Business.Services.Product
+namespace VitalChoice.Business.Services.Products
 {
     public class GCService : IGCService
     {
@@ -40,11 +40,8 @@ namespace VitalChoice.Business.Services.Product
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)
         {
-            var query = giftCertificateRepository.Query();
-
-            var conditions = new GCConditions();
-            conditions.Init(query);
-            conditions = conditions.NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
+            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WithCode(filter.Code).WithEmail(filter.Email).WithName(filter.Name);
+            var query = giftCertificateRepository.Query(conditions);            
 
 	        Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
 			var sortOrder = filter.Sorting.SortOrder;
@@ -99,22 +96,16 @@ namespace VitalChoice.Business.Services.Product
 
         public async Task<GiftCertificate> GetGiftCertificateAsync(int id)
         {
-            var query = giftCertificateRepository.Query();
-
-            var conditions = new GCConditions();
-            conditions.Init(query);
-            conditions = conditions.WithId(id).NotDeleted();
+            var conditions = new GcQuery().WithId(id).NotDeleted();
+            var query = giftCertificateRepository.Query(conditions);
 
             return (await query.SelectAsync(false)).FirstOrDefault();
         }
 
         public async Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model)
         {
-            var query = giftCertificateRepository.Query();
-
-            var conditions = new GCConditions();
-            conditions.Init(query);
-            conditions = conditions.WithId(model.Id).NotDeleted();
+            var conditions = new GcQuery().WithId(model.Id).NotDeleted();
+            var query = giftCertificateRepository.Query(conditions);
 
             GiftCertificate dbItem = (await query.SelectAsync()).FirstOrDefault();
 

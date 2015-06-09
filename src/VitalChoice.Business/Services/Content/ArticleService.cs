@@ -13,8 +13,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities.eCommerce.Product;
-using VitalChoice.Business.Services.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -26,12 +25,12 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IEcommerceRepositoryAsync<ProductEntity> productRepository;
+        private readonly IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ArticleService(IEcommerceRepositoryAsync<ProductEntity> productRepository, IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
+        public ArticleService(IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository, IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
             IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository)

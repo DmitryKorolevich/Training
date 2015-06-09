@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Products;
 
 namespace VitalChoice.Domain.Entities.Content
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Products;
 
 namespace VitalChoice.Domain.Entities
 {

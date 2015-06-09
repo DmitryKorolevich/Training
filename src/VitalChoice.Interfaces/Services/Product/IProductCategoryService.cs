@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Product;
-using VitalChoice.Domain.Transfer.Product;
+using VitalChoice.Domain.Entities.Products;
+using VitalChoice.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Product
 {

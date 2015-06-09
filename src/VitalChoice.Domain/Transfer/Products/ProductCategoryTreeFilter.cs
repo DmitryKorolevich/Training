@@ -1,8 +1,7 @@
 ﻿using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Domain.Transfer.Product
+namespace VitalChoice.Domain.Transfer.Products
 {
     public class ProductCategoryTreeFilter : FilterBase
     {

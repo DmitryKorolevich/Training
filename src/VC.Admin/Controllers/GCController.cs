@@ -8,12 +8,13 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Transfer.Product;
-using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
 using System.Security.Claims;
 using System;
+using VC.Admin.Models;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Validation.Base;
 

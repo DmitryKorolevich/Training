@@ -10,10 +10,10 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Workflow;
 
@@ -164,26 +164,26 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductToCategory>().Key(p => p.Id);
             builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
 
-            builder.Entity<ProductEntity>().Key(p => p.Id);
-		    builder.Entity<ProductEntity>().ForSqlServer().Table("Products");
-            builder.Entity<ProductEntity>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
-            builder.Entity<ProductEntity>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
-            builder.Entity<ProductEntity>()
+            builder.Entity<Product>().Key(p => p.Id);
+		    builder.Entity<Product>().ForSqlServer().Table("Products");
+            builder.Entity<Product>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<Product>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<Product>()
 		        .Collection(p => p.Skus)
 		        .InverseReference()
 		        .ForeignKey(s => s.IdProduct)
 		        .PrincipalKey(p => p.Id);
-		    builder.Entity<ProductEntity>()
+		    builder.Entity<Product>()
 		        .Collection(p => p.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdProduct)
 		        .PrincipalKey(p => p.Id);
-		    builder.Entity<ProductEntity>()
+		    builder.Entity<Product>()
 		        .Collection(p => p.OptionTypes)
 		        .InverseReference()
 		        .ForeignKey(t => t.IdProductType)
 		        .PrincipalKey(p => p.IdProductType);
-            builder.Entity<ProductEntity>()
+            builder.Entity<Product>()
                 .Collection(p => p.ProductsToCategories)
                 .InverseReference()
                 .ForeignKey(t => t.IdProduct)

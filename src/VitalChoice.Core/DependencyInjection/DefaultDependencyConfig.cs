@@ -13,7 +13,6 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services;
 using VitalChoice.Business.Services.Content;
 using VitalChoice.Business.Services.Content.ContentProcessors;
-using VitalChoice.Business.Services.Product;
 using VitalChoice.Business.Services.Settings;
 using VitalChoice.Business.Services.Workflow;
 using VitalChoice.Core.Infrastructure;
@@ -34,6 +33,7 @@ using VitalChoice.Validation.Base;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using Newtonsoft.Json;
+using VitalChoice.Business.Services.Products;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;

@@ -1,57 +1,57 @@
 {
-    "webroot": "wwwroot",
-    "version": "1.0.0-*",
-    "exclude": [
-        "wwwroot",
-        "node_modules",
-        "bower_components",
-        "deploy"
-    ],
-    "publishExclude": [
-        "node_modules",
-        "bower_components",
-        "deploy",
-        "**.kproj",
-        "**.user",
-        "**.vspscc"
-    ],
-    "dependencies": {
-        "Microsoft.AspNet.Server.IIS": "1.0.0-*",
-        "Microsoft.AspNet.Mvc": "6.0.0-*",
-        "Microsoft.AspNet.Diagnostics": "1.0.0-*",
-        "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-*",
-      "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-      "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
-        "Kestrel": "1.0.0-*",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-*",
-        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
-        "Microsoft.Framework.Logging.Console": "1.0.0-*",
-        "EntityFramework.Commands": "7.0.0-*",
-        "VitalChoice.Domain": "1.0.0-*",
-        "VitalChoice.Data": "1.0.0-*",
-        "VitalChoice.Infrastructure": "1.0.0-*",
-        "VitalChoice.Core": "1.0.0-*",
-      "VitalChoice.Validation": "1.0.0-*",
-      "VitalChoice.DynamicData": "1.0.0-*"
+  "webroot": "wwwroot",
+  "version": "1.0.0-*",
+  "exclude": [
+    "wwwroot",
+    "node_modules",
+    "bower_components",
+    "deploy"
+  ],
+  "publishExclude": [
+    "node_modules",
+    "bower_components",
+    "deploy",
+    "**.kproj",
+    "**.user",
+    "**.vspscc"
+  ],
+  "dependencies": {
+    "Microsoft.AspNet.Server.IIS": "1.0.0-*",
+    "Microsoft.AspNet.Mvc": "6.0.0-*",
+    "Microsoft.AspNet.Diagnostics": "1.0.0-*",
+    "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-*",
+    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
+    "Kestrel": "1.0.0-*",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-*",
+    "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
+    "Microsoft.Framework.Logging.Console": "1.0.0-*",
+    "EntityFramework.Commands": "7.0.0-*",
+    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Data": "1.0.0-*",
+    "VitalChoice.Infrastructure": "1.0.0-*",
+    "VitalChoice.Core": "1.0.0-*",
+    "VitalChoice.Validation": "1.0.0-*",
+    "VitalChoice.DynamicData": "1.0.0-*"
+  },
+  "frameworks": {
+    "dnx451": {
+      "compilationOptions": { "define": [ "DNX451" ] },
+      "dependencies": {
+        "Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*"
+      }
     },
-    "frameworks": {
-        "dnx451": {
-            "compilationOptions": { "define": [ "DNX451" ] },
-            "dependencies": {
-                "Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*"
-            }
-        },
-        "dnxcore50": {
-            "compilationOptions": { "define": [ "DNXCORE50" ] },
-            "dependencies": {
-                "System.Runtime": "4.0.20-*"
-            }
-        }
-    },
-    "commands": {
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004",
-        "gen": "Microsoft.Framework.CodeGeneration",
-        "ef": "EntityFramework.Commands"
+    "dnxcore50": {
+      "compilationOptions": { "define": [ "DNXCORE50" ] },
+      "dependencies": {
+        "System.Runtime": "4.0.20-*"
+      }
     }
+  },
+  "commands": {
+    "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
+    "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5004",
+    "gen": "Microsoft.Framework.CodeGeneration",
+    "ef": "EntityFramework.Commands"
+  }
 }

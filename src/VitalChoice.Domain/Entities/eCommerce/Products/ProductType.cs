@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Domain.Entities.eCommerce.Product
+﻿namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
     public enum ProductType
     {

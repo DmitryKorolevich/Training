@@ -31,15 +31,33 @@ namespace VitalChoice.DynamicData
 
         public dynamic Data => DynamicData;
 
-        public virtual IDynamicEntity<TEntity, TOptionValue, TOptionType> FromEntity
-            (TEntity entity)
+        protected DynamicObject(TEntity entity, bool withDefaults = false)
+        {
+            if (withDefaults)
+            {
+                FromEntityWithDefaultsInternal(entity);
+            }
+            else
+            {
+                FromEntityInternal(entity);
+            }
+        }
+
+        protected DynamicObject()
+        {
+            
+        }
+
+        protected abstract void FromEntity(TEntity entity);
+
+        private void FromEntityInternal(TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
             MoveDynamicFields(entity);
 
-            var data = DynamicData as IDictionary<string, object>;
+            var data = DictionaryData;
             foreach (var value in entity.OptionValues)
             {
                 data.Add(value.OptionType.Name, ConvertTo(value.Value, value.OptionType.IdFieldType));
@@ -48,19 +66,20 @@ namespace VitalChoice.DynamicData
             DateCreated = entity.DateCreated;
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
-            return this;
+            FromEntity(entity);
         }
 
-        public virtual IDynamicEntity<TEntity, TOptionValue, TOptionType>
-            FromEntityWithDefaults(TEntity entity)
+        protected abstract void FromEntityWithDefaults(TEntity entity);
+
+        private void FromEntityWithDefaultsInternal(TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
             MoveDynamicFields(entity);
 
-            var data = DynamicData as IDictionary<string, object>;
-            ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) this).FromEntity(entity);
+            var data = DictionaryData;
+            FromEntityInternal(entity);
             foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
             {
                 data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
@@ -69,10 +88,12 @@ namespace VitalChoice.DynamicData
             DateCreated = entity.DateCreated;
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
-            return this;
+            FromEntityWithDefaults(entity);
         }
 
-        public virtual TEntity ToEntity()
+        protected abstract void FillEntity(TEntity entity);
+
+        public TEntity ToEntity()
         {
             var result = new TEntity {OptionValues = new List<TOptionValue>()};
             foreach (var data in DynamicData)
@@ -89,6 +110,7 @@ namespace VitalChoice.DynamicData
             }
             result.Id = Id;
             result.StatusCode = StatusCode;
+            FillEntity(result);
             return result;
         }
 
@@ -205,11 +227,9 @@ namespace VitalChoice.DynamicData
             model.FillDynamic(this);
         }
 
-        public static explicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)
+        public static implicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)
         {
-            if ((object) dynamicObject == null)
-                return null;
-            return ((IDynamicEntity<TEntity, TOptionValue, TOptionType>) dynamicObject).ToEntity();
+            return dynamicObject?.ToEntity();
         }
 
         protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =

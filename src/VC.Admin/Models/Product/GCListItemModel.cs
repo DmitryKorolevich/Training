@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Product;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Products;
 
 namespace VC.Admin.Models.Product
 {
@@ -53,16 +53,16 @@ namespace VC.Admin.Models.Product
                 Email = item.Email;
                 StatusCode = item.StatusCode;
                 GCType = item.GCType;
-                if (!String.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName))
+                if (!string.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName))
                 {
                     RecipientName = $"{item.FirstName} {item.LastName} ";
                 }
-                if (!String.IsNullOrEmpty(item.Email))
+                if (!string.IsNullOrEmpty(item.Email))
                 {
                     RecipientEmail = $"({item.Email})";
                 }
                 ProductName = StatusEnumHelper.GetGCTypeName(item.GCType);
-                if (item.User != null && item.User.Profile != null)
+                if (item.User?.Profile != null)
                 {
                     AgentId = item.User.Profile.AgentId;
                 }

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 
-namespace VitalChoice.Domain.Entities.eCommerce.Product
+namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
-    public class ProductEntity : DynamicDataEntity<ProductOptionValue, ProductOptionType>
+    public class Product : DynamicDataEntity<ProductOptionValue, ProductOptionType>
     {
         public string Name { get; set; }
 

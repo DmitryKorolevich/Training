@@ -3,36 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
-using Templates;
 using VitalChoice.Business.Queries.Product;
-using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Product;
-using VitalChoice.Interfaces.Services.Product;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Product;
-using VitalChoice.Data.Helpers;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.Interfaces.Services.Product;
 
-namespace VitalChoice.Business.Services.Product
+namespace VitalChoice.Business.Services.Products
 {
     public class ProductService : IProductService
     {
         private readonly IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
-        private readonly IEcommerceRepositoryAsync<ProductEntity> productRepository;
+        private readonly IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> skuRepository;
         private readonly ILogger logger;
 
         public ProductService(IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<ProductEntity> productRepository, IEcommerceRepositoryAsync<Sku> skuRepository)
+            IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository, IEcommerceRepositoryAsync<Sku> skuRepository)
         {
             this.vProductSkuRepository = vProductSkuRepository;
             this.productOptionTypeRepository = productOptionTypeRepository;
@@ -115,11 +112,8 @@ namespace VitalChoice.Business.Services.Product
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
-            var query = vProductSkuRepository.Query();
-
-            var conditions = new VProductSkuConditions();
-            conditions.Init(query);
-            conditions = conditions.NotDeleted().WithText(filter.SearchText);
+            var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
+            var query = vProductSkuRepository.Query(conditions);
 
             Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable = x => x.OrderByDescending(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
@@ -127,7 +121,7 @@ namespace VitalChoice.Business.Services.Product
             {
                 case VProductSkuSortPath.Name:
                     sortable =
-                        (x) =>
+                        x =>
                             sortOrder == SortOrder.Asc
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
@@ -141,22 +135,14 @@ namespace VitalChoice.Business.Services.Product
 
         public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults=false)
         {
-            IQueryFluent<ProductEntity> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
+            IQueryFluent<Product> res = productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.OptionValues)
                 .Include(p=>p.ProductsToCategories).Include(p => p.OptionTypes);
             var item =(await res.SelectAsync(false)).FirstOrDefault();
             ProductDynamic toReturn = null;
             if (item!=null)
             {
                 item.Skus = (await skuRepository.Query(p=>p.IdProduct==item.Id).Include(p => p.OptionValues).SelectAsync(false)).ToList();
-                toReturn = new ProductDynamic();
-                if(withDefaults)
-                {
-                    toReturn.FromEntityWithDefaults(item);
-                }
-                else
-                {
-                    toReturn.FromEntity(item);
-                }
+                toReturn = new ProductDynamic(item, withDefaults);
             }
 
             return toReturn;

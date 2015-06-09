@@ -9,12 +9,12 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Product;
+using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Product;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Product;
 
-namespace VitalChoice.Business.Services.Product
+namespace VitalChoice.Business.Services.Products
 {
     public class ProductCategoryService : IProductCategoryService
     {

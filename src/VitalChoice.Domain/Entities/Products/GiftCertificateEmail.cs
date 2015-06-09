@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Content;
-
-namespace VitalChoice.Domain.Entities.Product
+﻿namespace VitalChoice.Domain.Entities.Products
 {
     public class GiftCertificateEmail : Entity
     {
