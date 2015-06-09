@@ -48,6 +48,14 @@ namespace VitalChoice.Business.Services.Content
                 if (filter.CategoryId.Value != -1)
                 {
                     ids = (await recipeToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.RecipeId).ToList();
+                    if (ids.Count == 0)
+                    {
+                        return new PagedList<Recipe>()
+                        {
+                            Count = 0,
+                            Items = new Recipe[0],
+                        };
+                    }
                     query = query.WithIds(ids);
                 }
                 else

@@ -48,6 +48,14 @@ namespace VitalChoice.Business.Services.Content
                 if (filter.CategoryId.Value != -1)
                 {
                     ids = (await faqToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.FAQId).ToList();
+                    if (ids.Count == 0)
+                    {
+                        return new PagedList<FAQ>()
+                        {
+                            Count = 0,
+                            Items = new FAQ[0],
+                        };
+                    }
                     query = query.WithIds(ids);
                 }
                 else

@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Queries.Log
             }
             if (!String.IsNullOrEmpty(logLevel))
             {
-                Add(x => x.LogLevel.Equals(logLevel));
+                Add(x => x.LogLevel == logLevel);
             }
             if (!String.IsNullOrEmpty(message))
             {

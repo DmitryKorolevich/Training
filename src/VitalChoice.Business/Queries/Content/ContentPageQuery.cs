@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Queries.Content
     {
         public ContentPageQuery WithId(int id)
         {
-            And(x => x.Id.Equals(id));
+            And(x => x.Id == id);
             return this;
         }
 
@@ -36,10 +36,6 @@ namespace VitalChoice.Business.Queries.Content
                     Or(x => x.Id == id);
                 }
             }
-            else
-            {
-                And(x => 1 != 1);
-            }
             return this;
         }
 
@@ -57,7 +53,7 @@ namespace VitalChoice.Business.Queries.Content
 
         public ContentPageQuery NotDeleted()
         {
-            And(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));
+            And(x => x.StatusCode==RecordStatusCode.Active || x.StatusCode==RecordStatusCode.NotActive);
             return this;
         }
     }

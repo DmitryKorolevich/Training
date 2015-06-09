@@ -130,6 +130,6 @@
     <None Include="PostDeployment\Scripts\YouTubeAndCrossSellsFields.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="PostDeployment\Scripts\ProductOptionTypesNutrition.sql" />
+    <None Include="PostDeployment\Scripts\ProductOptionTypesNutrition.sql" />
   </ItemGroup>
 </Project>

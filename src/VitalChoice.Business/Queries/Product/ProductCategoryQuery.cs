@@ -13,21 +13,21 @@ namespace VitalChoice.Business.Queries.Product
     {
         public ProductCategoryQuery WithId(int id)
         {
-            Add(x => x.Id.Equals(id));
+            Add(x => x.Id == id);
 
             return this;
         }
 
         public ProductCategoryQuery WithParentId(int id)
         {
-            Add(x => x.ParentId.Equals(id));
+            Add(x => x.ParentId == id);
 
             return this;
         }
 
         public ProductCategoryQuery NotDeleted()
         {
-            Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));
+            Add(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
 
             return this;
         }
@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
             {
-                Add(x => x.StatusCode.Equals(status));
+                Add(x => x.StatusCode == status);
             }
 
             return this;

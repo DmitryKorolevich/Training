@@ -49,10 +49,6 @@ namespace VitalChoice.Business.Services.Content
         
         public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)
         {
-            //var items = optionTypeRepository.Query().Select().ToList();
-
-            //ProductEntity product3 = (productRepository.Query(p => p.Id == 1).Include(p => p.OptionValues).Include(p => p.OptionTypes).Include(p => p.Skus).Select()).FirstOrDefault();
-
             ArticleQuery query = new ArticleQuery();
             List<int> ids = null;
             if(filter.CategoryId.HasValue)
@@ -60,6 +56,14 @@ namespace VitalChoice.Business.Services.Content
                 if (filter.CategoryId.Value != -1)
                 {
                     ids = (await articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.ArticleId).ToList();
+                    if(ids.Count==0)
+                    {
+                        return new PagedList<Article>()
+                        {
+                            Count=0,
+                            Items =new List<Article>(),
+                        };
+                    }
                     query = query.WithIds(ids);
                 }
                 else

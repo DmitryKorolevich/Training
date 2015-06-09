@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (type.HasValue)
             {
-                Add(x => x.Type.Equals(type));
+                Add(x => x.Type == type);
             }
 
             return this;
@@ -22,21 +22,21 @@ namespace VitalChoice.Business.Queries.Content
 
         public CategoryQuery WithId(int id)
         {
-            Add(x => x.Id.Equals(id));
+            Add(x => x.Id ==id);
 
             return this;
         }
 
         public CategoryQuery WithParentId(int id)
         {
-            Add(x => x.ParentId.Equals(id));
+            Add(x => x.ParentId ==id);
 
             return this;
         }
 
         public CategoryQuery NotDeleted()
         {
-            Add(x => x.StatusCode.Equals(RecordStatusCode.Active) || x.StatusCode.Equals(RecordStatusCode.NotActive));
+            Add(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
 
             return this;
         }
@@ -45,7 +45,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
             {
-                Add(x => x.StatusCode.Equals(status));
+                Add(x => x.StatusCode ==status);
             }
 
             return this;
