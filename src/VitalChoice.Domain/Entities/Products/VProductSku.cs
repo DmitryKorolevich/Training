@@ -5,13 +5,15 @@ namespace VitalChoice.Domain.Entities.Products
 {
     public class VProductSku: Entity
     {
+        public int? SkuId { get; set; }
+
         public string Code { get; set; }
 
         public string Name { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
-        public decimal WholesalePrice { get; set; }
+        public decimal? WholesalePrice { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
 

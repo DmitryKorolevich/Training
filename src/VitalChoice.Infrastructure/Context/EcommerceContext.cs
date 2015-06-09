@@ -123,8 +123,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
             builder.Entity<GiftCertificate>().Property(p => p.PublicId).ForSqlServer().UseDefaultValueGeneration();
 
-            builder.Entity<VProductSku>().Key(p => p.Id);
-		    builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
+            builder.Entity<VProductSku>().Key(p => p.IdProduct);
+            builder.Entity<VProductSku>().Ignore(x => x.Id);
+            builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
 
             builder.Entity<ProductOptionType>().Key(p => p.Id);
             builder.Entity<ProductOptionType>().ForSqlServer().Table("ProductOptionTypes");

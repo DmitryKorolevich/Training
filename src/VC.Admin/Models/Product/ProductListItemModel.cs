@@ -15,7 +15,7 @@ namespace VC.Admin.Models.Product
 {
     public class ProductListItemModel : Model<VProductSku, IMode>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public int ProductId { get; set; }
 
@@ -33,7 +33,7 @@ namespace VC.Admin.Models.Product
         {
             if(item!=null)
             {
-                Id = item.Id;
+                Id = item.SkuId;
                 ProductId = item.IdProduct;
                 Name = item.Name;
                 Thumbnail = item.Thumbnail;

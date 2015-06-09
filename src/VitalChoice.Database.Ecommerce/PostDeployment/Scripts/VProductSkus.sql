@@ -4,7 +4,7 @@ GO
 CREATE VIEW [dbo].[VProductSkus]
 AS 
 SELECT 
-	s.Id,
+	s.Id AS SkuId,
 	s.Code, 
 	s.Price, 
 	s.WholesalePrice, 
