@@ -222,6 +222,10 @@ namespace VC.Admin.Models.Product
         public void FillSelfFrom(ProductDynamic dynamicObject)
         {
             CategoryIds = dynamicObject.CategoryIds.ToList();
+            if(SKUs==null)
+            {
+                SKUs = new List<SKUManageModel>();
+            }
 
             CrossSellProducts = new List<CrossSellProductModel>()
                     {
