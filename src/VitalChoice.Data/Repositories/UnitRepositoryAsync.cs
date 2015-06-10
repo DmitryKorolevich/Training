@@ -13,9 +13,9 @@ using VitalChoice.Domain;
 namespace VitalChoice.Data.Repositories
 {
     public class UnitRepositoryAsync<TEntity> : ReadRepositoryAsync<TEntity>,
-    IUnitRepositoryAsync<TEntity> where TEntity : Entity
+        IUnitRepositoryAsync<TEntity> where TEntity : Entity
     {
-        public UnitRepositoryAsync(IDataContextAsync context) :base(context)
+        public UnitRepositoryAsync(IDataContextAsync context) : base(context)
         {
         }
 
@@ -188,7 +188,7 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool DeleteAll(ICollection<TEntity> entitySet)
         {
-            if (!entitySet.Any())
+            if (entitySet == null || !entitySet.Any())
                 return false;
             DbSet.RemoveRange(entitySet);
             return true;
@@ -247,6 +247,8 @@ namespace VitalChoice.Data.Repositories
         public virtual Task<bool> DeleteAllAsync(CancellationToken cancellationToken,
             ICollection<TEntity> entitySet)
         {
+            if (entitySet == null || !entitySet.Any())
+                return Task.FromResult(false);
             DbSet.RemoveRange(entitySet);
             return Task.FromResult(true);
         }
