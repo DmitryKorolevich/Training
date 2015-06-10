@@ -226,7 +226,7 @@ namespace VitalChoice.Business.Services.Products
                     (await
                         _skuRepository.Query(p => p.IdProduct == entity.Id)
                             .Include(p => p.OptionValues)
-                            .SelectAsync()).ToArray();
+                            .SelectAsync()).ToList();
                 IncludeSkuOptionTypes(entity, optionTypes);
                 model.UpdateEntity(entity);
                 await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
