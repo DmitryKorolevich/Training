@@ -44,7 +44,7 @@ namespace VitalChoice.DynamicData.Entities
                 IdProduct = Id
             }).ToArray();
 
-            entity.Skus = Skus?.Select(s => s.ToEntity()).ToArray();
+            entity.Skus = Skus?.Select(s => s.ToEntity()).ToArray() ?? new Sku[0];
         }
 
         protected override void UpdateEntityInternal(Product entity)

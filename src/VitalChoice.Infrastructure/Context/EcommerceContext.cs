@@ -138,12 +138,14 @@ namespace VitalChoice.Infrastructure.Context
 		        .Reference(p => p.Lookup)
 		        .InverseCollection()
 		        .ForeignKey(p => p.IdLookup)
-		        .PrincipalKey(p => p.Id);
+		        .PrincipalKey(p => p.Id)
+                .Required(false);
             builder.Entity<ProductOptionType>()
                 .Reference(p => p.FieldType)
                 .InverseCollection()
                 .ForeignKey(p => p.IdFieldType)
-                .PrincipalKey(p => p.Id);
+                .PrincipalKey(p => p.Id)
+                .Required();
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
 		    builder.Entity<ProductOptionValue>().ForSqlServer().Table("ProductOptionValues");
@@ -151,7 +153,8 @@ namespace VitalChoice.Infrastructure.Context
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
 		        .ForeignKey(t => t.IdOptionType)
-		        .PrincipalKey(v => v.Id).Required();
+		        .PrincipalKey(v => v.Id)
+                .Required();
 
             builder.Entity<ProductTypeEntity>().Key(t => t.Id);
 		    builder.Entity<ProductTypeEntity>().ForSqlServer().Table("ProductTypes");
@@ -164,7 +167,8 @@ namespace VitalChoice.Infrastructure.Context
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdSku)
-		        .PrincipalKey(s => s.Id).Required(false);
+		        .PrincipalKey(s => s.Id)
+                .Required(false);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
@@ -178,22 +182,26 @@ namespace VitalChoice.Infrastructure.Context
 		        .Collection(p => p.Skus)
 		        .InverseReference()
 		        .ForeignKey(s => s.IdProduct)
-		        .PrincipalKey(p => p.Id).Required();
+		        .PrincipalKey(p => p.Id)
+                .Required();
             builder.Entity<Product>()
 		        .Collection(p => p.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdProduct)
-		        .PrincipalKey(p => p.Id).Required(false);
+		        .PrincipalKey(p => p.Id)
+                .Required(false);
             builder.Entity<Product>()
 		        .Collection(p => p.OptionTypes)
 		        .InverseReference()
 		        .ForeignKey(t => t.IdProductType)
-		        .PrincipalKey(p => p.IdProductType).Required(false);
+		        .PrincipalKey(p => p.IdProductType)
+                .Required(false);
 		    builder.Entity<Product>()
 		        .Collection(p => p.ProductsToCategories)
 		        .InverseReference()
 		        .ForeignKey(t => t.IdProduct)
-		        .PrincipalKey(p => p.Id).Required();
+		        .PrincipalKey(p => p.Id)
+                .Required();
 
             #endregion
 
