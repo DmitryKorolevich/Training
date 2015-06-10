@@ -119,7 +119,7 @@ namespace VitalChoice.DynamicData
             entity.OptionValues = newOptions;
             entity.Id = Id;
             entity.StatusCode = StatusCode;
-            FillNewEntity(entity);
+            UpdateEntityInternal(entity);
         }
 
         protected abstract void UpdateEntityInternal(TEntity entity);
