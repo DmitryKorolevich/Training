@@ -343,7 +343,7 @@ BEGIN
 	UNION
 	SELECT N'0', 5, 3, N'AutoShipProduct'
 	UNION
-	SELECT N'0', 3, 3, N'OffPercent'
+	SELECT N'0', 2, 3, N'OffPercent'
 	UNION
 	SELECT N'0', 5, 3, N'HideFromDataFeed'
 	UNION
@@ -389,7 +389,7 @@ BEGIN
 	UNION
 	SELECT N'0', 5, 4, N'AutoShipProduct'
 	UNION
-	SELECT N'0', 3, 4, N'OffPercent'
+	SELECT N'0', 2, 4, N'OffPercent'
 	UNION
 	SELECT N'0', 5, 4, N'HideFromDataFeed'
 	UNION

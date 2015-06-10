@@ -180,11 +180,15 @@ namespace VC.Admin.Models.Product
 
         public IList<VideoModel> Videos { get; set; }
 
-        [Map]
+        [Map("Skus")]
         public IList<SKUManageModel> SKUs { get; set; }
 
         public ProductManageModel()
         {
+            SKUs = new List<SKUManageModel>();
+            Videos = new List<VideoModel>();
+            CrossSellProducts = new List<CrossSellProductModel>();
+            CategoryIds = new List<int>();
         }
 
         public override ProductDynamic Convert()
@@ -222,10 +226,6 @@ namespace VC.Admin.Models.Product
         public void FillSelfFrom(ProductDynamic dynamicObject)
         {
             CategoryIds = dynamicObject.CategoryIds.ToList();
-            if(SKUs==null)
-            {
-                SKUs = new List<SKUManageModel>();
-            }
 
             CrossSellProducts = new List<CrossSellProductModel>()
                     {

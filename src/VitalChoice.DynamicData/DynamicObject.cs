@@ -8,6 +8,7 @@ using System.Reflection;
 using Templates.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
@@ -56,11 +57,16 @@ namespace VitalChoice.DynamicData
                 throw new ArgumentNullException(nameof(entity));
 
             var data = DictionaryData;
-            if (entity.OptionValues != null)
+            var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
+            if (entity.OptionValues != null && optionTypes != null)
             {
                 foreach (var value in entity.OptionValues)
                 {
-                    data.Add(value.OptionType.Name, ConvertTo(value.Value, value.OptionType.IdFieldType));
+                    TOptionType optionType;
+                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
+                    {
+                        data.Add(optionType.Name, ConvertTo(value.Value, optionType.IdFieldType));
+                    }
                 }
             }
             Id = entity.Id;
@@ -167,15 +173,20 @@ namespace VitalChoice.DynamicData
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    pair.Value.Set?.Invoke(result,
-                        ConvertToModelObject(dynamicProperty.PropertyType, dynamicProperty.Get?.Invoke(this)));
+                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
+                    ThrowIfNotValid(typeof(TModel), typeof(TDynamic), value, pair.Key, pair.Value, true);
+
+                    pair.Value.Set?.Invoke(result, value);
                 }
                 else
                 {
-                    object value;
-                    if (data.TryGetValue(mappingName, out value))
+                    object dynamicValue;
+                    if (data.TryGetValue(mappingName, out dynamicValue))
                     {
-                        pair.Value.Set?.Invoke(result, ConvertToModelObject(pair.Value.PropertyType, value));
+                        var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
+                        ThrowIfNotValid(typeof(TModel), typeof(TDynamic), value, pair.Key, pair.Value, true);
+
+                        pair.Value.Set?.Invoke(result, value);
                     }
                 }
             }
@@ -195,15 +206,20 @@ namespace VitalChoice.DynamicData
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    pair.Value.Set?.Invoke(result,
-                        ConvertToModelObject(dynamicProperty.PropertyType, dynamicProperty.Get?.Invoke(this)));
+                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
+                    ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+
+                    pair.Value.Set?.Invoke(result, value);
                 }
                 else
                 {
-                    object value;
-                    if (data.TryGetValue(mappingName, out value))
+                    object dynamicValue;
+                    if (data.TryGetValue(mappingName, out dynamicValue))
                     {
-                        pair.Value.Set?.Invoke(result, ConvertToModelObject(value?.GetType(), value));
+                        var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
+                        ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+
+                        pair.Value.Set?.Invoke(result, value);
                     }
                 }
             }
@@ -222,19 +238,23 @@ namespace VitalChoice.DynamicData
             var cache = GetTypeCache(ModelTypeMappingCache, objectType);
             var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic), true);
             var data = DynamicData as IDictionary<string, object>;
-            foreach (var genericProperty in cache)
+            foreach (var pair in cache)
             {
-                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    dynamicProperty.Set?.Invoke(this,
-                        ConvertFromModelObject(genericProperty.Value.PropertyType,
-                            genericProperty.Value.Get?.Invoke(model)));
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
+                        pair.Value.Get?.Invoke(model));
+                    ThrowIfNotValid(typeof (TModel), typeof (TDynamic), value, mappingName, dynamicProperty, false);
+
+                    dynamicProperty.Set?.Invoke(this, value);
                 }
                 else
                 {
-                    data.Add(mappingName, ConvertFromModelObject(genericProperty.Value.PropertyType, genericProperty.Value.Get?.Invoke(model)));
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
+
+                    data.Add(mappingName, value);
                 }
             }
             model.FillDynamic(this as TDynamic);
@@ -247,22 +267,24 @@ namespace VitalChoice.DynamicData
             var cache = GetTypeCache(ModelTypeMappingCache, modelType);
             var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
             var data = DynamicData as IDictionary<string, object>;
-            foreach (var genericProperty in cache)
+            foreach (var pair in cache)
             {
-                var mappingName = genericProperty.Value.Map.Name ?? genericProperty.Key;
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    dynamicProperty.Set?.Invoke(this,
-                        ConvertFromModelObject(genericProperty.Value.PropertyType,
-                            genericProperty.Value.Get?.Invoke(model)));
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
+                        pair.Value.Get?.Invoke(model));
+                    ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty, false);
+                    dynamicProperty.Set?.Invoke(this, value);
                 }
                 else
                 {
-                    data.Add(mappingName, ConvertFromModelObject(genericProperty.Value.PropertyType, genericProperty.Value.Get?.Invoke(model)));
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
+                    data.Add(mappingName, value);
                 }
             }
-            model.FillDynamic((dynamic)this);
+            model.FillDynamic((dynamic) this);
         }
 
         public static implicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)
@@ -305,18 +327,18 @@ namespace VitalChoice.DynamicData
             return result;
         }
 
-        private static object ConvertFromModelObject(Type propertyType, object obj)
+        private static object ConvertFromModelObject(Type sourceType, Type destType, object obj)
         {
             if (obj == null)
                 return null;
-            if (propertyType.GetTypeInfo().IsGenericType)
+            if (sourceType.GetTypeInfo().IsGenericType)
             {
-                if (propertyType.IsImplement<IEnumerable>())
+                if (sourceType.IsImplement<IEnumerable>() && destType != null)
                 {
                     IList results =
                         (IList)
                             Activator.CreateInstance(
-                                typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
+                                typeof (List<>).MakeGenericType(destType.GenericTypeArguments.First()));
                     // ReSharper disable once PossibleNullReferenceException
                     foreach (dynamic item in obj as IEnumerable)
                     {
@@ -333,7 +355,8 @@ namespace VitalChoice.DynamicData
                         {
                             var dynamicType = itemInterface.GetGenericArguments().First();
                             IDynamicObject dynamicObject = (IDynamicObject) Activator.CreateInstance(dynamicType);
-                            results.Add(dynamicObject.FromModel(itemType, dynamicType, item));
+                            dynamicObject.FromModel(itemType, dynamicType, item);
+                            results.Add(dynamicObject);
                         }
                     }
                     return results;
@@ -353,31 +376,46 @@ namespace VitalChoice.DynamicData
             return obj;
         }
 
-        private static object ConvertToModelObject(Type propertyType, object obj)
+        private static object ConvertToModelObject(Type destType, object obj)
         {
             if (obj == null)
                 return null;
-            if (propertyType.GetTypeInfo().IsGenericType)
+            if (destType.GetTypeInfo().IsGenericType)
             {
-                if (propertyType.IsImplement<IEnumerable>())
+                if (destType.IsImplement<IEnumerable>())
                 {
                     IList results =
                         (IList)
                             Activator.CreateInstance(
-                                typeof (List<>).MakeGenericType(propertyType.GenericTypeArguments.First()));
+                                typeof (List<>).MakeGenericType(destType.GenericTypeArguments.First()));
                     // ReSharper disable once PossibleNullReferenceException
                     foreach (IDynamicObject item in obj as IEnumerable)
                     {
-                        results.Add(item?.ToModel(propertyType.GenericTypeArguments.First(), item.GetType()));
+                        results.Add(item?.ToModel(destType.GenericTypeArguments.First(), item.GetType()));
                     }
                     return results;
                 }
             }
-            if (typeof (IDynamicObject).IsAssignableFrom(propertyType))
+            if (typeof (IDynamicObject).IsAssignableFrom(destType))
             {
-                return (obj as IDynamicObject)?.ToModel(propertyType, obj.GetType());
+                return (obj as IDynamicObject)?.ToModel(destType, obj.GetType());
             }
             return obj;
+        }
+
+        private static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
+            GenericProperty destProperty, bool toModelDirection)
+        {
+            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType)
+            {
+                throw new ApiException(
+                    $"Value is null while it should be a ValueType {destProperty.PropertyType}.\r\n [{modelType} <-> {dynamicType}]");
+            }
+            if (value != null && !destProperty.PropertyType.IsInstanceOfType(value))
+            {
+                throw new ApiException(
+                    $"Value {value} of Type [{value.GetType()}] is not assignable to property {propertyName} with Type {destProperty.PropertyType}.\r\n [{modelType} {(toModelDirection ? "<-" : "->")} {dynamicType}]");
+            }
         }
 
         //crutch

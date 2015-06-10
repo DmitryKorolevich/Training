@@ -22,7 +22,7 @@ using VitalChoice.DynamicData.Entities;
         [Map]
         public int Id { get; set; }
 
-        [Map]
+        [Map("Code")]
         [Localized(GeneralFieldNames.SKU)]
         public string Name { get; set; }
 
@@ -31,7 +31,7 @@ using VitalChoice.DynamicData.Entities;
         [Map]
         public bool Hidden { get; set; }
 
-        [Map]
+        [Map("Price")]
         public decimal RetailPrice { get; set; }
 
         [Map]
