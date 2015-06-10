@@ -114,6 +114,22 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
+        public virtual async Task<bool> InsertGraphRangeAsync(ICollection<TEntity> entities)
+        {
+            return await InsertGraphRangeAsync(CancellationToken.None, entities);
+        }
+
+        public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken,
+            ICollection<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Context.TrackGraphForAdd(entity);
+            }
+            await Context.SaveChangesAsync(CancellationToken.None);
+            return true;
+        }
+
         public virtual TEntity Update(TEntity entity)
         {
             TEntity toReturn;

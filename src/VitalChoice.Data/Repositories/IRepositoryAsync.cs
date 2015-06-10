@@ -19,6 +19,8 @@ namespace VitalChoice.Data.Repositories
         bool InsertGraphRange(params TEntity[] entities);
         Task<bool> InsertGraphRangeAsync(params TEntity[] entities);
         Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities);
+        Task<bool> InsertGraphRangeAsync(ICollection<TEntity> entities);
+        Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, ICollection<TEntity> entities);
         TEntity Update(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity);

@@ -178,24 +178,23 @@ namespace VitalChoice.Infrastructure.Context
                 .Collection(p => p.Skus)
                 .InverseReference()
                 .ForeignKey(s => s.IdProduct)
-                .PrincipalKey(p => p.Id);
+                .PrincipalKey(p => p.Id)
+                .Required();
             builder.Entity<Product>()
                 .Collection(p => p.OptionValues)
                 .InverseReference()
                 .ForeignKey(o => o.IdProduct)
-                .PrincipalKey(p => p.Id);
+                .PrincipalKey(p => p.Id)
+                .Required(false);
 
             builder.Entity<Product>().Ignore(p => p.OptionTypes);
-            //builder.Entity<Product>()
-            //    .Collection(p => p.OptionTypes)
-            //    .InverseReference()
-            //    .ForeignKey(t => t.IdProductType)
-            //    .PrincipalKey(p => p.IdProductType);
-            builder.Entity<Product>()
-                .Collection(p => p.ProductsToCategories)
-                .InverseReference()
-                .ForeignKey(t => t.IdProduct)
-                .PrincipalKey(p => p.Id);
+
+		    builder.Entity<Product>()
+		        .Collection(p => p.ProductsToCategories)
+		        .InverseReference()
+		        .ForeignKey(t => t.IdProduct)
+		        .PrincipalKey(p => p.Id)
+		        .Required();
 
             #endregion
 
