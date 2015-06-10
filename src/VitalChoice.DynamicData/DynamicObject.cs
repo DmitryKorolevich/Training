@@ -118,6 +118,8 @@ namespace VitalChoice.DynamicData
             }
             entity.OptionValues = newOptions;
             entity.Id = Id;
+            entity.DateCreated = DateCreated;
+            entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
             UpdateEntityInternal(entity);
         }
@@ -126,7 +128,7 @@ namespace VitalChoice.DynamicData
 
         public TEntity ToEntity()
         {
-            var result = new TEntity {OptionValues = new List<TOptionValue>()};
+            var entity = new TEntity {OptionValues = new List<TOptionValue>()};
             foreach (var data in DynamicData)
             {
                 var option = new TOptionValue
@@ -139,13 +141,15 @@ namespace VitalChoice.DynamicData
                 };
                 if (option.Value != null)
                 {
-                    result.OptionValues.Add(option);
+                    entity.OptionValues.Add(option);
                 }
             }
-            result.Id = Id;
-            result.StatusCode = StatusCode;
-            FillNewEntity(result);
-            return result;
+            entity.Id = Id;
+            entity.DateCreated = DateTime.Now;
+            entity.DateEdited = DateTime.Now;
+            entity.StatusCode = StatusCode;
+            FillNewEntity(entity);
+            return entity;
         }
 
         public TModel ToModel<TModel, TDynamic>()

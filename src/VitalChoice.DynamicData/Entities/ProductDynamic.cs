@@ -60,7 +60,7 @@ namespace VitalChoice.DynamicData.Entities
                 IdProduct = Id
             }).ToArray();
 
-            if (Skus != null)
+            if (Skus != null && Skus.Any())
             {
                 //Update existing
                 var itemsToUpdate = Skus.Join(entity.Skus, sd => sd.Id, s => s.Id,
@@ -71,7 +71,11 @@ namespace VitalChoice.DynamicData.Entities
                 }
 
                 //Delete
-                entity.Skus.RemoveAll(e => Skus.All(s => s.Id != e.Id));
+                var toDelete = entity.Skus.Where(e => Skus.All(s => s.Id != e.Id));
+                foreach (var sku in toDelete)
+                {
+                    sku.StatusCode = RecordStatusCode.Deleted;
+                }
 
                 //Insert
                 entity.Skus.AddRange(Skus.Where(s => s.Id == 0).Select(s =>
@@ -83,7 +87,10 @@ namespace VitalChoice.DynamicData.Entities
             }
             else
             {
-                entity.Skus.Clear();
+                foreach (var sku in entity.Skus)
+                {
+                    sku.StatusCode = RecordStatusCode.Deleted;
+                }
             }
 
             //Set key on options
