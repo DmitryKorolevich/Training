@@ -203,7 +203,7 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool DeleteAll(ICollection<TEntity> entitySet)
         {
-            if (!entitySet.Any())
+            if (entitySet == null || !entitySet.Any())
                 return false;
             DbSet.RemoveRange(entitySet);
             Context.SaveChanges();
@@ -266,7 +266,7 @@ namespace VitalChoice.Data.Repositories
         public virtual async Task<bool> DeleteAllAsync(CancellationToken cancellationToken,
             ICollection<TEntity> entitySet)
         {
-            if (!entitySet.Any())
+            if (entitySet == null || !entitySet.Any())
                 return false;
             DbSet.RemoveRange(entitySet);
             await Context.SaveChangesAsync(cancellationToken);
