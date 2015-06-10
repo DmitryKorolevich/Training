@@ -20,33 +20,27 @@ namespace VitalChoice.Business.Queries.Content
 
         public ArticleQuery WithName(string name)
         {
-            if (!String.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 And(x => x.Name.Contains(name));
             }
             return this;
         }
 
-        public ArticleQuery WithIds(List<int> ids)
+        public ArticleQuery WithIds(ICollection<int> ids)
         {
-            if (ids.Count>0)
+            if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    Or(x => x.Id == id);
-                }
+                Or(x => ids.Contains(x.Id));
             }
             return this;
         }
 
-        public ArticleQuery NotWithIds(List<int> ids)
+        public ArticleQuery NotWithIds(ICollection<int> ids)
         {
             if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    And(x => x.Id != id);
-                }
+                And(x => !ids.Contains(x.Id));
             }
             return this;
         }

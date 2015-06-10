@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Workflow
                 await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName))
                     .Include(t => t.Actions)
                     .ThenInclude(ta => ta.Executor)
-                    .SelectAsync();
+                    .SelectAsync(false);
             var tree = result.SingleOrDefault();
             if (tree == null)
                 throw new ApiException($"Tree {treeName} not found");

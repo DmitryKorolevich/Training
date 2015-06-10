@@ -199,8 +199,7 @@ namespace VitalChoice.Business.Services.Content
             var dbItem = (await contentPageRepository.Query(p => p.Id == id).Include(p=>p.ContentPagesToContentCategories).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.ContentPageCategory && p.StatusCode != RecordStatusCode.Deleted).
-                                 SelectAsync(false)).ToList();
+                var categories = await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.ContentPageCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
 
                 List<int> forDelete = new List<int>();
                 foreach (var contentPageToContentCategory in dbItem.ContentPagesToContentCategories)

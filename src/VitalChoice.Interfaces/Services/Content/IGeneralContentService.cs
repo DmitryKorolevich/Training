@@ -6,7 +6,7 @@ namespace VitalChoice.Interfaces.Services.Content
 {
 	public interface IGeneralContentService
     {
-        Task<IEnumerable<ContentTypeEntity>> GetContentTypesAsync();
-        Task<IEnumerable<ContentProcessor>> GetContentProcessorsAsync();
+        Task<List<ContentTypeEntity>> GetContentTypesAsync();
+        Task<List<ContentProcessor>> GetContentProcessorsAsync();
     }
 }

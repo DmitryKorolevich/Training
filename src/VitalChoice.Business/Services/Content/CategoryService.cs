@@ -55,7 +55,7 @@ namespace VitalChoice.Business.Services.Content
         {
             ContentCategory toReturn = null;
             var query = new CategoryQuery().WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
-            List<ContentCategory> categories = (await contentCategoryRepository.Query(query).SelectAsync(false)).ToList();
+            var categories = await contentCategoryRepository.Query(query).SelectAsync(false);
 
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);
             if (toReturn == null)
@@ -71,14 +71,11 @@ namespace VitalChoice.Business.Services.Content
 
         public async Task<bool> UpdateCategoriesTreeAsync(ContentCategory category)
         {
-            bool toReturn = false;
-            if(category==null)
-            {
-                throw new ArgumentException();
-            }
+            if (category == null)
+                throw new ArgumentNullException(nameof(category));
 
             var query = new CategoryQuery().WithType(category.Type).NotDeleted();
-            List<ContentCategory> dbCategories = (await contentCategoryRepository.Query(query).SelectAsync()).ToList();
+            var dbCategories = await contentCategoryRepository.Query(query).SelectAsync();
             category.SetSubCategoriesOrder();
 
             foreach (var dbCategory in dbCategories)
@@ -91,10 +88,8 @@ namespace VitalChoice.Business.Services.Content
                     await contentCategoryRepository.UpdateAsync(dbCategory);
                 }
             }
-            
-            toReturn = true;
 
-            return toReturn;
+            return true;
         }
 
         public async Task<ContentCategory> GetCategoryAsync(int id)
@@ -107,46 +102,48 @@ namespace VitalChoice.Business.Services.Content
 
         public async Task<ContentCategory> UpdateCategoryAsync(ContentCategory model)
         {
-            ContentCategory dbItem = null;
+            ContentCategory dbItem;
             if (model.Id == 0)
             {
-                dbItem = new ContentCategory();
-                dbItem.ParentId = model.ParentId;
+                dbItem = new ContentCategory {ParentId = model.ParentId};
                 if(!dbItem.ParentId.HasValue)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
-                else
+                var parentExist = await contentCategoryRepository.Query(p => p.Id == model.ParentId && p.Type == model.Type &&
+                                                                             p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
+                if(!parentExist)
                 {
-                    var parentExist = await contentCategoryRepository.Query(p => p.Id == dbItem.ParentId.Value && p.Type == model.Type &&
-                        p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
-                    if(!parentExist)
-                    {
-                        throw new AppValidationException("The category with the given parent id doesn't exist.");
-                    }
+                    throw new AppValidationException("The category with the given parent id doesn't exist.");
+                }
 
-                    var subCategories = (await contentCategoryRepository.Query(p => p.ParentId == dbItem.ParentId.Value && p.Type == model.Type &&
-                       p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
-                    if (subCategories.Count != 0)
-                    {
-                        dbItem.Order = subCategories.Max(p => p.Order)+1;
-                    }
+                var subCategories =
+                    await
+                        contentCategoryRepository.Query(
+                            p =>
+                                p.ParentId == model.ParentId && p.Type == model.Type &&
+                                p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
+                if (subCategories.Count != 0)
+                {
+                    dbItem.Order = subCategories.Max(p => p.Order)+1;
                 }
 
                 dbItem.Type = model.Type;
                 dbItem.StatusCode = RecordStatusCode.Active;
                 if (model.ContentItem != null)
                 {
-                    dbItem.ContentItem = new ContentItem();
-                    dbItem.ContentItem.Created = DateTime.Now;
-                    dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
+                    dbItem.ContentItem = new ContentItem
+                    {
+                        Created = DateTime.Now,
+                        ContentItemToContentProcessors = new List<ContentItemToContentProcessor>()
+                    };
                 }
 
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
-                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)dbItem.Type).SelectAsync(false)).FirstOrDefault();
-                    if(contentType != null && contentType.DefaultMasterContentItemId.HasValue)
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)model.Type).SelectAsync(false)).FirstOrDefault();
+                    if(contentType?.DefaultMasterContentItemId != null)
                     {
                         model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                     }
@@ -168,10 +165,10 @@ namespace VitalChoice.Business.Services.Content
                     }
                 }
             }
-
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != dbItem.Id
+                var idDbItem = dbItem.Id;
+                var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != idDbItem
                     && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
@@ -215,7 +212,7 @@ namespace VitalChoice.Business.Services.Content
             if (dbItem != null)
             {
                 //Check sub categories
-                string message = String.Empty;
+                string message = string.Empty;
                 CategoryQuery query = new CategoryQuery().WithParentId(id).NotDeleted();
                 var subCategoriesExist = (await contentCategoryRepository.Query(query).SelectAnyAsync());
                 if (subCategoriesExist)
@@ -225,8 +222,9 @@ namespace VitalChoice.Business.Services.Content
 
                 if (dbItem.Type == ContentType.RecipeCategory)
                 {
-                    var categories = (await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
-                    RecipeQuery innerQuery = new RecipeQuery().WithIds(categories.Select(p => p.RecipeId).ToList()).NotDeleted();
+                    var categories =
+                        await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
+                    RecipeQuery innerQuery = new RecipeQuery().WithIds(categories.Select(p => p.RecipeId).ToArray()).NotDeleted();
                     var exist = (await recipeRepository.Query(innerQuery).SelectAnyAsync());
                     if (exist)
                     {
@@ -236,9 +234,10 @@ namespace VitalChoice.Business.Services.Content
 
                 if (dbItem.Type == ContentType.ArticleCategory)
                 {
-                    var categories = (await articleToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
-                    ArticleQuery innerQuery = new ArticleQuery().WithIds(categories.Select(p => p.ArticleId).ToList()).NotDeleted();
-                    var exist = (await articleRepository.Query(innerQuery).SelectAnyAsync());
+                    var categories =
+                        await articleToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
+                    ArticleQuery innerQuery = new ArticleQuery().WithIds(categories.Select(p => p.ArticleId).ToArray()).NotDeleted();
+                    var exist = await articleRepository.Query(innerQuery).SelectAnyAsync();
                     if (exist)
                     {
                         message += "Category with articles can't be deleted. " + Environment.NewLine;
@@ -247,9 +246,9 @@ namespace VitalChoice.Business.Services.Content
 
                 if (dbItem.Type == ContentType.FAQCategory)
                 {
-                    var categories = (await faqToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
-                    FAQQuery innerQuery = new FAQQuery().WithIds(categories.Select(p => p.FAQId).ToList()).NotDeleted();
-                    var exist = (await faqRepository.Query(innerQuery).SelectAnyAsync());
+                    var categories = await faqToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
+                    FAQQuery innerQuery = new FAQQuery().WithIds(categories.Select(p => p.FAQId).ToArray()).NotDeleted();
+                    var exist = await faqRepository.Query(innerQuery).SelectAnyAsync();
                     if (exist)
                     {
                         message += "Category with faqs can't be deleted. " + Environment.NewLine;
@@ -258,8 +257,9 @@ namespace VitalChoice.Business.Services.Content
 
                 if (dbItem.Type == ContentType.ContentPageCategory)
                 {
-                    var categories = (await contentPageToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false)).ToList();
-                    ContentPageQuery innerQuery = new ContentPageQuery().WithIds(categories.Select(p => p.ContentPageId).ToList()).NotDeleted();
+                    var categories =
+                        await contentPageToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
+                    ContentPageQuery innerQuery = new ContentPageQuery().WithIds(categories.Select(p => p.ContentPageId).ToArray()).NotDeleted();
                     var exist = (await contentPageRepository.Query(innerQuery).SelectAnyAsync());
                     if (exist)
                     {
@@ -267,7 +267,7 @@ namespace VitalChoice.Business.Services.Content
                     }
                 }
 
-                if (!String.IsNullOrEmpty(message))
+                if (!string.IsNullOrEmpty(message))
                 {
                     throw new AppValidationException(message);
                 }
@@ -300,14 +300,7 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                foreach (var subCategory in uiRoot.SubCategories)
-                {
-                    var res = FindUICategory(subCategory, id);
-                    if (res != null)
-                    {
-                        return res;
-                    }
-                }
+                return uiRoot.SubCategories.Select(subCategory => FindUICategory(subCategory, id)).FirstOrDefault(res => res != null);
             }
 
             return null;

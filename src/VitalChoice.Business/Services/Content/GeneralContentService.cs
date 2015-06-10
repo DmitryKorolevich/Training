@@ -21,16 +21,14 @@ namespace VitalChoice.Business.Services.Content
             _logger = LoggerService.GetDefault();
         }
 
-        public async Task<IEnumerable<ContentTypeEntity>> GetContentTypesAsync()
+        public async Task<List<ContentTypeEntity>> GetContentTypesAsync()
         {
-            var toReturn = (await contentTypeRepository.Query().SelectAsync(false)).ToList();
-            return toReturn;
+            return await contentTypeRepository.Query().SelectAsync(false);
         }
 
-        public async Task<IEnumerable<ContentProcessor>> GetContentProcessorsAsync()
+        public async Task<List<ContentProcessor>> GetContentProcessorsAsync()
         {
-            var toReturn = (await contentProcessorRepository.Query().SelectAsync(false)).ToList();
-            return toReturn;
+            return await contentProcessorRepository.Query().SelectAsync(false);
         }
     }
 }

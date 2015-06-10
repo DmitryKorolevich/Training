@@ -27,26 +27,20 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
-        public ContentPageQuery WithIds(List<int> ids)
+        public ContentPageQuery WithIds(ICollection<int> ids)
         {
-            if (ids.Count>0)
+            if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    Or(x => x.Id == id);
-                }
+                Or(x => ids.Contains(x.Id));
             }
             return this;
         }
 
-        public ContentPageQuery NotWithIds(List<int> ids)
+        public ContentPageQuery NotWithIds(ICollection<int> ids)
         {
             if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    And(x => x.Id != id);
-                }
+                And(x => !ids.Contains(x.Id));
             }
             return this;
         }

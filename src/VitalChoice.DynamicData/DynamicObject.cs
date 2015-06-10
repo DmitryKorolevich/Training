@@ -98,22 +98,22 @@ namespace VitalChoice.DynamicData
 
         public void UpdateEntity(TEntity entity)
         {
-            var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o.Id);
+            var optionTypesCache = entity.OptionTypes?.ToDictionary(o => o.Name, o => o.Id);
             var newOptions = new List<TOptionValue>();
-            foreach (var data in DynamicData)
+            if (optionTypesCache != null)
             {
-                int idOption;
-                if (optionTypesCache.TryGetValue(data.Key, out idOption))
+                foreach (var data in DynamicData)
                 {
+                    int idOption;
+                    if (!optionTypesCache.TryGetValue(data.Key, out idOption)) continue;
+                    if (data.Value == null) continue;
+
                     var option = new TOptionValue
                     {
                         Value = data.Value?.ToString(),
                         IdOptionType = idOption
                     };
-                    if (option.Value != null)
-                    {
-                        newOptions.Add(option);
-                    }
+                    newOptions.Add(option);
                 }
             }
             entity.OptionValues = newOptions;
@@ -131,16 +131,16 @@ namespace VitalChoice.DynamicData
             var entity = new TEntity {OptionValues = new List<TOptionValue>()};
             foreach (var data in DynamicData)
             {
-                var option = new TOptionValue
+                if (data.Value != null)
                 {
-                    Value = data.Value?.ToString(),
-                    OptionType = new TOptionType
+                    var option = new TOptionValue
                     {
-                        Name = data.Key
-                    }
-                };
-                if (option.Value != null)
-                {
+                        Value = data.Value?.ToString(),
+                        OptionType = new TOptionType
+                        {
+                            Name = data.Key
+                        }
+                    };
                     entity.OptionValues.Add(option);
                 }
             }

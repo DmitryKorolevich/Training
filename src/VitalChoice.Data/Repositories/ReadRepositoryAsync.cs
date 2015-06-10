@@ -65,7 +65,7 @@ namespace VitalChoice.Data.Repositories
 			return query;
 		}
 
-		internal async Task<IEnumerable<TEntity>> SelectAsync(
+		internal async Task<List<TEntity>> SelectAsync(
             IQueryable<TEntity> query,
             Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -73,10 +73,10 @@ namespace VitalChoice.Data.Repositories
 			int? pageSize = null,
             bool tracking = true)
 		{
-			//TODO: added temporarly till ef 7 becomes stable, remove when it arrives
+		    //TODO: added temporarly till ef 7 becomes stable, remove when it arrives
 			if (EarlyRead) 
 			{
-				IEnumerable<TEntity> earlyRead = query.ToList();
+				IEnumerable<TEntity> earlyRead = query.ToArray();
 				if (orderBy != null)
 					earlyRead = orderBy(earlyRead.AsQueryable());
 
@@ -86,12 +86,9 @@ namespace VitalChoice.Data.Repositories
 				if (page != null && pageSize != null)
 					earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
-				return earlyRead;
+				return earlyRead.ToList();
 			}
-			else
-			{
-				return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
-			}
+		    return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
 		}
 	}
 }

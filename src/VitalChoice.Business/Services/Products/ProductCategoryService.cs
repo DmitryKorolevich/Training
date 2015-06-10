@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Products
         {
             ProductCategory toReturn = null;
             var query = new ProductCategoryQuery().NotDeleted().WithStatus(filter.Status);
-            List<ProductCategory> categories = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).ToList();
+            List<ProductCategory> categories = await productCategoryEcommerceRepository.Query(query).SelectAsync(false);
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);
             if (toReturn == null)
             {
@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var query = new ProductCategoryQuery().NotDeleted();
-            List<ProductCategory> dbCategories = (await productCategoryEcommerceRepository.Query(query).SelectAsync()).ToList();
+            List<ProductCategory> dbCategories = await productCategoryEcommerceRepository.Query(query).SelectAsync();
             category.SetSubCategoriesOrder();
 
             foreach (var dbCategory in dbCategories)
@@ -104,41 +104,38 @@ namespace VitalChoice.Business.Services.Products
             ProductCategoryContent dbItem = null;
             if (model.Id == 0)
             {
-                dbItem = new ProductCategoryContent();
-                dbItem.ParentId = model.ParentId;
+                dbItem = new ProductCategoryContent {ParentId = model.ParentId};
                 if(!dbItem.ParentId.HasValue)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
-                else
+                var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == model.ParentId && 
+                                                                                      p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
+                if(!parentExist)
                 {
-                    var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == dbItem.ParentId.Value && 
-                        p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
-                    if(!parentExist)
-                    {
-                        throw new AppValidationException("The category with the given parent id doesn't exist.");
-                    }
-
-                    var subCategories = (await productCategoryEcommerceRepository.Query(p => p.ParentId == dbItem.ParentId.Value && 
-                       p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
-                    if (subCategories.Count != 0)
-                    {
-                        dbItem.Order = subCategories.Max(p => p.Order)+1;
-                    }
+                    throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
-                
+
+                var subCategories =
+                    await productCategoryEcommerceRepository.Query(p => p.ParentId == model.ParentId &&
+                                                                        p.StatusCode != RecordStatusCode.Deleted)
+                        .SelectAsync(false);
+                if (subCategories.Count != 0)
+                {
+                    dbItem.Order = subCategories.Max(p => p.Order)+1;
+                }
+
                 dbItem.StatusCode = RecordStatusCode.Active;
                 if (model.ContentItem != null)
                 {
-                    dbItem.ContentItem = new ContentItem();
-                    dbItem.ContentItem.Created = DateTime.Now;
+                    dbItem.ContentItem = new ContentItem {Created = DateTime.Now};
                 }
 
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
                     var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.ProductCategory).SelectAsync(false)).FirstOrDefault();
-                    if(contentType != null && contentType.DefaultMasterContentItemId.HasValue)
+                    if(contentType?.DefaultMasterContentItemId != null)
                     {
                         model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                     }
@@ -155,7 +152,8 @@ namespace VitalChoice.Business.Services.Products
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+                var idDbItem = dbItem.Id;
+                var urlDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Url == model.Url && p.Id != idDbItem
                     && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
@@ -261,14 +259,7 @@ namespace VitalChoice.Business.Services.Products
             }
             else
             {
-                foreach (var subCategory in uiRoot.SubCategories)
-                {
-                    var res = FindUICategory(subCategory, id);
-                    if (res != null)
-                    {
-                        return res;
-                    }
-                }
+                return uiRoot.SubCategories.Select(subCategory => FindUICategory(subCategory, id)).FirstOrDefault(res => res != null);
             }
 
             return null;

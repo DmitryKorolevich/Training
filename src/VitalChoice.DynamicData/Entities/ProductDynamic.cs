@@ -42,9 +42,9 @@ namespace VitalChoice.DynamicData.Entities
             {
                 IdCategory = c,
                 IdProduct = Id
-            }).ToArray();
+            }).ToList();
 
-            entity.Skus = Skus?.Select(s => s.ToEntity()).ToArray() ?? new Sku[0];
+            entity.Skus = Skus?.Select(s => s.ToEntity()).ToList() ?? new List<Sku>();
         }
 
         protected override void UpdateEntityInternal(Product entity)
@@ -83,7 +83,7 @@ namespace VitalChoice.DynamicData.Entities
                     var sku = s.ToEntity();
                     sku.IdProduct = Id;
                     return sku;
-                }).ToArray());
+                }));
             }
             else
             {
@@ -117,7 +117,7 @@ namespace VitalChoice.DynamicData.Entities
             Type = entity.IdProductType;
             Hidden = entity.Hidden;
             IdExternal = entity.IdExternal;
-            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToArray();
+            CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
             Skus = new List<SkuDynamic>();
             foreach (var sku in entity.Skus)
             {

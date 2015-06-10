@@ -27,26 +27,20 @@ namespace VitalChoice.Business.Queries.Content
             return this;
         }
 
-        public RecipeQuery WithIds(List<int> ids)
+        public RecipeQuery WithIds(ICollection<int> ids)
         {
             if (ids.Count>0)
             {
-                foreach (var id in ids)
-                {
-                    Or(x => x.Id == id);
-                }
+                Or(x => ids.Contains(x.Id));
             }
             return this;
         }
 
-        public RecipeQuery NotWithIds(List<int> ids)
+        public RecipeQuery NotWithIds(ICollection<int> ids)
         {
             if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    And(x => x.Id != id);
-                }
+                And(x => !ids.Contains(x.Id));
             }
             return this;
         }

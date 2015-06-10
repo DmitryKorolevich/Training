@@ -26,8 +26,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             using (var uof = new VitalChoiceUnitOfWork())
             {
                 var repository = uof.RepositoryAsync<ContentCategory>();
-                var subCategories = (await repository.Query(p => p.ParentId== categoryId && p.StatusCode == RecordStatusCode.Active).
-                    SelectAsync(false)).ToList();
+                var subCategories =
+                    await
+                        repository.Query(p => p.ParentId == categoryId && p.StatusCode == RecordStatusCode.Active)
+                            .SelectAsync(false);
                 model.Categories = subCategories.OrderBy(p => p.Order).ToList();
             }
             return model;

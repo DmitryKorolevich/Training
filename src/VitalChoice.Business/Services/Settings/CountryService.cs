@@ -27,11 +27,11 @@ namespace VitalChoice.Business.Services.Settings
             logger = LoggerService.GetDefault();
         }
 
-        public async Task<IEnumerable<Country>> GetCountriesAsync()
+        public async Task<ICollection<Country>> GetCountriesAsync()
         {
             List<Country> toReturn = null;
-            toReturn = (await countryRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
-            var states = (await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
+            toReturn = await countryRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
+            var states = await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
             toReturn = toReturn.OrderBy(p => p.Order).ToList();
             foreach(var item in toReturn)
             {
@@ -46,7 +46,7 @@ namespace VitalChoice.Business.Services.Settings
             return toReturn;
         }
 
-        public async Task<bool> UpdateCountriesOrderAsync(IEnumerable<Country> model)
+        public async Task<bool> UpdateCountriesOrderAsync(ICollection<Country> model)
         {
             bool toReturn = false;
             int i = 0;
@@ -65,10 +65,10 @@ namespace VitalChoice.Business.Services.Settings
                 i++;
             }
 
-            var dbCountries = (await countryRepository.Query(p=>p.StatusCode != RecordStatusCode.Deleted).SelectAsync()).ToList();
+            var dbCountries = await countryRepository.Query(p=>p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
             foreach (var dbCountry in dbCountries)
             {
-                var country = model.Where(p => p.Id == dbCountry.Id).FirstOrDefault();
+                var country = model.FirstOrDefault(p => p.Id == dbCountry.Id);
                 if (country != null)
                 {
                     dbCountry.Order = country.Order;
@@ -76,20 +76,17 @@ namespace VitalChoice.Business.Services.Settings
             }
             toReturn = await countryRepository.UpdateRangeAsync(dbCountries);
 
-            var dbStates = (await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync()).ToList();
+            var dbStates = await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
             foreach (var dbState in dbStates)
             {
-                var country = model.Where(p => p.CountryCode == dbState.CountryCode).FirstOrDefault();
-                if (country != null)
+                var country = model.FirstOrDefault(p => p.CountryCode == dbState.CountryCode);
+                var state = country?.States.FirstOrDefault(p => p.Id == dbState.Id);
+                if (state != null)
                 {
-                    var state = country.States.Where(p => p.Id == dbState.Id).FirstOrDefault();
-                    if (state != null)
-                    {
-                        dbState.Order = state.Order;
-                    }
+                    dbState.Order = state.Order;
                 }
             }
-            toReturn = await stateRepository.UpdateRangeAsync(dbStates);
+            toReturn = toReturn && await stateRepository.UpdateRangeAsync(dbStates);
 
             return toReturn;
         }
@@ -101,7 +98,7 @@ namespace VitalChoice.Business.Services.Settings
             {
                 dbItem = new Country();
 
-                var countries = (await countryRepository.Query(p =>p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).ToList();
+                var countries = await countryRepository.Query(p =>p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
                 if (countries.Count != 0)
                 {
                     dbItem.Order = countries.Max(p => p.Order) + 1;
@@ -116,11 +113,16 @@ namespace VitalChoice.Business.Services.Settings
             {
                 if (dbItem.CountryCode != model.CountryCode)
                 {
-                    var codeDublicatesExist = await countryRepository.Query(p => p.CountryCode == model.CountryCode 
-                        && p.Id!=dbItem.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+                    var idDbItem = dbItem.Id;
+                    var codeDublicatesExist = await countryRepository.Query(p => p.CountryCode == model.CountryCode
+                                                                                 && p.Id != idDbItem &&
+                                                                                 p.StatusCode !=
+                                                                                 RecordStatusCode.Deleted)
+                        .SelectAnyAsync();
                     if (codeDublicatesExist)
                     {
-                        throw new AppValidationException("CountryCode", "Country with the same country code already exists, please use a unique country code.");
+                        throw new AppValidationException("CountryCode",
+                            "Country with the same country code already exists, please use a unique country code.");
                     }
                 }
 
@@ -155,7 +157,11 @@ namespace VitalChoice.Business.Services.Settings
             if (dbItem != null)
             {
                 string message = String.Empty;
-                var statesExist = (await stateRepository.Query(p=>p.CountryCode==dbItem.CountryCode && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync());
+                var statesExist =
+                    await
+                        stateRepository.Query(
+                            p => p.CountryCode == dbItem.CountryCode && p.StatusCode != RecordStatusCode.Deleted)
+                            .SelectAnyAsync();
                 if (statesExist)
                 {
                     message += "Country with states can't be deleted. " + Environment.NewLine;

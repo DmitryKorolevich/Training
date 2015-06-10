@@ -28,12 +28,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
                 var repository = uof.RepositoryAsync<RecipeToContentCategory>();
                 var recipeToContentCategories = (await repository.Query(p => p.ContentCategoryId== categoryId).
-                    Include(p=>p.Recipe).SelectAsync(false)).ToList().Where(p=>p.Recipe.StatusCode == RecordStatusCode.Active).ToList();
-                var recipes = new List<Recipe>();
-                foreach(var item in recipeToContentCategories)
-                {
-                    recipes.Add(item.Recipe);
-                }
+                    Include(p=>p.Recipe).SelectAsync(false)).Where(p=>p.Recipe.StatusCode == RecordStatusCode.Active).ToArray();
+                var recipes = recipeToContentCategories.Select(item => item.Recipe).ToList();
                 model.Recipes = recipes;
             }
             return model;

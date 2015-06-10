@@ -183,8 +183,7 @@ namespace VitalChoice.Business.Services.Content
             var dbItem = (await faqRepository.Query(p => p.Id == id).Include(p=>p.FAQsToContentCategories).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var categories = (await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.FAQCategory && p.StatusCode != RecordStatusCode.Deleted).
-                                 SelectAsync(false)).ToList();
+                var categories = await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.FAQCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
 
                 List<int> forDelete = new List<int>();
                 foreach (var faqToContentCategory in dbItem.FAQsToContentCategories)
@@ -230,7 +229,7 @@ namespace VitalChoice.Business.Services.Content
                 {
                     ContentCategoryId = p,
                     FAQId = dbItem.Id
-                }).ToList());
+                }));
 
                 toReturn = true;
             }

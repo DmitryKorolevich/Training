@@ -42,13 +42,12 @@ namespace VitalChoice.Business.Services.Content
             _logger = LoggerService.GetDefault();
         }
 
-        public async Task<IEnumerable<ContentTypeEntity>> GetContentTypesAsync()
+        public async Task<List<ContentTypeEntity>> GetContentTypesAsync()
         {
-            var toReturn = (await contentTypeRepository.Query().SelectAsync(false)).ToList();
-            return toReturn;
+            return await contentTypeRepository.Query().SelectAsync(false);
         }
 
-        public async Task<IEnumerable<MasterContentItem>> GetMasterContentItemsAsync(MasterContentItemListFilter filter)
+        public async Task<List<MasterContentItem>> GetMasterContentItemsAsync(MasterContentItemListFilter filter)
         {
             var query = new MasterContentItemQuery();
             query = query.WithType(filter.Type).NotDeleted().WithStatus(filter.Status);
@@ -82,9 +81,14 @@ namespace VitalChoice.Business.Services.Content
 					break;
 			}
 
-			var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.Type).Include(p=>p.User).ThenInclude(p => p.Profile).OrderBy(sortable).
-                SelectAsync(false)).ToList();
-            return toReturn;
+            return
+                await
+                    masterContentItemRepository.Query(query)
+                        .Include(p => p.Type)
+                        .Include(p => p.User)
+                        .ThenInclude(p => p.Profile)
+                        .OrderBy(sortable)
+                        .SelectAsync(false);
         }
 
         public async Task<MasterContentItem> GetMasterContentItemAsync(int id)
@@ -101,11 +105,13 @@ namespace VitalChoice.Business.Services.Content
             MasterContentItem dbItem = null;
             if (model.Id == 0)
             {
-                dbItem = new MasterContentItem();
-                dbItem.TypeId = model.Type.Id;
-                dbItem.StatusCode = RecordStatusCode.Active;
-                dbItem.MasterContentItemToContentProcessors = new List<MasterContentItemToContentProcessor>();
-                dbItem.Created = DateTime.Now;
+                dbItem = new MasterContentItem
+                {
+                    TypeId = model.Type.Id,
+                    StatusCode = RecordStatusCode.Active,
+                    MasterContentItemToContentProcessors = new List<MasterContentItemToContentProcessor>(),
+                    Created = DateTime.Now
+                };
             }
             else
             {
@@ -122,7 +128,8 @@ namespace VitalChoice.Business.Services.Content
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != dbItem.Id
+                var idDbItem = dbItem.Id;
+                var nameDublicatesExist = await masterContentItemRepository.Query(p => p.Name == model.Name && p.Id != idDbItem
                     && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (nameDublicatesExist)
                 {
@@ -152,8 +159,7 @@ namespace VitalChoice.Business.Services.Content
                 if (model.Type.DefaultMasterContentItemId.HasValue)
                 {
                     var contentType = (await contentTypeRepository.Query(p => p.Id == dbItem.TypeId).SelectAsync()).FirstOrDefault();
-                    if (contentType != null && model.Type.DefaultMasterContentItemId.HasValue && 
-                        contentType.DefaultMasterContentItemId != model.Type.DefaultMasterContentItemId)
+                    if (contentType != null && contentType.DefaultMasterContentItemId != model.Type.DefaultMasterContentItemId)
                     {
                         contentType.DefaultMasterContentItemId = dbItem.Id;
                         await contentTypeRepository.UpdateAsync(contentType);

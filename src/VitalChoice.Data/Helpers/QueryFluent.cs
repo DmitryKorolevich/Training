@@ -75,10 +75,10 @@ namespace VitalChoice.Data.Helpers
             return await Repository.Select(Query, _expression, _orderBy).CountAsync();
         }
 
-        public IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
+        public List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
         {
             totalCount = Repository.Select(Query, _expression).Count();
-            return Repository.Select(Query, _expression, _orderBy, page, pageSize, tracking);
+            return Repository.Select(Query, _expression, _orderBy, page, pageSize, tracking).ToList();
         }
         public async Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false)
         {
@@ -87,17 +87,17 @@ namespace VitalChoice.Data.Helpers
             return new PagedList<TEntity>(items, count);
         }
 
-        public IEnumerable<TEntity> Select(bool tracking = true)
+        public List<TEntity> Select(bool tracking = true)
         {
-            return Repository.Select(Query, _expression, _orderBy, tracking: tracking);
+            return Repository.Select(Query, _expression, _orderBy, tracking: tracking).ToList();
         }
 
-        public IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
+        public List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
-            return Repository.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
+            return Repository.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector).ToList();
         }
 
-        public async Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true)
+        public async Task<List<TEntity>> SelectAsync(bool tracking = true)
         {
             return await Repository.SelectAsync(Query, _expression, _orderBy, tracking: tracking);
         }

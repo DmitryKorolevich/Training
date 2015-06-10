@@ -15,11 +15,11 @@ namespace VitalChoice.Data.Helpers
         IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression);
         Task<bool> SelectAnyAsync();
         Task<int> SelectCountAsync();
-        IEnumerable<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
+        List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
         Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false);
-        IEnumerable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
-        IEnumerable<TEntity> Select(bool tracking = true);
-        Task<IEnumerable<TEntity>> SelectAsync(bool tracking = true);
+        List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
+        List<TEntity> Select(bool tracking = true);
+        Task<List<TEntity>> SelectAsync(bool tracking = true);
         IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
     }
 }

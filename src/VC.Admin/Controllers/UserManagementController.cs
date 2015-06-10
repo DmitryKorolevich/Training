@@ -52,7 +52,7 @@ namespace VC.Admin.Controllers
 					PublicId = x.PublicId,
 					RoleIds = x.Roles.Select(y=> (RoleType)y.RoleId).ToList(),
 					Status = x.Status
-				})
+				}).ToList()
 		    };
 		}
 

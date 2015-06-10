@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<AppSettings> GetAppSettingsAsync()
         {
-            var appSettings = (await appSettingRepository.Query().SelectAsync(false)).ToList();
+            var appSettings = await appSettingRepository.Query().SelectAsync(false);
 
             AppSettings toReturn = CreateAppSettings(appSettings);
 
