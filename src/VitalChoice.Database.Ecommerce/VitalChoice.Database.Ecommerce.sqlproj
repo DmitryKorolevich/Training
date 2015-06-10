@@ -77,7 +77,6 @@
     </None>
     <None Include="Azure.publish.xml" />
     <None Include="PostDeployment\Scripts\WorkflowExecutors.sql" />
-    <None Include="PostDeployment\Scripts\UserLogin.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
