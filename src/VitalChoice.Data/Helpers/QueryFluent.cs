@@ -62,15 +62,9 @@ namespace VitalChoice.Data.Helpers
 
         public IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression)
         {
-            Query = Query.Include(expression);
-            return new IncludableQueryFluent<TEntity, TProperty>(this);
+            return new IncludableQueryFluent<TEntity, TProperty>(this, Query.Include(expression));
         }
 
-        public IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, ICollection<TProperty>>> expression)
-        {
-            Query = Query.Include(expression);
-            return new IncludableQueryFluent<TEntity, TProperty>(this,true);
-        }
         public async Task<bool> SelectAnyAsync()
         {
             return await Repository.Select(Query, _expression, _orderBy).AnyAsync();

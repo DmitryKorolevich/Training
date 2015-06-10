@@ -25,9 +25,17 @@ namespace VitalChoice.Data.Repositories
         bool UpdateRange(IEnumerable<TEntity> entities);
         Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities);
         Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities);
-        void Delete(int id);
-		void Delete(TEntity entity);
-		Task<bool> DeleteAsync(int id);
+        bool Delete(int id);
+        bool Delete(TEntity entity);
+        bool DeleteAll(ICollection<int> ids);
+        bool DeleteAll(ICollection<TEntity> entitySet);
+        Task<bool> DeleteAsync(int id);
 		Task<bool> DeleteAsync(CancellationToken cancellationToken, int id);
-	}
+        Task<bool> DeleteAsync(TEntity entity);
+        Task<bool> DeleteAsync(CancellationToken cancellationToken, TEntity entity);
+        Task<bool> DeleteAllAsync(ICollection<int> ids);
+        Task<bool> DeleteAllAsync(CancellationToken cancellationToken, ICollection<int> ids);
+        Task<bool> DeleteAllAsync(ICollection<TEntity> entitySet);
+        Task<bool> DeleteAllAsync(CancellationToken cancellationToken, ICollection<TEntity> entitySet);
+    }
 }

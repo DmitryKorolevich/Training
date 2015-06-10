@@ -33,12 +33,32 @@ namespace VitalChoice.DynamicData.Entities
             BaseConvert(entity);
         }
 
-        protected override void FillEntity(Sku entity)
+        protected override void FillNewEntity(Sku entity)
         {
             entity.Code = Code;
             entity.Hidden = Hidden;
             entity.Price = Price;
             entity.WholesalePrice = WholesalePrice;
+
+            //Set key on options
+            foreach (var value in entity.OptionValues)
+            {
+                value.IdSku = Id;
+            }
+        }
+
+        protected override void UpdateEntityInternal(Sku entity)
+        {
+            entity.Code = Code;
+            entity.Hidden = Hidden;
+            entity.Price = Price;
+            entity.WholesalePrice = WholesalePrice;
+
+            //Set key on options
+            foreach (var value in entity.OptionValues)
+            {
+                value.IdSku = Id;
+            }
         }
 
         private void BaseConvert(Sku entity)

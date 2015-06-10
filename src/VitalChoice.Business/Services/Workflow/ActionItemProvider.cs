@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Workflow;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Workflow;
 using VitalChoice.Domain.Exceptions;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using Templates;
 using Templates.Exceptions;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;

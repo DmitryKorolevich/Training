@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Domain.Entities.Products
 {
@@ -20,6 +21,8 @@ namespace VitalChoice.Domain.Entities.Products
         public CustomerTypeCode Assigned { get; set; }
 
         public int Order { get; set; }
+
+        public ICollection<ProductToCategory> ProductToCategories { get; set; }
 
         public ProductCategory()
         {

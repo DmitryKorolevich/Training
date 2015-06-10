@@ -4,11 +4,12 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.DynamicData
 {
-    public interface IDynamicEntity<out TEntity, TOptionValue, TOptionType>
+    public interface IDynamicEntity<TEntity, TOptionValue, TOptionType>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>
         where TOptionType : OptionType
         where TOptionValue : OptionValue<TOptionType>
     {
+        void UpdateEntity(TEntity entity);
         TEntity ToEntity();
         int Id { get; set; }
         RecordStatusCode StatusCode { get; set; }

@@ -118,6 +118,11 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
             builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
+		    builder.Entity<ProductCategory>()
+		        .Collection(cat => cat.ProductToCategories)
+		        .InverseReference()
+		        .ForeignKey(c => c.IdCategory)
+		        .PrincipalKey(cat => cat.Id);
 
             builder.Entity<GiftCertificate>().Key(p => p.Id);
             builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
@@ -146,7 +151,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
 		        .ForeignKey(t => t.IdOptionType)
-		        .PrincipalKey(v => v.Id);
+		        .PrincipalKey(v => v.Id).Required();
 
             builder.Entity<ProductTypeEntity>().Key(t => t.Id);
 		    builder.Entity<ProductTypeEntity>().ForSqlServer().Table("ProductTypes");
@@ -155,11 +160,11 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<Sku>().ForSqlServer().Table("Skus");
 		    builder.Entity<Sku>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
             builder.Entity<Sku>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
-            builder.Entity<Sku>()
+		    builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdSku)
-		        .PrincipalKey(s => s.Id);
+		        .PrincipalKey(s => s.Id).Required(false);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
@@ -169,26 +174,26 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<Product>().ForSqlServer().Table("Products");
             builder.Entity<Product>().Property(s => s.DateCreated).ForSqlServer().UseDefaultValueGeneration();
             builder.Entity<Product>().Property(s => s.DateEdited).ForSqlServer().UseDefaultValueGeneration();
-            builder.Entity<Product>()
+		    builder.Entity<Product>()
 		        .Collection(p => p.Skus)
 		        .InverseReference()
 		        .ForeignKey(s => s.IdProduct)
-		        .PrincipalKey(p => p.Id);
-		    builder.Entity<Product>()
+		        .PrincipalKey(p => p.Id).Required();
+            builder.Entity<Product>()
 		        .Collection(p => p.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdProduct)
-		        .PrincipalKey(p => p.Id);
-		    builder.Entity<Product>()
+		        .PrincipalKey(p => p.Id).Required(false);
+            builder.Entity<Product>()
 		        .Collection(p => p.OptionTypes)
 		        .InverseReference()
 		        .ForeignKey(t => t.IdProductType)
-		        .PrincipalKey(p => p.IdProductType);
-            builder.Entity<Product>()
-                .Collection(p => p.ProductsToCategories)
-                .InverseReference()
-                .ForeignKey(t => t.IdProduct)
-                .PrincipalKey(p => p.Id);
+		        .PrincipalKey(p => p.IdProductType).Required(false);
+		    builder.Entity<Product>()
+		        .Collection(p => p.ProductsToCategories)
+		        .InverseReference()
+		        .ForeignKey(t => t.IdProduct)
+		        .PrincipalKey(p => p.Id).Required();
 
             #endregion
 

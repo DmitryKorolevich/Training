@@ -189,7 +189,7 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.Populate(services);
 
                 builder.Register<IDataContextAsync>(x => x.Resolve<VitalChoiceContext>());
-                builder.RegisterType<EcommerceContext>();
+                builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
                 builder.RegisterType<LogsContext>();
                 builder.RegisterGeneric(typeof(RepositoryAsync<>))
                     .As(typeof(IRepositoryAsync<>));

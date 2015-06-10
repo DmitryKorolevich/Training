@@ -55,12 +55,13 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            MoveDynamicFields(entity);
-
             var data = DictionaryData;
-            foreach (var value in entity.OptionValues)
+            if (entity.OptionValues != null)
             {
-                data.Add(value.OptionType.Name, ConvertTo(value.Value, value.OptionType.IdFieldType));
+                foreach (var value in entity.OptionValues)
+                {
+                    data.Add(value.OptionType.Name, ConvertTo(value.Value, value.OptionType.IdFieldType));
+                }
             }
             Id = entity.Id;
             DateCreated = entity.DateCreated;
@@ -76,13 +77,15 @@ namespace VitalChoice.DynamicData
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            MoveDynamicFields(entity);
 
             var data = DictionaryData;
             FromEntityInternal(entity);
-            foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
+            if (entity.OptionTypes != null)
             {
-                data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
+                foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
+                {
+                    data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
+                }
             }
             Id = entity.Id;
             DateCreated = entity.DateCreated;
@@ -91,7 +94,35 @@ namespace VitalChoice.DynamicData
             FromEntityWithDefaults(entity);
         }
 
-        protected abstract void FillEntity(TEntity entity);
+        protected abstract void FillNewEntity(TEntity entity);
+
+        public void UpdateEntity(TEntity entity)
+        {
+            var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o.Id);
+            var newOptions = new List<TOptionValue>();
+            foreach (var data in DynamicData)
+            {
+                int idOption;
+                if (optionTypesCache.TryGetValue(data.Key, out idOption))
+                {
+                    var option = new TOptionValue
+                    {
+                        Value = data.Value?.ToString(),
+                        IdOptionType = idOption
+                    };
+                    if (option.Value != null)
+                    {
+                        newOptions.Add(option);
+                    }
+                }
+            }
+            entity.OptionValues = newOptions;
+            entity.Id = Id;
+            entity.StatusCode = StatusCode;
+            FillNewEntity(entity);
+        }
+
+        protected abstract void UpdateEntityInternal(TEntity entity);
 
         public TEntity ToEntity()
         {
@@ -100,17 +131,20 @@ namespace VitalChoice.DynamicData
             {
                 var option = new TOptionValue
                 {
-                    Value = data.Value.ToString(),
+                    Value = data.Value?.ToString(),
                     OptionType = new TOptionType
                     {
                         Name = data.Key
                     }
                 };
-                result.OptionValues.Add(option);
+                if (option.Value != null)
+                {
+                    result.OptionValues.Add(option);
+                }
             }
             result.Id = Id;
             result.StatusCode = StatusCode;
-            FillEntity(result);
+            FillNewEntity(result);
             return result;
         }
 
@@ -239,24 +273,6 @@ namespace VitalChoice.DynamicData
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
         protected ExpandoObject DynamicData { get; } = new ExpandoObject();
-
-        private static void MoveDynamicFields(TEntity entity)
-        {
-            if (entity.OptionValues != null && entity.OptionTypes != null)
-            {
-                foreach (var optionValue in entity.OptionValues)
-                {
-                    foreach (var optionType in entity.OptionTypes)
-                    {
-                        if (optionValue.IdOptionType == optionType.Id)
-                        {
-                            optionValue.OptionType = optionType;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
 
         private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType, bool ignoreMapAttribute = false)
         {

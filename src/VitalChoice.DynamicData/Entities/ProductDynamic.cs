@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NuGet;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
@@ -30,7 +31,23 @@ namespace VitalChoice.DynamicData.Entities
 
         public ICollection<int> CategoryIds { get; set; }
 
-        protected override void FillEntity(Product entity)
+        protected override void FillNewEntity(Product entity)
+        {
+            entity.Hidden = Hidden;
+            entity.IdExternal = IdExternal;
+            entity.IdProductType = Type;
+            entity.Name = Name;
+            entity.Url = Url;
+            entity.ProductsToCategories = CategoryIds?.Select(c => new ProductToCategory
+            {
+                IdCategory = c,
+                IdProduct = Id
+            }).ToArray();
+
+            entity.Skus = Skus?.Select(s => s.ToEntity()).ToArray();
+        }
+
+        protected override void UpdateEntityInternal(Product entity)
         {
             entity.Hidden = Hidden;
             entity.IdExternal = IdExternal;
@@ -43,12 +60,37 @@ namespace VitalChoice.DynamicData.Entities
                 IdProduct = Id
             }).ToArray();
 
-            entity.Skus = Skus.Select(s =>
+            if (Skus != null)
             {
-                var sku = s.ToEntity();
-                sku.IdProduct = Id;
-                return sku;
-            }).ToArray();
+                //Update existing
+                var itemsToUpdate = Skus.Join(entity.Skus, sd => sd.Id, s => s.Id,
+                    (skuDynamic, sku) => new {skuDynamic, sku});
+                foreach (var item in itemsToUpdate)
+                {
+                    item.skuDynamic.UpdateEntity(item.sku);
+                }
+
+                //Delete
+                entity.Skus.RemoveAll(e => Skus.All(s => s.Id != e.Id));
+
+                //Insert
+                entity.Skus.AddRange(Skus.Where(s => s.Id == 0).Select(s =>
+                {
+                    var sku = s.ToEntity();
+                    sku.IdProduct = Id;
+                    return sku;
+                }).ToArray());
+            }
+            else
+            {
+                entity.Skus.Clear();
+            }
+
+            //Set key on options
+            foreach (var value in entity.OptionValues)
+            {
+                value.IdProduct = Id;
+            }
         }
 
         protected override void FromEntity(Product entity)

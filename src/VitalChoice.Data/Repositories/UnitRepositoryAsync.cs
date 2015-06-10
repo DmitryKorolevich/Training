@@ -155,19 +155,43 @@ namespace VitalChoice.Data.Repositories
             return Task.FromResult(true);
         }
 
-        public virtual void Delete(int id)
+        public virtual bool Delete(int id)
         {
             var entity = DbSet.FirstOrDefault(x => x.Id == id);
             if (entity != null)
             {
-                Delete(entity);
+                DbSet.Attach(entity);
+                Context.SetState(entity, EntityState.Deleted);
+                return true;
             }
+            return false;
         }
 
-        public virtual void Delete(TEntity entity)
+        public virtual bool Delete(TEntity entity)
         {
-            DbSet.Attach(entity);
-            Context.SetState(entity, EntityState.Deleted);
+            DbSet.Remove(entity);
+            return true;
+        }
+
+        public virtual bool DeleteAll(ICollection<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+                return false;
+            var entitySet = DbSet.Where(e => ids.Any(id => id == e.Id));
+            DbSet.AttachRange(entitySet);
+            foreach (var entity in entitySet)
+            {
+                Context.SetState(entity, EntityState.Deleted);
+            }
+            return true;
+        }
+
+        public virtual bool DeleteAll(ICollection<TEntity> entitySet)
+        {
+            if (!entitySet.Any())
+                return false;
+            DbSet.RemoveRange(entitySet);
+            return true;
         }
 
         public virtual async Task<bool> DeleteAsync(int id)
@@ -175,13 +199,55 @@ namespace VitalChoice.Data.Repositories
             return await DeleteAsync(CancellationToken.None, id);
         }
 
-        public virtual Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
+        public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
         {
-            var entity = DbSet.FirstOrDefault(x => x.Id == id);
-            if (entity == null) return Task.FromResult(false);
+            var entity = await DbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            if (entity == null) return false;
 
-            DbSet.Attach(entity);
             DbSet.Remove(entity);
+            return true;
+        }
+
+        public virtual async Task<bool> DeleteAsync(TEntity entity)
+        {
+            return await DeleteAsync(CancellationToken.None, entity);
+        }
+
+        public virtual Task<bool> DeleteAsync(CancellationToken cancellationToken, TEntity entity)
+        {
+            if (entity == null)
+                return Task.FromResult(false);
+            DbSet.Remove(entity);
+            return Task.FromResult(true);
+        }
+
+        public virtual async Task<bool> DeleteAllAsync(ICollection<int> ids)
+        {
+            return await DeleteAllAsync(CancellationToken.None, ids);
+        }
+
+        public virtual Task<bool> DeleteAllAsync(CancellationToken cancellationToken, ICollection<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+                return Task.FromResult(false);
+            var entitySet = DbSet.Where(e => ids.Any(id => id == e.Id));
+            DbSet.AttachRange(entitySet);
+            foreach (var entity in entitySet)
+            {
+                Context.SetState(entity, EntityState.Deleted);
+            }
+            return Task.FromResult(true);
+        }
+
+        public virtual async Task<bool> DeleteAllAsync(ICollection<TEntity> entitySet)
+        {
+            return await DeleteAllAsync(CancellationToken.None, entitySet);
+        }
+
+        public virtual Task<bool> DeleteAllAsync(CancellationToken cancellationToken,
+            ICollection<TEntity> entitySet)
+        {
+            DbSet.RemoveRange(entitySet);
             return Task.FromResult(true);
         }
     }
