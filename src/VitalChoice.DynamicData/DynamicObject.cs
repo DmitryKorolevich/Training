@@ -183,7 +183,7 @@ namespace VitalChoice.DynamicData
             return result;
         }
 
-        public object ToModel(Type modelType, Type dynamicType)
+        object IDynamicObject.ToModel(Type modelType, Type dynamicType)
         {
             dynamic result = Activator.CreateInstance(modelType);
             var cache = GetTypeCache(ModelTypeMappingCache, modelType);
@@ -208,7 +208,7 @@ namespace VitalChoice.DynamicData
                 }
             }
 
-            result.FillSelfFrom(this);
+            result.FillSelfFrom((dynamic)this);
             return result;
         }
 
@@ -240,7 +240,7 @@ namespace VitalChoice.DynamicData
             model.FillDynamic(this as TDynamic);
         }
 
-        public void FromModel(Type modelType, Type dynamicType, dynamic model)
+        void IDynamicObject.FromModel(Type modelType, Type dynamicType, dynamic model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -262,7 +262,7 @@ namespace VitalChoice.DynamicData
                     data.Add(mappingName, ConvertFromModelObject(genericProperty.Value.PropertyType, genericProperty.Value.Get?.Invoke(model)));
                 }
             }
-            model.FillDynamic(this);
+            model.FillDynamic((dynamic)this);
         }
 
         public static implicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)

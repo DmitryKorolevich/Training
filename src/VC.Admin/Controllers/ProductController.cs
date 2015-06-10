@@ -164,9 +164,9 @@ namespace VC.Admin.Controllers
             if (item == null)
                 return null;
 
-            item = (ProductDynamic)(await productService.UpdateProductAsync(item));
+            item = (await productService.UpdateProductAsync(item));
 
-            ProductManageModel toReturn = (ProductManageModel)item.ToModel(typeof(ProductManageModel), typeof(ProductDynamic));
+            ProductManageModel toReturn = item.ToModel<ProductManageModel, ProductDynamic>();
             return toReturn;
         }
 

@@ -177,7 +177,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 try
                 {
-                    Product product = null;
+                    Product product;
                     if (model.Id == 0)
                     {
                         product = await InsertProduct(model);
