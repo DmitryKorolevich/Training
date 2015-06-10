@@ -175,29 +175,27 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Product>().Key(p => p.Id);
 		    builder.Entity<Product>().ForSqlServer().Table("Products");
             builder.Entity<Product>()
-		        .Collection(p => p.Skus)
-		        .InverseReference()
-		        .ForeignKey(s => s.IdProduct)
-		        .PrincipalKey(p => p.Id)
-                .Required();
+                .Collection(p => p.Skus)
+                .InverseReference()
+                .ForeignKey(s => s.IdProduct)
+                .PrincipalKey(p => p.Id);
             builder.Entity<Product>()
-		        .Collection(p => p.OptionValues)
-		        .InverseReference()
-		        .ForeignKey(o => o.IdProduct)
-		        .PrincipalKey(p => p.Id)
-                .Required(false);
+                .Collection(p => p.OptionValues)
+                .InverseReference()
+                .ForeignKey(o => o.IdProduct)
+                .PrincipalKey(p => p.Id);
+
+            builder.Entity<Product>().Ignore(p => p.OptionTypes);
+            //builder.Entity<Product>()
+            //    .Collection(p => p.OptionTypes)
+            //    .InverseReference()
+            //    .ForeignKey(t => t.IdProductType)
+            //    .PrincipalKey(p => p.IdProductType);
             builder.Entity<Product>()
-		        .Collection(p => p.OptionTypes)
-		        .InverseReference()
-		        .ForeignKey(t => t.IdProductType)
-		        .PrincipalKey(p => p.IdProductType)
-                .Required(false);
-		    builder.Entity<Product>()
-		        .Collection(p => p.ProductsToCategories)
-		        .InverseReference()
-		        .ForeignKey(t => t.IdProduct)
-		        .PrincipalKey(p => p.Id)
-                .Required();
+                .Collection(p => p.ProductsToCategories)
+                .InverseReference()
+                .ForeignKey(t => t.IdProduct)
+                .PrincipalKey(p => p.Id);
 
             #endregion
 

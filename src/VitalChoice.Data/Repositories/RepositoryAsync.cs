@@ -268,6 +268,7 @@ namespace VitalChoice.Data.Repositories
         {
             if (entitySet == null || !entitySet.Any())
                 return false;
+            DbSet.AttachRange(entitySet);
             DbSet.RemoveRange(entitySet);
             await Context.SaveChangesAsync(cancellationToken);
             return true;

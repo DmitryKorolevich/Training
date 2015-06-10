@@ -58,7 +58,7 @@ namespace VitalChoice.DynamicData.Entities
             {
                 IdCategory = c,
                 IdProduct = Id
-            }).ToArray();
+            }).ToList();
 
             if (Skus != null && Skus.Any())
             {

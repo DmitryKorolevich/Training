@@ -91,19 +91,19 @@ BEGIN
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT '1', 2, 1, 'Seller', @IdLookup
+	SELECT '1', 3, 1, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT '1', 2, 2, 'Seller', @IdLookup
+	SELECT '1', 3, 2, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT '1', 2, 3, 'Seller', @IdLookup
+	SELECT '1', 3, 3, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT '1', 2, 4, 'Seller', @IdLookup
+	SELECT '1', 3, 4, 'Seller', @IdLookup
 
 
 	INSERT INTO Lookups
@@ -129,19 +129,19 @@ BEGIN
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 1, 'SpecialIcon', @IdLookup
+	SELECT NULL, 3, 1, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 2, 'SpecialIcon', @IdLookup
+	SELECT NULL, 3, 2, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 3, 'SpecialIcon', @IdLookup
+	SELECT NULL, 3, 3, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 4, 'SpecialIcon', @IdLookup
+	SELECT NULL, 3, 4, 'SpecialIcon', @IdLookup
 
 
 	INSERT INTO Lookups
@@ -231,19 +231,28 @@ BEGIN
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 1, 'GoogleCategory', @IdLookup
+	SELECT NULL, 3, 1, 'GoogleCategory', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 2, 'GoogleCategory', @IdLookup
+	SELECT NULL, 3, 2, 'GoogleCategory', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 3, 'GoogleCategory', @IdLookup
+	SELECT NULL, 3, 3, 'GoogleCategory', @IdLookup
 
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 2, 4, 'GoogleCategory', @IdLookup
+	SELECT NULL, 3, 4, 'GoogleCategory', @IdLookup
+
+END
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE IdLookup IS NOT NULL AND IdFieldType=2)
+BEGIN
+
+  UPDATE ProductOptionTypes
+  SET IdFieldType=3
+  WHERE IdLookup IS NOT NULL AND IdFieldType=2
 
 END
 
@@ -299,58 +308,6 @@ BEGIN
 	SELECT N'0', 5, 2, N'AutoShipFrequency3'
 	UNION
 	SELECT N'0', 5, 2, N'AutoShipFrequency6'
-
-
-	--perishable product type
-
-	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name)
-	SELECT NULL, 4, 2, N'Description'
-	UNION
-	SELECT NULL, 4, 2, N'Serving'
-	UNION
-	SELECT NULL, 4, 2, N'Recepies'
-	UNION
-	SELECT NULL, 4, 2, N'Ingredients'
-	UNION
-	SELECT NULL, 4, 2, N'ShortDescription'
-	UNION
-	SELECT NULL, 4, 2, N'ProductNotes'
-	UNION
-	SELECT NULL, 4, 2, N'MetaTitle'
-	UNION
-	SELECT NULL, 4, 2, N'MetaDescription'
-	UNION
-	SELECT NULL, 4, 2, N'TaxCode'
-	UNION
-	SELECT NULL, 4, 2, N'Thumbnail'
-	UNION
-	SELECT NULL, 4, 2, N'NutritionalTitle'
-	UNION
-	SELECT NULL, 4, 2, N'MainProductImage'
-	UNION
-	SELECT N'0', 3, 2, N'Stock'
-	UNION
-	SELECT N'2', 5, 2, N'DisregardStock'
-	UNION
-	SELECT N'0', 5, 2, N'DisallowSingle'
-	UNION
-	SELECT N'0', 5, 2, N'NonDiscountable'
-	UNION
-	SELECT N'0', 5, 2, N'AutoShipProduct'
-	UNION
-	SELECT N'0', 2, 2, N'OffPercent'
-	UNION
-	SELECT N'0', 5, 2, N'HideFromDataFeed'
-	UNION
-	SELECT N'0', 5, 2, N'AutoShipFrequency1'
-	UNION
-	SELECT N'0', 5, 2, N'AutoShipFrequency2'
-	UNION
-	SELECT N'0', 5, 2, N'AutoShipFrequency3'
-	UNION
-	SELECT N'0', 5, 2, N'AutoShipFrequency6'
-
 
 	--EGC product type
 
