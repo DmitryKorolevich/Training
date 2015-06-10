@@ -34,3 +34,6 @@ Post-Deployment Script Template
 :r .\Scripts\VProductSkus.sql
 :r .\Scripts\YouTubeAndCrossSellsFields.sql
 :r .\Scripts\ProductOptionTypesNutrition.sql
+
+:r .\Scripts\CustomerAreaBasics.sql
+:r .\Scripts\CustomerAreaBasicsData.sql

@@ -132,4 +132,8 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductOptionTypesNutrition.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\CustomerAreaBasics.sql" />
+    <None Include="PostDeployment\Scripts\CustomerAreaBasicsData.sql" />
+  </ItemGroup>
 </Project>
