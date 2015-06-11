@@ -267,6 +267,7 @@ namespace VitalChoice.Business.Services.Products
                 await _productToCategoryRepository.DeleteAllAsync(dbCategories);
 
                 await _productToCategoryRepository.InsertRangeAsync(categories);
+                toReturn.ProductsToCategories = categories;
                 return toReturn;
             }
             return null;
