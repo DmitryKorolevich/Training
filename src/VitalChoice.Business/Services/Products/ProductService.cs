@@ -220,15 +220,7 @@ namespace VitalChoice.Business.Services.Products
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
 
                 entity.OptionTypes = new List<ProductOptionType>();
-                var skus = entity.Skus;
-                entity.Skus = new List<Sku>();
                 var result = await _productRepository.InsertGraphAsync(entity);
-                foreach (var sku in skus)
-                {
-                    sku.IdProduct = result.Id;
-                }
-                await _skuRepository.InsertGraphRangeAsync(skus);
-                result.Skus = skus;
                 result.OptionTypes = optionTypes;
                 return result;
             }
