@@ -213,6 +213,10 @@ namespace VitalChoice.Business.Services
         public bool DeleteFile(string fullRelativeName)
         {
             bool toReturn = false;
+            if(fullRelativeName.StartsWith(appOptions.Options.FilesRelativePath))
+            {
+                fullRelativeName = fullRelativeName.Substring(appOptions.Options.FilesRelativePath.Length, fullRelativeName.Length - appOptions.Options.FilesRelativePath.Length);
+            }
             var path = ConvertUrlToPath(fullRelativeName);
             FileInfo fileInfo = new FileInfo(path);
             if (fileInfo.Exists)

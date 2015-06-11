@@ -170,7 +170,7 @@ namespace VitalChoice.Business.Services.Products
                 IncludeProductOptionTypes(entity, optionTypes);
                 entity.Skus =
                     await
-                        _skuRepository.Query(p => p.IdProduct == entity.Id)
+                        _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                             .Include(p => p.OptionValues)
                             .SelectAsync(false);
                 IncludeSkuOptionTypes(entity, optionTypes);
@@ -250,7 +250,7 @@ namespace VitalChoice.Business.Services.Products
                 entity.OptionTypes =
                     await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
 
-                entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id)
+                entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode!=RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues)
                     .SelectAsync();
 
