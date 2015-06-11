@@ -34,6 +34,7 @@ using VitalChoice.Workflow.Core;
 using System.Linq;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Data.Repositories.Customs;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -232,6 +233,8 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
                 builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();
                 builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
+                builder.RegisterType<VProductSkuRepository>()
+                    .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>()); ;
                 var container = builder.Build();
 
                 LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
