@@ -220,15 +220,15 @@ namespace VitalChoice.Business.Services.Products
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
 
                 entity.OptionTypes = new List<ProductOptionType>();
-                //var skus = entity.Skus;
-                //entity.Skus = new List<Sku>();
+                var skus = entity.Skus;
+                entity.Skus = new List<Sku>();
                 var result = await _productRepository.InsertGraphAsync(entity);
-                //foreach (var sku in skus)
-                //{
-                //    sku.IdProduct = result.Id;
-                //}
-                //await _skuRepository.InsertGraphRangeAsync(skus);
-                //result.Skus = skus;
+                foreach (var sku in skus)
+                {
+                    sku.IdProduct = result.Id;
+                }
+                await _skuRepository.InsertGraphRangeAsync(skus);
+                result.Skus = skus;
                 result.OptionTypes = optionTypes;
                 return result;
             }
@@ -339,9 +339,9 @@ namespace VitalChoice.Business.Services.Products
 
         private static void IncludeSkuOptionTypesByName(Product item, Dictionary<string, ProductOptionType> optionTypes)
         {
-            var forRemove = new List<ProductOptionValue>();
             foreach (var sku in item.Skus)
             {
+                var forRemove = new List<ProductOptionValue>();
                 foreach (var value in sku.OptionValues)
                 {
                     ProductOptionType optionType;
@@ -355,10 +355,10 @@ namespace VitalChoice.Business.Services.Products
                         value.IdOptionType = optionType.Id;
                     }
                 }
-            }
-            foreach (var forRemoveItem in forRemove)
-            {
-                item.OptionValues.Remove(forRemoveItem);
+                foreach (var forRemoveItem in forRemove)
+                {
+                    sku.OptionValues.Remove(forRemoveItem);
+                }
             }
         }
     }

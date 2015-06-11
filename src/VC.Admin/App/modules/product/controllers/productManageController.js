@@ -433,7 +433,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
             }
 
             var sku = {
-                Id: null,
+                Id: 0,
                 Name: '',
                 Active: true,
                 RetailPrice: 0.00,
