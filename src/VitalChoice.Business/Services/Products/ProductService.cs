@@ -19,12 +19,13 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Data.Repositories.Customs;
 
 namespace VitalChoice.Business.Services.Products
 {
     public class ProductService : IProductService
     {
-        private readonly IEcommerceRepositoryAsync<VProductSku> _vProductSkuRepository;
+        private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypeRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionValue> _productOptionValueRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
@@ -34,7 +35,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
 
-        public ProductService(IEcommerceRepositoryAsync<VProductSku> vProductSkuRepository,
+        public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
@@ -129,6 +130,8 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
+            //await _vProductSkuRepository.GetProductsAsync(filter);
+
             var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
             var query = _vProductSkuRepository.Query(conditions);
 
