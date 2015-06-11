@@ -12,8 +12,8 @@ namespace VitalChoice.Data.Services
 	{
         void Insert(TEntity entity);
         Task InsertAsync(TEntity entity);
-        bool InsertRange(IEnumerable<TEntity> entities);
-	    Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities);
+        bool InsertRange(ICollection<TEntity> entities);
+	    Task<bool> InsertRangeAsync(ICollection<TEntity> entities);
         TEntity InsertGraph(TEntity entity);
 		Task<TEntity> InsertGraphAsync(TEntity entity);
 	    bool InsertGraphRange(params TEntity[] entities);
@@ -22,9 +22,9 @@ namespace VitalChoice.Data.Services
 	    Task<TEntity> UpdateAsync(TEntity entity);
         void Delete(int id);
         void Delete(TEntity entity);
-		IEnumerable<TEntity> Query();
-		IEnumerable<TEntity> Query(IQueryObject<TEntity> queryObject);
-		IEnumerable<TEntity> Query(Expression<Func<TEntity, bool>> query);
+		List<TEntity> Query();
+        List<TEntity> Query(IQueryObject<TEntity> queryObject);
+        List<TEntity> Query(Expression<Func<TEntity, bool>> query);
         Task<bool> DeleteAsync(int id);
         Task<bool> DeleteAsync(CancellationToken cancellationToken, int id);
     }

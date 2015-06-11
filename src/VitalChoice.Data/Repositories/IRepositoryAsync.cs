@@ -10,9 +10,9 @@ namespace VitalChoice.Data.Repositories
         TEntity Insert(TEntity entity);
         Task<TEntity> InsertAsync(TEntity entity);
         Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity);
-        bool InsertRange(IEnumerable<TEntity> entities);
-        Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities);
-        Task<bool> InsertRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities);
+        bool InsertRange(ICollection<TEntity> entities);
+        Task<bool> InsertRangeAsync(ICollection<TEntity> entities);
+        Task<bool> InsertRangeAsync(CancellationToken cancellationToken, ICollection<TEntity> entities);
         TEntity InsertGraph(TEntity entity);
         Task<TEntity> InsertGraphAsync(TEntity entity);
         Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity);
@@ -24,9 +24,9 @@ namespace VitalChoice.Data.Repositories
         TEntity Update(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity);
-        bool UpdateRange(IEnumerable<TEntity> entities);
-        Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities);
-        Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities);
+        bool UpdateRange(ICollection<TEntity> entities);
+        Task<bool> UpdateRangeAsync(ICollection<TEntity> entities);
+        Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, ICollection<TEntity> entities);
         bool Delete(int id);
         bool Delete(TEntity entity);
         bool DeleteAll(ICollection<int> ids);

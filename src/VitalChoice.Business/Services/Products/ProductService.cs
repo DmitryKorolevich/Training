@@ -238,12 +238,10 @@ namespace VitalChoice.Business.Services.Products
             var entity = (await _productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
-                .Include(p => p.ProductsToCategories)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
                 await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
-                await _productToCategoryRepository.DeleteAllAsync(entity.ProductsToCategories);
 
                 entity.OptionTypes =
                     await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
@@ -258,9 +256,13 @@ namespace VitalChoice.Business.Services.Products
                     await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
                 }
 
+                await _productToCategoryRepository.DeleteAllAsync(await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false));
+
                 model.UpdateEntity(entity);
+
                 await _productToCategoryRepository.InsertRangeAsync(entity.ProductsToCategories);
-                await _productOptionValueRepository.InsertRangeAsync(entity.OptionValues);
+
+                entity.ProductsToCategories = new List<ProductToCategory>();
                 return await _productRepository.UpdateAsync(entity);
             }
             return null;

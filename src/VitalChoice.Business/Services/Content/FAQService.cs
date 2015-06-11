@@ -229,7 +229,7 @@ namespace VitalChoice.Business.Services.Content
                 {
                     ContentCategoryId = p,
                     FAQId = dbItem.Id
-                }));
+                }).ToList());
 
                 toReturn = true;
             }

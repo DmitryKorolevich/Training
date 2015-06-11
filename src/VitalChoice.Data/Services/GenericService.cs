@@ -32,12 +32,12 @@ namespace VitalChoice.Data.Services
 		    await Repository.InsertAsync(entity);
 	    }
 
-	    public virtual bool InsertRange(IEnumerable<TEntity> entities)
+	    public virtual bool InsertRange(ICollection<TEntity> entities)
         {
 			return Repository.InsertRange(entities);
 		}
 
-	    public virtual async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
+	    public virtual async Task<bool> InsertRangeAsync(ICollection<TEntity> entities)
 	    {
 			return await Repository.InsertRangeAsync(entities);
 		}
@@ -82,17 +82,17 @@ namespace VitalChoice.Data.Services
 			Repository.Delete(entity);
 		}
 
-        public IEnumerable<TEntity> Query()
+        public List<TEntity> Query()
         {
             return Repository.Query().Select();
         }
 
-        public virtual IEnumerable<TEntity> Query(IQueryObject<TEntity> queryObject)
+        public virtual List<TEntity> Query(IQueryObject<TEntity> queryObject)
         {
             return Repository.Query(queryObject).Select();
         }
 
-		public virtual IEnumerable<TEntity> Query(Expression<Func<TEntity, bool>> query)
+		public virtual List<TEntity> Query(Expression<Func<TEntity, bool>> query)
         {
             return Repository.Query(query).Select();
         }
