@@ -255,15 +255,19 @@ namespace VitalChoice.Business.Services.Products
                     sku.OptionTypes = entity.OptionTypes;
                     await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
                 }
-
-                await _productToCategoryRepository.DeleteAllAsync(await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false));
-
+                
                 model.UpdateEntity(entity);
 
-                await _productToCategoryRepository.InsertRangeAsync(entity.ProductsToCategories);
+                var categories = entity.ProductsToCategories;
+                entity.ProductsToCategories = null;
 
-                entity.ProductsToCategories = new List<ProductToCategory>();
-                return await _productRepository.UpdateAsync(entity);
+                var toReturn = await _productRepository.UpdateAsync(entity);
+                
+                var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+                await _productToCategoryRepository.DeleteAllAsync(dbCategories);
+
+                await _productToCategoryRepository.InsertRangeAsync(categories);
+                return toReturn;
             }
             return null;
         }
