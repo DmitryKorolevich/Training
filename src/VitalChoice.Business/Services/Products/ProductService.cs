@@ -192,11 +192,9 @@ namespace VitalChoice.Business.Services.Products
                     if (model.Id == 0)
                     {
                         product = await InsertProduct(model);
+                        return await GetProductAsync(product.Id);
                     }
-                    else
-                    {
-                        product = await UpdateProduct(model);
-                    }
+                    product = await UpdateProduct(model);
                     transaction.Commit();
                 }
                 catch (Exception e)
