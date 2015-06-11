@@ -37,13 +37,21 @@ namespace VitalChoice.Data.Repositories.Customs
                                 : x.OrderByDescending(y => y.Name);
                     break;
             }
+            query = query.GroupBy(p=>p.IdProduct).Select(g => new VProductSku() {
+                IdProduct = g.Key,
+                Name = g.Min(p=>p.Name),
+                Thumbnail = g.Min(p=>p.Thumbnail),
+                StatusCode = g.Min(p => p.StatusCode),
+                Hidden = g.Min(p => p.Hidden),
+                IdProductType = g.Min(p => p.IdProductType),
+            });
+            var count = await query.CountAsync();
             query = sortable(query);
-            var groups = query.GroupBy(p=>p.IdProduct).Select(g => new { IdProduct = g.Key, Name = g.Min(p=>p.Name) });
-            var count = await groups.CountAsync();
-            groups = groups.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount);
-            var items = await groups.ToListAsync();
+            query = query.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount);
+            var items = await query.ToListAsync();
+            var toReturn = new PagedList<VProductSku>(items, count);
 
-            return await Task.FromResult<PagedList<VProductSku>>(null);
+            return toReturn;
         }
     }
 }

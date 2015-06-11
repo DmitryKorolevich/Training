@@ -70,7 +70,7 @@ namespace VC.Admin.Models.Product
         public string Serving { get; set; }
 
         [Map]
-        public string Recepies { get; set; }
+        public string Recipes { get; set; }
 
         [Map]
         public string Ingredients { get; set; }
@@ -101,6 +101,9 @@ namespace VC.Admin.Models.Product
 
         [Map]
         public string MainProductImage { get; set; }
+
+        [Map]
+        public string SubProductGroupName { get; set; }
 
         [Map]
         public string NutritionalTitle { get; set; }

@@ -22,7 +22,7 @@
                                         <fieldset>
                                             <div class="form-group">
                                                 <label for="" class="col-md-3 control-label">Product ID</label>
-                                                <div class="col-md-9 form-control-static">
+                                                <div class="col-md-9 form-control-static" data-ng-if="product.Id">
                                                     <span>{{product.Id}}</span>
                                                 </div>
                                             </div>
@@ -106,18 +106,18 @@
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
-                                                <label for="Recepies" class="col-md-3 control-label">Recepies</label>
+                                                <label for="Recipes" class="col-md-3 control-label">Recipes</label>
                                                 <div class="col-md-9">
-                                                    <div class="input-group" data-ng-show="!RecepiesExpanded">
-                                                        <input type="text" name="Recepies" class="form-control" id="short" placeholder="Recepies" disabled data-ng-model="product.Recepies">
+                                                    <div class="input-group" data-ng-show="!RecipesExpanded">
+                                                        <input type="text" name="Recipes" class="form-control" id="short" placeholder="Recipes" disabled data-ng-model="product.Recipes">
                                                         <span class="input-group-btn">
-                                                            <a data-ng-click="toogleEditorState('RecepiesExpanded')" class="btn btn-default">Expand</a>
+                                                            <a data-ng-click="toogleEditorState('RecipesExpanded')" class="btn btn-default">Expand</a>
                                                         </span>
                                                     </div>
-                                                    <div class="toogle-editor" data-ng-show="RecepiesExpanded">
-                                                        <a data-ng-click="toogleEditorState('RecepiesExpanded')" class="btn btn-default">Hide</a>
+                                                    <div class="toogle-editor" data-ng-show="RecipesExpanded">
+                                                        <a data-ng-click="toogleEditorState('RecipesExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="RecepiesExpanded" text-angular data-ng-model="product.Recepies"></div>
+                                                    <div data-ng-show="RecipesExpanded" text-angular data-ng-model="product.Recipes"></div>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
@@ -238,6 +238,12 @@
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Sub Product Group Name</span>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                            <input type="text" class="form-control" placeholder="Example: Number of Portions" data-ng-model="product.SubProductGroupName">
+                                        </div>
+                                    </div>
                                     <span class="legend">Sub Products</span>
                                     <div class="form-group">
                                         <button data-ng-click="addSKU();" class="btn btn-info">Add New SKU</button>
@@ -292,7 +298,7 @@
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">ID</label>
-                                                                                        <span class="form-control-static">{{subSku.Id}}</span>
+                                                                                        <span class="form-control-static" data-ng-if="subSku.Id">{{subSku.Id}}</span>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
                                                                                         <button class="btn btn-danger" data-ng-click="deleteSKU($index)">Delete</button>
@@ -341,7 +347,7 @@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row">
+                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
                                                                                         <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
@@ -357,7 +363,7 @@
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <div class="col-md-12">
-                                                                                <div class="fixed-accordion-row">
+                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label for="lblDisregard{{subSku.Id}}" class="control-label">Disregard Stock</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
@@ -365,7 +371,7 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row">
+                                                                                <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label for="lblDisallowSingle{{subSku.Id}}" class="control-label">Disallow Single</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
@@ -383,7 +389,7 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="form-group" data-ng-hide="product.Type==2">
+                                                                        <div class="form-group" data-ng-hide="product.Type==2 || product.Type==3 || product.Type==4">
                                                                             <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row">
                                                                                     <label class="control-label">Orphan Type</label>
@@ -395,7 +401,7 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="form-group">
+                                                                        <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                                             <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row extra-spacing">
                                                                                     <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>

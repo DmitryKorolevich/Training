@@ -75,6 +75,9 @@ namespace VitalChoice.Business.Services.Products
                 names.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i);
                 names.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i);
             }
+            names.Add(ProductConstants.FIELD_NAME_DISREGARD_STOCK);
+            names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
+            names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
             var items = await GetProductOptionTypesAsync(names);
             foreach (var item in items.Where(p => p.IdProductType.HasValue))
             {
@@ -132,27 +135,27 @@ namespace VitalChoice.Business.Services.Products
         {
             //await _vProductSkuRepository.GetProductsAsync(filter);
 
-            var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
-            var query = _vProductSkuRepository.Query(conditions);
+            //var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
+            //var query = _vProductSkuRepository.Query(conditions);
 
-            Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable =
-                x => x.OrderByDescending(y => y.Name);
-            var sortOrder = filter.Sorting.SortOrder;
-            switch (filter.Sorting.Path)
-            {
-                case VProductSkuSortPath.Name:
-                    sortable =
-                        x =>
-                            sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.Name)
-                                : x.OrderByDescending(y => y.Name);
-                    break;
-            }
+            //Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable =
+            //    x => x.OrderByDescending(y => y.Name);
+            //var sortOrder = filter.Sorting.SortOrder;
+            //switch (filter.Sorting.Path)
+            //{
+            //    case VProductSkuSortPath.Name:
+            //        sortable =
+            //            x =>
+            //                sortOrder == SortOrder.Asc
+            //                    ? x.OrderBy(y => y.Name)
+            //                    : x.OrderByDescending(y => y.Name);
+            //        break;
+            //}
 
-            PagedList<VProductSku> toReturn =
-                await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            //PagedList<VProductSku> toReturn =
+            //    await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
 
-            return toReturn;
+            return await _vProductSkuRepository.GetProductsAsync(filter); ;
         }
 
         public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false)

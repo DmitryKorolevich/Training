@@ -21,6 +21,8 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 1, N'SaturatedFatPercent'
 	UNION
+	SELECT NULL, 4, 1, N'TransFat'
+	UNION
 	SELECT NULL, 4, 1, N'TransFatPercent'
 	UNION
 	SELECT NULL, 4, 1, N'Cholesterol'
@@ -46,6 +48,8 @@ BEGIN
 	SELECT NULL, 4, 1, N'Protein'
 	UNION
 	SELECT NULL, 4, 1, N'ProteinPercent'
+	UNION
+	SELECT NULL, 4, 1, N'AdditionalNotes'
 
 
 --perishable product type
@@ -67,6 +71,8 @@ BEGIN
 	SELECT NULL, 4, 2, N'SaturatedFat'
 	UNION
 	SELECT NULL, 4, 2, N'SaturatedFatPercent'
+	UNION
+	SELECT NULL, 4, 2, N'TransFat'
 	UNION
 	SELECT NULL, 4, 2, N'TransFatPercent'
 	UNION
@@ -93,5 +99,8 @@ BEGIN
 	SELECT NULL, 4, 2, N'Protein'
 	UNION
 	SELECT NULL, 4, 2, N'ProteinPercent'
+	UNION
+	SELECT NULL, 4, 2, N'AdditionalNotes'
+	
 
 END

@@ -9,6 +9,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
         var sellerFieldName = 'Seller';
         var googleCategoryFieldName = 'GoogleCategory';
         var specialIconFieldName = 'SpecialIcon';
+        
+        var disregardStockFieldName = 'DisregardStock';
+        var nonDiscountableFieldName = 'NonDiscountable';
+        var hideFromDataFeedFieldName = 'HideFromDataFeed';
 
         function successSaveHandler(result) {
             if (result.Success) {
@@ -439,9 +443,9 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 RetailPrice: 0.00,
                 WholesalePrice: 0.00,
                 Stock: null,
-                DisregardStock: true,
-                NonDiscountable: true,
-                HideFromDataFeed: true,
+                DisregardStock: Boolean.parse($scope.productTypeDefaults[disregardStockFieldName]),
+                NonDiscountable: Boolean.parse($scope.productTypeDefaults[nonDiscountableFieldName]),
+                HideFromDataFeed: Boolean.parse($scope.productTypeDefaults[hideFromDataFeedFieldName]),
                 Seller: $scope.defaultSeller,
                 IsOpen: true,
             };

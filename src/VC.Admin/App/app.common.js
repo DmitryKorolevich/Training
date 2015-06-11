@@ -30,6 +30,22 @@
     throw new Error("Unable to copy object! Its type isn't supported.");
 }
 
+Boolean.parse = function (str) {
+    if (str) {
+        switch (str.toLowerCase()) {
+            case "true":
+                return true;
+            case "false":
+                return false;
+            case "1":
+                return true;
+            case "0":
+                return false;
+        }
+    }
+    return false;
+};
+
 String.prototype.format = function () {
     return String.format(this, arguments.length == 1 ? arguments[0] : arguments);
 };

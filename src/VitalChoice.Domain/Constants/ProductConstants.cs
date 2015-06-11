@@ -12,5 +12,9 @@ namespace VitalChoice.Domain.Constants
         public const string FIELD_NAME_YOUTUBE_IMAGE = "YouTubeImage";
         public const string FIELD_NAME_YOUTUBE_TEXT = "YouTubeText";
         public const int FIELD_COUNT_YOUTUBE = 3;
+
+        public const string FIELD_NAME_DISREGARD_STOCK = "DisregardStock";
+        public const string FIELD_NAME_NON_DISCOUNTABLE = "NonDiscountable";
+        public const string FIELD_NAME_HIDE_FROM_DATA_FEED = "HideFromDataFeed";
     }
 }

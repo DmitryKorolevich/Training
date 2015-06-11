@@ -26,7 +26,7 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 1, N'Serving'
 	UNION
-	SELECT NULL, 4, 1, N'Recepies'
+	SELECT NULL, 4, 1, N'Recipes'
 	UNION
 	SELECT NULL, 4, 1, N'Ingredients'
 	UNION
@@ -267,7 +267,7 @@ BEGIN
 	UNION
 	SELECT NULL, 4, 2, N'Serving'
 	UNION
-	SELECT NULL, 4, 2, N'Recepies'
+	SELECT NULL, 4, 2, N'Recipes'
 	UNION
 	SELECT NULL, 4, 2, N'Ingredients'
 	UNION
