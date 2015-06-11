@@ -54,11 +54,12 @@ namespace VitalChoice.DynamicData.Entities
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
-            entity.ProductsToCategories = CategoryIds.Select(c => new ProductToCategory
+            entity.ProductsToCategories.Clear();
+            entity.ProductsToCategories.AddRange(CategoryIds.Select(c => new ProductToCategory
             {
                 IdCategory = c,
                 IdProduct = Id
-            }).ToList();
+            }));
 
             if (Skus != null && Skus.Any())
             {

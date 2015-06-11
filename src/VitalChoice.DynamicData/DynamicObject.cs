@@ -105,7 +105,7 @@ namespace VitalChoice.DynamicData
         public void UpdateEntity(TEntity entity)
         {
             var optionTypesCache = entity.OptionTypes?.ToDictionary(o => o.Name, o => o.Id);
-            var newOptions = new List<TOptionValue>();
+            entity.OptionValues.Clear();
             if (optionTypesCache != null)
             {
                 foreach (var data in DynamicData)
@@ -119,10 +119,9 @@ namespace VitalChoice.DynamicData
                         Value = data.Value?.ToString(),
                         IdOptionType = idOption
                     };
-                    newOptions.Add(option);
+                    entity.OptionValues.Add(option);
                 }
             }
-            entity.OptionValues = newOptions;
             entity.Id = Id;
             entity.DateCreated = DateCreated;
             entity.DateEdited = DateTime.Now;
