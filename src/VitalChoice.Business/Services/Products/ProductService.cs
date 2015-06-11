@@ -130,7 +130,7 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
-            await _vProductSkuRepository.GetProductsAsync(filter);
+            //await _vProductSkuRepository.GetProductsAsync(filter);
 
             var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
             var query = _vProductSkuRepository.Query(conditions);
