@@ -193,12 +193,12 @@ namespace VitalChoice.Business.Services.Products
             using (var transaction = new TransactionManager(_context).BeginTransaction())
             {
                 Product product = null;
+                int idProduct = 0;
                 try
                 {
                     if (model.Id == 0)
                     {
-                        product = await InsertProduct(model);
-                        return await GetProductAsync(product.Id);
+                        idProduct = (await InsertProduct(model)).Id;
                     }
                     product = await UpdateProduct(model);
                     transaction.Commit();
@@ -208,6 +208,8 @@ namespace VitalChoice.Business.Services.Products
                     _logger.LogError(e.Message, e);
                     transaction.Rollback();
                 }
+                if (idProduct != 0)
+                    return await GetProductAsync(idProduct);
                 return new ProductDynamic(product);
             }
         }
