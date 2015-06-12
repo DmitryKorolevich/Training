@@ -23,6 +23,8 @@ namespace VitalChoice.DynamicData.Entities
 
         public decimal WholesalePrice { get; set; }
 
+        public int Order { get; set; }
+
         protected override void FromEntity(Sku entity)
         {
             BaseConvert(entity);
@@ -39,6 +41,7 @@ namespace VitalChoice.DynamicData.Entities
             entity.Hidden = Hidden;
             entity.Price = Price;
             entity.WholesalePrice = WholesalePrice;
+            entity.Order = Order;
 
             //Set key on options
             foreach (var value in entity.OptionValues)
@@ -53,6 +56,7 @@ namespace VitalChoice.DynamicData.Entities
             entity.Hidden = Hidden;
             entity.Price = Price;
             entity.WholesalePrice = WholesalePrice;
+            entity.Order = Order;
 
             //Set key on options
             foreach (var value in entity.OptionValues)

@@ -1,11 +1,11 @@
-﻿<div class="container-fluid">
+﻿<div class="container-fluid product-edit">
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div>
                 <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <button ui-sref="index.oneCol.manageProducts" class="btn btn-info width-80px">Preview</button>
+                <button ui-sref="index.oneCol.manageProducts" class="btn btn-info width-80px">View</button>
                 <button ui-sref="index.oneCol.manageProducts" class="btn btn-default width-80px">Cancel</button>
             </div>
         </div>
@@ -185,6 +185,18 @@
                                                     <select class="form-control" name="GoogleCategory" data-ng-model="product.GoogleCategory" ng-options="googleCategory.Key as googleCategory.Text for googleCategory in googleCategories">
                                                         <option value="" ng-if="false"></option>
                                                     </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="meta_title" class="col-md-3 control-label">Google Feed Title</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" placeholder="Google Feed Title" data-ng-model="product.GoogleFeedTitle">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="meta_description" class="col-md-3 control-label">Google Feed Description</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" class="form-control" placeholder="Google Feed Description" rows="10" data-ng-model="product.GoogleFeedDescription"></textarea>
                                                 </div>
                                             </div>
                                             <span class="legend">Tax</span>
@@ -387,12 +399,8 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="form-group" data-ng-hide="product.Type==2 || product.Type==3 || product.Type==4">
-                                                                            <div class="col-md-12">
                                                                                 <div class="fixed-accordion-row">
-                                                                                    <label class="control-label">Orphan Type</label>
+                                                                                    <label class="control-label">Orphan</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
                                                                                             <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
@@ -634,10 +642,12 @@
                         </div>
                     </tab>
                     <tab heading="Categories" active="categoriesTab.active">
-                        <div class="container container-left">
+                        <div class="container container-left categories">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Categories</span>
+                                    <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                                    <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
                                     <div ui-tree data-drag-enabled="false" class="ya-treeview">
                                         <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
                                             <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">

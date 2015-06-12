@@ -20,3 +20,6 @@ END
 IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'Hidden' AND [Object_ID] = OBJECT_ID(N'[dbo].Skus', N'U'))
 	ALTER TABLE dbo.Skus
 	ADD Hidden BIT NOT NULL DEFAULT 0
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'Order' AND [Object_ID] = OBJECT_ID(N'[dbo].Skus', N'U'))
+	ALTER TABLE Skus ADD [Order] INT NOT NULL DEFAULT(0)

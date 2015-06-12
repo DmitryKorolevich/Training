@@ -4,7 +4,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
 .controller('productManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
     function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
-        $scope.editTracker = promiseTracker("edit");
 
         var sellerFieldName = 'Seller';
         var googleCategoryFieldName = 'GoogleCategory';
@@ -231,7 +230,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 updateCrossses();
                 updateVideos();
 
-                productService.updateProduct($scope.product, $scope.editTracker).success(function (result) {
+                productService.updateProduct($scope.product, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);
                 }).error(function (result) {
                     errorHandler(result);
@@ -242,6 +241,22 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 $scope.forms.crossessubmitted = true;
                 $scope.forms.videossubmitted = true;
             }
+        };
+
+        var getCategoriesTreeViewScope = function () {
+            return angular.element($('.product-edit .categories .ya-treeview').get(0)).scope();
+        };
+
+        $scope.updateCategoriesCollapsed = function (expand) {
+            var scope = getCategoriesTreeViewScope();
+            if (expand) {
+                scope.expandAll();
+            }
+            else
+            {
+                scope.collapseAll();
+            }
+            $scope.categoriesExpanded = expand;
         };
 
         $scope.sortableOptions = {

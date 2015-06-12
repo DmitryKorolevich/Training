@@ -13,5 +13,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
         public decimal Price { get; set; }
 
         public decimal WholesalePrice { get; set; }
+
+        public int Order { get; set; }
     }
 }

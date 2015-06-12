@@ -54,3 +54,28 @@ WHERE IdFieldType=5 AND DefaultValue='0'
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='GoogleFeedTitle')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdProductType, Name)
+SELECT NULL, 4, 1, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 2, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 3, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 4, N'GoogleFeedTitle'
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdProductType, Name)
+SELECT NULL, 4, 1, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 2, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 3, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 4, N'GoogleFeedDescription'
+
+END

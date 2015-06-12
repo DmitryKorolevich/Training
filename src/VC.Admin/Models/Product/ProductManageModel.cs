@@ -91,6 +91,12 @@ namespace VC.Admin.Models.Product
         public int? GoogleCategory { get; set; }
 
         [Map]
+        public string GoogleFeedTitle { get; set; }
+
+        [Map]
+        public string GoogleFeedDescription { get; set; }
+
+        [Map]
         public string TaxCode { get; set; }
 
         [Map]

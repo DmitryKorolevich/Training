@@ -82,15 +82,15 @@ namespace VitalChoice.Business.Services.Products
             foreach (var item in items.Where(p => p.IdProductType.HasValue))
             {
                 Dictionary<string, string> productTypeDefaultValues = null;
-                if (item.IdProductType != null && toReturn.ContainsKey((int) item.IdProductType))
+                if (item.IdProductType != null && toReturn.ContainsKey((int)item.IdProductType))
                 {
-                    productTypeDefaultValues = toReturn[(int) item.IdProductType.Value];
+                    productTypeDefaultValues = toReturn[(int)item.IdProductType.Value];
                 }
                 else
                 {
                     productTypeDefaultValues = new Dictionary<string, string>();
                     if (item.IdProductType != null)
-                        toReturn.Add((int) item.IdProductType, productTypeDefaultValues);
+                        toReturn.Add((int)item.IdProductType, productTypeDefaultValues);
                 }
                 if (!productTypeDefaultValues.ContainsKey(item.Name))
                 {
@@ -133,28 +133,6 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
-            //await _vProductSkuRepository.GetProductsAsync(filter);
-
-            //var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
-            //var query = _vProductSkuRepository.Query(conditions);
-
-            //Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable =
-            //    x => x.OrderByDescending(y => y.Name);
-            //var sortOrder = filter.Sorting.SortOrder;
-            //switch (filter.Sorting.Path)
-            //{
-            //    case VProductSkuSortPath.Name:
-            //        sortable =
-            //            x =>
-            //                sortOrder == SortOrder.Asc
-            //                    ? x.OrderBy(y => y.Name)
-            //                    : x.OrderByDescending(y => y.Name);
-            //        break;
-            //}
-
-            //PagedList<VProductSku> toReturn =
-            //    await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-
             return await _vProductSkuRepository.GetProductsAsync(filter); ;
         }
 
@@ -179,6 +157,7 @@ namespace VitalChoice.Business.Services.Products
                         _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                             .Include(p => p.OptionValues)
                             .SelectAsync(false);
+                entity.Skus = entity.Skus.OrderBy(p => p.Order).ToList();
                 IncludeSkuOptionTypes(entity, optionTypes);
                 return new ProductDynamic(entity, withDefaults);
             }
@@ -216,6 +195,7 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Product> InsertProduct(ProductDynamic model)
         {
+            SetSkusOrder(model);
             var entity = model.ToEntity();
             if (entity != null)
             {
@@ -224,6 +204,15 @@ namespace VitalChoice.Business.Services.Products
                 Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
                 IncludeProductOptionTypesByName(entity, optionTypesSorted);
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
+                if (entity != null && entity.Skus != null)
+                {
+                    int order = 0;
+                    foreach (var sku in entity.Skus)
+                    {
+                        sku.Order = order;
+                        order++;
+                    }
+                }
 
                 entity.OptionTypes = new List<ProductOptionType>();
                 var result = await _productRepository.InsertGraphAsync(entity);
@@ -235,6 +224,7 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Product> UpdateProduct(ProductDynamic model)
         {
+            SetSkusOrder(model);
             var entity = (await _productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
@@ -246,7 +236,7 @@ namespace VitalChoice.Business.Services.Products
                 entity.OptionTypes =
                     await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
 
-                entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode!=RecordStatusCode.Deleted)
+                entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues)
                     .SelectAsync();
 
@@ -255,14 +245,14 @@ namespace VitalChoice.Business.Services.Products
                     sku.OptionTypes = entity.OptionTypes;
                     await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
                 }
-                
+
                 model.UpdateEntity(entity);
 
                 var categories = entity.ProductsToCategories;
                 entity.ProductsToCategories = null;
 
                 var toReturn = await _productRepository.UpdateAsync(entity);
-                
+
                 var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
                 await _productToCategoryRepository.DeleteAllAsync(dbCategories);
 
@@ -271,6 +261,22 @@ namespace VitalChoice.Business.Services.Products
                 return toReturn;
             }
             return null;
+        }
+
+        private void SetSkusOrder(ProductDynamic entity)
+        {
+            if (entity != null && entity.Skus != null)
+            {
+                int order = 0;
+                foreach (var sku in entity.Skus)
+                {
+                    if (sku.StatusCode != RecordStatusCode.Deleted)
+                    {
+                        sku.Order = order;
+                        order++;
+                    }
+                }
+            }
         }
 
         public async Task<bool> DeleteProductAsync(int id)

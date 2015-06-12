@@ -1,4 +1,4 @@
-﻿<div class="container-fluid">
+﻿<div class="container-fluid product-categories">
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div>
@@ -16,6 +16,8 @@
                             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(rootCategory.Id)">
                                 <i class="glyphicon glyphicon-plus"></i>
                             </a>
+                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
                             <div ui-tree class="ya-treeview">
                                 <ol ui-tree-nodes data-ng-model="rootCategory.SubItems">
                                     <li ng-repeat="item in rootCategory.SubItems" ui-tree-node data-ng-include="'app/modules/content/partials/contentCategoriesReordering.html'">

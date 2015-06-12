@@ -21,6 +21,7 @@
                 if (result.Success) {
                     $scope.rootCategory = result.Data;
                     $scope.loaded = true;
+                    $scope.categoriesExpanded = true;
                 } else {
                     errorHandler(result);
                 }
@@ -38,6 +39,21 @@
 
         loadCategories();
     }
+
+    var getCategoriesTreeViewScope = function () {
+        return angular.element($('.product-categories .ya-treeview').get(0)).scope();
+    };
+
+    $scope.updateCategoriesCollapsed = function (expand) {
+        var scope = getCategoriesTreeViewScope();
+        if (expand) {
+            scope.expandAll();
+        }
+        else {
+            scope.collapseAll();
+        }
+        $scope.categoriesExpanded = expand;
+    };
 
     function removeCategoryFromTree(id) {
         removeCategory($scope.rootCategory, id);
