@@ -203,9 +203,3 @@ BEGIN
 END
 
 GO
-
-IF(NOT EXISTS (SELECT [Id] FROM [dbo].[Users]))
-BEGIN
-	INSERT INTO [dbo].[Users]
-	SELECT [Id] FROM [VitalChoice.Infrastructure].[dbo].[AspNetUsers]
-END
