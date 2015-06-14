@@ -11,8 +11,7 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 	{
         protected override IUnitOfWorkAsync Init()
         {
-            var options = CallContextServiceLocator.Locator.ServiceProvider.GetService<IOptions<AppOptions>>();
-            var context = new VitalChoiceContext(options);
+            var context = new VitalChoiceContext(Options);
 			return new Data.UnitOfWork.UnitOfWork(context);
 		}
 	}

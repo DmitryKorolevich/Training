@@ -1,19 +1,18 @@
 ﻿<div class="container-fluid">
 	<div class="well">
 		<span class="legend">Approved Payment Methods</span>
-		<hr />
 		<div class="form-group">
-			<button data-ng-click="setState();" ladda="refreshTracker.active()" class="btn btn-primary">ApplyChanges</button>
+			<button data-ng-click="setState();" ladda="refreshTracker.active()" class="btn btn-primary">Apply Changes</button>
 		</div>
 		<spinner-overlay data-loading="refreshTracker.active()">
-			<table class="table table-striped table-hover ">
+			<table class="table table-striped table-hover">
 			    <thead>
-			    <tr>
-			        <th>Name</th>
-                    <th>Availability</th>
+                   <tr>
+                    <th>Name</th>
+                    <th colspan="2">Availability</th>
                     <th>Updated</th>
-			    </tr>
-			    <tr>
+                 </tr>
+			     <tr>
 			        <th></th>
 			        <th>Retail</th>
 			        <th>Wholesale</th>
@@ -23,9 +22,9 @@
 				<tbody>
 				<tr data-ng-repeat="paymentMethod in paymentMethods">
 					<td>{{paymentMethod.Name}}</td>
-					<td><input type="checkbox" data-ng-checked="retailApplicable(paymentMethod)" data-ng-change="updateRetail(paymentMethod)"></td>
-				    <td><input type="checkbox" data-ng-checked="wholesaleApplicable(paymentMethod)" data-ng-change="updateWholesale(paymentMethod)"></td>
-                    <td>{{paymentMethod.EditedDate | date:"MM/dd/yy"}}<br />{{paymentMethod.EditedDate | date:"h:mm a"}}<br />{{paymentMethod.EditedBy}}</td>
+					<td><input type="checkbox" data-ng-model="paymentMethod.RetailAvailable"></td>
+				    <td><input type="checkbox" data-ng-model="paymentMethod.WholesaleAvailable"></td>
+                    <td>{{paymentMethod.DateEdited | date:"MM/dd/yy"}}<br />{{paymentMethod.DateEdited | date:"h:mm a"}}<br />{{paymentMethod.EditedBy}}</td>
 				</tr>
 				</tbody>
 			</table>

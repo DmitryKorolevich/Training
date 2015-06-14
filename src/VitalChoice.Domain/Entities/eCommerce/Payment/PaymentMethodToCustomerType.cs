@@ -3,7 +3,7 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Payment
 {
-    public class PaymentMethodToCustomerType
+    public class PaymentMethodToCustomerType:Entity
     {
 		public PaymentMethod PaymentMethod { get; set; }
 

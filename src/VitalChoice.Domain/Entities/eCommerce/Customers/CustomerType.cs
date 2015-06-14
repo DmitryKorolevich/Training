@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Customers
@@ -9,7 +9,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
     {
 		public string Name { get; set; }
 
-		public RecordStatusCode RecordStatusCode { get; set; }
+		public RecordStatusCode StatusCode { get; set; }
 
 		public DateTime DateCreated { get; set; }
 
@@ -23,6 +23,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
 	    public ICollection<Customer> Customers { get; set; }
 
-	    public int StatusCode { get; set; }
+		public ICollection<PaymentMethodToCustomerType> PaymentMethods { get; set; }
     }
 }

@@ -251,16 +251,20 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<CustomerType>().Key(p => p.Id);
 			builder.Entity<CustomerType>().ForSqlServer().Table("CustomerTypes");
 			builder.Entity<CustomerType>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
-			builder.Entity<CustomerType>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+			builder.Entity<CustomerType>().Collection(p => p.PaymentMethods)
+				.InverseReference(p => p.CustomerType)
+				.ForeignKey(p => p.IdPaymentMethod)
+				.PrincipalKey(p => p.Id);
+			//builder.Entity<CustomerType>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
 
 			#endregion
 
 			#region Orders
 
 			builder.Entity<OrderNote>().Key(p => p.Id);
-			builder.Entity<OrderNote>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<OrderNote>().ForSqlServer().Table("OrderNotes");
 			builder.Entity<OrderNote>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
-			builder.Entity<OrderNote>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+			//builder.Entity<OrderNote>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
 			builder.Entity<OrderNote>()
 				.Collection(p => p.CustomerTypes)
 				.InverseReference(p => p.OrderNote)
@@ -269,15 +273,19 @@ namespace VitalChoice.Infrastructure.Context
 			#endregion
 
 			#region Payment
+			builder.Entity<PaymentMethodToCustomerType>().Key(p => new { p.IdPaymentMethod, p.IdCustomerType });
+			builder.Entity<PaymentMethodToCustomerType>().ForSqlServer().Table("PaymentMethodsToCustomerTypes");
+			builder.Entity<PaymentMethodToCustomerType>().Ignore(p => p.Id);
 
 			builder.Entity<PaymentMethod>().Key(p => p.Id);
-			builder.Entity<PaymentMethod>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<PaymentMethod>().ForSqlServer().Table("PaymentMethods");
 			builder.Entity<PaymentMethod>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
-			builder.Entity<PaymentMethod>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+			//builder.Entity<PaymentMethod>().Reference<RecordStatusCode>().InverseCollection().ForeignKey(p => p.StatusCode);
 			builder.Entity<PaymentMethod>()
 				.Collection(p => p.CustomerTypes)
 				.InverseReference(p => p.PaymentMethod)
-				.ForeignKey(p => p.IdPaymentMethod);
+				.ForeignKey(p => p.IdPaymentMethod)
+				.PrincipalKey(p => p.Id);
 
 			#endregion
 

@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Queries.Payment
     {
 		public PaymentMethodQuery NotDeleted()
 		{
-			Add(x => x.RecordStatusCode != RecordStatusCode.Deleted);
+			Add(x => x.StatusCode != RecordStatusCode.Deleted);
 
 			return this;
 		}

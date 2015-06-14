@@ -10,7 +10,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 
 	    public string Description { get; set; }
 
-	    public RecordStatusCode RecordStatusCode { get; set; }
+	    public RecordStatusCode StatusCode { get; set; }
 
 	    public DateTime DateCreated { get; set; }
 

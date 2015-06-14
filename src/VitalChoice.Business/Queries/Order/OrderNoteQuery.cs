@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Queries.Order
     {
 		public OrderNoteQuery NotDeleted()
 		{
-			Add(x => x.RecordStatusCode != RecordStatusCode.Deleted);
+			Add(x => x.StatusCode != RecordStatusCode.Deleted);
 
 			return this;
 		}

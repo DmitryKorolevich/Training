@@ -11,6 +11,9 @@
 				.success(function (result) {
 					if (result.Success) {
 						$scope.paymentMethods = result.Data;
+
+						applyMatrixState();
+
 					} else {
 						toaster.pop('error', 'Error!', "Can't get access to the approved payment methods");
 					}
@@ -20,20 +23,43 @@
 				});
 		};
 
-		function isApplicableMethod(item, key) {
+		function isApplicableMethod(paymentMethod, customerType) {
 			return paymentMethod.CustomerTypes && paymentMethod.CustomerTypes.indexOf(customerType) > -1;
 		};
 
-		function updateAvailability(paymentMethod, customerType) {
-			var index = isApplicableMethod(customerType);
-			if (index > -1) {
-				paymentMethod.CustomerTypes.splice(idx, 1);
+		function updateAvailability(paymentMethod, propertyName, customerType) {
+			if (!paymentMethod[propertyName]) {
+				if (isApplicableMethod(paymentMethod, customerType)) {
+					paymentMethod.CustomerTypes.splice(paymentMethod.CustomerTypes.indexOf(customerType), 1);
+				}
 			} else {
-				paymentMethod.CustomerTypes.push(customerType);
+				if (!isApplicableMethod(paymentMethod, customerType)) {
+					paymentMethod.CustomerTypes.push(customerType);
+				}
 			}
 		};
 
-		$scope.setState = function() {
+		function applyMatrixState() {
+			angular.forEach($scope.paymentMethods, function (paymentMethod) {
+				if (isApplicableMethod(paymentMethod, 1)) {
+					paymentMethod.RetailAvailable = true;
+				}
+				if (isApplicableMethod(paymentMethod, 2)) {
+					paymentMethod.WholesaleAvailable = true;
+				}
+			});
+		};
+
+		function syncMatrixState() {
+			angular.forEach($scope.paymentMethods, function(paymentMethod) {
+				updateAvailability(paymentMethod, 'RetailAvailable', 1);
+				updateAvailability(paymentMethod, 'WholesaleAvailable', 2);
+			});
+		};
+
+		$scope.setState = function () {
+			syncMatrixState();
+
 			paymentMethodService.setState($scope.paymentMethods, $scope.refreshTracker)
 				.success(function(result) {
 					if (result.Success) {
@@ -62,14 +88,6 @@
 
 		$scope.wholesaleApplicable = function (item) {
 			return isApplicableMethod(item, 2);
-		};
-
-		$scope.updateRetail = function(paymentMethod) {
-			updateAvailability(paymentMethod, 1);
-		};
-
-		$scope.updateWholesale = function (paymentMethod) {
-			updateAvailability(paymentMethod, 1);
 		};
 
 		initialize();

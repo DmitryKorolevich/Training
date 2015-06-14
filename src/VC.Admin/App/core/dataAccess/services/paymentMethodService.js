@@ -16,8 +16,8 @@ angular.module('app.core.dataAccess.services.paymentMethodService', [])
 		getPaymentMethods: function(tracker) {
 			return $http.get(baseUrl + 'GetPaymentMethods', getConfig(tracker));
 		},
-		setState: function(creatUserModel, tracker) {
-			return $http.post(baseUrl + 'CreateUser', creatUserModel, getConfig(tracker));
+		setState: function(state, tracker) {
+			return $http.post(baseUrl + 'SetState', state, getConfig(tracker));
 		}
 	};
 }]);
