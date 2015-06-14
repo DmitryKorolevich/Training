@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Users;
+
+namespace VitalChoice.Domain.Entities.eCommerce.Customers
+{
+    public class CustomerType: Entity
+    {
+		public string Name { get; set; }
+
+		public RecordStatusCode RecordStatusCode { get; set; }
+
+		public DateTime DateCreated { get; set; }
+
+		public DateTime DateEdited { get; set; }
+
+		public int? IdEditedBy { get; set; }
+
+		public User EditedBy { get; set; }
+
+	    public int Order { get; set; }
+
+	    public ICollection<Customer> Customers { get; set; }
+
+	    public int StatusCode { get; set; }
+    }
+}

@@ -27,3 +27,4 @@ Post-Deployment Script Template
 :r .\Scripts\CURs.sql
 :r .\Scripts\FilesPermissions.sql
 :r .\Scripts\MarketingPermissions.sql
+:r .\Scripts\EcommerceMigration.sql

@@ -152,3 +152,60 @@ BEGIN
 	ALTER TABLE [dbo].[PaymentMethodsToCustomerTypes] CHECK CONSTRAINT [FK_PaymentMethodsToCustomerTypes_PaymentMethods]
 
 END
+
+IF((SELECT OBJECTPROPERTY( OBJECT_ID(N'Users'), 'TableHasIdentity')) = 1)
+BEGIN
+	ALTER TABLE [dbo].[Customers] 
+	DROP CONSTRAINT [FK_Customers_Users]
+
+	ALTER TABLE [dbo].[Customers] DROP CONSTRAINT [FK_Customers_Users_EditedBy]
+
+	ALTER TABLE [dbo].[CustomerTypes]  DROP CONSTRAINT [FK_CustomerTypes_Users]
+
+	ALTER TABLE [dbo].[OrderNotes]  DROP CONSTRAINT [FK_OrderNotes_Users]
+
+	ALTER TABLE [dbo].[PaymentMethods] DROP CONSTRAINT [FK_PaymentMethods_Users]
+
+	DROP TABLE [dbo].[Users]
+	
+	CREATE TABLE [dbo].[Users](
+		[Id] [int] NOT NULL,
+	 CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	)
+	)
+
+	ALTER TABLE [dbo].[Customers]  WITH CHECK ADD  CONSTRAINT [FK_Customers_Users] FOREIGN KEY([Id])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[Customers] CHECK CONSTRAINT [FK_Customers_Users]
+
+	ALTER TABLE [dbo].[Customers]  WITH CHECK ADD  CONSTRAINT [FK_Customers_Users_EditedBy] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[Customers] CHECK CONSTRAINT [FK_Customers_Users_EditedBy]
+
+	ALTER TABLE [dbo].[CustomerTypes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerTypes_Users] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[CustomerTypes] CHECK CONSTRAINT [FK_CustomerTypes_Users]
+
+	ALTER TABLE [dbo].[OrderNotes]  WITH CHECK ADD  CONSTRAINT [FK_OrderNotes_Users] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[OrderNotes] CHECK CONSTRAINT [FK_OrderNotes_Users]
+
+	ALTER TABLE [dbo].[PaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_PaymentMethods_Users] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[PaymentMethods] CHECK CONSTRAINT [FK_PaymentMethods_Users]
+END
+
+GO
+
+IF(NOT EXISTS (SELECT [Id] FROM [dbo].[Users]))
+BEGIN
+	INSERT INTO [dbo].[Users]
+	SELECT [Id] FROM [VitalChoice.Infrastructure].[dbo].[AspNetUsers]
+END

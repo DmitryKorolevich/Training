@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Domain.Transfer.Base
 {
@@ -26,5 +27,7 @@ namespace VitalChoice.Domain.Transfer.Base
         public IList<LookupItem<int>> RecordStatuses { get; set; }
 
         public IList<LookupItem<int>> ProductTypes { get; set; }
+
+	    public IList<LookupItem<int>> CustomerTypes { get; set; }
     }
 }

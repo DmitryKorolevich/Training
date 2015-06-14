@@ -47,6 +47,7 @@ namespace VC.Admin.Controllers
                     GCTypes = referenceData.GCTypes,
                     RecordStatuses = referenceData.RecordStatuses,
                     ProductTypes = referenceData.ProductTypes,
+					CustomerTypes = referenceData.CustomerTypes
                 };
 	        }
 			else

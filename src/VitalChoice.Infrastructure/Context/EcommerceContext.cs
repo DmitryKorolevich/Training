@@ -10,7 +10,11 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Products;
@@ -223,9 +227,61 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<State>().Key(p => p.Id);
             builder.Entity<State>().ForSqlServer().Table("States");
 
-            #endregion
+			#endregion
 
-            base.OnModelCreating(builder);
+			#region Users
+
+			builder.Entity<User>().Key(p => p.Id);
+			builder.Entity<User>().ForSqlServer().Table("Users");
+
+			#endregion
+
+			#region Customers
+
+			builder.Entity<Customer>().Key(p => p.Id);
+			builder.Entity<Customer>().ForSqlServer().Table("Customers");
+			builder.Entity<Customer>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
+			builder.Entity<Customer>().Reference(p => p.User).InverseReference().ForeignKey<Customer>(p => p.Id).PrincipalKey<User>(p => p.Id).Required();
+			builder.Entity<Customer>()
+				.Reference(p => p.CustomerType)
+				.InverseCollection(p => p.Customers)
+				.ForeignKey(p => p.IdCustomerType)
+				.PrincipalKey(p => p.Id);
+
+			builder.Entity<CustomerType>().Key(p => p.Id);
+			builder.Entity<CustomerType>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<CustomerType>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
+			builder.Entity<CustomerType>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+
+			#endregion
+
+			#region Orders
+
+			builder.Entity<OrderNote>().Key(p => p.Id);
+			builder.Entity<OrderNote>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<OrderNote>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
+			builder.Entity<OrderNote>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+			builder.Entity<OrderNote>()
+				.Collection(p => p.CustomerTypes)
+				.InverseReference(p => p.OrderNote)
+				.ForeignKey(p => p.IdOrderNote);
+
+			#endregion
+
+			#region Payment
+
+			builder.Entity<PaymentMethod>().Key(p => p.Id);
+			builder.Entity<PaymentMethod>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<PaymentMethod>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
+			builder.Entity<PaymentMethod>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+			builder.Entity<PaymentMethod>()
+				.Collection(p => p.CustomerTypes)
+				.InverseReference(p => p.PaymentMethod)
+				.ForeignKey(p => p.IdPaymentMethod);
+
+			#endregion
+
+			base.OnModelCreating(builder);
 		}
 	}
 }
