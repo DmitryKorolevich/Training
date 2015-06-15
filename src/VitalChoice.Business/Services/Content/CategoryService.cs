@@ -80,8 +80,8 @@ namespace VitalChoice.Business.Services.Content
 
             foreach (var dbCategory in dbCategories)
             {
-                ContentCategory uiCategory = FindUICategory(category,dbCategory.Id);
-                if(uiCategory!=null)
+                ContentCategory uiCategory = FindUICategory(category, dbCategory.Id);
+                if (uiCategory != null)
                 {
                     dbCategory.ParentId = uiCategory.ParentId;
                     dbCategory.Order = uiCategory.Order;
@@ -105,14 +105,14 @@ namespace VitalChoice.Business.Services.Content
             ContentCategory dbItem;
             if (model.Id == 0)
             {
-                dbItem = new ContentCategory {ParentId = model.ParentId};
-                if(!dbItem.ParentId.HasValue)
+                dbItem = new ContentCategory { ParentId = model.ParentId };
+                if (!dbItem.ParentId.HasValue)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
                 var parentExist = await contentCategoryRepository.Query(p => p.Id == model.ParentId && p.Type == model.Type &&
-                                                                             p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
-                if(!parentExist)
+                                                                             p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+                if (!parentExist)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
@@ -125,7 +125,7 @@ namespace VitalChoice.Business.Services.Content
                                 p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
                 if (subCategories.Count != 0)
                 {
-                    dbItem.Order = subCategories.Max(p => p.Order)+1;
+                    dbItem.Order = subCategories.Max(p => p.Order) + 1;
                 }
 
                 dbItem.Type = model.Type;
@@ -143,7 +143,7 @@ namespace VitalChoice.Business.Services.Content
                 {
                     //set predefined master
                     var contentType = (await contentTypeRepository.Query(p => p.Id == (int)model.Type).SelectAsync(false)).FirstOrDefault();
-                    if(contentType?.DefaultMasterContentItemId != null)
+                    if (contentType?.DefaultMasterContentItemId != null)
                     {
                         model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                     }
@@ -169,7 +169,7 @@ namespace VitalChoice.Business.Services.Content
             {
                 var idDbItem = dbItem.Id;
                 var urlDublicatesExist = await contentCategoryRepository.Query(p => p.Url == model.Url && p.Type == model.Type && p.Id != idDbItem
-                    && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
                     throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
@@ -224,8 +224,12 @@ namespace VitalChoice.Business.Services.Content
                 {
                     var categories =
                         await recipeToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
-                    RecipeQuery innerQuery = new RecipeQuery().WithIds(categories.Select(p => p.RecipeId).ToArray()).NotDeleted();
-                    var exist = (await recipeRepository.Query(innerQuery).SelectAnyAsync());
+                    var exist = false;
+                    if (categories.Count > 0)
+                    {
+                        RecipeQuery innerQuery = new RecipeQuery().WithIds(categories.Select(p => p.RecipeId).ToArray()).NotDeleted();
+                        exist = (await recipeRepository.Query(innerQuery).SelectAnyAsync());
+                    }
                     if (exist)
                     {
                         message += "Category with recipes can't be deleted. " + Environment.NewLine;
@@ -236,8 +240,12 @@ namespace VitalChoice.Business.Services.Content
                 {
                     var categories =
                         await articleToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
-                    ArticleQuery innerQuery = new ArticleQuery().WithIds(categories.Select(p => p.ArticleId).ToArray()).NotDeleted();
-                    var exist = await articleRepository.Query(innerQuery).SelectAnyAsync();
+                    var exist = false;
+                    if (categories.Count > 0)
+                    {
+                        ArticleQuery innerQuery = new ArticleQuery().WithIds(categories.Select(p => p.ArticleId).ToArray()).NotDeleted();
+                        exist = await articleRepository.Query(innerQuery).SelectAnyAsync();
+                    }
                     if (exist)
                     {
                         message += "Category with articles can't be deleted. " + Environment.NewLine;
@@ -247,8 +255,12 @@ namespace VitalChoice.Business.Services.Content
                 if (dbItem.Type == ContentType.FAQCategory)
                 {
                     var categories = await faqToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
-                    FAQQuery innerQuery = new FAQQuery().WithIds(categories.Select(p => p.FAQId).ToArray()).NotDeleted();
-                    var exist = await faqRepository.Query(innerQuery).SelectAnyAsync();
+                    var exist = false;
+                    if (categories.Count > 0)
+                    {
+                        FAQQuery innerQuery = new FAQQuery().WithIds(categories.Select(p => p.FAQId).ToArray()).NotDeleted();
+                        exist = await faqRepository.Query(innerQuery).SelectAnyAsync();
+                    }
                     if (exist)
                     {
                         message += "Category with faqs can't be deleted. " + Environment.NewLine;
@@ -259,8 +271,12 @@ namespace VitalChoice.Business.Services.Content
                 {
                     var categories =
                         await contentPageToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
-                    ContentPageQuery innerQuery = new ContentPageQuery().WithIds(categories.Select(p => p.ContentPageId).ToArray()).NotDeleted();
-                    var exist = (await contentPageRepository.Query(innerQuery).SelectAnyAsync());
+                    var exist = false;
+                    if (categories.Count > 0)
+                    {
+                        ContentPageQuery innerQuery = new ContentPageQuery().WithIds(categories.Select(p => p.ContentPageId).ToArray()).NotDeleted();
+                        exist = (await contentPageRepository.Query(innerQuery).SelectAnyAsync());
+                    }
                     if (exist)
                     {
                         message += "Category with content pages can't be deleted. " + Environment.NewLine;

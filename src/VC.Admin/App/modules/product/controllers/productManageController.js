@@ -244,7 +244,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
         };
 
         var getCategoriesTreeViewScope = function () {
-            return angular.element($('.product-edit .categories .ya-treeview').get(0)).scope();
+            return angular.element($('.categories .ya-treeview').get(0)).scope();
         };
 
         $scope.updateCategoriesCollapsed = function (expand) {

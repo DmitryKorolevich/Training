@@ -240,7 +240,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteFAQAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await faqRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await faqRepository.Query(p => p.Id == id && p.StatusCode!=RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

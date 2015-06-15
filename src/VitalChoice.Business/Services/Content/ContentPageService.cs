@@ -256,7 +256,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteContentPageAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await contentPageRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await contentPageRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

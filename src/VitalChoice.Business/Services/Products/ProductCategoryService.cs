@@ -219,7 +219,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await productCategoryEcommerceRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await productCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 //Check sub categories

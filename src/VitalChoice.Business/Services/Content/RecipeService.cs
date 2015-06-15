@@ -253,7 +253,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteRecipeAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await recipeRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await recipeRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;
