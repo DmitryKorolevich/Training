@@ -169,17 +169,20 @@ namespace VitalChoice.Business.Services.Products
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
+            Product product = null;
+            int idProduct = 0;
             using (var transaction = new TransactionManager(_context).BeginTransaction())
             {
-                Product product = null;
-                int idProduct = 0;
                 try
                 {
                     if (model.Id == 0)
                     {
                         idProduct = (await InsertProduct(model)).Id;
                     }
-                    product = await UpdateProduct(model);
+                    else
+                    {
+                        product = await UpdateProduct(model);
+                    }
                     transaction.Commit();
                 }
                 catch (Exception e)
@@ -187,10 +190,10 @@ namespace VitalChoice.Business.Services.Products
                     _logger.LogError(e.Message, e);
                     transaction.Rollback();
                 }
-                if (idProduct != 0)
-                    return await GetProductAsync(idProduct);
-                return new ProductDynamic(product);
             }
+            if (idProduct != 0)
+                return await GetProductAsync(idProduct);
+            return new ProductDynamic(product);
         }
 
         private async Task<Product> InsertProduct(ProductDynamic model)
@@ -199,24 +202,12 @@ namespace VitalChoice.Business.Services.Products
             var entity = model.ToEntity();
             if (entity != null)
             {
-                var optionTypes =
-                    await _productOptionTypeRepository.Query(o => o.ProductType == model.Type).SelectAsync(false);
-                Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
+                entity.OptionTypes =
+                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
+                Dictionary<string, ProductOptionType> optionTypesSorted = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
                 IncludeProductOptionTypesByName(entity, optionTypesSorted);
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
-                if (entity.Skus != null)
-                {
-                    int order = 0;
-                    foreach (var sku in entity.Skus)
-                    {
-                        sku.Order = order;
-                        order++;
-                    }
-                }
-
-                entity.OptionTypes = new List<ProductOptionType>();
                 var result = await _productRepository.InsertGraphAsync(entity);
-                result.OptionTypes = optionTypes;
                 return result;
             }
             return null;
@@ -228,25 +219,25 @@ namespace VitalChoice.Business.Services.Products
             var entity = (await _productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
-                .Include(p => p.OptionTypes)
                 .Include(p => p.ProductsToCategories)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
-                //await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+                await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+                await _productToCategoryRepository.DeleteAllAsync(entity.ProductsToCategories);
 
-                //entity.OptionTypes =
-                //    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
+                entity.OptionTypes =
+                    await _productOptionTypeRepository.Query(o => o.IdProductType == entity.IdProductType).SelectAsync(false);
 
                 entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues)
                     .SelectAsync();
 
-                //foreach (var sku in entity.Skus)
-                //{
-                //    sku.OptionTypes = entity.OptionTypes;
-                //    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
-                //}
+                foreach (var sku in entity.Skus)
+                {
+                    sku.OptionTypes = entity.OptionTypes;
+                    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
+                }
 
                 model.UpdateEntity(entity);
 
@@ -256,7 +247,7 @@ namespace VitalChoice.Business.Services.Products
                 var toReturn = await _productRepository.UpdateAsync(entity);
 
                 //var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
-                //await _productToCategoryRepository.DeleteAllAsync(dbCategories);
+                
 
                 //await _productToCategoryRepository.InsertRangeAsync(categories);
                 //toReturn.ProductsToCategories = categories;

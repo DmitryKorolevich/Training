@@ -146,7 +146,6 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(p => p.IdFieldType)
                 .PrincipalKey(p => p.Id)
                 .Required();
-		    builder.Entity<ProductOptionType>().Property(o => o.ProductType).Column("IdProductType");
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
 		    builder.Entity<ProductOptionValue>().Table("ProductOptionValues");
@@ -187,14 +186,7 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(o => o.IdProduct)
                 .PrincipalKey(p => p.Id)
                 .Required(false);
-		    builder.Entity<Product>()
-		        .Collection(p => p.OptionTypes)
-		        .InverseReference()
-		        .ForeignKey(o => o.IdProductType)
-		        .PrincipalKey(p => p.IdProductType)
-		        .Required(false);
-		    builder.Entity<Product>()
-		        .Property(p => p.ProductType).Column("IdProductType");
+		    builder.Entity<Product>().Ignore(p => p.OptionTypes);
 
 		    builder.Entity<Product>()
 		        .Collection(p => p.ProductsToCategories)
@@ -224,11 +216,11 @@ namespace VitalChoice.Infrastructure.Context
             #region Settings
 
             builder.Entity<Country>().Key(p => p.Id);
-            builder.Entity<Country>().ForSqlServer().Table("Countries");
+            builder.Entity<Country>().Table("Countries");
             builder.Entity<Country>().Ignore(p => p.States);
 
             builder.Entity<State>().Key(p => p.Id);
-            builder.Entity<State>().ForSqlServer().Table("States");
+            builder.Entity<State>().Table("States");
 
             #endregion
 

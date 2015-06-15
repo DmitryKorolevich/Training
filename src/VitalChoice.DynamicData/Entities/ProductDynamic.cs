@@ -34,7 +34,7 @@ namespace VitalChoice.DynamicData.Entities
         {
             entity.Hidden = Hidden;
             entity.IdExternal = IdExternal;
-            entity.ProductType = Type;
+            entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
             entity.ProductsToCategories?.Clear();
@@ -57,7 +57,7 @@ namespace VitalChoice.DynamicData.Entities
         {
             entity.Hidden = Hidden;
             entity.IdExternal = IdExternal;
-            entity.ProductType = Type;
+            entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
             //entity.ProductsToCategories.Clear();
@@ -130,7 +130,7 @@ namespace VitalChoice.DynamicData.Entities
         {
             Name = entity.Name;
             Url = entity.Url;
-            Type = entity.ProductType;
+            Type = entity.IdProductType;
             Hidden = entity.Hidden;
             IdExternal = entity.IdExternal;
             CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
