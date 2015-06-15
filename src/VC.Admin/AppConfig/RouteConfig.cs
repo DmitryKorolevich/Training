@@ -7,6 +7,7 @@ namespace VC.Admin.AppConfig
     {
         public static void RegisterRoutes(IRouteBuilder routeBuilder)
         {
+
             routeBuilder.MapRoute(
 			  name: "defaultApi",
 			  template: "api/{controller}/{action}/{id?}");

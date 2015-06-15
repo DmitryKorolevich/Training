@@ -13,16 +13,15 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
         {
             JsonResult result;
             var apiException = context.Exception as ApiException;
-            if (apiException != null)
-            {
-                result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message)) {StatusCode = (int)apiException.Status};
-            }
-            else
+            if (apiException == null)
             {
                 var exception = context.Exception as AppValidationException;
                 if (exception != null)
                 {
-                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(exception.Messages)) {StatusCode = (int) HttpStatusCode.OK};
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(exception.Messages))
+                    {
+                        StatusCode = (int) HttpStatusCode.OK
+                    };
                 }
                 else
                 {
@@ -31,6 +30,24 @@ namespace VitalChoice.Validation.Helpers.GlobalFilters
                         StatusCode = (int) HttpStatusCode.InternalServerError
                     };
                     LoggerService.GetDefault().LogError(context.Exception.ToString());
+                }
+            }
+            else
+            {
+                if (context.Exception is ApiValidationException)
+                {
+                    var exception = context.Exception as ApiValidationException;
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(exception.Messages))
+                    {
+                        StatusCode = (int)HttpStatusCode.OK
+                    };
+                }
+                else
+                {
+                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
+                    {
+                        StatusCode = (int) apiException.Status
+                    };
                 }
             }
 

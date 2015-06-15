@@ -19,7 +19,7 @@
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.20-*",
-        "System.Data.Common" : "1.0.0.0"
+        "System.Data.Common" : "4.0.0-*"
       }
     }
   }

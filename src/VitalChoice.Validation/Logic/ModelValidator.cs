@@ -29,17 +29,9 @@ namespace VitalChoice.Validation.Logic
             IsValid = IsValid && validationResult.IsValid;
             if (!IsValid)
             {
-                if (!string.IsNullOrEmpty(propertyPrefixPath))
-                {
-                    propertyPrefixPath += ".";
-                }
-                else
-                {
-                    propertyPrefixPath = string.Empty;
-                }
                 foreach (var validationError in validationResult.Errors)
                 {
-                    ValidationErrors.Add(string.Format("{0}.i{1}.{3}{2}", collectionName, index, validationError.PropertyName, propertyPrefixPath), validationError.ErrorMessage);
+                    ValidationErrors.Add($"{collectionName}.i{index}.{validationError.PropertyName}", validationError.ErrorMessage);
                 }
             }
         }
