@@ -27,7 +27,7 @@ angular
 					});
 				},
 				runRestoreDataScenario: function (response) {
-					if (response.config.method === "GET" && response.config.url.indexOf("/Api/") === 0 && response.data && response.data.Data) {
+					if (/*response.config.method === "GET" &&*/ response.config.url.indexOf("/Api/") === 0 && response.data && response.data.Data) {
 						var result = response.config.url.match(regex)
 						if (result.length === 2) {
 							var key = result[1] + ":" + $location.path();

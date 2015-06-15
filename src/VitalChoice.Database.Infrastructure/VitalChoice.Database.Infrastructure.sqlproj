@@ -27,6 +27,7 @@
     <DefaultFilegroup>PRIMARY</DefaultFilegroup>
     <CreateProjectFromDatabaseCompleted>True</CreateProjectFromDatabaseCompleted>
     <TargetDatabase>VitalChoice.Infrastructure</TargetDatabase>
+    <PermissionSet>SAFE</PermissionSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -115,5 +116,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\MarketingPermissions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VitalChoice.Database.Ecommerce\VitalChoice.Database.Ecommerce.sqlproj">
+      <Name>VitalChoice.Database.Ecommerce</Name>
+      <Project>{3b44a066-17a4-46d2-b7d1-7e67ba6aa8d0}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>VitalChoice.Ecommerce</DatabaseVariableLiteralValue>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\EcommerceMigration.sql" />
   </ItemGroup>
 </Project>

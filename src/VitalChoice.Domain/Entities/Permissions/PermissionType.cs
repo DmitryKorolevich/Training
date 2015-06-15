@@ -14,6 +14,6 @@
 		Settings = 10,
 		Help = 11,
         Files = 12,
-        Marketing = 14,
+        Marketing = 14
     }
 }

@@ -33,8 +33,13 @@ using VitalChoice.Validation.Base;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using Newtonsoft.Json;
+using VitalChoice.Business.Services.Orders;
+using VitalChoice.Business.Services.Payment;
 using VitalChoice.Business.Services.Products;
 using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services.Order;
+using VitalChoice.Interfaces.Services.Payment;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -82,8 +87,6 @@ namespace VitalChoice.Core.DependencyInjection
 
                 // Add MVC services to the services container.
                 services.AddMvc();
-
-				services.AddOptions();
 
 				services.AddAuthorization();
 
@@ -234,16 +237,20 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();
                 builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
                 builder.RegisterType<VProductSkuRepository>()
-                    .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>()); ;
-                var container = builder.Build();
+                    .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+	            builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
+	            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
+				var container = builder.Build();
 
-                LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
+				LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
                 if (!String.IsNullOrEmpty(appPath))
                 {
                     FileService.Init(appPath);
                 }
 
-                return container.Resolve<IServiceProvider>();
+				UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
+
+	            return container.Resolve<IServiceProvider>();
 #else
 
 		        return null;

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Users
 {
-    public class User
+    public class User: Entity
     {
-        public string Name { get; set; }
-
-        public int? AccountTypeId { get; set; }
+	    public Customer Customer { get; set; }
     }
 }

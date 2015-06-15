@@ -1,14 +1,18 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.Options;
 
 namespace VitalChoice.Infrastructure.UnitOfWork
 {
     public abstract class UnitOfWorkBase : IUnitOfWorkAsync
 	{
 		private IUnitOfWorkAsync uow;
+
+	    protected static IOptions<AppOptions> Options { get; private set; }
 
 	    public UnitOfWorkBase()
 	    {
@@ -17,7 +21,12 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 
 	    protected abstract IUnitOfWorkAsync Init();
 
-		public void Dispose()
+	    public static void SetOptions(IOptions<AppOptions> options)
+	    {
+		    Options = options;
+	    }
+
+	    public void Dispose()
 		{
 			uow.Dispose();
 		}

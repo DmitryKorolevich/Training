@@ -9,8 +9,10 @@ using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Mail;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
@@ -36,9 +38,10 @@ namespace VitalChoice.Business.Services
 
 		private readonly IAppInfrastructureService appInfrastructureService;
 		private readonly INotificationService notificationService;
+		private readonly IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync;
 		private readonly AppOptions options;
 
-		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options)
+		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync)
 		{
 			this.userManager = userManager;
 			this.roleManager = roleManager;
@@ -46,6 +49,7 @@ namespace VitalChoice.Business.Services
 			this.signInManager = signInManager;
 			this.appInfrastructureService = appInfrastructureService;
 			this.notificationService = notificationService;
+			this.ecommerceRepositoryAsync = ecommerceRepositoryAsync;
 			this.options = options.Options;
 		}
 
@@ -171,6 +175,8 @@ namespace VitalChoice.Business.Services
 								throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
 							}
 						}
+
+						await ecommerceRepositoryAsync.InsertAsync(new User() {Id = user.Id});
 
 						if (sendActivation)
 						{

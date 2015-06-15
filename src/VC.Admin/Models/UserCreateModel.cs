@@ -24,8 +24,7 @@ namespace VC.Admin.Models
         {
             User user = new User
             {
-                Name = Name,
-                AccountTypeId = AccountTypeId,
+                
             };
             return user;
         }

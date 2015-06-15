@@ -22,6 +22,8 @@ namespace VitalChoice.Domain.Constants
 			public const string CurrentUserStatusUpdate = "CurrentUserStatusUpdate";
 			public const string GenerateSecurityStampError = "GenerateSecurityStampError";
 			public const string UserIsNotConfirmed = "UserIsNotConfirmed";
+		    public const string CantFindRecord = "CantFindRecord";
+		    public const string TitleTakenAlready = "TitleTakenAlready";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -35,12 +37,14 @@ namespace VitalChoice.Domain.Constants
 		    {Keys.CantFindUser, "User not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
 		    {Keys.UserIsDisabled, "User is disabled"},
-            {Keys.EmailIsTakenAlready, "Email '{0}' is already in use."},
-            {Keys.AgentIdIsTakenAlready, "Agent ID is already in use."},
-			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted."},
-			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated."},
-			{Keys.GenerateSecurityStampError, "Cannot generate security token."},
-			{Keys.UserIsNotConfirmed, "User not confirmed."}
+            {Keys.EmailIsTakenAlready, "Email '{0}' is already in use"},
+            {Keys.AgentIdIsTakenAlready, "Agent ID is already in use"},
+			{Keys.CurrentUserRemoval, "Currently logged in user can't be deleted"},
+			{Keys.CurrentUserStatusUpdate, "Status of currently logged in user can't be updated"},
+			{Keys.GenerateSecurityStampError, "Cannot generate security token"},
+			{Keys.UserIsNotConfirmed, "User not confirmed"},
+			{Keys.CantFindRecord, "Record not found"},
+			{Keys.TitleTakenAlready, "Title is already in use"}
 		};
     }
 }
