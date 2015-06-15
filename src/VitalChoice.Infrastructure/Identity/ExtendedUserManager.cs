@@ -16,7 +16,7 @@ namespace VitalChoice.Infrastructure.Identity
             IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
             IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors, IEnumerable<IUserTokenProvider<ApplicationUser>> tokenProviders,
-            ILoggerFactory logger, IHttpContextAccessor contextAccessor)
+            ILogger<UserManager<ApplicationUser>> logger, IHttpContextAccessor contextAccessor)
             : base(
                 store, optionsAccessor, passwordHasher, userValidators.Where(x => x is ExtendedUserValidator),
                 passwordValidators, keyNormalizer, errors, tokenProviders, logger, contextAccessor)

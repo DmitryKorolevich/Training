@@ -1,11 +1,7 @@
-﻿#if DNX451 || DNXCORE50 || NET45
-using System;
+﻿using System;
 using System.IO;
-
-#if DNX451 || DNXCORE50
 using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Infrastructure;
-#endif
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -33,4 +29,3 @@ namespace VitalChoice.Core.Infrastructure
 		}
 	}
 }
-#endif

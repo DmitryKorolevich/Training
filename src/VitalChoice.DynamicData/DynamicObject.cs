@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +11,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
+using System.Dynamic;
 
 // ReSharper disable StaticMemberInGenericType
 

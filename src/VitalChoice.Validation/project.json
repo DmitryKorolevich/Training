@@ -9,7 +9,7 @@
   "dependencies": {
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
-    "FluentValidation": "5.6.0.5-beta4"
+    "FluentValidation": "5.6.0.5-beta5"
   },
 
   "frameworks": {

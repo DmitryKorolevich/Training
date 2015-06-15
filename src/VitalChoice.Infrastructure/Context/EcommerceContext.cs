@@ -42,7 +42,7 @@ namespace VitalChoice.Infrastructure.Context
 	        
 	    }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        protected override void OnConfiguring(EntityOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
@@ -68,7 +68,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Base
 
             builder.Entity<FieldType>().Key(f => f.Id);
-            builder.Entity<FieldType>().ForSqlServer().Table("FieldTypes");
+            builder.Entity<FieldType>().Table("FieldTypes");
 
             #endregion
 
@@ -117,7 +117,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Products
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
-            builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
+            builder.Entity<ProductCategory>().Table("ProductCategories");
 		    builder.Entity<ProductCategory>()
 		        .Collection(cat => cat.ProductToCategories)
 		        .InverseReference()
@@ -125,7 +125,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey(cat => cat.Id);
 
             builder.Entity<GiftCertificate>().Key(p => p.Id);
-            builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
+            builder.Entity<GiftCertificate>().Table("GiftCertificates");
             builder.Entity<GiftCertificate>().Property(p => p.PublicId).ForSqlServer().UseDefaultValueGeneration();
 
             builder.Entity<VProductSku>().Key(p => p.IdProduct);
@@ -133,7 +133,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
 
             builder.Entity<ProductOptionType>().Key(p => p.Id);
-            builder.Entity<ProductOptionType>().ForSqlServer().Table("ProductOptionTypes");
+            builder.Entity<ProductOptionType>().Table("ProductOptionTypes");
 		    builder.Entity<ProductOptionType>()
 		        .Reference(p => p.Lookup)
 		        .InverseCollection()
@@ -148,7 +148,7 @@ namespace VitalChoice.Infrastructure.Context
                 .Required();
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
-		    builder.Entity<ProductOptionValue>().ForSqlServer().Table("ProductOptionValues");
+		    builder.Entity<ProductOptionValue>().Table("ProductOptionValues");
 		    builder.Entity<ProductOptionValue>()
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
@@ -157,10 +157,10 @@ namespace VitalChoice.Infrastructure.Context
                 .Required();
 
             builder.Entity<ProductTypeEntity>().Key(t => t.Id);
-		    builder.Entity<ProductTypeEntity>().ForSqlServer().Table("ProductTypes");
+		    builder.Entity<ProductTypeEntity>().Table("ProductTypes");
 
             builder.Entity<Sku>().Key(s => s.Id);
-		    builder.Entity<Sku>().ForSqlServer().Table("Skus");
+		    builder.Entity<Sku>().Table("Skus");
 		    builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
@@ -170,10 +170,10 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
-            builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
+            builder.Entity<ProductToCategory>().Table("ProductsToCategories");
 
             builder.Entity<Product>().Key(p => p.Id);
-		    builder.Entity<Product>().ForSqlServer().Table("Products");
+		    builder.Entity<Product>().Table("Products");
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
                 .InverseReference()
@@ -202,9 +202,9 @@ namespace VitalChoice.Infrastructure.Context
             #region Lookups
 
             builder.Entity<Lookup>().Key(p => p.Id);
-            builder.Entity<Lookup>().ForRelational().Table("Lookups");
+            builder.Entity<Lookup>().Table("Lookups");
             builder.Entity<LookupVariant>().Key(p => new { p.Id, p.IdLookup });
-            builder.Entity<LookupVariant>().ForRelational().Table("LookupVariants");
+            builder.Entity<LookupVariant>().Table("LookupVariants");
 		    builder.Entity<Lookup>()
 		        .Collection(p => p.LookupVariants)
 		        .InverseReference()

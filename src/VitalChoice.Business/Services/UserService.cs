@@ -20,6 +20,7 @@ using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
+using Microsoft.Data.Entity;
 
 namespace VitalChoice.Business.Services
 {

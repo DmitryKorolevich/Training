@@ -228,36 +228,38 @@ namespace VitalChoice.Business.Services.Products
             var entity = (await _productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
+                .Include(p => p.ProductsToCategories)
+                .Include(p => p.OptionTypes)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
-                await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+                //await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
-                entity.OptionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
+                //entity.OptionTypes =
+                //    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
 
                 entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues)
                     .SelectAsync();
 
-                foreach (var sku in entity.Skus)
-                {
-                    sku.OptionTypes = entity.OptionTypes;
-                    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
-                }
+                //foreach (var sku in entity.Skus)
+                //{
+                //    sku.OptionTypes = entity.OptionTypes;
+                //    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
+                //}
 
                 model.UpdateEntity(entity);
 
-                var categories = entity.ProductsToCategories;
-                entity.ProductsToCategories = null;
+                //var categories = entity.ProductsToCategories;
+                //entity.ProductsToCategories = null;
 
                 var toReturn = await _productRepository.UpdateAsync(entity);
 
-                var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
-                await _productToCategoryRepository.DeleteAllAsync(dbCategories);
+                //var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+                //await _productToCategoryRepository.DeleteAllAsync(dbCategories);
 
-                await _productToCategoryRepository.InsertRangeAsync(categories);
-                toReturn.ProductsToCategories = categories;
+                //await _productToCategoryRepository.InsertRangeAsync(categories);
+                //toReturn.ProductsToCategories = categories;
                 return toReturn;
             }
             return null;

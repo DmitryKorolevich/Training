@@ -5,10 +5,11 @@ using Microsoft.AspNet.Authentication.Notifications;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
+using Microsoft.Framework.Runtime.Infrastructure;
 using Newtonsoft.Json;
 using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
@@ -23,7 +24,9 @@ namespace VC.Admin
 		
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
+            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+
+            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 
@@ -32,7 +35,7 @@ namespace VC.Admin
 			{
 				configuration.AddJsonFile("config.local.json");
 			}
-			Configuration = configuration;
+			Configuration = configuration.Build();
 
             var reg = new DefaultDependencyConfig();
 

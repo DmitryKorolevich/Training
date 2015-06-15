@@ -5,47 +5,47 @@ namespace VitalChoice.Infrastructure.Cache
 {
     public class CacheProvider : ICacheProvider
     {
-	    private readonly IMemoryCache memoryCache;
+	    private readonly IMemoryCache _memoryCache;
 
-		private static readonly object padlock = new object();
+		private static readonly object Padlock = new object();
 
 		public CacheProvider(IMemoryCache memoryCache)
 	    {
-			this.memoryCache = memoryCache;
+			this._memoryCache = memoryCache;
 	    }
 
 		public void SetItem(string key, object value, int minutes = 60)
 		{
-			lock (padlock)
+			lock (Padlock)
 			{
-				memoryCache.Set(key, context => {
-					context.SetAbsoluteExpiration(TimeSpan.FromMinutes(minutes));
-					return value;
-				});
+			    _memoryCache.Set(key, value, new MemoryCacheEntryOptions
+			    {
+			        AbsoluteExpiration = new DateTimeOffset(DateTime.Now.AddMinutes(minutes))
+			    });
 			}
 		}
 
 	    public object GetItem(string key)
 	    {
-		    lock (padlock)
+		    lock (Padlock)
 		    {
-			    return memoryCache.Get(key);
+			    return _memoryCache.Get(key);
 		    }
 	    }
 
 		public T GetItem<T>(string key)
 		{
-			lock (padlock)
+			lock (Padlock)
 			{
-				return memoryCache.Get<T>(key);
+				return _memoryCache.Get<T>(key);
 			}
 		}
 
 		public void Remove(string key)
 		{
-			lock (padlock)
+			lock (Padlock)
 			{
-				memoryCache.Remove(key);
+				_memoryCache.Remove(key);
 			}
 		}
 	}

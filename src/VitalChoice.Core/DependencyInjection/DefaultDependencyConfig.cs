@@ -5,7 +5,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.Caching.Memory;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using Templates;
@@ -131,10 +131,10 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     var inputFormatter =
                         (JsonInputFormatter)
-                            o.InputFormatters.SingleOrDefault(f => f.Instance.GetType()==typeof(JsonInputFormatter))?.Instance;
+                            o.InputFormatters.SingleOrDefault(f => f.GetType()==typeof(JsonInputFormatter));
                     var outputFormatter =
                         (JsonOutputFormatter)
-                            o.OutputFormatters.SingleOrDefault(f => f.Instance.GetType() == typeof(JsonOutputFormatter))?.Instance;
+                            o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonOutputFormatter));
 
                     if (inputFormatter != null)
                     {

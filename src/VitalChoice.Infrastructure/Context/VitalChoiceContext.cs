@@ -40,7 +40,7 @@ namespace VitalChoice.Infrastructure.Context
 	        
 	    }       
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        protected override void OnConfiguring(EntityOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
@@ -152,7 +152,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductCategoryContent>().Ignore(x => x.StatusCode);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Assigned);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Order);
-            builder.Entity<ProductCategoryContent>().ForRelational().Table("ProductCategories");
+            builder.Entity<ProductCategoryContent>().Table("ProductCategories");
             builder.Entity<ProductCategoryContent>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
             builder.Entity<ProductCategoryContent>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).

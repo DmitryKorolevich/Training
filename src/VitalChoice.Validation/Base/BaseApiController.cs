@@ -4,7 +4,7 @@ namespace VitalChoice.Validation.Base
 {
 	[BuildNumberValidationFilter]
     [ApiModelAutoValidationFilter]
-    [ApiExceptionFilter]
+    //[ApiExceptionFilter]
     public abstract class BaseApiController : BaseController
     {
     }

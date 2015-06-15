@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NuGet;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
@@ -38,11 +37,18 @@ namespace VitalChoice.DynamicData.Entities
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
-            entity.ProductsToCategories = CategoryIds?.Select(c => new ProductToCategory
+            entity.ProductsToCategories?.Clear();
+            if (entity.ProductsToCategories != null && CategoryIds != null)
             {
-                IdCategory = c,
-                IdProduct = Id
-            }).ToList();
+                foreach (var category in CategoryIds.Select(c => new ProductToCategory
+                {
+                    IdCategory = c,
+                    IdProduct = Id
+                }))
+                {
+                    entity.ProductsToCategories.Add(category);
+                }
+            }
 
             entity.Skus = Skus?.Select(s => s.ToEntity()).ToList() ?? new List<Sku>();
         }
@@ -85,12 +91,15 @@ namespace VitalChoice.DynamicData.Entities
                 }
 
                 //Insert
-                entity.Skus.AddRange(Skus.Where(s => s.Id == 0).Select(s =>
+                foreach (var skuItem in Skus.Where(s => s.Id == 0).Select(s =>
                 {
                     var sku = s.ToEntity();
                     sku.IdProduct = Id;
                     return sku;
-                }));
+                }))
+                {
+                    entity.Skus.Add(skuItem);
+                }
             }
             else
             {

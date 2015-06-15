@@ -17,7 +17,7 @@ namespace VitalChoice.Data.Transaction
 
 	    public RelationalTransaction BeginTransaction()
 	    {
-			return _dataContext.Database.AsRelational().AsSqlServer().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+			return _dataContext.Database.AsRelational().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
 		}
     }
 }

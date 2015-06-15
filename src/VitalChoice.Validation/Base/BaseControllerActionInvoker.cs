@@ -4,6 +4,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
+using Microsoft.Framework.Logging;
 
 namespace VitalChoice.Validation.Base
 {
@@ -14,25 +15,29 @@ namespace VitalChoice.Validation.Base
              IReadOnlyList<IFilterProvider> filterProviders,
              IControllerFactory controllerFactory,
              ControllerActionDescriptor descriptor,
-             IInputFormattersProvider inputFormatters,
+             IReadOnlyList<IInputFormatter> inputFormatters,
+             IReadOnlyList<IOutputFormatter> outputFormatters,
              IControllerActionArgumentBinder controllerActionArgumentBinder,
-             IModelBinderProvider modelBinders,
-             IModelValidatorProviderProvider modelValidatorProviders,
-             IValueProviderFactoryProvider valueProviderFactories,
+             IReadOnlyList<IModelBinder> modelBinders,
+             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
+             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
              IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-             ITempDataDictionary tempData)
+             ITempDataDictionary tempData,
+             ILoggerFactory loggerFactory)
             : base(
              actionContext,
              filterProviders,
              controllerFactory,
              descriptor,
              inputFormatters,
+             outputFormatters,
              controllerActionArgumentBinder,
              modelBinders,
              modelValidatorProviders,
              valueProviderFactories,
              actionBindingContextAccessor,
-             tempData)
+             tempData,
+             loggerFactory, 20)
         {
 
         }

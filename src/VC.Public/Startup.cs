@@ -6,7 +6,7 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
@@ -27,7 +27,7 @@ namespace VC.Public
         {
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new Configuration( /*applicationEnvironment.ApplicationBasePath*/)
+            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 
@@ -36,7 +36,7 @@ namespace VC.Public
             {
                 configuration.AddJsonFile("config.local.json");
             }
-            Configuration = configuration;
+            Configuration = configuration.Build();
 
             var reg = new DefaultDependencyConfig();
             return reg.RegisterInfrastructure(Configuration, services, null);

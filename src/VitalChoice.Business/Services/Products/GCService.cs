@@ -15,6 +15,7 @@ using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Product;
+using Microsoft.Data.Entity;
 
 namespace VitalChoice.Business.Services.Products
 {

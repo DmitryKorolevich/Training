@@ -18,7 +18,13 @@
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
         "System.Threading": "4.0.10-*",
-        "Microsoft.CSharp": "4.0.0-*"
+        "Microsoft.CSharp": "4.0.0-*",
+        "System.Dynamic.Runtime": "4.0.10-*",
+        "Microsoft.Framework.Runtime": "1.0.0-*",
+        "System.Reflection": "4.0.10-*",
+        "System.Reflection.Emit": "4.0.0-*",
+        "System.Reflection.Emit.Lightweight": "4.0.0-*",
+        "System.Reflection.Emit.ILGeneration": "4.0.0-*"
       }
     }
   }
