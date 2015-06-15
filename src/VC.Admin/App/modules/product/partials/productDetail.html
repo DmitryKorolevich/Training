@@ -399,7 +399,7 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row">
+                                                                                <div class="fixed-accordion-row" data-ng-show="product.Type==1">
                                                                                     <label class="control-label">Orphan</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
@@ -642,8 +642,8 @@
                         </div>
                     </tab>
                     <tab heading="Categories" active="categoriesTab.active">
-                        <div class="container container-left categories">
-                            <div class="well row">
+                        <div class="container container-left">
+                            <div class="well row categories">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Categories</span>
                                     <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>

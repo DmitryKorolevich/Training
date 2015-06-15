@@ -10,12 +10,14 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="container container-left">
-                    <div class="well row">
+                    <div class="well row categories">
                         <spinner-overlay data-loading="refreshTracker.active()">
                             <span class="legend">Manage Countries, States / Provinces</span>
                             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addCountry()">
                                 <i class="glyphicon glyphicon-plus"></i>
                             </a>
+                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
                             <div ui-tree="treeOptions" class="ya-treeview">
                                 <ol ui-tree-nodes data-ng-model="countries" data-type="country">
                                     <li ng-repeat="country in countries" collapsed="true" ui-tree-node>

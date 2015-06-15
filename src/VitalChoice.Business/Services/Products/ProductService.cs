@@ -282,7 +282,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteProductAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _productRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _productRepository.Query(p => p.Id == id && p.StatusCode!=RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 var skusCount =

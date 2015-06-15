@@ -20,6 +20,7 @@
             .success(function (result) {
                 if (result.Success) {
                     $scope.rootCategory = result.Data;
+                    $scope.categoriesExpanded = true;
                     $scope.loaded = true;
                 } else {
                     errorHandler(result);
@@ -37,7 +38,22 @@
         $scope.loaded = false;
 
         loadCategories();
-    }
+    };
+
+    var getCategoriesTreeViewScope = function () {
+        return angular.element($('.categories .ya-treeview').get(0)).scope();
+    };
+
+    $scope.updateCategoriesCollapsed = function (expand) {
+        var scope = getCategoriesTreeViewScope();
+        if (expand) {
+            scope.expandAll();
+        }
+        else {
+            scope.collapseAll();
+        }
+        $scope.categoriesExpanded = expand;
+    };
 
     function removeCategoryFromTree(id) {
         removeCategory($scope.rootCategory, id);
