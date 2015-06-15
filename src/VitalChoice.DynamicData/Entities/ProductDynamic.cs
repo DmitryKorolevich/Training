@@ -60,12 +60,6 @@ namespace VitalChoice.DynamicData.Entities
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
-            //entity.ProductsToCategories.Clear();
-            //entity.ProductsToCategories.AddRange(CategoryIds.Select(c => new ProductToCategory
-            //{
-            //    IdCategory = c,
-            //    IdProduct = Id
-            //}));
 
             entity.ProductsToCategories = CategoryIds.Select(c => new ProductToCategory
             {
@@ -135,8 +129,12 @@ namespace VitalChoice.DynamicData.Entities
             IdExternal = entity.IdExternal;
             CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
             Skus = new List<SkuDynamic>();
+            int order = 0;
             foreach (var sku in entity.Skus)
             {
+                
+                sku.Order = order;
+                order++;
                 sku.OptionTypes = entity.OptionTypes;
                 SkuDynamic skuDynamic;
                 if (withDefaults)

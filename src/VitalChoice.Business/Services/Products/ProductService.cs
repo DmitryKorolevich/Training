@@ -236,21 +236,16 @@ namespace VitalChoice.Business.Services.Products
                 foreach (var sku in entity.Skus)
                 {
                     sku.OptionTypes = entity.OptionTypes;
-                    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
                 }
 
                 model.UpdateEntity(entity);
 
-                //var categories = entity.ProductsToCategories;
-                //entity.ProductsToCategories = null;
+                foreach (var sku in entity.Skus.Where(s => s.StatusCode != RecordStatusCode.Deleted))
+                {
+                    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
+                }
 
                 var toReturn = await _productRepository.UpdateAsync(entity);
-
-                //var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
-                
-
-                //await _productToCategoryRepository.InsertRangeAsync(categories);
-                //toReturn.ProductsToCategories = categories;
                 return toReturn;
             }
             return null;
