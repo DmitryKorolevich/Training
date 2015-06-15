@@ -146,6 +146,7 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(p => p.IdFieldType)
                 .PrincipalKey(p => p.Id)
                 .Required();
+		    builder.Entity<ProductOptionType>().Property(o => o.ProductType).Column("IdProductType");
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
 		    builder.Entity<ProductOptionValue>().Table("ProductOptionValues");
@@ -167,7 +168,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(o => o.IdSku)
 		        .PrincipalKey(s => s.Id)
                 .Required(false);
-            builder.Entity<Sku>().Ignore(p => p.OptionTypes);
+		    builder.Entity<Sku>().Ignore(s => s.OptionTypes);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
             builder.Entity<ProductToCategory>().Table("ProductsToCategories");
@@ -186,8 +187,14 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(o => o.IdProduct)
                 .PrincipalKey(p => p.Id)
                 .Required(false);
-
-            builder.Entity<Product>().Ignore(p => p.OptionTypes);
+		    builder.Entity<Product>()
+		        .Collection(p => p.OptionTypes)
+		        .InverseReference()
+		        .ForeignKey(o => o.IdProductType)
+		        .PrincipalKey(p => p.IdProductType)
+		        .Required(false);
+		    builder.Entity<Product>()
+		        .Property(p => p.ProductType).Column("IdProductType");
 
 		    builder.Entity<Product>()
 		        .Collection(p => p.ProductsToCategories)

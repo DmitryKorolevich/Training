@@ -200,11 +200,11 @@ namespace VitalChoice.Business.Services.Products
             if (entity != null)
             {
                 var optionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
+                    await _productOptionTypeRepository.Query(o => o.ProductType == model.Type).SelectAsync(false);
                 Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
                 IncludeProductOptionTypesByName(entity, optionTypesSorted);
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
-                if (entity != null && entity.Skus != null)
+                if (entity.Skus != null)
                 {
                     int order = 0;
                     foreach (var sku in entity.Skus)
@@ -228,8 +228,8 @@ namespace VitalChoice.Business.Services.Products
             var entity = (await _productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
-                .Include(p => p.ProductsToCategories)
                 .Include(p => p.OptionTypes)
+                .Include(p => p.ProductsToCategories)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {

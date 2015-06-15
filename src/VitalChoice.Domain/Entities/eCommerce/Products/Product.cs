@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Common;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Products
@@ -11,7 +12,9 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public bool Hidden { get; set; }
 
-        public ProductType IdProductType { get; set; }
+        public int IdProductType { get; set; }
+
+        public ProductType ProductType { get; set; }
 
         public int? IdExternal { get; set; }
 
