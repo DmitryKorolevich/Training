@@ -255,11 +255,18 @@ namespace VitalChoice.Infrastructure.Context
 				.InverseReference(p => p.CustomerType)
 				.ForeignKey(p => p.IdPaymentMethod)
 				.PrincipalKey(p => p.Id);
+			builder.Entity<CustomerType>().Collection(p => p.OrderNotes)
+				.InverseReference(p => p.CustomerType)
+				.ForeignKey(p => p.IdOrderNote)
+				.PrincipalKey(p => p.Id);
 			//builder.Entity<CustomerType>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
 
 			#endregion
 
 			#region Orders
+			builder.Entity<OrderNoteToCustomerType>().Key(p => new { p.IdOrderNote, p.IdCustomerType });
+			builder.Entity<OrderNoteToCustomerType>().ForSqlServer().Table("OrderNotesToCustomerTypes");
+			builder.Entity<OrderNoteToCustomerType>().Ignore(p => p.Id);
 
 			builder.Entity<OrderNote>().Key(p => p.Id);
 			builder.Entity<OrderNote>().ForSqlServer().Table("OrderNotes");
@@ -268,7 +275,8 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<OrderNote>()
 				.Collection(p => p.CustomerTypes)
 				.InverseReference(p => p.OrderNote)
-				.ForeignKey(p => p.IdOrderNote);
+				.ForeignKey(p => p.IdOrderNote)
+				.PrincipalKey(p => p.Id);
 
 			#endregion
 

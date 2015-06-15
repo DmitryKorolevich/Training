@@ -7,7 +7,9 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.addEditCountryController',
 	'app.modules.setting.controllers.addEditStateController',
 	'app.modules.setting.controllers.settingsController',
-	'app.modules.setting.controllers.paymentMethodsController'
+	'app.modules.setting.controllers.paymentMethodsController',
+	'app.modules.setting.controllers.orderNotesManagementController',
+	'app.modules.setting.controllers.addEditOrderNoteController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -33,6 +35,11 @@ angular.module('app.modules.setting', [
 					url: '/settings/approvedpaymentmethods',
 					templateUrl: 'app/modules/setting/partials/paymentMethodsList.html',
 					controller: 'paymentMethodsController'
+				})
+				.state('index.oneCol.manageOrderNotes', {
+					url: '/settings/ordernotes',
+					templateUrl: 'app/modules/setting/partials/orderNotesList.html',
+					controller: 'orderNotesManagementController'
 				});
 		}
 ]);

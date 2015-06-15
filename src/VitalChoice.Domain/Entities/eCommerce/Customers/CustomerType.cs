@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 
@@ -24,5 +25,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    public ICollection<Customer> Customers { get; set; }
 
 		public ICollection<PaymentMethodToCustomerType> PaymentMethods { get; set; }
+
+		public ICollection<OrderNoteToCustomerType> OrderNotes { get; set; }
     }
 }

@@ -6,6 +6,11 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 {
     public class OrderNote: Entity
     {
+	    public OrderNote()
+	    {
+			CustomerTypes = new List<OrderNoteToCustomerType>();
+	    }
+
 	    public string Title { get; set; }
 
 	    public string Description { get; set; }

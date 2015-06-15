@@ -59,10 +59,13 @@ namespace VitalChoice.Data.Repositories
 		    if (!tracking)
 		        query = query.AsNoTracking();
 
-			if (page != null && pageSize != null)
-				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+	        if (page != null && pageSize != null)
+	        {
+		        var pageNo = page.Value - 1;
+		        query = pageNo <= 0 ? query.Take(pageSize.Value) : query.Skip(pageNo * pageSize.Value).Take(pageSize.Value);
+	        }
 
-			return query;
+	        return query;
 		}
 
 		internal async Task<List<TEntity>> SelectAsync(

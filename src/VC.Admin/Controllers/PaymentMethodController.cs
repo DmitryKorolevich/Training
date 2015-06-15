@@ -45,7 +45,7 @@ namespace VC.Admin.Controllers
 			return result.Select(x => new PaymentMethodListItemModel()
 			{
 				Id = x.Id,
-				CustomerTypes = x.CustomerTypes.Select(y=>y.IdCustomerType).ToList(),
+				CustomerTypes = x.CustomerTypes?.Select(y=>y.IdCustomerType).ToList(),
 				DateEdited = x.DateEdited,
 				EditedBy = x.AdminProfile?.AgentId,
 				Name = x.Name

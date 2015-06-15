@@ -16,5 +16,36 @@ namespace VitalChoice.Business.Queries.Order
 
 			return this;
 		}
+
+		public OrderNoteQuery MatchByid(int id)
+		{
+			Add(x => x.Id == id);
+
+			return this;
+		}
+
+		public OrderNoteQuery MatchBySearchText(string keyword)
+		{
+			if (!string.IsNullOrWhiteSpace(keyword))
+			{
+				Add(x => x.Title.ToLower().Contains(keyword.ToLower()));
+			}
+
+			return this;
+		}
+
+		public OrderNoteQuery MatchByName(string name, int? id)
+		{
+			if (!string.IsNullOrWhiteSpace(name))
+			{
+				Add(x => x.Title.ToLower().Equals(name.ToLower()));
+			}
+			if (id.HasValue)
+			{
+				Add(x => x.Id != id.Value);
+			}
+
+			return this;
+		}
 	}
 }

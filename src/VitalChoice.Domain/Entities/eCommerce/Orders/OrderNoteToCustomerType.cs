@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Domain.Entities.eCommerce.Orders
 {
-    public class OrderNoteToCustomerType
+    public class OrderNoteToCustomerType: Entity
     {
 	    public OrderNote OrderNote { get; set; }
 
