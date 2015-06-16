@@ -141,7 +141,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, null)).SelectAnyAsync())
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.TitleTakenAlready]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.LabelTakenAlready]);
 			}
 
 			orderNote.StatusCode = RecordStatusCode.Active;
@@ -180,7 +180,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, orderNote.Id)).SelectAnyAsync())
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.TitleTakenAlready]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.LabelTakenAlready]);
 			}
 
 			orderNote.StatusCode = RecordStatusCode.Active;

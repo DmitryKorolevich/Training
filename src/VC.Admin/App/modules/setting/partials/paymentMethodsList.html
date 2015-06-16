@@ -1,23 +1,18 @@
 ﻿<div class="container-fluid">
 	<div class="well">
-		<span class="legend">Approved Payment Methods</span>
+		<span class="legend">Manage Payment Methods</span>
 		<div class="form-group">
-			<button data-ng-click="setState();" ladda="refreshTracker.active()" class="btn btn-primary">Apply Changes</button>
+			<button data-ng-click="setState();" ladda="refreshTracker.active()" class="btn btn-success">Apply Changes</button>
 		</div>
 		<spinner-overlay data-loading="refreshTracker.active()">
 			<table class="table table-striped table-hover">
 			    <thead>
                    <tr>
                     <th>Name</th>
-                    <th colspan="2">Availability</th>
+                    <th>Retail</th>
+                    <th>Wholesale</th>
                     <th>Updated</th>
                  </tr>
-			     <tr>
-			        <th></th>
-			        <th>Retail</th>
-			        <th>Wholesale</th>
-                    <th></th>
-			    </tr>
 			    </thead>
 				<tbody>
 				<tr data-ng-repeat="paymentMethod in paymentMethods">

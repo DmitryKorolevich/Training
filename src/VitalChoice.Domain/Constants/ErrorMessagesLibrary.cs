@@ -24,6 +24,7 @@ namespace VitalChoice.Domain.Constants
 			public const string UserIsNotConfirmed = "UserIsNotConfirmed";
 		    public const string CantFindRecord = "CantFindRecord";
 		    public const string TitleTakenAlready = "TitleTakenAlready";
+		    public const string LabelTakenAlready = "LabelTakenAlready";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -44,7 +45,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.GenerateSecurityStampError, "Cannot generate security token"},
 			{Keys.UserIsNotConfirmed, "User not confirmed"},
 			{Keys.CantFindRecord, "Record not found"},
-			{Keys.TitleTakenAlready, "Title is already in use"}
+			{Keys.TitleTakenAlready, "Title is already in use"},
+			{Keys.LabelTakenAlready, "Label is already in use"}
 		};
     }
 }

@@ -102,8 +102,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'manageCountries', stateName: 'index.oneCol.manageCountries', stateLabel: 'Manage Countries / States', access: 10 },
 				{ name: 'manageSettings', stateName: 'index.oneCol.manageSettings', stateLabel: 'Perishable Cart Threshold', access: 10 },
-				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Approved Payment Methods', access: 10 },
-				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Order Specific Notes', access: 10 }
+				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Manage Payment Methods', access: null }, //only for super admins
+				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Order Specific Notes', access: null }
 			]
 		},
 		{

@@ -32,5 +32,7 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         SKU = 54,
         RetailPrice=55,
         WholesalePrice = 56,
+		Label = 57,
+	    OrderNote = 58
     }
 }

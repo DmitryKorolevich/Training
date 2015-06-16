@@ -1,9 +1,9 @@
 ﻿<div class="container-fluid">
 	<div class="well">
-		<span class="legend">Order Specific Notes</span>
+		<span class="legend">Manage Order Specific Notes</span>
 		<div class="row form-group">
 			<div class="col-md-4">
-                <input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Title">
+                <input type="text" class="form-control" data-ng-model="filter.SearchText" placeholder="Filter by Label, Order Note">
 			</div>
 		</div>
         <div class="row form-group">
@@ -20,14 +20,15 @@
 				<thead>
 				<tr>
 				    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Title')">
-				        <span>Title</span>
+				        <span>Label</span>
 				        <span data-ng-if="filter.Sorting.Path == 'Title'">
                             <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
 				    </th>
-				    <th>Description</th>
-				    <th colspan="2">Availability</th>
+				    <th>Order Note</th>
+                    <th>Retail</th>
+                    <th>Wholesale</th>
 				    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Updated')">
 				        <span>Updated</span>
 				        <span data-ng-if="filter.Sorting.Path == 'Updated'">
@@ -35,14 +36,6 @@
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
 				    </th>
-                    <th></th>
-				</tr>
-				<tr>
-                    <th></th>
-				    <th></th>
-				    <th>Retail</th>
-				    <th>Wholesale</th>
-				    <th></th>
                     <th></th>
 				</tr>
 				</thead>

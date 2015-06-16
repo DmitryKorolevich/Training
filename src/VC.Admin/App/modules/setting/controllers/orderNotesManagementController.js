@@ -33,7 +33,7 @@ angular.module('app.modules.setting.controllers.orderNotesManagementController',
 	    $scope.filter = {
 	        SearchText: "",
 	        Paging: { PageIndex: 1, PageItemCount: 100 },
-	        Sorting: gridSorterUtil.resolve(refreshOrderNotes, 'Updated', 'Desc')
+	        Sorting: gridSorterUtil.resolve(refreshOrderNotes, 'Title', 'Asc')
 	    };
 
 	    refreshOrderNotes();

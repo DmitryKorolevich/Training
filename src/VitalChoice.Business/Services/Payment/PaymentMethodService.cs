@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Payment
 		{
 			var condition = new PaymentMethodQuery().NotDeleted();
 
-			var query = _paymentMethodRepository.Query(condition).OrderBy(x => x.OrderBy(y => y.Order));
+			var query = _paymentMethodRepository.Query(condition).OrderBy(x => x.OrderBy(y => y.Name));
 
 			var paymentMethods = await query.Include(x => x.CustomerTypes).SelectAsync(false);
 
