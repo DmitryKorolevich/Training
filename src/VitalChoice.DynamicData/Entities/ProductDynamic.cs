@@ -33,6 +33,7 @@ namespace VitalChoice.DynamicData.Entities
 
         protected override void FillNewEntity(Product entity)
         {
+            SetSkuOrdering(Skus);
             entity.Hidden = Hidden;
             entity.IdExternal = IdExternal;
             entity.IdProductType = Type;
@@ -47,19 +48,27 @@ namespace VitalChoice.DynamicData.Entities
             entity.Skus = Skus?.Select(s => s.ToEntity()).ToList() ?? new List<Sku>();
         }
 
+        private static void SetSkuOrdering(IEnumerable<SkuDynamic> skus)
+        {
+            int order = 0;
+            foreach (var sku in skus)
+            {
+                if (sku.StatusCode != RecordStatusCode.Deleted)
+                {
+                    sku.Order = order;
+                    order++;
+                }
+            }
+        }
+
         protected override void UpdateEntityInternal(Product entity)
         {
+            SetSkuOrdering(Skus);
             entity.Hidden = Hidden;
             entity.IdExternal = IdExternal;
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
-            //entity.ProductsToCategories.Clear();
-            //entity.ProductsToCategories.AddRange(CategoryIds.Select(c => new ProductToCategory
-            //{
-            //    IdCategory = c,
-            //    IdProduct = Id
-            //}));
 
             entity.ProductsToCategories = CategoryIds.Select(c => new ProductToCategory
             {
@@ -105,19 +114,10 @@ namespace VitalChoice.DynamicData.Entities
             {
                 value.IdProduct = Id;
             }
+            
         }
 
-        protected override void FromEntity(Product entity)
-        {
-            BaseConvert(entity);
-        }
-
-        protected override void FromEntityWithDefaults(Product entity)
-        {
-            BaseConvert(entity, true);
-        }
-
-        private void BaseConvert(Product entity, bool withDefaults = false)
+        protected override void FromEntity(Product entity, bool withDefaults = false)
         {
             Name = entity.Name;
             Url = entity.Url;

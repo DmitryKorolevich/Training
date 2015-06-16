@@ -49,7 +49,7 @@ namespace VitalChoice.DynamicData
             
         }
 
-        protected abstract void FromEntity(TEntity entity);
+        protected abstract void FromEntity(TEntity entity, bool withDefaults = false);
 
         private void FromEntityInternal(TEntity entity)
         {
@@ -76,8 +76,6 @@ namespace VitalChoice.DynamicData
             FromEntity(entity);
         }
 
-        protected abstract void FromEntityWithDefaults(TEntity entity);
-
         private void FromEntityWithDefaultsInternal(TEntity entity)
         {
             if (entity == null)
@@ -93,19 +91,17 @@ namespace VitalChoice.DynamicData
                     data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
                 }
             }
-            Id = entity.Id;
-            DateCreated = entity.DateCreated;
-            DateEdited = entity.DateEdited;
-            StatusCode = entity.StatusCode;
-            FromEntityWithDefaults(entity);
+            FromEntity(entity, true);
         }
 
         protected abstract void FillNewEntity(TEntity entity);
 
         public void UpdateEntity(TEntity entity)
         {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
             var optionTypesCache = entity.OptionTypes?.ToDictionary(o => o.Name, o => o.Id);
-            entity.OptionValues.Clear();
+            entity.OptionValues = new List<TOptionValue>();
             if (optionTypesCache != null)
             {
                 foreach (var data in DynamicData)
@@ -123,7 +119,7 @@ namespace VitalChoice.DynamicData
                 }
             }
             entity.Id = Id;
-            entity.DateCreated = DateCreated;
+            entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
             UpdateEntityInternal(entity);

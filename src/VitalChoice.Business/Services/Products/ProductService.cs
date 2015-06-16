@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Product;
@@ -168,7 +169,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
-            using (var transaction = new TransactionManager(_context).BeginTransaction())
+            using (var uow = new EcommerceUnitOfWork())
             {
                 Product product = null;
                 int idProduct = 0;
@@ -176,15 +177,13 @@ namespace VitalChoice.Business.Services.Products
                 {
                     if (model.Id == 0)
                     {
-                        idProduct = (await InsertProduct(model)).Id;
+                        idProduct = (await InsertProduct(model, uow)).Id;
                     }
-                    product = await UpdateProduct(model);
-                    transaction.Commit();
+                    product = await UpdateProduct(model, uow);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e.Message, e);
-                    transaction.Rollback();
                 }
                 if (idProduct != 0)
                     return await GetProductAsync(idProduct);
@@ -192,9 +191,8 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        private async Task<Product> InsertProduct(ProductDynamic model)
+        private async Task<Product> InsertProduct(ProductDynamic model, EcommerceUnitOfWork uow)
         {
-            SetSkusOrder(model);
             var entity = model.ToEntity();
             if (entity != null)
             {
@@ -203,7 +201,7 @@ namespace VitalChoice.Business.Services.Products
                 Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
                 IncludeProductOptionTypesByName(entity, optionTypesSorted);
                 IncludeSkuOptionTypesByName(entity, optionTypesSorted);
-                if (entity != null && entity.Skus != null)
+                if (entity.Skus != null)
                 {
                     int order = 0;
                     foreach (var sku in entity.Skus)
@@ -214,68 +212,83 @@ namespace VitalChoice.Business.Services.Products
                 }
 
                 entity.OptionTypes = new List<ProductOptionType>();
-                var result = await _productRepository.InsertGraphAsync(entity);
+                var productRepository = uow.RepositoryAsync<Product>();
+
+                var result = await productRepository.InsertGraphAsync(entity);
+                await uow.SaveChangesAsync(CancellationToken.None);
+
                 result.OptionTypes = optionTypes;
                 return result;
             }
             return null;
         }
 
-        private async Task<Product> UpdateProduct(ProductDynamic model)
+        private async Task<Product> UpdateProduct(ProductDynamic model, EcommerceUnitOfWork uow)
         {
-            SetSkusOrder(model);
-            var entity = (await _productRepository.Query(
+            var productRepository = uow.RepositoryAsync<Product>();
+            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
+            var skuRepository = uow.RepositoryAsync<Sku>();
+            var productToCategoryRepository = uow.RepositoryAsync<ProductToCategory>();
+
+            var entity = (await productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
-                await _productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+                await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
                 entity.OptionTypes =
                     await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
 
-                entity.Skus = await _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
-                    .Include(p => p.OptionValues)
-                    .SelectAsync();
+                entity.Skus =
+                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
+                        .Include(p => p.OptionValues)
+                        .SelectAsync();
+
+                var skuOptions = new ICollection<ProductOptionValue>[entity.Skus.Count];
+                var optionIndex = 0;
 
                 foreach (var sku in entity.Skus)
                 {
+                    skuOptions[optionIndex] = sku.OptionValues;
+                    optionIndex++;
                     sku.OptionTypes = entity.OptionTypes;
-                    await _productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
                 }
 
                 model.UpdateEntity(entity);
 
+                optionIndex = 0;
+                foreach (var sku in entity.Skus)
+                {
+                    if (optionIndex >= skuOptions.Length)
+                        break;
+                    if (sku.StatusCode == RecordStatusCode.Deleted)
+                    {
+                        sku.OptionValues = skuOptions[optionIndex];
+                    }
+                    else
+                    {
+                        await productOptionValueRepository.DeleteAllAsync(skuOptions[optionIndex]);
+                    }
+                    optionIndex++;
+                }
+
                 var categories = entity.ProductsToCategories;
                 entity.ProductsToCategories = null;
 
-                var toReturn = await _productRepository.UpdateAsync(entity);
+                var toReturn = await productRepository.UpdateAsync(entity);
 
-                var dbCategories = await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
-                await _productToCategoryRepository.DeleteAllAsync(dbCategories);
+                var dbCategories = await productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync();
+                await productToCategoryRepository.DeleteAllAsync(dbCategories);
 
-                await _productToCategoryRepository.InsertRangeAsync(categories);
+                await productToCategoryRepository.InsertRangeAsync(categories);
+                await uow.SaveChangesAsync(CancellationToken.None);
+
                 toReturn.ProductsToCategories = categories;
                 return toReturn;
             }
             return null;
-        }
-
-        private void SetSkusOrder(ProductDynamic entity)
-        {
-            if (entity != null && entity.Skus != null)
-            {
-                int order = 0;
-                foreach (var sku in entity.Skus)
-                {
-                    if (sku.StatusCode != RecordStatusCode.Deleted)
-                    {
-                        sku.Order = order;
-                        order++;
-                    }
-                }
-            }
         }
 
         public async Task<bool> DeleteProductAsync(int id)

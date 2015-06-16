@@ -45,6 +45,15 @@ foreach{
 				Push-Location ${project}
 				iex "${deployScript} -RootDeploy ${RootDeploy}"
 				Pop-Location
+				$deployProjectPath = $RootBuild + "\src\" + $projectName + "\deploy"
+				ls -Path "${deployProjectPath}" | `
+				foreach{
+					if ($_.GetType().Name.Equals("DirectoryInfo")) {
+						$targetName = $_.Name
+						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\files"
+						New-SymLink -Path "${RootDeploy}\files" -SymName "${destinationPath}" -Directory
+					}
+				}
 			}
 		}
 	}
