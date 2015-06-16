@@ -17,9 +17,10 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Workflow;
+using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -117,6 +118,65 @@ namespace VitalChoice.Infrastructure.Context
 
             #endregion
 
+            #region GiftCertificates
+
+            builder.Entity<GiftCertificate>().Key(p => p.Id);
+            builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
+            builder.Entity<GiftCertificate>().Property(p => p.PublicId).ForSqlServer().UseDefaultValueGeneration();
+
+            #endregion
+
+            #region Discounts
+
+            builder.Entity<DiscountOptionType>().Key(p => p.Id);
+            builder.Entity<DiscountOptionType>().ForSqlServer().Table("DiscountOptionTypes");
+            builder.Entity<DiscountOptionType>()
+                .Reference(p => p.Lookup)
+                .InverseCollection()
+                .ForeignKey(p => p.IdLookup)
+                .PrincipalKey(p => p.Id);
+            builder.Entity<DiscountOptionType>()
+                .Reference(p => p.FieldType)
+                .InverseCollection()
+                .ForeignKey(p => p.IdFieldType)
+                .PrincipalKey(p => p.Id);
+
+            builder.Entity<DiscountOptionValue>().Key(o => o.Id);
+            builder.Entity<DiscountOptionValue>().ForSqlServer().Table("DiscountOptionValues");
+            builder.Entity<DiscountOptionValue>()
+                .Reference(v => v.OptionType)
+                .InverseCollection()
+                .ForeignKey(t => t.IdOptionType)
+                .PrincipalKey(v => v.Id);
+
+            builder.Entity<DiscountToCategory>().Key(p => p.Id);
+            builder.Entity<DiscountToCategory>().ForRelational().Table("DiscountsToCategories");
+
+            builder.Entity<DiscountToProduct>().Key(p => p.Id);
+            builder.Entity<DiscountToProduct>().ForRelational().Table("DiscountsToProducts");
+
+            builder.Entity<Discount>().Key(p => p.Id);
+            builder.Entity<Discount>().ForSqlServer().Table("Discounts");
+            builder.Entity<Discount>()
+                .Collection(p => p.OptionValues)
+                .InverseReference()
+                .ForeignKey(o => o.IdDiscount)
+                .PrincipalKey(p => p.Id);
+
+            builder.Entity<Discount>().Ignore(p => p.OptionTypes);
+
+            builder.Entity<Discount>()
+                .Collection(p => p.DiscountsToCategories)
+                .InverseReference()
+                .ForeignKey(t => t.IdDiscount)
+                .PrincipalKey(p => p.Id);
+            builder.Entity<Discount>()
+                .Collection(p => p.DiscountsToProducts)
+                .InverseReference()
+                .ForeignKey(t => t.IdDiscount)
+                .PrincipalKey(p => p.Id);
+
+            #endregion
 
             #region Products
 
@@ -127,10 +187,6 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(c => c.IdCategory)
 		        .PrincipalKey(cat => cat.Id);
-
-            builder.Entity<GiftCertificate>().Key(p => p.Id);
-            builder.Entity<GiftCertificate>().ForRelational().Table("GiftCertificates");
-            builder.Entity<GiftCertificate>().Property(p => p.PublicId).ForSqlServer().UseDefaultValueGeneration();
 
             builder.Entity<VProductSku>().Key(p => p.IdProduct);
             builder.Entity<VProductSku>().Ignore(x => x.Id);

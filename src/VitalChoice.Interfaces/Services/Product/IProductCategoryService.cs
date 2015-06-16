@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Products;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Product

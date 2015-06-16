@@ -2,7 +2,7 @@
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Users;
 
-namespace VitalChoice.Domain.Entities.Products
+namespace VitalChoice.Domain.Entities.eCommerce.GiftCertificates
 {
     public class GiftCertificate : Entity
     {

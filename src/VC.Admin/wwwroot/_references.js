@@ -1531,3 +1531,5 @@
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
+/// <reference path="app/app.common.js" />
+/// <reference path="../app/modules/product/controllers/partcontroller.js" />

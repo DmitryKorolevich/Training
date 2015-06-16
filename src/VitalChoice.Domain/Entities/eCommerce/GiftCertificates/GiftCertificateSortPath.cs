@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Domain.Entities.Products
+﻿namespace VitalChoice.Domain.Entities.eCommerce.GiftCertificates
 {
     public static class GiftCertificateSortPath
     {

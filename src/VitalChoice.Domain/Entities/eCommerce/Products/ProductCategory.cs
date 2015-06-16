@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Products;
 
-namespace VitalChoice.Domain.Entities.Products
+namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
     public class ProductCategory : Entity
     {

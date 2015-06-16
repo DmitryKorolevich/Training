@@ -6,7 +6,6 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Products;

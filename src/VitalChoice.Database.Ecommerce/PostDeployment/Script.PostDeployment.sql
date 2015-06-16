@@ -35,6 +35,7 @@ Post-Deployment Script Template
 :r .\Scripts\YouTubeAndCrossSellsFields.sql
 :r .\Scripts\ProductOptionTypesNutrition.sql
 :r .\Scripts\ProductOptionTypesUpdate.sql
+:r .\Scripts\Discounts.sql
 
 :r .\Scripts\CustomerAreaBasics.sql
 :r .\Scripts\CustomerAreaBasicsData.sql
