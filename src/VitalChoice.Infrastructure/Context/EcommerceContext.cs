@@ -121,6 +121,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Products
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
+            builder.Entity<ProductCategory>().Property(p => p.Id).GenerateValueOnAdd();
             builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
 		    builder.Entity<ProductCategory>()
 		        .Collection(cat => cat.ProductToCategories)
@@ -152,6 +153,7 @@ namespace VitalChoice.Infrastructure.Context
                 .Required();
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
+		    builder.Entity<ProductOptionValue>().Property(p => p.Id).GenerateValueOnAdd();
 		    builder.Entity<ProductOptionValue>().ForSqlServer().Table("ProductOptionValues");
 		    builder.Entity<ProductOptionValue>()
 		        .Reference(v => v.OptionType)
@@ -164,7 +166,8 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<ProductTypeEntity>().ForSqlServer().Table("ProductTypes");
 
             builder.Entity<Sku>().Key(s => s.Id);
-		    builder.Entity<Sku>().ForSqlServer().Table("Skus");
+            builder.Entity<Sku>().Property(p => p.Id).GenerateValueOnAdd();
+            builder.Entity<Sku>().ForSqlServer().Table("Skus");
 		    builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
@@ -177,7 +180,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
 
             builder.Entity<Product>().Key(p => p.Id);
-		    builder.Entity<Product>().ForSqlServer().Table("Products");
+            builder.Entity<Product>().Property(p => p.Id).GenerateValueOnAdd();
+            builder.Entity<Product>().ForSqlServer().Table("Products");
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
                 .InverseReference()

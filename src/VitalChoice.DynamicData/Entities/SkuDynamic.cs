@@ -25,14 +25,13 @@ namespace VitalChoice.DynamicData.Entities
 
         public int Order { get; set; }
 
-        protected override void FromEntity(Sku entity)
+        protected override void FromEntity(Sku entity, bool withDefaults = false)
         {
-            BaseConvert(entity);
-        }
-
-        protected override void FromEntityWithDefaults(Sku entity)
-        {
-            BaseConvert(entity);
+            Code = entity.Code;
+            Hidden = entity.Hidden;
+            Price = entity.Price;
+            WholesalePrice = entity.WholesalePrice;
+            Order = entity.Order;
         }
 
         protected override void FillNewEntity(Sku entity)
@@ -63,14 +62,6 @@ namespace VitalChoice.DynamicData.Entities
             {
                 value.IdSku = Id;
             }
-        }
-
-        private void BaseConvert(Sku entity)
-        {
-            Code = entity.Code;
-            Hidden = entity.Hidden;
-            Price = entity.Price;
-            WholesalePrice = entity.WholesalePrice;
         }
     }
 }

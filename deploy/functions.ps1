@@ -1,3 +1,5 @@
+. ".\New-SymLink.ps1"
+
 function GetTargets() {
 	[string[]] $targetNames = @()
 	ls | `
