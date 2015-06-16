@@ -17,7 +17,6 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
@@ -142,7 +141,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, null)).SelectAnyAsync())
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.TitleTakenAlready]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.LabelTakenAlready]);
 			}
 
 			orderNote.StatusCode = RecordStatusCode.Active;
@@ -181,7 +180,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByName(orderNote.Title, orderNote.Id)).SelectAnyAsync())
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.TitleTakenAlready]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.LabelTakenAlready]);
 			}
 
 			orderNote.StatusCode = RecordStatusCode.Active;

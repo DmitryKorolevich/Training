@@ -9,12 +9,12 @@ using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 
 namespace VitalChoice.Business.Services.Products
 {

@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Products;
+using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 
 namespace VC.Admin.Models.Product
 {

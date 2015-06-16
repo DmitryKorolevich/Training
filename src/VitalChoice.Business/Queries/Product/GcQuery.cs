@@ -7,7 +7,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Products;
+using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 
 namespace VitalChoice.Business.Queries.Product
 {

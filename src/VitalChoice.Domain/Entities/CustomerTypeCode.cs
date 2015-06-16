@@ -1,10 +1,11 @@
 ﻿using System;
 
-namespace VitalChoice.Domain.Entities.Content
+namespace VitalChoice.Domain.Entities
 {
     public enum CustomerTypeCode
     {
         All = 1,
         Wholesale = 2,
+        Retail = 3,
     }
 }

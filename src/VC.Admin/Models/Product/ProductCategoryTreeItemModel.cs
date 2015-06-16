@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product
 {

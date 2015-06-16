@@ -13,10 +13,10 @@ namespace VC.Admin.Models.OrderNote
 	{
 		public int Id { get; set; }
 
-		[Localized(GeneralFieldNames.Title)]
+		[Localized(GeneralFieldNames.Label)]
 		public string Title { get; set; }
 
-		[Localized(GeneralFieldNames.Description)]
+		[Localized(GeneralFieldNames.OrderNote)]
 		public string Description { get; set; }
 
 		public IList<int> CustomerTypes { get; set; }

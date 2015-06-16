@@ -9,10 +9,10 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Products;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Business.Services.Products
 {

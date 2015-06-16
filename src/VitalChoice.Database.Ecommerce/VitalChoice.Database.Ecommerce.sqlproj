@@ -140,4 +140,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductOptionTypesUpdate.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Discounts.sql" />
+  </ItemGroup>
 </Project>
