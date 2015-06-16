@@ -16,6 +16,7 @@ if ($Src.Equals("")) {
 if ($RootBuild.Equals("")) {
 	$RootBuild = "C:\Temp\vc"
 }
+$filesLinkSource = "$RootDeploy" + "\files"
 ni -itemtype directory -path "empty" -Force
 echo "Clean temp..."
 robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh > clean.log
@@ -51,7 +52,7 @@ foreach{
 					if ($_.GetType().Name.Equals("DirectoryInfo")) {
 						$targetName = $_.Name
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\files"
-						New-SymLink -Path "${RootDeploy}\files" -SymName "${destinationPath}" -Directory
+						cmd /c mklink /D $destinationPath $filesLinkSource
 					}
 				}
 			}

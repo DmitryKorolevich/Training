@@ -287,10 +287,10 @@ namespace VitalChoice.DynamicData
             return dynamicObject?.ToEntity();
         }
 
-        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
-        protected static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
         protected ExpandoObject DynamicData { get; } = new ExpandoObject();
