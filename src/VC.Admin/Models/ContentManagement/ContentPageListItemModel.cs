@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;

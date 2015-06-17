@@ -25,7 +25,6 @@ using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Order;
 

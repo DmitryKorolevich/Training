@@ -15,7 +15,6 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payment;

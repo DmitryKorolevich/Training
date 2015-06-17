@@ -12,7 +12,6 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 

@@ -7,6 +7,7 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.settingService',
 	'app.core.dataAccess.services.authenticationService',
 	'app.core.dataAccess.services.productService',
+	'app.core.dataAccess.services.discountService',
 	'app.core.dataAccess.services.fileService',
 	'app.core.dataAccess.services.profileService',
 	'app.core.dataAccess.services.gcService',

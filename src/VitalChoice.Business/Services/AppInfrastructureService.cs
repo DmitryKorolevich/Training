@@ -3,7 +3,8 @@ using System.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Framework.OptionsModel;
-using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.Content;
@@ -12,11 +13,10 @@ using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
-using VitalChoice.Infrastructure.Queries.Customer;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Infrastructure.Services
+namespace VitalChoice.Business.Services
 {
     public class AppInfrastructureService : IAppInfrastructureService
     {
@@ -102,7 +102,13 @@ namespace VitalChoice.Infrastructure.Services
 				    Text = x.Value
 			    }).ToList(),
 
-			    CustomerTypes =
+                DiscountTypes = StatusEnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
+
+                CustomerTypes =
 				    customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
 					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
 					    .ToList()

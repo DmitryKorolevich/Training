@@ -13,12 +13,11 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Entities;
 using VitalChoice.DynamicData.Entities;
 using System;
+using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Infrastructure.Base;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
@@ -49,6 +48,20 @@ namespace VC.Admin.Controllers
             toReturn.DefaultValues = await productService.GetProductEditDefaultSettingsAsync();
             return toReturn;
 
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<SkuListItemModel>>> GetSkus([FromBody]VProductSkuFilter filter)
+        {
+            var result = await productService.GetSkusAsync(filter);
+
+            var toReturn = new PagedList<SkuListItemModel>
+            {
+                Items = result.Items.Select(p => new SkuListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
         }
 
         [HttpPost]

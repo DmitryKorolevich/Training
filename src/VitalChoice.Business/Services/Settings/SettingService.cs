@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 

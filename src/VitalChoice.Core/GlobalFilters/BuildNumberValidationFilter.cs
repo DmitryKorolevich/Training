@@ -3,7 +3,7 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
 
-namespace VitalChoice.Infrastructure.GlobalFilters
+namespace VitalChoice.Core.GlobalFilters
 {
     public class BuildNumberValidationFilter : ActionFilterAttribute
     {

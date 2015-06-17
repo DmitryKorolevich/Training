@@ -22,7 +22,20 @@ namespace VitalChoice.Business.Queries.Product
 
         public VProductSkuQuery NotDeleted()
         {
-            Add(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
+            Add(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive) &&
+                (x.SkuStatusCode == RecordStatusCode.Active || x.SkuStatusCode == RecordStatusCode.NotActive));
+            return this;
+        }
+
+        public VProductSkuQuery WithActiveSku()
+        {
+            Add(x => x.SkuStatusCode == RecordStatusCode.Active);
+            return this;
+        }
+
+        public VProductSkuQuery WithActiveProduct()
+        {
+            Add(x => x.StatusCode == RecordStatusCode.Active);
             return this;
         }
 

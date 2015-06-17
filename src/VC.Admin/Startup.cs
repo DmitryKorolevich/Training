@@ -15,7 +15,6 @@ using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
-using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin
 {

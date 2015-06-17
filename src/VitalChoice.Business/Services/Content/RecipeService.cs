@@ -12,7 +12,6 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 

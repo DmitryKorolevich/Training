@@ -6,7 +6,7 @@ using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Infrastructure.Base
+namespace VitalChoice.Core.Base
 {
     public abstract class BaseController: Controller
     {

@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Account;
+using VitalChoice.Core.Base;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
-using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Models;
 

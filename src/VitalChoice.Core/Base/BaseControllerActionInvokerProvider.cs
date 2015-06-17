@@ -6,7 +6,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
 
-namespace VitalChoice.Infrastructure.Base
+namespace VitalChoice.Core.Base
 {
 
     public class ValidationActionInvokerProvider : IActionInvokerProvider

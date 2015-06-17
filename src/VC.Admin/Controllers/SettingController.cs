@@ -7,13 +7,12 @@ using VitalChoice.Validation.Models;
 using System.Collections.Generic;
 using VC.Admin.Models.Setting;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.Base;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Infrastructure.Base;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 

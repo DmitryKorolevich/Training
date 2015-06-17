@@ -2,7 +2,7 @@
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 
-namespace VitalChoice.Infrastructure.Queries.Customer
+namespace VitalChoice.Business.Queries.Customer
 {
     public class CustomerTypeQuery: QueryObject<CustomerType>
     {

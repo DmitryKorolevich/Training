@@ -14,7 +14,6 @@ using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 

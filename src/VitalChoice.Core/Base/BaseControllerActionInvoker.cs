@@ -5,7 +5,7 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 
-namespace VitalChoice.Infrastructure.Base
+namespace VitalChoice.Core.Base
 {
     public class BaseControllerActionInvoker : ControllerActionInvoker
     {

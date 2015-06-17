@@ -36,13 +36,13 @@ using Newtonsoft.Json;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Business.Services.Payment;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
-using VitalChoice.Infrastructure.Base;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
+using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Products;
 #if DNX451
 using Autofac;
@@ -236,6 +236,7 @@ namespace VitalChoice.Core.DependencyInjection
 				builder.RegisterType<NotificationService>().As<INotificationService>();
                 builder.RegisterType<GCService>().As<IGCService>();
                 builder.RegisterType<ProductService>().As<IProductService>();
+                builder.RegisterType<DiscountService>().As<IDiscountService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
                 builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();

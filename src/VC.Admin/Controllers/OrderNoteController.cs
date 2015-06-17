@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.OrderNote;
+using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Validation.Models;
 

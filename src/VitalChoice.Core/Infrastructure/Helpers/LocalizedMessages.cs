@@ -4,11 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
+using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Infrastructure.Utils
+namespace VitalChoice.Core.Infrastructure.Helpers
 {
     public static class LocalizedMessages2
     {

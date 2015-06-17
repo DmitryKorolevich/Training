@@ -5,7 +5,7 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Infrastructure.GlobalFilters
+namespace VitalChoice.Core.GlobalFilters
 {
     public class ApiModelAutoValidationFilter : ActionFilterAttribute
     {

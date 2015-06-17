@@ -42,6 +42,7 @@
 		"app/core/dataAccess/services/settingService.js",
 		"app/core/dataAccess/services/authenticationService.js",
 		"app/core/dataAccess/services/productService.js",
+		"app/core/dataAccess/services/discountService.js",
 		"app/core/dataAccess/services/fileService.js",
 		"app/core/dataAccess/services/profileService.js",
 		"app/core/dataAccess/services/gcService.js",

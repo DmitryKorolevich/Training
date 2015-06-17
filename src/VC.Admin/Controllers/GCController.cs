@@ -13,11 +13,10 @@ using System.Security.Claims;
 using System;
 using VC.Admin.Models;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Infrastructure.Base;
-using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers

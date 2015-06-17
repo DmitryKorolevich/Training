@@ -1,6 +1,6 @@
-﻿using VitalChoice.Infrastructure.GlobalFilters;
+﻿using VitalChoice.Core.GlobalFilters;
 
-namespace VitalChoice.Infrastructure.Base
+namespace VitalChoice.Core.Base
 {
 	[BuildNumberValidationFilter]
     [ApiModelAutoValidationFilter]

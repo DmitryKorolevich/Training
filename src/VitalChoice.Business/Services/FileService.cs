@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Infrastructure.Services
+namespace VitalChoice.Business.Services
 {
     public class FileService : IFileService
     {

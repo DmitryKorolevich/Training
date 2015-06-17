@@ -26,6 +26,7 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
 	    OldPassword = 19,
 	    NewPassword = 20,
 	    ConfirmNewPassword = 21,
+        Code = 49,
         Quantity = 50,
         Amount = 51,
         Message = 52,

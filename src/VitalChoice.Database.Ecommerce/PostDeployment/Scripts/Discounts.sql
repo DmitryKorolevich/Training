@@ -46,6 +46,19 @@ END
 
 GO
 
+IF (( SELECT Count(*) AS existFlag FROM sys.columns 
+WHERE [name] = N'ExcludeSkus' AND [object_id] = OBJECT_ID(N'Discounts')) = 0
+AND (SELECT Count(*) AS existFlag FROM sys.columns 
+WHERE [object_id] = OBJECT_ID(N'Discounts')) > 0)
+BEGIN
+
+ALTER TABLE Discounts ADD ExcludeSkus BIT NOT NULL DEFAULT(0)
+ALTER TABLE Discounts ADD ExcludeCategories BIT NOT NULL DEFAULT(0)
+
+END
+
+GO
+
 IF OBJECT_ID(N'[dbo].[DiscountsToCategories]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[DiscountsToCategories]
@@ -61,16 +74,61 @@ END
 
 GO
 
-IF OBJECT_ID(N'[dbo].[DiscountsToProducts]', N'U') IS NULL
+IF OBJECT_ID(N'[dbo].[DiscountsToProducts]', N'U') IS NOT NULL
 BEGIN
-	CREATE TABLE [dbo].[DiscountsToProducts]
+	DROP TABLE [dbo].[DiscountsToProducts]
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[DiscountsToSelectedProducts]', N'U') IS NOT NULL
+BEGIN
+	DROP TABLE [dbo].[DiscountsToSelectedProducts]
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[DiscountsToSkus]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[DiscountsToSkus]
 	(
 		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-		[IdProduct] INT NOT NULL, 
 		[IdDiscount] INT NOT NULL, 
-		[Include] BIT NOT NULL, 
-		CONSTRAINT [FK_DiscountsToProducts_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]), 
-		CONSTRAINT [FK_DiscountsToProducts_ToProduct] FOREIGN KEY ([IdProduct]) REFERENCES [Products]([Id])
+		[IdSku] INT NOT NULL, 
+		CONSTRAINT [FK_DiscountsToSkus_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]), 
+		CONSTRAINT [FK_DiscountsToSkus_ToSku] FOREIGN KEY ([IdSku]) REFERENCES [Skus]([Id])
+	)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[DiscountsToSelectedSkus]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].DiscountsToSelectedSkus
+	(
+		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+		[IdDiscount] INT NOT NULL, 
+		[IdSku] INT NOT NULL, 
+		CONSTRAINT [FK_DiscountsToSelectedSkus_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]), 
+		CONSTRAINT [FK_DiscountsToSelectedSkus_ToSku] FOREIGN KEY ([IdSku]) REFERENCES [Skus]([Id])
+	)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[DiscountTiers]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[DiscountTiers]
+	(
+		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+		[IdDiscount] INT NOT NULL, 
+		[From] MONEY NOT NULL, 
+		[To] MONEY NOT NULL, 
+		[IdDiscountType] INT NOT NULL, 
+		[Percent] DECIMAL(3,2) NOT NULL, 
+		[Amount] MONEY NOT NULL, 
+		[Order] INT NOT NULL, 
+		CONSTRAINT [FK_DiscountTiers_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]),
 	)
 END
 
@@ -110,3 +168,65 @@ BEGIN
 	
 	CREATE INDEX [IX_DiscountOptionValues_Value] ON [dbo].[DiscountOptionValues] ([Value]) INCLUDE (Id, IdDiscount, IdOptionType)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM DiscountOptionTypes)
+BEGIN
+
+	INSERT INTO DiscountOptionTypes
+	(DefaultValue, IdFieldType, IdDiscountType, Name)
+	SELECT 'False', 5, 1, N'OneTimeOnly'
+	UNION
+	SELECT 'False', 5, 1, N'AllowHealthwise'
+	UNION
+	SELECT 'False', 5, 1, N'RequireMinimumPerishable'
+	UNION
+	SELECT NULL, 1, 1, N'RequireMinimumPerishableAmount'
+	UNION
+	SELECT 'False', 5, 1, N'FreeShipping'
+	UNION
+	SELECT 'False', 5, 2, N'OneTimeOnly'
+	UNION
+	SELECT 'False', 5, 2, N'AllowHealthwise'
+	UNION
+	SELECT 'False', 5, 2, N'RequireMinimumPerishable'
+	UNION
+	SELECT NULL, 1, 2, N'RequireMinimumPerishableAmount'
+	UNION
+	SELECT 'False', 5, 2, N'FreeShipping'
+	UNION
+	SELECT 'False', 5, 3, N'OneTimeOnly'
+	UNION
+	SELECT 'False', 5, 4, N'OneTimeOnly'
+	UNION
+	SELECT 'False', 5, 4, N'AllowHealthwise'
+	UNION
+	SELECT 'False', 5, 4, N'RequireMinimumPerishable'
+	UNION
+	SELECT NULL, 1, 4, N'RequireMinimumPerishableAmount'
+	UNION
+	SELECT 'False', 5, 4, N'FreeShipping'
+	UNION
+	SELECT 'False', 5, 5, N'OneTimeOnly'
+	UNION
+	SELECT 'False', 5, 5, N'AllowHealthwise'
+	UNION
+	SELECT 'False', 5, 5, N'RequireMinimumPerishable'
+	UNION
+	SELECT NULL, 1, 5, N'RequireMinimumPerishableAmount'
+	UNION
+	SELECT 'False', 5, 5, N'FreeShipping'
+	UNION
+
+	SELECT NULL, 1, 1, N'Amount'
+	UNION
+	SELECT NULL, 1, 2, N'Percent'
+	UNION
+	SELECT NULL, 1, 4, N'Amount'
+	UNION
+	SELECT NULL, 4, 4, N'ProductSKU'
+
+END
+
+GO
