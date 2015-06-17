@@ -19,7 +19,7 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
-            var query = this.DbSet.Where(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
+            var query = this.DbSet.Where(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive));
             if(!String.IsNullOrEmpty(filter.SearchText))
             {
                 query = query.Where(x => x.Code.Contains(filter.SearchText) || x.Name.Contains(filter.SearchText));

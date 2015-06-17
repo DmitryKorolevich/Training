@@ -6,6 +6,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
     {
         public int IdProduct { get; set; }
 
+        public Product Product { get; set; }
+
         public string Code { get; set; }
 
         public bool Hidden { get; set; }

@@ -31,6 +31,9 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    },
 
 	    //products  
+	    getSkus: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetSkus', filter, getConfig(tracker));
+	    },
 	    getProducts: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetProducts', filter, getConfig(tracker));
 	    },

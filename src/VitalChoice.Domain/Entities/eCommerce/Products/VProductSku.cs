@@ -16,6 +16,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public RecordStatusCode StatusCode { get; set; }
 
+        public RecordStatusCode? SkuStatusCode { get; set; }
+
         public int IdProduct { get; set; }
 
         public DateTime DateCreated { get; set; }

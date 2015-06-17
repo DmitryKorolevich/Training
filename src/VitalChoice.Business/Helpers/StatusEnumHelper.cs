@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Business.Helpers
@@ -29,21 +30,21 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
-        public static Dictionary<string,string> GetContentItemStatusNames()
+        public static Dictionary<string, string> GetContentItemStatusNames()
         {
             Dictionary<string, string> toReturn = new Dictionary<string, string>();
-            toReturn.Add($"{(int) RecordStatusCode.NotActive}:{(int) CustomerTypeCode.All}", "Draft");
-            toReturn.Add($"{(int) RecordStatusCode.Active}:{(int) CustomerTypeCode.All}", "Published - All");
-            toReturn.Add($"{(int) RecordStatusCode.Active}:{(int) CustomerTypeCode.Wholesale}", "Published - Wholesale Only");
+            toReturn.Add($"{(int)RecordStatusCode.NotActive}:{(int)CustomerTypeCode.All}", "Draft");
+            toReturn.Add($"{(int)RecordStatusCode.Active}:{(int)CustomerTypeCode.All}", "Published - All");
+            toReturn.Add($"{(int)RecordStatusCode.Active}:{(int)CustomerTypeCode.Wholesale}", "Published - Wholesale Only");
             return toReturn;
         }
 
         public static Dictionary<string, string> GetProductCategoryStatusNames()
         {
             Dictionary<string, string> toReturn = new Dictionary<string, string>();
-            toReturn.Add($"{(int) RecordStatusCode.NotActive}:{(int) CustomerTypeCode.All}", "Hide within storefront");
-            toReturn.Add($"{(int) RecordStatusCode.Active}:{(int) CustomerTypeCode.All}", "Active - All Customers");
-            toReturn.Add($"{(int) RecordStatusCode.Active}:{(int) CustomerTypeCode.Wholesale}", "Active - Wholesale Customers Only");
+            toReturn.Add($"{(int)RecordStatusCode.NotActive}:{(int)CustomerTypeCode.All}", "Hide within storefront");
+            toReturn.Add($"{(int)RecordStatusCode.Active}:{(int)CustomerTypeCode.All}", "Active - All Customers");
+            toReturn.Add($"{(int)RecordStatusCode.Active}:{(int)CustomerTypeCode.Wholesale}", "Active - Wholesale Customers Only");
             return toReturn;
         }
 
@@ -84,6 +85,43 @@ namespace VitalChoice.Business.Helpers
                 {(int) ProductType.Gc, "Gift Certificate"},
                 {(int) ProductType.EGс, "E Gift Certificate"}
             };
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetDiscountTypes()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) DiscountType.PriceDiscount, "Price Discount"},
+                {(int) DiscountType.PercentDiscount, "Percent Discount"},
+                {(int) DiscountType.FreeShipping, "Free Shipping"},
+                {(int) DiscountType.Threshold, "Threshold"},
+                {(int) DiscountType.Tiered, "Tiered"},
+            };
+            return toReturn;
+        }
+
+        public static string GetDiscountTypeName(DiscountType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case DiscountType.PriceDiscount:
+                    toReturn = "Price Discount";
+                    break;
+                case DiscountType.PercentDiscount:
+                    toReturn = "Percent Discount";
+                    break;
+                case DiscountType.FreeShipping:
+                    toReturn = "Free Shipping";
+                    break;
+                case DiscountType.Threshold:
+                    toReturn = "Threshold";
+                    break;
+                case DiscountType.Tiered:
+                    toReturn = "Tiered";
+                    break;
+            }
             return toReturn;
         }
     }

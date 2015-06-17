@@ -16,12 +16,20 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 
         public int? IdExternal { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+
+        public bool ExcludeSkus { get; set; }
+
+        public bool ExcludeCategories { get; set; }
 
         public ICollection<DiscountToCategory> DiscountsToCategories { get; set; }
 
-        public ICollection<DiscountToProduct> DiscountsToProducts { get; set; }
+        public ICollection<DiscountToSku> DiscountsToSkus { get; set; }
+
+        public ICollection<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
+
+        public ICollection<DiscountTier> DiscountTiers { get; set; }
     }
 }

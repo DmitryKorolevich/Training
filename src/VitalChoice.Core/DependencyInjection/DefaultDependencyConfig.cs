@@ -232,6 +232,7 @@ namespace VitalChoice.Core.DependencyInjection
 				builder.RegisterType<NotificationService>().As<INotificationService>();
                 builder.RegisterType<GCService>().As<IGCService>();
                 builder.RegisterType<ProductService>().As<IProductService>();
+                builder.RegisterType<DiscountService>().As<IDiscountService>();
                 builder.RegisterType<CountryService>().As<ICountryService>();
                 builder.RegisterType(typeof(ExtendedUserValidator)).As(typeof(IUserValidator<ApplicationUser>));
                 builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();

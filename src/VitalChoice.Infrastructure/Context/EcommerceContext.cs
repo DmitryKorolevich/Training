@@ -152,8 +152,16 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<DiscountToCategory>().Key(p => p.Id);
             builder.Entity<DiscountToCategory>().ForRelational().Table("DiscountsToCategories");
 
-            builder.Entity<DiscountToProduct>().Key(p => p.Id);
-            builder.Entity<DiscountToProduct>().ForRelational().Table("DiscountsToProducts");
+            builder.Entity<DiscountToSku>().Key(p => p.Id);
+            builder.Entity<DiscountToSku>().ForRelational().Table("DiscountsToSkus");
+            builder.Entity<DiscountToSku>().Ignore(p => p.ShortSkuInfo);
+
+            builder.Entity<DiscountToSelectedSku>().Key(p => p.Id);
+            builder.Entity<DiscountToSelectedSku>().ForRelational().Table("DiscountsToSelectedSkus");
+            builder.Entity<DiscountToSelectedSku>().Ignore(p => p.ShortSkuInfo);
+
+            builder.Entity<DiscountTier>().Key(p => p.Id);
+            builder.Entity<DiscountTier>().ForRelational().Table("DiscountTiers");
 
             builder.Entity<Discount>().Key(p => p.Id);
             builder.Entity<Discount>().ForSqlServer().Table("Discounts");
@@ -171,7 +179,17 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(t => t.IdDiscount)
                 .PrincipalKey(p => p.Id);
             builder.Entity<Discount>()
-                .Collection(p => p.DiscountsToProducts)
+                .Collection(p => p.DiscountsToSkus)
+                .InverseReference()
+                .ForeignKey(t => t.IdDiscount)
+                .PrincipalKey(p => p.Id);
+            builder.Entity<Discount>()
+                .Collection(p => p.DiscountsToSelectedSkus)
+                .InverseReference()
+                .ForeignKey(t => t.IdDiscount)
+                .PrincipalKey(p => p.Id);
+            builder.Entity<Discount>()
+                .Collection(p => p.DiscountTiers)
                 .InverseReference()
                 .ForeignKey(t => t.IdDiscount)
                 .PrincipalKey(p => p.Id);
@@ -240,7 +258,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Product>().ForSqlServer().Table("Products");
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
-                .InverseReference()
+                .InverseReference(p=>p.Product)
                 .ForeignKey(s => s.IdProduct)
                 .PrincipalKey(p => p.Id)
                 .Required();

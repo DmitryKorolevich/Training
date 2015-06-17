@@ -28,6 +28,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> ProductTypes { get; set; }
 
-	    public IList<LookupItem<int>> CustomerTypes { get; set; }
+        public IList<LookupItem<int>> DiscountTypes { get; set; }
+
+        public IList<LookupItem<int>> CustomerTypes { get; set; }
     }
 }
