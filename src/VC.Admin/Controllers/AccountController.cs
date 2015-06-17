@@ -7,8 +7,8 @@ using VC.Admin.Models.Account;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Validation.Base;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers

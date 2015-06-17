@@ -7,7 +7,9 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "VitalChoice.Domain": "1.0.0-*"
+    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.DynamicInterfaces": "1.0.0-*",
+    "VitalChoice.Validation": "1.0.0-*"
   },
 
   "frameworks": {

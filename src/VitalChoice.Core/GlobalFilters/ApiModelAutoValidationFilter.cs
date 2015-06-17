@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
-using VitalChoice.Validation.Models;
-using System.Threading.Tasks;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Validation.Helpers.GlobalFilters
+namespace VitalChoice.Infrastructure.GlobalFilters
 {
     public class ApiModelAutoValidationFilter : ActionFilterAttribute
     {

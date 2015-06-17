@@ -16,9 +16,9 @@ using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
 using VC.Admin.Models.UserManagement;
 using VC.Admin.Validators.UserManagement;
+using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Base;
 
 namespace VC.Admin.Controllers
 {

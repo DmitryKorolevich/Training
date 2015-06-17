@@ -27,19 +27,23 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Content.ContentProcessors;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Settings;
-using VitalChoice.Validation.Base;
 using VitalChoice.Workflow.Core;
 using System.Linq;
+using Microsoft.Framework.Logging;
+using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Business.Services.Payment;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Infrastructure.Base;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
+using VitalChoice.Interfaces.Services.Products;
 #if DNX451
 using Autofac;
 using Microsoft.Framework.DependencyInjection.Autofac;
@@ -240,6 +244,12 @@ namespace VitalChoice.Core.DependencyInjection
                     .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
 	            builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
 	            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
+                var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+
+                builder.RegisterInstance(
+                    LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.Get("App:LogPath")))
+                    .As<ILoggerProviderExtended>().SingleInstance();
+
 				var container = builder.Build();
 
 				LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));

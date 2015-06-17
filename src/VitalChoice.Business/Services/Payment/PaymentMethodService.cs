@@ -15,7 +15,9 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payment;
 
 namespace VitalChoice.Business.Services.Payment
@@ -29,18 +31,21 @@ namespace VitalChoice.Business.Services.Payment
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly ILogger _logger;
 
-		public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
-			IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository, EcommerceContext context, IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository)
-		{
-			_paymentMethodRepository = paymentMethodRepository;
-			_contextAccessor = contextAccessor;
-			_adminProfileRepository = adminProfileRepository;
-			_context = context;
-			_paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
-			_logger = LoggerService.GetDefault();
-		}
+	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
+	        IHttpContextAccessor contextAccessor, IRepositoryAsync<AdminProfile> adminProfileRepository,
+	        EcommerceContext context,
+	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
+	        ILoggerProviderExtended loggerProvider)
+	    {
+	        _paymentMethodRepository = paymentMethodRepository;
+	        _contextAccessor = contextAccessor;
+	        _adminProfileRepository = adminProfileRepository;
+	        _context = context;
+	        _paymentMethodToCustomerTypeRepository = paymentMethodToCustomerTypeRepository;
+	        _logger = loggerProvider.CreateLoggerDefault();
+	    }
 
-		public async Task<IList<ExtendedPaymentMethod>> GetApprovedPaymentMethodsAsync()
+	    public async Task<IList<ExtendedPaymentMethod>> GetApprovedPaymentMethodsAsync()
 		{
 			var condition = new PaymentMethodQuery().NotDeleted();
 

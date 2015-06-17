@@ -13,8 +13,10 @@ using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -30,12 +32,13 @@ namespace VitalChoice.Business.Services.Products
         private readonly INotificationService notificationService;
         private readonly ILogger logger;
 
-        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository, UserManager<ApplicationUser> userManager, INotificationService notificationService)
+        public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository,
+            UserManager<ApplicationUser> userManager, INotificationService notificationService, ILoggerProviderExtended loggerProvider)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;
             this.notificationService = notificationService;
-            logger = LoggerService.GetDefault();
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)

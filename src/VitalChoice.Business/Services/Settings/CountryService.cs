@@ -8,6 +8,8 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Settings
@@ -20,11 +22,12 @@ namespace VitalChoice.Business.Services.Settings
         private readonly IEcommerceRepositoryAsync<State> stateRepository;
         private readonly ILogger logger;
 
-        public CountryService(IEcommerceRepositoryAsync<Country> countryRepository, IEcommerceRepositoryAsync<State> stateRepository)
+        public CountryService(IEcommerceRepositoryAsync<Country> countryRepository,
+            IEcommerceRepositoryAsync<State> stateRepository, ILoggerProviderExtended loggerProvider)
         {
             this.countryRepository = countryRepository;
             this.stateRepository = stateRepository;
-            logger = LoggerService.GetDefault();
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<ICollection<Country>> GetCountriesAsync()

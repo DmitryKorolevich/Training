@@ -15,6 +15,7 @@ using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -31,10 +32,13 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ArticleService(IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository, IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
-            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        public ArticleService(IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository,
+            IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
+            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,
+            IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository,
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended logger)
         {
             this.productRepository = productRepository;
             this.optionTypeRepository = optionTypeRepository;
@@ -45,9 +49,9 @@ namespace VitalChoice.Business.Services.Content
             this.articleToContentCategoryRepository = articleToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
-            logger = LoggerService.GetDefault();
+            this.logger = logger.CreateLoggerDefault();
         }
-        
+
         public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)
         {
             ArticleQuery query = new ArticleQuery();

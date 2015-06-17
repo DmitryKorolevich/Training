@@ -10,9 +10,7 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
-using Newtonsoft.Json;
 using VC.Public.AppConfig;
-using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 
@@ -25,7 +23,7 @@ namespace VC.Public
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+            //var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
             var configuration = new Configuration( /*applicationEnvironment.ApplicationBasePath*/)
                 .AddJsonFile("config.json")
@@ -45,11 +43,6 @@ namespace VC.Public
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
         {
-            // Configure the HTTP request pipeline.
-            // Add the console logger.
-            loggerfactory.AddConsole();
-            LoggerService.Build(env.WebRootPath, Configuration.Get("App:LogPath"));
-
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
@@ -69,10 +62,7 @@ namespace VC.Public
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
 
-            app.UseMvc(routes =>
-            {
-                RouteConfig.RegisterRoutes(routes);
-            });
+            app.UseMvc(RouteConfig.RegisterRoutes);
         }
     }
 }

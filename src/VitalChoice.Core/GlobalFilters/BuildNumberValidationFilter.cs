@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
 
-namespace VitalChoice.Validation.Helpers.GlobalFilters
+namespace VitalChoice.Infrastructure.GlobalFilters
 {
     public class BuildNumberValidationFilter : ActionFilterAttribute
     {

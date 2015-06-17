@@ -13,8 +13,10 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Interfaces.Services.Content.ContentProcessors;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -28,20 +30,22 @@ namespace VitalChoice.Business.Services.Products
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
-        public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
-            IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
-		{
-            this.masterContentItemRepository = masterContentItemRepository;
-            this.productCategoryRepository = productCategoryRepository;
-            this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
-            this.contentItemRepository = contentItemRepository;
-            this.contentProcessorsService = contentProcessorsService;
-            _templatesCache = templatesCache;
-            _logger = LoggerService.GetDefault();
-		}
+	    public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
+	        IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
+	        IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
+	        IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService,
+	        ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider)
+	    {
+	        this.masterContentItemRepository = masterContentItemRepository;
+	        this.productCategoryRepository = productCategoryRepository;
+	        this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
+	        this.contentItemRepository = contentItemRepository;
+	        this.contentProcessorsService = contentProcessorsService;
+	        _templatesCache = templatesCache;
+	        _logger = loggerProvider.CreateLoggerDefault();
+	    }
 
-        #region Public
+	    #region Public
 
         public async Task<ExecutedContentItem> GetProductCategoryContentAsync(Dictionary<string, object> parameters, string categoryUrl = null)
         {

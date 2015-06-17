@@ -12,6 +12,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicInterfaces;
 
 // ReSharper disable StaticMemberInGenericType
 

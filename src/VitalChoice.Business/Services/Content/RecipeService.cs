@@ -12,6 +12,8 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
@@ -27,9 +29,12 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        public RecipeService(IRepositoryAsync<Recipe> recipeRepository,
+            IRepositoryAsync<ContentCategory> contentCategoryRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,
+            IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository,
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
         {
             this.recipeRepository = recipeRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -37,7 +42,7 @@ namespace VitalChoice.Business.Services.Content
             this.recipeToContentCategoryRepository = recipeToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
-            logger = LoggerService.GetDefault();
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)

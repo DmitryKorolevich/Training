@@ -20,7 +20,6 @@
       "compilationOptions": { "define": [ "DNX451" ] },
       "dependencies": {
         "Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*",
-        "Microsoft.Framework.Logging.NLog": "1.0.0-*"
       }
     },
     "dnxcore50": {

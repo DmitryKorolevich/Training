@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.Infrastructure.Services
 {
     public class FileService : IFileService
     {
@@ -45,9 +45,9 @@ namespace VitalChoice.Business.Services
             }
         }
 
-        public FileService(IOptions<AppOptions> appOptions)
+        public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
         {
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
             this.appOptions = appOptions;
         }
 

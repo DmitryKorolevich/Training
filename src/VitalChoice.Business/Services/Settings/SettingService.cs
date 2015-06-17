@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Settings
@@ -14,10 +16,10 @@ namespace VitalChoice.Business.Services.Settings
         private readonly IRepositoryAsync<AppSettingItem> appSettingRepository;
         private readonly ILogger logger;
 
-        public SettingService(IRepositoryAsync<AppSettingItem> appSettingRepository)
+        public SettingService(IRepositoryAsync<AppSettingItem> appSettingRepository, ILoggerProviderExtended loggerProvider)
         {
             this.appSettingRepository = appSettingRepository;
-            logger = LoggerService.GetDefault();
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<AppSettingItem> GetAppSettingAsync(int id)

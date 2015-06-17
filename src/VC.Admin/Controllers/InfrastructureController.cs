@@ -8,8 +8,8 @@ using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Validation.Base;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers

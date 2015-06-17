@@ -12,6 +12,8 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
@@ -27,9 +29,12 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ContentPageService(IRepositoryAsync<ContentPage> contentPageRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        public ContentPageService(IRepositoryAsync<ContentPage> contentPageRepository,
+            IRepositoryAsync<ContentCategory> contentCategoryRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,
+            IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository,
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended logger)
         {
             this.contentPageRepository = contentPageRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -37,9 +42,9 @@ namespace VitalChoice.Business.Services.Content
             this.contentPageToContentCategoryRepository = contentPageToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
-            logger = LoggerService.GetDefault();
+            this.logger = logger.CreateLoggerDefault();
         }
-        
+
         public async Task<PagedList<ContentPage>> GetContentPagesAsync(ContentPageListFilter filter)
         {
             ContentPageQuery query = new ContentPageQuery();

@@ -1,10 +1,8 @@
 ﻿using System;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Logs;
 
-namespace VitalChoice.Business.Queries.Log
+namespace VitalChoice.Infrastructure.Queries.Log
 {
     public class CommonLogQuery : QueryObject<CommonLogItem> {
         public CommonLogQuery GetItems(string logLevel = null, string message = null, string source=null, DateTime? from = null, DateTime? to =null)

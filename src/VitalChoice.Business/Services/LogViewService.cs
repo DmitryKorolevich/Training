@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Business.Queries.Log;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Infrastructure.Queries.Log;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.Infrastructure.Services
 {
     public class LogViewService : ILogViewService
     {

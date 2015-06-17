@@ -3,8 +3,7 @@ using System.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Framework.OptionsModel;
-using VitalChoice.Business.Helpers;
-using VitalChoice.Business.Queries.Customer;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.Content;
@@ -13,10 +12,11 @@ using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Queries.Customer;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.Infrastructure.Services
 {
     public class AppInfrastructureService : IAppInfrastructureService
     {

@@ -11,6 +11,8 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
@@ -27,9 +29,12 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ContentPage> contentPageRepository;
         private readonly ILogger _logger;
 
-        public MasterContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<MasterContentItemToContentProcessor> masterContentItemToProcessorsRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository,
-            IRepositoryAsync<FAQ> faqRepository, IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository)
+        public MasterContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
+            IRepositoryAsync<MasterContentItemToContentProcessor> masterContentItemToProcessorsRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository,
+            IRepositoryAsync<FAQ> faqRepository, IRepositoryAsync<Article> articleRepository,
+            IRepositoryAsync<ContentPage> contentPageRepository, ILoggerProviderExtended loggerProvider)
         {
             this.masterContentItemRepository = masterContentItemRepository;
             this.masterContentItemToProcessorsRepository = masterContentItemToProcessorsRepository;
@@ -39,7 +44,7 @@ namespace VitalChoice.Business.Services.Content
             this.faqRepository = faqRepository;
             this.articleRepository = articleRepository;
             this.contentPageRepository = contentPageRepository;
-            _logger = LoggerService.GetDefault();
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<List<ContentTypeEntity>> GetContentTypesAsync()

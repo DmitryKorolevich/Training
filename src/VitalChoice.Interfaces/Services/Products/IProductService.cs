@@ -5,7 +5,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 
-namespace VitalChoice.Interfaces.Services.Product
+namespace VitalChoice.Interfaces.Services.Products
 {
 	public interface IProductService
     {
@@ -17,9 +17,9 @@ namespace VitalChoice.Interfaces.Services.Product
 
         Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
-        Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false);
+	    Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false);
 
-        Task<ProductDynamic> UpdateProductAsync(ProductDynamic model);
+	    Task<ProductDynamic> UpdateProductAsync(ProductDynamic model);
 
         Task<bool> DeleteProductAsync(int id);
     }

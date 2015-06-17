@@ -18,8 +18,10 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -40,7 +42,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
             IEcommerceRepositoryAsync<ProductOptionValue> productOptionValueRepository,
-            IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository)
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider)
         {
             this._vProductSkuRepository = vProductSkuRepository;
             this._productOptionTypeRepository = productOptionTypeRepository;
@@ -49,8 +51,8 @@ namespace VitalChoice.Business.Services.Products
             this._skuRepository = skuRepository;
             _context = context;
             _productOptionValueRepository = productOptionValueRepository;
-            this._productToCategoryRepository = _productToCategoryRepository;
-            _logger = LoggerService.GetDefault();
+            this._productToCategoryRepository = productToCategoryRepository;
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         #region ProductOptions

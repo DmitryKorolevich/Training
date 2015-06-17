@@ -4,7 +4,7 @@ using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 
-namespace VitalChoice.Interfaces.Services.Product
+namespace VitalChoice.Interfaces.Services.Products
 {
 	public interface IGCService
     {

@@ -11,7 +11,9 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 
@@ -30,24 +32,27 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
-        public ContentViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<FAQ> faqRepository,
-            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository,
-            IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache)
-		{
-            this.masterContentItemRepository = masterContentItemRepository;
-            this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
-            this.contentProcessorsService = contentProcessorsService;
-            this.recipeRepository = recipeRepository;
-            this.faqRepository = faqRepository;
-            this.articleRepository = articleRepository;
-            this.contentPageRepository = contentPageRepository;
-            _templatesCache = templatesCache;
-            _logger = LoggerService.GetDefault();
-		}
+	    public ContentViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
+	        IRepositoryAsync<ContentCategory> contentCategoryRepository,
+	        IRepositoryAsync<ContentItem> contentItemRepository, IRepositoryAsync<Recipe> recipeRepository,
+	        IRepositoryAsync<FAQ> faqRepository,
+	        IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository,
+	        IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache,
+	        ILoggerProviderExtended loggerProvider)
+	    {
+	        this.masterContentItemRepository = masterContentItemRepository;
+	        this.contentCategoryRepository = contentCategoryRepository;
+	        this.contentItemRepository = contentItemRepository;
+	        this.contentProcessorsService = contentProcessorsService;
+	        this.recipeRepository = recipeRepository;
+	        this.faqRepository = faqRepository;
+	        this.articleRepository = articleRepository;
+	        this.contentPageRepository = contentPageRepository;
+	        _templatesCache = templatesCache;
+	        _logger = loggerProvider.CreateLoggerDefault();
+	    }
 
-        #region Public
+	    #region Public
 
         public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null)
         {

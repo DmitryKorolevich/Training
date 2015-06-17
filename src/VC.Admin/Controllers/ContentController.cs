@@ -12,10 +12,12 @@ using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Models;
 using System.Security.Claims;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Validation.Base;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Infrastructure.Base;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
 {

@@ -10,14 +10,16 @@ using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Entities; 
-using VitalChoice.Interfaces.Services.Product;
-using VitalChoice.Validation.Base;
+using VitalChoice.Domain.Entities;
 using VitalChoice.DynamicData.Entities;
 using System;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Base;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
 {

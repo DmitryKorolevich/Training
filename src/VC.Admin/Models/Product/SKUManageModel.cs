@@ -12,6 +12,7 @@ using VitalChoice.DynamicData;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.DynamicInterfaces;
 
 namespace VC.Admin.Models.Product
 {

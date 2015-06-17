@@ -2,6 +2,7 @@
 using FluentValidation;
 using VC.Admin.Models.UserManagement;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 

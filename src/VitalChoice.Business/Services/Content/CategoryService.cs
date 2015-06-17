@@ -11,6 +11,8 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
@@ -32,11 +34,14 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<ContentItem> contentItemRepository,
-            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+        public CategoryService(IRepositoryAsync<ContentCategory> contentCategoryRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategory, IRepositoryAsync<Recipe> recipeRepository,
             IRepositoryAsync<FAQToContentCategory> faqToContentCategory, IRepositoryAsync<FAQ> faqRepository,
-            IRepositoryAsync<ArticleToContentCategory> articleToContentCategory, IRepositoryAsync<Article> articleRepository)
+            IRepositoryAsync<ArticleToContentCategory> articleToContentCategory,
+            IRepositoryAsync<Article> articleRepository, ILoggerProviderExtended logger)
         {
             this.contentCategoryRepository = contentCategoryRepository;
             this.contentItemRepository = contentItemRepository;
@@ -48,7 +53,7 @@ namespace VitalChoice.Business.Services.Content
             this.faqRepository = faqRepository;
             this.articleToContentCategory = articleToContentCategory;
             this.articleRepository = articleRepository;
-            logger = LoggerService.GetDefault();
+            this.logger = logger.CreateLoggerDefault();
         }
 
         public async Task<ContentCategory> GetCategoriesTreeAsync(CategoryTreeFilter filter)

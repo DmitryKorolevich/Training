@@ -14,6 +14,8 @@ using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin
 {
@@ -44,11 +46,6 @@ namespace VC.Admin
 		// Configure is called after ConfigureServices is called.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
 		{
-			// Configure the HTTP request pipeline.
-			// Add the console logger.
-			loggerfactory.AddConsole();
-            LoggerService.Build(env.WebRootPath, Configuration.Get("App:LogPath"));
-
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
 			{

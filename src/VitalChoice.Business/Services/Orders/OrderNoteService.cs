@@ -25,8 +25,9 @@ using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Order;
-using VitalChoice.Interfaces.Services.Product;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -40,14 +41,14 @@ namespace VitalChoice.Business.Services.Orders
 		private readonly ILogger _logger;
 
 		public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository, IHttpContextAccessor contextAccessor,
-			EcommerceContext context, IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository, IRepositoryAsync<AdminProfile> adminProfileRepository)
+			EcommerceContext context, IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository, IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider)
 		{
 			_orderNoteRepository = orderNoteRepository;
 			_contextAccessor = contextAccessor;
 			_context = context;
 			_orderNoteToCustomerTypeRepository = orderNoteToCustomerTypeRepository;
 			_adminProfileRepository = adminProfileRepository;
-			_logger = LoggerService.GetDefault();
+		    _logger = loggerProvider.CreateLoggerDefault();
 		}
 
 		public async Task<PagedList<ExtendedOrderNote>> GetOrderNotesAsync(FilterBase filter)

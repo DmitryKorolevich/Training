@@ -7,7 +7,7 @@ using VitalChoice.Domain.Entities.Localization;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Utils;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.Infrastructure.Services
 {
     public static class LocalizationService
     {

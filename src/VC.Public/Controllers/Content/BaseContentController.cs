@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
 using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Product;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Public.Controllers.Content
 {

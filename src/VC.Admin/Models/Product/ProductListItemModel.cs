@@ -7,7 +7,6 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product

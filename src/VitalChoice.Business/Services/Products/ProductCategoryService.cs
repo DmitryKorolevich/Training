@@ -11,8 +11,10 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -26,15 +28,18 @@ namespace VitalChoice.Business.Services.Products
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ProductCategoryService(IRepositoryAsync<ProductCategoryContent> productCategoryRepository, IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository, IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository)
+        public ProductCategoryService(IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
+            IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
+            IRepositoryAsync<ContentItem> contentItemRepository,
+            IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
         {
             this.productCategoryRepository = productCategoryRepository;
             this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
-            logger = LoggerService.GetDefault();
+            logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter)

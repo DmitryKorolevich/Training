@@ -2,7 +2,7 @@
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 
-namespace VitalChoice.DynamicData
+namespace VitalChoice.DynamicInterfaces
 {
     public interface IDynamicEntity<TEntity, TOptionValue, TOptionType>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>

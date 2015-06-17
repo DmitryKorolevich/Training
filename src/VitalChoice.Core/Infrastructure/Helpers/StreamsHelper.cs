@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace VitalChoice.Business.Helpers
+namespace VitalChoice.Core.Infrastructure.Helpers
 {
     public static class StreamsHelper
     {

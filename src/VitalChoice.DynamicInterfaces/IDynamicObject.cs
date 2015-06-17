@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VitalChoice.DynamicData
+namespace VitalChoice.DynamicInterfaces
 {
     public interface IDynamicObject
     {

@@ -6,20 +6,8 @@ using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
 
-namespace VitalChoice.Validation.Base
+namespace VitalChoice.Infrastructure.Base
 {
-    //public class InputFormattersProvider : IInputFormattersProvider
-    //{
-    //    public InputFormattersProvider(IEnumerable<InputFormatterDescriptor> inputFormatters)
-    //    {
-    //        InputFormatters = inputFormatters.Select(d => d.Instance).ToArray();
-    //    }
-
-    //    public IReadOnlyList<IInputFormatter> InputFormatters
-    //    {
-    //        get;
-    //    }
-    //}
 
     public class ValidationActionInvokerProvider : IActionInvokerProvider
     {

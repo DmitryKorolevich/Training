@@ -1,7 +1,4 @@
-﻿using System;
-using VitalChoice.Domain.Entities;
-
-namespace VitalChoice.DynamicData
+﻿namespace VitalChoice.DynamicInterfaces
 {
     public interface IModelToDynamic<in TDynamic>
     {

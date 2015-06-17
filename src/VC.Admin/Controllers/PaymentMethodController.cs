@@ -20,10 +20,10 @@ using VC.Admin.Models.UserManagement;
 using VC.Admin.Validators.UserManagement;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Transfer.PaymentMethod;
+using VitalChoice.Infrastructure.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Base;
 
 namespace VC.Admin.Controllers
 {

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
+﻿using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 
-namespace VitalChoice.Business.Queries.Customer
+namespace VitalChoice.Infrastructure.Queries.Customer
 {
     public class CustomerTypeQuery: QueryObject<CustomerType>
     {

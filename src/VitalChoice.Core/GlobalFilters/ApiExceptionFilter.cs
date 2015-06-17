@@ -1,11 +1,12 @@
 ﻿using System.Net;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
-using VitalChoice.Business.Services;
+using VitalChoice.Core.Services;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Validation.Models;
 
-namespace VitalChoice.Validation.Helpers.GlobalFilters
+namespace VitalChoice.Infrastructure.GlobalFilters
 {
     public class ApiExceptionFilter : ExceptionFilterAttribute
     {

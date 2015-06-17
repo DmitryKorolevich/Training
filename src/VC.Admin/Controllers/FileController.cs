@@ -11,13 +11,15 @@ using Microsoft.Net.Http.Headers;
 using System.IO;
 using System;
 using VitalChoice.Domain.Exceptions;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Files;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Base;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Validation.Base;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Core.Services;
 
 namespace VC.Admin.Controllers
 {
