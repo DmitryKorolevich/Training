@@ -19,8 +19,10 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Validation.Helpers;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -185,18 +187,11 @@ namespace VitalChoice.Business.Services.Products
             {
                 Product product = null;
                 int idProduct = 0;
-                try
+                if (model.Id == 0)
                 {
-                    if (model.Id == 0)
-                    {
-                        idProduct = (await InsertProduct(model, uow)).Id;
-                    }
-                    product = await UpdateProduct(model, uow);
+                    idProduct = (await InsertProduct(model, uow)).Id;
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e.Message, e);
-                }
+                product = await UpdateProduct(model, uow);
                 if (idProduct != 0)
                     return await GetProductAsync(idProduct);
                 return new ProductDynamic(product);
@@ -248,15 +243,26 @@ namespace VitalChoice.Business.Services.Products
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
-                await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
-
-                entity.OptionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
-
                 entity.Skus =
                     await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
                         .SelectAsync();
+
+                var newSet = model.Skus.Select(s => s.Code).ToList();
+                var oldSet = entity.Skus.Select(s => s.Id).ToList();
+                SkuQuery checkQuery = new SkuQuery();
+                var existItems = await
+                    _skuRepository.Query(checkQuery.NotDeleted().Excluding(oldSet).Including(newSet))
+                        .SelectAsync();
+                if (existItems.Any())
+                {
+                    throw new ApiValidationException(CollectionFormProperty.GetFullName("SKUs", newSet.IndexOf(existItems.First().Code), "Name"), "This sku already exists in the database");
+                }
+
+                await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+
+                entity.OptionTypes =
+                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
 
                 var skuOptions = new ICollection<ProductOptionValue>[entity.Skus.Count];
                 var optionIndex = 0;
@@ -269,7 +275,6 @@ namespace VitalChoice.Business.Services.Products
                 }
 
                 model.UpdateEntity(entity);
-
                 optionIndex = 0;
                 foreach (var sku in entity.Skus)
                 {

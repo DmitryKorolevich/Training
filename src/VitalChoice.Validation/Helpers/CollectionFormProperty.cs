@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Infrastructure.Utils
+﻿namespace VitalChoice.Validation.Helpers
 {
     public static class CollectionFormProperty
     {

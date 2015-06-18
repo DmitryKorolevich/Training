@@ -28,6 +28,7 @@ namespace VitalChoice.DynamicData
         public RecordStatusCode StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
+        public Type ModelType { get; private set; }
 
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
 
@@ -159,33 +160,7 @@ namespace VitalChoice.DynamicData
             where TDynamic : class
         {
             var result = new TModel();
-            var objectType = typeof(TModel);
-            var cache = GetTypeCache(ModelTypeMappingCache, objectType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic), true);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var pair in cache)
-            {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
-                {
-                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
-                    ThrowIfNotValid(typeof(TModel), typeof(TDynamic), value, pair.Key, pair.Value, true);
-
-                    pair.Value.Set?.Invoke(result, value);
-                }
-                else
-                {
-                    object dynamicValue;
-                    if (data.TryGetValue(mappingName, out dynamicValue))
-                    {
-                        var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
-                        ThrowIfNotValid(typeof(TModel), typeof(TDynamic), value, pair.Key, pair.Value, true);
-
-                        pair.Value.Set?.Invoke(result, value);
-                    }
-                }
-            }
+            ToModelInternal(result, typeof(TModel), typeof(TDynamic));
             result.FillSelfFrom(this as TDynamic);
             return result;
         }
@@ -193,33 +168,7 @@ namespace VitalChoice.DynamicData
         object IDynamicObject.ToModel(Type modelType, Type dynamicType)
         {
             dynamic result = Activator.CreateInstance(modelType);
-            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var pair in cache)
-            {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
-                {
-                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
-                    ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
-
-                    pair.Value.Set?.Invoke(result, value);
-                }
-                else
-                {
-                    object dynamicValue;
-                    if (data.TryGetValue(mappingName, out dynamicValue))
-                    {
-                        var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
-                        ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
-
-                        pair.Value.Set?.Invoke(result, value);
-                    }
-                }
-            }
-
+            ToModelInternal(result, modelType, dynamicType);
             result.FillSelfFrom((dynamic)this);
             return result;
         }
@@ -230,29 +179,7 @@ namespace VitalChoice.DynamicData
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
-            var objectType = typeof(TModel);
-            var cache = GetTypeCache(ModelTypeMappingCache, objectType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, typeof(TDynamic), true);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var pair in cache)
-            {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
-                {
-                    var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
-                        pair.Value.Get?.Invoke(model));
-                    ThrowIfNotValid(typeof (TModel), typeof (TDynamic), value, mappingName, dynamicProperty, false);
-
-                    dynamicProperty.Set?.Invoke(this, value);
-                }
-                else
-                {
-                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
-
-                    data.Add(mappingName, value);
-                }
-            }
+            FromModelInternal(model, typeof(TModel), typeof(TDynamic));
             model.FillDynamic(this as TDynamic);
         }
 
@@ -260,26 +187,7 @@ namespace VitalChoice.DynamicData
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
-            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
-            var data = DynamicData as IDictionary<string, object>;
-            foreach (var pair in cache)
-            {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
-                {
-                    var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
-                        pair.Value.Get?.Invoke(model));
-                    ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty, false);
-                    dynamicProperty.Set?.Invoke(this, value);
-                }
-                else
-                {
-                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
-                    data.Add(mappingName, value);
-                }
-            }
+            FromModelInternal(model, modelType, dynamicType);
             model.FillDynamic((dynamic) this);
         }
 
@@ -321,6 +229,64 @@ namespace VitalChoice.DynamicData
                 return resultProperties;
             }
             return result;
+        }
+
+        private void ToModelInternal(object result, Type modelType, Type dynamicType)
+        {
+            ModelType = modelType;
+            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var pair in cache)
+            {
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                {
+                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
+                    ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+
+                    pair.Value.Set?.Invoke(result, value);
+                }
+                else
+                {
+                    object dynamicValue;
+                    if (data.TryGetValue(mappingName, out dynamicValue))
+                    {
+                        var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
+                        ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+
+                        pair.Value.Set?.Invoke(result, value);
+                    }
+                }
+            }
+        }
+
+        private void FromModelInternal(object model, Type modelType, Type dynamicType)
+        {
+            ModelType = modelType;
+            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
+            var data = DynamicData as IDictionary<string, object>;
+            foreach (var pair in cache)
+            {
+                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                GenericProperty dynamicProperty;
+                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                {
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
+                        pair.Value.Get?.Invoke(model));
+                    ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty, false);
+
+                    dynamicProperty.Set?.Invoke(this, value);
+                }
+                else
+                {
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
+
+                    data.Add(mappingName, value);
+                }
+            }
         }
 
         private static object ConvertFromModelObject(Type sourceType, Type destType, object obj)

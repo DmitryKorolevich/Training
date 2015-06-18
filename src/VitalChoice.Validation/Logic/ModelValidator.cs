@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using FluentValidation.Results;
-using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Logic.Interfaces;
 using VitalChoice.Validation.Models.Interfaces;
