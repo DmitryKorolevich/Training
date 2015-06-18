@@ -48,6 +48,8 @@ namespace VC.Admin.Controllers
                     RecordStatuses = referenceData.RecordStatuses,
                     ProductTypes = referenceData.ProductTypes,
                     DiscountTypes = referenceData.DiscountTypes,
+                    AssignedCustomerTypes = referenceData.AssignedCustomerTypes,
+                    ActiveFilterOptions = referenceData.ActiveFilterOptions,
                     CustomerTypes = referenceData.CustomerTypes
                 };
 	        }

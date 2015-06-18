@@ -34,7 +34,7 @@ BEGIN
 		[Description] NVARCHAR(250) NOT NULL, 
 		[Code] NVARCHAR(250) NOT NULL,
 		[Assigned] INT NOT NULL,
-		[StartDate] DATETIME2 NOT NULL,
+		[StartDate] DATETIME2 NULL,
 		[ExpirationDate] DATETIME2 NULL,
 		CONSTRAINT [FK_Discounts_ToProductType] FOREIGN KEY ([IdDiscountType]) REFERENCES [DiscountTypes]([Id]), 
 		CONSTRAINT [FK_Discounts_ToRecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes] ([StatusCode])
@@ -66,6 +66,18 @@ GO
 
 IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_NAME ='FK_Discounts_ToUser')
 	ALTER TABLE [dbo].[Discounts] ADD CONSTRAINT [FK_Discounts_ToUser] FOREIGN KEY ([IdEditedBy]) REFERENCES [Users] ([Id])
+
+GO
+
+ALTER TABLE [dbo].[Discounts] ALTER COLUMN [StartDate] DATETIME2 NULL
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdAddedBy' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
+	ALTER TABLE dbo.Discounts
+	ADD IdAddedBy INT NULL
+
+	ALTER TABLE [dbo].[Discounts] ADD CONSTRAINT [FK_Discounts_ToAddedUser] FOREIGN KEY ([IdAddedBy]) REFERENCES [Users] ([Id])
 
 GO
 

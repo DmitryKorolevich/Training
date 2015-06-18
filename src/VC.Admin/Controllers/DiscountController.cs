@@ -57,9 +57,15 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
+                var now = DateTime.Now;
+                now = new DateTime(now.Year, now.Month, now.Day);
                 return new DiscountManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
+                    Assigned = CustomerTypeCode.All,
+                    DiscountType=DiscountType.PriceDiscount,
+                    StartDate = now,
+                    ExpirationDate= now.AddDays(30),
                     DiscountsToSelectedSkus = new List<DiscountToSelectedSku>(),
                     DiscountsToSkus = new List<DiscountToSku>(),
                     DiscountTiers = new List<DiscountTier>(),

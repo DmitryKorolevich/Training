@@ -4,6 +4,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 {
     public class DiscountOptionValue : OptionValue<DiscountOptionType>
     {
-        public int IdDiscount { get; set; }
+        public int? IdDiscount { get; set; }
     }
 }

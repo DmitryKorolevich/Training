@@ -155,8 +155,7 @@ namespace VitalChoice.Business.Services.Products
             IQueryFluent<Product> res = _productRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
-                .Include(p => p.ProductsToCategories)
-                .Include(p => p.EditedBy);
+                .Include(p => p.ProductsToCategories);
             var entity = (await res.SelectAsync(false)).FirstOrDefault();
 
             if (entity != null)

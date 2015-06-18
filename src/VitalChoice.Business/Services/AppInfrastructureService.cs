@@ -108,6 +108,18 @@ namespace VitalChoice.Business.Services
                     Text = x.Value
                 }).ToList(),
 
+                AssignedCustomerTypes = StatusEnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList(),
+
+                ActiveFilterOptions = StatusEnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+                {
+                    Key = x.Key==-1 ? null : (int?)x.Key,
+                    Text = x.Value
+                }).ToList(),
+
                 CustomerTypes =
 				    customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
 					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
