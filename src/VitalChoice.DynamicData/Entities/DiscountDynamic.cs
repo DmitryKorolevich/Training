@@ -27,8 +27,6 @@ namespace VitalChoice.DynamicData.Entities
 
         public CustomerTypeCode Assigned { get; set; }
 
-        public int? IdExternal { get; set; }
-
         public DateTime? StartDate { get; set; }
 
         public DateTime? ExpirationDate { get; set; }
@@ -52,7 +50,6 @@ namespace VitalChoice.DynamicData.Entities
             entity.Description = Description;
             entity.IdDiscountType = DiscountType;
             entity.Assigned = Assigned;
-            entity.IdExternal = IdExternal;
             entity.StartDate = StartDate;
             entity.ExpirationDate = ExpirationDate;
             entity.ExcludeSkus = ExcludeSkus;
@@ -86,7 +83,6 @@ namespace VitalChoice.DynamicData.Entities
             entity.Description = Description;
             entity.IdDiscountType = DiscountType;
             entity.Assigned = Assigned;
-            entity.IdExternal = IdExternal;
             entity.StartDate = StartDate;
             entity.ExpirationDate = ExpirationDate;
             entity.ExcludeSkus = ExcludeSkus;
@@ -114,7 +110,6 @@ namespace VitalChoice.DynamicData.Entities
             Description = entity.Description;
             DiscountType = entity.IdDiscountType;
             Assigned = entity.Assigned;
-            IdExternal = entity.IdExternal;
             StartDate = entity.StartDate;
             ExpirationDate = entity.ExpirationDate;
             ExcludeSkus = entity.ExcludeSkus;

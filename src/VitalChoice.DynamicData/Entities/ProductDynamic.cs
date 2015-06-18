@@ -25,8 +25,6 @@ namespace VitalChoice.DynamicData.Entities
 
         public bool Hidden { get; set; }
 
-        public int? IdExternal { get; set; }
-
         public ICollection<SkuDynamic> Skus { get; set; }
 
         public ICollection<int> CategoryIds { get; set; }
@@ -35,7 +33,6 @@ namespace VitalChoice.DynamicData.Entities
         {
             SetSkuOrdering(Skus);
             entity.Hidden = Hidden;
-            entity.IdExternal = IdExternal;
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
@@ -65,7 +62,6 @@ namespace VitalChoice.DynamicData.Entities
         {
             SetSkuOrdering(Skus);
             entity.Hidden = Hidden;
-            entity.IdExternal = IdExternal;
             entity.IdProductType = Type;
             entity.Name = Name;
             entity.Url = Url;
@@ -123,7 +119,6 @@ namespace VitalChoice.DynamicData.Entities
             Url = entity.Url;
             Type = entity.IdProductType;
             Hidden = entity.Hidden;
-            IdExternal = entity.IdExternal;
             CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
             Skus = new List<SkuDynamic>();
             foreach (var sku in entity.Skus)

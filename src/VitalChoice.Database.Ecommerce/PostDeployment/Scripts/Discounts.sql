@@ -59,6 +59,11 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'EditedById' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
+	EXEC SP_RENAME 'Discounts.IdExternal' , 'EditedById', 'COLUMN'
+
+GO
+
 IF OBJECT_ID(N'[dbo].[DiscountsToCategories]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[DiscountsToCategories]

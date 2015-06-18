@@ -249,6 +249,8 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey(s => s.Id)
                 .Required(false);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
+            builder.Entity<Sku>().Ignore(p => p.EditedBy);
+            builder.Entity<Sku>().Ignore(p => p.EditedById);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
             builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");

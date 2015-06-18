@@ -14,8 +14,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 
         public DiscountType IdDiscountType { get; set; }
 
-        public int? IdExternal { get; set; }
-
         public DateTime? StartDate { get; set; }
 
         public DateTime? ExpirationDate { get; set; }

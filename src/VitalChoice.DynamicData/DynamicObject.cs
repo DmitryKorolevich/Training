@@ -8,6 +8,7 @@ using System.Reflection;
 using Templates.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
@@ -28,6 +29,8 @@ namespace VitalChoice.DynamicData
         public RecordStatusCode StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
+        public int? EditedById { get; set; }
+        public User EditedBy { get; set; }
         public Type ModelType { get; private set; }
 
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
@@ -75,6 +78,8 @@ namespace VitalChoice.DynamicData
             DateCreated = entity.DateCreated;
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
+            EditedById = entity.EditedById;
+            EditedBy = entity.EditedBy;
             FromEntity(entity);
         }
 
@@ -124,6 +129,8 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
+            entity.EditedById = EditedById;
+            entity.EditedBy = EditedBy;
             UpdateEntityInternal(entity);
         }
 
@@ -151,6 +158,8 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
+            entity.EditedById = EditedById;
+            entity.EditedBy = EditedBy;
             FillNewEntity(entity);
             return entity;
         }

@@ -20,6 +20,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using System.Security.Claims;
 
 namespace VC.Admin.Controllers
 {
@@ -77,6 +78,13 @@ namespace VC.Admin.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.EditedById = userId;
+            }
 
             item = (await _discountService.UpdateDiscountAsync(item));
 

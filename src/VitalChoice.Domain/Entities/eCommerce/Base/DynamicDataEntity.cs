@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
@@ -12,6 +13,10 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
         public DateTime DateCreated { get; set; }
 
         public DateTime DateEdited { get; set; }
+
+        public int? EditedById { get; set; }
+
+        public User EditedBy { get; set; }
 
         public ICollection<TOptionValue> OptionValues { get; set; }
 

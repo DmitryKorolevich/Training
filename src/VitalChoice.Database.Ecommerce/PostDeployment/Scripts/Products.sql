@@ -21,3 +21,10 @@ END
 IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'Hidden' AND [Object_ID] = OBJECT_ID(N'[dbo].Products', N'U'))
 	ALTER TABLE dbo.Products
 	ADD Hidden BIT NOT NULL DEFAULT 0
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'EditedById' AND [Object_ID] = OBJECT_ID(N'[dbo].Products', N'U'))
+	EXEC SP_RENAME 'Products.IdExternal' , 'EditedById', 'COLUMN'
+
+GO

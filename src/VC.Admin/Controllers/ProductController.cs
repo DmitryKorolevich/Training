@@ -19,6 +19,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
+using System.Security.Claims;
 
 namespace VC.Admin.Controllers
 {
@@ -108,68 +109,6 @@ namespace VC.Admin.Controllers
             var item = await productService.GetProductAsync(id);
             ProductManageModel toReturn = item.ToModel<ProductManageModel, ProductDynamic>();
             return toReturn;
-
-            return await Task.FromResult<ProductManageModel>(new ProductManageModel()
-            {
-                Id = 5,
-                Name = "Test",
-                Url = "test",
-                StatusCode = RecordStatusCode.Active,
-                Type = ProductType.Gc,
-                Hidden = false,
-                CategoryIds = new List<int>() { 6, 7, 5 },
-                SKUs = new List<SKUManageModel>()
-                {
-                    new SKUManageModel()
-                    {
-                        Id = 43454,
-                        Name = "FRP006",
-                        Active = true,
-                        Hidden = true,
-                        RetailPrice = (decimal)55.00,
-                        WholesalePrice = (decimal)9.00,
-                        Stock = 5,
-                        DisregardStock = true,
-                        AutoShipFrequency2=true,
-                        AutoShipFrequency6=true,
-                        DisallowSingle=true,
-                        AutoShipProduct=true,
-                        HideFromDataFeed=true,
-                        OffPercent = 11,
-                        NonDiscountable=true,
-                    },
-                    new SKUManageModel()
-                    {
-                        Id = 43454,
-                        Name = "FRP006",
-                        Active = true,
-                        Hidden = true,
-                        RetailPrice = (decimal)55.00,
-                        WholesalePrice = (decimal)9.00,
-                        Stock = 5,
-                        DisregardStock = true,
-                        AutoShipFrequency2=true,
-                        AutoShipFrequency6=true,
-                        DisallowSingle=true,
-                        AutoShipProduct=true,
-                        HideFromDataFeed=true,
-                        OffPercent = 11,
-                        NonDiscountable=true,
-                    },
-                },
-                CrossSellProducts = new List<CrossSellProductModel>()
-                {
-                    new CrossSellProductModel(),
-                    new CrossSellProductModel(),
-                    new CrossSellProductModel(),
-                    new CrossSellProductModel(),
-                },
-                Videos = new List<VideoModel>() {
-                    new VideoModel(),
-                    new VideoModel(),
-                    new VideoModel(),
-                },
-            });
         }
 
         [HttpPost]
@@ -178,6 +117,13 @@ namespace VC.Admin.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.EditedById = userId;
+            }
 
             item = (await productService.UpdateProductAsync(item));
 
