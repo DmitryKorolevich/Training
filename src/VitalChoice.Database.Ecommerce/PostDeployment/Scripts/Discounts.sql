@@ -59,8 +59,13 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'EditedById' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
-	EXEC SP_RENAME 'Discounts.IdExternal' , 'EditedById', 'COLUMN'
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdEditedBy' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
+	EXEC SP_RENAME 'Discounts.IdExternal' , 'IdEditedBy', 'COLUMN'
+
+GO
+
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_NAME ='FK_Discounts_ToUser')
+	ALTER TABLE [dbo].[Discounts] ADD CONSTRAINT [FK_Discounts_ToUser] FOREIGN KEY ([IdEditedBy]) REFERENCES [Users] ([Id])
 
 GO
 

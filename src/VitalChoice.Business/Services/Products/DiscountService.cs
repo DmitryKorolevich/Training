@@ -71,7 +71,8 @@ namespace VitalChoice.Business.Services.Products
                 .Include(p => p.DiscountTiers)
                 .Include(p => p.DiscountsToSelectedSkus)
                 .Include(p => p.DiscountsToSkus)
-                .Include(p => p.DiscountsToCategories);
+                .Include(p => p.DiscountsToCategories)
+                .Include(p => p.EditedBy);
             var entity = (await res.SelectAsync(false)).FirstOrDefault();
 
             if (entity != null)

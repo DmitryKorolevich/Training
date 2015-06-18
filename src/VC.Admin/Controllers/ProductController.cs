@@ -122,7 +122,7 @@ namespace VC.Admin.Controllers
             int userId;
             if (Int32.TryParse(sUserId, out userId))
             {
-                item.EditedById = userId;
+                item.IdEditedBy = userId;
             }
 
             item = (await productService.UpdateProductAsync(item));

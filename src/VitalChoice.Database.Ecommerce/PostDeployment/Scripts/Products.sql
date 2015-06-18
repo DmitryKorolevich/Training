@@ -24,7 +24,12 @@ IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'Hidden' AND [Object_ID] =
 
 GO
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'EditedById' AND [Object_ID] = OBJECT_ID(N'[dbo].Products', N'U'))
-	EXEC SP_RENAME 'Products.IdExternal' , 'EditedById', 'COLUMN'
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdEditedBy' AND [Object_ID] = OBJECT_ID(N'[dbo].Products', N'U'))
+	EXEC SP_RENAME 'Products.IdExternal' , 'IdEditedBy', 'COLUMN'
+
+GO
+
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_NAME ='FK_Products_ToUser')
+	ALTER TABLE [dbo].[Products] ADD CONSTRAINT [FK_Products_ToUser] FOREIGN KEY ([IdEditedBy]) REFERENCES [Users] ([Id])
 
 GO
