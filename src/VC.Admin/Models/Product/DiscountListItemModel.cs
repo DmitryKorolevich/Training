@@ -24,7 +24,21 @@ namespace VC.Admin.Models.Product
 
         public RecordStatusCode StatusCode { get; set; }
 
+        public CustomerTypeCode Assigned { get; set; }
+
+        public string AssignedName { get; set; }
+
         public DiscountType DiscountType { get; set; }
+
+        public string DiscountTypeName { get; set; }
+
+        public DateTime? StartDate { get; set; }
+
+        public DateTime? ExpirationDate { get; set; }
+
+        public DateTime DateCreated { get; set; }
+
+        public string AddedByAgentId { get; set; }
 
         public DiscountListItemModel(DiscountDynamic item)
         {
@@ -34,7 +48,17 @@ namespace VC.Admin.Models.Product
                 Code = item.Code;
                 Description = item.Description;
                 StatusCode = item.StatusCode;
+                Assigned = item.Assigned;
+                AssignedName = StatusEnumHelper.GetAssignedCustomerTypeName(item.Assigned);
                 DiscountType = item.DiscountType;
+                DiscountTypeName = StatusEnumHelper.GetDiscountTypeName(item.DiscountType);
+                StartDate = item.StartDate;
+                ExpirationDate = item.ExpirationDate;
+                DateCreated = item.DateCreated;
+                if (item.AddedBy != null && item.AddedBy.AdminProfile != null)
+                {
+                    AddedByAgentId = item.AddedBy.AdminProfile.AgentId;
+                }
             }
         }
     }
