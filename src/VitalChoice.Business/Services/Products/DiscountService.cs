@@ -153,13 +153,15 @@ namespace VitalChoice.Business.Services.Products
             if (entity != null)
             {
                 var skuIds = entity.DiscountsToSelectedSkus.Select(p => p.IdSku).ToList();
+                skuIds.AddRange(entity.DiscountsToSkus.Select(p=>p.IdSku));
+                skuIds = skuIds.Distinct().ToList();
                 var shortSkus = (await _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.Product)
                     .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
                 foreach (var sku in entity.DiscountsToSelectedSkus)
                 {
                     foreach (var shortSku in shortSkus)
                     {
-                        if (sku.Id == shortSku.Id)
+                        if (sku.IdSku == shortSku.Id)
                         {
                             sku.ShortSkuInfo = shortSku;
                             break;
@@ -170,7 +172,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     foreach (var shortSku in shortSkus)
                     {
-                        if (sku.Id == shortSku.Id)
+                        if (sku.IdSku == shortSku.Id)
                         {
                             sku.ShortSkuInfo = shortSku;
                             break;

@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Services
 {
     public class FileService : IFileService
     {
-        private const string ALLOWED_EXTENSIONS = ".jpg,.gif,.png,.pdf";
+        private const string ALLOWED_EXTENSIONS = ".jpg,.jpeg,.gif,.png,.pdf";
         private const int MAX_FILE_SIZE = 10485760;
         private const int NUMBER_OF_TRIES = 20;
         private const int MILISECONDS_INTERVAL_BETWEEN_TRIES = 50;

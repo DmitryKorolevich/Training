@@ -1,4 +1,4 @@
-﻿angular.module('app.modules.content.controllers.productsController', [])
+﻿angular.module('app.modules.product.controllers.productsController', [])
 .controller('productsController', ['$scope', '$rootScope', '$state', 'productService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
     function ($scope, $rootScope, $state, productService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
         $scope.refreshTracker = promiseTracker("refresh");

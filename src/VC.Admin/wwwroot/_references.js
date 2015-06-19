@@ -1544,3 +1544,6 @@
 /// <reference path="app/shared/menu/services/sidebarFactory.js" />
 /// <reference path="../app/modules/product/controllers/discountmanagecontroller.js" />
 /// <reference path="../app/modules/product/controllers/discountscontroller.js" />
+/// <reference path="app/modules/product/controllers/discountManageController.js" />
+/// <reference path="app/modules/product/controllers/discountsController.js" />
+/// <reference path="../app/modules/product/controllers/skussearchcontroller.js" />

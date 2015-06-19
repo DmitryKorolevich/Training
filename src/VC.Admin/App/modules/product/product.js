@@ -3,11 +3,12 @@
 angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoriesController',
 	'app.modules.product.controllers.productCategoryManageController',
-	'app.modules.content.controllers.productsController',
+	'app.modules.product.controllers.productsController',
 	'app.modules.product.controllers.productManageController',
 	'app.modules.product.controllers.addProductPopupController',
-	'app.modules.content.controllers.discountsController',
+	'app.modules.product.controllers.discountsController',
 	'app.modules.product.controllers.discountManageController',
+	'app.modules.product.controllers.skusSearchController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

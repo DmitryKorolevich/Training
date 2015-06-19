@@ -226,7 +226,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(c => c.IdCategory)
 		        .PrincipalKey(cat => cat.Id);
 
-            builder.Entity<VProductSku>().Key(p => p.IdProduct);
+            builder.Entity<VProductSku>().Key(p => new { p.IdProduct, p.SkuId});
             builder.Entity<VProductSku>().Ignore(x => x.Id);
             builder.Entity<VProductSku>().ForSqlServer().Table("VProductSkus");
 

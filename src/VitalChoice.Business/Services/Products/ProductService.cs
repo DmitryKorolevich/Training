@@ -134,7 +134,7 @@ namespace VitalChoice.Business.Services.Products
 
         #region Products
 
-        public async Task<PagedList<VProductSku>> GetSkusAsync(VProductSkuFilter filter)
+        public async Task<ICollection<VProductSku>> GetSkusAsync(VProductSkuFilter filter)
         {
             var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
             var query = _vProductSkuRepository.Query(conditions);
@@ -142,7 +142,7 @@ namespace VitalChoice.Business.Services.Products
             Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
 
-            return await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            return await query.OrderBy(sortable).SelectAsync(false);
         }
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)

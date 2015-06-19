@@ -59,9 +59,33 @@ namespace VitalChoice.DynamicData.Entities
                 IdCategory = c,
                 IdDiscount = Id
             }).ToList();
-            entity.DiscountsToSkus = DiscountsToSkus?.ToList();
-            entity.DiscountsToSelectedSkus = DiscountsToSelectedSkus?.ToList();
-            entity.DiscountTiers = DiscountTiers?.ToList();
+            if(DiscountsToSkus!=null)
+            {
+                foreach(var item in DiscountsToSkus)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountsToSkus = DiscountsToSkus.ToList();
+            }
+            if (DiscountsToSelectedSkus != null)
+            {
+                foreach (var item in DiscountsToSelectedSkus)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountsToSelectedSkus = DiscountsToSelectedSkus.ToList();
+            }
+            if (DiscountTiers != null)
+            {
+                foreach (var item in DiscountTiers)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountTiers = DiscountTiers.ToList();
+            }
         }
 
         private static void SetDiscountTiersOrdering(IEnumerable<DiscountTier> tiers)
@@ -92,9 +116,33 @@ namespace VitalChoice.DynamicData.Entities
                 IdCategory = c,
                 IdDiscount = Id
             }).ToList();
-            entity.DiscountsToSkus = DiscountsToSkus?.ToList();
-            entity.DiscountsToSelectedSkus = DiscountsToSelectedSkus?.ToList();
-            entity.DiscountTiers = DiscountTiers?.ToList();
+            if (DiscountsToSkus != null)
+            {
+                foreach (var item in DiscountsToSkus)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountsToSkus = DiscountsToSkus.ToList();
+            }
+            if (DiscountsToSelectedSkus != null)
+            {
+                foreach (var item in DiscountsToSelectedSkus)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountsToSelectedSkus = DiscountsToSelectedSkus.ToList();
+            }
+            if (DiscountTiers != null)
+            {
+                foreach (var item in DiscountTiers)
+                {
+                    item.Id = 0;
+                    item.IdDiscount = Id;
+                }
+                entity.DiscountTiers = DiscountTiers.ToList();
+            }
 
             //Set key on options
             foreach (var value in entity.OptionValues)

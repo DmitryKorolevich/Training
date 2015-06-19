@@ -21,6 +21,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
                 Id = sku.Id;
                 IdProduct = sku.IdProduct;
                 ProductName = sku.Product.Name;
+                Code = sku.Code;
                 Price = sku.Price;
                 WholesalePrice = sku.WholesalePrice;
             }
