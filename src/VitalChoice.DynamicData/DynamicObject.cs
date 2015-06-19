@@ -13,9 +13,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
-using VitalChoice.DynamicInterfaces;
-
-// ReSharper disable StaticMemberInGenericType
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData
 {
@@ -205,12 +203,6 @@ namespace VitalChoice.DynamicData
             return dynamicObject?.ToEntity();
         }
 
-        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
-            new Dictionary<Type, Dictionary<string, GenericProperty>>();
-
-        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
-            new Dictionary<Type, Dictionary<string, GenericProperty>>();
-
         protected ExpandoObject DynamicData { get; } = new ExpandoObject();
 
         private static Dictionary<string, GenericProperty> GetTypeCache(Dictionary<Type, Dictionary<string, GenericProperty>> cache, Type objectType, bool ignoreMapAttribute = false)
@@ -243,8 +235,8 @@ namespace VitalChoice.DynamicData
         private void ToModelInternal(object result, Type modelType, Type dynamicType)
         {
             ModelType = modelType;
-            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
+            var cache = GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var pair in cache)
             {
@@ -274,8 +266,8 @@ namespace VitalChoice.DynamicData
         private void FromModelInternal(object model, Type modelType, Type dynamicType)
         {
             ModelType = modelType;
-            var cache = GetTypeCache(ModelTypeMappingCache, modelType);
-            var dynamicCache = GetTypeCache(DynamicTypeMappingCache, dynamicType, true);
+            var cache = GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+            var dynamicCache = GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);
             var data = DynamicData as IDictionary<string, object>;
             foreach (var pair in cache)
             {

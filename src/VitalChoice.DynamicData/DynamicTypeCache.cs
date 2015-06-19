@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 
 namespace VitalChoice.DynamicData
 {
-    public struct DynamicTypeCache
+    public static class DynamicTypeCache
     {
-        public Dictionary<string, GenericProperty> GenericProperties;
-        public Type MapTo;
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
+
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
     }
 }

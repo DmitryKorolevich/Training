@@ -34,21 +34,10 @@ namespace VitalChoice.Core.GlobalFilters
             }
             else
             {
-                if (context.Exception is ApiValidationException)
+                result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
                 {
-                    var exception = context.Exception as ApiValidationException;
-                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(exception.Messages))
-                    {
-                        StatusCode = (int)HttpStatusCode.OK
-                    };
-                }
-                else
-                {
-                    result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
-                    {
-                        StatusCode = (int) apiException.Status
-                    };
-                }
+                    StatusCode = (int) apiException.Status
+                };
             }
 
             context.Result = result;
