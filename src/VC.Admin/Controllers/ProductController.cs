@@ -52,17 +52,11 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<PagedList<SkuListItemModel>>> GetSkus([FromBody]VProductSkuFilter filter)
+        public async Task<Result<ICollection<SkuListItemModel>>> GetSkus([FromBody]VProductSkuFilter filter)
         {
             var result = await productService.GetSkusAsync(filter);
 
-            var toReturn = new PagedList<SkuListItemModel>
-            {
-                Items = result.Items.Select(p => new SkuListItemModel(p)).ToList(),
-                Count = result.Count,
-            };
-
-            return toReturn;
+            return result.Select(p => new SkuListItemModel(p)).ToArray();
         }
 
         [HttpPost]

@@ -30,6 +30,10 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> DiscountTypes { get; set; }
 
+        public IList<LookupItem<int>> AssignedCustomerTypes { get; set; }
+
+        public IList<LookupItem<int?>> ActiveFilterOptions { get; set; }
+
         public IList<LookupItem<int>> CustomerTypes { get; set; }
     }
 }

@@ -8,7 +8,7 @@
 
         public decimal To { get; set; }
 
-        public DiscountType DiscountType { get; set; }
+        public DiscountType IdDiscountType { get; set; }
 
         public decimal Percent { get; set; }
 

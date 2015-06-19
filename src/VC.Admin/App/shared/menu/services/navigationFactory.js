@@ -43,7 +43,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
             name: 'marketing',
         	stateLabel: 'Marketing',
         	subMenu: [
-                { name: 'manageDCs', stateName: 'index.oneCol.manageDCs', stateLabel: 'Manage Discount Codes', access: 14 },
+                { name: 'manageDCs', stateName: 'index.oneCol.manageDiscounts', stateLabel: 'Manage Discount Codes', access: 14 },
                 { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
         	]
         },

@@ -37,10 +37,7 @@ namespace VC.Admin.Models.Product
 
         [Map]
         public CustomerTypeCode Assigned { get; set; }
-
-        [Map]
-        public int? IdExternal { get; set; }
-
+        
         [Map]
         public DateTime? StartDate { get; set; }
 

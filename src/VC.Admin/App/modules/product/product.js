@@ -3,9 +3,12 @@
 angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoriesController',
 	'app.modules.product.controllers.productCategoryManageController',
-	'app.modules.content.controllers.productsController',
+	'app.modules.product.controllers.productsController',
 	'app.modules.product.controllers.productManageController',
 	'app.modules.product.controllers.addProductPopupController',
+	'app.modules.product.controllers.discountsController',
+	'app.modules.product.controllers.discountManageController',
+	'app.modules.product.controllers.skusSearchController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -42,6 +45,21 @@ angular.module('app.modules.product', [
 				    url: '/products/{id:int}',
 				    templateUrl: 'app/modules/product/partials/productDetail.html',
 				    controller: 'productManageController'
+				})
+		        .state('index.oneCol.manageDiscounts', {
+		            url: '/discounts',
+		            templateUrl: 'app/modules/product/partials/discountsList.html',
+		            controller: 'discountsController'
+		        })
+		        .state('index.oneCol.addNewDiscount', {
+		            url: '/discounts/add',
+		            templateUrl: 'app/modules/product/partials/discountDetail.html',
+		            controller: 'discountManageController'
+		        })
+				.state('index.oneCol.discountDetail', {
+				    url: '/discounts/{id:int}',
+				    templateUrl: 'app/modules/product/partials/discountDetail.html',
+				    controller: 'discountManageController'
 				});
 		}
 ]);

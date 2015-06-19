@@ -27,6 +27,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public DiscountQuery WithStatus(RecordStatusCode? status)
+        {
+            if (status.HasValue)
+            {
+                Add(x => x.StatusCode == status.Value);
+            }
+            return this;
+        }
+
         public DiscountQuery WithType(DiscountType? type)
         {
             if (type.HasValue)

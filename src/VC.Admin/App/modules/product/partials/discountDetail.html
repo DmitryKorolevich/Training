@@ -1,0 +1,247 @@
+﻿<div class="container-fluid discount-edit">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button ui-sref="index.oneCol.manageDiscounts" class="btn btn-default width-160px">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Discount Details" active="detailsTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                        <fieldset>
+                                            <span class="legend">General Information</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Customer Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="Assigned" data-ng-model="discount.Assigned" ng-options="assignedCustomerType.Key as assignedCustomerType.Text for assignedCustomerType in assignedCustomerTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Description" class="form-control" placeholder="Description" data-ng-model="discount.Description" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Description.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.server">{{serverMessages.GetMessage('Description')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">Code</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Code" class="form-control" placeholder="Code" data-ng-model="discount.Code" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Code.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Code.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Code")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Code.$error.server">{{serverMessages.GetMessage('Code')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Status and Expiration</span>
+                                            <div class="form-group">
+                                                <label for="active" class="col-md-3 control-label">Active</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="StatusCode" data-ng-model="discount.StatusCode" data-ng-true-value="2" data-ng-false-value="1" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Start Date</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); startDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Expiration Date</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); expirationDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="active" class="col-md-3 control-label">One Time Only</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="OneTimeOnly" data-ng-model="discount.OneTimeOnly" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Discount Type</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Discount Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="DiscountType" data-ng-model="discount.DiscountType" ng-options="discountType.Key as discountType.Text for discountType in discountTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Allow Healthwise</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="AllowHealthwise" data-ng-model="discount.AllowHealthwise" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Require Minimum Perishable</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="RequireMinimumPerishable" data-ng-model="discount.RequireMinimumPerishable" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="!(discount.DiscountType==3 || !discount.RequireMinimumPerishable)">
+                                                <label for="type" class="col-md-3 control-label">Require Minimum Perishable Amount</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">$</span>
+                                                        <input type="text" name="RequireMinimumPerishableAmount" class="form-control" placeholder="Require Minimum Perishable Amount" money min="0.01" max="100000" data-ng-model="discount.RequireMinimumPerishableAmount" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.RequireMinimumPerishableAmount.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Require Minimum Perishable Amount",1000000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.min">{{getValidationMessage("{0} must be over $0.00","Require Minimum Perishable Amount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.RequireMinimumPerishableAmount.$error.server">{{serverMessages.GetMessage('Require Minimum Perishable Amount')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Free Shipping</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="FreeShipping" data-ng-model="discount.FreeShipping" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" data-ng-hide="discount.DiscountType==3">
+                                                <label for="active" class="col-md-3 control-label">Selected Products Only</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="SelectedProductsOnly" data-ng-model="discount.SelectedProductsOnly" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+
+                                    <div data-ng-show="discount.DiscountType!=3 && discount.SelectedProductsOnly">
+                                        <span class="legend">Selected Products</span>
+                                        <table class="table table-striped table-hover ">
+                                            <thead>
+                                                <tr>
+                                                    <th>SKU</th>
+                                                    <th>Name</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-ng-repeat="item in discount.DiscountsToSelectedSkus">
+                                                    <td>{{item.ShortSkuInfo.Code}}</td>
+                                                    <td>{{item.ShortSkuInfo.ProductName}}</td>
+                                                    <td>
+                                                        <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteDiscountToSelectedSku($index);">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div ng-controller="skusSearchController" onload="name = 'DiscountsToSelectedSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Filter Products">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Filter by Product(s)</span>
+                                    <div class="row form-group">
+                                        <div class="col-md-12 inline">
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="false" name="ExcludeSkus1"> Include selected products</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="true" name="ExcludeSkus2"> Exclude selected products</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="legend">Selected Products</span>
+                                    <table class="table table-striped table-hover ">
+                                        <thead>
+                                            <tr>
+                                                <th>SKU</th>
+                                                <th>Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="item in discount.DiscountsToSkus">
+                                                <td>{{item.ShortSkuInfo.Code}}</td>
+                                                <td>{{item.ShortSkuInfo.ProductName}}</td>
+                                                <td>
+                                                    <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteDiscountToSku($index);">Delete</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div ng-controller="skusSearchController" onload="name = 'DiscountsToSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Filter Categories">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <span class="legend">Filter by Category</span>
+                                    <div class="row form-group">
+                                        <div class="col-md-12 inline">
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="false" name="ExcludeCategories1"> Include selected categories</label>
+                                            </div>
+                                            <div class="radio">
+                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="true" name="ExcludeCategories2"> Exclude selected categories</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="categories">
+                                        <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                                        <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
+                                        <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                            <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
+                                                <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

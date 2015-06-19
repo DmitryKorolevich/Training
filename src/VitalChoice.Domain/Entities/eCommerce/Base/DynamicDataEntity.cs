@@ -14,6 +14,10 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
 
         public DateTime DateEdited { get; set; }
 
+        public int? IdAddedBy { get; set; }
+
+        public User AddedBy { get; set; }
+
         public int? IdEditedBy { get; set; }
 
         public User EditedBy { get; set; }

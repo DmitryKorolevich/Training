@@ -27,6 +27,8 @@ namespace VitalChoice.DynamicData
         public RecordStatusCode StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
+        public int? IdAddedBy { get; set; }
+        public User AddedBy { get; set; }
         public int? IdEditedBy { get; set; }
         public User EditedBy { get; set; }
         public Type ModelType { get; private set; }
@@ -76,6 +78,8 @@ namespace VitalChoice.DynamicData
             DateCreated = entity.DateCreated;
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
+            IdAddedBy = entity.IdAddedBy;
+            AddedBy = entity.AddedBy;
             IdEditedBy = entity.IdEditedBy;
             EditedBy = entity.EditedBy;
             FromEntity(entity);
@@ -127,8 +131,8 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
+            entity.IdAddedBy = entity.IdAddedBy;
             entity.IdEditedBy = IdEditedBy;
-            entity.EditedBy = EditedBy;
             UpdateEntityInternal(entity);
         }
 
@@ -156,8 +160,8 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
+            entity.IdAddedBy = IdEditedBy;
             entity.IdEditedBy = IdEditedBy;
-            entity.EditedBy = EditedBy;
             FillNewEntity(entity);
             return entity;
         }
@@ -369,7 +373,8 @@ namespace VitalChoice.DynamicData
         private static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
             GenericProperty destProperty, bool toModelDirection)
         {
-            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType)
+            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType &&
+                destProperty.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
             {
                 throw new ApiException(
                     $"Value is null while it should be a ValueType {destProperty.PropertyType}.\r\n [{modelType} <-> {dynamicType}]");

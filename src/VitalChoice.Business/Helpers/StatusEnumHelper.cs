@@ -124,5 +124,45 @@ namespace VitalChoice.Business.Helpers
             }
             return toReturn;
         }
+
+        public static Dictionary<int, string> GetAssignedCustomerTypes()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) CustomerTypeCode.All, "All"},
+                {(int) CustomerTypeCode.Retail, "Retail Only"},
+                {(int) CustomerTypeCode.Wholesale, "Wholesale Only"},
+            };
+            return toReturn;
+        }
+
+        public static string GetAssignedCustomerTypeName(CustomerTypeCode type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case CustomerTypeCode.All:
+                    toReturn = "All";
+                    break;
+                case CustomerTypeCode.Retail:
+                    toReturn = "Retail Only";
+                    break;
+                case CustomerTypeCode.Wholesale:
+                    toReturn = "Wholesale Only";
+                    break;
+            }
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetActiveFilterOptions()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) -1, "All" },
+                {(int) RecordStatusCode.Active, "Active"},
+                {(int) RecordStatusCode.NotActive, "Not Active"}
+            };
+            return toReturn;
+        }
     }
 }

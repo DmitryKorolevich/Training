@@ -22,6 +22,9 @@ using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -31,6 +34,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<DiscountOptionValue> _discountOptionValueRepository;
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
+        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
 
@@ -38,12 +42,14 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<DiscountOptionValue> discountOptionValueRepository,
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
             EcommerceContext context, ILoggerProviderExtended loggerProvider)
         {
             this._discountOptionTypeRepository = discountOptionTypeRepository;
             this._discountOptionValueRepository = discountOptionValueRepository;
             this._discountRepository = discountRepository;
             this._skuRepository = skuRepository;
+            this._adminProfileRepository = adminProfileRepository;
             _context = context;
             _logger = loggerProvider.CreateLoggerDefault();
         }
@@ -52,13 +58,83 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter)
         {
-            var conditions = new DiscountQuery().NotDeleted().WithText(filter.SearchText);
+            var conditions = new DiscountQuery().NotDeleted().WithText(filter.SearchText).WithStatus(filter.Status);
             var query = _discountRepository.Query(conditions);
 
             Func<IQueryable<Discount>, IOrderedQueryable<Discount>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case DiscountSortPath.Code:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Code)
+                                : x.OrderByDescending(y => y.Code);
+                    break;
+                case DiscountSortPath.Description:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Description)
+                                : x.OrderByDescending(y => y.Description);
+                    break;
+                case DiscountSortPath.IdDiscountType:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.IdDiscountType)
+                                : x.OrderByDescending(y => y.IdDiscountType);
+                    break;
+                case DiscountSortPath.Assigned:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Assigned)
+                                : x.OrderByDescending(y => y.Assigned);
+                    break;
+                case DiscountSortPath.StartDate:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.StartDate)
+                                : x.OrderByDescending(y => y.StartDate);
+                    break;
+                case DiscountSortPath.ExpirationDate:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.ExpirationDate)
+                                : x.OrderByDescending(y => y.ExpirationDate);
+                    break;
+                case DiscountSortPath.DateCreated:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.DateCreated)
+                                : x.OrderByDescending(y => y.DateCreated);
+                    break;
+            }
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            if(result.Items.Count()>0)
+            {
+                var ids = result.Items.Select(p => p.IdAddedBy).ToList();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                foreach(var item in result.Items)
+                {
+                    foreach(var profile in profiles)
+                    {
+                        if(item.IdAddedBy==profile.Id)
+                        {
+                            item.AddedBy = new User()
+                            {
+                                AdminProfile=profile,
+                            };
+                        }
+                    }
+                }
+            }
             PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
 
             return toReturn;
@@ -71,20 +147,21 @@ namespace VitalChoice.Business.Services.Products
                 .Include(p => p.DiscountTiers)
                 .Include(p => p.DiscountsToSelectedSkus)
                 .Include(p => p.DiscountsToSkus)
-                .Include(p => p.DiscountsToCategories)
-                .Include(p => p.EditedBy);
+                .Include(p => p.DiscountsToCategories);
             var entity = (await res.SelectAsync(false)).FirstOrDefault();
 
             if (entity != null)
             {
                 var skuIds = entity.DiscountsToSelectedSkus.Select(p => p.IdSku).ToList();
+                skuIds.AddRange(entity.DiscountsToSkus.Select(p=>p.IdSku));
+                skuIds = skuIds.Distinct().ToList();
                 var shortSkus = (await _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.Product)
                     .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
                 foreach (var sku in entity.DiscountsToSelectedSkus)
                 {
                     foreach (var shortSku in shortSkus)
                     {
-                        if (sku.Id == shortSku.Id)
+                        if (sku.IdSku == shortSku.Id)
                         {
                             sku.ShortSkuInfo = shortSku;
                             break;
@@ -95,7 +172,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     foreach (var shortSku in shortSkus)
                     {
-                        if (sku.Id == shortSku.Id)
+                        if (sku.IdSku == shortSku.Id)
                         {
                             sku.ShortSkuInfo = shortSku;
                             break;
@@ -122,6 +199,7 @@ namespace VitalChoice.Business.Services.Products
                 int idDiscount = 0;
                 try
                 {
+                    await ValidateDiscount(model);
                     if (model.Id == 0)
                     {
                         idDiscount = (await InsertDiscount(model, uow)).Id;
@@ -136,6 +214,17 @@ namespace VitalChoice.Business.Services.Products
                     return await GetDiscountAsync(idDiscount);
                 return new DiscountDynamic(discount);
             }
+        }
+
+        private async Task<bool> ValidateDiscount(DiscountDynamic model)
+        {
+            var codeDublicatesExist = await _discountRepository.Query(p => p.Code == model.Code && p.Id != model.Id
+                && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+            if (codeDublicatesExist)
+            {
+                throw new AppValidationException("Code", "Discount with the same Code already exists, please use a unique Code.");
+            }
+            return true;
         }
 
         private async Task<Discount> InsertDiscount(DiscountDynamic model, EcommerceUnitOfWork uow)
