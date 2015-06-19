@@ -14,6 +14,8 @@ namespace VitalChoice.DynamicData.Validation
         public DynamicCollectionErrorBuilder(TCollection obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null) : base(obj, collectionName, indexes, propertyName, error)
         {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
         }
 
         public IErrorResult<TProperty> Property<TEntity>(
@@ -24,29 +26,31 @@ namespace VitalChoice.DynamicData.Validation
             // ReSharper disable once UseNullPropagation
             if (fieldSelector is LambdaExpression)
             {
-                fieldSelector = ((LambdaExpression)fieldSelector).Body;
+                fieldSelector = ((LambdaExpression) fieldSelector).Body;
             }
             if (fieldSelector.NodeType == ExpressionType.MemberAccess)
             {
-                MemberExpression member = (MemberExpression)fieldSelector;
+                MemberExpression member = (MemberExpression) fieldSelector;
                 var dynamicFieldName = member.Member.Name;
+                var modelType = Data.FirstOrDefault()?.ModelType;
+                if (modelType == null)
+                    throw new ArgumentException("There are no objects to enumerate or object didn't ModelType");
+
+                var modelFieldName = GetModelName(dynamicFieldName, modelType);
                 var getter = propertySelector.Compile();
                 var entityGetter = valueSelector.Compile();
                 var valueSet = new HashSet<object>(values.Select(v => entityGetter.Invoke(v)));
                 int index = 0;
                 List<int> indexes = new List<int>();
-                if (Data != null)
+                foreach (var item in Data)
                 {
-                    foreach (var item in Data)
+                    if (valueSet.Contains(getter.Invoke(item)))
                     {
-                        if (valueSet.Contains(getter.Invoke(item)))
-                        {
-                            indexes.Add(index);
-                        }
-                        index++;
+                        indexes.Add(index);
                     }
+                    index++;
                 }
-                return new ErrorResult<TProperty>(CollectionName, indexes.ToArray(), dynamicFieldName);
+                return new ErrorResult<TProperty>(CollectionName, indexes.ToArray(), modelFieldName);
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
         }

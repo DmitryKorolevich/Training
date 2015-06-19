@@ -14,7 +14,10 @@ namespace VitalChoice.DynamicData.Validation
         public DynamicErrorBuilder(TProperty obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null) : base(obj, collectionName, indexes, propertyName, error)
         {
-
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+            if (obj.ModelType == null)
+                throw new ArgumentException($"{obj} didn't have ModelType set, seems object was never created from model");
         }
 
         public IErrorResult<TProperty> Property(
@@ -30,8 +33,7 @@ namespace VitalChoice.DynamicData.Validation
             {
                 MemberExpression member = (MemberExpression)fieldSelector;
                 var dynamicFieldName = member.Member.Name;
-                var modelName = DynamicTypeCache.ModelTypeMappingCache[Data.ModelType].FirstOrDefault(
-                    c => c.Value.Map.Name == dynamicFieldName).Value.Map.Name ?? dynamicFieldName;
+                var modelName = GetModelName(dynamicFieldName, Data.ModelType);
                 return new ErrorResult<TProperty>(CollectionName, Indexes, modelName);
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
@@ -51,17 +53,14 @@ namespace VitalChoice.DynamicData.Validation
             {
                 MemberExpression member = (MemberExpression) collectionSelector;
                 var dynamicCollectionName = member.Member.Name;
-                Dictionary<string, GenericProperty> cache;
-                if (DynamicTypeCache.ModelTypeMappingCache.TryGetValue(Data.ModelType,
-                    out cache))
-                {
-                    var modelCollection = cache.FirstOrDefault(c => c.Value.Map.Name == dynamicCollectionName);
-                    var modelCollectionName = modelCollection.Value.Map.Name ?? modelCollection.Key;
-                    var innerCollectionValue =
-                        DynamicTypeCache.DynamicTypeMappingCache[typeof (TProperty)][
-                            dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
-                    return new DynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty>(innerCollectionValue, modelCollectionName);
-                }
+
+                var modelCollectionName = GetModelName(dynamicCollectionName, Data.ModelType);
+                var innerCollectionValue =
+                    DynamicTypeCache.DynamicTypeMappingCache[typeof (TProperty)][
+                        dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
+                return
+                    new DynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty>(
+                        innerCollectionValue, modelCollectionName);
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
         }
@@ -73,32 +72,26 @@ namespace VitalChoice.DynamicData.Validation
         }
 
         public IDynamicErrorBuilder<TResultProperty> Collection<TResultProperty>(
-            Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression, IEnumerable<int> indexes) 
+            Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression, IEnumerable<int> indexes)
             where TResultProperty : class, IDynamicObject
         {
             Expression collectionSelector = collectionExpression;
             // ReSharper disable once UseNullPropagation
             if (collectionSelector is LambdaExpression)
             {
-                collectionSelector = ((LambdaExpression)collectionSelector).Body;
+                collectionSelector = ((LambdaExpression) collectionSelector).Body;
             }
             if (collectionSelector.NodeType == ExpressionType.MemberAccess)
             {
-                MemberExpression member = (MemberExpression)collectionSelector;
+                MemberExpression member = (MemberExpression) collectionSelector;
                 var dynamicCollectionName = member.Member.Name;
-                Dictionary<string, GenericProperty> cache;
-                if (DynamicTypeCache.ModelTypeMappingCache.TryGetValue(Data.ModelType,
-                    out cache))
-                {
-                    var modelCollection = cache.FirstOrDefault(c => c.Value.Map.Name == dynamicCollectionName);
-                    var modelCollectionName = modelCollection.Value.Map.Name ?? modelCollection.Key;
-                    var innerCollectionValue =
-                        DynamicTypeCache.DynamicTypeMappingCache[typeof(TProperty)][
-                            dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
-                    var itemIndexes = indexes.ToArray();
-                    TResultProperty innerItem = innerCollectionValue?.Skip(itemIndexes.FirstOrDefault()).FirstOrDefault();
-                    return new DynamicErrorBuilder<TResultProperty>(innerItem, modelCollectionName, itemIndexes);
-                }
+                var modelCollectionName = GetModelName(dynamicCollectionName, Data.ModelType);
+                var innerCollectionValue =
+                    DynamicTypeCache.DynamicTypeMappingCache[typeof (TProperty)][
+                        dynamicCollectionName].Get?.Invoke(Data) as ICollection<TResultProperty>;
+                var itemIndexes = indexes.ToArray();
+                TResultProperty innerItem = innerCollectionValue?.Skip(itemIndexes.FirstOrDefault()).FirstOrDefault();
+                return new DynamicErrorBuilder<TResultProperty>(innerItem, modelCollectionName, itemIndexes);
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
         }

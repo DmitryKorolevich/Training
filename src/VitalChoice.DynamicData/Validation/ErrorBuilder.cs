@@ -12,6 +12,8 @@ namespace VitalChoice.DynamicData.Validation
         public ErrorBuilder(TProperty obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null) : base(obj, collectionName, indexes, propertyName, error)
         {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
         }
 
         public IErrorBuilder<TResultProperty> Collection<TResultProperty>(
