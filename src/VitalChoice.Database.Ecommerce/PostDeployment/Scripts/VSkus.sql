@@ -1,4 +1,6 @@
-﻿IF OBJECT_ID(N'[dbo].[VSkus]', N'V') IS NOT NULL
+﻿GO
+
+IF OBJECT_ID(N'[dbo].[VSkus]', N'V') IS NOT NULL
 	DROP VIEW [dbo].[VSkus]
 GO
 CREATE VIEW [dbo].[VSkus]

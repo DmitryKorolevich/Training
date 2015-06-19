@@ -22,3 +22,5 @@ SELECT
 	LEFT JOIN Skus AS s ON p.Id = s.IdProduct
 	LEFT JOIN ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdProductType = p.IdProductType
 	LEFT JOIN ProductOptionValues AS val ON val.IdProduct = p.Id AND val.IdOptionType = opt.Id
+
+GO
