@@ -18,7 +18,12 @@ namespace VitalChoice.Domain.Exceptions
             {
                 Field=field,
                 Message=message,
-            }); 
+            });
+        }
+
+        public AppValidationException(MessageInfo messages) : base("See messages")
+        {
+            Messages.Add(messages);
         }
 
         public AppValidationException(string message) : base("See messages")

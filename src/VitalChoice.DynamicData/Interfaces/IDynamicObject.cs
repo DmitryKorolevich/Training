@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VitalChoice.DynamicInterfaces
+namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IDynamicObject
     {
@@ -15,5 +15,7 @@ namespace VitalChoice.DynamicInterfaces
         object ToModel(Type modelType, Type dynamicType);
 
         void FromModel(Type modelType, Type dynamicType, dynamic model);
+        
+        Type ModelType { get; }
     }
 }

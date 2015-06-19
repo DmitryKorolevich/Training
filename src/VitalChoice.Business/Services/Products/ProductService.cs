@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Validation.Helpers;
@@ -219,8 +220,47 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
+        private async Task<List<MessageInfo>> ValidateProduct(ProductDynamic model, int? existingProductId = null,
+            ICollection<int> existSkus = null)
+        {
+            List<MessageInfo> errors = new List<MessageInfo>();
+
+            var existProduct =
+                await
+                    _productRepository.Query(
+                        new ProductQuery().NotDeleted().Excluding(existingProductId).WithName(model.Name))
+                        .SelectAsync(false);
+
+            if (existProduct.Any())
+            {
+                errors.AddRange(
+                    model.CreateError()
+                        .Property(p => p.Name)
+                        .Error("Product name should be unique in the database")
+                        .Build());
+            }
+
+            var newSet = model.Skus.Select(s => s.Code).ToArray();
+            if (newSet.Any())
+            {
+                var existItems = await
+                    _skuRepository.Query(new SkuQuery().NotDeleted().Excluding(existSkus).Including(newSet))
+                        .SelectAsync(false);
+                if (existItems.Any())
+                {
+                    errors.AddRange(model.CreateError()
+                        .Collection(p => p.Skus)
+                        .Property(s => s.Code, existItems, item => item.Code)
+                        .Error("This sku already exists in the database").Build());
+                }
+            }
+            return errors;
+        }
+
         private async Task<Product> InsertProduct(ProductDynamic model, EcommerceUnitOfWork uow)
         {
+            (await ValidateProduct(model)).Raise();
+
             var entity = model.ToEntity();
             if (entity != null)
             {
@@ -268,18 +308,9 @@ namespace VitalChoice.Business.Services.Products
                     await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
                         .SelectAsync();
-
-                var newSet = model.Skus.Select(s => s.Code).ToList();
-                var oldSet = entity.Skus.Select(s => s.Id).ToList();
-                SkuQuery checkQuery = new SkuQuery();
-                var existItems = await
-                    _skuRepository.Query(checkQuery.NotDeleted().Excluding(oldSet).Including(newSet))
-                        .SelectAsync();
-                if (existItems.Any())
-                {
-                    throw new ApiValidationException(CollectionFormProperty.GetFullName("SKUs", newSet.IndexOf(existItems.First().Code), "Name"), "This sku already exists in the database");
-                }
-
+                
+                var oldSet = entity.Skus.Select(s => s.Id).ToArray();
+                (await ValidateProduct(model, model.Id, oldSet)).Raise();
                 await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
                 entity.OptionTypes =

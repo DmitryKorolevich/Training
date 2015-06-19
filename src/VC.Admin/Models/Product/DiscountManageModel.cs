@@ -14,7 +14,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.DynamicInterfaces;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.Models.Product
 {

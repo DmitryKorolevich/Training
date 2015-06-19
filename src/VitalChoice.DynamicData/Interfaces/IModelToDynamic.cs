@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.DynamicInterfaces
+﻿namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IModelToDynamic<in TDynamic>
     {

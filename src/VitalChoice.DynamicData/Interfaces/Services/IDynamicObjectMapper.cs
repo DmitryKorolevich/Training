@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.DynamicInterfaces.Services
+﻿namespace VitalChoice.DynamicData.Interfaces.Services
 {
     public interface IDynamicObjectMapper
     {
