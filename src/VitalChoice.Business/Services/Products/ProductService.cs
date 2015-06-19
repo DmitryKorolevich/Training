@@ -225,13 +225,13 @@ namespace VitalChoice.Business.Services.Products
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            var existProduct =
+            var productSameName =
                 await
                     _productRepository.Query(
                         new ProductQuery().NotDeleted().Excluding(existingProductId).WithName(model.Name))
                         .SelectAsync(false);
 
-            if (existProduct.Any())
+            if (productSameName.Any())
             {
                 errors.AddRange(
                     model.CreateError()
@@ -240,17 +240,33 @@ namespace VitalChoice.Business.Services.Products
                         .Build());
             }
 
+            var productSameUrl =
+                await
+                    _productRepository.Query(
+                        new ProductQuery().NotDeleted().Excluding(existingProductId).WithUrl(model.Url))
+                        .SelectAsync(false);
+
+
+            if(productSameUrl.Any())
+            {
+                errors.AddRange(
+                    model.CreateError()
+                        .Property(p => p.Url)
+                        .Error("Product url should be unique in the database")
+                        .Build());
+            }
+
             var newSet = model.Skus.Select(s => s.Code).ToArray();
             if (newSet.Any())
             {
-                var existItems = await
+                var skusSameCode = await
                     _skuRepository.Query(new SkuQuery().NotDeleted().Excluding(existSkus).Including(newSet))
                         .SelectAsync(false);
-                if (existItems.Any())
+                if (skusSameCode.Any())
                 {
                     errors.AddRange(model.CreateError()
                         .Collection(p => p.Skus)
-                        .Property(s => s.Code, existItems, item => item.Code)
+                        .Property(s => s.Code, skusSameCode, item => item.Code)
                         .Error("This sku already exists in the database").Build());
                 }
             }
