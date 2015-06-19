@@ -9,13 +9,27 @@ namespace VitalChoice.Interfaces.Services.Products
 {
 	public interface IProductService
     {
+        #region Products
+
         Task<List<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names);
 
         Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync();
 
         Task<List<ProductOptionType>> GetProductLookupsAsync();
 
-        Task<ICollection<VProductSku>> GetSkusAsync(VProductSkuFilter filter);
+        #endregion
+
+        #region Skus
+
+        Task<Sku> GetSku(string code);
+
+        Task<Sku> GetSku(int id);
+
+        Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter);
+
+        #endregion
+
+        #region Products
 
         Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
@@ -24,5 +38,7 @@ namespace VitalChoice.Interfaces.Services.Products
 	    Task<ProductDynamic> UpdateProductAsync(ProductDynamic model);
 
         Task<bool> DeleteProductAsync(int id);
+
+        #endregion
     }
 }

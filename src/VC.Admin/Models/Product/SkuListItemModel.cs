@@ -28,7 +28,7 @@ namespace VC.Admin.Models.Product
 
         public ProductType ProductType { get; set; }
 
-        public SkuListItemModel(VProductSku item)
+        public SkuListItemModel(VSku item)
         {
             if(item!=null)
             {

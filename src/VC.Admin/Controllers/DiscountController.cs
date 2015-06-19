@@ -21,6 +21,8 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System.Security.Claims;
+using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Domain.Exceptions;
 
 namespace VC.Admin.Controllers
 {
@@ -28,11 +30,13 @@ namespace VC.Admin.Controllers
     public class DiscountController : BaseApiController
     {
         private readonly IDiscountService _discountService;
+        private readonly IProductService _productService;
         private readonly ILogger _logger;
 
-        public DiscountController(IDiscountService discountService)
+        public DiscountController(IDiscountService discountService, IProductService _productService)
         {
             this._discountService = discountService;
+            this._productService = _productService;
             this._logger = LoggerService.GetDefault();
         }
 
@@ -75,6 +79,15 @@ namespace VC.Admin.Controllers
 
             var item = await _discountService.GetDiscountAsync(id);
             DiscountManageModel toReturn = item.ToModel<DiscountManageModel, DiscountDynamic>();
+            int skuId = 0;
+            if(item.DictionaryData.ContainsKey("ProductSKU") && item.DictionaryData["ProductSKU"] is string && Int32.TryParse((string)item.DictionaryData["ProductSKU"],out skuId))
+            {
+                var sku = await _productService.GetSku(skuId);
+                if(sku!=null)
+                {
+                    toReturn.ProductSKU = sku.Code;
+                }
+            }
             return toReturn;
         }
 
@@ -84,6 +97,16 @@ namespace VC.Admin.Controllers
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
+
+            if(item.DiscountType==DiscountType.Threshold)
+            {
+                var sku = await _productService.GetSku(model.ProductSKU);
+                if(sku==null)
+                {
+                    throw new AppValidationException("ProductSKU", "The give SKU doesn't exist.");
+                }
+                item.Data.ProductSKU = sku.Id;
+            }
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
