@@ -252,3 +252,15 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM DiscountOptionTypes WHERE IdDiscountType=4 AND Name='Threshold')
+BEGIN
+
+UPDATE DiscountOptionTypes
+SET Name='Threshold'
+WHERE IdDiscountType=4 AND Name='Amount'
+
+END
+
+GO 
+

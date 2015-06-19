@@ -9,9 +9,9 @@ using VitalChoice.Domain.Entities.Logs;
 
 namespace VitalChoice.Business.Queries.Product
 {
-    public class VProductSkuQuery : QueryObject<VProductSku>
+    public class VSkuQuery : QueryObject<VSku>
     {
-        public VProductSkuQuery WithText(string text)
+        public VSkuQuery WithText(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
@@ -20,26 +20,26 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
-        public VProductSkuQuery NotDeleted()
+        public VSkuQuery NotDeleted()
         {
             Add(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive) &&
                 (x.SkuStatusCode == RecordStatusCode.Active || x.SkuStatusCode == RecordStatusCode.NotActive));
             return this;
         }
 
-        public VProductSkuQuery WithActiveSku()
+        public VSkuQuery WithActiveSku()
         {
             Add(x => x.SkuStatusCode == RecordStatusCode.Active);
             return this;
         }
 
-        public VProductSkuQuery WithActiveProduct()
+        public VSkuQuery WithActiveProduct()
         {
             Add(x => x.StatusCode == RecordStatusCode.Active);
             return this;
         }
 
-        public VProductSkuQuery WithType(ProductType? type)
+        public VSkuQuery WithType(ProductType? type)
         {
             if (type.HasValue)
             {

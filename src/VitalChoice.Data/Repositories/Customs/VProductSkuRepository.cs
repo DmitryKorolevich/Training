@@ -37,10 +37,12 @@ namespace VitalChoice.Data.Repositories.Customs
                                 : x.OrderByDescending(y => y.Name);
                     break;
             }
-            query = query.GroupBy(p=>p.IdProduct).Select(g => new VProductSku() {
+
+            query = query.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
+            {
                 IdProduct = g.Key,
-                Name = g.Min(p=>p.Name),
-                Thumbnail = g.Min(p=>p.Thumbnail),
+                Name = g.Min(p => p.Name),
+                Thumbnail = g.Min(p => p.Thumbnail),
                 StatusCode = g.Min(p => p.StatusCode),
                 Hidden = g.Min(p => p.Hidden),
                 IdProductType = g.Min(p => p.IdProductType),

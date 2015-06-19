@@ -69,7 +69,7 @@ namespace VC.Admin.Models.Product
         [Map]
         public bool FreeShipping { get; set; }
 
-        //1 and 4
+        //1
         [Map]
         public decimal Amount { get; set; }
 
@@ -79,6 +79,10 @@ namespace VC.Admin.Models.Product
 
         //4
         [Map]
+        public decimal Threshold { get; set; }
+
+        //4
+        //A SKU code for the frontend UI
         public string ProductSKU { get; set; }
 
 

@@ -143,4 +143,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Discounts.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VSkus.sql" />
+  </ItemGroup>
 </Project>

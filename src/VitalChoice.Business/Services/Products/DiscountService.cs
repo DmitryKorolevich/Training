@@ -117,19 +117,19 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            if(result.Items.Count()>0)
+            if (result.Items.Count() > 0)
             {
                 var ids = result.Items.Select(p => p.IdAddedBy).ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
-                foreach(var item in result.Items)
+                foreach (var item in result.Items)
                 {
-                    foreach(var profile in profiles)
+                    foreach (var profile in profiles)
                     {
-                        if(item.IdAddedBy==profile.Id)
+                        if (item.IdAddedBy == profile.Id)
                         {
                             item.AddedBy = new User()
                             {
-                                AdminProfile=profile,
+                                AdminProfile = profile,
                             };
                         }
                     }
@@ -153,7 +153,7 @@ namespace VitalChoice.Business.Services.Products
             if (entity != null)
             {
                 var skuIds = entity.DiscountsToSelectedSkus.Select(p => p.IdSku).ToList();
-                skuIds.AddRange(entity.DiscountsToSkus.Select(p=>p.IdSku));
+                skuIds.AddRange(entity.DiscountsToSkus.Select(p => p.IdSku));
                 skuIds = skuIds.Distinct().ToList();
                 var shortSkus = (await _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.Product)
                     .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
@@ -197,19 +197,12 @@ namespace VitalChoice.Business.Services.Products
             {
                 Discount discount = null;
                 int idDiscount = 0;
-                try
+                await ValidateDiscount(model);
+                if (model.Id == 0)
                 {
-                    await ValidateDiscount(model);
-                    if (model.Id == 0)
-                    {
-                        idDiscount = (await InsertDiscount(model, uow)).Id;
-                    }
-                    discount = await UpdateDiscount(model, uow);
+                    idDiscount = (await InsertDiscount(model, uow)).Id;
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e.Message, e);
-                }
+                discount = await UpdateDiscount(model, uow);
                 if (idDiscount != 0)
                     return await GetDiscountAsync(idDiscount);
                 return new DiscountDynamic(discount);

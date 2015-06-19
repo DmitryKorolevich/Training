@@ -29,6 +29,7 @@ namespace VitalChoice.Business.Services.Products
     public class ProductService : IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
+        private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypeRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionValue> _productOptionValueRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
@@ -39,6 +40,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly ILogger _logger;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
+            IEcommerceRepositoryAsync<VSku> _vSkuRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
@@ -46,6 +48,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider)
         {
             this._vProductSkuRepository = vProductSkuRepository;
+            this._vSkuRepository = _vSkuRepository;
             this._productOptionTypeRepository = productOptionTypeRepository;
             this._lookupRepository = lookupRepository;
             this._productRepository = productRepository;
@@ -132,18 +135,36 @@ namespace VitalChoice.Business.Services.Products
 
         #endregion
 
-        #region Products
+        #region Skus
 
-        public async Task<ICollection<VProductSku>> GetSkusAsync(VProductSkuFilter filter)
+        public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
-            var conditions = new VProductSkuQuery().NotDeleted().WithText(filter.SearchText);
-            var query = _vProductSkuRepository.Query(conditions);
+            var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText);
+            var query = _vSkuRepository.Query(conditions);
 
-            Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
 
             return await query.OrderBy(sortable).SelectAsync(false);
         }
+
+        public async Task<Sku> GetSku(string code)
+        {
+            var query = _skuRepository.Query(p => p.Code == code && p.StatusCode != RecordStatusCode.Deleted);
+
+            return (await query.SelectAsync(false)).FirstOrDefault();
+        }
+
+        public async Task<Sku> GetSku(int id)
+        {
+            var query = _skuRepository.Query(p=>p.Id==id && p.StatusCode!=RecordStatusCode.Deleted);
+
+            return (await query.SelectAsync(false)).FirstOrDefault();
+        }
+
+        #endregion
+
+        #region Products
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
