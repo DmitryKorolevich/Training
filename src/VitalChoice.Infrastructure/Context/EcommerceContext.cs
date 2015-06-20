@@ -9,6 +9,7 @@ using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
@@ -206,12 +207,6 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(o => o.IdEditedBy)
                 .PrincipalKey(p => p.Id)
                 .Required(false);
-            builder.Entity<Discount>()
-                .Reference(p => p.AddedBy)
-                .InverseCollection()
-                .ForeignKey(o => o.IdAddedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
 
             #endregion
 
@@ -274,8 +269,6 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
             builder.Entity<Sku>().Ignore(p => p.EditedBy);
             builder.Entity<Sku>().Ignore(p => p.IdEditedBy);
-            builder.Entity<Sku>().Ignore(p => p.AddedBy);
-            builder.Entity<Sku>().Ignore(p => p.IdAddedBy);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
             builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
@@ -299,12 +292,6 @@ namespace VitalChoice.Infrastructure.Context
                 .Reference(p => p.EditedBy)
                 .InverseCollection()
                 .ForeignKey(o => o.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
-            builder.Entity<Product>()
-                .Reference(p => p.AddedBy)
-                .InverseCollection()
-                .ForeignKey(o => o.IdAddedBy)
                 .PrincipalKey(p => p.Id)
                 .Required(false);
 
@@ -365,19 +352,112 @@ namespace VitalChoice.Infrastructure.Context
 				.InverseCollection(p => p.Customers)
 				.ForeignKey(p => p.IdCustomerType)
 				.PrincipalKey(p => p.Id);
+			builder.Entity<Customer>().Collection(p => p.PaymentMethods).InverseReference().ForeignKey(p => p.IdPaymentMethod);
+			builder.Entity<Customer>().Reference(p => p.DefaultPaymentMethod).InverseReference().ForeignKey<Customer>(p => p.Id).PrincipalKey<PaymentMethod>(p => p.Id).Required();
+			builder.Entity<Customer>().Collection(p => p.OrderNotes).InverseReference().ForeignKey(p => p.IdCustomer);
+			builder.Entity<Customer>().Collection(p => p.Addresses).InverseReference().ForeignKey(p => p.IdCustomer);
+			builder.Entity<Customer>().Collection(p => p.CustomerNotes).InverseReference().ForeignKey(p => p.IdCustomer);
+			builder.Entity<CustomerOptionType>().Key(p => p.Id);
+			builder.Entity<CustomerOptionType>().ForSqlServer().Table("CustomerOptionTypes");
+			builder.Entity<CustomerOptionType>()
+				.Reference(p => p.Lookup)
+				.InverseCollection()
+				.ForeignKey(p => p.IdLookup)
+				.PrincipalKey(p => p.Id)
+				.Required(false);
+			builder.Entity<ProductOptionType>()
+				.Reference(p => p.FieldType)
+				.InverseCollection()
+				.ForeignKey(p => p.IdFieldType)
+				.PrincipalKey(p => p.Id)
+				.Required();
+			builder.Entity<CustomerOptionValue>().Key(o => o.Id);
+			builder.Entity<CustomerOptionValue>().ForSqlServer().Table("CustomerOptionValues");
+			builder.Entity<CustomerOptionValue>()
+				.Reference(v => v.OptionType)
+				.InverseCollection()
+				.ForeignKey(t => t.IdOptionType)
+				.PrincipalKey(v => v.Id)
+				.Required();
 
-			builder.Entity<CustomerType>().Key(p => p.Id);
-			builder.Entity<CustomerType>().ForSqlServer().Table("CustomerTypes");
-			builder.Entity<CustomerType>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
-			builder.Entity<CustomerType>().Collection(p => p.PaymentMethods)
+			builder.Entity<CustomerNote>().Key(p => p.Id);
+			builder.Entity<CustomerNote>().ForSqlServer().Table("CustomerNotes");
+			builder.Entity<CustomerNoteOptionType>().Key(p => p.Id);
+			builder.Entity<CustomerNoteOptionType>().ForSqlServer().Table("CustomerNoteOptionTypes");
+			builder.Entity<CustomerNoteOptionType>()
+				.Reference(p => p.Lookup)
+				.InverseCollection()
+				.ForeignKey(p => p.IdLookup)
+				.PrincipalKey(p => p.Id)
+				.Required(false);
+			builder.Entity<ProductOptionType>()
+				.Reference(p => p.FieldType)
+				.InverseCollection()
+				.ForeignKey(p => p.IdFieldType)
+				.PrincipalKey(p => p.Id)
+				.Required();
+			builder.Entity<CustomerNoteOptionValue>().Key(o => o.Id);
+			builder.Entity<CustomerNoteOptionValue>().ForSqlServer().Table("CustomerNoteOptionValues");
+			builder.Entity<CustomerNoteOptionValue>()
+				.Reference(v => v.OptionType)
+				.InverseCollection()
+				.ForeignKey(t => t.IdOptionType)
+				.PrincipalKey(v => v.Id)
+				.Required();
+
+			builder.Entity<CustomerTypeEntity>().Key(p => p.Id);
+			builder.Entity<CustomerTypeEntity>().ForSqlServer().Table("CustomerTypes");
+			builder.Entity<CustomerTypeEntity>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
+			builder.Entity<CustomerTypeEntity>().Collection(p => p.PaymentMethods)
 				.InverseReference(p => p.CustomerType)
 				.ForeignKey(p => p.IdPaymentMethod)
 				.PrincipalKey(p => p.Id);
-			builder.Entity<CustomerType>().Collection(p => p.OrderNotes)
+			builder.Entity<CustomerTypeEntity>().Collection(p => p.OrderNotes)
 				.InverseReference(p => p.CustomerType)
 				.ForeignKey(p => p.IdOrderNote)
 				.PrincipalKey(p => p.Id);
-			//builder.Entity<CustomerType>().Reference(p => p.RecordStatusCode).InverseCollection().ForeignKey(p => p.StatusCode);
+
+			builder.Entity<CustomerToOrderNote>().Key(p => new { p.IdCustomer, p.IdOrderNote });
+			builder.Entity<CustomerToOrderNote>().ForSqlServer().Table("CustomerToOrderNotes");
+			builder.Entity<CustomerToOrderNote>().Ignore(p => p.Id);
+
+			builder.Entity<CustomerToPaymentMethod>().Key(p => new { p.IdCustomer, p.IdPaymentMethod });
+			builder.Entity<CustomerToPaymentMethod>().ForSqlServer().Table("CustomerToPaymentMethods");
+			builder.Entity<CustomerToPaymentMethod>().Ignore(p => p.Id);
+
+			#endregion
+
+			#region Addresses
+
+			builder.Entity<Address>().Key(p => p.Id);
+			builder.Entity<Address>().ForSqlServer().Table("Addresses");
+			builder.Entity<Address>().Reference(p => p.Сountry).InverseCollection().ForeignKey(p => p.IdCountry);
+			builder.Entity<Address>().Reference(p => p.State).InverseCollection().ForeignKey(p => p.IdState);
+			builder.Entity<AddressOptionType>().Key(p => p.Id);
+			builder.Entity<AddressOptionType>().ForSqlServer().Table("AddressOptionTypes");
+			builder.Entity<AddressOptionType>()
+				.Reference(p => p.Lookup)
+				.InverseCollection()
+				.ForeignKey(p => p.IdLookup)
+				.PrincipalKey(p => p.Id)
+				.Required(false);
+			builder.Entity<ProductOptionType>()
+				.Reference(p => p.FieldType)
+				.InverseCollection()
+				.ForeignKey(p => p.IdFieldType)
+				.PrincipalKey(p => p.Id)
+				.Required();
+			builder.Entity<AddressOptionValue>().Key(o => o.Id);
+			builder.Entity<AddressOptionValue>().ForSqlServer().Table("AddressOptionValues");
+			builder.Entity<AddressOptionValue>()
+				.Reference(v => v.OptionType)
+				.InverseCollection()
+				.ForeignKey(t => t.IdOptionType)
+				.PrincipalKey(v => v.Id)
+				.Required();
+
+			builder.Entity<AddressTypeEntity>().Key(p => p.Id);
+			builder.Entity<AddressTypeEntity>().ForSqlServer().Table("AddressTypes");
 
 			#endregion
 

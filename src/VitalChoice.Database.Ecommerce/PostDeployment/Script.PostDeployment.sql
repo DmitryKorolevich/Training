@@ -40,3 +40,5 @@ Post-Deployment Script Template
 
 :r .\Scripts\CustomerAreaBasics.sql
 :r .\Scripts\CustomerAreaBasicsData.sql
+
+:r .\Scripts\ReferencesToUsers.sql

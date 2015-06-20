@@ -146,4 +146,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VSkus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ReferencesToUsers.sql" />
+  </ItemGroup>
 </Project>

@@ -119,15 +119,15 @@ namespace VitalChoice.Business.Services.Products
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             if (result.Items.Count() > 0)
             {
-                var ids = result.Items.Select(p => p.IdAddedBy).ToList();
+                var ids = result.Items.Select(p => p.IdEditedBy).ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
                 foreach (var item in result.Items)
                 {
                     foreach (var profile in profiles)
                     {
-                        if (item.IdAddedBy == profile.Id)
+                        if (item.IdEditedBy == profile.Id)
                         {
-                            item.AddedBy = new User()
+                            item.EditedBy = new User()
                             {
                                 AdminProfile = profile,
                             };

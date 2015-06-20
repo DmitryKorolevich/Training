@@ -55,9 +55,9 @@ namespace VC.Admin.Models.Product
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;
-                if (item.AddedBy != null && item.AddedBy.AdminProfile != null)
+                if (item.EditedBy != null && item.EditedBy.AdminProfile != null)
                 {
-                    AddedByAgentId = item.AddedBy.AdminProfile.AgentId;
+                    AddedByAgentId = item.EditedBy.AdminProfile.AgentId;
                 }
             }
         }

@@ -27,8 +27,6 @@ namespace VitalChoice.DynamicData
         public RecordStatusCode StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
-        public int? IdAddedBy { get; set; }
-        public User AddedBy { get; set; }
         public int? IdEditedBy { get; set; }
         public User EditedBy { get; set; }
         public Type ModelType { get; private set; }
@@ -78,8 +76,6 @@ namespace VitalChoice.DynamicData
             DateCreated = entity.DateCreated;
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
-            IdAddedBy = entity.IdAddedBy;
-            AddedBy = entity.AddedBy;
             IdEditedBy = entity.IdEditedBy;
             EditedBy = entity.EditedBy;
             FromEntity(entity);
@@ -131,7 +127,6 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
-            entity.IdAddedBy = entity.IdAddedBy;
             entity.IdEditedBy = IdEditedBy;
             UpdateEntityInternal(entity);
         }
@@ -160,7 +155,6 @@ namespace VitalChoice.DynamicData
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = StatusCode;
-            entity.IdAddedBy = IdEditedBy;
             entity.IdEditedBy = IdEditedBy;
             FillNewEntity(entity);
             return entity;
