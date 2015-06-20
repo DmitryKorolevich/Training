@@ -4,7 +4,7 @@
     "EnableBundlingAndMinification": true,
     "Versioning": {
       "EnableStaticContentVersioning": true,
-      "AutoGenerateBuildNumber": false,
+      "AutoGenerateBuildNumber": true,
       "BuildNumber": 1
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
