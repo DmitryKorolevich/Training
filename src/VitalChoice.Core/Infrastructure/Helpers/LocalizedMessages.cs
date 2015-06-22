@@ -7,22 +7,12 @@ using FluentValidation;
 using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Core.Infrastructure.Helpers
 {
-    public static class LocalizedMessages2
+    public static class LocalizedMessages
     {
-
-        public static string Do()
-        {
-            var data = LocalizationService.GetString(ValidationMessages.FieldLength);
-            return data;
-        }
-    }
-
-        public static class LocalizedMessages
-    {
-
         public static string GetMessage<TEnum>(TEnum key, IEnumerable<object> args) where TEnum : IComparable
         {
             return LocalizationService.GetString(key, args.ToArray());
@@ -64,12 +54,17 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             var attribute =
                 memberExpression.Member.GetCustomAttributes(typeof (LocalizedAttribute), false).FirstOrDefault() as
                 LocalizedAttribute;
-            if (attribute == null)
+            List<object> parameters = new List<object>();
+            if (attribute != null)
             {
-                throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", memberExpression.Member.Name), memberExpression.Member.Name);
+                parameters.Add(GetFieldName((IComparable)attribute.EnumValue));
+            }
+            else
+            {
+                parameters.Add(BaseAppConstants.DEFAULT_FORM_FIELD_NAME);
             }
 
-            return optionsChain.WithMessage(GetMessage(messageKey, new object[] { GetFieldName((IComparable)attribute.EnumValue)}));
+            return optionsChain.WithMessage(GetMessage(messageKey, parameters));
         }
 
         /// <summary>
@@ -98,11 +93,15 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             var attribute =
                 memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as
                 LocalizedAttribute;
-            if (attribute == null)
+            List<object> parameters = new List<object>();
+            if (attribute != null)
             {
-                throw new ArgumentException(string.Format("LocalizedAttribute not set on property {0}.", memberExpression.Member.Name), memberExpression.Member.Name);
+                parameters.Add(GetFieldName((IComparable)attribute.EnumValue));
             }
-            List<object> parameters = new List<object> { GetFieldName((IComparable)attribute.EnumValue) };
+            else
+            {
+                parameters.Add(BaseAppConstants.DEFAULT_FORM_FIELD_NAME);
+            }
             if (args != null)
             {
                 parameters.AddRange(args);

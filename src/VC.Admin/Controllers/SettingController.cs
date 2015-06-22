@@ -27,13 +27,14 @@ namespace VC.Admin.Controllers
         private readonly IFileService fileService;
         private readonly ILogger logger;
 
-        public SettingController(ILogViewService logViewService, ICountryService countryService, ISettingService settingService, IFileService fileService)
+        public SettingController(ILogViewService logViewService, ICountryService countryService, ISettingService settingService, IFileService fileService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
             this.settingService = settingService;
             this.fileService = fileService;
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
         }
 
         #region Countries/States

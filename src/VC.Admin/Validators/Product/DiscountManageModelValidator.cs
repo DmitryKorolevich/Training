@@ -5,6 +5,7 @@ using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Validators.Product
 {
@@ -29,11 +30,15 @@ namespace VC.Admin.Validators.Product
             {
                 RuleFor(model => model.Code)
                     .NotEmpty()
-                    .WithMessage(model => model.Code, ValidationMessages.FieldRequired);
+                    .WithMessage(model => model.Code, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Code, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.Description)
                     .NotEmpty()
-                    .WithMessage(model => model.Description, ValidationMessages.FieldRequired);
+                    .WithMessage(model => model.Description, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Description, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.RequireMinimumPerishableAmount)
                     .Cascade(CascadeMode.StopOnFirstFailure)
@@ -75,7 +80,10 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.ProductSKU)
                     .NotEmpty()
                     .When(p => p.DiscountType == DiscountType.Threshold)
-                    .WithMessage(ValidationMessages.FieldRequired, GeneralFieldNames.Code);
+                    .WithMessage(ValidationMessages.FieldRequired, GeneralFieldNames.Code)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .When(p => p.DiscountType == DiscountType.Threshold)
+                    .WithMessage(model => model.ProductSKU, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
 
