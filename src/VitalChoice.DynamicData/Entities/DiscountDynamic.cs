@@ -56,7 +56,7 @@ namespace VitalChoice.DynamicData.Entities
             entity.ExpirationDate = ExpirationDate;
             entity.ExcludeSkus = ExcludeSkus;
             entity.ExcludeCategories = ExcludeCategories;
-            entity.IdEditedBy = entity.IdEditedBy;
+            entity.IdAddedBy = entity.IdEditedBy;
 
             entity.DiscountsToCategories = CategoryIds?.Select(c => new DiscountToCategory
             {
@@ -169,7 +169,7 @@ namespace VitalChoice.DynamicData.Entities
             ExpirationDate = entity.ExpirationDate;
             ExcludeSkus = entity.ExcludeSkus;
             ExcludeCategories = entity.ExcludeCategories;
-            IdEditedBy = entity.IdAddedBy;
+            IdAddedBy = entity.IdAddedBy;
 
             CategoryIds = entity.DiscountsToCategories?.Select(p => p.IdCategory).ToList();
             DiscountsToSkus = entity.DiscountsToSkus?.ToList();

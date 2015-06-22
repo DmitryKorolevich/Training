@@ -94,6 +94,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<DiscountManageModel>> UpdateDiscount([FromBody]DiscountManageModel model)
         {
+            _logger.LogError("TEST ERROR!");
+
             var item = ConvertWithValidate(model);
             if (item == null)
                 return null;
