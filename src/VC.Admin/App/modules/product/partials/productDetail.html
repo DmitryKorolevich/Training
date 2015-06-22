@@ -362,7 +362,7 @@
                                                                                 <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Stock.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
@@ -441,7 +441,7 @@
                                                                                 <div class="fixed-accordion-row">
                                                                                     <label class="control-label">% Off</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="number" name="OffPercent" class="form-control" placeholder="% Off" data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <input name="OffPercent" class="form-control number" placeholder="% Off" money data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
                                                                                         <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.OffPercent.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>

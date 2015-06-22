@@ -28,7 +28,6 @@ namespace VitalChoice.DynamicData
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
         public int? IdEditedBy { get; set; }
-        public User EditedBy { get; set; }
         public Type ModelType { get; private set; }
 
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
@@ -77,7 +76,6 @@ namespace VitalChoice.DynamicData
             DateEdited = entity.DateEdited;
             StatusCode = entity.StatusCode;
             IdEditedBy = entity.IdEditedBy;
-            EditedBy = entity.EditedBy;
             FromEntity(entity);
         }
 

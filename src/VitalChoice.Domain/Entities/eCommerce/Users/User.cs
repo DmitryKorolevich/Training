@@ -9,7 +9,5 @@ namespace VitalChoice.Domain.Entities.eCommerce.Users
     public class User: Entity
     {
 	    public Customer Customer { get; set; }
-
-        public AdminProfile AdminProfile { get; set; }
     }
 }

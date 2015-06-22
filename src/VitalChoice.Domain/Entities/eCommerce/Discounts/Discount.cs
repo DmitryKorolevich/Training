@@ -6,6 +6,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 {
     public class Discount : DynamicDataEntity<DiscountOptionValue, DiscountOptionType>
     {
+        public int? IdAddedBy { get; set; }
+
         public string Code { get; set; }
 
         public string Description { get; set; }

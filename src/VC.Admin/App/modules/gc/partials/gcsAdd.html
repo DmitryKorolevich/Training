@@ -27,7 +27,7 @@
                                         <div class="form-group">
                                             <label class="col-md-3 control-label">Quantity</label>
                                             <div class="col-md-9">
-                                                <input type="number" name="Quantity" class="form-control" placeholder="Quantity" data-ng-model="gc.Quantity" min="1" max="100" required ng-pattern="/^\d{0,9}?$/">
+                                                <input type="text" name="Quantity" class="form-control" placeholder="Quantity" data-ng-model="gc.Quantity" numbers-only min="1" max="100" required ng-pattern="/^\d{0,9}?$/">
                                                 <div class="error-container" ng-show="forms.form.submitted && forms.form.Quantity.$invalid">
                                                     <small class="error" ng-show="forms.form.Quantity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Quantity")}}</small>
                                                     <small class="error" ng-show="forms.form.Quantity.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Quantity",100)}}</small>
