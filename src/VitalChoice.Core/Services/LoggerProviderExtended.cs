@@ -20,7 +20,7 @@ namespace VitalChoice.Core.Services
 #if !DNXCORE50
             int backLevelCount = 0;
             var searchPath = basePath;
-            while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 3)
+            while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)
             {
                 searchPath = Path.Combine(searchPath, "..");
                 backLevelCount++;
