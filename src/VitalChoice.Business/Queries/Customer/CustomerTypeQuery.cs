@@ -4,7 +4,7 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Business.Queries.Customer
 {
-    public class CustomerTypeQuery: QueryObject<CustomerType>
+    public class CustomerTypeQuery: QueryObject<CustomerTypeEntity>
     {
 	    public CustomerTypeQuery NotDeleted()
 	    {

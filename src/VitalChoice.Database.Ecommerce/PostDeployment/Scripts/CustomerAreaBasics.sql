@@ -203,3 +203,279 @@ BEGIN
 END
 
 GO
+
+IF COL_LENGTH('[dbo].[Customers]','Email') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Customers]
+	ADD [FirstName] NVARCHAR(250) NOT NULL,
+		[LastName] NVARCHAR(250) NOT NULL,
+		[Email] NVARCHAR(100) NOT NULL,
+		[IdDefaultPaymentMethod] INT NOT NULL,
+		[StatusCode] INT NOT NULL
+
+	ALTER TABLE [dbo].[Customers]  WITH CHECK ADD CONSTRAINT [FK_Customers_RecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes] ([StatusCode])
+
+	ALTER TABLE [dbo].[Customers]  WITH CHECK ADD CONSTRAINT [FK_Customers_DefaultPaymentMethod] FOREIGN KEY([IdDefaultPaymentMethod])
+	REFERENCES [dbo].[PaymentMethods] ([Id])
+
+	CREATE UNIQUE NONCLUSTERED INDEX [IX_Email_Customers]
+    ON [dbo].[Customers]([Email] ASC);
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerToPaymentMethods]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerToPaymentMethods]
+	([IdCustomer] INT NOT NULL,
+	 [IdPaymentMethod] INT NOT NULL,
+	  CONSTRAINT [PK_CustomerToPaymentMethods] PRIMARY KEY CLUSTERED 
+	(
+		[IdCustomer] ASC,
+		[IdPaymentMethod] ASC
+	)
+	)
+
+	ALTER TABLE [dbo].[CustomerToPaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_CustomerToPaymentMethods_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+	ALTER TABLE [dbo].[CustomerToPaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_CustomerToPaymentMethods_PaymentMethods] FOREIGN KEY([IdPaymentMethod])
+	REFERENCES [dbo].[PaymentMethods] ([Id])
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerToOrderNotes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerToOrderNotes]
+	([IdCustomer] INT NOT NULL,
+	 [IdOrderNote] INT NOT NULL,
+	  CONSTRAINT [PK_CustomerToOrderNotes] PRIMARY KEY CLUSTERED 
+	(
+		[IdCustomer] ASC,
+		[IdOrderNote] ASC
+	)
+	)
+
+	ALTER TABLE [dbo].[CustomerToOrderNotes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerToOrderNotes_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+	ALTER TABLE [dbo].[CustomerToOrderNotes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerToOrderNotes_OrderNotes] FOREIGN KEY([IdOrderNote])
+	REFERENCES [dbo].[OrderNotes] ([Id])
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[AddressTypes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[AddressTypes]
+	([Id] INT IDENTITY(1,1) NOT NULL,
+	 [Name] NVARCHAR(50) NOT NULL,
+	 CONSTRAINT [PK_AddressTypes] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	)
+	)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[Addresses]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[Addresses]
+	([Id] INT IDENTITY(1,1) NOT NULL,
+	 [IdCustomer] INT NOT NULL,
+	 [IdCountry] INT NOT NULL,
+	 [IdState] INT NOT NULL,
+	 [IdAddressType] INT NOT NULL,
+	 [County] NVARCHAR(250) NOT NULL,
+	 [DateCreated] [datetime2](7) NOT NULL,
+	 [DateEdited] [datetime2](7) NOT NULL,
+	 [IdEditedBy] [int] NULL,
+	 [StatusCode] INT NOT NULL
+
+	  CONSTRAINT [PK_Addresses] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	)
+	)
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD CONSTRAINT [FK_Addresses_RecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes] ([StatusCode])
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD  CONSTRAINT [FK_Addresses_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD  CONSTRAINT [FK_Addresses_Countries] FOREIGN KEY([IdCountry])
+	REFERENCES [dbo].[Countries] ([Id])
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD  CONSTRAINT [FK_Addresses_States] FOREIGN KEY([IdState])
+	REFERENCES [dbo].[States] ([Id])
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD  CONSTRAINT [FK_Addresses_AddressTypes] FOREIGN KEY([IdAddressType])
+	REFERENCES [dbo].[AddressTypes] ([Id])
+
+	ALTER TABLE [dbo].[Addresses]  WITH CHECK ADD  CONSTRAINT [FK_Addresses_Users_EditedBy] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerOptionTypes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerOptionTypes]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[Name] NVARCHAR(50) NOT NULL, 
+		[IdFieldType] INT NOT NULL, 
+		[IdLookup] INT NULL, 
+		[IdCustomerType] INT NULL, 
+		[DefaultValue] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerOptionTypes] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerOptionTypes_Lookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
+		CONSTRAINT [FK_CustomerOptionTypes_FieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id]), 
+		CONSTRAINT [FK_CustomerOptionTypes_CustomerType] FOREIGN KEY ([IdCustomerType]) REFERENCES [CustomerTypes]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerOptionTypes_Name] ON [dbo].[CustomerOptionTypes] ([Name]) INCLUDE (Id, IdFieldType, IdCustomerType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerOptionValues]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerOptionValues]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[IdCustomer] INT NULL, 
+		[IdOptionType] INT NOT NULL, 
+		[Value] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerOptionValues] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerOptionValues_CustomerOptionTypes] FOREIGN KEY ([IdOptionType]) REFERENCES [CustomerOptionTypes]([Id]), 
+		CONSTRAINT [FK_CustomerOptionValues_Customer] FOREIGN KEY ([IdCustomer]) REFERENCES [Customers]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerOptionValues_Value] ON [dbo].[CustomerOptionValues] ([Value]) INCLUDE (Id, IdCustomer, IdOptionType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerNotes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerNotes]
+	([Id] INT IDENTITY(1,1) NOT NULL,
+	 [IdCustomer] INT NOT NULL,
+	 [DateCreated] [datetime2](7) NOT NULL,
+	 [DateEdited] [datetime2](7) NOT NULL,
+	 [IdEditedBy] [int] NULL,
+	  CONSTRAINT [PK_CustomerNotes] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	)
+	)
+
+	ALTER TABLE [dbo].[CustomerNotes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerNotes_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+	ALTER TABLE [dbo].[CustomerNotes]  WITH CHECK ADD  CONSTRAINT [FK_CustomerNotes_Users_EditedBy] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerNoteOptionTypes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerNoteOptionTypes]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[Name] NVARCHAR(50) NOT NULL, 
+		[IdFieldType] INT NOT NULL, 
+		[IdLookup] INT NULL, 
+		[DefaultValue] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerNoteOptionTypes] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerNoteOptionTypes_Lookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
+		CONSTRAINT [FK_CustomerNoteOptionTypes_FieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerNoteOptionTypes_Name] ON [dbo].[CustomerNoteOptionTypes] ([Name]) INCLUDE (Id, IdFieldType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerNoteOptionValues]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerNoteOptionValues]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[IdCustomerNote] INT NULL, 
+		[IdOptionType] INT NOT NULL, 
+		[Value] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerNoteOptionValues] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerNoteOptionValues_CustomerNoteOptionTypes] FOREIGN KEY ([IdOptionType]) REFERENCES [CustomerNoteOptionTypes]([Id]), 
+		CONSTRAINT [FK_CustomerNoteOptionValues_CustomerNotes] FOREIGN KEY ([IdCustomerNote]) REFERENCES [CustomerNotes]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerNoteOptionValues_Value] ON [dbo].[CustomerNoteOptionValues] ([Value]) INCLUDE (Id, IdCustomerNote, IdOptionType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[AddressOptionTypes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[AddressOptionTypes]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[Name] NVARCHAR(50) NOT NULL, 
+		[IdFieldType] INT NOT NULL, 
+		[IdLookup] INT NULL, 
+		[IdAddressType] INT NULL, 
+		[DefaultValue] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_AddressOptionTypes] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_AddressOptionTypes_Lookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
+		CONSTRAINT [FK_AddressOptionTypes_FieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id]), 
+		CONSTRAINT [FK_AddressOptionTypes_AddressType] FOREIGN KEY ([IdAddressType]) REFERENCES [AddressTypes]([Id])
+	);
+
+	CREATE INDEX [IX_AddressOptionTypes_Name] ON [dbo].[AddressOptionTypes] ([Name]) INCLUDE (Id, IdFieldType, IdAddressType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[AddressOptionValues]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[AddressOptionValues]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[IdAddress] INT NULL, 
+		[IdOptionType] INT NOT NULL, 
+		[Value] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_AddressOptionValues] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_AddressOptionValues_AddressOptionTypes] FOREIGN KEY ([IdOptionType]) REFERENCES [AddressOptionTypes]([Id]), 
+		CONSTRAINT [FK_AddressOptionValues_Address] FOREIGN KEY ([IdAddress]) REFERENCES [Addresses]([Id])
+	);
+
+	CREATE INDEX [IX_AddressOptionValues_Value] ON [dbo].[AddressOptionValues] ([Value]) INCLUDE (Id, IdAddress, IdOptionType)
+END
+
+GO

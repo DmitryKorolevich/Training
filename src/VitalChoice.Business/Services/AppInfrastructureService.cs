@@ -26,11 +26,11 @@ namespace VitalChoice.Business.Services
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
-	    private readonly IEcommerceRepositoryAsync<CustomerType> customerTypeRepository;
+	    private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
 
 	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
-            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerType> customerTypeRepository)
+            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
