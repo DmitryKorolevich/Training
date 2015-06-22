@@ -182,6 +182,7 @@ namespace VitalChoice.Business.Services.Products
 
                 entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == entity.IdDiscountType).SelectAsync(false);
                 Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+                entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToList();
                 IncludeDiscountOptionTypes(entity, optionTypes);
                 return new DiscountDynamic(entity, withDefaults);
             }

@@ -155,6 +155,9 @@ BEGIN
 	)
 END
 
+ALTER TABLE [dbo].[DiscountTiers] ALTER COLUMN [Percent] DECIMAL(5,2) NULL
+ALTER TABLE [dbo].[DiscountTiers] ALTER COLUMN [Amount] MONEY NULL 
+
 GO
 
 IF OBJECT_ID(N'[dbo].[DiscountOptionTypes]', N'U') IS NULL

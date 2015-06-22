@@ -20,6 +20,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public VSkuQuery WithCode(string code)
+        {
+            if (!string.IsNullOrEmpty(code))
+            {
+                Add(x => x.Code.Contains(code));
+            }
+            return this;
+        }
+
         public VSkuQuery NotDeleted()
         {
             Add(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive) &&

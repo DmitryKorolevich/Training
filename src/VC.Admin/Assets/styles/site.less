@@ -471,10 +471,6 @@ button.main-button{
 	width: 30px;
 }
 
-.fixed-accordion-row button{
-	margin-left: 15px;
-}
-
 .font-default{
 	font-size: inherit;
 }
@@ -508,7 +504,7 @@ form .error-container small{
 }
 
 form .error-container.small-block{
-	width: 145px;
+	width: 130px;
 }
 
 .toogle-editor{
@@ -518,6 +514,16 @@ form .error-container.small-block{
 
 form .form-group p {
     margin: 0;
+}
+
+.form-horizontal .form-group .input-group.autocomplete .dropdown-menu {
+    padding: 0;
+    width: 100%;
+}
+
+.form-horizontal .form-group .input-group.autocomplete .input-group-addon
+{
+    min-width: 39px;
 }
 
 .input-group {
@@ -896,3 +902,5 @@ th.sortable-column {
 
 .categories {position: relative;}
 .categories .expand-button { position: absolute; right: 0; z-index:1;}
+
+.discount-edit .tiers .form-group { margin-bottom: 0px;} 

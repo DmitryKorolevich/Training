@@ -116,6 +116,26 @@ namespace VC.Admin.Models.Product
             dynamicObject.DiscountsToSkus = DiscountsToSkus.ToList();
             dynamicObject.DiscountsToSelectedSkus = DiscountsToSelectedSkus.ToList();
             dynamicObject.DiscountTiers = DiscountTiers.ToList();
+
+            foreach(var item in dynamicObject.DiscountTiers)
+            {
+                if(item.IdDiscountType==DiscountType.PriceDiscount)
+                {
+                    item.Percent = null;
+                }
+                if (item.IdDiscountType == DiscountType.PercentDiscount)
+                {
+                    item.Amount = null;
+                }
+                if(item.Amount.HasValue)
+                {
+                    item.Amount = Math.Round(item.Amount.Value * 100)/100;
+                }
+                if (item.Percent.HasValue)
+                {
+                    item.Percent = Math.Round(item.Percent.Value * 100) / 100;
+                }
+            }
         }
 
         public void FillSelfFrom(DiscountDynamic dynamicObject)

@@ -140,13 +140,21 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
-            var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText);
+            var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code);
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
 
-            return await query.OrderBy(sortable).SelectAsync(false);
+            if (filter.Paging == null)
+            {
+                return await query.OrderBy(sortable).SelectAsync(false);
+            }
+            else
+            {
+                var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
+                return pagedList.Items;
+            }
         }
 
         public async Task<Sku> GetSku(string code)

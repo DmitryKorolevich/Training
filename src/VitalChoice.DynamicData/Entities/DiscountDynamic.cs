@@ -96,6 +96,7 @@ namespace VitalChoice.DynamicData.Entities
                 foreach (var tier in tiers)
                 {
                     tier.Order = order;
+                    order++;
                 }
             }
         }

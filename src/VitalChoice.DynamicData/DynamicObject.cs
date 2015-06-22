@@ -121,7 +121,7 @@ namespace VitalChoice.DynamicData
 
                     var option = new TOptionValue
                     {
-                        Value = data.Value?.ToString(),
+                        Value = ConvertToOption(data.Value),
                         IdOptionType = idOption
                     };
                     entity.OptionValues.Add(option);
@@ -405,6 +405,25 @@ namespace VitalChoice.DynamicData
                     return double.Parse(value, CultureInfo.InvariantCulture);
                 default:
                     throw new NotImplementedException($"Type conversion for TypeId:{typeId} is not implemented");
+            }
+        }
+
+        private static string ConvertToOption(object value)
+        {
+            if (value==null)
+                return null;
+            if(value is double)
+            {
+                return ((double)value).ToString(CultureInfo.InvariantCulture);
+            } else if (value is decimal)
+            {
+                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+            } if (value is int)
+            {
+                return ((int)value).ToString(CultureInfo.InvariantCulture);
+            } else
+            {
+                return value.ToString();
             }
         }
     }

@@ -14,6 +14,13 @@ namespace VC.Admin.Validators.Product
         {
             ValidationErrors.Clear();
             ParseResults(ValidatorsFactory.GetValidator<DiscountModelValidator>().Validate(value));
+            if (value.DiscountTiers != null)
+            {
+                for (int i = 0; i < value.DiscountTiers.Count; i++)
+                {
+                    ParseResults(ValidatorsFactory.GetValidator<DiscountTierValidator>().Validate(value.DiscountTiers[i]), "DiscountTiers", i);
+                }
+            }
         }
 
         private class DiscountModelValidator : AbstractValidator<DiscountManageModel>
@@ -31,12 +38,82 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.RequireMinimumPerishableAmount)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .GreaterThan(0)
-                    .When(p =>p.DiscountType!=DiscountType.FreeShipping && p.RequireMinimumPerishable)
+                    .When(p => p.DiscountType != DiscountType.FreeShipping && p.RequireMinimumPerishable)
                     .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 0)
                     .LessThanOrEqualTo(100000)
                     .When(p => p.DiscountType != DiscountType.FreeShipping && p.RequireMinimumPerishable)
-                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 100000)
-                    .WithName("Require Minimum Perishable Amount");
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Amount, 100000);
+
+
+                RuleFor(model => model.Amount)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.DiscountType == DiscountType.PriceDiscount)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 0)
+                    .LessThanOrEqualTo(100000)
+                    .When(p => p.DiscountType == DiscountType.PriceDiscount)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Amount, 100000);
+
+                RuleFor(model => model.Percent)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.DiscountType == DiscountType.PercentDiscount)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Percent, 0)
+                    .LessThanOrEqualTo(100000)
+                    .When(p => p.DiscountType == DiscountType.PercentDiscount)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Percent, 100);
+
+                RuleFor(model => model.Threshold)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.DiscountType == DiscountType.Threshold)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 0)
+                    .LessThanOrEqualTo(100000)
+                    .When(p => p.DiscountType == DiscountType.Threshold)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Amount, 100000);
+
+                RuleFor(model => model.ProductSKU)
+                    .NotEmpty()
+                    .When(p => p.DiscountType == DiscountType.Threshold)
+                    .WithMessage(ValidationMessages.FieldRequired, GeneralFieldNames.Code);
+            }
+        }
+
+        private class DiscountTierValidator : AbstractValidator<DiscountTier>
+        {
+            public DiscountTierValidator()
+            {
+                RuleFor(model => model.From)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThanOrEqualTo(0)
+                    .WithMessage(ValidationMessages.FieldMinOrEqual, GeneralFieldNames.Min, 0)
+                    .LessThanOrEqualTo(100000)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Min, 100000);
+
+                RuleFor(model => model.To)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Max, 0)
+                    .LessThanOrEqualTo(100000)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Max, 100000);
+
+                RuleFor(model => model.Amount)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.IdDiscountType == DiscountType.PriceDiscount)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Amount, 0)
+                    .LessThanOrEqualTo(100000)
+                    .When(p => p.IdDiscountType == DiscountType.PriceDiscount)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Amount, 100000);
+
+                RuleFor(model => model.Amount)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.IdDiscountType == DiscountType.PercentDiscount)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Percent, 0)
+                    .LessThanOrEqualTo(100000)
+                    .When(p => p.IdDiscountType == DiscountType.PercentDiscount)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Percent, 100);
             }
         }
     }
