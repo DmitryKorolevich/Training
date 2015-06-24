@@ -140,7 +140,7 @@ namespace VitalChoice.DynamicData
                 {
                     var option = new TOptionValue
                     {
-                        Value = data.Value?.ToString(),
+                        Value = ConvertToOption(data.Value),
                         OptionType = new TOptionType
                         {
                             Name = data.Key

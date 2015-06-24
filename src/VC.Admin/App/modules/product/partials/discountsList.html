@@ -52,14 +52,14 @@
                         </th>
                         <th>Active</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('StartDate')">
-                            <span>Starts</span>
+                            <span>Valid From</span>
                             <span data-ng-if="filter.Sorting.Path == 'StartDate'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('ExpirationDate')">
-                            <span>Ends</span>
+                            <span>Valid To</span>
                             <span data-ng-if="filter.Sorting.Path == 'ExpirationDate'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
@@ -85,8 +85,8 @@
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
-                        <td>{{item.StartDate | date:"MM/dd/yy"}}<br />{{item.StartDate | date:"h:mm a"}}</td>
-                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}<br />{{item.ExpirationDate | date:"h:mm a"}}</td>
+                        <td>{{item.StartDate | date:"MM/dd/yy"}}</td>
+                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}</td>
                         <td>{{item.DateCreated | date:"MM/dd/yy"}}<br />{{item.DateCreated | date:"h:mm a"}}<br />{{item.AddedByAgentId}}</td>
                         <td>
                             <button class="btn btn-default btn-success" data-ng-click="open(item.Id);">Edit</button>

@@ -7,6 +7,9 @@
             <div class="btn-group margin-top-10px">
                 <button ui-sref="index.oneCol.manageDiscounts" class="btn btn-default width-160px">Cancel</button>
             </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageDiscounts">Manage All</button>
+            </div>
         </div>
     </div>
     <div class="right-pane-main">
@@ -57,25 +60,33 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="date" class="col-md-3 control-label">Start Date</label>
+                                                <label for="date" class="col-md-3 control-label">Valid From</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" />
+                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.StartDate" is-open="startDateOpened" required/>
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); startDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
                                                     </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.StartDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid From")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.server">{{serverMessages.GetMessage('StartDate')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="date" class="col-md-3 control-label">Expiration Date</label>
+                                                <label for="date" class="col-md-3 control-label">Valid To</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" />
+                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="discount.ExpirationDate" is-open="expirationDateOpened" required/>
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); expirationDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
                                                     </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ExpirationDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid To")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.server">{{serverMessages.GetMessage('ExpirationDate')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">

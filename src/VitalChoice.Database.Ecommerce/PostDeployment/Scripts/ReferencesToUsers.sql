@@ -27,3 +27,12 @@ IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CON
 	ALTER TABLE [dbo].[Products] ADD CONSTRAINT [FK_Products_ToUser] FOREIGN KEY ([IdEditedBy]) REFERENCES [Users] ([Id])
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdAddedBy' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
+BEGIN
+	ALTER TABLE dbo.Discounts
+	ADD IdAddedBy INT NULL
+
+	ALTER TABLE [dbo].[Discounts] ADD CONSTRAINT [FK_Discounts_ToAddedUser] FOREIGN KEY ([IdAddedBy]) REFERENCES [Users] ([Id])
+END
+GO
