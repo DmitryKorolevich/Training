@@ -29,6 +29,7 @@ namespace VitalChoice.DynamicData
         public DateTime DateEdited { get; set; }
         public int? IdEditedBy { get; set; }
         public Type ModelType { get; private set; }
+        public User EditedBy { get; set; }
 
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
 
