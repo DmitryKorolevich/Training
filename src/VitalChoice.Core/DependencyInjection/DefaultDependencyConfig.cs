@@ -147,7 +147,7 @@ namespace VitalChoice.Core.DependencyInjection
                     {
                         inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                         inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                        inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                     }
                     else
                     {
@@ -155,7 +155,7 @@ namespace VitalChoice.Core.DependencyInjection
                         var newFormatter = new JsonInputFormatter();
                         newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                         newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                         o.InputFormatters.Add(newFormatter);
                     }
 
@@ -163,7 +163,7 @@ namespace VitalChoice.Core.DependencyInjection
                     {
                         outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                         outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                        outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                     }
                     else
                     {
@@ -171,7 +171,7 @@ namespace VitalChoice.Core.DependencyInjection
                         var newFormatter = new JsonOutputFormatter();
                         newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                         newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                        newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                         o.OutputFormatters.Add(newFormatter);
                     }
                 });

@@ -2,187 +2,197 @@
 
 angular.module('app.core.utils.appBootstrap', [])
 	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', 'webStorageUtil', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress, webStorageUtil) {
-			function getReferenceItem(lookup, key) {
-				return $.grep(lookup, function(elem) {
-					return elem.Key === key;
-				})[0];
-			};
+	    function getReferenceItem(lookup, key) {
+	        return $.grep(lookup, function (elem) {
+	            return elem.Key === key;
+	        })[0];
+	    };
 
-			function stopPropagation($event) {
-			    $event.preventDefault();
-			    $event.stopPropagation();
-			};
+	    function stopPropagation($event) {
+	        $event.preventDefault();
+	        $event.stopPropagation();
+	    };
 
-			function getValidationMessage(key, field, arg) {
-			    var item = getReferenceItem($rootScope.ReferenceData.Labels, key);
-			    var messageFormat;
-			    if (item) {
-			        messageFormat = item.Text;
-			    }
-			    else
-			    {
-			        messageFormat = key;
-			    }
-                var message='';
-                if(field)
-                {
-                    var item = getReferenceItem($rootScope.ReferenceData.Labels, Array.isArray(field) ? field[0] : field);
-                    if (item) {
-	                    if (Array.isArray(field)) {
-							field[0] = item.Text;
-	                    } else {
-							field = item.Text;
-	                    }
-                    }
-                    message = messageFormat.format(field, arg);
-                }
-                else
-                {
-                    message=messageFormat;
-                }
+	    function getValidationMessage(key, field, arg) {
+	        var item = getReferenceItem($rootScope.ReferenceData.Labels, key);
+	        var messageFormat;
+	        if (item) {
+	            messageFormat = item.Text;
+	        }
+	        else {
+	            messageFormat = key;
+	        }
+	        var message = '';
+	        if (field) {
+	            var item = getReferenceItem($rootScope.ReferenceData.Labels, Array.isArray(field) ? field[0] : field);
+	            if (item) {
+	                if (Array.isArray(field)) {
+	                    field[0] = item.Text;
+	                } else {
+	                    field = item.Text;
+	                }
+	            }
+	            message = messageFormat.format(field, arg);
+	        }
+	        else {
+	            message = messageFormat;
+	        }
 
-				return message;
-			};
+	        return message;
+	    };
 
-			function validatePermission(permission) {
-				if (!$rootScope.authenticated || !$rootScope.currentUser) {
-					return false;
-				}
+	    function validatePermission(permission) {
+	        if (!$rootScope.authenticated || !$rootScope.currentUser) {
+	            return false;
+	        }
 
-				return $rootScope.currentUser.IsSuperAdmin || $rootScope.currentUser.Permissions.indexOf(permission) > -1;
-			};
+	        return $rootScope.currentUser.IsSuperAdmin || $rootScope.currentUser.Permissions.indexOf(permission) > -1;
+	    };
 
-			function validatePermissionMenuItem(menuItem) {
-			    if (!$rootScope.authenticated || !$rootScope.currentUser) {
-			        return false;
-			    }
+	    function validatePermissionMenuItem(menuItem) {
+	        if (!$rootScope.authenticated || !$rootScope.currentUser) {
+	            return false;
+	        }
 
-			    if ($rootScope.currentUser.IsSuperAdmin)
-			        return true;
-			    
-                var result=false;
-                if(menuItem && menuItem.subMenu)
-                {
-                    $.each(menuItem.subMenu, function (index, subMenuItem) {
-                        if($rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1)
-                        {
-                            result=true;
-                            return false;
-                        }
-                    });
-                }
+	        if ($rootScope.currentUser.IsSuperAdmin)
+	            return true;
 
-                return result;
-			};
+	        var result = false;
+	        if (menuItem && menuItem.subMenu) {
+	            $.each(menuItem.subMenu, function (index, subMenuItem) {
+	                if ($rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1) {
+	                    result = true;
+	                    return false;
+	                }
+	            });
+	        }
 
-			function logout() {
-				authenticationService.logout().success(function() {
-					$rootScope.authenticated = false;
-					$rootScope.currentUser = {};
+	        return result;
+	    };
 
-					$rootScope.$state.go("index.oneCol.login");
-				}).error(function() {
-					//handle error
-				});
-			}
+	    function logout() {
+	        authenticationService.logout().success(function () {
+	            $rootScope.authenticated = false;
+	            $rootScope.currentUser = {};
 
-			function unauthorizedArea(path) {
-			    if (!path && path != "") {
-			        path = $location.path();
-			    }
+	            $rootScope.$state.go("index.oneCol.login");
+	        }).error(function () {
+	            //handle error
+	        });
+	    }
 
-			    return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1 || path.indexOf("/authentication/passwordreset") > -1;
-			};
+	    function unauthorizedArea(path) {
+	        if (!path && path != "") {
+	            path = $location.path();
+	        }
 
-			function initialize() {
-			    bindRootScope();
+	        return path.indexOf("/authentication/activate") > -1 || path.indexOf("/authentication/login") > -1 || path.indexOf("/authentication/passwordreset") > -1;
+	    };
 
-			    $rootScope.appStarted = false;
-				$rootScope.ReferenceData = {};
+	    function initialize() {
+	        bindRootScope();
 
-				infrastructureService.getReferenceData().success(function(res) {
-					if (res.Success) {
-						$rootScope.ReferenceData = res.Data;
+	        $rootScope.appStarted = false;
+	        $rootScope.ReferenceData = {};
 
-						if (!$rootScope.unauthorizedArea()) {
-							authenticationService.getCurrenUser()
-								.success(function(res) {
-									if (res.Success && res.Data) {
-										$rootScope.authenticated = true;
-										$rootScope.currentUser = res.Data;
-									} else {
-										$rootScope.authenticated = false;
+	        infrastructureService.getReferenceData().success(function (res) {
+	            if (res.Success) {
+	                $rootScope.ReferenceData = res.Data;
 
-										$rootScope.$state.go("index.oneCol.login");
-									}
-									$rootScope.appStarted = true;
-								}).error(function() {
-									toaster.pop('error', "Error!", "Can't get current user info");
-								});
+	                if (!$rootScope.unauthorizedArea()) {
+	                    authenticationService.getCurrenUser()
+                            .success(function (res) {
+                                if (res.Success && res.Data) {
+                                    $rootScope.authenticated = true;
+                                    $rootScope.currentUser = res.Data;
+                                } else {
+                                    $rootScope.authenticated = false;
 
-						} else {
-							$rootScope.authenticated = false;
-							$rootScope.appStarted = true;
-						}
+                                    $rootScope.$state.go("index.oneCol.login");
+                                }
+                                $rootScope.appStarted = true;
+                            }).error(function () {
+                                toaster.pop('error', "Error!", "Can't get current user info");
+                            });
 
-					} else {
-						toaster.pop('error', 'Error!', "Unable to initialize app properly");
-					}
-				}).error(function(res) {
-					toaster.pop('error', "Error!", "Server error occured");
-				});
+	                } else {
+	                    $rootScope.authenticated = false;
+	                    $rootScope.appStarted = true;
+	                }
 
-				$rootScope.getReferenceItem = getReferenceItem;
-				$rootScope.getValidationMessage = getValidationMessage;
-				$rootScope.logout = logout;
-				$rootScope.validatePermission = validatePermission;
-				$rootScope.unauthorizedArea = unauthorizedArea;
-				$rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
-				$rootScope.stopPropagation = stopPropagation;
-			}
+	            } else {
+	                toaster.pop('error', 'Error!', "Unable to initialize app properly");
+	            }
+	        }).error(function (res) {
+	            toaster.pop('error', "Error!", "Server error occured");
+	        });
 
-			function bindRootScope() {
-			    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-			    	if ($rootScope.appStarted && $rootScope.$state.href(toState) != null && !$rootScope.unauthorizedArea($rootScope.$state.href(toState)) && !$rootScope.authenticated) {
-			            toaster.pop('warning', "Caution!", "You must login before accessing this area.");
+	        $rootScope.getReferenceItem = getReferenceItem;
+	        $rootScope.getValidationMessage = getValidationMessage;
+	        $rootScope.logout = logout;
+	        $rootScope.validatePermission = validatePermission;
+	        $rootScope.unauthorizedArea = unauthorizedArea;
+	        $rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
+	        $rootScope.stopPropagation = stopPropagation;
+	    }
 
-			            event.preventDefault();
-			        }
-			        else {
-			    		ngProgress.start();
+	    function bindRootScope() {
+	        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+	            if ($rootScope.appStarted && $rootScope.$state.href(toState) != null && !$rootScope.unauthorizedArea($rootScope.$state.href(toState)) && !$rootScope.authenticated) {
+	                toaster.pop('warning', "Caution!", "You must login before accessing this area.");
 
-			    		if ($rootScope.lastRemediationKey) {
-			    			webStorageUtil.removeSession($rootScope.lastRemediationKey);
-			    			$rootScope.lastRemediationKey = null;
-					    }
-			        }
-			    });
-			    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState) {
-			        ngProgress.complete();
-			        $rootScope.$state.previous = fromState;
-			    });
-			    $rootScope.$on('$stateChangeError', function () {
-			    	ngProgress.complete();
-			    });
-			    $rootScope.$on('$stateNotFound', function () {
-			    	ngProgress.complete();
-			    });
-			}
+	                event.preventDefault();
+	            }
+	            else {
+	                ngProgress.start();
 
-			var data = [];
+	                if ($rootScope.lastRemediationKey) {
+	                    webStorageUtil.removeSession($rootScope.lastRemediationKey);
+	                    $rootScope.lastRemediationKey = null;
+	                }
+	            }
+	        });
+	        $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState) {
+	            ngProgress.complete();
+	            $rootScope.$state.previous = fromState;
+	        });
+	        $rootScope.$on('$stateChangeError', function () {
+	            ngProgress.complete();
+	        });
+	        $rootScope.$on('$stateNotFound', function () {
+	            ngProgress.complete();
+	        });
+	    }
 
-			var setData = function (name,value) {
-			    data[name] = value;
-			};
+	    var data = [];
 
-			var getData = function (name) {
-			    return data[name];
-			};
+	    var setData = function (name, value) {
+	        data[name] = value;
+	    };
 
-			return {
-			    initialize: initialize,
-			    setData: setData,
-                getData: getData,
-			}
-		}
-	]);
+	    var getData = function (name) {
+	        return data[name];
+	    };
+
+	    return {
+	        initialize: initialize,
+	        setData: setData,
+	        getData: getData,
+	    }
+	}
+	])
+
+    .filter('utc', [function () {
+        return function (date) {
+            if (date) {
+                date = new Date(date);
+            }
+            if (date) {
+                return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            }
+            else
+            {
+                return date;
+            }
+        }
+    }]);
