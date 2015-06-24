@@ -28,10 +28,11 @@ namespace VC.Admin.Controllers
         private readonly IFileService fileService;
         private readonly ILogger logger;
 
-        public FileController(IFileService fileService)
+        public FileController(IFileService fileService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.fileService = fileService;
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
         }
 
         [HttpGet]

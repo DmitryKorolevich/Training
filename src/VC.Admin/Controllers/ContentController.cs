@@ -17,6 +17,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
 {
@@ -31,7 +32,8 @@ namespace VC.Admin.Controllers
         private readonly ILogger logger;
 
         public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
-            IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService)
+            IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.masterContentService = masterContentService;
             this.categoryService = categoryService;
@@ -39,7 +41,7 @@ namespace VC.Admin.Controllers
             this.faqService = faqService;
             this.articleService = articleService;
             this.contentPageService = contentPageService;
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
         }
         
         #region MasterContent

@@ -10,9 +10,9 @@
 
         public DiscountType IdDiscountType { get; set; }
 
-        public decimal Percent { get; set; }
+        public decimal? Percent { get; set; }
 
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
 
         public int Order { get; set; }
     }

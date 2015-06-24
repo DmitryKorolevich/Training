@@ -337,7 +337,6 @@ namespace VitalChoice.Infrastructure.Context
 
 			builder.Entity<User>().Key(p => p.Id);
 			builder.Entity<User>().ForSqlServer().Table("Users");
-            builder.Entity<User>().Ignore(p => p.AdminProfile);
 
             #endregion
 

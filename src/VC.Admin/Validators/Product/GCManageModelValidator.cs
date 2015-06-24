@@ -6,6 +6,7 @@ using VitalChoice.Validation.Helpers;
 using System;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Utils;
+using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Validators.Product
 {
@@ -32,7 +33,9 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.Email)
                     .Matches(ValidationPatterns.EmailPattern)
                     .When(p=>!String.IsNullOrEmpty(p.Email))
-                    .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
+                    .WithMessage(model => model.Email, ValidationMessages.EmailFormat)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Email, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

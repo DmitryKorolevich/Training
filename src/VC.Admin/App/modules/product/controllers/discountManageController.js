@@ -13,13 +13,30 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 var messages = "";
                 if (result.Messages) {
                     $scope.forms.submitted = true;
+                    $scope.forms.discountTiersSubmitted = true;
                     $scope.detailsTab.active = true;
                     $scope.serverMessages = new ServerMessages(result.Messages);
+
                     $.each(result.Messages, function (index, value) {
                         if (value.Field) {
-                            $scope.forms.mainForm[value.Field].$setValidity("server", false);
+                            if (value.Field.indexOf('.') > -1) {
+                                var items = value.Field.split(".");
+                                $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                            }
+                            else {
+                                $.each($scope.forms, function (index, form) {
+                                    if (form && !(typeof form === 'boolean')) {
+                                        if (form[value.Field] != undefined) {
+                                            form[value.Field].$setValidity("server", false);
+                                            if (formForShowing == null) {
+                                                formForShowing = index;
+                                            }
+                                            return false;
+                                        }
+                                    }
+                                });
+                            }
                         }
-                        messages += value.Message + "<br />";
                     });
                 }
                 toaster.pop('error', "Error!", messages, null, 'trustedHtml');
@@ -35,6 +52,15 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 
             $scope.assignedCustomerTypes = $rootScope.ReferenceData.AssignedCustomerTypes;
             $scope.discountTypes = $rootScope.ReferenceData.DiscountTypes;
+            $scope.tierDiscountTypes = [
+                { Key: 1, Text: "$" },
+                { Key: 2, Text: "%" }
+            ];//price or percent
+
+            $scope.skuFilter = {
+                Code: '',
+                Paging: { PageIndex: 1, PageItemCount: 10 },
+            };
 
             $scope.forms = {};
             $scope.detailsTab = {
@@ -69,7 +95,9 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			            }
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
 			            addProductsListWatchers();
-
+			            if ($scope.discount.DiscountTiers.length == 0) {
+			                $scope.addTier();
+			            }
 			        } else {
 			            errorHandler(result);
 			        }
@@ -80,13 +108,9 @@ angular.module('app.modules.product.controllers.discountManageController', [])
         };
 
         $scope.save = function () {
-            $.each($scope.forms.mainForm, function (index, element) {
-                if (element && element.$name == index) {
-                    element.$setValidity("server", true);
-                }
-            });
+            clearServerValidation();
 
-            if (isValid()) {
+            if (isMainFormValid() && $scope.forms.DiscountTiers.$valid) {
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.discount.CategoryIds = categoryIds;
@@ -97,6 +121,9 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 if (data.DiscountType == 3 || !data.SelectedProductsOnly) {
                     data.DiscountsToSelectedSkus = [];
                 }
+                if (data.DiscountType != 5) {
+                    data.DiscountTiers = [];
+                };
 
                 discountService.updateDiscount(data, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);
@@ -105,11 +132,37 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 });
             } else {
                 $scope.forms.submitted = true;
+                $scope.forms.discountTiersSubmitted = true;
                 $scope.detailsTab.active = true;
             }
         };
 
-        var isValid = function () {
+        var clearServerValidation = function () {
+            $.each($scope.forms, function (index, form) {
+                if (form && !(typeof form === 'boolean')) {
+                    if (index == "DiscountTiers") {
+                        $.each(form, function (index, subForm) {
+                            if (index.indexOf('i') == 0) {
+                                $.each(subForm, function (index, element) {
+                                    if (element && element.$name == index) {
+                                        element.$setValidity("server", true);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        $.each(form, function (index, element) {
+                            if (element && element.$name == index) {
+                                element.$setValidity("server", true);
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        var isMainFormValid = function () {
             if ($scope.forms.mainForm.$valid) {
                 return true;
             }
@@ -228,6 +281,97 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             $.each(category.SubItems, function (index, value) {
                 getSelected(value, ids);
             });
+        };
+
+        $scope.addTier = function () {
+            if ($scope.forms.DiscountTiers.$valid) {
+                var tier = {
+                    From: null,
+                    To: null,
+                    IdDiscountType: 2,//percent
+                    Percent: null,
+                    Amount: null,
+                }
+                if ($scope.discount.DiscountTiers.length != 0) {
+                    var lastTier = $scope.discount.DiscountTiers[$scope.discount.DiscountTiers.length - 1];
+                    if (lastTier.To) {
+                        tier.From = lastTier.To + 0.01;
+                    }
+                }
+                $scope.discount.DiscountTiers.push(tier);
+                $scope.forms.discountTiersSubmitted = false;
+            }
+            else
+            {
+                $scope.forms.discountTiersSubmitted = true;
+            }
+        };
+
+        $scope.tierToBlur = function (index)
+        {
+            var currentTier = $scope.discount.DiscountTiers[index];
+            if (index == 0 && currentTier.From && currentTier.To)
+            {
+                if (currentTier.From >= currentTier.To)
+                {
+                    currentTier.To = Math.round((currentTier.From + 0.01) * 100) / 100;
+                    recalculateTiers(index);
+                }
+            }
+        };
+
+        $scope.tierFromBlur = function (index) {
+            recalculateTiers(index);
+        };
+
+        var recalculateTiers = function (index) {
+            var currentTier = $scope.discount.DiscountTiers[index];
+            if (index != 0)
+            {
+                var tierBefore = $scope.discount.DiscountTiers[index - 1];
+                if(tierBefore && tierBefore.To)
+                {
+                    if (tierBefore.To >= currentTier.From)
+                    {
+                        currentTier.From = Math.round((tierBefore.To + 0.01) * 100) / 100;
+                    }
+                }
+                else
+                {
+                    currentTier.From = null;
+                }                    
+            }
+            if (currentTier.From) {
+                if(currentTier.From >= currentTier.To)
+                {
+                    currentTier.To = Math.round((currentTier.From + 0.01) * 100) / 100;
+                }
+                if (index+1 < $scope.discount.DiscountTiers.length)
+                {
+                    index++;
+                    recalculateTiers(index);
+                }
+            }
+            else
+            {
+                if (index != 0) {
+                    currentTier.To = null;
+                }
+            }
+        };
+
+        $scope.deleteTier = function (index) {
+            $scope.discount.DiscountTiers.splice(index, 1);
+        };
+
+        $scope.getSkus = function (val) {
+            $scope.skuFilter.Code = val;
+            return productService.getSkus($scope.skuFilter)
+                .then(function (result) {
+                    return result.data.Data.map(function (item) {
+                        return item.Code;
+                    });
+                });
         };
 
         initialize();

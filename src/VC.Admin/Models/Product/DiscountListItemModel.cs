@@ -55,9 +55,9 @@ namespace VC.Admin.Models.Product
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;
-                if (item.EditedBy != null && item.EditedBy.AdminProfile != null)
+                if(item.DictionaryData.ContainsKey("AddedByAgentId"))
                 {
-                    AddedByAgentId = item.EditedBy.AdminProfile.AgentId;
+                    AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
             }
         }

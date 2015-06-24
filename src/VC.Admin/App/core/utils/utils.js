@@ -24,6 +24,7 @@ angular.module('app.utils', [
 	'app.core.utils.parts.basePaginationDirective',
 	'app.core.utils.parts.imgLoadDirective',
 	'app.core.utils.parts.fileFieldDirective',
+	'app.core.utils.parts.numbersOnlyDirective',
 	'app.core.utils.textAngular',
 	'app.core.utils.webStorageUtil',
 	'app.core.utils.dataStateRemediator'

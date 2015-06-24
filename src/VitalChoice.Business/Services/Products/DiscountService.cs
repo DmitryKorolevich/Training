@@ -117,25 +117,23 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            if (result.Items.Count() > 0)
+            PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
+            if (toReturn.Items.Count() > 0)
             {
-                var ids = result.Items.Select(p => p.IdEditedBy).ToList();
+                var ids = result.Items.Select(p => p.IdAddedBy).ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
-                foreach (var item in result.Items)
+                foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)
                     {
-                        if (item.IdEditedBy == profile.Id)
+                        if (item.IdAddedBy == profile.Id)
                         {
-                            item.EditedBy = new User()
-                            {
-                                AdminProfile = profile,
-                            };
+                            item.Data.AddedByAgentId = profile.AgentId;
                         }
                     }
                 }
             }
-            PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
+
 
             return toReturn;
         }
@@ -182,6 +180,7 @@ namespace VitalChoice.Business.Services.Products
 
                 entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == entity.IdDiscountType).SelectAsync(false);
                 Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+                entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToList();
                 IncludeDiscountOptionTypes(entity, optionTypes);
                 return new DiscountDynamic(entity, withDefaults);
             }

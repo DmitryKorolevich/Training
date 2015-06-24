@@ -20,6 +20,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
 {
@@ -30,11 +31,12 @@ namespace VC.Admin.Controllers
         private readonly IProductService productService;
         private readonly ILogger logger;
 
-        public ProductController(IProductCategoryService productCategoryService, IProductService productService)
+        public ProductController(IProductCategoryService productCategoryService, IProductService productService,
+            ILoggerProviderExtended loggerProvider)
         {
             this.productCategoryService = productCategoryService;
             this.productService = productService;
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
         }
 
         #region Products

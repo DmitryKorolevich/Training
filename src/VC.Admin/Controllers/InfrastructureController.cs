@@ -19,7 +19,8 @@ namespace VC.Admin.Controllers
         private readonly IAppInfrastructureService appInfrastructureService;
         private readonly IHttpContextAccessor contextAccessor;
 
-        public InfrastructureController(IAppInfrastructureService appInfrastructureService, IHttpContextAccessor contextAccessor)
+        public InfrastructureController(IAppInfrastructureService appInfrastructureService, IHttpContextAccessor contextAccessor,
+            ILoggerProviderExtended loggerProvider)
         {
             this.appInfrastructureService = appInfrastructureService;
             this.contextAccessor = contextAccessor;

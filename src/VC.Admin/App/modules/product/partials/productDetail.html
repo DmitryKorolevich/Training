@@ -170,13 +170,19 @@
                                             <div class="form-group">
                                                 <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="product.MetaTitle">
+                                                    <input type="text" name="MetaTitle" class="form-control" placeholder="Meta Title" data-ng-model="product.MetaTitle">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.MetaTitle.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.MetaTitle.$error.server">{{serverMessages.GetMessage('MetaTitle')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="product.MetaDescription"></textarea>
+                                                    <textarea type="text" name="MetaDescription" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="product.MetaDescription"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.MetaDescription.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.MetaDescription.$error.server">{{serverMessages.GetMessage('MetaDescription')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -190,20 +196,29 @@
                                             <div class="form-group">
                                                 <label for="meta_title" class="col-md-3 control-label">Google Feed Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Google Feed Title" data-ng-model="product.GoogleFeedTitle">
+                                                    <input type="text" name="GoogleFeedTitle" class="form-control" placeholder="Google Feed Title" data-ng-model="product.GoogleFeedTitle">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.GoogleFeedTitle.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.GoogleFeedTitle.$error.server">{{serverMessages.GetMessage('GoogleFeedTitle')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="meta_description" class="col-md-3 control-label">Google Feed Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Google Feed Description" rows="10" data-ng-model="product.GoogleFeedDescription"></textarea>
+                                                    <textarea type="text" name="GoogleFeedDescription" class="form-control" placeholder="Google Feed Description" rows="10" data-ng-model="product.GoogleFeedDescription"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.GoogleFeedDescription.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.GoogleFeedDescription.$error.server">{{serverMessages.GetMessage('GoogleFeedDescription')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <span class="legend">Tax</span>
                                             <div class="form-group">
                                                 <label for="tax_code" class="col-md-3 control-label">Tax Code</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Tax Code" data-ng-model="product.TaxCode">
+                                                    <input type="text" name="TaxCode" class="form-control" placeholder="Tax Code" data-ng-model="product.TaxCode">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.TaxCode.$invalid">
+                                                        <small class="error" ng-show="forms.parentDetails.TaxCode.$error.server">{{serverMessages.GetMessage('TaxCode')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <span class="legend">Other Settings</span>
@@ -362,7 +377,7 @@
                                                                                 <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="number" name="Stock" class="form-control" placeholder="" data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/">
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Stock.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
@@ -441,7 +456,7 @@
                                                                                 <div class="fixed-accordion-row">
                                                                                     <label class="control-label">% Off</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="number" name="OffPercent" class="form-control" placeholder="% Off" data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <input name="OffPercent" class="form-control number" placeholder="% Off" money data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
                                                                                         <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.OffPercent.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>
@@ -493,145 +508,217 @@
                                             <div class="form-group">
                                                 <label for="title" class="col-md-3 control-label">Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Title" data-ng-model="product.NutritionalTitle">
+                                                    <input type="text" name="NutritionalTitle" class="form-control" placeholder="Title" data-ng-model="product.NutritionalTitle">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.NutritionalTitle.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.NutritionalTitle.$error.server">{{serverMessages.GetMessage('NutritionalTitle')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="serving_size" class="col-md-3 control-label">Serving Size</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Serving Size" data-ng-model="product.ServingSize">
+                                                    <input type="text" name="ServingSize" class="form-control" placeholder="Serving Size" data-ng-model="product.ServingSize">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.ServingSize.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.ServingSize.$error.server">{{serverMessages.GetMessage('ServingSize')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="servings" class="col-md-3 control-label">Servings</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Servings" data-ng-model="product.Servings">
+                                                    <input type="text" name="Servings" class="form-control" placeholder="Servings" data-ng-model="product.Servings">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Servings.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Servings.$error.server">{{serverMessages.GetMessage('Servings')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="calories" class="col-md-3 control-label">Calories</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Calories" data-ng-model="product.Calories">
+                                                    <input type="text" name="Calories" class="form-control" placeholder="Calories" data-ng-model="product.Calories">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Calories.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Calories.$error.server">{{serverMessages.GetMessage('Calories')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="calories_from_fat" class="col-md-3 control-label">Calories from Fat</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Calories from Fat" data-ng-model="product.CaloriesFromFat">
+                                                    <input type="text" name="CaloriesFromFat" class="form-control" placeholder="Calories from Fat" data-ng-model="product.CaloriesFromFat">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.CaloriesFromFat.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.CaloriesFromFat.$error.server">{{serverMessages.GetMessage('CaloriesFromFat')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="total_fat" class="col-md-3 control-label">Total Fat</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Total Fat" data-ng-model="product.TotalFat">
+                                                    <input type="text" name="TotalFat" class="form-control" placeholder="Total Fat" data-ng-model="product.TotalFat">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TotalFat.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TotalFat.$error.server">{{serverMessages.GetMessage('TotalFat')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="total_fat_percent" class="col-md-3 control-label">Total Fat Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Total Fat Percent" data-ng-model="product.TotalFatPercent">
+                                                    <input type="text" name="TotalFatPercent" class="form-control" placeholder="Total Fat Percent" data-ng-model="product.TotalFatPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TotalFatPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TotalFatPercent.$error.server">{{serverMessages.GetMessage('TotalFatPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="saturated_fat" class="col-md-3 control-label">Saturated Fat</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Saturated Fat" data-ng-model="product.SaturatedFat">
+                                                    <input type="text" name="SaturatedFat" class="form-control" placeholder="Saturated Fat" data-ng-model="product.SaturatedFat">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.SaturatedFat.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.SaturatedFat.$error.server">{{serverMessages.GetMessage('SaturatedFat')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="saturated_fat_percent" class="col-md-3 control-label">Saturated Fat Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Saturated Fat Percent" data-ng-model="product.SaturatedFatPercent">
+                                                    <input type="text" name="SaturatedFatPercent" class="form-control" placeholder="Saturated Fat Percent" data-ng-model="product.SaturatedFatPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.SaturatedFatPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.SaturatedFatPercent.$error.server">{{serverMessages.GetMessage('SaturatedFatPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="trans_fat" class="col-md-3 control-label">Trans Fat</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Trans Fat" data-ng-model="product.TransFat">
+                                                    <input type="text" name="TransFat" class="form-control" placeholder="Trans Fat" data-ng-model="product.TransFat">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TransFat.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TransFat.$error.server">{{serverMessages.GetMessage('TransFat')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="trans_fat_percent" class="col-md-3 control-label">Trans Fat Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Trans Fat Percent" data-ng-model="product.TransFatPercent">
+                                                    <input type="text" name="TransFatPercent" class="form-control" placeholder="Trans Fat Percent" data-ng-model="product.TransFatPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TransFatPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TransFatPercent.$error.server">{{serverMessages.GetMessage('TransFatPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="cholesterol" class="col-md-3 control-label">Cholesterol</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Cholesterol" data-ng-model="product.Cholesterol">
+                                                    <input type="text" name="Cholesterol" class="form-control" placeholder="Cholesterol" data-ng-model="product.Cholesterol">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Cholesterol.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Cholesterol.$error.server">{{serverMessages.GetMessage('Cholesterol')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="cholesterol_percent" class="col-md-3 control-label">Cholesterol Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Cholesterol Percent" data-ng-model="product.CholesterolPercent">
+                                                    <input type="text" name="CholesterolPercent" class="form-control" placeholder="Cholesterol Percent" data-ng-model="product.CholesterolPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.CholesterolPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.CholesterolPercent.$error.server">{{serverMessages.GetMessage('CholesterolPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="sodium" class="col-md-3 control-label">Sodium</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Sodium" data-ng-model="product.Sodium">
+                                                    <input type="text" name="Sodium" class="form-control" placeholder="Sodium" data-ng-model="product.Sodium">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Sodium.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Sodium.$error.server">{{serverMessages.GetMessage('Sodium')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="sodium_percent" class="col-md-3 control-label">Sodium Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Sodium Percent" data-ng-model="product.SodiumPercent">
+                                                    <input type="text" name="SodiumPercent" class="form-control" placeholder="Sodium Percent" data-ng-model="product.SodiumPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.SodiumPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.SodiumPercent.$error.server">{{serverMessages.GetMessage('SodiumPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="total_carbohydrate" class="col-md-3 control-label">Total Carbohydrate</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Total Carbohydrate" data-ng-model="product.TotalCarbohydrate">
+                                                    <input type="text" name="TotalCarbohydrate" class="form-control" placeholder="Total Carbohydrate" data-ng-model="product.TotalCarbohydrate">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TotalCarbohydrate.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TotalCarbohydrate.$error.server">{{serverMessages.GetMessage('TotalCarbohydrate')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="total_carbohydrate_percent" class="col-md-3 control-label">Total Carbohydrate Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Total Carbohydrate Percent" data-ng-model="product.TotalCarbohydratePercent">
+                                                    <input type="text" name="TotalCarbohydratePercent" class="form-control" placeholder="Total Carbohydrate Percent" data-ng-model="product.TotalCarbohydratePercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.TotalCarbohydratePercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.TotalCarbohydratePercent.$error.server">{{serverMessages.GetMessage('TotalCarbohydratePercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="dietary_fiber" class="col-md-3 control-label">Dietary Fiber</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Dietary Fiber" data-ng-model="product.DietaryFiber">
+                                                    <input type="text" name="DietaryFiber" class="form-control" placeholder="Dietary Fiber" data-ng-model="product.DietaryFiber">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.DietaryFiber.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.DietaryFiber.$error.server">{{serverMessages.GetMessage('DietaryFiber')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="dietary_fiber_percent" class="col-md-3 control-label">Dietary Fiber Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Dietary Fiber Percent" data-ng-model="product.DietaryFiberPercent">
+                                                    <input type="text" name="DietaryFiberPercent" class="form-control" placeholder="Dietary Fiber Percent" data-ng-model="product.DietaryFiberPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.DietaryFiberPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.DietaryFiberPercent.$error.server">{{serverMessages.GetMessage('DietaryFiberPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="sugars" class="col-md-3 control-label">Sugars</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Sugars" data-ng-model="product.Sugars">
+                                                    <input type="text" name="Sugars" class="form-control" placeholder="Sugars" data-ng-model="product.Sugars">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Sugars.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Sugars.$error.server">{{serverMessages.GetMessage('Sugars')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="sugars_percent" class="col-md-3 control-label">Sugars Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Sugars Percent" data-ng-model="product.SugarsPercent">
+                                                    <input type="text" name="SugarsPercent" class="form-control" placeholder="Sugars Percent" data-ng-model="product.SugarsPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.SugarsPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.SugarsPercent.$error.server">{{serverMessages.GetMessage('SugarsPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="protein" class="col-md-3 control-label">Protein</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Protein" data-ng-model="product.Protein">
+                                                    <input type="text" name="Protein" class="form-control" placeholder="Protein" data-ng-model="product.Protein">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.Protein.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.Protein.$error.server">{{serverMessages.GetMessage('Protein')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="protein_percent" class="col-md-3 control-label">Protein Percent</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Protein Percent" data-ng-model="product.ProteinPercent">
+                                                    <input type="text" name="ProteinPercent" class="form-control" placeholder="Protein Percent" data-ng-model="product.ProteinPercent">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.ProteinPercent.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.ProteinPercent.$error.server">{{serverMessages.GetMessage('ProteinPercent')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="nutri_additional_Notes" class="col-md-3 control-label">Additional Notes</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Additional Notes" rows="10" data-ng-model="product.AdditionalNotes"></textarea>
+                                                    <textarea type="text" name="AdditionalNotes" class="form-control" placeholder="Additional Notes" rows="10" data-ng-model="product.AdditionalNotes"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.nutritional.AdditionalNotes.$invalid">
+                                                        <small class="error" ng-show="forms.nutritional.AdditionalNotes.$error.server">{{serverMessages.GetMessage('AdditionalNotes')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
 

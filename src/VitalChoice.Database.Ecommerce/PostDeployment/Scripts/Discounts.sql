@@ -63,6 +63,15 @@ ALTER TABLE [dbo].[Discounts] ALTER COLUMN [StartDate] DATETIME2 NULL
 
 GO
 
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdAddedBy' AND [Object_ID] = OBJECT_ID(N'[dbo].Discounts', N'U'))
+BEGIN
+	ALTER TABLE dbo.Discounts
+	ADD IdAddedBy INT NULL
+
+	ALTER TABLE [dbo].[Discounts] ADD CONSTRAINT [FK_Discounts_ToAddedUser] FOREIGN KEY ([IdAddedBy]) REFERENCES [Users] ([Id])
+END
+GO
+
 IF OBJECT_ID(N'[dbo].[DiscountsToCategories]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[DiscountsToCategories]
@@ -135,6 +144,9 @@ BEGIN
 		CONSTRAINT [FK_DiscountTiers_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]),
 	)
 END
+
+ALTER TABLE [dbo].[DiscountTiers] ALTER COLUMN [Percent] DECIMAL(5,2) NULL
+ALTER TABLE [dbo].[DiscountTiers] ALTER COLUMN [Amount] MONEY NULL 
 
 GO
 

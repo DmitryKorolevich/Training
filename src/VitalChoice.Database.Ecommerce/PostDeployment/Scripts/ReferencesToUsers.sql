@@ -1,13 +1,4 @@
-﻿IF COL_LENGTH('[dbo].[Discounts]','IdAddedBy') IS NOT NULL
-BEGIN
-	ALTER TABLE [dbo].[Discounts]
-	DROP CONSTRAINT [FK_Discounts_ToAddedUser]
-
-	ALTER TABLE [dbo].[Discounts]
-	DROP COLUMN [IdAddedBy]
-END
-
-IF COL_LENGTH('[dbo].[Products]','IdAddedBy') IS NOT NULL
+﻿IF COL_LENGTH('[dbo].[Products]','IdAddedBy') IS NOT NULL
 BEGIN
 	ALTER TABLE [dbo].[Products]
 	DROP CONSTRAINT [FK_Products_ToAddedUser]

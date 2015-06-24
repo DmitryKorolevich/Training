@@ -18,6 +18,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
 {
@@ -27,10 +28,10 @@ namespace VC.Admin.Controllers
         private readonly IGCService GCService;
         private readonly ILogger logger;
 
-        public GCController(IGCService GCService)
+        public GCController(IGCService GCService, ILoggerProviderExtended loggerProvider)
         {
             this.GCService = GCService;
-            this.logger = LoggerService.GetDefault();
+            this.logger = loggerProvider.CreateLoggerDefault();
         }
 
         [HttpPost]

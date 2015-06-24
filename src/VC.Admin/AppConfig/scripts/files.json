@@ -63,6 +63,7 @@
 		"app/core/utils/parts/imgloadDirective.js",
 		"app/core/utils/parts/fileFieldDirective.js",
     "app/core/utils/parts/angular-money-directive.js",
+    "app/core/utils/parts/numbersOnlyDirective.js",
 		"app/core/utils/templateOverrides.js",
 		"app/core/utils/textAngular/controllers/imageCustomizationController.js",
 		"app/core/utils/textAngular/services/imageCustomizationService.js",

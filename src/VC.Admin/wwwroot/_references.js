@@ -1545,3 +1545,4 @@
 /// <reference path="app/modules/product/controllers/discountmanagecontroller.js" />
 /// <reference path="app/modules/product/controllers/discountscontroller.js" />
 /// <reference path="app/modules/product/controllers/skussearchcontroller.js" />
+/// <reference path="../app/core/utils/parts/numbersonlydirective.js" />

@@ -23,6 +23,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System.Security.Claims;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
 {
@@ -33,11 +34,11 @@ namespace VC.Admin.Controllers
         private readonly IProductService _productService;
         private readonly ILogger _logger;
 
-        public DiscountController(IDiscountService discountService, IProductService _productService)
+        public DiscountController(IDiscountService discountService, IProductService _productService, ILoggerProviderExtended loggerProvider)
         {
             this._discountService = discountService;
             this._productService = _productService;
-            this._logger = LoggerService.GetDefault();
+            this._logger = loggerProvider.CreateLoggerDefault();
         }
 
         #region Products
