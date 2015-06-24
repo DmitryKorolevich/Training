@@ -150,6 +150,11 @@ namespace VC.Admin.Models.Product
 
         public void FillSelfFrom(DiscountDynamic dynamicObject)
         {
+            if(ExpirationDate.HasValue)
+            {
+                ExpirationDate = new DateTime(ExpirationDate.Value.Year, ExpirationDate.Value.Month, ExpirationDate.Value.Day);
+            }
+
             CategoryIds = dynamicObject.CategoryIds.ToList();
             DiscountsToSkus = dynamicObject.DiscountsToSkus.ToList();
             DiscountsToSelectedSkus = dynamicObject.DiscountsToSelectedSkus.ToList();
