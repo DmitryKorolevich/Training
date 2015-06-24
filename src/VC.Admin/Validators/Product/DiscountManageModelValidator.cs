@@ -40,6 +40,14 @@ namespace VC.Admin.Validators.Product
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Description, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
+                RuleFor(model => model.StartDate)
+                    .Must(model=> model.HasValue)
+                    .WithMessage(model => model.StartDate, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.ExpirationDate)
+                    .Must(model => model.HasValue)
+                    .WithMessage(model => model.StartDate, ValidationMessages.FieldRequired);
+
                 RuleFor(model => model.RequireMinimumPerishableAmount)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .GreaterThan(0)

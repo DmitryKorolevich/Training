@@ -93,6 +93,16 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			            if ($scope.discount.DiscountsToSelectedSkus.length > 0) {
 			                $scope.discount.SelectedProductsOnly = true;
 			            }
+
+			            if ($scope.discount.ExpirationDate)
+			            {
+			                var date = new Date($scope.discount.ExpirationDate);
+			                $scope.discount.ExpirationDate = new Date(date.getUTCFullYear(),
+                                                                      date.getUTCMonth(),
+                                                                      date.getUTCDate(),
+                                                                      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+			            }
+
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
 			            addProductsListWatchers();
 			            if ($scope.discount.DiscountTiers.length == 0) {

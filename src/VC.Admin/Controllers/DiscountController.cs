@@ -68,7 +68,7 @@ namespace VC.Admin.Controllers
                 {
                     StatusCode = RecordStatusCode.Active,
                     Assigned = CustomerTypeCode.All,
-                    DiscountType=DiscountType.PriceDiscount,
+                    DiscountType=DiscountType.PercentDiscount,
                     StartDate = now,
                     ExpirationDate= now.AddDays(30),
                     DiscountsToSelectedSkus = new List<DiscountToSelectedSku>(),

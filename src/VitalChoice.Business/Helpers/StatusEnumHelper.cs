@@ -92,8 +92,8 @@ namespace VitalChoice.Business.Helpers
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>
             {
-                {(int) DiscountType.PriceDiscount, "Price Discount"},
-                {(int) DiscountType.PercentDiscount, "Percent Discount"},
+                {(int) DiscountType.PercentDiscount, "Percent"},
+                {(int) DiscountType.PriceDiscount, "Price"},
                 {(int) DiscountType.FreeShipping, "Free Shipping"},
                 {(int) DiscountType.Threshold, "Threshold"},
                 {(int) DiscountType.Tiered, "Tiered"},
@@ -107,10 +107,10 @@ namespace VitalChoice.Business.Helpers
             switch (type)
             {
                 case DiscountType.PriceDiscount:
-                    toReturn = "Price Discount";
+                    toReturn = "Price";
                     break;
                 case DiscountType.PercentDiscount:
-                    toReturn = "Percent Discount";
+                    toReturn = "Percent";
                     break;
                 case DiscountType.FreeShipping:
                     toReturn = "Free Shipping";

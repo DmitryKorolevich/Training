@@ -108,6 +108,15 @@ namespace VC.Admin.Models.Product
             DiscountDynamic toReturn = new DiscountDynamic();
             toReturn.FromModel<DiscountManageModel, DiscountDynamic>(this);
 
+            if(toReturn.StartDate.HasValue)
+            {
+                toReturn.StartDate = new DateTime(toReturn.StartDate.Value.Year, toReturn.StartDate.Value.Month, toReturn.StartDate.Value.Day);
+            }
+            if (toReturn.ExpirationDate.HasValue)
+            {
+                toReturn.ExpirationDate = (new DateTime(toReturn.ExpirationDate.Value.Year, toReturn.ExpirationDate.Value.Month, toReturn.ExpirationDate.Value.Day)).AddDays(1).AddSeconds(-1);
+            }
+
             return toReturn;
         }
 
