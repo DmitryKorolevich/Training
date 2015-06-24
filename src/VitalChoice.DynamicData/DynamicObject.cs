@@ -403,21 +403,12 @@ namespace VitalChoice.DynamicData
 
         private static string ConvertToOption(object value)
         {
-            if (value==null)
+            if (value == null)
                 return null;
-            if(value is double)
-            {
-                return ((double)value).ToString(CultureInfo.InvariantCulture);
-            } else if (value is decimal)
-            {
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-            } if (value is int)
-            {
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
-            } else
-            {
-                return value.ToString();
-            }
+            string result;
+            if ((result = value as string) != null)
+                return result;
+            return Convert.ToString(value, CultureInfo.InvariantCulture);
         }
     }
 }
