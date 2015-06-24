@@ -85,9 +85,9 @@
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
-                        <td>{{item.StartDate | date:"MM/dd/yy" : 'UTC'}}</td>
-                        <td>{{item.ExpirationDate | date:"MM/dd/yy" : 'UTC'}}</td>
-                        <td>{{item.DateCreated | date:"MM/dd/yy" : 'UTC'}}<br />{{item.DateCreated | date:"h:mm a" : 'UTC'}}<br />{{item.AddedByAgentId}}</td>
+                        <td>{{item.StartDate | date:"MM/dd/yy"}}</td>
+                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}</td>
+                        <td>{{item.DateCreated | date:"MM/dd/yy"}}<br />{{item.DateCreated | date:"h:mm a"}}<br />{{item.AddedByAgentId}}</td>
                         <td>
                             <button class="btn btn-default btn-success" data-ng-click="open(item.Id);">Edit</button>
                             <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">Delete</button>

@@ -114,7 +114,7 @@ namespace VC.Admin.Models.Product
             }
             if (toReturn.ExpirationDate.HasValue)
             {
-                toReturn.ExpirationDate = (new DateTime(toReturn.ExpirationDate.Value.Year, toReturn.ExpirationDate.Value.Month, toReturn.ExpirationDate.Value.Day)).AddDays(1).AddSeconds(-1);
+                toReturn.ExpirationDate = (new DateTime(ExpirationDate.Value.Year, ExpirationDate.Value.Month, ExpirationDate.Value.Day)).AddDays(1);
             }
 
             return toReturn;
@@ -150,6 +150,11 @@ namespace VC.Admin.Models.Product
 
         public void FillSelfFrom(DiscountDynamic dynamicObject)
         {
+            if(ExpirationDate.HasValue)
+            {
+                ExpirationDate = ExpirationDate.Value.AddDays(-1);
+            }
+
             CategoryIds = dynamicObject.CategoryIds.ToList();
             DiscountsToSkus = dynamicObject.DiscountsToSkus.ToList();
             DiscountsToSelectedSkus = dynamicObject.DiscountsToSelectedSkus.ToList();

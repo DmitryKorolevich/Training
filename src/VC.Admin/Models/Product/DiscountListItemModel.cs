@@ -59,6 +59,10 @@ namespace VC.Admin.Models.Product
                 {
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
+                if (ExpirationDate.HasValue)
+                {
+                    ExpirationDate = ExpirationDate.Value.AddDays(-1);
+                }
             }
         }
     }

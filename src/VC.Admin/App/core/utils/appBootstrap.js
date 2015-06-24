@@ -180,19 +180,4 @@ angular.module('app.core.utils.appBootstrap', [])
 	        getData: getData,
 	    }
 	}
-	])
-
-    .filter('utc', [function () {
-        return function (date) {
-            if (date) {
-                date = new Date(date);
-            }
-            if (date) {
-                return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            }
-            else
-            {
-                return date;
-            }
-        }
-    }]);
+	]);
