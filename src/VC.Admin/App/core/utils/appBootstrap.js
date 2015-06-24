@@ -180,24 +180,4 @@ angular.module('app.core.utils.appBootstrap', [])
 	        getData: getData,
 	    }
 	}
-	])
-
-    .filter('local', [function () {
-        return function (date) {
-            if (date) {
-                date = new Date(date);
-            }
-            if (date) {
-                return new Date(date.getFullYear(),
-                     date.getMonth(),
-                     date.getDate(),
-                     date.getHours(),
-                     date.getMinutes(),
-                     date.getSeconds());
-            }
-            else
-            {
-                return date;
-            }
-        }
-    }]);
+	]);
