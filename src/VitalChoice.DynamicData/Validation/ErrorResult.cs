@@ -1,7 +1,6 @@
 using System.Linq;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Validation.Abstractions;
-using VitalChoice.Validation.Helpers;
 
 namespace VitalChoice.DynamicData.Validation
 {

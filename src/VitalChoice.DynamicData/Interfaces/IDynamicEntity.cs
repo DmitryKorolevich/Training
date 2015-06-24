@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
@@ -15,5 +16,7 @@ namespace VitalChoice.DynamicData.Interfaces
         RecordStatusCode StatusCode { get; set; }
         DateTime DateCreated { get; set; }
         DateTime DateEdited { get; set; }
+        int? IdEditedBy { get; set; }
+        User EditedBy { get; set; }
     }
 }

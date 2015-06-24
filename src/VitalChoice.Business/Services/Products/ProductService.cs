@@ -23,7 +23,6 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Validation.Helpers;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -211,16 +210,16 @@ namespace VitalChoice.Business.Services.Products
                 int idProduct = 0;
                 if (model.Id == 0)
                 {
-                    idProduct = (await InsertProduct(model, uow)).Id;
+                    idProduct = (await InsertProductAsync(model, uow)).Id;
                 }
-                product = await UpdateProduct(model, uow);
+                product = await UpdateProductAsync(model, uow);
                 if (idProduct != 0)
                     return await GetProductAsync(idProduct);
                 return new ProductDynamic(product);
             }
         }
 
-        private async Task<List<MessageInfo>> ValidateProduct(ProductDynamic model, int? existingProductId = null,
+        private async Task<List<MessageInfo>> ValidateProductAsync(ProductDynamic model, int? existingProductId = null,
             ICollection<int> existSkus = null)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
@@ -273,9 +272,9 @@ namespace VitalChoice.Business.Services.Products
             return errors;
         }
 
-        private async Task<Product> InsertProduct(ProductDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Product> InsertProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
         {
-            (await ValidateProduct(model)).Raise();
+            (await ValidateProductAsync(model)).Raise();
 
             var entity = model.ToEntity();
             if (entity != null)
@@ -307,7 +306,7 @@ namespace VitalChoice.Business.Services.Products
             return null;
         }
 
-        private async Task<Product> UpdateProduct(ProductDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Product> UpdateProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
         {
             var productRepository = uow.RepositoryAsync<Product>();
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
@@ -326,7 +325,7 @@ namespace VitalChoice.Business.Services.Products
                         .SelectAsync();
                 
                 var oldSet = entity.Skus.Select(s => s.Id).ToArray();
-                (await ValidateProduct(model, model.Id, oldSet)).Raise();
+                (await ValidateProductAsync(model, model.Id, oldSet)).Raise();
                 await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
                 entity.OptionTypes =
