@@ -17,6 +17,5 @@ namespace VitalChoice.DynamicData.Interfaces
         DateTime DateCreated { get; set; }
         DateTime DateEdited { get; set; }
         int? IdEditedBy { get; set; }
-        User EditedBy { get; set; }
     }
 }
