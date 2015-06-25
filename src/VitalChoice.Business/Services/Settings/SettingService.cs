@@ -21,23 +21,30 @@ namespace VitalChoice.Business.Services.Settings
             logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task<AppSettingItem> GetAppSettingAsync(int id)
+        public async Task<ICollection<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names)
         {
-            var appSetting = (await appSettingRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var appSettingItems = (await appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(false)).ToArray();
 
-            return appSetting;
+            return appSettingItems;
         }
 
-        public async Task<AppSettingItem> UpdateAppSettingAsync(int id, string value)
+        public async Task<ICollection<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items)
         {
-            AppSettingItem toReturn = (await appSettingRepository.Query(p => p.Id == id).SelectAsync()).FirstOrDefault(); ;
-            if(toReturn!=null)
+            var names = items.Select(p => p.Name).ToArray();
+            var dbItems = (await appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(true)).ToArray();
+            foreach(var dbItem in dbItems)
             {
-                toReturn.Value = value;
-                await appSettingRepository.UpdateAsync(toReturn);
+                foreach(var item in items)
+                {
+                    if(dbItem.Name==item.Name)
+                    {
+                        dbItem.Value = item.Value;
+                    }
+                }
             }
+            await appSettingRepository.UpdateRangeAsync(dbItems);
 
-            return toReturn;
+            return dbItems;
         }
 
         public async Task<AppSettings> GetAppSettingsAsync()

@@ -18,7 +18,6 @@ using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Settings)]
     public class SettingController : BaseApiController
     {
         private readonly ILogViewService logViewService;
@@ -40,6 +39,7 @@ namespace VC.Admin.Controllers
         #region Countries/States
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries()
         {
             var result = await countryService.GetCountriesAsync();
@@ -48,6 +48,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<bool>> UpdateCountriesOrder([FromBody]IEnumerable<CountryListItemModel> model)
         {
             List<Country> countries = new List<Country>();
@@ -60,6 +61,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<CountryManageModel>> UpdateCountry([FromBody]CountryManageModel model)
         {
             var item = ConvertWithValidate(model);
@@ -72,12 +74,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<bool>> DeleteCountry(int id)
         {
             return await countryService.DeleteCountryAsync(id);
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<StateManageModel>> UpdateState([FromBody]StateManageModel model)
         {
             var item = ConvertWithValidate(model);
@@ -90,6 +94,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<bool>> DeleteState(int id)
         {
             return await countryService.DeleteStateAsync(id);
@@ -100,29 +105,30 @@ namespace VC.Admin.Controllers
         #region Settings
 
         [HttpGet]
-        public async Task<Result<string>> GetGlobalPerishableThreshold()
+        [SuperAdminAuthorize()]
+        public async Task<Result<GlobalSettingsManageModel>> GetGlobalSettings()
         {
             string toReturn = null;
-            var result = await settingService.GetAppSettingAsync(SettingConstants.GLOBAL_PERISHABLE_THRESHOLD);
-            if(result!=null)
+            var items = await settingService.GetAppSettingItemsAsync(new List<string>
             {
-                toReturn = result.Value;
-            }
+                SettingConstants.GLOBAL_PERISHABLE_THRESHOLD_NAME,
+                SettingConstants.GLOBAL_CREDIT_CARD_AUTHORIZATIONS_NAME,
+            });
 
-            return toReturn;
+            return new GlobalSettingsManageModel(items);
         }
 
         [HttpPost]
-        public async Task<Result<string>> UpdateGlobalPerishableThreshold(string id)
+        [SuperAdminAuthorize()]
+        public async Task<Result<GlobalSettingsManageModel>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
         {
-            string toReturn = null;
-            var result = await settingService.UpdateAppSettingAsync(SettingConstants.GLOBAL_PERISHABLE_THRESHOLD,id?.Trim());
-            if (result != null)
-            {
-                toReturn = result.Value;
-            }
+            var item = ConvertWithValidate(model);
+            if (item == null)
+                return null;
 
-            return toReturn;
+            var appSettingItems = await settingService.UpdateAppSettingItemsAsync(item);
+
+            return new GlobalSettingsManageModel(appSettingItems);
         }
 
         #endregion
@@ -130,6 +136,7 @@ namespace VC.Admin.Controllers
         #region Logs
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
             var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
