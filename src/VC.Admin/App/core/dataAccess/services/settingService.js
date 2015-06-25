@@ -39,11 +39,11 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	    },
 
 	    //settings
-	    getGlobalPerishableThreshold: function (tracker) {
-	        return $http.get(baseUrl + 'GetGlobalPerishableThreshold', getConfig(tracker));
+	    getGlobalSettings: function (tracker) {
+	        return $http.get(baseUrl + 'GetGlobalSettings', getConfig(tracker));
 	    },
-	    updateGlobalPerishableThreshold: function (value, tracker) {
-	        return $http.post(baseUrl + 'UpdateGlobalPerishableThreshold/' + value, getConfig(tracker));
+	    updateGlobalSettings: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateGlobalSettings', model, getConfig(tracker));
 	    },
 	};
 }]);

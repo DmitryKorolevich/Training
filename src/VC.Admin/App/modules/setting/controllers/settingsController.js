@@ -13,7 +13,7 @@ angular.module('app.modules.setting.controllers.settingsController', [])
             } else {
                 var messages = "";
                 if (result.Messages) {
-                    $scope.forms.form.submitted = true;
+                    $scope.forms.submitted = true;
                     $scope.serverMessages = new ServerMessages(result.Messages);
                     $.each(result.Messages, function (index, value) {
                         if (value.Field) {
@@ -35,10 +35,10 @@ angular.module('app.modules.setting.controllers.settingsController', [])
 
             $scope.settings={};
 
-            settingService.getGlobalPerishableThreshold($scope.refreshTracker)
+            settingService.getGlobalSettings($scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
-                        $scope.settings.Threshold = result.Data;
+                        $scope.settings = result.Data;
                     } else {
                         errorHandler(result);
                     }
@@ -56,14 +56,14 @@ angular.module('app.modules.setting.controllers.settingsController', [])
             });
 
             if ($scope.forms.form.$valid) {
-                settingService.updateGlobalPerishableThreshold($scope.settings.Threshold, $scope.editTracker).success(function (result) {
+                settingService.updateGlobalSettings($scope.settings, $scope.editTracker).success(function (result) {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.form.submitted = true;
+                $scope.forms.submitted = true;
             }
         };
 

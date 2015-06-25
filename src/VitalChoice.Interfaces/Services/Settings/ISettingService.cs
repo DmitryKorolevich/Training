@@ -1,13 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Interfaces.Services.Settings
 {
 	public interface ISettingService
     {
-        Task<AppSettingItem> GetAppSettingAsync(int id);
+        Task<ICollection<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names);
 
-        Task<AppSettingItem> UpdateAppSettingAsync(int id, string value);
+        Task<ICollection<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items);
 
         Task<AppSettings> GetAppSettingsAsync();
     }
