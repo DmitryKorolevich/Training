@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Users;
@@ -11,7 +12,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TOptionValue : OptionValue<TOptionType>
     {
         void UpdateEntity(TEntity entity);
-        TEntity ToEntity();
+        TEntity ToEntity(ICollection<TOptionType> optionTypes);
         int Id { get; set; }
         RecordStatusCode StatusCode { get; set; }
         DateTime DateCreated { get; set; }

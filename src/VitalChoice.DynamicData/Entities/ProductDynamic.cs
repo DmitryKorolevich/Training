@@ -42,7 +42,7 @@ namespace VitalChoice.DynamicData.Entities
                 IdProduct = Id
             }).ToList();
 
-            entity.Skus = Skus?.Select(s => s.ToEntity()).ToList() ?? new List<Sku>();
+            entity.Skus = Skus?.Select(s => s.ToEntity(entity.OptionTypes)).ToList() ?? new List<Sku>();
         }
 
         private static void SetSkuOrdering(IEnumerable<SkuDynamic> skus)
@@ -92,7 +92,7 @@ namespace VitalChoice.DynamicData.Entities
                 //Insert
                 entity.Skus.AddRange(Skus.Where(s => s.Id == 0).Select(s =>
                 {
-                    var sku = s.ToEntity();
+                    var sku = s.ToEntity(entity.OptionTypes);
                     sku.IdProduct = Id;
                     return sku;
                 }));

@@ -8,7 +8,6 @@ using System.Reflection;
 using Templates.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
@@ -67,7 +66,7 @@ namespace VitalChoice.DynamicData
                     TOptionType optionType;
                     if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
                     {
-                        data.Add(optionType.Name, ConvertTo(value.Value, optionType.IdFieldType));
+                        data.Add(optionType.Name, ConvertTo(value, (FieldType)optionType.IdFieldType));
                     }
                 }
             }
@@ -91,36 +90,25 @@ namespace VitalChoice.DynamicData
             {
                 foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
                 {
-                    data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, optionType.IdFieldType));
+                    data.Add(optionType.Name, ConvertTo(optionType.DefaultValue, (FieldType)optionType.IdFieldType));
                 }
             }
             FromEntity(entity, true);
         }
 
-        protected abstract void FillNewEntity(TEntity entity);
+        protected abstract void UpdateEntityInternal(TEntity entity);
 
         public void UpdateEntity(TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
-            var optionTypesCache = entity.OptionTypes?.ToDictionary(o => o.Name, o => o.Id);
-            entity.OptionValues = new List<TOptionValue>();
-            if (optionTypesCache != null)
-            {
-                foreach (var data in DynamicData)
-                {
-                    int idOption;
-                    if (!optionTypesCache.TryGetValue(data.Key, out idOption)) continue;
-                    if (data.Value == null) continue;
+            if (entity.OptionTypes == null)
+                throw new ArgumentException("OptionTypes collection is null");
 
-                    var option = new TOptionValue
-                    {
-                        Value = ConvertToOption(data.Value),
-                        IdOptionType = idOption
-                    };
-                    entity.OptionValues.Add(option);
-                }
-            }
+            var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
+            entity.OptionValues = new List<TOptionValue>();
+
+            FillEntityOptions(optionTypesCache, entity);
             entity.Id = Id;
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
@@ -129,26 +117,15 @@ namespace VitalChoice.DynamicData
             UpdateEntityInternal(entity);
         }
 
-        protected abstract void UpdateEntityInternal(TEntity entity);
+        protected abstract void FillNewEntity(TEntity entity);
 
-        public TEntity ToEntity()
+        public TEntity ToEntity(ICollection<TOptionType> optionTypes)
         {
-            var entity = new TEntity {OptionValues = new List<TOptionValue>()};
-            foreach (var data in DynamicData)
-            {
-                if (data.Value != null)
-                {
-                    var option = new TOptionValue
-                    {
-                        Value = ConvertToOption(data.Value),
-                        OptionType = new TOptionType
-                        {
-                            Name = data.Key
-                        }
-                    };
-                    entity.OptionValues.Add(option);
-                }
-            }
+            if (optionTypes == null) throw new ArgumentNullException(nameof(optionTypes));
+
+            var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
+            var entity = new TEntity {OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
+            FillEntityOptions(optionTypesCache, entity);
             entity.Id = Id;
             entity.DateCreated = DateTime.Now;
             entity.DateEdited = DateTime.Now;
@@ -156,6 +133,22 @@ namespace VitalChoice.DynamicData
             entity.IdEditedBy = IdEditedBy;
             FillNewEntity(entity);
             return entity;
+        }
+
+        private void FillEntityOptions(Dictionary<string, TOptionType> optionTypesCache, TEntity entity)
+        {
+            foreach (var data in DynamicData)
+            {
+                if (data.Value == null) continue;
+                TOptionType optionType;
+
+                if (!optionTypesCache.TryGetValue(data.Key, out optionType)) continue;
+
+                var option = new TOptionValue();
+                ConvertToOption(option, data.Value, (FieldType) optionType.IdFieldType);
+                option.IdOptionType = optionType.Id;
+                entity.OptionValues.Add(option);
+            }
         }
 
         public TModel ToModel<TModel, TDynamic>()
@@ -192,11 +185,6 @@ namespace VitalChoice.DynamicData
                 throw new ArgumentNullException(nameof(model));
             FromModelInternal(model, modelType, dynamicType);
             model.FillDynamic((dynamic) this);
-        }
-
-        public static implicit operator TEntity(DynamicObject<TEntity, TOptionValue, TOptionType> dynamicObject)
-        {
-            return dynamicObject?.ToEntity();
         }
 
         protected ExpandoObject DynamicData { get; } = new ExpandoObject();
@@ -378,36 +366,57 @@ namespace VitalChoice.DynamicData
             }
         }
 
-        //crutch
-        private static object ConvertTo(string value, int typeId)
+        private static object ConvertTo(TOptionValue value, FieldType typeId)
+        {
+            if (string.IsNullOrEmpty(value.Value) && value.BigValue == null)
+                return null;
+            return typeId == FieldType.LargeString ? value.BigValue?.Value : ConvertTo(value.Value, typeId);
+        }
+
+        private static object ConvertTo(string value, FieldType typeId)
         {
             if (string.IsNullOrEmpty(value))
                 return null;
             switch (typeId)
             {
-                case 4:
+                case FieldType.String:
                     return value;
-                case 5:
+                case FieldType.Bool:
                     return bool.Parse(value);
-                case 3:
+                case FieldType.Int:
                     return int.Parse(value, CultureInfo.InvariantCulture);
-                case 1:
+                case FieldType.Decimal:
                     return decimal.Parse(value, CultureInfo.InvariantCulture);
-                case 2:
+                case FieldType.Double:
                     return double.Parse(value, CultureInfo.InvariantCulture);
+                case FieldType.DateTime:
+                    return DateTime.Parse(value, CultureInfo.InvariantCulture);
+                case FieldType.Int64:
+                    return long.Parse(value, CultureInfo.InvariantCulture);
+                case FieldType.LargeString:
+                    return value;
                 default:
-                    throw new NotImplementedException($"Type conversion for TypeId:{typeId} is not implemented");
+                    throw new NotImplementedException($"Type conversion for Type:{typeId} is not implemented");
             }
         }
 
-        private static string ConvertToOption(object value)
+        private static void ConvertToOption(TOptionValue option, object value, FieldType typeId)
         {
-            if (value == null)
-                return null;
-            string result;
-            if ((result = value as string) != null)
-                return result;
-            return Convert.ToString(value, CultureInfo.InvariantCulture);
+            switch (typeId)
+            {
+                case FieldType.String:
+                    option.Value = value as string;
+                    break;
+                case FieldType.LargeString:
+                    option.BigValue = new BigStringValue
+                    {
+                        Value = value as string
+                    };
+                    break;
+                default:
+                    option.Value = Convert.ToString(value, CultureInfo.InvariantCulture);
+                    break;
+            }
         }
     }
 }

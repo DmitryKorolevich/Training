@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Domain.Constants;
@@ -36,6 +37,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
+        private readonly IEcommerceRepositoryAsync<BigStringValue> _bigStringValueRepository;
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
 
@@ -45,7 +47,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
             IEcommerceRepositoryAsync<ProductOptionValue> productOptionValueRepository,
-            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider)
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository)
         {
             this._vProductSkuRepository = vProductSkuRepository;
             this._vSkuRepository = _vSkuRepository;
@@ -56,6 +58,7 @@ namespace VitalChoice.Business.Services.Products
             _context = context;
             _productOptionValueRepository = productOptionValueRepository;
             this._productToCategoryRepository = productToCategoryRepository;
+            _bigStringValueRepository = bigStringValueRepository;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -189,23 +192,42 @@ namespace VitalChoice.Business.Services.Products
 
             if (entity != null)
             {
+                await SetBigValuesAsync(entity, _bigStringValueRepository);
                 entity.OptionTypes =
                     await
                         _productOptionTypeRepository.Query(o => o.IdProductType == entity.IdProductType)
                             .SelectAsync(false);
-                Dictionary<int, ProductOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
-                IncludeProductOptionTypes(entity, optionTypes);
+                //Dictionary<int, ProductOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+                //IncludeProductOptionTypes(entity, optionTypes);
                 entity.Skus =
                     await
                         _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                             .Include(p => p.OptionValues)
                             .SelectAsync(false);
-                entity.Skus = entity.Skus.OrderBy(p => p.Order).ToList();
-                IncludeSkuOptionTypes(entity, optionTypes);
+                //entity.Skus = entity.Skus.OrderBy(p => p.Order).ToList();
+                //IncludeSkuOptionTypes(entity, optionTypes);
                 return new ProductDynamic(entity, withDefaults);
             }
 
             return null;
+        }
+
+        private async Task SetBigValuesAsync(Product entity, IRepositoryAsync<BigStringValue> bigStringValueRepository, bool tracked = false)
+        {
+            var bigIdsList = entity.OptionValues.Where(v => v.IdBigString != null)
+                .Select(v => v.IdBigString.Value)
+                .ToList();
+            var bigValues =
+                (await bigStringValueRepository.Query(b => bigIdsList.Contains(b.IdBigString)).SelectAsync(tracked))
+                    .ToDictionary
+                    (b => b.IdBigString, b => b);
+            foreach (var value in entity.OptionValues)
+            {
+                if (value.IdBigString != null)
+                {
+                    value.BigValue = bigValues[value.IdBigString.Value];
+                }
+            }
         }
 
         public async Task<ProductDynamic> UpdateProductAsync(ProductDynamic model)
@@ -284,14 +306,14 @@ namespace VitalChoice.Business.Services.Products
         {
             (await ValidateProductAsync(model)).Raise();
 
-            var entity = model.ToEntity();
+            var optionTypes =
+                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
+            var entity = model.ToEntity(optionTypes);
             if (entity != null)
             {
-                var optionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
-                Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
-                IncludeProductOptionTypesByName(entity, optionTypesSorted);
-                IncludeSkuOptionTypesByName(entity, optionTypesSorted);
+                //Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
+                //IncludeProductOptionTypesByName(entity, optionTypesSorted);
+                //IncludeSkuOptionTypesByName(entity, optionTypesSorted);
                 if (entity.Skus != null)
                 {
                     int order = 0;
@@ -320,6 +342,7 @@ namespace VitalChoice.Business.Services.Products
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
             var skuRepository = uow.RepositoryAsync<Sku>();
             var productToCategoryRepository = uow.RepositoryAsync<ProductToCategory>();
+            var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
 
             var entity = (await productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
@@ -331,9 +354,13 @@ namespace VitalChoice.Business.Services.Products
                     await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
                         .SelectAsync();
-                
+                await SetBigValuesAsync(entity, bigValueRepository, true);
                 var oldSet = entity.Skus.Select(s => s.Id).ToArray();
                 (await ValidateProductAsync(model, model.Id, oldSet)).Raise();
+
+                await
+                    bigValueRepository.DeleteAllAsync(
+                        entity.OptionValues.Where(o => o.BigValue != null).Select(o => o.BigValue).ToList());
                 await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
                 entity.OptionTypes =
@@ -368,7 +395,9 @@ namespace VitalChoice.Business.Services.Products
 
                 var categories = entity.ProductsToCategories;
                 entity.ProductsToCategories = null;
-
+                await
+                    bigValueRepository.InsertRangeAsync(
+                        entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
                 var toReturn = await productRepository.UpdateAsync(entity);
 
                 var dbCategories = await productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync();
@@ -385,97 +414,100 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<bool> DeleteProductAsync(int id)
         {
-            bool toReturn = false;
-            var dbItem = (await _productRepository.Query(p => p.Id == id && p.StatusCode!=RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+
+            var skuExists =
+                await
+                    _skuRepository.Query(p => p.IdProduct == id && p.StatusCode != RecordStatusCode.Deleted)
+                        .SelectAnyAsync();
+            if (skuExists)
+            {
+                throw new AppValidationException(
+                    "The given product contains sub products. Delete sub products first.");
+            }
+            var dbItem =
+                (await
+                    _productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
+                        .SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var skusCount =
-                    await
-                        _skuRepository.Query(p => p.IdProduct == id && p.StatusCode != RecordStatusCode.Deleted)
-                            .SelectCountAsync();
-                if (skusCount > 0)
-                {
-                    throw new AppValidationException(
-                        "The given product contains sub products. Delete sub products first.");
-                }
                 dbItem.StatusCode = RecordStatusCode.Deleted;
                 await _productRepository.UpdateAsync(dbItem);
 
-                toReturn = true;
+                return true;
             }
-            return toReturn;
+            return false;
         }
 
         #endregion
 
-        private static void IncludeProductOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
-        {
-            foreach (var value in item.OptionValues)
-            {
-                ProductOptionType optionType;
-                value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
-            }
-        }
+        //private static void IncludeProductOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
+        //{
+        //    foreach (var value in item.OptionValues)
+        //    {
+        //        ProductOptionType optionType;
+        //        value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
+        //    }
+        //}
 
-        private static void IncludeSkuOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
-        {
-            foreach (var sku in item.Skus)
-            {
-                foreach (var value in sku.OptionValues)
-                {
-                    ProductOptionType optionType;
-                    value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
-                }
-            }
-        }
+        //private static void IncludeSkuOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
+        //{
+        //    foreach (var sku in item.Skus)
+        //    {
+        //        foreach (var value in sku.OptionValues)
+        //        {
+        //            ProductOptionType optionType;
+        //            value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
+        //        }
+        //    }
+        //}
 
-        private static void IncludeProductOptionTypesByName(Product item,
-            Dictionary<string, ProductOptionType> optionTypes)
-        {
-            var forRemove = new List<ProductOptionValue>();
-            foreach (var value in item.OptionValues)
-            {
-                ProductOptionType optionType;
-                optionTypes.TryGetValue(value.OptionType.Name, out optionType);
-                if (optionType == null)
-                {
-                    forRemove.Add(value);
-                }
-                else
-                {
-                    value.OptionType = null;
-                    value.IdOptionType = optionType.Id;
-                }
-            }
-            foreach (var forRemoveItem in forRemove)
-            {
-                item.OptionValues.Remove(forRemoveItem);
-            }
-        }
+        //private static void IncludeProductOptionTypesByName(Product item,
+        //    Dictionary<string, ProductOptionType> optionTypes)
+        //{
+        //    var forRemove = new List<ProductOptionValue>();
+        //    foreach (var value in item.OptionValues)
+        //    {
+        //        ProductOptionType optionType;
+        //        optionTypes.TryGetValue(value.OptionType.Name, out optionType);
+        //        if (optionType == null)
+        //        {
+        //            forRemove.Add(value);
+        //        }
+        //        else
+        //        {
+        //            value.OptionType = null;
+        //            value.IdOptionType = optionType.Id;
+        //        }
+        //    }
+        //    foreach (var forRemoveItem in forRemove)
+        //    {
+        //        item.OptionValues.Remove(forRemoveItem);
+        //    }
+        //}
 
-        private static void IncludeSkuOptionTypesByName(Product item, Dictionary<string, ProductOptionType> optionTypes)
-        {
-            foreach (var sku in item.Skus)
-            {
-                var forRemove = new List<ProductOptionValue>();
-                foreach (var value in sku.OptionValues)
-                {
-                    ProductOptionType optionType;
-                    if (!optionTypes.TryGetValue(value.OptionType.Name, out optionType))
-                    {
-                        forRemove.Add(value);
-                    }
-                    else
-                    {
-                        value.OptionType = null;
-                        value.IdOptionType = optionType.Id;
-                    }
-                }
-                foreach (var forRemoveItem in forRemove)
-                {
-                    sku.OptionValues.Remove(forRemoveItem);
-                }
-            }
-        }
+        //private static void IncludeSkuOptionTypesByName(Product item, Dictionary<string, ProductOptionType> optionTypes)
+        //{
+        //    foreach (var sku in item.Skus)
+        //    {
+        //        var forRemove = new List<ProductOptionValue>();
+        //        foreach (var value in sku.OptionValues)
+        //        {
+        //            ProductOptionType optionType;
+        //            if (!optionTypes.TryGetValue(value.OptionType.Name, out optionType))
+        //            {
+        //                forRemove.Add(value);
+        //            }
+        //            else
+        //            {
+        //                value.OptionType = null;
+        //                value.IdOptionType = optionType.Id;
+        //            }
+        //        }
+        //        foreach (var forRemoveItem in forRemove)
+        //        {
+        //            sku.OptionValues.Remove(forRemoveItem);
+        //        }
+        //    }
+        //}
     }
 }

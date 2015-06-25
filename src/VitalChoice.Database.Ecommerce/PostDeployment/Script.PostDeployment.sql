@@ -10,6 +10,8 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
+:r .\Scripts\BigStringValues.sql
+
 :r .\Scripts\RecordStatusCodes.sql
 
 :r .\Scripts\WorkflowExecutors.sql

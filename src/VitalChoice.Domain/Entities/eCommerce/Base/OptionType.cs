@@ -10,8 +10,6 @@
 
         public int IdFieldType { get; set; }
 
-        public FieldType FieldType { get; set; }
-
         public string DefaultValue { get; set; }
     }
 }

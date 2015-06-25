@@ -73,8 +73,12 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Base
 
-            builder.Entity<FieldType>().Key(f => f.Id);
-            builder.Entity<FieldType>().ForSqlServer().Table("FieldTypes");
+            builder.Entity<FieldTypeEntity>().Key(f => f.Id);
+            builder.Entity<FieldTypeEntity>().ForSqlServer().Table("FieldTypes");
+
+		    builder.Entity<BigStringValue>().Key(b => b.IdBigString);
+            builder.Entity<BigStringValue>().Ignore(b => b.Id);
+		    builder.Entity<BigStringValue>().ForSqlServer().Table("BigStringValues");
 
             #endregion
 
@@ -137,12 +141,6 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(p => p.IdLookup)
                 .PrincipalKey(p => p.Id)
                 .Required(false);
-            builder.Entity<DiscountOptionType>()
-                .Reference(p => p.FieldType)
-                .InverseCollection()
-                .ForeignKey(p => p.IdFieldType)
-                .PrincipalKey(p => p.Id)
-                .Required();
 
             builder.Entity<DiscountOptionValue>().Key(o => o.Id);
             builder.Entity<DiscountOptionValue>().ForSqlServer().Table("DiscountOptionValues");
@@ -151,6 +149,9 @@ namespace VitalChoice.Infrastructure.Context
                 .InverseCollection()
                 .ForeignKey(t => t.IdOptionType)
                 .PrincipalKey(v => v.Id);
+
+            builder.Entity<DiscountOptionValue>().Ignore(d => d.BigValue);
+            builder.Entity<DiscountOptionValue>().Ignore(d => d.IdBigString);
 
             builder.Entity<DiscountToCategory>().Key(p => p.Id);
             builder.Entity<DiscountToCategory>().ForRelational().Table("DiscountsToCategories");
@@ -213,7 +214,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Products
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
-            builder.Entity<ProductCategory>().Property(p => p.Id).GenerateValueOnAdd();
+		    builder.Entity<ProductCategory>().Property(p => p.Id);
             builder.Entity<ProductCategory>().ForRelational().Table("ProductCategories");
 		    builder.Entity<ProductCategory>()
 		        .Collection(cat => cat.ProductToCategories)
@@ -237,28 +238,29 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(p => p.IdLookup)
 		        .PrincipalKey(p => p.Id)
                 .Required(false);
-            builder.Entity<ProductOptionType>()
-                .Reference(p => p.FieldType)
-                .InverseCollection()
-                .ForeignKey(p => p.IdFieldType)
-                .PrincipalKey(p => p.Id)
-                .Required();
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
-		    builder.Entity<ProductOptionValue>().Property(p => p.Id).GenerateValueOnAdd();
+		    builder.Entity<ProductOptionValue>().Property(p => p.Id);
 		    builder.Entity<ProductOptionValue>().ForSqlServer().Table("ProductOptionValues");
 		    builder.Entity<ProductOptionValue>()
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
-		        .ForeignKey(t => t.IdOptionType)
-		        .PrincipalKey(v => v.Id)
+		        .ForeignKey(v => v.IdOptionType)
+		        .PrincipalKey(t => t.Id)
                 .Required();
+		    builder.Entity<ProductOptionValue>()
+		        .Reference(v => v.BigValue)
+		        .InverseCollection()
+		        .ForeignKey(v => v.IdBigString)
+		        .PrincipalKey(b => b.IdBigString)
+		        .Required(false);
+            builder.Entity<ProductOptionValue>().Property(v => v.IdBigString).Required(false);
 
             builder.Entity<ProductTypeEntity>().Key(t => t.Id);
 		    builder.Entity<ProductTypeEntity>().ForSqlServer().Table("ProductTypes");
 
             builder.Entity<Sku>().Key(s => s.Id);
-            builder.Entity<Sku>().Property(p => p.Id).GenerateValueOnAdd();
+		    builder.Entity<Sku>().Property(p => p.Id);
             builder.Entity<Sku>().ForSqlServer().Table("Skus");
 		    builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
@@ -274,7 +276,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductToCategory>().ForRelational().Table("ProductsToCategories");
 
             builder.Entity<Product>().Key(p => p.Id);
-            builder.Entity<Product>().Property(p => p.Id).GenerateValueOnAdd();
+		    builder.Entity<Product>().Property(p => p.Id);
             builder.Entity<Product>().ForSqlServer().Table("Products");
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
@@ -364,22 +366,18 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdLookup)
 				.PrincipalKey(p => p.Id)
 				.Required(false);
-			builder.Entity<ProductOptionType>()
-				.Reference(p => p.FieldType)
-				.InverseCollection()
-				.ForeignKey(p => p.IdFieldType)
-				.PrincipalKey(p => p.Id)
-				.Required();
 			builder.Entity<CustomerOptionValue>().Key(o => o.Id);
 			builder.Entity<CustomerOptionValue>().ForSqlServer().Table("CustomerOptionValues");
-			builder.Entity<CustomerOptionValue>()
-				.Reference(v => v.OptionType)
-				.InverseCollection()
-				.ForeignKey(t => t.IdOptionType)
-				.PrincipalKey(v => v.Id)
-				.Required();
+		    builder.Entity<CustomerOptionValue>()
+		        .Reference(v => v.OptionType)
+		        .InverseCollection()
+		        .ForeignKey(t => t.IdOptionType)
+		        .PrincipalKey(v => v.Id)
+		        .Required();
+            builder.Entity<CustomerOptionValue>().Ignore(c => c.BigValue);
+            builder.Entity<CustomerOptionValue>().Ignore(c => c.IdBigString);
 
-			builder.Entity<CustomerNote>().Key(p => p.Id);
+            builder.Entity<CustomerNote>().Key(p => p.Id);
 			builder.Entity<CustomerNote>().ForSqlServer().Table("CustomerNotes");
 			builder.Entity<CustomerNoteOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerNoteOptionType>().ForSqlServer().Table("CustomerNoteOptionTypes");
@@ -389,12 +387,6 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdLookup)
 				.PrincipalKey(p => p.Id)
 				.Required(false);
-			builder.Entity<ProductOptionType>()
-				.Reference(p => p.FieldType)
-				.InverseCollection()
-				.ForeignKey(p => p.IdFieldType)
-				.PrincipalKey(p => p.Id)
-				.Required();
 			builder.Entity<CustomerNoteOptionValue>().Key(o => o.Id);
 			builder.Entity<CustomerNoteOptionValue>().ForSqlServer().Table("CustomerNoteOptionValues");
 			builder.Entity<CustomerNoteOptionValue>()
@@ -404,7 +396,10 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(v => v.Id)
 				.Required();
 
-			builder.Entity<CustomerTypeEntity>().Key(p => p.Id);
+            builder.Entity<CustomerNoteOptionValue>().Ignore(c => c.BigValue);
+            builder.Entity<CustomerNoteOptionValue>().Ignore(c => c.IdBigString);
+
+            builder.Entity<CustomerTypeEntity>().Key(p => p.Id);
 			builder.Entity<CustomerTypeEntity>().ForSqlServer().Table("CustomerTypes");
 			builder.Entity<CustomerTypeEntity>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
 			builder.Entity<CustomerTypeEntity>().Collection(p => p.PaymentMethods)
@@ -440,12 +435,6 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdLookup)
 				.PrincipalKey(p => p.Id)
 				.Required(false);
-			builder.Entity<ProductOptionType>()
-				.Reference(p => p.FieldType)
-				.InverseCollection()
-				.ForeignKey(p => p.IdFieldType)
-				.PrincipalKey(p => p.Id)
-				.Required();
 			builder.Entity<AddressOptionValue>().Key(o => o.Id);
 			builder.Entity<AddressOptionValue>().ForSqlServer().Table("AddressOptionValues");
 			builder.Entity<AddressOptionValue>()
@@ -455,7 +444,10 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(v => v.Id)
 				.Required();
 
-			builder.Entity<AddressTypeEntity>().Key(p => p.Id);
+            builder.Entity<AddressOptionValue>().Ignore(c => c.BigValue);
+            builder.Entity<AddressOptionValue>().Ignore(c => c.IdBigString);
+
+            builder.Entity<AddressTypeEntity>().Key(p => p.Id);
 			builder.Entity<AddressTypeEntity>().ForSqlServer().Table("AddressTypes");
 
 			#endregion

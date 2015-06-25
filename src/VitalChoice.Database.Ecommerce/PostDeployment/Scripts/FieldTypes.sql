@@ -16,8 +16,17 @@ BEGIN
 	UNION
 	SELECT 4, 'string'
 END
+GO
 IF NOT EXISTS(SELECT * FROM FieldTypes WHERE TypeName = 'bool')
 	INSERT INTO FieldTypes
 	(Id, TypeName)
 	VALUES
 	(5, 'bool')
+GO
+IF NOT EXISTS(SELECT * FROM FieldTypes WHERE TypeName = 'DateTime')
+	INSERT INTO FieldTypes
+	(Id, TypeName)
+	VALUES
+	(6, 'DateTime'),
+	(7, 'long'),
+	(8, 'LargeString')
