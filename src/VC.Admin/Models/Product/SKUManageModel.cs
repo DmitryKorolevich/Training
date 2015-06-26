@@ -57,7 +57,7 @@ using VitalChoice.DynamicData.Entities;
         public bool AutoShipProduct { get; set; }
 
         [Map]
-        public double OffPercent { get; set; }
+        public double? OffPercent { get; set; }
 
         [Map]
         public int Seller { get; set; }
@@ -92,6 +92,14 @@ using VitalChoice.DynamicData.Entities;
         public void FillDynamic(SkuDynamic dynamicObject)
         {
             dynamicObject.StatusCode = Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
+            if(!dynamicObject.Data.AutoShipProduct)
+            {
+                dynamicObject.Data.AutoShipFrequency1 = null;
+                dynamicObject.Data.AutoShipFrequency2 = null;
+                dynamicObject.Data.AutoShipFrequency3 = null;
+                dynamicObject.Data.AutoShipFrequency6 = null;
+                dynamicObject.Data.OffPercent = null;
+            }
         }
 
         public void FillSelfFrom(SkuDynamic dynamicObject)

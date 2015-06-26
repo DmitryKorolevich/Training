@@ -54,6 +54,8 @@ namespace VC.Admin.Models.ContentManagement
 
         public IEnumerable<int> CategoryIds { get; set; }
 
+        public IList<ArticleToProduct> ArticlesToProducts { get; set; }
+
         public ArticleManageModel()
         {
         }
@@ -88,6 +90,7 @@ namespace VC.Admin.Models.ContentManagement
             {
                 CategoryIds = item.ArticlesToContentCategories.Select(p => p.ContentCategoryId).ToList();
             }
+            ArticlesToProducts = item.ArticlesToProducts.ToList();
         }
 
         public override Article Convert()
@@ -114,6 +117,7 @@ namespace VC.Admin.Models.ContentManagement
                     ContentProcessorId = p,
                 }).ToList();
             }
+            toReturn.ArticlesToProducts = ArticlesToProducts;
 
             return toReturn;
         }

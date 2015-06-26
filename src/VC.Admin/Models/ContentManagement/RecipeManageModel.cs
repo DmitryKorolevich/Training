@@ -47,14 +47,7 @@ namespace VC.Admin.Models.ContentManagement
 
         public IEnumerable<int> CategoryIds { get; set; }
 
-        public IEnumerable<AssignedProduct> AssignedProducts { get; set; }
-
-        public class AssignedProduct
-        {
-            public int Id { get; set; }
-            public string SKU { get; set; }
-            public string Name { get; set; }
-        }
+        public IList<RecipeToProduct> RecipesToProducts { get; set; }
 
         public RecipeManageModel()
         {
@@ -87,21 +80,8 @@ namespace VC.Admin.Models.ContentManagement
             {
                 CategoryIds = item.RecipesToContentCategories.Select(p => p.ContentCategoryId).ToList();
             }
-            AssignedProducts = new List<AssignedProduct>()
-            {
-                    new AssignedProduct()
-                    {
-                        Id=1,
-                        SKU="FSP",
-                        Name="Wild Pacific Spot Prawns, Jumbo - 16 oz Tray"
-                    },
-                    new AssignedProduct()
-                    {
-                        Id=2,
-                        SKU="FSP",
-                        Name="Wild Pacific Spot Prawns, Large - 16 oz Tray"
-                    },
-            };
+
+            RecipesToProducts = item.RecipesToProducts.ToList();
         }
 
         public override Recipe Convert()
@@ -125,6 +105,7 @@ namespace VC.Admin.Models.ContentManagement
                     ContentProcessorId = p,
                 }).ToList();
             }
+            toReturn.RecipesToProducts = RecipesToProducts;
 
             return toReturn;
         }

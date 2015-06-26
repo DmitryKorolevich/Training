@@ -129,4 +129,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\EcommerceMigration.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\RecipesToProducts.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ArticlesToProducts.sql" />
+  </ItemGroup>
 </Project>

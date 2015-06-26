@@ -114,21 +114,20 @@
                                     <table class="table table-striped table-hover ">
                                         <thead>
                                             <tr>
-                                                <th>SKU</th>
-                                                <th>Product Name</th>
-                                                <th>Actions</th>
+                                                <th>Name</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr data-ng-repeat="assignedProduct in recipe.AssignedProducts">
-                                                <td>{{assignedProduct.SKU}}</td>
-                                                <td>{{assignedProduct.Name}}</td>
+                                            <tr data-ng-repeat="item in recipe.RecipesToProducts">
+                                                <td>{{item.ShortProductInfo.ProductName}}</td>
                                                 <td>
-                                                    <button class="btn btn-default btn-danger" data-ng-click="deleteAssignedProduct($index);">Delete</button>
+                                                    <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteRecipesToProducts($index);">Delete</button>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <div ng-controller="productsSearchController" onload="name = 'RecipesToProducts'" data-ng-include="'app/modules/product/partials/productsSearchList.html'"></div>
                                 </spinner-overlay>
                             </div>
                         </div>

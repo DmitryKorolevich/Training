@@ -137,6 +137,7 @@
 		"app/modules/product/controllers/discountsController.js",
 		"app/modules/product/controllers/discountManageController.js",
 		"app/modules/product/controllers/skusSearchController.js",
+		"app/modules/product/controllers/productsSearchController.js",
 		"app/modules/product/product.js",
 		"app/modules/file/controllers/filesController.js",
 		"app/modules/file/controllers/addFolderController.js",

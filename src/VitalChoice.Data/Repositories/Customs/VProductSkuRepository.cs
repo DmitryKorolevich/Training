@@ -49,7 +49,10 @@ namespace VitalChoice.Data.Repositories.Customs
             });
             var count = await query.CountAsync();
             query = sortable(query);
-            query = query.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount);
+            if (filter.Paging != null)
+            {
+                query = query.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount);
+            }
             var items = await query.ToListAsync();
             var toReturn = new PagedList<VProductSku>(items, count);
 

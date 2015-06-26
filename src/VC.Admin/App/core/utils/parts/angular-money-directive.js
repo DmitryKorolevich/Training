@@ -98,21 +98,29 @@ angular.module('fiestah.money', [])
     // Min validation
     attrs.$observe('min', function (value) {
       min = parseFloat(value || 0);
-      minValidator(ngModelCtrl.$modelValue);
+      ngModelCtrl.$validate();
+      //minValidator(ngModelCtrl.$modelValue);
     });
 
-    ngModelCtrl.$parsers.push(minValidator);
+    ngModelCtrl.$validators.min = function (value) {
+        return ngModelCtrl.$isEmpty(value) || isUndefined(min) || value >= min;
+    };
+    //ngModelCtrl.$parsers.push(minValidator);
     ngModelCtrl.$formatters.push(minValidator);
 
 
     // Max validation (optional)
     if (angular.isDefined(attrs.max)) {
       attrs.$observe('max', function (val) {
-        max = parseFloat(val);
-        maxValidator(ngModelCtrl.$modelValue);
+          max = parseFloat(val);
+          ngModelCtrl.$validate();
+          //maxValidator(ngModelCtrl.$modelValue);
       });
 
-      ngModelCtrl.$parsers.push(maxValidator);
+      ngModelCtrl.$validators.max = function (value) {
+          return ngModelCtrl.$isEmpty(value) || isUndefined(max) || value <= max;
+      };
+      //ngModelCtrl.$parsers.push(maxValidator);
       ngModelCtrl.$formatters.push(maxValidator);
     }
 
@@ -134,7 +142,7 @@ angular.module('fiestah.money', [])
 
           return lastValidValue;
         } else {
-          return undefined;
+            return value;
         }
       });
       ngModelCtrl.$formatters.push(function (value) {
@@ -150,6 +158,8 @@ angular.module('fiestah.money', [])
         }
       });
     }
+
+    function isUndefined(value) { return typeof value === 'undefined'; }
   }
 
   return {

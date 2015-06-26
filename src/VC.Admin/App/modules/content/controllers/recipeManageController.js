@@ -48,7 +48,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.detailsTab = {
                 active: true
             };
-            $scope.loaded = false;
             $scope.forms = {};
 
             $scope.save = function () {
@@ -87,7 +86,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 			                            $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
 			                        };
 			                        setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
-			                        $scope.loaded = true;
+			                        addProductsListWatchers();
 			                    } else {
 			                        errorHandler(result);
 			                    }
@@ -125,14 +124,59 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             });
         }
 
-        $scope.deleteAssignedProduct = function (index) {
-            confirmUtil.confirm(function () {
-                $scope.recipe.AssignedProducts.splice(index, 1);
-            }, 'Are you sure you want to delete the given assigned product?');
-        };
-
         $scope.goToMaster = function (id) {
             $state.go('index.oneCol.masterDetail', { id: id });
+        };
+
+        function notifyAboutAddBlockIds(name) {
+            var blockIds = [];
+            var list = $scope.recipe[name];
+            $.each(list, function (index, item) {
+                blockIds.push(item.IdProduct);
+            });
+            var data = {};
+            data.name = name;
+            data.blockIds = blockIds;
+            $scope.$broadcast('productsSearch#in#setBlockIds', data);
+        };
+
+        $scope.$on('productsSearch#out#addItems', function (event, args) {
+            var list = $scope.recipe[args.name];
+            if (list) {
+                if (args.items) {
+                    var newSelectedProducts = [];
+                    $.each(args.items, function (index, item) {
+                        var add = true;
+                        $.each(list, function (index, selectedProduct) {
+                            if (item.Id == selectedProduct.IdProduct) {
+                                add = false;
+                                return;
+                            }
+                        });
+                        if (add) {
+                            var newSelectedProduct = {};
+                            newSelectedProduct.IdProduct = item.ProductId;
+                            newSelectedProduct.ShortProductInfo = {};
+                            newSelectedProduct.ShortProductInfo.ProductName = item.Name;
+                            newSelectedProducts.push(newSelectedProduct);
+                        }
+                    });
+                    $.each(newSelectedProducts, function (index, newSelectedProduct) {
+                        list.push(newSelectedProduct);
+                    });
+                }
+            }
+        });
+
+        function addProductsListWatchers() {
+            $scope.$watchCollection('recipe.RecipesToProducts', function () {
+                notifyAboutAddBlockIds('RecipesToProducts');
+            });
+            notifyAboutAddBlockIds('RecipesToProducts');
+        };
+
+        $scope.deleteRecipesToProducts = function (index) {
+            $scope.recipe.RecipesToProducts.splice(index, 1);
         };
 
         initialize();

@@ -153,27 +153,30 @@ namespace VitalChoice.Business.Services.Products
                 var skuIds = entity.DiscountsToSelectedSkus.Select(p => p.IdSku).ToList();
                 skuIds.AddRange(entity.DiscountsToSkus.Select(p => p.IdSku));
                 skuIds = skuIds.Distinct().ToList();
-                var shortSkus = (await _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.Product)
-                    .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
-                foreach (var sku in entity.DiscountsToSelectedSkus)
+                if (skuIds.Count > 0)
                 {
-                    foreach (var shortSku in shortSkus)
+                    var shortSkus = (await _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.Product)
+                    .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
+                    foreach (var sku in entity.DiscountsToSelectedSkus)
                     {
-                        if (sku.IdSku == shortSku.Id)
+                        foreach (var shortSku in shortSkus)
                         {
-                            sku.ShortSkuInfo = shortSku;
-                            break;
+                            if (sku.IdSku == shortSku.Id)
+                            {
+                                sku.ShortSkuInfo = shortSku;
+                                break;
+                            }
                         }
                     }
-                }
-                foreach (var sku in entity.DiscountsToSkus)
-                {
-                    foreach (var shortSku in shortSkus)
+                    foreach (var sku in entity.DiscountsToSkus)
                     {
-                        if (sku.IdSku == shortSku.Id)
+                        foreach (var shortSku in shortSkus)
                         {
-                            sku.ShortSkuInfo = shortSku;
-                            break;
+                            if (sku.IdSku == shortSku.Id)
+                            {
+                                sku.ShortSkuInfo = shortSku;
+                                break;
+                            }
                         }
                     }
                 }

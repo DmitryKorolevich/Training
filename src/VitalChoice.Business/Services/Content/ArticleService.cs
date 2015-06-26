@@ -27,20 +27,22 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository;
+        private readonly IRepositoryAsync<ArticleToProduct> _articleToProductRepository;
+        private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
-        public ArticleService(IEcommerceRepositoryAsync<Domain.Entities.eCommerce.Products.Product> productRepository,
-            IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
+        public ArticleService(IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
             IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended logger)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IRepositoryAsync<ArticleToProduct> articleToProductRepository,
+            IEcommerceRepositoryAsync<Product> productRepository,
+            ILoggerProviderExtended logger)
         {
-            this.productRepository = productRepository;
             this.optionTypeRepository = optionTypeRepository;
 
             this.articleRepository = articleRepository;
@@ -49,6 +51,8 @@ namespace VitalChoice.Business.Services.Content
             this.articleToContentCategoryRepository = articleToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this._articleToProductRepository = articleToProductRepository;
+            this._productRepository = productRepository;
             this.logger = logger.CreateLoggerDefault();
         }
 
@@ -119,7 +123,27 @@ namespace VitalChoice.Business.Services.Content
             ArticleQuery query = new ArticleQuery().WithId(id).NotDeleted();
             var toReturn = (await articleRepository.Query(query).Include(p=>p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
                 Include(p=>p.ArticlesToContentCategories).Include(p => p.User).ThenInclude(p => p.Profile).
+                Include(p => p.ArticlesToProducts).
                 SelectAsync(false)).FirstOrDefault();
+
+            var productIds = toReturn.ArticlesToProducts.Select(p => p.IdProduct).ToList();
+            if (productIds.Count > 0)
+            {
+                var shortProducts = (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+                    .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
+                foreach (var product in toReturn.ArticlesToProducts)
+                {
+                    foreach (var shortProduct in shortProducts)
+                    {
+                        if (product.IdProduct == shortProduct.Id)
+                        {
+                            product.ShortProductInfo = shortProduct;
+                            break;
+                        }
+                    }
+                }
+            }
+
             return toReturn;
         }
 
@@ -180,6 +204,13 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
                 dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
 
+                ICollection<ArticleToProduct> articlesToProducts = new List<ArticleToProduct>();
+                if (model.ArticlesToProducts != null)
+                {
+                    articlesToProducts = model.ArticlesToProducts.ToList();
+                }
+                dbItem.ArticlesToProducts = null;
+
                 if (model.Id == 0)
                 {
                     dbItem = await articleRepository.InsertGraphAsync(dbItem);
@@ -188,6 +219,16 @@ namespace VitalChoice.Business.Services.Content
                 {
                     dbItem = await articleRepository.UpdateAsync(dbItem);
                 }
+
+                foreach (var item in articlesToProducts)
+                {
+                    item.Id = 0;
+                    item.IdArticle = dbItem.Id;
+                }
+                var dbProducts = await _articleToProductRepository.Query(c => c.IdArticle == dbItem.Id).SelectAsync();
+                await _articleToProductRepository.DeleteAllAsync(dbProducts);
+                await _articleToProductRepository.InsertRangeAsync(articlesToProducts);
+                dbItem.ArticlesToProducts = articlesToProducts;
             }
 
             return dbItem;

@@ -9,6 +9,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.discountsController',
 	'app.modules.product.controllers.discountManageController',
 	'app.modules.product.controllers.skusSearchController',
+	'app.modules.product.controllers.productsSearchController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

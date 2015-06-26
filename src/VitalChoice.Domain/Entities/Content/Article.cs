@@ -12,5 +12,7 @@ namespace VitalChoice.Domain.Entities.Content
         public string Author { get; set; }
 
         public virtual ICollection<ArticleToContentCategory> ArticlesToContentCategories { get; set; }
+
+        public virtual ICollection<ArticleToProduct> ArticlesToProducts { get; set; }
     }
 }

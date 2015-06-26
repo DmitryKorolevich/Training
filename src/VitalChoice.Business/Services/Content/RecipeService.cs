@@ -14,6 +14,8 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -25,6 +27,8 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly IRepositoryAsync<RecipeToProduct> _recipeToProductRepository;
+        private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -33,7 +37,10 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
+            IEcommerceRepositoryAsync<Product> productRepository,
+            ILoggerProviderExtended loggerProvider)
         {
             this.recipeRepository = recipeRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -41,6 +48,8 @@ namespace VitalChoice.Business.Services.Content
             this.recipeToContentCategoryRepository = recipeToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this._recipeToProductRepository = recipeToProductRepository;
+            this._productRepository = productRepository;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -105,17 +114,6 @@ namespace VitalChoice.Business.Services.Content
                 OrderBy(sortable).
                 SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
 
-            //VitalChoiceContext content = new VitalChoiceContext();
-            //var res = (from p in content.Set<Recipe>()
-            //           join o in content.Set<ContentItem>().AsNoTracking()
-            //               on p.ContentItemId equals o.Id
-            //           select new Recipe
-            //           {
-            //               Id = p.Id,
-            //               ContentItem = o
-            //           }).OrderBy(p => p.ContentItem.Title).ToList();
-
-
             return toReturn;
         }
 
@@ -124,7 +122,27 @@ namespace VitalChoice.Business.Services.Content
             RecipeQuery query = new RecipeQuery().WithId(id).NotDeleted();
             var toReturn = (await recipeRepository.Query(query).Include(p=>p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
                 Include(p=>p.RecipesToContentCategories).Include(p => p.User).ThenInclude(p => p.Profile).
+                Include(p=>p.RecipesToProducts).
                 SelectAsync(false)).FirstOrDefault();
+
+            var productIds = toReturn.RecipesToProducts.Select(p => p.IdProduct).ToList();
+            if (productIds.Count > 0)
+            {
+                var shortProducts = (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+                    .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
+                foreach (var product in toReturn.RecipesToProducts)
+                {
+                    foreach (var shortProduct in shortProducts)
+                    {
+                        if (product.IdProduct == shortProduct.Id)
+                        {
+                            product.ShortProductInfo = shortProduct;
+                            break;
+                        }
+                    }
+                }
+            }
+
             return toReturn;
         }
 
@@ -180,6 +198,13 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
                 dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
                 dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
+                                
+                ICollection<RecipeToProduct> recipesToProducts = new List<RecipeToProduct>();
+                if (model.RecipesToProducts != null)
+                {                    
+                    recipesToProducts = model.RecipesToProducts.ToList();
+                }
+                dbItem.RecipesToProducts = null;
 
                 if (model.Id == 0)
                 {
@@ -189,6 +214,16 @@ namespace VitalChoice.Business.Services.Content
                 {
                     dbItem = await recipeRepository.UpdateAsync(dbItem);
                 }
+
+                foreach (var item in recipesToProducts)
+                {
+                    item.Id = 0;
+                    item.IdRecipe = dbItem.Id;
+                }
+                var dbProducts = await _recipeToProductRepository.Query(c => c.IdRecipe == dbItem.Id).SelectAsync();
+                await _recipeToProductRepository.DeleteAllAsync(dbProducts);
+                await _recipeToProductRepository.InsertRangeAsync(recipesToProducts);
+                dbItem.RecipesToProducts = recipesToProducts;
             }
 
             return dbItem;

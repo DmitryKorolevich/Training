@@ -103,6 +103,10 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
                 PrincipalKey(p => p.Id);
 
+            builder.Entity<RecipeToProduct>().Key(p => p.Id);
+            builder.Entity<RecipeToProduct>().ForRelational().Table("RecipesToProducts");
+            builder.Entity<RecipeToProduct>().Ignore(p => p.ShortProductInfo);
+
             builder.Entity<Recipe>().Key(p => p.Id);
             builder.Entity<Recipe>().ForSqlServer().Table("Recipes");
             builder.Entity<RecipeToContentCategory>().Key(p => p.Id);
@@ -111,6 +115,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+            builder.Entity<Recipe>()
+                .Collection(p => p.RecipesToProducts)
+                .InverseReference()
+                .ForeignKey(t => t.IdRecipe)
+                .PrincipalKey(p => p.Id)
+                .Required();
 
             builder.Entity<FAQ>().Key(p => p.Id);
             builder.Entity<FAQ>().ForSqlServer().Table("FAQs");
@@ -121,6 +131,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<FAQ>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 
+            builder.Entity<ArticleToProduct>().Key(p => p.Id);
+            builder.Entity<ArticleToProduct>().ForRelational().Table("ArticlesToProducts");
+            builder.Entity<ArticleToProduct>().Ignore(p => p.ShortProductInfo);
 
             builder.Entity<Article>().Key(p => p.Id);
             builder.Entity<Article>().ForSqlServer().Table("Articles");
@@ -130,7 +143,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Article>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
-
+            builder.Entity<Article>()
+                .Collection(p => p.ArticlesToProducts)
+                .InverseReference()
+                .ForeignKey(t => t.IdArticle)
+                .PrincipalKey(p => p.Id)
+                .Required();
 
             builder.Entity<ContentPage>().Key(p => p.Id);
             builder.Entity<ContentPage>().ForSqlServer().Table("ContentPages");

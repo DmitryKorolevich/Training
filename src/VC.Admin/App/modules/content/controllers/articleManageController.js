@@ -48,7 +48,6 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
         $scope.detailsTab = {
             active: true
         };
-        $scope.loaded = false;
         $scope.forms = {};
 
         $scope.save = function () {
@@ -86,12 +85,11 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         .success(function (result) {
                             if (result.Success) {
                                 $scope.article = result.Data;
-                                //$scope.article.PublishedDateObject = new DateObject(Date.parseDateTime($scope.article.PublishedDate));
                                 if ($scope.article.Url) {
                                     $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
                                 }
                                 setSelected($scope.rootCategory, $scope.article.CategoryIds);
-                                $scope.loaded = true;
+                                //addProductsListWatchers();
                             } else {
                                 errorHandler(result);
                             }
@@ -132,6 +130,57 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
     $scope.goToMaster = function (id) {
         $state.go('index.oneCol.masterDetail', { id: id });
     };
+
+    //function notifyAboutAddBlockIds(name) {
+    //    var blockIds = [];
+    //    var list = $scope.article[name];
+    //    $.each(list, function (index, item) {
+    //        blockIds.push(item.IdProduct);
+    //    });
+    //    var data = {};
+    //    data.name = name;
+    //    data.blockIds = blockIds;
+    //    $scope.$broadcast('productsSearch#in#setBlockIds', data);
+    //};
+
+    //$scope.$on('productsSearch#out#addItems', function (event, args) {
+    //    var list = $scope.article[args.name];
+    //    if (list) {
+    //        if (args.items) {
+    //            var newSelectedProducts = [];
+    //            $.each(args.items, function (index, item) {
+    //                var add = true;
+    //                $.each(list, function (index, selectedProduct) {
+    //                    if (item.Id == selectedProduct.IdProduct) {
+    //                        add = false;
+    //                        return;
+    //                    }
+    //                });
+    //                if (add) {
+    //                    var newSelectedProduct = {};
+    //                    newSelectedProduct.IdProduct = item.ProductId;
+    //                    newSelectedProduct.ShortProductInfo = {};
+    //                    newSelectedProduct.ShortProductInfo.ProductName = item.Name;
+    //                    newSelectedProducts.push(newSelectedProduct);
+    //                }
+    //            });
+    //            $.each(newSelectedProducts, function (index, newSelectedProduct) {
+    //                list.push(newSelectedProduct);
+    //            });
+    //        }
+    //    }
+    //});
+
+    //function addProductsListWatchers() {
+    //    $scope.$watchCollection('article.ArticlesToProducts', function () {
+    //        notifyAboutAddBlockIds('ArticlesToProducts');
+    //    });
+    //    notifyAboutAddBlockIds('ArticlesToProducts');
+    //};
+
+    //$scope.deleteArticlesToProducts = function (index) {
+    //    $scope.article.ArticlesToProducts.splice(index, 1);
+    //};
 
     initialize();
 }]);
