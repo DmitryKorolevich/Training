@@ -16,6 +16,8 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Infrastructure.UnitOfWork;
+using System.Threading;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -237,63 +239,69 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> AttachArticleToCategoriesAsync(int id, IEnumerable<int> categoryIds)
         {
             bool toReturn = false;
-            var dbItem = (await articleRepository.Query(p => p.Id == id).Include(p=>p.ArticlesToContentCategories).SelectAsync(false)).FirstOrDefault();
-            if (dbItem != null)
+            using (var uow = new VitalChoiceUnitOfWork())
             {
-                var categories =
-                    await
-                        contentCategoryRepository.Query(
-                            p =>
-                                categoryIds.Contains(p.Id) && p.Type == ContentType.ArticleCategory &&
-                                p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
-
-                List<int> forDelete = new List<int>();
-                foreach (var articleToContentCategory in dbItem.ArticlesToContentCategories)
+                var articleRepository = uow.RepositoryAsync<Article>();
+                var articleToContentCategoryRepository = uow.RepositoryAsync<ArticleToContentCategory>();
+                var dbItem = (await articleRepository.Query(p => p.Id == id).Include(p => p.ArticlesToContentCategories).SelectAsync(false)).FirstOrDefault();
+                if (dbItem != null)
                 {
-                    bool delete = true;
-                    foreach (var category in categories)
-                    {
-                        if(articleToContentCategory.ContentCategoryId==category.Id)
-                        {
-                            delete = false;
-                            break;
-                        }
-                    }
-                    if(delete)
-                    {
-                        forDelete.Add(articleToContentCategory.Id);
-                    }
-                }
+                    var categories =
+                        await
+                            contentCategoryRepository.Query(
+                                p =>
+                                    categoryIds.Contains(p.Id) && p.Type == ContentType.ArticleCategory &&
+                                    p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
 
-                List<int> forAdd = new List<int>();
-                foreach (var category in categories)
-                {
-                    bool add = true;
+                    List<int> forDelete = new List<int>();
                     foreach (var articleToContentCategory in dbItem.ArticlesToContentCategories)
                     {
-                        if (articleToContentCategory.ContentCategoryId == category.Id)
+                        bool delete = true;
+                        foreach (var category in categories)
                         {
-                            add = false;
-                            break;
+                            if (articleToContentCategory.ContentCategoryId == category.Id)
+                            {
+                                delete = false;
+                                break;
+                            }
+                        }
+                        if (delete)
+                        {
+                            forDelete.Add(articleToContentCategory.Id);
                         }
                     }
-                    if (add)
+
+                    List<int> forAdd = new List<int>();
+                    foreach (var category in categories)
                     {
-                        forAdd.Add(category.Id);
+                        bool add = true;
+                        foreach (var articleToContentCategory in dbItem.ArticlesToContentCategories)
+                        {
+                            if (articleToContentCategory.ContentCategoryId == category.Id)
+                            {
+                                add = false;
+                                break;
+                            }
+                        }
+                        if (add)
+                        {
+                            forAdd.Add(category.Id);
+                        }
                     }
-                }
 
-                foreach (var forDeleteId in forDelete)
-                {
-                    await articleToContentCategoryRepository.DeleteAsync(forDeleteId);
-                }
-                await articleToContentCategoryRepository.InsertRangeAsync(forAdd.Select(p => new ArticleToContentCategory()
-                {
-                    ContentCategoryId = p,
-                    ArticleId = dbItem.Id
-                }).ToList());
+                    foreach (var forDeleteId in forDelete)
+                    {
+                        await articleToContentCategoryRepository.DeleteAsync(forDeleteId);
+                    }
+                    await articleToContentCategoryRepository.InsertRangeAsync(forAdd.Select(p => new ArticleToContentCategory()
+                    {
+                        ContentCategoryId = p,
+                        ArticleId = dbItem.Id
+                    }).ToList());
+                    await uow.SaveChangesAsync(CancellationToken.None);
 
-                toReturn = true;
+                    toReturn = true;
+                }
             }
 
             return toReturn;
