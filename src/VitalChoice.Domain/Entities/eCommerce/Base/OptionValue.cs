@@ -8,5 +8,9 @@
         public string Value { get; set; }
 
         public TOptionType OptionType { get; set; }
+
+        public long? IdBigString { get; set; }
+
+        public BigStringValue BigValue { get; set; }
     }
 }

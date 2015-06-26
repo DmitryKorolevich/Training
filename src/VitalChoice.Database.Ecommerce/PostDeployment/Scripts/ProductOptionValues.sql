@@ -14,3 +14,8 @@ BEGIN
 
 	CREATE INDEX [IX_ProductOptionValues_Value] ON [dbo].[ProductOptionValues] ([Value]) INCLUDE (Id, IdProduct, IdSku, IdOptionType)
 END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[ProductOptionValues]') AND name = N'IdBigString')
+	ALTER TABLE [ProductOptionValues]
+	ADD [IdBigString] BIGINT NULL,
+	CONSTRAINT [FK_ProductOptionValue_ToBigStringValue] FOREIGN KEY ([IdBigString]) REFERENCES [BigStringValues]([IdBigString]) ON DELETE CASCADE

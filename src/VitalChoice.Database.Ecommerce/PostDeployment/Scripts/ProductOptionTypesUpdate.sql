@@ -79,3 +79,35 @@ UNION
 SELECT NULL, 4, 4, N'GoogleFeedDescription'
 
 END
+GO
+IF (SELECT TOP 1 IdFieldType FROM ProductOptionTypes WHERE Name = N'AdditionalNotes') <> 8
+BEGIN
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Description'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'ShortDescription'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'ProductNotes'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Serving'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Recipes'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Ingredients'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'AdditionalNotes'
+END

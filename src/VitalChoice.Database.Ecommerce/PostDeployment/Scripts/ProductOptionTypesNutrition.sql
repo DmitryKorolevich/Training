@@ -1,4 +1,4 @@
-﻿IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE IdProductType=2 AND Name='NutritionalTitle')
+﻿IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE IdProductType=2 AND Name='AdditionalNotes')
 BEGIN
 
 --non-perishable product type

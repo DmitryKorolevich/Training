@@ -247,5 +247,4 @@ WHERE IdDiscountType=4 AND Name='Amount'
 
 END
 
-GO 
-
+GO

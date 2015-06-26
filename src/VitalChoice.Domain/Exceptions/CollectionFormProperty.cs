@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Validation.Helpers
+﻿namespace VitalChoice.Domain.Exceptions
 {
     public static class CollectionFormProperty
     {

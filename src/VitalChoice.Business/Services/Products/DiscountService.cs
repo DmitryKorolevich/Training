@@ -118,7 +118,7 @@ namespace VitalChoice.Business.Services.Products
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
-            if (toReturn.Items.Count() > 0)
+            if (toReturn.Items.Any())
             {
                 var ids = result.Items.Select(p => p.IdAddedBy).ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
@@ -182,9 +182,9 @@ namespace VitalChoice.Business.Services.Products
                 }
 
                 entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == entity.IdDiscountType).SelectAsync(false);
-                Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+                //Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
                 entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToList();
-                IncludeDiscountOptionTypes(entity, optionTypes);
+                //IncludeDiscountOptionTypes(entity, optionTypes);
                 return new DiscountDynamic(entity, withDefaults);
             }
 
@@ -224,12 +224,12 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Discount> InsertDiscount(DiscountDynamic model, EcommerceUnitOfWork uow)
         {
-            var entity = model.ToEntity();
+            var optionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
+            var entity = model.ToEntity(optionTypes);
             if (entity != null)
             {
-                var optionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
-                Dictionary<string, DiscountOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
-                IncludeDiscountOptionTypesByName(entity, optionTypesSorted);
+                //Dictionary<string, DiscountOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
+                //IncludeDiscountOptionTypesByName(entity, optionTypesSorted);
 
                 entity.OptionTypes = new List<DiscountOptionType>();
                 var discountRepository = uow.RepositoryAsync<Discount>();
@@ -321,37 +321,37 @@ namespace VitalChoice.Business.Services.Products
 
         #endregion
 
-        private static void IncludeDiscountOptionTypes(Discount item, Dictionary<int, DiscountOptionType> optionTypes)
-        {
-            foreach (var value in item.OptionValues)
-            {
-                DiscountOptionType optionType;
-                value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
-            }
-        }
+        //private static void IncludeDiscountOptionTypes(Discount item, Dictionary<int, DiscountOptionType> optionTypes)
+        //{
+        //    foreach (var value in item.OptionValues)
+        //    {
+        //        DiscountOptionType optionType;
+        //        value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
+        //    }
+        //}
 
-        private static void IncludeDiscountOptionTypesByName(Discount item,
-            Dictionary<string, DiscountOptionType> optionTypes)
-        {
-            var forRemove = new List<DiscountOptionValue>();
-            foreach (var value in item.OptionValues)
-            {
-                DiscountOptionType optionType;
-                optionTypes.TryGetValue(value.OptionType.Name, out optionType);
-                if (optionType == null)
-                {
-                    forRemove.Add(value);
-                }
-                else
-                {
-                    value.OptionType = null;
-                    value.IdOptionType = optionType.Id;
-                }
-            }
-            foreach (var forRemoveItem in forRemove)
-            {
-                item.OptionValues.Remove(forRemoveItem);
-            }
-        }
+        //private static void IncludeDiscountOptionTypesByName(Discount item,
+        //    Dictionary<string, DiscountOptionType> optionTypes)
+        //{
+        //    var forRemove = new List<DiscountOptionValue>();
+        //    foreach (var value in item.OptionValues)
+        //    {
+        //        DiscountOptionType optionType;
+        //        optionTypes.TryGetValue(value.OptionType.Name, out optionType);
+        //        if (optionType == null)
+        //        {
+        //            forRemove.Add(value);
+        //        }
+        //        else
+        //        {
+        //            value.OptionType = null;
+        //            value.IdOptionType = optionType.Id;
+        //        }
+        //    }
+        //    foreach (var forRemoveItem in forRemove)
+        //    {
+        //        item.OptionValues.Remove(forRemoveItem);
+        //    }
+        //}
     }
 }
