@@ -183,3 +183,4 @@ node_modules/
 /.vs
 artifacts
 /src/files
+/src/internalLog.txt
