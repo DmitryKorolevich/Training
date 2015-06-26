@@ -1546,3 +1546,5 @@
 /// <reference path="app/modules/product/controllers/discountscontroller.js" />
 /// <reference path="app/modules/product/controllers/skussearchcontroller.js" />
 /// <reference path="../app/core/utils/parts/numbersonlydirective.js" />
+/// <reference path="app/core/utils/parts/numbersOnlyDirective.js" />
+/// <reference path="../app/modules/product/controllers/skussearchcontroller - copy.js" />

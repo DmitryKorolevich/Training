@@ -16,8 +16,8 @@
                                 <fieldset>
                                     <span class="legend">Minimum Cart Perishable Value</span>
                                     <div class="form-group">
-                                        <label for="name" class="col-md-3 control-label">Minimum Perishable</label>
-                                        <div class="col-md-9">
+                                        <label for="name" class="col-md-4 control-label">Minimum Perishable</label>
+                                        <div class="col-md-8">
                                             <input type="text" name="GlobalPerishableThreshold" class="form-control" placeholder="Minimum Perishable" data-ng-model="settings.GlobalPerishableThreshold" ng-pattern="/^\d+$/">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.GlobalPerishableThreshold.$invalid">
                                                 <small class="error" ng-show="forms.form.GlobalPerishableThreshold.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Global Perishable Threshol")}}</small>
@@ -26,8 +26,8 @@
                                     </div>
                                     <span class="legend">Credit Card Authorizations</span>
                                     <div class="form-group">
-                                        <label for="active" class="col-md-3 control-label">Credit card authorizations on</label>
-                                        <div class="col-md-9">
+                                        <label for="active" class="col-md-4 control-label">Credit card authorizations on</label>
+                                        <div class="col-md-8">
                                             <div class="checkbox">
                                                 <label><input type="checkbox" name="CreditCardAuthorizations" data-ng-model="settings.CreditCardAuthorizations"/></label>
                                             </div>

@@ -437,7 +437,7 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row extra-spacing">
+                                                                                <div class="fixed-accordion-row extra-spacing" data-ng-if="subSku.AutoShipProduct">
                                                                                     <label class="control-label">Auto-Ship Frequency</label>
                                                                                     <label class="checkbox-inline">
                                                                                         <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
@@ -456,15 +456,14 @@
                                                                                         6
                                                                                     </label>
                                                                                 </div>
-                                                                                <div class="fixed-accordion-row">
+                                                                                <div class="fixed-accordion-row" data-ng-if="subSku.AutoShipProduct">
                                                                                     <label class="control-label">% Off</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input name="OffPercent" class="form-control number" placeholder="% Off" money data-ng-model="subSku.OffPercent" min="0" max="100" ng-pattern="/^\d{0,9}?$/">
+                                                                                        <input name="OffPercent" class="form-control number" placeholder="% Off" money data-ng-model="subSku.OffPercent" min="0" max="100" required>
                                                                                         <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.OffPercent.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","% Off")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","% Off",100)}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","% Off",1)}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","% Off")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.OffPercent.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","% Off",0)}}</small>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

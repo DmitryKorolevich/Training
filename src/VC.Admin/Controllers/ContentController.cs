@@ -188,6 +188,7 @@ namespace VC.Admin.Controllers
                 {
                     Template = String.Empty,
                     CategoryIds = new List<int>(),
+                    RecipesToProducts = new List<RecipeToProduct>(),
                 };
             }
             return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
@@ -313,6 +314,7 @@ namespace VC.Admin.Controllers
                     PublishedDate = new DateTime(now.Year, now.Month, now.Day),
                     Template=String.Empty,
                     CategoryIds=new List<int>(),
+                    ArticlesToProducts =new List<ArticleToProduct>(),
                 };
             }
             return new ArticleManageModel((await articleService.GetArticleAsync(id)));

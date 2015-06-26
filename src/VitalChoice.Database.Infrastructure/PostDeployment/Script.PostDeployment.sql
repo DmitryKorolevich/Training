@@ -28,3 +28,6 @@ Post-Deployment Script Template
 :r .\Scripts\FilesPermissions.sql
 :r .\Scripts\MarketingPermissions.sql
 :r .\Scripts\EcommerceMigration.sql
+
+:r .\Scripts\RecipesToProducts.sql
+:r .\Scripts\ArticlesToProducts.sql
