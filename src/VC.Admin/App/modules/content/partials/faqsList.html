@@ -54,7 +54,14 @@
                 <tr data-ng-repeat="faq in faqs">
                     <td>{{faq.Name}}</td>
                     <td>{{faq.Url}}</td>
-                    <td>{{faq.Category}}</td>
+                    <td>
+                        <div data-ng-if="faq.Categories && faq.Categories.length>0">
+                            <div data-ng-repeat="category in faq.Categories">
+                                {{category}}
+                            </div>
+                        </div>
+                        <div data-ng-if="!faq.Categories || faq.Categories.length==0">No Categories</div>
+                    </td>
                     <td>{{faq.Updated | date:"MM/dd/yy"}}<br />{{faq.Updated | date:"h:mm a"}}<br />{{faq.AgentId}}</td>
                     <td>
                         <button class="btn btn-default btn-success" data-ng-click="open(faq.Id);">Edit</button>

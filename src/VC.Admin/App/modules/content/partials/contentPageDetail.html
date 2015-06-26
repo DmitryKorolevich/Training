@@ -91,10 +91,12 @@
                     </tab>
                     <tab heading="Categories">
                         <div class="container container-left">
-                            <div class="well row">
+                            <div class="well row categories">
                                 <spinner-overlay data-loading="refreshTracker.active()">
                                     <span class="legend">Categories</span>
                                     <button class="btn btn-info width-160px margin-bottom-10px" ui-sref="index.oneCol.manageContentPageCategories({mode:'edit', id: id})">Manage Categories</button>
+                                    <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                                    <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
                                     <div ui-tree data-drag-enabled="false" class="ya-treeview">
                                         <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
                                             <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
