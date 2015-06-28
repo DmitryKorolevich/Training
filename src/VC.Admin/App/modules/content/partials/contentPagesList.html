@@ -61,7 +61,14 @@
                 <tr data-ng-repeat="contentPage in contentPages">
                     <td>{{contentPage.Name}}</td>
                     <td>{{contentPage.Url}}</td>
-                    <td>{{contentPage.Category}}</td>
+                    <td>
+                        <div data-ng-if="contentPage.Categories && contentPage.Categories.length>0">
+                            <div data-ng-repeat="category in contentPage.Categories">
+                                {{category}}
+                            </div>
+                        </div>
+                        <div data-ng-if="!contentPage.Categories || contentPage.Categories.length==0">No Categories</div>
+                    </td>
                     <td>{{contentPage.Status}}</td>
                     <td>{{contentPage.Updated | date:"MM/dd/yy"}}<br />{{contentPage.Updated | date:"h:mm a"}}<br />{{contentPage.AgentId}}</td>
                     <td>

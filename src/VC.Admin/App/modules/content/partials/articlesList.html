@@ -54,7 +54,14 @@
                     <tr data-ng-repeat="article in articles">
                         <td>{{article.Name}}</td>
                         <td>{{article.Url}}</td>
-                        <td>{{article.Category}}</td>
+                        <td>
+                            <div data-ng-if="article.Categories && article.Categories.length>0">
+                                <div data-ng-repeat="category in article.Categories">
+                                    {{category}}
+                                </div>
+                            </div>
+                            <div data-ng-if="!article.Categories || article.Categories.length==0">No Categories</div>
+                        </td>
                         <td>{{article.Updated | date:"MM/dd/yy"}}<br />{{article.Updated | date:"h:mm a"}}<br />{{article.AgentId}}</td>
                         <td>
                             <button class="btn btn-default btn-success" data-ng-click="open(article.Id);">Edit</button>

@@ -19,7 +19,7 @@ namespace VC.Admin.Models.ContentManagement
 
         public string Url { get; set; }
 
-        public string Category { get; set; }
+        public ICollection<string> Categories { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -37,25 +37,11 @@ namespace VC.Admin.Models.ContentManagement
                 Name = item.Name;
                 Url = item.Url;
                 StatusCode = item.StatusCode;
-                if(item.RecipesToContentCategories!=null)
+                if (item.RecipesToContentCategories != null)
                 {
-                    foreach(var RecipesToContentCategory in item.RecipesToContentCategories.OrderBy(p=>p.ContentCategory.Name))
-                    {
-                        if(RecipesToContentCategory.ContentCategory!=null)
-                        {
-                            Category += RecipesToContentCategory.ContentCategory.Name + ", ";
-                        }
-                    }
+                    Categories = item.RecipesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => p.ContentCategory.Name).ToArray();
                 }
-                if(String.IsNullOrEmpty(Category))
-                {
-                    Category = ContentConstants.NO_CATEGORIES_LABEL;
-                }
-                else
-                {
-                    Category=Category.Remove(Category.Length - 2, 2);
-                }
-                if(item.ContentItem!=null)
+                if (item.ContentItem!=null)
                 {
                     Created = item.ContentItem.Created;
                     Updated = item.ContentItem.Updated;

@@ -54,7 +54,14 @@
                 <tr data-ng-repeat="recipe in recipes">
                     <td>{{recipe.Name}}</td>
                     <td>{{recipe.Url}}</td>
-                    <td>{{recipe.Category}}</td>
+                    <td>
+                        <div data-ng-if="recipe.Categories && recipe.Categories.length>0">
+                            <div data-ng-repeat="category in recipe.Categories">
+                                {{category}}
+                            </div>
+                        </div>
+                        <div data-ng-if="!recipe.Categories || recipe.Categories.length==0">No Categories</div>
+                    </td>
                     <td>{{recipe.Updated | date:"MM/dd/yy"}}<br />{{recipe.Updated | date:"h:mm a"}}<br />{{recipe.AgentId}}</td>
                     <td>
                         <button class="btn btn-default btn-success" data-ng-click="open(recipe.Id);">Edit</button>

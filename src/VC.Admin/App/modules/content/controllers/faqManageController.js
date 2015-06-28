@@ -102,7 +102,22 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
 			error(function (result) {
 			    errorHandler(result);
 			});
-    }
+    };
+
+    var getCategoriesTreeViewScope = function () {
+        return angular.element($('.categories .ya-treeview').get(0)).scope();
+    };
+
+    $scope.updateCategoriesCollapsed = function (expand) {
+        var scope = getCategoriesTreeViewScope();
+        if (expand) {
+            scope.expandAll();
+        }
+        else {
+            scope.collapseAll();
+        }
+        $scope.categoriesExpanded = expand;
+    };
 
     function setSelected(category, ids) {
         category.IsSelected = false;
