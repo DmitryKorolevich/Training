@@ -224,6 +224,11 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			var condition = new OrderNoteQuery().NotDeleted().MatchByid(id);
 
+			if (await _orderNoteRepository.Query(condition.HasCustomerAssignments()).SelectAnyAsync())
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.HasAssignments]);
+			}
+
 			var orderNote = (await _orderNoteRepository.Query(condition).SelectAsync(false)).SingleOrDefault();
 
 			if (orderNote != null)

@@ -21,6 +21,7 @@ namespace VC.Admin.Models.UserManagement
 	    public UserStatus Status { get; set; }
 
 	    public string AgentId { get; set; }
+
 	    public DateTime? LastLoginDate { get; set; }
 	}
 }

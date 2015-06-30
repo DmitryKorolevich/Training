@@ -1,0 +1,277 @@
+﻿<div class="container-fluid">
+	<div class="left-pane-controls">
+		<div class="well container-fluid">
+			<div>
+				<button ui-sref="index.oneCol.customersList" class="btn btn-success width-160px">Save</button>
+			</div>
+			<div class="margin-top-10px">
+				<button ui-sref="index.oneCol.customersList" class="btn btn-default width-160px">Cancel</button>
+			</div>
+		</div>
+	</div>
+	<div class="right-pane-main">
+		<div class="container-fluid">
+			<div class="row">
+				<tabset>
+					<tab heading="Account Profile" active="accountProfileTab.active">
+						<div class="container container-left">
+						<div class="well row">
+                            <spinner-overlay data-loading="addTracker.active()">
+                                <form class="form-horizontal">
+                                    <fieldset>
+                                        <span class="legend">Customer Type</span>
+                                        <div class="form-group">
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div data-ng-if="currentCustomer.CustomerType == 2">
+                                            <div class="form-group">
+                                                <label for="taxExempt" class="col-md-3 control-label">Tax Exempt</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="website" class="col-md-3 control-label">Website</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="tier" class="col-md-3 control-label">Tier</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="tradeClass" class="col-md-3 control-label">Trade Class</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Inception Date</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Profile Details</span>
+                                        <div class="form-group">
+                                            <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate">
+                                            </div>
+                                        </div>
+                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="address in [currentCustomer.ProfileAddress]"></div>
+                                        <div class="form-group">
+                                            <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="enterEmail" data-ng-model="currentCustomer.Email" placeholder="Enter Email">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.EmailConfirm" placeholder="Re-enter Email">
+                                            </div>
+                                        </div>
+                                        <!--<span class="legend">Customer Files</span>
+                                        <div class="form-group">
+                                            <div class="container-fluid">
+                                                <div class="">
+                                                    <table class="table table-striped table-hover ">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th>Upload Date</th>
+                                                                <th>Description</th>
+                                                                <th>File Name</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr data-ng-repeat="file in currentCustomer.Files" data-ng-class="{success: order.RowStatus == 1, info: order.RowStatus == 2, warning: order.RowStatus == 3}">
+                                                                <td><input type="checkbox"></td>
+                                                                <td>{{file.UploadDate}}</td>
+                                                                <td>{{file.Description}}</td>
+                                                                <td>{{file.FileName}}</td>
+                                                                <td>
+                                                                    <button ui-sref="index.col.dashboard" class="btn btn-default btn-primary">View</button>
+                                                                    <button ui-sref="index.col.dashboard" class="btn btn-default btn-info">Download</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <button ui-sref="index.col.dashboard" class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Upload New File</span>
+                                        <div class="form-group">
+                                            <label for="fileDescription" class="col-md-3 control-label">Description</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="fileDescription" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <input type="file" class="" id="" placeholder="Choose File">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <button class="btn btn-primary">Upload</button>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Update Password</span>
+                                        <div class="form-group">
+                                            <label for="enterPassword" class="col-md-3 control-label">Enter New Password</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="enterPassword" placeholder="Enter New Password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="reEnterPassword" class="col-md-3 control-label">Re-enter New Password</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="reEnterPassword" placeholder="Re-enter New Password">
+                                            </div>
+                                        </div>-->
+                                        <span class="legend">Approved Payment Methods</span>
+                                        <div class="form-group">
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="paymentMethod in paymentMethods">
+                                                    <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)">
+                                                    {{paymentMethod.Name}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="state" class="col-md-3 control-label">Default Payment Method</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control" id="ddCreditCard" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Automatic Order Specific Notes</span>
+                                        <div class="form-group">
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="orderNote in orderNotes">
+                                                    <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)">
+                                                    {{orderNote.Name}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <span class="legend">DNM / DNR</span>
+                                        <div class="form-group">
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <label class="checkbox-inline col-md-3">
+                                                    <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail">
+                                                    Do Not Mail
+                                                </label>
+                                                <label class="checkbox-inline col-md-3">
+                                                    <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent">
+                                                    Do Not Rent
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <span class="legend">Suspend User Account</span>
+                                        <div class="form-group">
+                                            <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
+                                            <div class="col-md-9">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="reason" class="col-md-3 control-label">Reason</label>
+                                            <div class="col-md-9">
+                                                <textarea type="text" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </spinner-overlay>
+						  </div>
+						</div>
+					</tab>
+					<tab heading="Shipping Address" active="shippingAddressTab.active">
+						<div class="container container-left">
+							<div class="well row">
+							    <spinner-overlay data-loading="addTracker.active()">
+							        <form class="form-horizontal">
+                                        <fieldset>
+                                            <span class="legend">Shipping Address</span>
+                                            <div class="form-group">
+                                                <label for="sameAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox" id="sameAsProfile" data-ng-model="currentCustomer.sameShipping">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="address in [currentCustomer.Shipping]"></div>
+                                            <div class="form-group">
+                                                <label for="shippingEmail" class="col-md-3 control-label">Email</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" id="shippingEmail" placeholder="Email" data-ng-model="currentCustomer.Shipping.Email">
+                                                </div>
+                                            </div>
+                                        </fieldset>
+							        </form>
+							    </spinner-overlay>
+							</div>
+						</div>
+					</tab>
+					<tab heading="Customer Notes" active="customerNotesTab.active">
+						<div class="container container-left">
+							<div class="well row">
+                                <spinner-overlay data-loading="addTracker.active()">
+                                    <form class="form-horizontal">
+                                        <fieldset>
+                                            <span class="legend">Customer Notes</span>
+                                            <div class="form-group">
+                                                <label for="country" class="col-md-3 control-label">Priority</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" id="priority" data-ng-model="currentCustomer.CustomerNote.Priority" data-ng-options="priority.Key as priority.Text for priority in ReferenceData.CustomerNotePriorities">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="note" class="col-md-3 control-label">Note</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" class="form-control" data-ng-model="currentCustomer.CustomerNote.Text" id="note" placeholder="Note" rows="10"></textarea>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </spinner-overlay>
+							</div>
+						</div>
+					</tab>
+				</tabset>
+			</div>
+		</div>
+	</div>
+</div>

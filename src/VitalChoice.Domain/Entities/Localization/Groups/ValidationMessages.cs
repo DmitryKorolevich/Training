@@ -15,9 +15,11 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
 		AtLeastOneRole = 8,
 		UserStatusRestriction = 9,
 		PasswordMustMatch = 10,
-        FieldNameInvalidFormat =11,
+        FieldNameInvalidFormat = 11,
         FieldMinOrEqual = 12,
         FieldMaxOrEqual = 14,
         Exist = 15,
-    }
+		EmailMustMatch = 16,
+		AtLeastOneItem = 17
+	}
 }

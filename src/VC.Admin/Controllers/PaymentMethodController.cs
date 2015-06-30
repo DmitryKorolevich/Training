@@ -27,7 +27,7 @@ using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Controllers
 {
-	[AdminAuthorize(PermissionType.Settings)]
+	[SuperAdminAuthorize]
     public class PaymentMethodController : BaseApiController
     {
 		private readonly IPaymentMethodService _paymentMethodService;

@@ -26,10 +26,6 @@ angular.module('app.modules.demo',
 					url: '/customers/locate',
 					templateUrl: 'app/modules/demo/partials/searchCustomer.html'
 				})
-				.state('index.oneCol.addNewCustomer', {
-					url: '/customers/add',
-					templateUrl: 'app/modules/demo/partials/addNewCustomer.html'
-				})
 				.state('index.oneCol.customersList', {
 					url: '/customers',
 					templateUrl: 'app/modules/demo/partials/customers.html',

@@ -1,0 +1,69 @@
+﻿<div class="form-group">
+	<label class="col-md-3 control-label">Company</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Company" placeholder="Company">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-md-3 control-label">First Name</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.FirstName" placeholder="First Name">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-md-3 control-label">Last Name</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control"data-ng-model="address.LastName" placeholder="Last Name">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-md-3 control-label">Address 1</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Address1" placeholder="Address 1">
+	</div>
+</div>
+<div class="form-group">
+	<label  class="col-md-3 control-label">Address 2</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Address2" placeholder="Address 2">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-md-3 control-label">City</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.City" placeholder="City">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-md-3 control-label">Country</label>
+	<div class="col-md-9">
+		<select class="form-control" data-ng-model="address.Country" data-ng-options="country as country.CountryName for country in countries">
+		</select>
+	</div>
+</div>
+<div class="form-group">
+	<label for="state" class="col-md-3 control-label">State/Province</label>
+	<div class="col-md-9">
+	    <select data-ng-show="address.Country.States && address.Country.States.length > 0" class="form-control" id="state" data-ng-model="address.State" data-ng-options="state.Id as state.StateName for state in address.Country.States">
+	    </select>
+        <input data-ng-show="!(address.Country.States && address.Country.States.length > 0)" type="text" class="form-control" data-ng-model="address.County" placeholder="State">
+	</div>
+</div>
+<div class="form-group">
+	<label for="zip" class="col-md-3 control-label">Zip</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Zip" id="zip" placeholder="Zip">
+	</div>
+</div>
+<div class="form-group">
+	<label for="phone" class="col-md-3 control-label">Phone</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Phone" id="phone" placeholder="Phone">
+	</div>
+</div>
+<div class="form-group">
+	<label for="fax" class="col-md-3 control-label">Fax</label>
+	<div class="col-md-9">
+		<input type="text" class="form-control" data-ng-model="address.Fax" id="fax" placeholder="Fax">
+	</div>
+</div>

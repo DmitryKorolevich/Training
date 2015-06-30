@@ -48,6 +48,7 @@
 		"app/core/dataAccess/services/gcService.js",
 		"app/core/dataAccess/services/paymentMethodService.js",
 		"app/core/dataAccess/services/orderNoteService.js",
+		"app/core/dataAccess/services/customerService.js",
 		"app/core/dataAccess/dataAccess.js",
 		"app/core/utils/httpInterceptor.js",
 		"app/core/utils/modalUtil.js",
@@ -147,6 +148,8 @@
 		"app/modules/gc/controllers/sendEmailController.js",
 		"app/modules/gc/controllers/gcDetailController.js",
 		"app/modules/gc/controllers/gcsAddController.js",
-		"app/modules/gc/gc.js"
+    "app/modules/gc/gc.js",
+    "app/modules/customer/controllers/addCustomerController.js",
+		"app/modules/customer/customer.js"
 	]
 }

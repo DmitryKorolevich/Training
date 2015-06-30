@@ -222,9 +222,15 @@ BEGIN
     ON [dbo].[Customers]([Email] ASC);
 END
 
+IF COL_LENGTH('[dbo].[Customers]','FirstName') IS NOT NULL
+BEGIN
+	ALTER TABLE [dbo].[Customers]
+	DROP COLUMN [FirstName], [LastName]
+END
+
 GO
 
-IF OBJECT_ID(N'[dbo].[CustomerToPaymentMethods]', N'U') IS NULL
+IF OBJECT_ID(N'[dbo].[CustomersToPaymentMethods]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[CustomerToPaymentMethods]
 	([IdCustomer] INT NOT NULL,
@@ -246,7 +252,7 @@ END
 
 GO
 
-IF OBJECT_ID(N'[dbo].[CustomerToOrderNotes]', N'U') IS NULL
+IF OBJECT_ID(N'[dbo].[CustomersToOrderNotes]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[CustomerToOrderNotes]
 	([IdCustomer] INT NOT NULL,
@@ -476,6 +482,92 @@ BEGIN
 	);
 
 	CREATE INDEX [IX_AddressOptionValues_Value] ON [dbo].[AddressOptionValues] ([Value]) INCLUDE (Id, IdAddress, IdOptionType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerPaymentMethods]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerPaymentMethods](
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[IdPaymentMethod] INT NOT NULL, 
+		[IdAddress] INT NOT NULL, 
+		[IdCustomer] INT NOT NULL, 
+		[DateCreated] [datetime2](7) NOT NULL,
+		[DateEdited] [datetime2](7) NOT NULL,
+		[IdEditedBy] [int] NULL,
+		[StatusCode] INT NOT NULL
+		CONSTRAINT [PK_CustomerPaymentMethods] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerPaymentMethods_PaymentMethod] FOREIGN KEY ([IdPaymentMethod]) REFERENCES [PaymentMethods]([Id])
+	);
+
+	ALTER TABLE [dbo].[CustomerPaymentMethods]  WITH CHECK ADD CONSTRAINT [FK_CustomerPaymentMethods_RecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes] ([StatusCode])
+
+	ALTER TABLE [dbo].[CustomerPaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_CustomerPaymentMethods_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+	ALTER TABLE [dbo].[CustomerPaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_CustomerPaymentMethods_Users_EditedBy] FOREIGN KEY([IdEditedBy])
+	REFERENCES [dbo].[Users] ([Id])
+
+	ALTER TABLE [dbo].[CustomerPaymentMethods]  WITH CHECK ADD  CONSTRAINT [FK_CustomerPaymentMethods_Addresses_EditedBy] FOREIGN KEY([IdAddress])
+	REFERENCES [dbo].[Addresses] ([Id])
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerPaymentMethodOptionTypes]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerPaymentMethodOptionTypes]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[Name] NVARCHAR(50) NOT NULL, 
+		[IdPaymentMethod] INT NOT NULL, 
+		[IdFieldType] INT NOT NULL, 
+		[IdLookup] INT NULL, 
+		[DefaultValue] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerPaymentMethodOptionTypes] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerPaymentMethodOptionTypes_PaymentMethod] FOREIGN KEY ([IdPaymentMethod]) REFERENCES [PaymentMethods]([Id]),
+		CONSTRAINT [FK_CustomerPaymentMethodOptionTypes_Lookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
+		CONSTRAINT [FK_CustomerPaymentMethodOptionTypes_FieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerPaymentMethodOptionTypes_Name] ON [dbo].[CustomerPaymentMethodOptionTypes] ([Name]) INCLUDE (Id, IdFieldType)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomerPaymentMethodValues]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerPaymentMethodValues]
+	(
+		[Id] INT IDENTITY(1,1) NOT NULL, 
+		[IdCustomerPaymentMethod] INT NULL, 
+		[IdOptionType] INT NOT NULL, 
+		[Value] NVARCHAR(250) NULL, 
+		 CONSTRAINT [PK_CustomerPaymentMethodValues] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		),
+		CONSTRAINT [FK_CustomerPaymentMethodValues_CustomerPaymentMethodOptionTypes] FOREIGN KEY ([IdOptionType]) REFERENCES [CustomerPaymentMethodOptionTypes]([Id]), 
+		CONSTRAINT [FK_CustomerPaymentMethodValues_CustomerPaymentMethods] FOREIGN KEY ([IdCustomerPaymentMethod]) REFERENCES [CustomerPaymentMethods]([Id])
+	);
+
+	CREATE INDEX [IX_CustomerPaymentMethodValues_Value] ON [dbo].[CustomerPaymentMethodValues] ([Value]) INCLUDE (Id, IdCustomerPaymentMethod, IdOptionType)
+END
+
+GO
+
+IF NOT EXISTS (SELECT [Id] FROM [dbo].[Addresses])
+BEGIN
+	ALTER TABLE [dbo].[Addresses]
+		ALTER COLUMN [IdState] INT NULL
 END
 
 GO

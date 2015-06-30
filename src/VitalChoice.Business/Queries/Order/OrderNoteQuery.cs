@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 
 namespace VitalChoice.Business.Queries.Order
@@ -44,6 +45,20 @@ namespace VitalChoice.Business.Queries.Order
 			{
 				Add(x => x.Id != id.Value);
 			}
+
+			return this;
+		}
+
+	    public OrderNoteQuery MatchByCustomerType(CustomerType customerType)
+	    {
+			Add(x => x.CustomerTypes.Select(y=>y.IdCustomerType).Contains((int)customerType));
+
+			return this;
+		}
+
+		public OrderNoteQuery HasCustomerAssignments()
+		{
+			Add(x => x.Customers.Any());
 
 			return this;
 		}

@@ -11,6 +11,22 @@ BEGIN
 	SET IDENTITY_INSERT [dbo].[CustomerTypes] OFF
 END
 
+IF NOT EXISTS (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Billing')
+BEGIN
+	SET IDENTITY_INSERT [dbo].[AddressTypes] ON
+
+	INSERT INTO [dbo].[AddressTypes]
+	([Id], [Name])
+	VALUES
+	(1, N'Profile'),
+	(2, N'Billing'),
+	(3, N'Shipping')
+
+	SET IDENTITY_INSERT [dbo].[AddressTypes] OFF
+END
+
+GO
+
 IF NOT EXISTS (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Credit Card')
 BEGIN
 	SET IDENTITY_INSERT [dbo].[PaymentMethods] ON
@@ -30,4 +46,198 @@ BEGIN
 	CROSS JOIN [dbo].[CustomerTypes] ct
 
 	SET IDENTITY_INSERT [dbo].[PaymentMethods] OFF
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerOptionTypes])
+BEGIN
+	INSERT INTO [dbo].[CustomerOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdCustomerType], [DefaultValue])
+	VALUES
+	(N'LinkedToAffiliate', 4, NULL, NULL, NULL),
+	(N'DoNotMail', 5, NULL, NULL, NULL),
+	(N'DoNotRent', 5, NULL, NULL, NULL),
+	(N'SuspensionReason', 4, NULL, NULL, NULL)
+
+	DECLARE @IdLookup INT
+	
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType])
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'Yes, Current Certificate'),
+	(2, @IdLookup, 'Sales Tax will be Paid')
+
+	INSERT INTO [dbo].[CustomerOptionTypes]
+	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	VALUES
+	(N'TaxExempt', 3, 2, @IdLookup, '1'),
+	(N'Website', 4, 2, NULL, NULL),
+	(N'PromotingWebsites', 4, 2, NULL, NULL),
+	(N'InceptionDate', 4, 2, NULL, NULL)
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType])
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'Tier 1'),
+	(2, @IdLookup, 'Tier 2'),
+	(3, @IdLookup, 'Tier 3')
+
+	INSERT INTO [dbo].[CustomerOptionTypes]
+	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	VALUES
+	(N'Tier', 3, 2, @IdLookup, '1')
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType])
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'Retail - General'),
+	(2, @IdLookup, 'Retail - Specialty Foods'),
+	(3, @IdLookup, 'Retail - Health & Supplements'),
+	(4, @IdLookup, 'Retail - Online'),
+	(5, @IdLookup, 'Retail - All Other'),
+	(6, @IdLookup, 'Retail - Drop Ship'),
+	(7, @IdLookup, 'Buying Group & Co-Ops'),
+	(8, @IdLookup, 'Clinical - General Practice'),
+	(9, @IdLookup, 'Clinical - Optometrist'),
+	(10, @IdLookup, 'Clinical - Chiropractor'),
+	(11, @IdLookup, 'Clinical - Alternative Medicine'),
+	(12, @IdLookup, 'Clinical - Homeopath'),
+	(13, @IdLookup, 'Clinical - Naturopath'),
+	(14, @IdLookup, 'Clinical - Osteopath'),
+	(15, @IdLookup, 'Clinical - Traditional Chinese Medicine'),
+	(16, @IdLookup, 'Clinical - All Other'),
+	(17, @IdLookup, 'Spa & Massage'),
+	(18, @IdLookup, 'Private Label & Bulk'),
+	(19, @IdLookup, 'International')
+
+	INSERT INTO [dbo].[CustomerOptionTypes]
+	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	VALUES
+	(N'TradeClass', 3, 2, @IdLookup, '1')
+
+END
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes])
+BEGIN
+	INSERT INTO [dbo].[AddressOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdAddressType], [DefaultValue])
+	VALUES
+	(N'Company', 4, NULL, NULL, NULL),
+	(N'FirstName', 4, NULL, NULL, NULL),
+	(N'LastName', 4, NULL, NULL, NULL),
+	(N'Company', 4, NULL, NULL, NULL),
+	(N'Address1', 4, NULL, NULL, NULL),
+	(N'Address2', 4, NULL, NULL, NULL),
+	(N'City', 4, NULL, NULL, NULL),
+	(N'Zip', 3, NULL, NULL, NULL),
+	(N'Phone', 4, NULL, NULL, NULL),
+	(N'Fax', 4, NULL, NULL, NULL),
+	(N'Email', 4, NULL, 1, NULL),
+	(N'Email', 4, NULL, 3, NULL)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomersToOrderNotes]', N'U') IS NULL
+BEGIN
+	EXEC sp_rename 'CustomerToOrderNotes', 'CustomersToOrderNotes'
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[CustomersToPaymentMethods]', N'U') IS NULL
+BEGIN
+	EXEC sp_rename 'CustomerToPaymentMethods', 'CustomersToPaymentMethods'
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerPaymentMethodOptionTypes])
+BEGIN
+	DECLARE @Card INT
+
+	SET @Card = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Credit Card')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	VALUES
+	(N'NameOnCard', 4, NULL, @Card, NULL),
+	(N'CardNumber', 4, NULL, @Card, NULL),
+	(N'ExpDateMonth', 4, NULL, @Card, NULL),
+	(N'ExpDateYear', 4, NULL, @Card, NULL)
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType])
+	VALUES
+	(N'string')
+
+	DECLARE @IdLookup INT
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'MasterCard'),
+	(2, @IdLookup, 'Visa'),
+	(3, @IdLookup, 'American Express'),
+	(4, @IdLookup, 'Discover')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	VALUES
+	(N'CardType', 3, @IdLookup, 1, '1')
+
+	DECLARE @CheckId INT
+
+	SET @CheckId = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Check')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	VALUES
+	(N'CheckNumber', 4, NULL, @CheckId, NULL),
+	(N'PaidInFull', 5, NULL, @CheckId, NULL)
+END
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerNoteOptionTypes])
+BEGIN
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType])
+	VALUES
+	(N'string')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'High Priority'),
+	(2, @IdLookup, 'Normal Priority')
+
+	INSERT INTO [dbo].[CustomerNoteOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [DefaultValue])
+	VALUES
+	(N'Priority', 3, @IdLookup, '1')
 END

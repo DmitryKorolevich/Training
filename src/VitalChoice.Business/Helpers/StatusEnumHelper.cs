@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
@@ -164,5 +165,5 @@ namespace VitalChoice.Business.Helpers
             };
             return toReturn;
         }
-    }
+	}
 }

@@ -13,7 +13,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Addresses
 
 	    public Country Сountry { get; set; }
 
-	    public int IdState { get; set; }
+	    public int? IdState { get; set; }
 
 	    public State State { get; set; }
 

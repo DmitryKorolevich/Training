@@ -51,7 +51,11 @@ namespace VC.Admin.Controllers
                     DiscountTypes = referenceData.DiscountTypes,
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,
                     ActiveFilterOptions = referenceData.ActiveFilterOptions,
-                    CustomerTypes = referenceData.CustomerTypes
+                    CustomerTypes = referenceData.CustomerTypes,
+					TaxExempts = referenceData.TaxExempts,
+					Tiers = referenceData.Tiers,
+					TradeClasses = referenceData.TradeClasses,
+					CustomerNotePriorities = referenceData.CustomerNotePriorities
                 };
 	        }
 			else

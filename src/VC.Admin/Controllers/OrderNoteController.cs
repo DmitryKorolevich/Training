@@ -6,7 +6,6 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Interfaces.Services.Order;
@@ -14,7 +13,7 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers
 {
-	[AdminAuthorize(PermissionType.Settings)]
+	[SuperAdminAuthorize]
     public class OrderNoteController : BaseApiController
     {
 		private readonly IOrderNoteService _orderNoteService;
