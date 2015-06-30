@@ -12,7 +12,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Product
 {
     [ApiValidator(typeof(ProductCategoryManageModelValidator))]
-    public class ProductCategoryManageModel : Model<ProductCategoryContent, IMode>
+    public class ProductCategoryManageModel : BaseModel
     {
         public int Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -87,7 +87,7 @@ namespace VC.Admin.Models.Product
             }
         }
 
-        public override ProductCategoryContent Convert()
+        public ProductCategoryContent Convert()
         {
             ProductCategoryContent toReturn = new ProductCategoryContent();
             toReturn.Id = Id;

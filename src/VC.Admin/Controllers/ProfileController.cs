@@ -42,13 +42,15 @@ namespace VC.Admin.Controllers
 
 		    if (context.User.Identity.IsAuthenticated)
 		    {
-				var settings = new UpdateProfileSettings();
-				settings.Mode = (string.IsNullOrWhiteSpace(profileModel.OldPassword) &&
-										  string.IsNullOrWhiteSpace(profileModel.NewPassword) &&
-										  string.IsNullOrWhiteSpace(profileModel.ConfirmNewPassword))
-					? UpdateProfileMode.Default
-					: UpdateProfileMode.WithPassword;
-				if (ConvertWithValidate(profileModel, settings) == null)
+		        var settings = new UpdateProfileSettings
+		        {
+		            Mode = (string.IsNullOrWhiteSpace(profileModel.OldPassword) &&
+		                    string.IsNullOrWhiteSpace(profileModel.NewPassword) &&
+		                    string.IsNullOrWhiteSpace(profileModel.ConfirmNewPassword))
+		                ? UpdateProfileMode.Default
+		                : UpdateProfileMode.WithPassword
+		        };
+		        if (!Validate(profileModel, settings))
 					return null;
 
 				var user = await userService.FindAsync(context.User.GetUserName());

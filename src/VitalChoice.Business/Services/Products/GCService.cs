@@ -16,6 +16,7 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
+using Microsoft.Data.Entity;
 
 namespace VitalChoice.Business.Services.Products
 {

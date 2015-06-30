@@ -12,7 +12,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(RecipeManageModelValidator))]
-    public class RecipeManageModel : Model<Recipe, IMode>
+    public class RecipeManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -84,7 +84,7 @@ namespace VC.Admin.Models.ContentManagement
             RecipesToProducts = item.RecipesToProducts.ToList();
         }
 
-        public override Recipe Convert()
+        public Recipe Convert()
         {
             Recipe toReturn = new Recipe();
             toReturn.Id = Id;

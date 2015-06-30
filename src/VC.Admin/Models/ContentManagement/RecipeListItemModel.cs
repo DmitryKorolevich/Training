@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Models.ContentManagement
 {
-    public class RecipeListItemModel : Model<Recipe, IMode>
+    public class RecipeListItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 

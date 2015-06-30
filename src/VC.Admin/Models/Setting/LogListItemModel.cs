@@ -5,7 +5,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Setting
 {
-    public class LogListItemModel : Model<CommonLogItem, IMode>
+    public class LogListItemModel : BaseModel
     {
         public DateTime Date { get; set; }
 

@@ -13,7 +13,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(FaqManageModelValidator))]
-    public class FAQManageModel : Model<FAQ, IMode>
+    public class FAQManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -78,7 +78,7 @@ namespace VC.Admin.Models.ContentManagement
             }
         }
 
-        public override FAQ Convert()
+        public FAQ Convert()
         {
             FAQ toReturn = new FAQ();
             toReturn.Id = Id;

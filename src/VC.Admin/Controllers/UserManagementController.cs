@@ -66,7 +66,7 @@ namespace VC.Admin.Controllers
 		[ControlMode(UserManageMode.Create, typeof(UserManageSettings))]
 		public async Task<Result<bool>> CreateUser([FromBody]ManageUserModel userModel)
 		{
-			if (ConvertWithValidate(userModel) == null)
+			if (!Validate(userModel))
 				return false;
 
 			var appUser = new ApplicationUser()
@@ -92,7 +92,7 @@ namespace VC.Admin.Controllers
 		[ControlMode(UserManageMode.Update, typeof(UserManageSettings))]
 		public async Task<Result<bool>> UpdateUser([FromBody]ManageUserModel userModel)
 		{
-			if (ConvertWithValidate(userModel) == null)
+			if (!Validate(userModel))
 				return false;
 
 			var user = await userService.GetAsync(userModel.PublicId);

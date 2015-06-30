@@ -18,7 +18,7 @@ namespace VC.Admin.Models.Product
 {
 using VitalChoice.DynamicData.Entities;
 
-    public class SKUManageModel : Model<SkuDynamic, IMode>, IModelToDynamic<SkuDynamic>
+    public class SKUManageModel : BaseModel 
     {
         [Map]
         public int Id { get; set; }
@@ -77,34 +77,22 @@ using VitalChoice.DynamicData.Entities;
         [Map]
         public bool AutoShipFrequency6 { get; set; }
 
-        public SKUManageModel()
+        public void FillDynamic(SkuMapped mappedObject)
         {
-        }
-
-        public override SkuDynamic Convert()
-        {
-            SkuDynamic toReturn = new SkuDynamic();
-            toReturn.FromModel<SKUManageModel, SkuDynamic>(this);
-
-            return toReturn;
-        }
-
-        public void FillDynamic(SkuDynamic dynamicObject)
-        {
-            dynamicObject.StatusCode = Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
-            if(!dynamicObject.Data.AutoShipProduct)
+            mappedObject.StatusCode = Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
+            if(!mappedObject.Data.AutoShipProduct)
             {
-                dynamicObject.Data.AutoShipFrequency1 = null;
-                dynamicObject.Data.AutoShipFrequency2 = null;
-                dynamicObject.Data.AutoShipFrequency3 = null;
-                dynamicObject.Data.AutoShipFrequency6 = null;
-                dynamicObject.Data.OffPercent = null;
+                mappedObject.Data.AutoShipFrequency1 = null;
+                mappedObject.Data.AutoShipFrequency2 = null;
+                mappedObject.Data.AutoShipFrequency3 = null;
+                mappedObject.Data.AutoShipFrequency6 = null;
+                mappedObject.Data.OffPercent = null;
             }
         }
 
-        public void FillSelfFrom(SkuDynamic dynamicObject)
+        public void FillSelfFrom(SkuMapped mappedObject)
         {
-            Active = dynamicObject.StatusCode == RecordStatusCode.Active;
+            Active = mappedObject.StatusCode == RecordStatusCode.Active;
         }
     }
 }

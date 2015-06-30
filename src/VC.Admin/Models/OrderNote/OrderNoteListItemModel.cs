@@ -5,7 +5,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.OrderNote
 {
-    public class OrderNoteListItemModel : Model<VitalChoice.Domain.Entities.eCommerce.Orders.OrderNote, AbstractModeContainer<IMode>>
+    public class OrderNoteListItemModel : BaseModel<AbstractModeContainer<IMode>>
 	{
 		public int Id { get; set; }
 

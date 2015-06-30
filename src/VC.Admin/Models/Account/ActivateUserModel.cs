@@ -5,7 +5,7 @@ using VitalChoice.Domain.Entities.Users;
 
 namespace VC.Admin.Models.Account
 {
-    public class ActivateUserModel : Model<ApplicationUser, IMode>
+    public class ActivateUserModel : BaseModel
 	{
 	    public string AgentId { get; set; }
 	    public string FirstName { get; set; }

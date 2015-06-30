@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -38,6 +39,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
         private readonly IEcommerceRepositoryAsync<BigStringValue> _bigStringValueRepository;
+        private readonly ProductMapper _mapper;
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
 
@@ -47,7 +49,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
             IEcommerceRepositoryAsync<ProductOptionValue> productOptionValueRepository,
-            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository)
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper)
         {
             this._vProductSkuRepository = vProductSkuRepository;
             this._vSkuRepository = _vSkuRepository;
@@ -59,6 +61,7 @@ namespace VitalChoice.Business.Services.Products
             _productOptionValueRepository = productOptionValueRepository;
             this._productToCategoryRepository = productToCategoryRepository;
             _bigStringValueRepository = bigStringValueRepository;
+            _mapper = mapper;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -146,17 +149,13 @@ namespace VitalChoice.Business.Services.Products
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-            var sortOrder = filter.Sorting.SortOrder;
 
             if (filter.Paging == null)
             {
                 return await query.OrderBy(sortable).SelectAsync(false);
             }
-            else
-            {
-                var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
-                return pagedList.Items;
-            }
+            var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
+            return pagedList.Items;
         }
 
         public async Task<Sku> GetSku(string code)
@@ -182,7 +181,7 @@ namespace VitalChoice.Business.Services.Products
             return await _vProductSkuRepository.GetProductsAsync(filter);
         }
 
-        public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false)
+        public async Task<ProductMapped> GetProductAsync(int id, bool withDefaults = false)
         {
             IQueryFluent<Product> res = _productRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
@@ -197,16 +196,14 @@ namespace VitalChoice.Business.Services.Products
                     await
                         _productOptionTypeRepository.Query(o => o.IdProductType == entity.IdProductType)
                             .SelectAsync(false);
-                //Dictionary<int, ProductOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
-                //IncludeProductOptionTypes(entity, optionTypes);
+
                 entity.Skus =
                     await
                         _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                             .Include(p => p.OptionValues)
                             .SelectAsync(false);
-                //entity.Skus = entity.Skus.OrderBy(p => p.Order).ToList();
-                //IncludeSkuOptionTypes(entity, optionTypes);
-                return new ProductDynamic(entity, withDefaults);
+
+                return _mapper.FromEntity(entity, withDefaults);
             }
 
             return null;
@@ -230,7 +227,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        public async Task<ProductDynamic> UpdateProductAsync(ProductDynamic model)
+        public async Task<ProductMapped> UpdateProductAsync(ProductMapped model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -242,14 +239,17 @@ namespace VitalChoice.Business.Services.Products
                 {
                     idProduct = (await InsertProductAsync(model, uow)).Id;
                 }
-                product = await UpdateProductAsync(model, uow);
+                else
+                {
+                    product = await UpdateProductAsync(model, uow);
+                }
                 if (idProduct != 0)
                     return await GetProductAsync(idProduct);
-                return new ProductDynamic(product);
+                return _mapper.FromEntity(product);
             }
         }
 
-        private async Task<List<MessageInfo>> ValidateProductAsync(ProductDynamic model, int? existingProductId = null,
+        private async Task<List<MessageInfo>> ValidateProductAsync(ProductMapped model, int? existingProductId = null,
             ICollection<int> existSkus = null)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
@@ -302,13 +302,13 @@ namespace VitalChoice.Business.Services.Products
             return errors;
         }
 
-        private async Task<Product> InsertProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Product> InsertProductAsync(ProductMapped model, EcommerceUnitOfWork uow)
         {
             (await ValidateProductAsync(model)).Raise();
 
             var optionTypes =
                     await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
-            var entity = model.ToEntity(optionTypes);
+            var entity = _mapper.ToEntity(model, optionTypes);
             if (entity != null)
             {
                 //Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.Products
             return null;
         }
 
-        private async Task<Product> UpdateProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Product> UpdateProductAsync(ProductMapped model, EcommerceUnitOfWork uow)
         {
             var productRepository = uow.RepositoryAsync<Product>();
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
@@ -375,8 +375,7 @@ namespace VitalChoice.Business.Services.Products
                     optionIndex++;
                     sku.OptionTypes = entity.OptionTypes;
                 }
-
-                model.UpdateEntity(entity);
+                _mapper.UpdateEntity(model, entity);
                 optionIndex = 0;
                 foreach (var sku in entity.Skus)
                 {

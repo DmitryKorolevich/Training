@@ -19,7 +19,7 @@ using VitalChoice.DynamicData.Interfaces;
 namespace VC.Admin.Models.Product
 {
     [ApiValidator(typeof(DiscountManageModelValidator))]
-    public class DiscountManageModel : Model<DiscountDynamic, IMode>, IModelToDynamic<DiscountDynamic>
+    public class DiscountManageModel : BaseModel
     {
         [Map]
         public int Id { get; set; }
@@ -86,11 +86,13 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Code)]
         public string ProductSKU { get; set; }
 
-
+        [Map]
         public IList<int> CategoryIds { get; set; }
 
+        [Map]
         public IList<DiscountToSku> DiscountsToSkus { get; set; }
 
+        [Map]
         public IList<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
 
         public IList<DiscountTier> DiscountTiers { get; set; }
@@ -103,31 +105,18 @@ namespace VC.Admin.Models.Product
             DiscountTiers = new List<DiscountTier>();
         }
 
-        public override DiscountDynamic Convert()
+        public void FillDynamic(DiscountMapped mappedObject)
         {
-            DiscountDynamic toReturn = new DiscountDynamic();
-            toReturn.FromModel<DiscountManageModel, DiscountDynamic>(this);
-
-            if(toReturn.StartDate.HasValue)
+            if (mappedObject.StartDate.HasValue)
             {
-                toReturn.StartDate = new DateTime(toReturn.StartDate.Value.Year, toReturn.StartDate.Value.Month, toReturn.StartDate.Value.Day);
+                mappedObject.StartDate = new DateTime(mappedObject.StartDate.Value.Year, mappedObject.StartDate.Value.Month, mappedObject.StartDate.Value.Day);
             }
-            if (toReturn.ExpirationDate.HasValue)
+            if (mappedObject.ExpirationDate != null)
             {
-                toReturn.ExpirationDate = (new DateTime(ExpirationDate.Value.Year, ExpirationDate.Value.Month, ExpirationDate.Value.Day)).AddDays(1);
+                mappedObject.ExpirationDate = (new DateTime(mappedObject.ExpirationDate.Value.Year, mappedObject.ExpirationDate.Value.Month, mappedObject.ExpirationDate.Value.Day)).AddDays(1);
             }
 
-            return toReturn;
-        }
-
-        public void FillDynamic(DiscountDynamic dynamicObject)
-        {
-            dynamicObject.CategoryIds = CategoryIds.ToList();
-            dynamicObject.DiscountsToSkus = DiscountsToSkus.ToList();
-            dynamicObject.DiscountsToSelectedSkus = DiscountsToSelectedSkus.ToList();
-            dynamicObject.DiscountTiers = DiscountTiers.ToList();
-
-            foreach(var item in dynamicObject.DiscountTiers)
+            foreach (var item in mappedObject.DiscountTiers)
             {
                 if(item.IdDiscountType==DiscountType.PriceDiscount)
                 {
@@ -148,17 +137,9 @@ namespace VC.Admin.Models.Product
             }
         }
 
-        public void FillSelfFrom(DiscountDynamic dynamicObject)
+        public void FillSelfFrom(DiscountMapped mappedObject)
         {
-            if(ExpirationDate.HasValue)
-            {
-                ExpirationDate = ExpirationDate.Value.AddDays(-1);
-            }
-
-            CategoryIds = dynamicObject.CategoryIds.ToList();
-            DiscountsToSkus = dynamicObject.DiscountsToSkus.ToList();
-            DiscountsToSelectedSkus = dynamicObject.DiscountsToSelectedSkus.ToList();
-            DiscountTiers = dynamicObject.DiscountTiers.ToList();
+            ExpirationDate = ExpirationDate?.AddDays(-1);
         }
     }
 }

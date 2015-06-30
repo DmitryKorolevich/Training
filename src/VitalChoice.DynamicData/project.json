@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "",
   "authors": [ "" ],
@@ -7,14 +7,16 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "VitalChoice.Domain": "1.0.0-*"
+    "VitalChoice.Domain": "1.0.0-*",
+    "Autofac.Dnx": "4.0.0-*"
   },
 
   "frameworks": {
-    "dnx451": { },
+    "dnx451": {
+    },
     "dnxcore50": {
       "dependencies": {
-        "System.Runtime" :  "4.0.20-*",
+        "System.Runtime": "4.0.20-*",
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
         "System.Threading": "4.0.10-*",

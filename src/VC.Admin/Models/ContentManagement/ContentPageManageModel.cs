@@ -13,7 +13,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(ContentPageManageModelValidator))]
-    public class ContentPageManageModel : Model<ContentPage, IMode>
+    public class ContentPageManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -84,7 +84,7 @@ namespace VC.Admin.Models.ContentManagement
             }
         }
 
-        public override ContentPage Convert()
+        public ContentPage Convert()
         {
             ContentPage toReturn = new ContentPage();
             toReturn.Id = Id;

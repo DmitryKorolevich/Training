@@ -5,7 +5,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.Caching.Memory;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using Templates;
@@ -30,6 +30,7 @@ using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
@@ -44,11 +45,10 @@ using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Products;
-#if DNX451
 using Autofac;
-using Microsoft.Framework.DependencyInjection.Autofac;
+using Autofac.Dnx;
 using VitalChoice.Data.Repositories.Specifics;
-#endif
+using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -56,7 +56,7 @@ namespace VitalChoice.Core.DependencyInjection
     {
         private static bool _called = false;
 
-        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, string appPath)
+        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, string appPath, Assembly projectAssembly)
         {
             if (!_called)
             {
@@ -180,7 +180,7 @@ namespace VitalChoice.Core.DependencyInjection
 				{
 					x.User.RequireUniqueEmail = true;
 					x.Lockout.MaxFailedAccessAttempts = 5;
-					x.Lockout.EnabledByDefault = true;
+                    x.Lockout.AllowedForNewUsers = true;
 					x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
 					x.Password.RequiredLength = 8;
 					x.Password.RequireDigit = true;
@@ -189,13 +189,11 @@ namespace VitalChoice.Core.DependencyInjection
 
 				services.ConfigureAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
-				
 
-#if DNX451
-				var builder = new ContainerBuilder();
+                var builder = new ContainerBuilder();
 
                 builder.Populate(services);
-
+                
                 builder.Register<IDataContextAsync>(x => x.Resolve<VitalChoiceContext>());
                 builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
                 builder.RegisterType<LogsContext>();
@@ -251,6 +249,10 @@ namespace VitalChoice.Core.DependencyInjection
                     LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.Get("App:LogPath")))
                     .As<ILoggerProviderExtended>().SingleInstance();
 
+                var modelContainer = new ModelToDynamicContainer();
+                modelContainer.Register(projectAssembly);
+                builder.RegisterInstance(modelContainer).As<IModelToDynamicContainer>().SingleInstance();
+
 				var container = builder.Build();
 
 				LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(), configuration.Get("App:DefaultCultureId"));
@@ -262,11 +264,6 @@ namespace VitalChoice.Core.DependencyInjection
 				UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
 
 	            return container.Resolve<IServiceProvider>();
-#else
-
-		        return null;
-#endif
-
             }
             return null;
         }

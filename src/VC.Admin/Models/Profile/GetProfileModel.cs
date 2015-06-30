@@ -4,7 +4,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Profile
 {
-    public class GetProfileModel : Model<ApplicationUser, IMode>
+    public class GetProfileModel : BaseModel
 	{
 	    public string FirstName { get; set; }
 

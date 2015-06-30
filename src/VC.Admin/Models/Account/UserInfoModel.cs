@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.Users;
 
 namespace VC.Admin.Models.Account
 {
-    public class UserInfoModel : Model<ApplicationUser, IMode>
+    public class UserInfoModel : BaseModel
 	{
 		public string Email { get; set; }
 

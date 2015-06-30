@@ -9,7 +9,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(CreateAccountValidator))]
-	public class CreateAccountModel : Model<ApplicationUser, IMode>
+	public class CreateAccountModel : BaseModel
 	{
 	    public Guid PublicId { get; set; }
 

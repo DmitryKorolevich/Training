@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace VC.Admin.Models.Setting
 {
-    public class GlobalSettingsManageModel : Model<List<AppSettingItem>, IMode>
+    public class GlobalSettingsManageModel : BaseModel
     {
         public int? GlobalPerishableThreshold { get; set; }
 
@@ -63,7 +63,7 @@ namespace VC.Admin.Models.Setting
 #endif
         }
 
-        public override List<AppSettingItem> Convert()
+        public List<AppSettingItem> Convert()
         {
             List<AppSettingItem> toReturn = new List<AppSettingItem>();
 #if DNX451

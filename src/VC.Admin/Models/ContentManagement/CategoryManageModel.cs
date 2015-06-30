@@ -13,7 +13,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(CategoryManageModelValidator))]
-    public class CategoryManageModel : Model<ContentCategory, IMode>
+    public class CategoryManageModel : BaseModel
     {
         public int Id { get; set; }
         [Localized(GeneralFieldNames.Name)]
@@ -76,7 +76,7 @@ namespace VC.Admin.Models.ContentManagement
             }
         }
 
-        public override ContentCategory Convert()
+        public ContentCategory Convert()
         {
             ContentCategory toReturn = new ContentCategory();
             toReturn.Id = Id;

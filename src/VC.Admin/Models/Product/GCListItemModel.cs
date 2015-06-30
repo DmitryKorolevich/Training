@@ -13,7 +13,7 @@ using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 
 namespace VC.Admin.Models.Product
 {
-    public class GCListItemModel : Model<GiftCertificate, IMode>
+    public class GCListItemModel : BaseModel
     {
         public int Id { get; set; }
 

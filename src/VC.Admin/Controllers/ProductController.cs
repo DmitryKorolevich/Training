@@ -20,6 +20,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
@@ -29,13 +30,15 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
+        private readonly ProductMapper _mapper;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ProductMapper mapper)
         {
             this.productCategoryService = productCategoryService;
             this.productService = productService;
+            _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -103,17 +106,18 @@ namespace VC.Admin.Controllers
             }
 
             var item = await productService.GetProductAsync(id);
-            ProductManageModel toReturn = item.ToModel<ProductManageModel, ProductDynamic>();
+            
+            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
         }
 
         [HttpPost]
         public async Task<Result<ProductManageModel>> UpdateProduct([FromBody]ProductManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            
+            var item = _mapper.FromModel(model);
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -123,7 +127,7 @@ namespace VC.Admin.Controllers
 
             item = (await productService.UpdateProductAsync(item));
 
-            ProductManageModel toReturn = item.ToModel<ProductManageModel, ProductDynamic>();
+            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
         }
 
@@ -147,10 +151,10 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         public async Task<Result<bool>> UpdateCategoriesTree([FromBody]ProductCategoryTreeItemModel model)
-        {
-            var category = ConvertWithValidate(model);
-            if (category == null)
+        {            
+            if (!Validate(model))
                 return false;
+            var category = model.Convert();
 
             return await productCategoryService.UpdateCategoriesTreeAsync(category);
         }
@@ -173,10 +177,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ProductCategoryManageModel>> UpdateCategory([FromBody]ProductCategoryManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             item = await productCategoryService.UpdateCategoryAsync(item);
 
             return new ProductCategoryManageModel(item);

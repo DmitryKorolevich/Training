@@ -35,10 +35,7 @@
     },
     "frameworks": {
         "dnx451": {
-            "compilationOptions": { "define": [ "DNX451" ] },
-            "dependencies": {
-                "Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*"
-            }
+            "compilationOptions": { "define": [ "DNX451" ] }
         },
         "dnxcore50": {
             "compilationOptions": { "define": [ "DNXCORE50" ] },

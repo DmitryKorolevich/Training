@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Business.Services.Dynamic;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -37,13 +38,14 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
+        private readonly DiscountMapper _mapper;
 
         public DiscountService(IEcommerceRepositoryAsync<DiscountOptionType> discountOptionTypeRepository,
             IEcommerceRepositoryAsync<DiscountOptionValue> discountOptionValueRepository,
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            EcommerceContext context, ILoggerProviderExtended loggerProvider)
+            EcommerceContext context, ILoggerProviderExtended loggerProvider, DiscountMapper mapper)
         {
             this._discountOptionTypeRepository = discountOptionTypeRepository;
             this._discountOptionValueRepository = discountOptionValueRepository;
@@ -52,11 +54,12 @@ namespace VitalChoice.Business.Services.Products
             this._adminProfileRepository = adminProfileRepository;
             _context = context;
             _logger = loggerProvider.CreateLoggerDefault();
+            _mapper = mapper;
         }
 
         #region Discounts
 
-        public async Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter)
+        public async Task<PagedList<DiscountMapped>> GetDiscountsAsync(DiscountFilter filter)
         {
             var conditions = new DiscountQuery().NotDeleted().WithText(filter.SearchText).WithStatus(filter.Status);
             var query = _discountRepository.Query(conditions);
@@ -117,7 +120,7 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
+            PagedList<DiscountMapped> toReturn = new PagedList<DiscountMapped>(result.Items.Select(p => _mapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Any())
             {
                 var ids = result.Items.Select(p => p.IdAddedBy).ToList();
@@ -138,7 +141,7 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<DiscountDynamic> GetDiscountAsync(int id, bool withDefaults = false)
+        public async Task<DiscountMapped> GetDiscountAsync(int id, bool withDefaults = false)
         {
             IQueryFluent<Discount> res = _discountRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
@@ -185,13 +188,13 @@ namespace VitalChoice.Business.Services.Products
                 //Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
                 entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToList();
                 //IncludeDiscountOptionTypes(entity, optionTypes);
-                return new DiscountDynamic(entity, withDefaults);
+                return _mapper.FromEntity(entity, withDefaults);
             }
 
             return null;
         }
 
-        public async Task<DiscountDynamic> UpdateDiscountAsync(DiscountDynamic model)
+        public async Task<DiscountMapped> UpdateDiscountAsync(DiscountMapped model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -207,11 +210,11 @@ namespace VitalChoice.Business.Services.Products
                 discount = await UpdateDiscount(model, uow);
                 if (idDiscount != 0)
                     return await GetDiscountAsync(idDiscount);
-                return new DiscountDynamic(discount);
+                return _mapper.FromEntity(discount);
             }
         }
 
-        private async Task<bool> ValidateDiscount(DiscountDynamic model)
+        private async Task<bool> ValidateDiscount(DiscountMapped model)
         {
             var codeDublicatesExist = await _discountRepository.Query(p => p.Code == model.Code && p.Id != model.Id
                 && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
@@ -222,10 +225,10 @@ namespace VitalChoice.Business.Services.Products
             return true;
         }
 
-        private async Task<Discount> InsertDiscount(DiscountDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Discount> InsertDiscount(DiscountMapped model, EcommerceUnitOfWork uow)
         {
             var optionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
-            var entity = model.ToEntity(optionTypes);
+            var entity = _mapper.ToEntity(model, optionTypes);
             if (entity != null)
             {
                 //Dictionary<string, DiscountOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
@@ -243,7 +246,7 @@ namespace VitalChoice.Business.Services.Products
             return null;
         }
 
-        private async Task<Discount> UpdateDiscount(DiscountDynamic model, EcommerceUnitOfWork uow)
+        private async Task<Discount> UpdateDiscount(DiscountMapped model, EcommerceUnitOfWork uow)
         {
             var discountRepository = uow.RepositoryAsync<Discount>();
             var discountOptionValueRepository = uow.RepositoryAsync<DiscountOptionValue>();
@@ -262,7 +265,7 @@ namespace VitalChoice.Business.Services.Products
 
                 entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
 
-                model.UpdateEntity(entity);
+                _mapper.UpdateEntity(model, entity);
 
                 var selectedSkus = entity.DiscountsToSelectedSkus;
                 entity.DiscountsToSelectedSkus = null;

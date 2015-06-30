@@ -9,7 +9,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.OrderNote
 {
 	[ApiValidator(typeof(OrderNoteManageValidator))]
-	public class ManageOrderNoteModel : Model<VitalChoice.Domain.Entities.eCommerce.Orders.OrderNote, AbstractModeContainer<IMode>>
+	public class ManageOrderNoteModel : BaseModel<AbstractModeContainer<IMode>>
 	{
 		public int Id { get; set; }
 

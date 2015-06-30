@@ -12,7 +12,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product
 {
-    public class SkuListItemModel : Model<VProductSku, IMode>
+    public class SkuListItemModel : BaseModel
     {
         public int? Id { get; set; }
 

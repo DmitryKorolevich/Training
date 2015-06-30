@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation.Abstractions;
@@ -9,7 +10,7 @@ namespace VitalChoice.DynamicData.Validation
     public static class RaiseErrorExtension
     {
         public static IDynamicErrorBuilder<TDynamic> CreateError<TDynamic>(this TDynamic obj)
-            where TDynamic : class, IDynamicObject
+            where TDynamic : class, IModelTypeContainer
         {
             return new DynamicErrorBuilder<TDynamic>(obj);
         }

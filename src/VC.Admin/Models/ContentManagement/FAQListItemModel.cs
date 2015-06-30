@@ -10,7 +10,7 @@ using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Models.ContentManagement
 {
-    public class FAQListItemModel : Model<FAQ, IMode>
+    public class FAQListItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 

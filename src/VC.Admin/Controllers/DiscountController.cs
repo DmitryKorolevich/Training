@@ -21,8 +21,10 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System.Security.Claims;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
@@ -32,12 +34,14 @@ namespace VC.Admin.Controllers
     {
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
+        private readonly IDynamicObjectMapper<DiscountMapped, Discount, DiscountOptionValue, DiscountOptionType> _mapper;
         private readonly ILogger _logger;
 
-        public DiscountController(IDiscountService discountService, IProductService _productService, ILoggerProviderExtended loggerProvider)
+        public DiscountController(IDiscountService discountService, IProductService productService, ILoggerProviderExtended loggerProvider, DiscountMapper mapper)
         {
             this._discountService = discountService;
-            this._productService = _productService;
+            this._productService = productService;
+            _mapper = mapper;
             this._logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -79,7 +83,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _discountService.GetDiscountAsync(id);
-            DiscountManageModel toReturn = item.ToModel<DiscountManageModel, DiscountDynamic>();
+            DiscountManageModel toReturn = _mapper.ToModel<DiscountManageModel>(item);
             int skuId = 0;
             if(item.DictionaryData.ContainsKey("ProductSKU") && item.DictionaryData["ProductSKU"] is string && Int32.TryParse((string)item.DictionaryData["ProductSKU"],out skuId))
             {
@@ -95,14 +99,13 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<DiscountManageModel>> UpdateDiscount([FromBody]DiscountManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
-            if(item.DiscountType==DiscountType.Threshold)
+            var item = _mapper.FromModel(model);
+            if (item.DiscountType == DiscountType.Threshold)
             {
                 var sku = await _productService.GetSku(model.ProductSKU);
-                if(sku==null)
+                if (sku == null)
                 {
                     throw new AppValidationException("ProductSKU", "The give SKU doesn't exist.");
                 }
@@ -118,8 +121,7 @@ namespace VC.Admin.Controllers
 
             item = (await _discountService.UpdateDiscountAsync(item));
 
-            DiscountManageModel toReturn = item.ToModel<DiscountManageModel, DiscountDynamic>();
-            return toReturn;
+            return _mapper.ToModel<DiscountManageModel>(item);
         }
 
         [HttpPost]

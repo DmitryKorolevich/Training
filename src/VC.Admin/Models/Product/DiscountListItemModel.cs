@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.DynamicData.Entities;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Business.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
 
 namespace VC.Admin.Models.Product
 {
-    public class DiscountListItemModel : Model<DiscountDynamic, IMode>
+    public class DiscountListItemModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -40,7 +34,7 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public DiscountListItemModel(DiscountDynamic item)
+        public DiscountListItemModel(DiscountMapped item)
         {
             if(item!=null)
             {
@@ -59,10 +53,7 @@ namespace VC.Admin.Models.Product
                 {
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
-                if (ExpirationDate.HasValue)
-                {
-                    ExpirationDate = ExpirationDate.Value.AddDays(-1);
-                }
+                ExpirationDate = ExpirationDate?.AddDays(-1);
             }
         }
     }

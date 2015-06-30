@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
@@ -25,7 +26,7 @@ namespace VC.Public
         {
             //var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new Configuration( /*applicationEnvironment.ApplicationBasePath*/)
+            var configuration = new ConfigurationBuilder( /*applicationEnvironment.ApplicationBasePath*/)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 
@@ -34,10 +35,10 @@ namespace VC.Public
             {
                 configuration.AddJsonFile("config.local.json");
             }
-            Configuration = configuration;
+            Configuration = configuration.Build();
 
             var reg = new DefaultDependencyConfig();
-            return reg.RegisterInfrastructure(Configuration, services, null);
+            return reg.RegisterInfrastructure(Configuration, services, null, typeof(Startup).GetTypeInfo().Assembly);
         }
 
         // Configure is called after ConfigureServices is called.

@@ -2,15 +2,13 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "VitalChoice.Domain":  "1.0.0-*"
+    "VitalChoice.Domain": "1.0.0-*",
+    "Autofac.Dnx" : "4.0.0-*"
   },
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] },
-      "dependencies": {
-        "Microsoft.Framework.DependencyInjection.Autofac": "1.0.0-*"
-      }
+      "compilationOptions": { "define": [ "DNX451" ] }
     },
     "dnxcore50": {
       "compilationOptions": { "define": [ "DNXCORE50" ] },

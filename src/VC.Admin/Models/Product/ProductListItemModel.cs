@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product
 {
-    public class ProductListItemModel : Model<VProductSku, IMode>
+    public class ProductListItemModel : BaseModel
     {
         public int? Id { get; set; }
 

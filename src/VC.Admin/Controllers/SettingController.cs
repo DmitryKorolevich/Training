@@ -64,10 +64,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<CountryManageModel>> UpdateCountry([FromBody]CountryManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             item = await countryService.UpdateCountryAsync(item);
 
             return new CountryManageModel(item);
@@ -84,10 +83,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<StateManageModel>> UpdateState([FromBody]StateManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             item = await countryService.UpdateStateAsync(item);
 
             return new StateManageModel(item);
@@ -108,7 +106,6 @@ namespace VC.Admin.Controllers
         [SuperAdminAuthorize()]
         public async Task<Result<GlobalSettingsManageModel>> GetGlobalSettings()
         {
-            string toReturn = null;
             var items = await settingService.GetAppSettingItemsAsync(new List<string>
             {
                 SettingConstants.GLOBAL_PERISHABLE_THRESHOLD_NAME,
@@ -122,9 +119,9 @@ namespace VC.Admin.Controllers
         [SuperAdminAuthorize()]
         public async Task<Result<GlobalSettingsManageModel>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
+            var item = model.Convert();
 
             var appSettingItems = await settingService.UpdateAppSettingItemsAsync(item);
 

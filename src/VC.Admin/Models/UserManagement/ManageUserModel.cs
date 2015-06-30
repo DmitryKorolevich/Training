@@ -11,7 +11,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.UserManagement
 {
 	[ApiValidator(typeof(UserManageAdminValidator))]
-	public class ManageUserModel : Model<ApplicationUser, UserManageSettings>
+	public class ManageUserModel : BaseModel<UserManageSettings>
 	{
 		[Localized(GeneralFieldNames.FirstName)]
 		public string FirstName { get; set; }

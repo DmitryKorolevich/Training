@@ -16,42 +16,69 @@ namespace VitalChoice.Core.Base
         }
 
         [NonAction]
-        public T ConvertWithValidate<T, TViewMode>(Model<T, TViewMode> model, T dbEntity = null)
-            where T: class, new()
+        public bool Validate<TViewMode>(BaseModel<TViewMode> model)
             where TViewMode: class, IMode
         {
             model.Mode = (TViewMode)Settings.ValidationMode;
             model.Validate();
-            if (!model.IsValid) {
-                foreach (var validationError in model.Errors) {
-                    ModelState.AddModelError(validationError.Key, validationError.Value);
-                }
+            if (model.IsValid)
+            {
+                return true;
             }
-            else {
-                return dbEntity == null ? model.Convert() : model.Update(dbEntity);
+            foreach (var validationError in model.Errors)
+            {
+                ModelState.AddModelError(validationError.Key, validationError.Value);
             }
-            return null;
+            return false;
         }
 
         [NonAction]
-        public T ConvertWithValidate<T, TViewMode>(Model<T, TViewMode> model, TViewMode mode, T dbEntity = null)
-            where T : class, new()
+        public bool Validate<TViewMode>(BaseModel<TViewMode> model, TViewMode mode)
             where TViewMode : class, IMode
         {
             model.Mode = mode;
             model.Validate();
-            if (!model.IsValid)
+            if (model.IsValid)
             {
-                foreach (var validationError in model.Errors)
-                {
-                    ModelState.AddModelError(validationError.Key, validationError.Value);
-                }
+                return true;
             }
-            else
+            foreach (var validationError in model.Errors)
             {
-                return dbEntity == null ? model.Convert() : model.Update(dbEntity);
+                ModelState.AddModelError(validationError.Key, validationError.Value);
             }
-            return null;
+            return false;
+        }
+
+        [NonAction]
+        public bool Validate(BaseModel model)
+        {
+            model.Mode = Settings.ValidationMode;
+            model.Validate();
+            if (model.IsValid)
+            {
+                return true;
+            }
+            foreach (var validationError in model.Errors)
+            {
+                ModelState.AddModelError(validationError.Key, validationError.Value);
+            }
+            return false;
+        }
+
+        [NonAction]
+        public bool Validate(BaseModel model, IMode mode)
+        {
+            model.Mode = mode;
+            model.Validate();
+            if (model.IsValid)
+            {
+                return true;
+            }
+            foreach (var validationError in model.Errors)
+            {
+                ModelState.AddModelError(validationError.Key, validationError.Value);
+            }
+            return false;
         }
 
         [HttpGet]

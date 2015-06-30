@@ -6,7 +6,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.PaymentMethod
 {
-    public class PaymentMethodListItemModel: Model<VitalChoice.Domain.Entities.eCommerce.Payment.PaymentMethod, IMode>
+    public class PaymentMethodListItemModel: BaseModel
 	{
 	    public PaymentMethodListItemModel()
 	    {

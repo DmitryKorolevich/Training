@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(LoginValidator))]
-	public class LoginModel : Model<ApplicationUser, IMode>
+	public class LoginModel : BaseModel
 	{
 		[Localized(GeneralFieldNames.Email)]
 		public string Email { get; set; }

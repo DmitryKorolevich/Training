@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities.Settings;
 
 namespace VC.Admin.Models.Setting
 {
-    public class StateListItemModel : Model<State, IMode>
+    public class StateListItemModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -32,7 +32,7 @@ namespace VC.Admin.Models.Setting
             }
         }
 
-        public override State Convert()
+        public State Convert()
         {
             State state = new State();
 

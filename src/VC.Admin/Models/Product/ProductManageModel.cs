@@ -42,7 +42,7 @@ namespace VC.Admin.Models.Product
     }
 
     [ApiValidator(typeof(ProductManageModelValidator))]
-    public class ProductManageModel : Model<ProductDynamic, IMode>, IModelToDynamic<ProductDynamic>
+    public class ProductManageModel : BaseModel
     {
         [Map]
         public int Id { get; set; }
@@ -201,24 +201,16 @@ namespace VC.Admin.Models.Product
             CategoryIds = new List<int>();
         }
 
-        public override ProductDynamic Convert()
+        public void FillDynamic(ProductMapped mappedObject)
         {
-            ProductDynamic toReturn = new ProductDynamic();
-            toReturn.FromModel<ProductManageModel, ProductDynamic>(this);
-
-            return toReturn;
-        }
-
-        public void FillDynamic(ProductDynamic dynamicObject)
-        {
-            dynamicObject.CategoryIds = CategoryIds.ToList();
+            mappedObject.CategoryIds = CategoryIds.ToList();
 
             if(CrossSellProducts!=null)
             {
                 for(int i=0;i<CrossSellProducts.Count;i++)
                 {
-                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + (i + 1), CrossSellProducts[i].Image);
-                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + (i + 1), CrossSellProducts[i].Url);
+                    mappedObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + (i + 1), CrossSellProducts[i].Image);
+                    mappedObject.DictionaryData.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + (i + 1), CrossSellProducts[i].Url);
                 }
             }
 
@@ -226,16 +218,16 @@ namespace VC.Admin.Models.Product
             {
                 for (int i = 0; i < Videos.Count; i++)
                 {
-                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + (i + 1), Videos[i].Image);
-                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + (i + 1), Videos[i].Text);
-                    dynamicObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + (i + 1), Videos[i].Video);
+                    mappedObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + (i + 1), Videos[i].Image);
+                    mappedObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + (i + 1), Videos[i].Text);
+                    mappedObject.DictionaryData.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + (i + 1), Videos[i].Video);
                 }
             }
         }
 
-        public void FillSelfFrom(ProductDynamic dynamicObject)
+        public void FillSelfFrom(ProductMapped mappedObject)
         {
-            CategoryIds = dynamicObject.CategoryIds.ToList();
+            CategoryIds = mappedObject.CategoryIds.ToList();
 
             CrossSellProducts = new List<CrossSellProductModel>()
                     {
@@ -247,13 +239,13 @@ namespace VC.Admin.Models.Product
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
             {
                 var crossSellProduct = CrossSellProducts[i-1];
-                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i))
+                if (mappedObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i))
                 {
-                    crossSellProduct.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i];
+                    crossSellProduct.Image = (string)mappedObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i];
                 }
-                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i))
+                if (mappedObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i))
                 {
-                    crossSellProduct.Url = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i];
+                    crossSellProduct.Url = (string)mappedObject.DictionaryData[ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i];
                 }
             }
 
@@ -266,17 +258,17 @@ namespace VC.Admin.Models.Product
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
             {
                 var video = Videos[i-1];
-                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i))
+                if (mappedObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i))
                 {
-                    video.Image = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i];
+                    video.Image = (string)mappedObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i];
                 }
-                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i))
+                if (mappedObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i))
                 {
-                    video.Text = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i];
+                    video.Text = (string)mappedObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i];
                 }
-                if (dynamicObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i))
+                if (mappedObject.DictionaryData.ContainsKey(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i))
                 {
-                    video.Video = (string)dynamicObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i];
+                    video.Video = (string)mappedObject.DictionaryData[ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i];
                 }
             }
         }

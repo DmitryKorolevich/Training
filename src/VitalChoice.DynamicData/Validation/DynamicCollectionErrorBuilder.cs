@@ -8,7 +8,7 @@ using VitalChoice.DynamicData.Validation.Abstractions;
 namespace VitalChoice.DynamicData.Validation
 {
     public class DynamicCollectionErrorBuilder<TCollection, TProperty> : ErrorBuilderBase<TCollection>, IDynamicCollectionErrorBuilder<TCollection, TProperty> 
-        where TProperty: class, IDynamicObject
+        where TProperty: class, IModelTypeContainer
         where TCollection : ICollection<TProperty>
     {
         public DynamicCollectionErrorBuilder(TCollection obj, string collectionName = null, int[] indexes = null,

@@ -59,7 +59,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<UserInfoModel>> Activate([FromBody]CreateAccountModel model)
 		{
-			if (ConvertWithValidate(model) == null)
+			if (!Validate(model))
 				return null;
 
 			var user = await userService.GetAsync(model.PublicId);
@@ -84,7 +84,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<UserInfoModel>> ResetPassword([FromBody]ResetPasswordModel model)
 		{
-			if (ConvertWithValidate(model) == null)
+			if (!Validate(model))
 				return null;
 
 			await userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
@@ -103,7 +103,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<UserInfoModel>> Login([FromBody]LoginModel model)
 		{
-			if (ConvertWithValidate(model) == null)
+			if (!Validate(model))
 				return null;
 
 			var user = await userService.SignInAsync(model.Email, model.Password);

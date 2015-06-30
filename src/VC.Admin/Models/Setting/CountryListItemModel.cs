@@ -11,7 +11,7 @@ using VitalChoice.Domain.Entities.Settings;
 
 namespace VC.Admin.Models.Setting
 {
-    public class CountryListItemModel : Model<Country, IMode>
+    public class CountryListItemModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -36,7 +36,7 @@ namespace VC.Admin.Models.Setting
             }
         }
 
-        public override Country Convert()
+        public Country Convert()
         {
             Country country = new Country();
             country.Id = Id;

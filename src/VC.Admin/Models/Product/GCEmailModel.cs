@@ -12,7 +12,7 @@ using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 namespace VC.Admin.Models.Product
 {
     [ApiValidator(typeof(GCManageEmailModelValidator))]
-    public class GCEmailModel : Model<GiftCertificateEmail, IMode>
+    public class GCEmailModel : BaseModel
     {
         public string ToName { get; set; }
 
@@ -28,7 +28,7 @@ namespace VC.Admin.Models.Product
         {
         }
 
-        public override GiftCertificateEmail Convert()
+        public GiftCertificateEmail Convert()
         {
             GiftCertificateEmail toReturn = new GiftCertificateEmail();
             toReturn.ToName = ToName;

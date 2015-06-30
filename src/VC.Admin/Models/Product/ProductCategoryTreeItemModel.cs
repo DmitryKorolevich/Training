@@ -10,7 +10,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VC.Admin.Models.Product
 {
-    public class ProductCategoryTreeItemModel : Model<ProductCategory, IMode>
+    public class ProductCategoryTreeItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 
@@ -26,7 +26,7 @@ namespace VC.Admin.Models.Product
 
         public ProductCategoryTreeItemModel(ProductCategory item)
         {
-            if(item!=null)
+            if (item != null)
             {
                 Id = item.Id;
                 Name = item.Name;
@@ -39,34 +39,28 @@ namespace VC.Admin.Models.Product
 
         private void CreateSubCategories(ProductCategoryTreeItemModel model, ProductCategory category)
         {
-            var subModels = new List<ProductCategoryTreeItemModel>();
-            foreach(var subCategory in category.SubCategories)
-            {
-                ProductCategoryTreeItemModel subModel = new ProductCategoryTreeItemModel(subCategory);
-                subModels.Add(subModel);
-            }
+            var subModels = category.SubCategories.Select(subCategory => new ProductCategoryTreeItemModel(subCategory)).ToList();
             model.SubItems = subModels;
         }
 
-        public override ProductCategory Convert()
+        public ProductCategory Convert()
         {
             return Convert(null);
         }
 
         public ProductCategory Convert(int? parentId)
         {
-            ProductCategory toReturn = new ProductCategory();
-            toReturn.Id=Id;
-            toReturn.ParentId = parentId;
-            toReturn.Name = Name;
-            toReturn.Url = Url;
+            ProductCategory toReturn = new ProductCategory
+            {
+                Id = Id,
+                ParentId = parentId,
+                Name = Name,
+                Url = Url
+            };
             var subItems = new List<ProductCategory>();
             if (SubItems!=null)
             {
-                foreach(var subItem in SubItems)
-                {
-                    subItems.Add(subItem.Convert(toReturn.Id));
-                }
+                subItems.AddRange(SubItems.Select(subItem => subItem.Convert(toReturn.Id)));
             }
             toReturn.SubCategories = subItems;
             return toReturn;

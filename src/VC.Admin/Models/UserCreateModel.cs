@@ -7,7 +7,7 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 namespace VC.Admin.Models
 {
     [ApiValidator(typeof(UserCreateValidator))]
-    public class UserCreateModel : Model<User, UserCreateSettings>
+    public class UserCreateModel : BaseModel<UserCreateSettings>
     {
         [Localized(BaseButtonLabels.Go)]
         public string Name { get; set; }
@@ -20,7 +20,7 @@ namespace VC.Admin.Models
 
         }
 
-        public override User Convert()
+        public User Convert()
         {
             User user = new User
             {

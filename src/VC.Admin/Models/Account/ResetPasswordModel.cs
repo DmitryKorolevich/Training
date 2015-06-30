@@ -9,7 +9,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.Account
 {
 	[ApiValidator(typeof(ResetPasswordValidator))]
-	public class ResetPasswordModel : Model<ApplicationUser, IMode>
+	public class ResetPasswordModel : BaseModel
 	{
 	    public string Token { get; set; }
 

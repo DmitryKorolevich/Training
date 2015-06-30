@@ -8,7 +8,7 @@ using VitalChoice.DynamicData.Validation.Abstractions;
 namespace VitalChoice.DynamicData.Validation
 {
     public class DynamicErrorBuilder<TProperty> : ErrorBuilderBase<TProperty>, IDynamicErrorBuilder<TProperty>
-        where TProperty: class, IDynamicObject
+        where TProperty: class, IModelTypeContainer
     {
         public DynamicErrorBuilder(TProperty obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null) : base(obj, collectionName, indexes, propertyName, error)
@@ -40,7 +40,7 @@ namespace VitalChoice.DynamicData.Validation
 
         public IDynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty> Collection<TResultProperty>(
             Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression) 
-            where TResultProperty : class, IDynamicObject
+            where TResultProperty : class, IModelTypeContainer
         {
             Expression collectionSelector = collectionExpression;
             // ReSharper disable once UseNullPropagation
@@ -65,14 +65,14 @@ namespace VitalChoice.DynamicData.Validation
         }
 
         public IDynamicErrorBuilder<TResultProperty> Collection<TResultProperty>(Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression, int index) 
-            where TResultProperty : class, IDynamicObject
+            where TResultProperty : class, IModelTypeContainer
         {
             return Collection(collectionExpression, new[] {index});
         }
 
         public IDynamicErrorBuilder<TResultProperty> Collection<TResultProperty>(
             Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression, IEnumerable<int> indexes)
-            where TResultProperty : class, IDynamicObject
+            where TResultProperty : class, IModelTypeContainer
         {
             Expression collectionSelector = collectionExpression;
             // ReSharper disable once UseNullPropagation

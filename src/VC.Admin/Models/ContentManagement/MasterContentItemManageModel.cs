@@ -13,7 +13,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(MasterContentItemManageModelValidator))]
-    public class MasterContentItemManageModel : Model<MasterContentItem, IMode>
+    public class MasterContentItemManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -64,7 +64,7 @@ namespace VC.Admin.Models.ContentManagement
             }
         }
 
-        public override MasterContentItem Convert()
+        public MasterContentItem Convert()
         {
             MasterContentItem toReturn = new MasterContentItem();
             toReturn.Id = Id;

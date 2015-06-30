@@ -67,10 +67,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<GCListItemModel>>> AddGiftCertificates(int quantity, [FromBody]GCManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -84,10 +83,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<GCManageModel>> UpdateGiftCertificate([FromBody]GCManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             item = await GCService.UpdateGiftCertificateAsync(item);
 
             return new GCManageModel(item);
@@ -96,10 +94,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> SenfGiftCertificateEmail([FromBody]GCEmailModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return false;
-
+            var item = model.Convert();
             return await GCService.SendGiftCertificateEmailAsync(item);
         }
 

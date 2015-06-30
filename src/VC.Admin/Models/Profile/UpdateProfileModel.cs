@@ -12,7 +12,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.Profile
 {
 	[ApiValidator(typeof(UpdateProfileValidator))]
-	public class UpdateProfileModel : Model<ApplicationUser, UpdateProfileSettings>
+	public class UpdateProfileModel : BaseModel<UpdateProfileSettings>
 	{
 		[Localized(GeneralFieldNames.FirstName)]
 		public string FirstName { get; set; }

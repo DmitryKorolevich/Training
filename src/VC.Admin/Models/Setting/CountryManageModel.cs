@@ -14,7 +14,7 @@ using VitalChoice.Domain.Entities.Settings;
 namespace VC.Admin.Models.Setting
 {
     [ApiValidator(typeof(CountryManageModelValidator))]
-    public class CountryManageModel : Model<Country, IMode>
+    public class CountryManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -40,7 +40,7 @@ namespace VC.Admin.Models.Setting
             StatusCode = item.StatusCode;
         }
 
-        public override Country Convert()
+        public Country Convert()
         {
             Country toReturn = new Country();
 

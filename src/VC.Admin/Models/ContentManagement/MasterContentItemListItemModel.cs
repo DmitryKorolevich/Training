@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.ContentManagement
 {
-    public class MasterContentItemListItemModel : Model<MasterContentItem, IMode>
+    public class MasterContentItemListItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 

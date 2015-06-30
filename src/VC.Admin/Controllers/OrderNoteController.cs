@@ -53,7 +53,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> CreateOrderNote([FromBody]ManageOrderNoteModel orderNoteModel)
 		{
-			if (ConvertWithValidate(orderNoteModel) == null)
+			if (!Validate(orderNoteModel))
 				return false;
 
 			var orderNote = new OrderNote()
@@ -74,7 +74,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> UpdateOrderNote([FromBody]ManageOrderNoteModel orderNoteModel)
 		{
-			if (ConvertWithValidate(orderNoteModel) == null)
+			if (!Validate(orderNoteModel))
 				return false;
 
 			var orderNote = await _orderNoteService.GetAsync(orderNoteModel.Id);

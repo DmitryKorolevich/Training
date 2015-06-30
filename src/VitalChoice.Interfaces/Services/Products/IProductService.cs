@@ -33,9 +33,9 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
-	    Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false);
+	    Task<ProductMapped> GetProductAsync(int id, bool withDefaults = false);
 
-	    Task<ProductDynamic> UpdateProductAsync(ProductDynamic model);
+	    Task<ProductMapped> UpdateProductAsync(ProductMapped model);
 
         Task<bool> DeleteProductAsync(int id);
 

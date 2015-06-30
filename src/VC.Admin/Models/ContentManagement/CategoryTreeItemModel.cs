@@ -9,7 +9,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.ContentManagement
 {
-    public class CategoryTreeItemModel : Model<ContentCategory, IMode>
+    public class CategoryTreeItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 
@@ -38,16 +38,12 @@ namespace VC.Admin.Models.ContentManagement
 
         private void CreateSubCategories(CategoryTreeItemModel model, ContentCategory category)
         {
-            var subModels = new List<CategoryTreeItemModel>();
-            foreach(var subCategory in category.SubCategories)
-            {
-                CategoryTreeItemModel subModel = new CategoryTreeItemModel(subCategory);
-                subModels.Add(subModel);
-            }
+            var subModels =
+                category.SubCategories.Select(subCategory => new CategoryTreeItemModel(subCategory)).ToList();
             model.SubItems = subModels;
         }
 
-        public override ContentCategory Convert()
+        public ContentCategory Convert()
         {
             return Convert(null);
         }
@@ -63,10 +59,7 @@ namespace VC.Admin.Models.ContentManagement
             var subItems = new List<ContentCategory>();
             if (SubItems!=null)
             {
-                foreach(var subItem in SubItems)
-                {
-                    subItems.Add(subItem.Convert(toReturn.Id));
-                }
+                subItems.AddRange(SubItems.Select(subItem => subItem.Convert(toReturn.Id)));
             }
             toReturn.SubCategories = subItems;
             return toReturn;

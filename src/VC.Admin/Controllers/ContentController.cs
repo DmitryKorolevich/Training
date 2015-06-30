@@ -77,10 +77,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
         public async Task<Result<int?>> UpdateMasterContentItem([FromBody]MasterContentItemManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if(Int32.TryParse(sUserId,out userId))
@@ -117,10 +116,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<bool>> UpdateCategoriesTree([FromBody]CategoryTreeItemModel model)
         {
-            var category = ConvertWithValidate(model);
-            if (category == null)
+            if (!Validate(model))
                 return false;
-            
+            var category = model.Convert();
             return await categoryService.UpdateCategoriesTreeAsync(category);
         }
 
@@ -142,10 +140,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<CategoryManageModel>> UpdateCategory([FromBody]CategoryManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             item = await categoryService.UpdateCategoryAsync(item);
 
             return new CategoryManageModel(item);
@@ -198,10 +195,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<RecipeManageModel>> UpdateRecipe([FromBody]RecipeManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-            
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -260,10 +256,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<FAQManageModel>> UpdateFAQ([FromBody]FAQManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -324,10 +319,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<ArticleManageModel>> UpdateArticle([FromBody]ArticleManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -388,10 +382,9 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<ContentPageManageModel>> UpdateContentPage([FromBody]ContentPageManageModel model)
         {
-            var item = ConvertWithValidate(model);
-            if (item == null)
+            if (!Validate(model))
                 return null;
-
+            var item = model.Convert();
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))

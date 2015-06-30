@@ -13,7 +13,7 @@ using VitalChoice.Validation.Attributes;
 namespace VC.Admin.Models.ContentManagement
 {
     [ApiValidator(typeof(ArticleManageModelValidator))]
-    public class ArticleManageModel : Model<Article, IMode>
+    public class ArticleManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -93,7 +93,7 @@ namespace VC.Admin.Models.ContentManagement
             ArticlesToProducts = item.ArticlesToProducts.ToList();
         }
 
-        public override Article Convert()
+        public Article Convert()
         {
             Article toReturn = new Article();
             toReturn.Id = Id;

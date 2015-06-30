@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Autofac;
 using Microsoft.AspNet.Authentication.Notifications;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Diagnostics;
+using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
@@ -15,6 +19,7 @@ using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
+using VitalChoice.DynamicData.Services;
 
 namespace VC.Admin
 {
@@ -24,7 +29,7 @@ namespace VC.Admin
 		
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			var configuration = new Configuration(/*applicationEnvironment.ApplicationBasePath*/)
+			var configuration = new ConfigurationBuilder(/*applicationEnvironment.ApplicationBasePath*/)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 
@@ -33,14 +38,15 @@ namespace VC.Admin
 			{
 				configuration.AddJsonFile("config.local.json");
 			}
-			Configuration = configuration;
+			Configuration = configuration.Build();
 
             var reg = new DefaultDependencyConfig();
 
 			var filesPath = Configuration.Get("App:FilesPath");
-
-            return reg.RegisterInfrastructure(Configuration, services, filesPath);
-        }
+		    IContainer container;
+            var result = reg.RegisterInfrastructure(Configuration, services, filesPath, typeof(Startup).GetTypeInfo().Assembly);
+            return result;
+		}
 
 		// Configure is called after ConfigureServices is called.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
@@ -48,8 +54,8 @@ namespace VC.Admin
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
 			{
-				//app.UseErrorPage(ErrorPageOptions.ShowAll);
-				//app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+				app.UseErrorPage(ErrorPageOptions.ShowAll);
+				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
 			}
 			else
 			{

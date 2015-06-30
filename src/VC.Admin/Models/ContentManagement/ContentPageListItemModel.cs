@@ -12,7 +12,7 @@ using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Models.ContentManagement
 {
-    public class ContentPageListItemModel : Model<ContentPage, IMode>
+    public class ContentPageListItemModel : BaseModel
 	{
 	    public int Id { get; set; }
 

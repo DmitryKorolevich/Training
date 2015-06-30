@@ -10,7 +10,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Setting
 {
     [ApiValidator(typeof(StateManageModelValidator))]
-    public class StateManageModel : Model<State, IMode>
+    public class StateManageModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -39,7 +39,7 @@ namespace VC.Admin.Models.Setting
             StatusCode = item.StatusCode;
         }
 
-        public override State Convert()
+        public State Convert()
         {
             State toReturn = new State();
 
