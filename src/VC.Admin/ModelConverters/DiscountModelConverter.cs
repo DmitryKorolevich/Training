@@ -8,14 +8,14 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class DiscountModelConverter : IModelToDynamic<DiscountManageModel, DiscountMapped>
+    public class DiscountModelConverter : IModelToDynamic<DiscountManageModel, DiscountDynamic>
     {
-        public void DynamicToModel(DiscountManageModel model, DiscountMapped dynamic)
+        public void DynamicToModel(DiscountManageModel model, DiscountDynamic dynamic)
         {
             model.ExpirationDate = model.ExpirationDate?.AddDays(-1);
         }
 
-        public void ModelToDynamic(DiscountManageModel model, DiscountMapped dynamic)
+        public void ModelToDynamic(DiscountManageModel model, DiscountDynamic dynamic)
         {
             if (dynamic.StartDate.HasValue)
             {

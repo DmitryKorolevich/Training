@@ -3,7 +3,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
-    public class OrderNoteModel : Model<VitalChoice.Domain.Entities.eCommerce.Orders.OrderNote, AbstractModeContainer<IMode>>
+    public class OrderNoteModel : BaseModel<AbstractModeContainer<IMode>>
 	{
 		public string Name { get; set; }
 

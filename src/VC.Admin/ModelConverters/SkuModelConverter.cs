@@ -5,14 +5,14 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class SkuModelConverter : IModelToDynamic<SKUManageModel, SkuMapped>
+    public class SkuModelConverter : IModelToDynamic<SKUManageModel, SkuDynamic>
     {
-        public void DynamicToModel(SKUManageModel model, SkuMapped dynamic)
+        public void DynamicToModel(SKUManageModel model, SkuDynamic dynamic)
         {
             model.Active = dynamic.StatusCode == RecordStatusCode.Active;
         }
 
-        public void ModelToDynamic(SKUManageModel model, SkuMapped dynamic)
+        public void ModelToDynamic(SKUManageModel model, SkuDynamic dynamic)
         {
             dynamic.StatusCode = model.Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
             if (!dynamic.Data.AutoShipProduct)

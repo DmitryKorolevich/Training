@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Settings
             return toReturn;
         }
 
-        private AppSettings CreateAppSettings(IEnumerable<AppSettingItem> items)
+        private AppSettings CreateAppSettings(ICollection<AppSettingItem> items)
         {
             AppSettings toReturn = new AppSettings();
 #if DNX451
@@ -69,18 +69,18 @@ namespace VitalChoice.Business.Services.Settings
                     {
                         if (property.PropertyType == typeof(bool))
                         {
-                            bool toSet = false;
-                            if (bool.TryParse(setting.Value, out toSet))
+                            bool value;
+                            if (bool.TryParse(setting.Value, out value))
                             {
-                                property.SetValue(toReturn, toSet, null);
+                                property.SetValue(toReturn, value, null);
                             }
                         }
                         if (property.PropertyType == typeof(int?))
                         {
-                            int toSet = 0;
-                            if (int.TryParse(setting.Value, out toSet))
+                            int value;
+                            if (int.TryParse(setting.Value, out value))
                             {
-                                property.SetValue(toReturn, toSet, null);
+                                property.SetValue(toReturn, value, null);
                             }
                         }
                         if (property.PropertyType == typeof(string))
@@ -90,6 +90,8 @@ namespace VitalChoice.Business.Services.Settings
                     }
                     catch (Exception e)
                     {
+                        logger.LogCritical(0, e.Message, e);
+                        throw;
                     }
                 }
             }

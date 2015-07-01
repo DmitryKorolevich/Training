@@ -31,13 +31,14 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
         {
             this.productCategoryRepository = productCategoryRepository;
             this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
 

@@ -181,7 +181,7 @@ namespace VitalChoice.Business.Services.Products
             return await _vProductSkuRepository.GetProductsAsync(filter);
         }
 
-        public async Task<ProductMapped> GetProductAsync(int id, bool withDefaults = false)
+        public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false)
         {
             IQueryFluent<Product> res = _productRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
@@ -227,7 +227,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        public async Task<ProductMapped> UpdateProductAsync(ProductMapped model)
+        public async Task<ProductDynamic> UpdateProductAsync(ProductDynamic model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        private async Task<List<MessageInfo>> ValidateProductAsync(ProductMapped model, int? existingProductId = null,
+        private async Task<List<MessageInfo>> ValidateProductAsync(ProductDynamic model, int? existingProductId = null,
             ICollection<int> existSkus = null)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
@@ -302,7 +302,7 @@ namespace VitalChoice.Business.Services.Products
             return errors;
         }
 
-        private async Task<Product> InsertProductAsync(ProductMapped model, EcommerceUnitOfWork uow)
+        private async Task<Product> InsertProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
         {
             (await ValidateProductAsync(model)).Raise();
 
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.Products
             return null;
         }
 
-        private async Task<Product> UpdateProductAsync(ProductMapped model, EcommerceUnitOfWork uow)
+        private async Task<Product> UpdateProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
         {
             var productRepository = uow.RepositoryAsync<Product>();
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
@@ -347,6 +347,7 @@ namespace VitalChoice.Business.Services.Products
             var entity = (await productRepository.Query(
                 p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues)
+                .Include(p => p.ProductsToCategories)
                 .SelectAsync()).FirstOrDefault();
             if (entity != null)
             {
@@ -361,6 +362,7 @@ namespace VitalChoice.Business.Services.Products
                 await
                     bigValueRepository.DeleteAllAsync(
                         entity.OptionValues.Where(o => o.BigValue != null).Select(o => o.BigValue).ToList());
+                await productToCategoryRepository.DeleteAllAsync(entity.ProductsToCategories);
                 await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
                 entity.OptionTypes =
@@ -391,21 +393,12 @@ namespace VitalChoice.Business.Services.Products
                     }
                     optionIndex++;
                 }
-
-                var categories = entity.ProductsToCategories;
-                entity.ProductsToCategories = null;
                 await
                     bigValueRepository.InsertRangeAsync(
                         entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
+                await productToCategoryRepository.InsertRangeAsync(entity.ProductsToCategories);
                 var toReturn = await productRepository.UpdateAsync(entity);
-
-                var dbCategories = await productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync();
-                await productToCategoryRepository.DeleteAllAsync(dbCategories);
-
-                await productToCategoryRepository.InsertRangeAsync(categories);
                 await uow.SaveChangesAsync(CancellationToken.None);
-
-                toReturn.ProductsToCategories = categories;
                 return toReturn;
             }
             return null;

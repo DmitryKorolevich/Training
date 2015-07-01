@@ -34,7 +34,7 @@ namespace VC.Admin.Controllers
     {
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
-        private readonly IDynamicObjectMapper<DiscountMapped, Discount, DiscountOptionValue, DiscountOptionType> _mapper;
+        private readonly IDynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionValue, DiscountOptionType> _mapper;
         private readonly ILogger _logger;
 
         public DiscountController(IDiscountService discountService, IProductService productService, ILoggerProviderExtended loggerProvider, DiscountMapper mapper)

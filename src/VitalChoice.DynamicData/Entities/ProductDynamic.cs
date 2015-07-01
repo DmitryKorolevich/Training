@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class ProductMapped : MappedObject<Product, ProductOptionType, ProductOptionValue>
+    public sealed class ProductDynamic : MappedObject<Product, ProductOptionType, ProductOptionValue>
     {
         public string Name { get; set; }
 
@@ -16,7 +16,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public bool Hidden { get; set; }
 
-        public ICollection<SkuMapped> Skus { get; set; }
+        public ICollection<SkuDynamic> Skus { get; set; }
 
         public ICollection<int> CategoryIds { get; set; }
     }

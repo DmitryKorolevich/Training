@@ -34,7 +34,7 @@ using System.Reflection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
-using VitalChoice.Business.Services.Customer;
+using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Business.Services.Payment;
 using VitalChoice.Business.Services.Products;

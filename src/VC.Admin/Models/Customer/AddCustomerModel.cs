@@ -13,7 +13,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Customer
 {
 	[ApiValidator(typeof(CustomerAddModelValidator))]
-	public class AddCustomerModel : Model<CustomerDynamic, IMode>, IModelToDynamic<CustomerDynamic>
+	public class AddCustomerModel : BaseModel
 	{
 	    public AddCustomerModel()
 	    {
@@ -51,9 +51,11 @@ namespace VC.Admin.Models.Customer
 		[Map]
 		public string EmailConfirm { get; set; }
 
+        [Map]
 		public IList<int> ApprovedPaymentMethods { get; set; }
 
-		public IList<int> OrderNotes { get; set; }
+        [Map]
+        public IList<int> OrderNotes { get; set; }
 
 		[Map("IdDefaultPaymentMethod")]
 		public int? DefaultPaymentMethod { get; set; }
@@ -72,20 +74,8 @@ namespace VC.Admin.Models.Customer
 
 		public AddressModel ProfileAddress { get; set; }
 
-		public AddressModel Shipping { get; set; }
+        public AddressModel Shipping { get; set; }
 
 		public CustomerNoteModel CustomerNote { get; set; }
-
-		public void FillDynamic(CustomerDynamic dynamicObject)
-		{
-			dynamicObject.ApprovedPaymentMethods = ApprovedPaymentMethods;
-			dynamicObject.OrderNotes = OrderNotes;
-		}
-
-		public void FillSelfFrom(CustomerDynamic dynamicObject)
-		{
-			ApprovedPaymentMethods = dynamicObject.ApprovedPaymentMethods.ToList();
-			OrderNotes = dynamicObject.OrderNotes.ToList();
-		}
 	}
 }

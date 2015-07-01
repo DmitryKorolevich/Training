@@ -44,7 +44,6 @@ namespace VC.Admin
             var reg = new DefaultDependencyConfig();
 
 			var filesPath = Configuration.Get("App:FilesPath");
-		    IContainer container;
             var result = reg.RegisterInfrastructure(Configuration, services, filesPath, typeof(Startup).GetTypeInfo().Assembly);
             return result;
 		}

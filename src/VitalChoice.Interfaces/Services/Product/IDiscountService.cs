@@ -9,11 +9,11 @@ namespace VitalChoice.Interfaces.Services.Product
 {
 	public interface IDiscountService
     {
-        Task<PagedList<DiscountMapped>> GetDiscountsAsync(DiscountFilter filter);
+        Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter);
 
-        Task<DiscountMapped> GetDiscountAsync(int id, bool withDefaults = false);
+        Task<DiscountDynamic> GetDiscountAsync(int id, bool withDefaults = false);
 
-        Task<DiscountMapped> UpdateDiscountAsync(DiscountMapped model);
+        Task<DiscountDynamic> UpdateDiscountAsync(DiscountDynamic model);
 
         Task<bool> DeleteDiscountAsync(int id);
     }

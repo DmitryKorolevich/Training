@@ -10,7 +10,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
-	public class CustomerListItemModel : Model<CustomerDynamic, IMode>
+	public class CustomerListItemModel : BaseModel
 	{
 		public int Id { get; set; }
 

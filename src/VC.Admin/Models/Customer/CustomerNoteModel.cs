@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Customer
 {
 	[ApiValidator(typeof(CustomerNoteModelValidator))]
-	public class CustomerNoteModel : Model<CustomerNote, IMode>//, IModelToDynamic<AddressDynamic>
+	public class CustomerNoteModel : BaseModel
 	{
 		[Map]
 	    public CustomerNotePriority Priority { get; set; }

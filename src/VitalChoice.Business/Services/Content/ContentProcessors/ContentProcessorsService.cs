@@ -14,8 +14,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         public IContentProcessor GetContentProcessorByName(string name)
         {
             var fullName = PROCESSORS_NAME_SPACE + name;
-            IContentProcessor toReturn = null;
-
             if (processors == null)
                 processors = new Dictionary<string, IContentProcessor>();
 

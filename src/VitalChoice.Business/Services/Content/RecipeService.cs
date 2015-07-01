@@ -42,7 +42,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
         {
             this.recipeRepository = recipeRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -52,6 +52,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this._recipeToProductRepository = recipeToProductRepository;
             this._productRepository = productRepository;
+            this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
 

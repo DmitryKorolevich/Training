@@ -248,3 +248,9 @@ WHERE IdDiscountType=4 AND Name='Amount'
 END
 
 GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[DiscountsToCategories]', N'U') AND Name = 'Include')
+	ALTER TABLE DiscountsToCategories
+	DROP COLUMN [Include]
+
+GO

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
@@ -57,18 +58,11 @@ namespace VitalChoice.Core.Services
                 Func<object, Exception, string> formatter)
             {
                 var nLogLogLevel = GetLogLevel(logLevel);
-                var message = string.Empty;
-                if (formatter != null)
-                {
-                    message = formatter(state, exception);
-                }
-                else
-                {
-                    message = LogFormatter.Formatter(state, exception);
-                }
+                var message = formatter != null ? formatter(state, exception) : LogFormatter.Formatter(state, exception);
                 if (!string.IsNullOrEmpty(message))
                 {
-                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message, exception);
+                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, exception,
+                        CultureInfo.InvariantCulture, message);
                     eventInfo.Properties["EventId"] = eventId;
                     _logger.Log(eventInfo);
                 }
@@ -112,13 +106,7 @@ namespace VitalChoice.Core.Services
 
         private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
 
-        public ILoggerFactory Factory
-        {
-            get
-            {
-                return _factory;
-            }
-        }
+        public ILoggerFactory Factory => _factory;
 
         internal LoggerProviderExtended(string basePath, string logPath)
         {

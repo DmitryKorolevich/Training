@@ -36,9 +36,9 @@ namespace VitalChoice.Infrastructure.Identity
 			return user.Profile.ConfirmationToken.ToString();
 		}
 
-	    public async Task<bool> ValidateAsync(string purpose, string token, UserManager<ApplicationUser> manager, ApplicationUser user)
+	    public Task<bool> ValidateAsync(string purpose, string token, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    return user.Profile.ConfirmationToken.Equals(Guid.Parse(token)) && !user.Profile.IsConfirmed && user.Profile.TokenExpirationDate.Subtract(DateTime.Now).Days > 0;
+		    return Task.FromResult(user.Profile.ConfirmationToken.Equals(Guid.Parse(token)) && !user.Profile.IsConfirmed && user.Profile.TokenExpirationDate.Subtract(DateTime.Now).Days > 0);
 		}
 
 	    public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<ApplicationUser> manager, ApplicationUser user)

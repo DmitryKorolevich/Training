@@ -1,4 +1,4 @@
-﻿IF OBJECT_ID(N'[dbo].[Users]', N'U') IS NULL
+﻿IF OBJECT_ID(N'[dbo].[Customers]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[Customers](
 		[Id] [int] NOT NULL,
@@ -230,7 +230,7 @@ END
 
 GO
 
-IF OBJECT_ID(N'[dbo].[CustomersToPaymentMethods]', N'U') IS NULL
+IF OBJECT_ID(N'[dbo].[CustomerToPaymentMethods]', N'U') IS NULL AND OBJECT_ID(N'[dbo].[CustomersToPaymentMethods]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[CustomerToPaymentMethods]
 	([IdCustomer] INT NOT NULL,
@@ -252,7 +252,7 @@ END
 
 GO
 
-IF OBJECT_ID(N'[dbo].[CustomersToOrderNotes]', N'U') IS NULL
+IF OBJECT_ID(N'[dbo].[CustomerToOrderNotes]', N'U') IS NULL AND OBJECT_ID(N'[dbo].[CustomersToOrderNotes]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[CustomerToOrderNotes]
 	([IdCustomer] INT NOT NULL,

@@ -10,7 +10,7 @@ using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class SkuMapper : DynamicObjectMapper<SkuMapped, Sku, ProductOptionType, ProductOptionValue>
+    public class SkuMapper : DynamicObjectMapper<SkuDynamic, Sku, ProductOptionType, ProductOptionValue>
     {
         public SkuMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container)
             : base(mappers, container)
@@ -18,12 +18,12 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        protected override void FillNewEntity(SkuMapped dynamic, Sku entity)
+        protected override void FillNewEntity(SkuDynamic dynamic, Sku entity)
         {
             ToEntityStd(dynamic, entity);
         }
 
-        protected override void FromEntity(SkuMapped dynamic, Sku entity, bool withDefaults = false)
+        protected override void FromEntity(SkuDynamic dynamic, Sku entity, bool withDefaults = false)
         {
             dynamic.Code = entity.Code;
             dynamic.Hidden = entity.Hidden;
@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Dynamic
             dynamic.Order = entity.Order;
         }
 
-        protected override void UpdateEntityInternal(SkuMapped dynamic, Sku entity)
+        protected override void UpdateEntityInternal(SkuDynamic dynamic, Sku entity)
         {
             ToEntityStd(dynamic, entity);
 
@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        private static void ToEntityStd(SkuMapped dynamic, Sku entity)
+        private static void ToEntityStd(SkuDynamic dynamic, Sku entity)
         {
             entity.Code = dynamic.Code;
             entity.Hidden = dynamic.Hidden;

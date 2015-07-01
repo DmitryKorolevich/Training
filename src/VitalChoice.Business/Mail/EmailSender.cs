@@ -1,4 +1,4 @@
-﻿#if DNX451
+﻿#if !DNXCORE50
 using System.Net;
 using System.Net.Mail;
 #endif
@@ -48,7 +48,10 @@ namespace VitalChoice.Business.Mail
 			};
 
 			await client.SendMailAsync(mailmsg);
+#else
+            await Task.Delay(0);
 #endif
-		}
-	}
+
+        }
+    }
 }

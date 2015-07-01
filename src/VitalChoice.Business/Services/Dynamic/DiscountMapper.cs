@@ -9,13 +9,13 @@ using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class DiscountMapper : DynamicObjectMapper<DiscountMapped, Discount, DiscountOptionType, DiscountOptionValue>
+    public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
         public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container) : base(mappers, container)
         {
         }
 
-        protected override void FromEntity(DiscountMapped dynamic, Discount entity, bool withDefaults = false)
+        protected override void FromEntity(DiscountDynamic dynamic, Discount entity, bool withDefaults = false)
         {
             dynamic.Code = entity.Code;
             dynamic.Description = entity.Description;
@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Services.Dynamic
             dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
         }
 
-        protected override void UpdateEntityInternal(DiscountMapped dynamic, Discount entity)
+        protected override void UpdateEntityInternal(DiscountDynamic dynamic, Discount entity)
         {
             SetDiscountTiersOrdering(dynamic.DiscountTiers);
             entity.Code = dynamic.Code;
@@ -86,7 +86,7 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        protected override void FillNewEntity(DiscountMapped dynamic, Discount entity)
+        protected override void FillNewEntity(DiscountDynamic dynamic, Discount entity)
         {
             SetDiscountTiersOrdering(dynamic.DiscountTiers);
             entity.Code = dynamic.Code;

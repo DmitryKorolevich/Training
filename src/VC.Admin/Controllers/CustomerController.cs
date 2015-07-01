@@ -8,6 +8,7 @@ using VC.Admin.Models.Customer;
 using VC.Admin.Models.OrderNote;
 using VC.Admin.Models.Product;
 using VC.Admin.Models.Setting;
+using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
@@ -30,13 +31,15 @@ namespace VC.Admin.Controllers
     public class CustomerController : BaseApiController
     {
 		private readonly ICountryService _countryService;
-		private readonly ICustomerService _customerService;
+	    private readonly CustomerMapper _customerMapper;
+	    private readonly ICustomerService _customerService;
 
 
-		public CustomerController(ICustomerService customerService, ICountryService countryService)
+		public CustomerController(ICustomerService customerService, ICountryService countryService, CustomerMapper customerMapper)
 		{
 			_customerService = customerService;
 			_countryService = countryService;
+		    _customerMapper = customerMapper;
 		}
 
 		[HttpGet]
@@ -88,11 +91,10 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<AddCustomerModel>> AddCustomer([FromBody] AddCustomerModel addCustomerModel)
 		{
-			var item = ConvertWithValidate(addCustomerModel);
-			if (item == null)
+			if (!Validate(addCustomerModel))
 				return null;
-
-			var sUserId = Request.HttpContext.User.GetUserId();
+            var item = _customerMapper.FromModel(addCustomerModel);
+            var sUserId = Request.HttpContext.User.GetUserId();
 			int userId;
 			if (int.TryParse(sUserId, out userId))
 			{
@@ -101,7 +103,7 @@ namespace VC.Admin.Controllers
 
 			item = (await _customerService.AddUpdateCustomerAsync(item));
 
-			var toReturn = item.ToModel<AddCustomerModel, CustomerDynamic>();
+			var toReturn = _customerMapper.ToModel<AddCustomerModel>(item);
 			return toReturn;
 		}
 

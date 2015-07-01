@@ -11,7 +11,7 @@ using VitalChoice.Validation.Models.Interfaces;
 namespace VC.Admin.Models.Customer
 {
 	[ApiValidator(typeof(AddressModelValidator))]
-	public class AddressModel : Model<AddressDynamic, IMode>//, IModelToDynamic<AddressDynamic>
+	public class AddressModel : BaseModel
 	{
 		[Map]
 		public AddressType AddressType { get; set; }
@@ -54,15 +54,5 @@ namespace VC.Admin.Models.Customer
 
 		[Map]
 		public string Email { get; set; }
-
-		//public void FillDynamic(AddressDynamic dynamicObject)
-		//{
-		//	throw new NotImplementedException();
-		//}
-
-		//public void FillSelfFrom(AddressDynamic dynamicObject)
-		//{
-		//	throw new NotImplementedException();
-		//}
 	}
 }

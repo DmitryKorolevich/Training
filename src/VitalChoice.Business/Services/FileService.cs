@@ -269,21 +269,13 @@ namespace VitalChoice.Business.Services
 
         public static void SaveToFileSystem(string fullPath, byte[] content)
         {
-            try
+            using (FileStream fileStream = CreateWriteStream(fullPath, NUMBER_OF_TRIES,
+                MILISECONDS_INTERVAL_BETWEEN_TRIES))
             {
-                using (FileStream fileStream = CreateWriteStream(fullPath, NUMBER_OF_TRIES,
-                    MILISECONDS_INTERVAL_BETWEEN_TRIES))
+                using (BinaryWriter writer = new BinaryWriter(fileStream))
                 {
-                    using (BinaryWriter writer = new BinaryWriter(fileStream))
-                    {
-                        writer.Write(content, 0, content.Length);
-                    }
+                    writer.Write(content, 0, content.Length);
                 }
-            }
-            catch (Exception ex)
-            {
-
-                throw;
             }
         }
 

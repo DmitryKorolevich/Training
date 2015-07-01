@@ -3,7 +3,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
-	public class PaymentMethodModel : Model<VitalChoice.Domain.Entities.eCommerce.Payment.PaymentMethod, AbstractModeContainer<IMode>>
+	public class PaymentMethodModel : BaseModel<AbstractModeContainer<IMode>>
 	{
 		public string Name { get; set; }
 

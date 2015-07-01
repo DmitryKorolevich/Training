@@ -34,7 +34,7 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public DiscountListItemModel(DiscountMapped item)
+        public DiscountListItemModel(DiscountDynamic item)
         {
             if(item!=null)
             {

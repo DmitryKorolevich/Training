@@ -12,7 +12,7 @@ using VitalChoice.DynamicData.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class ProductMapper : DynamicObjectMapper<ProductMapped, Product, ProductOptionType, ProductOptionValue>
+    public class ProductMapper : DynamicObjectMapper<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
     {
         private readonly SkuMapper _skuMapper;
 
@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
-        protected override void FillNewEntity(ProductMapped dynamic, Product entity)
+        protected override void FillNewEntity(ProductDynamic dynamic, Product entity)
         {
             SetSkuOrdering(dynamic.Skus);
             entity.Hidden = dynamic.Hidden;
@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services.Dynamic
             entity.Skus = dynamic.Skus?.Select(s => _skuMapper.ToEntity(s, entity.OptionTypes)).ToList() ?? new List<Sku>();
         }
 
-        private static void SetSkuOrdering(IEnumerable<SkuMapped> skus)
+        private static void SetSkuOrdering(IEnumerable<SkuDynamic> skus)
         {
             int order = 0;
             foreach (var sku in skus)
@@ -52,18 +52,18 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        protected override void FromEntity(ProductMapped dynamic, Product entity, bool withDefaults = false)
+        protected override void FromEntity(ProductDynamic dynamic, Product entity, bool withDefaults = false)
         {
             dynamic.Name = entity.Name;
             dynamic.Url = entity.Url;
             dynamic.Type = entity.IdProductType;
             dynamic.Hidden = entity.Hidden;
             dynamic.CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
-            dynamic.Skus = new List<SkuMapped>();
+            dynamic.Skus = new List<SkuDynamic>();
             foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;
-                SkuMapped skuMapped;
+                SkuDynamic skuDynamic;
                 if (withDefaults)
                 {
                     //combine product part in skus
@@ -74,17 +74,17 @@ namespace VitalChoice.Business.Services.Dynamic
                             sku.OptionValues.Add(productValue);
                         }
                     }
-                    skuMapped = _skuMapper.FromEntity(sku, true);
+                    skuDynamic = _skuMapper.FromEntity(sku, true);
                 }
                 else
                 {
-                    skuMapped = _skuMapper.FromEntity(sku);
+                    skuDynamic = _skuMapper.FromEntity(sku);
                 }
-                dynamic.Skus.Add(skuMapped);
+                dynamic.Skus.Add(skuDynamic);
             }
         }
 
-        protected override void UpdateEntityInternal(ProductMapped dynamic, Product entity)
+        protected override void UpdateEntityInternal(ProductDynamic dynamic, Product entity)
         {
             SetSkuOrdering(dynamic.Skus);
             entity.Hidden = dynamic.Hidden;
