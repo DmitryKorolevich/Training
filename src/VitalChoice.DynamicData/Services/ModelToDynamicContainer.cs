@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
 
 namespace VitalChoice.DynamicData.Services
@@ -21,7 +22,7 @@ namespace VitalChoice.DynamicData.Services
         {
             _modelToDynamicCache =
                 searchAssembly.ExportedTypes.Where(t => t.IsImplementGeneric(typeof (IModelToDynamic<,>)))
-                    .ToDictionary(t => t, Activator.CreateInstance);
+                    .ToDictionary(t => t.TryGetElementType(typeof(IModelToDynamic<,>)), Activator.CreateInstance);
         }
 
         public IModelToDynamic<TModel, TDynamic> TryResolve<TModel, TDynamic>()

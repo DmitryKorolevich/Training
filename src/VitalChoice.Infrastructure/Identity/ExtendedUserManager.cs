@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Infrastructure.Identity
 {
@@ -16,10 +17,10 @@ namespace VitalChoice.Infrastructure.Identity
             IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
             IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors, IEnumerable<IUserTokenProvider<ApplicationUser>> tokenProviders,
-            ILoggerFactory logger, IHttpContextAccessor contextAccessor)
+            ILoggerProviderExtended logger, IHttpContextAccessor contextAccessor)
             : base(
                 store, optionsAccessor, passwordHasher, userValidators.Where(x => x is ExtendedUserValidator),
-                passwordValidators, keyNormalizer, errors, tokenProviders, logger, contextAccessor)
+                passwordValidators, keyNormalizer, errors, tokenProviders, new Logger<UserManager<ApplicationUser>>(logger.Factory), contextAccessor)
         {
         }
     }

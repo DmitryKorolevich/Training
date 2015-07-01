@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.OptionsModel;
+using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Core.Base
 {
@@ -13,11 +16,12 @@ namespace VitalChoice.Core.Base
     {
         private readonly IControllerActionArgumentBinder _argumentBinder;
         private readonly IControllerFactory _controllerFactory;
-        private readonly IFilterProvider[] _filterProviders;
-        private readonly IInputFormattersProvider _inputFormatters;
-        private readonly IModelBinderProvider _modelBinders;
-        private readonly IModelValidatorProviderProvider _modelValidatorProviders;
-        private readonly IValueProviderFactoryProvider _valueProviderFactories;
+        private readonly IReadOnlyList<IFilterProvider> _filterProviders;
+        private readonly IReadOnlyList<IInputFormatter> _inputFormatters;
+        private readonly IReadOnlyList<IOutputFormatter> _outputFormatters;
+        private readonly IReadOnlyList<IModelBinder> _modelBinders;
+        private readonly IReadOnlyList<IModelValidatorProvider> _modelValidatorProviders;
+        private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
         private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
         private readonly ITempDataDictionary _tempData;
         private readonly ILoggerFactory _loggerFactory;
@@ -25,23 +29,20 @@ namespace VitalChoice.Core.Base
 
         public ValidationActionInvokerProvider(
                     IControllerFactory controllerFactory,
-                    IEnumerable<IFilterProvider> filterProviders,
+                    IReadOnlyList<IFilterProvider> filterProviders,
                     IControllerActionArgumentBinder argumentBinder,
-                    IInputFormattersProvider inputFormattersProvider,
-                    IModelBinderProvider modelBinderProvider,
-                    IModelValidatorProviderProvider modelValidatorProviderProvider,
-                    IValueProviderFactoryProvider valueProviderFactoryProvider,
                     IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
                     ITempDataDictionary tempData,
-                    ILoggerFactory loggerFactory)
+                    ILoggerFactory loggerFactory, IOptions<MvcOptions> mvcOptions)
         {
             _controllerFactory = controllerFactory;
-            _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
+            _filterProviders = new ReadOnlyCollection<IFilterProvider>(filterProviders.OrderBy(item => item.Order).ToList());
             _argumentBinder = argumentBinder;
-            _inputFormatters = inputFormattersProvider;//new InputFormattersProvider(optionsAccessor.Options.InputFormatters);
-            _modelBinders = modelBinderProvider;
-            _modelValidatorProviders = modelValidatorProviderProvider;
-            _valueProviderFactories = valueProviderFactoryProvider;
+            _outputFormatters = new ReadOnlyCollection<IOutputFormatter>(mvcOptions.Options.OutputFormatters);
+            _inputFormatters = new ReadOnlyCollection<IInputFormatter>(mvcOptions.Options.InputFormatters);
+            _modelBinders = new ReadOnlyCollection<IModelBinder>(mvcOptions.Options.ModelBinders);
+            _modelValidatorProviders = new ReadOnlyCollection<IModelValidatorProvider>(mvcOptions.Options.ModelValidatorProviders);
+            _valueProviderFactories = new ReadOnlyCollection<IValueProviderFactory>(mvcOptions.Options.ValueProviderFactories);
             _actionBindingContextAccessor = actionBindingContextAccessor;
             _tempData = tempData;
             _loggerFactory = loggerFactory;
@@ -63,12 +64,13 @@ namespace VitalChoice.Core.Base
                                                     _controllerFactory,
                                                     actionDescriptor,
                                                     _inputFormatters,
+                                                    _outputFormatters,
                                                     _argumentBinder,
                                                     _modelBinders,
                                                     _modelValidatorProviders,
                                                     _valueProviderFactories,
                                                     _actionBindingContextAccessor,
-                                                    _tempData);
+                                                    _tempData, _loggerFactory);
             }
         }
 

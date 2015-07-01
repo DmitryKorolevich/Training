@@ -4,35 +4,29 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
+using Microsoft.Framework.Logging;
 
 namespace VitalChoice.Core.Base
 {
     public class BaseControllerActionInvoker : ControllerActionInvoker
     {
         public BaseControllerActionInvoker(
-             ActionContext actionContext,
-             IReadOnlyList<IFilterProvider> filterProviders,
-             IControllerFactory controllerFactory,
-             ControllerActionDescriptor descriptor,
-             IInputFormattersProvider inputFormatters,
-             IControllerActionArgumentBinder controllerActionArgumentBinder,
-             IModelBinderProvider modelBinders,
-             IModelValidatorProviderProvider modelValidatorProviders,
-             IValueProviderFactoryProvider valueProviderFactories,
-             IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-             ITempDataDictionary tempData)
+            ActionContext actionContext,
+            IReadOnlyList<IFilterProvider> filterProviders,
+            IControllerFactory controllerFactory,
+            ControllerActionDescriptor descriptor,
+            IReadOnlyList<IInputFormatter> inputFormatters,
+            IReadOnlyList<IOutputFormatter> outputFormatters,
+            IControllerActionArgumentBinder controllerActionArgumentBinder,
+            IReadOnlyList<IModelBinder> modelBinders,
+            IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
+            IReadOnlyList<IValueProviderFactory> valueProviderFactories,
+            IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
+            ITempDataDictionary tempData, ILoggerFactory loggerFactory)
             : base(
-             actionContext,
-             filterProviders,
-             controllerFactory,
-             descriptor,
-             inputFormatters,
-             controllerActionArgumentBinder,
-             modelBinders,
-             modelValidatorProviders,
-             valueProviderFactories,
-             actionBindingContextAccessor,
-             tempData)
+                actionContext, filterProviders, controllerFactory, descriptor, inputFormatters, outputFormatters,
+                controllerActionArgumentBinder, modelBinders, modelValidatorProviders, valueProviderFactories,
+                actionBindingContextAccessor, tempData, loggerFactory, 1000)
         {
 
         }

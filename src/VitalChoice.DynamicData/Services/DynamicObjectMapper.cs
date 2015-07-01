@@ -79,7 +79,7 @@ namespace VitalChoice.DynamicData.Services
             var result = new TModel();
             ToModelInternal(dynamic, result, typeof(TModel), typeof(TDynamic));
             var converter = _container.TryResolve<TModel, TDynamic>();
-            converter?.PostFillDynamicToModel(result, dynamic);
+            converter?.DynamicToModel(result, dynamic);
             return result;
         }
 
@@ -91,7 +91,7 @@ namespace VitalChoice.DynamicData.Services
             var result = new TDynamic();
             FromModelInternal(result, model, typeof(TModel), typeof(TDynamic));
             var converter = _container.TryResolve<TModel, TDynamic>();
-            converter?.PostFillModelToDynamic(model, result);
+            converter?.ModelToDynamic(model, result);
             return result;
         }
 
@@ -100,10 +100,10 @@ namespace VitalChoice.DynamicData.Services
             if (dynamic == null)
                 return null;
 
-            object result = Activator.CreateInstance(modelType);
+            dynamic result = Activator.CreateInstance(modelType);
             ToModelInternal(dynamic as MappedObject<TEntity, TOptionType, TOptionValue>, result, modelType, typeof(TDynamic));
             dynamic converter = _container.TryResolve(modelType);
-            converter?.PostFillDynamicToModel(result, dynamic);
+            converter?.DynamicToModel(result, dynamic);
             return result;
         }
 
@@ -115,7 +115,7 @@ namespace VitalChoice.DynamicData.Services
             var result = new TDynamic();
             FromModelInternal(result, model, modelType, typeof(TDynamic));
             dynamic converter = _container.TryResolve(modelType);
-            converter?.PostFillModelToDynamic(model, result);
+            converter?.ModelToDynamic(model, result);
             return result;
         }
 
@@ -200,10 +200,12 @@ namespace VitalChoice.DynamicData.Services
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(this));
-                    ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
-
-                    pair.Value.Set?.Invoke(result, value);
+                    var value = ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(dynamic));
+                    if (value != null)
+                    {
+                        ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+                        pair.Value.Set?.Invoke(result, value);
+                    }
                 }
                 else
                 {
@@ -211,9 +213,11 @@ namespace VitalChoice.DynamicData.Services
                     if (data.TryGetValue(mappingName, out dynamicValue))
                     {
                         var value = ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
-                        ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
-
-                        pair.Value.Set?.Invoke(result, value);
+                        if (value != null)
+                        {
+                            ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
+                            pair.Value.Set?.Invoke(result, value);
+                        }
                     }
                 }
             }
@@ -235,17 +239,36 @@ namespace VitalChoice.DynamicData.Services
                 {
                     var value = ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model));
-                    ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty, false);
-
-                    dynamicProperty.Set?.Invoke(this, value);
+                    if (value != null)
+                    {
+                        ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty, false);
+                        dynamicProperty.Set?.Invoke(dynamic, value);
+                    }
                 }
                 else
                 {
-                    var value = ConvertFromModelObject(pair.Value.PropertyType, null, pair.Value.Get?.Invoke(model));
-
-                    data.Add(mappingName, value);
+                    var value = ConvertFromModelObject(pair.Value.PropertyType, pair.Value.Get?.Invoke(model));
+                    if (value != null)
+                    {
+                        data.Add(mappingName, value);
+                    }
                 }
             }
+        }
+
+        private object ConvertFromModelObject(Type sourceType, object obj)
+        {
+            if (obj == null)
+                return null;
+
+            Type srcElementType = sourceType.TryGetElementType(typeof(ICollection<>));
+            if (srcElementType != null)
+            {
+                IList results = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(srcElementType));
+                results.AddRange(obj as IEnumerable);
+                return results;
+            }
+            return obj;
         }
 
         private object ConvertFromModelObject(Type sourceType, Type destType, object obj)
@@ -260,14 +283,14 @@ namespace VitalChoice.DynamicData.Services
             }
             if (destType.IsInstanceOfType(obj))
             {
-                return Convert.ChangeType(obj, destType);
+                return obj;
             }
 
-            Type destElementType = destType.TryGetElementType(typeof(IEnumerable<>));
-            Type srcElementType = sourceType.TryGetElementType(typeof(IEnumerable<>));
+            Type destElementType = destType.TryGetElementType(typeof(ICollection<>));
+            Type srcElementType = sourceType.TryGetElementType(typeof(ICollection<>));
             if (destElementType != null && srcElementType != null)
             {
-                ICollection<object> results = (ICollection<object>) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
+                IList results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
                 if (destElementType.IsImplementGeneric(typeof(MappedObject<,,>)))
                 {
                     foreach (var item in (IEnumerable)obj)
@@ -279,10 +302,10 @@ namespace VitalChoice.DynamicData.Services
                 }
                 else if (destElementType.IsAssignableFrom(srcElementType))
                 {
-                    results.AddCast((IEnumerable)obj, srcElementType, destElementType);
+                    results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
                 
-                return null;
+                return results;
             }
             return null;
         }
@@ -299,14 +322,14 @@ namespace VitalChoice.DynamicData.Services
             }
             if (destType.IsInstanceOfType(obj))
             {
-                return Convert.ChangeType(obj, destType);
+                return obj;
             }
 
-            Type destElementType = destType.TryGetElementType(typeof (IEnumerable<>));
-            Type srcElementType = objectType.TryGetElementType(typeof (IEnumerable<>));
+            Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
+            Type srcElementType = objectType.TryGetElementType(typeof (ICollection<>));
             if (destElementType != null && srcElementType != null)
             {
-                ICollection<object> results = (ICollection<object>)Activator.CreateInstance(typeof(List<>).MakeGenericType(destElementType));
+                var results = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(destElementType));
                 if (srcElementType.IsImplementGeneric(typeof(MappedObject<,,>)))
                 {
                     var mapper = _mappers[srcElementType];
@@ -317,9 +340,9 @@ namespace VitalChoice.DynamicData.Services
                 }
                 else if (destElementType.IsAssignableFrom(srcElementType))
                 {
-                    results.AddCast((IEnumerable)obj, srcElementType, destElementType);
+                    results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
-                return null;
+                return results;
             }
             return null;
         }

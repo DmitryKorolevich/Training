@@ -35,7 +35,7 @@ namespace VitalChoice.Infrastructure.Context
             }
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        protected override void OnConfiguring(EntityOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {

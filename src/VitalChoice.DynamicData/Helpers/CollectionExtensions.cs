@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace VitalChoice.DynamicData.Helpers
 {
     public static class CollectionExtensions
     {
-        public static void AddCast<T>(this ICollection<T> results, IEnumerable items, Type srcType, Type destType)
+        public static void AddCast(this IList results, IEnumerable items, Type srcType, Type destType)
         {
             if (srcType == null)
                 throw new ArgumentNullException(nameof(srcType));
@@ -18,19 +19,19 @@ namespace VitalChoice.DynamicData.Helpers
             if (!destType.IsAssignableFrom(srcType))
                 throw new ArgumentException($"{destType} is not assignable from {srcType}");
 
-            if (srcType != destType)
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    results.Add((T)Convert.ChangeType(item, typeof(T)));
-                }
+                results.Add(item);
             }
-            else
+        }
+
+        public static void AddRange(this IList results, IEnumerable items)
+        {
+            if (items == null)
+                return;
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    results.Add((T)item);
-                }
+                results.Add(item);
             }
         }
 

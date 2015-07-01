@@ -3,16 +3,122 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
+using Antlr4.Runtime.Misc;
 using Microsoft.Framework.Logging;
+#if !DNXCORE50
+using NLog;
+#endif
 using VitalChoice.Interfaces.Services;
+using ILogger = Microsoft.Framework.Logging.ILogger;
+using LogLevel = Microsoft.Framework.Logging.LogLevel;
 
 namespace VitalChoice.Core.Services
 {
+#if !DNXCORE50
+    public static class NLogLoggerFactoryExtensions
+    {
+        public static ILoggerFactory AddNLog(
+            this ILoggerFactory factory,
+            global::NLog.LogFactory logFactory)
+        {
+            factory.AddProvider(new NLogLoggerProvider(logFactory));
+            return factory;
+        }
+    }
+
+    public class NLogLoggerProvider : ILoggerProvider
+    {
+        private readonly LogFactory _logFactory;
+
+        public NLogLoggerProvider(LogFactory logFactory)
+        {
+            _logFactory = logFactory;
+        }
+
+        public ILogger CreateLogger(string name)
+        {
+            return new Logger(_logFactory.GetLogger(name));
+        }
+
+        private class Logger : ILogger
+        {
+            private readonly global::NLog.Logger _logger;
+
+            public Logger(global::NLog.Logger logger)
+            {
+                _logger = logger;
+            }
+
+            public void Log(
+                LogLevel logLevel,
+                int eventId,
+                object state,
+                Exception exception,
+                Func<object, Exception, string> formatter)
+            {
+                var nLogLogLevel = GetLogLevel(logLevel);
+                var message = string.Empty;
+                if (formatter != null)
+                {
+                    message = formatter(state, exception);
+                }
+                else
+                {
+                    message = LogFormatter.Formatter(state, exception);
+                }
+                if (!string.IsNullOrEmpty(message))
+                {
+                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message, exception);
+                    eventInfo.Properties["EventId"] = eventId;
+                    _logger.Log(eventInfo);
+                }
+            }
+
+            public bool IsEnabled(LogLevel logLevel)
+            {
+                return _logger.IsEnabled(GetLogLevel(logLevel));
+            }
+
+            private global::NLog.LogLevel GetLogLevel(LogLevel logLevel)
+            {
+                switch (logLevel)
+                {
+                    case LogLevel.Verbose:
+                        return global::NLog.LogLevel.Trace;
+                    case LogLevel.Debug:
+                        return global::NLog.LogLevel.Debug;
+                    case LogLevel.Information:
+                        return global::NLog.LogLevel.Info;
+                    case LogLevel.Warning:
+                        return global::NLog.LogLevel.Warn;
+                    case LogLevel.Error:
+                        return global::NLog.LogLevel.Error;
+                    case LogLevel.Critical:
+                        return global::NLog.LogLevel.Fatal;
+                }
+                return global::NLog.LogLevel.Debug;
+            }
+
+            public IDisposable BeginScopeImpl([NotNull] object state)
+            {
+                return NestedDiagnosticsContext.Push(state.ToString());
+            }
+        }
+    }
+#endif
     public class LoggerProviderExtended : ILoggerProviderExtended
     {
         private readonly ILoggerFactory _factory;
 
         private readonly Dictionary<string, ILogger> _loggers = new Dictionary<string, ILogger>();
+
+        public ILoggerFactory Factory
+        {
+            get
+            {
+                return _factory;
+            }
+        }
 
         internal LoggerProviderExtended(string basePath, string logPath)
         {
@@ -74,9 +180,9 @@ namespace VitalChoice.Core.Services
             return CreateLogger(type?.FullName ?? string.Empty);
         }
 
-        public ILogger CreateLogger<T>()
+        public ILogger<T> CreateLogger<T>()
         {
-            return CreateLogger(typeof(T).FullName);
+            return (ILogger<T>)CreateLogger(typeof(T).FullName);
         }
     }
 }

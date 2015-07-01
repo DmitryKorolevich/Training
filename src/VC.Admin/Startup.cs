@@ -29,7 +29,8 @@ namespace VC.Admin
 		
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
-			var configuration = new ConfigurationBuilder(/*applicationEnvironment.ApplicationBasePath*/)
+            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 

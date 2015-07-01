@@ -24,17 +24,15 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Message)]
         public string Message { get; set; }
 
-        public GCEmailModel()
-        {
-        }
-
         public GiftCertificateEmail Convert()
         {
-            GiftCertificateEmail toReturn = new GiftCertificateEmail();
-            toReturn.ToName = ToName;
-            toReturn.ToEmail = ToEmail;
-            toReturn.FromName = FromName;
-            toReturn.Message = Message;
+            GiftCertificateEmail toReturn = new GiftCertificateEmail
+            {
+                ToName = ToName,
+                ToEmail = ToEmail,
+                FromName = FromName,
+                Message = Message
+            };
 
             return toReturn;
         }

@@ -10,6 +10,9 @@ namespace VitalChoice.DynamicData.Helpers
     {
         public static Type TryGetElementType(this Type type, Type baseType)
         {
+            if (type == null)
+                return null;
+
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.IsGenericTypeDefinition)
                 return null;

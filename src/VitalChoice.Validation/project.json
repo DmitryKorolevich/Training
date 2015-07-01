@@ -7,7 +7,7 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "6.0.0-beta5",
+    "Microsoft.AspNet.Mvc": "6.0.0-*",
     "FluentValidation": "5.6.0.5-beta5",
     "VitalChoice.Domain": "1.0.0-*"
   },

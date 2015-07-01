@@ -24,9 +24,9 @@ namespace VC.Public
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            //var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new ConfigurationBuilder( /*applicationEnvironment.ApplicationBasePath*/)
+            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
 

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using VitalChoice.DynamicData.Interfaces.Services;
 
-namespace VitalChoice.DynamicData.Services
+namespace VitalChoice.DynamicData.Interfaces.Services
 {
     public interface IModelToDynamicContainer
     {

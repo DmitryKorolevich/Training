@@ -46,9 +46,12 @@ using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
-using Autofac.Dnx;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Services;
+using Autofac.Dnx;
+using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces.Services;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -138,10 +141,10 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     var inputFormatter =
                         (JsonInputFormatter)
-                            o.InputFormatters.SingleOrDefault(f => f.Instance.GetType()==typeof(JsonInputFormatter))?.Instance;
+                            o.InputFormatters.SingleOrDefault(f => f.GetType()==typeof(JsonInputFormatter));
                     var outputFormatter =
                         (JsonOutputFormatter)
-                            o.OutputFormatters.SingleOrDefault(f => f.Instance.GetType() == typeof(JsonOutputFormatter))?.Instance;
+                            o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonOutputFormatter));
 
                     if (inputFormatter != null)
                     {
@@ -251,7 +254,10 @@ namespace VitalChoice.Core.DependencyInjection
 
                 var modelContainer = new ModelToDynamicContainer();
                 modelContainer.Register(projectAssembly);
+
                 builder.RegisterInstance(modelContainer).As<IModelToDynamicContainer>().SingleInstance();
+
+                builder.RegisterMappers(typeof (ProductMapper).GetTypeInfo().Assembly);
 
 				var container = builder.Build();
 

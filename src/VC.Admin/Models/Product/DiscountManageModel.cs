@@ -95,6 +95,7 @@ namespace VC.Admin.Models.Product
         [Map]
         public IList<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
 
+        [Map]
         public IList<DiscountTier> DiscountTiers { get; set; }
 
         public DiscountManageModel()
@@ -103,43 +104,6 @@ namespace VC.Admin.Models.Product
             DiscountsToSkus = new List<DiscountToSku>();
             DiscountsToSelectedSkus = new List<DiscountToSelectedSku>();
             DiscountTiers = new List<DiscountTier>();
-        }
-
-        public void FillDynamic(DiscountMapped mappedObject)
-        {
-            if (mappedObject.StartDate.HasValue)
-            {
-                mappedObject.StartDate = new DateTime(mappedObject.StartDate.Value.Year, mappedObject.StartDate.Value.Month, mappedObject.StartDate.Value.Day);
-            }
-            if (mappedObject.ExpirationDate != null)
-            {
-                mappedObject.ExpirationDate = (new DateTime(mappedObject.ExpirationDate.Value.Year, mappedObject.ExpirationDate.Value.Month, mappedObject.ExpirationDate.Value.Day)).AddDays(1);
-            }
-
-            foreach (var item in mappedObject.DiscountTiers)
-            {
-                if(item.IdDiscountType==DiscountType.PriceDiscount)
-                {
-                    item.Percent = null;
-                }
-                if (item.IdDiscountType == DiscountType.PercentDiscount)
-                {
-                    item.Amount = null;
-                }
-                if(item.Amount.HasValue)
-                {
-                    item.Amount = Math.Round(item.Amount.Value * 100)/100;
-                }
-                if (item.Percent.HasValue)
-                {
-                    item.Percent = Math.Round(item.Percent.Value * 100) / 100;
-                }
-            }
-        }
-
-        public void FillSelfFrom(DiscountMapped mappedObject)
-        {
-            ExpirationDate = ExpirationDate?.AddDays(-1);
         }
     }
 }
