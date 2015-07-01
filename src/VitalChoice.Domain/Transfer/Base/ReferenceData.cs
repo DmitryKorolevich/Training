@@ -35,5 +35,13 @@ namespace VitalChoice.Domain.Transfer.Base
         public IList<LookupItem<int?>> ActiveFilterOptions { get; set; }
 
         public IList<LookupItem<int>> CustomerTypes { get; set; }
+
+	    public IList<LookupItem<int>> TaxExempts { get; set; }
+
+	    public List<LookupItem<int>> Tiers { get; set; }
+
+	    public List<LookupItem<int>> TradeClasses { get; set; }
+
+	    public List<LookupItem<int>> CustomerNotePriorities { get; set; }
     }
 }

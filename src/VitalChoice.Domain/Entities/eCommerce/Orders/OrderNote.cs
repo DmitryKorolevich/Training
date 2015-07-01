@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Orders
@@ -26,5 +27,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 		public User EditedBy { get; set; }
 
 	    public ICollection<OrderNoteToCustomerType> CustomerTypes { get; set; }
+
+	    public ICollection<CustomerToOrderNote> Customers { get; set; }
     }
 }

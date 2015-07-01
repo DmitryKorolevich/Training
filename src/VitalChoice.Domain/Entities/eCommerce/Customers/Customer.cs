@@ -4,16 +4,13 @@ using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Customers
 {
     public class Customer : DynamicDataEntity<CustomerOptionValue, CustomerOptionType>
 	{
 	    public User User { get; set; }
-
-	    public string FirstName { get; set; }
-
-	    public string LastName { get; set; }
 
 	    public string Email { get; set; }
 
@@ -32,5 +29,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    public ICollection<Address> Addresses { get; set; }
 
 	    public ICollection<CustomerNote> CustomerNotes { get; set; }
+
+	    public ICollection<CustomerPaymentMethod> CustomerPaymentMethods { get; set; }
 	}
 }

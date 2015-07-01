@@ -12,5 +12,6 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.profileService',
 	'app.core.dataAccess.services.gcService',
 	'app.core.dataAccess.services.paymentMethodService',
-	'app.core.dataAccess.services.orderNoteService'
+	'app.core.dataAccess.services.orderNoteService',
+	'app.core.dataAccess.services.customerService'
 ]);

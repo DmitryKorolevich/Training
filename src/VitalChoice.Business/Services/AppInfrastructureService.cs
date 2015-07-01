@@ -7,7 +7,9 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
@@ -27,10 +29,11 @@ namespace VitalChoice.Business.Services
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
 	    private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
+	    private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
 
 	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
-            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository)
+            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -39,6 +42,7 @@ namespace VitalChoice.Business.Services
             this.contentTypeRepository = contentTypeRepository;
             this.appOptionsAccessor = appOptionsAccessor;
 		    this.customerTypeRepository = customerTypeRepository;
+		    this.lookupVariantRepository = lookupVariantRepository;
         }
 
 	    private ReferenceData Populate()
@@ -123,8 +127,32 @@ namespace VitalChoice.Business.Services
                 CustomerTypes =
 				    customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
 					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
-					    .ToList()
-		    };
+					    .ToList(),
+
+				TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == (int)LookupEnum.CustomerTaxExempt).Select(false).Select(x=> new LookupItem<int>()
+				{
+					Key = x.Id,
+					Text = x.ValueVariant
+				}).ToList(),
+
+				Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerTier).Select(false).Select(x => new LookupItem<int>()
+				{
+					Key = x.Id,
+					Text = x.ValueVariant
+				}).ToList(),
+
+				TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerTradeClass).Select(false).Select(x => new LookupItem<int>()
+				{
+					Key = x.Id,
+					Text = x.ValueVariant
+				}).ToList(),
+
+				CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerNotePriorities).Select(false).Select(x => new LookupItem<int>()
+				{
+					Key = x.Id,
+					Text = x.ValueVariant
+				}).ToList()
+			};
 
 			return referenceData;
 	    }

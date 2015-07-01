@@ -20,5 +20,9 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> AssignedCustomerTypes { get; set; }
         public IList<LookupItem<int?>> ActiveFilterOptions { get; set; }
         public IList<LookupItem<int>> CustomerTypes { get; set; }
+	    public IList<LookupItem<int>> TaxExempts { get; set; }
+	    public IList<LookupItem<int>> Tiers { get; set; }
+	    public IList<LookupItem<int>> TradeClasses { get; set; }
+	    public IList<LookupItem<int>> CustomerNotePriorities { get; set; }
     }
 }

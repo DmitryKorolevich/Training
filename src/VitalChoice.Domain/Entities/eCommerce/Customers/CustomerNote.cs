@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Domain.Entities.eCommerce.Customers
 {
-    public class CustomerNote: DynamicDataEntity<CustomerOptionValue, CustomerOptionType>
+    public class CustomerNote: DynamicDataEntity<CustomerNoteOptionValue, CustomerNoteOptionType>
 	{
 	    public int IdCustomer { get; set; }
 

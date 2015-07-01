@@ -34,6 +34,7 @@ using System.Reflection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
+using VitalChoice.Business.Services.Customer;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Business.Services.Payment;
 using VitalChoice.Business.Services.Products;
@@ -41,6 +42,7 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services.Customer;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Product;
@@ -246,6 +248,7 @@ namespace VitalChoice.Core.DependencyInjection
                     .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
 	            builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
 	            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
+	            builder.RegisterType<CustomerService>().As<ICustomerService>();
                 var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
                 builder.RegisterInstance(

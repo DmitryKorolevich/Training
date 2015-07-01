@@ -10,4 +10,5 @@ angular.module('app.modules', [
 	'app.modules.product',
 	'app.modules.file',
 	'app.modules.gc',
+	'app.modules.customer'
 ]);
