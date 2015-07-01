@@ -160,6 +160,15 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [Name] = N'Zip' AND [IdFieldType] = 4)
+BEGIN
+	UPDATE [dbo].[AddressOptionTypes]
+	SET [IdFieldType] = 4
+	WHERE [Name] = N'Zip' AND [IdFieldType] = 3
+END
+
+GO
+
 IF OBJECT_ID(N'[dbo].[CustomersToOrderNotes]', N'U') IS NULL
 BEGIN
 	EXEC sp_rename 'CustomerToOrderNotes', 'CustomersToOrderNotes'
@@ -240,4 +249,12 @@ BEGIN
 	([Name],[IdFieldType], [IdLookup], [DefaultValue])
 	VALUES
 	(N'Priority', 3, @IdLookup, '1')
+END
+
+IF NOT EXISTS (SELECT [Id] FROM [dbo].[Users] WHERE [Id] = 1012)
+BEGIN
+	INSERT INTO [dbo].[Users]
+	([Id])
+	VALUES
+	(1012)
 END

@@ -2,7 +2,7 @@
 	<div class="left-pane-controls">
 		<div class="well container-fluid">
 			<div>
-				<button ui-sref="index.oneCol.customersList" class="btn btn-success width-160px">Save</button>
+				<button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
 			</div>
 			<div class="margin-top-10px">
 				<button ui-sref="index.oneCol.customersList" class="btn btn-default width-160px">Cancel</button>
@@ -17,7 +17,7 @@
 						<div class="container container-left">
 						<div class="well row">
                             <spinner-overlay data-loading="addTracker.active()">
-                                <form class="form-horizontal">
+                                <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
                                     <fieldset>
                                         <span class="legend">Customer Type</span>
                                         <div class="form-group">
@@ -31,39 +31,60 @@
                                             <div class="form-group">
                                                 <label for="taxExempt" class="col-md-3 control-label">Tax Exempt</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts">
+                                                    <select class="form-control" name="TaxExempt" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts" required>
                                                     </select>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.TaxExempt.$invalid">
+                                                        <small class="error" ng-show="forms.profile.TaxExempt.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tax Exempt")}}</small>
+                                                        <small class="error" ng-show="forms.profile.TaxExempt.$error.server">{{serverMessages.GetMessage('TaxExempt')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="website" class="col-md-3 control-label">Website</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website">
+                                                    <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.Website.$invalid">
+                                                        <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
+                                                        <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
+                                                        <small class="error" ng-show="forms.profile.Website.$error.server">{{serverMessages.GetMessage('Website')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="tier" class="col-md-3 control-label">Tier</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers">
+                                                    <select class="form-control" id="tier" name="Tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers" required>
                                                     </select>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.Tier.$invalid">
+                                                        <small class="error" ng-show="forms.profile.Tier.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tier")}}</small>
+                                                        <small class="error" ng-show="forms.profile.Tier.$error.server">{{serverMessages.GetMessage('Tier')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="tradeClass" class="col-md-3 control-label">Trade Class</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses">
+                                                    <select class="form-control" name="TradeClass" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses" required>
                                                     </select>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.TradeClass.$invalid">
+                                                        <small class="error" ng-show="forms.profile.TradeClass.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Trade Class")}}</small>
+                                                        <small class="error" ng-show="forms.profile.TradeClass.$error.server">{{serverMessages.GetMessage('TradeClass')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Inception Date</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required />
+                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required/>
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
                                                     </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.InceptionDate.$invalid">
+                                                        <small class="error" ng-show="forms.profile.InceptionDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Inception Date")}}</small>
+                                                        <small class="error" ng-show="forms.profile.InceptionDate.$error.server">{{serverMessages.GetMessage('InceptionDate')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -71,20 +92,37 @@
                                         <div class="form-group">
                                             <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate">
+                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" required data-ng-maxlength="100">
+                                                <div class="error-container" ng-show="forms.submitted && forms.profile.LinkedToAffiliate.$invalid">
+                                                    <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Linked to Affiliate")}}</small>
+                                                    <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
+                                                    <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="address in [currentCustomer.ProfileAddress]"></div>
+                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [accountProfileTab]"></div>
                                         <div class="form-group">
                                             <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" id="enterEmail" data-ng-model="currentCustomer.Email" placeholder="Enter Email">
+                                                <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.Email" placeholder="Enter Email" required data-ng-maxlength="100">
+                                                <div class="error-container" ng-show="forms.submitted && forms.profile.Email.$invalid">
+                                                    <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+                                                    <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+                                                    <small class="error" ng-show="forms.profile.Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
+                                                    <small class="error" ng-show="forms.profile.Email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.EmailConfirm" placeholder="Re-enter Email">
+                                                <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.EmailConfirm" placeholder="Re-enter Email" required data-ng-maxlength="100">
+                                                <div class="error-container" ng-show="forms.submitted && forms.profile.EmailConfirm.$invalid">
+                                                    <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
+                                                    <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
+                                                    <small class="error" ng-show="forms.profile.EmailConfirm.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Email Confirmation", "100"])}}</small>
+                                                    <small class="error" ng-show="forms.profile.EmailConfirm.$error.server">{{serverMessages.GetMessage('EmailConfirm')}}</small>
+                                                </div>
                                             </div>
                                         </div>
                                         <!--<span class="legend">Customer Files</span>
@@ -163,8 +201,12 @@
                                         <div class="form-group">
                                             <label for="state" class="col-md-3 control-label">Default Payment Method</label>
                                             <div class="col-md-9">
-                                                <select class="form-control" id="ddCreditCard" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods">
+                                                <select class="form-control" name="DefaultPaymentMethod" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods" required>
                                                 </select>
+                                                <div class="error-container" ng-show="forms.submitted && forms.profile.DefaultPaymentMethod.$invalid">
+                                                    <small class="error" ng-show="forms.profile.DefaultPaymentMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Default Payment Method")}}</small>
+                                                    <small class="error" ng-show="forms.profile.DefaultPaymentMethod.$error.server">{{serverMessages.GetMessage('DefaultPaymentMethod')}}</small>
+                                                </div>
                                             </div>
                                         </div>
                                         <span class="legend">Automatic Order Specific Notes</span>
@@ -202,10 +244,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group" data-ng-if="currentCustomer.SuspendUserAccount">
                                             <label for="reason" class="col-md-3 control-label">Reason</label>
                                             <div class="col-md-9">
-                                                <textarea type="text" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason"></textarea>
+                                                <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
+                                                <div class="error-container" ng-show="forms.submitted && forms.profile.Reason.$invalid">
+                                                    <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
+                                                    <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
+                                                    <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
+                                                </div>
                                             </div>
                                         </div>
                                     </fieldset>
@@ -218,7 +265,7 @@
 						<div class="container container-left">
 							<div class="well row">
 							    <spinner-overlay data-loading="addTracker.active()">
-							        <form class="form-horizontal">
+							        <form class="form-horizontal" name="forms.shipping" data-ng-submit="save()" data-ng-class="{submitted: forms.shippingSubmitted}" novalidate>
                                         <fieldset>
                                             <span class="legend">Shipping Address</span>
                                             <div class="form-group">
@@ -226,18 +273,12 @@
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="sameAsProfile" data-ng-model="currentCustomer.sameShipping">
+                                                            <input type="checkbox" id="sameAsProfile" data-ng-model="currentCustomer.sameShipping" data-ng-change="makeAsProfileAddress();">
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="address in [currentCustomer.Shipping]"></div>
-                                            <div class="form-group">
-                                                <label for="shippingEmail" class="col-md-3 control-label">Email</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" id="shippingEmail" placeholder="Email" data-ng-model="currentCustomer.Shipping.Email">
-                                                </div>
-                                            </div>
+                                            <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [shippingAddressTab]"></div>
                                         </fieldset>
 							        </form>
 							    </spinner-overlay>
@@ -248,20 +289,29 @@
 						<div class="container container-left">
 							<div class="well row">
                                 <spinner-overlay data-loading="addTracker.active()">
-                                    <form class="form-horizontal">
+                                    <form class="form-horizontal" name="forms.customerNote" data-ng-submit="save()" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate>
                                         <fieldset>
                                             <span class="legend">Customer Notes</span>
                                             <div class="form-group">
-                                                <label for="country" class="col-md-3 control-label">Priority</label>
+                                                <label for="priority" class="col-md-3 control-label">Priority</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="priority" data-ng-model="currentCustomer.CustomerNote.Priority" data-ng-options="priority.Key as priority.Text for priority in ReferenceData.CustomerNotePriorities">
+                                                    <select class="form-control" name="Priority" id="priority" data-ng-model="currentCustomer.CustomerNote.Priority" data-ng-options="priority.Key as priority.Text for priority in ReferenceData.CustomerNotePriorities" required>
                                                     </select>
+                                                    <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Priority.$invalid">
+                                                        <small class="error" ng-show="forms.customerNote.Priority.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Priority")}}</small>
+                                                        <small class="error" ng-show="forms.customerNote.Priority.$error.server">{{serverMessages.GetMessage('Priority')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="note" class="col-md-3 control-label">Note</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" data-ng-model="currentCustomer.CustomerNote.Text" id="note" placeholder="Note" rows="10"></textarea>
+                                                    <textarea type="text" name="Text" class="form-control" data-ng-model="currentCustomer.CustomerNote.Text" id="note" placeholder="Note" rows="10" required data-ng-maxlength="1000"></textarea>
+                                                    <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Text.$invalid">
+                                                        <small class="error" ng-show="forms.customerNote.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
+                                                        <small class="error" ng-show="forms.customerNote.Text.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Text", "1000"])}}</small>
+                                                        <small class="error" ng-show="forms.customerNote.Text.$error.server">{{serverMessages.GetMessage('Text')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </fieldset>

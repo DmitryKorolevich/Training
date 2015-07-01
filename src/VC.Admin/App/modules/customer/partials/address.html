@@ -1,69 +1,138 @@
 ﻿<div class="form-group">
-	<label class="col-md-3 control-label">Company</label>
+	<label for="model_company" class="col-md-3 control-label">Company</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Company" placeholder="Company">
+	    <input type="text" name="Company" class="form-control" id="model_company" data-ng-model="model.Address.Company" placeholder="Company" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Company.$invalid">
+            <small class="error" ng-show="forms[model.formName].Company.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Company")}}</small>
+            <small class="error" ng-show="forms[model.formName].Company.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Company", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Company.$error.server">{{serverMessages.GetMessage('Company')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-md-3 control-label">First Name</label>
+	<label for="model_firstname" class="col-md-3 control-label">First Name</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.FirstName" placeholder="First Name">
+	    <input type="text" name="FirstName" class="form-control" data-ng-model="model.Address.FirstName" id="model_firstname" placeholder="First Name" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].FirstName.$invalid">
+            <small class="error" ng-show="forms[model.formName].FirstName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.FirstName")}}</small>
+            <small class="error" ng-show="forms[model.formName].FirstName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.FirstName", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].FirstName.$error.server">{{serverMessages.GetMessage('FirstName')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-md-3 control-label">Last Name</label>
+	<label for="model_lastname" class="col-md-3 control-label">Last Name</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control"data-ng-model="address.LastName" placeholder="Last Name">
+	    <input type="text" name="LastName" class="form-control" id="model_lastname" data-ng-model="model.Address.LastName" placeholder="Last Name" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].LastName.$invalid">
+            <small class="error" ng-show="forms[model.formName].LastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
+            <small class="error" ng-show="forms[model.formName].LastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].LastName.$error.server">{{serverMessages.GetMessage('LastName')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-md-3 control-label">Address 1</label>
+	<label for="model_address1" class="col-md-3 control-label">Address 1</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Address1" placeholder="Address 1">
+	    <input type="text" name="Address1" class="form-control" data-ng-model="model.Address.Address1" id="model_address1" placeholder="Address 1" required data-ng-maxlength="100">
+	    <div class="error-container" ng-show="forms.submitted && forms[model.formName].Address1.$invalid">
+            <small class="error" ng-show="forms[model.formName].Address1.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Address1")}}</small>
+	        <small class="error" ng-show="forms[model.formName].Address1.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address1", "100"])}}</small>
+	        <small class="error" ng-show="forms[model.formName].Address1.$error.server">{{serverMessages.GetMessage('Address1')}}</small>
+	    </div>
 	</div>
 </div>
 <div class="form-group">
-	<label  class="col-md-3 control-label">Address 2</label>
+	<label for="model_address2" class="col-md-3 control-label">Address 2</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Address2" placeholder="Address 2">
+	    <input type="text" name="Address2" class="form-control" data-ng-model="model.Address.Address2" id="model_address2" placeholder="Address 2" data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Address2.$invalid">
+            <small class="error" ng-show="forms[model.formName].Address2.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address2", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Address2.$error.server">{{serverMessages.GetMessage('Address2')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-md-3 control-label">City</label>
+	<label for="model_city" class="col-md-3 control-label">City</label>
 	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.City" placeholder="City">
+	    <input type="text" name="City" class="form-control" data-ng-model="model.Address.City" id="model_city" placeholder="City" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].City.$invalid">
+            <small class="error" ng-show="forms[model.formName].City.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","City")}}</small>
+            <small class="error" ng-show="forms[model.formName].City.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["City", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].City.$error.server">{{serverMessages.GetMessage('City')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-md-3 control-label">Country</label>
+	<label for="model_country" class="col-md-3 control-label">Country</label>
 	<div class="col-md-9">
-		<select class="form-control" data-ng-model="address.Country" data-ng-options="country as country.CountryName for country in countries">
-		</select>
-	</div>
-</div>
-<div class="form-group">
-	<label for="state" class="col-md-3 control-label">State/Province</label>
-	<div class="col-md-9">
-	    <select data-ng-show="address.Country.States && address.Country.States.length > 0" class="form-control" id="state" data-ng-model="address.State" data-ng-options="state.Id as state.StateName for state in address.Country.States">
+	    <select id="model_country" name="Country" class="form-control" data-ng-model="model.Address.Country" data-ng-options="country as country.CountryName for country in countries" required>
 	    </select>
-        <input data-ng-show="!(address.Country.States && address.Country.States.length > 0)" type="text" class="form-control" data-ng-model="address.County" placeholder="State">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Country.$invalid">
+            <small class="error" ng-show="forms[model.formName].Country.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Country")}}</small>
+            <small class="error" ng-show="forms[model.formName].Country.$error.server">{{serverMessages.GetMessage('Country')}}</small>
+        </div>
 	</div>
 </div>
 <div class="form-group">
-	<label for="zip" class="col-md-3 control-label">Zip</label>
-	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Zip" id="zip" placeholder="Zip">
-	</div>
+	<label class="col-md-3 control-label">State/Province</label>
+    <div class="col-md-9" data-ng-if="address.Country.States && address.Country.States.length > 0">
+        <select name="State" class="form-control" id="model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in address.Country.States" required>
+        </select>
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].State.$invalid">
+            <small class="error" ng-show="forms[model.formName].State.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","State")}}</small>
+            <small class="error" ng-show="forms[model.formName].State.$error.server">{{serverMessages.GetMessage('State')}}</small>
+        </div>
+    </div>
+    <div class="col-md-9" data-ng-if="!(address.Country.States && address.Country.States.length > 0)">
+        <input type="text" name="County" id="model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].County.$invalid">
+            <small class="error" ng-show="forms[model.formName].County.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["State", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('State')}}</small>
+        </div>
+    </div>
 </div>
 <div class="form-group">
-	<label for="phone" class="col-md-3 control-label">Phone</label>
-	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Phone" id="phone" placeholder="Phone">
-	</div>
+	<label for="model_zip" class="col-md-3 control-label">Zip</label>
+    <div class="col-md-9">
+        <input type="text" name="Zip" class="form-control" data-ng-model="model.Address.Zip" id="model_zip" placeholder="Zip" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Zip.$invalid">
+            <small class="error" ng-show="forms[model.formName].Zip.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Zip")}}</small>
+            <small class="error" ng-show="forms[model.formName].Zip.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Zip", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Zip.$error.server">{{serverMessages.GetMessage('Zip')}}</small>
+        </div>
+    </div>
 </div>
 <div class="form-group">
-	<label for="fax" class="col-md-3 control-label">Fax</label>
-	<div class="col-md-9">
-		<input type="text" class="form-control" data-ng-model="address.Fax" id="fax" placeholder="Fax">
-	</div>
+	<label for="model_phone" class="col-md-3 control-label">Phone</label>
+    <div class="col-md-9">
+        <input type="text" name="Phone" class="form-control" data-ng-model="model.Address.Phone" id="model_phone" placeholder="Phone" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Phone.$invalid">
+            <small class="error" ng-show="forms[model.formName].Phone.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Phone")}}</small>
+            <small class="error" ng-show="forms[model.formName].Phone.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Phone", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Phone.$error.server">{{serverMessages.GetMessage('Phone')}}</small>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label for="model_fax" class="col-md-3 control-label">Fax</label>
+    <div class="col-md-9">
+        <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="model_fax" placeholder="Fax" data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Fax.$invalid">
+            <small class="error" ng-show="forms[model.formName].Fax.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Fax", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax')}}</small>
+        </div>
+    </div>
+</div>
+<div class="form-group" data-ng-if="model.Address.AddressType == 2 || model.Address.AddressType == 3">
+    <label for="model_email" class="col-md-3 control-label">Email</label>
+    <div class="col-md-9">
+        <input type="email" name="Email" class="form-control" id="model_email" placeholder="Email" data-ng-model="model.Address.Email" required data-ng-maxlength="100">
+        <div class="error-container" ng-show="forms.submitted && forms[model.formName].Email.$invalid">
+            <small class="error" ng-show="forms[model.formName].Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+            <small class="error" ng-show="forms[model.formName].Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+            <small class="error" ng-show="forms[model.formName].Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
+            <small class="error" ng-show="forms[model.formName].Email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
+        </div>
+    </div>
 </div>
