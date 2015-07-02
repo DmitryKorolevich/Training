@@ -10,7 +10,7 @@ namespace VitalChoice.DynamicData.Interfaces.Services
         MappedObject FromModel(Type modelType, dynamic model);
     }
 
-    public interface IDynamicObjectMapper<TDynamic, TEntity, TOptionValue, TOptionType> : IDynamicToModelMapper
+    public interface IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicToModelMapper
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

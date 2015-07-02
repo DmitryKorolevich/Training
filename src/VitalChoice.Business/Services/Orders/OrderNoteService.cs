@@ -152,13 +152,13 @@ namespace VitalChoice.Business.Services.Orders
 			{
 				try
 				{
-					var created = await _orderNoteRepository.InsertAsync(orderNote);
+					await _orderNoteRepository.InsertAsync(orderNote);
 
 					if (orderNote.CustomerTypes.Any())
 					{
 						foreach (var customerType in orderNote.CustomerTypes)
 						{
-							customerType.IdOrderNote = created.Id;
+							customerType.IdOrderNote = orderNote.Id;
 						}
 
 						await _orderNoteToCustomerTypeRepository.InsertRangeAsync(orderNote.CustomerTypes);

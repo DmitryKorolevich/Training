@@ -211,11 +211,11 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Id == 0)
                 {
-                    dbItem = await recipeRepository.InsertGraphAsync(dbItem);
+                    await recipeRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await recipeRepository.UpdateAsync(dbItem);
+                    await recipeRepository.UpdateAsync(dbItem);
                 }
 
                 foreach (var item in recipesToProducts)

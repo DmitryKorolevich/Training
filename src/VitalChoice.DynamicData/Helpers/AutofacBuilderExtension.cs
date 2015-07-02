@@ -20,6 +20,8 @@ namespace VitalChoice.DynamicData.Helpers
             foreach (var mapper in mappers)
             {
                 builder.RegisterTypes(mapper)
+                    .As(typeof(IDynamicObjectMapper<,,,>).MakeGenericType(mapper.GenericTypeArguments))
+                    .AsSelf()
                     .SingleInstance();
                 builder.RegisterType(mapper)
                     .Keyed<IDynamicToModelMapper>(mapper.TryGetElementType(typeof(DynamicObjectMapper<,,,>)))

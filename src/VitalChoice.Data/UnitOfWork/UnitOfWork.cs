@@ -15,7 +15,7 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.UnitOfWork
 {
-	public class UnitOfWork : IUnitOfWork, IUnitOfWorkAsync
+	public class UnitOfWork : IUnitOfWorkAsync
     {
         #region Private Fields
 
@@ -50,6 +50,11 @@ namespace VitalChoice.Data.UnitOfWork
         public int SaveChanges()
         {
             return _dataContext.SaveChanges();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return _dataContext.SaveChangesAsync(CancellationToken.None);
         }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken)

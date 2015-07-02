@@ -94,11 +94,11 @@ namespace VitalChoice.Business.Services.Customers
 				//await
 				//	bigValueRepository.InsertRangeAsync(
 				//		entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
-				var toReturn = await customerRepository.UpdateAsync(entity);
+				await customerRepository.UpdateAsync(entity);
 
 				await uow.SaveChangesAsync(CancellationToken.None);
 
-				return toReturn;
+				return entity;
 			}
 			return null;
 		}
@@ -117,11 +117,11 @@ namespace VitalChoice.Business.Services.Customers
 			    entity.OptionTypes = new List<CustomerOptionType>();
 			    var customerRepository = uow.RepositoryAsync<Customer>();
 
-			    var result = await customerRepository.InsertGraphAsync(entity);
+			    await customerRepository.InsertGraphAsync(entity);
 			    await uow.SaveChangesAsync(CancellationToken.None);
 
-			    result.OptionTypes = optionTypes;
-			    return result;
+			    entity.OptionTypes = optionTypes;
+			    return entity;
 		    }
 		    return null;
 	    }

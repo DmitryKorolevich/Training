@@ -227,7 +227,8 @@ namespace VitalChoice.Business.Services.Content
 
 	    public async Task<ContentItem> UpdateContentItemAsync(ContentItem itemToUpdate)
 	    {
-	        return await contentItemRepository.UpdateAsync(itemToUpdate);
+	        await contentItemRepository.UpdateAsync(itemToUpdate);
+	        return itemToUpdate;
 	    }
 
 	    public async Task<ContentItem> GetContentItemAsync(int id)
@@ -237,7 +238,8 @@ namespace VitalChoice.Business.Services.Content
 
 	    public virtual async Task<MasterContentItem> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate)
 	    {
-            return await masterContentItemRepository.UpdateAsync(itemToUpdate);
+            await masterContentItemRepository.UpdateAsync(itemToUpdate);
+            return itemToUpdate;
         }
 
 	    public virtual async Task<MasterContentItem> GetMasterContentItemAsync(int id)

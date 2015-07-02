@@ -176,11 +176,9 @@ namespace VitalChoice.Business.Services.Products
 
                 if (model.Id == 0)
                 {
-                    var ecommerceProduct = await productCategoryEcommerceRepository.InsertAsync(new ProductCategory(dbItem));
-                    if(ecommerceProduct!=null)
-                    {
-                        dbItem.Id = ecommerceProduct.Id;
-                    }
+                    var ecommerceProduct = new ProductCategory(dbItem);
+                    await productCategoryEcommerceRepository.InsertAsync(ecommerceProduct);
+                    dbItem.Id = ecommerceProduct.Id;
                 }
                 else
                 {
@@ -207,11 +205,11 @@ namespace VitalChoice.Business.Services.Products
 
                 if (model.Id == 0)
                 {
-                    dbItem = await productCategoryRepository.InsertGraphAsync(dbItem);
+                    await productCategoryRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await productCategoryRepository.UpdateAsync(dbItem);
+                    await productCategoryRepository.UpdateAsync(dbItem);
                     if (dbItem.ContentItem != null)
                     {
                         await contentItemRepository.UpdateAsync(dbItem.ContentItem);

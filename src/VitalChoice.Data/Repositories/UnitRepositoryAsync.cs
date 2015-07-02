@@ -19,33 +19,26 @@ namespace VitalChoice.Data.Repositories
         {
         }
 
-        public virtual TEntity Insert(TEntity entity)
+        public virtual bool Insert(TEntity entity)
         {
-            TEntity toReturn = null;
             DbSet.Add(entity);
-            toReturn = entity;
-            return toReturn;
+            return true;
         }
 
-        public virtual Task<TEntity> InsertAsync(TEntity entity)
+        public virtual Task<bool> InsertAsync(TEntity entity)
         {
             return InsertAsync(CancellationToken.None, entity);
         }
 
-        public virtual Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual Task<bool> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
-            TEntity toReturn = null;
             DbSet.Add(entity);
-            toReturn = entity;
-            return Task.FromResult(toReturn);
+            return Task.FromResult(true);
         }
 
         public virtual bool InsertRange(ICollection<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                DbSet.Add(entity);
-            }
+            DbSet.AddRange(entities);
             return true;
         }
 
@@ -56,32 +49,25 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> InsertRangeAsync(CancellationToken cancellationToken, ICollection<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                DbSet.Add(entity);
-            }
+            DbSet.AddRange(entities);
             return Task.FromResult(true);
         }
 
-        public virtual TEntity InsertGraph(TEntity entity)
+        public virtual bool InsertGraph(TEntity entity)
         {
-            TEntity toReturn = null;
             Context.TrackGraphForAdd(entity);
-            toReturn = entity;
-            return toReturn;
+            return true;
         }
 
-        public virtual Task<TEntity> InsertGraphAsync(TEntity entity)
+        public virtual Task<bool> InsertGraphAsync(TEntity entity)
         {
             return InsertGraphAsync(CancellationToken.None, entity);
         }
 
-        public virtual Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual Task<bool> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
         {
-            TEntity toReturn = null;
             Context.TrackGraphForAdd(entity);
-            toReturn = entity;
-            return Task.FromResult(toReturn);
+            return Task.FromResult(true);
         }
 
         public virtual bool InsertGraphRange(params TEntity[] entities)
@@ -121,36 +107,26 @@ namespace VitalChoice.Data.Repositories
             return Task.FromResult(true);
         }
 
-        public virtual TEntity Update(TEntity entity)
+        public virtual bool Update(TEntity entity)
         {
-            TEntity toReturn;
-            DbSet.Attach(entity);
-            Context.SetState(entity, EntityState.Modified);
-            toReturn = entity;
-            return toReturn;
+            DbSet.Update(entity);
+            return true;
         }
 
-        public virtual Task<TEntity> UpdateAsync(TEntity entity)
+        public virtual Task<bool> UpdateAsync(TEntity entity)
         {
             return UpdateAsync(CancellationToken.None, entity);
         }
 
-        public virtual Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
         {
-            TEntity toReturn;
-            DbSet.Attach(entity);
-            Context.SetState(entity, EntityState.Modified);
-            toReturn = entity;
-            return Task.FromResult(toReturn);
+            DbSet.Update(entity);
+            return Task.FromResult(true);
         }
 
         public virtual bool UpdateRange(ICollection<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                DbSet.Attach(entity);
-                Context.SetState(entity, EntityState.Modified);
-            }
+            DbSet.UpdateRange(entities);
             return true;
         }
 
@@ -161,11 +137,7 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, ICollection<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                DbSet.Attach(entity);
-                Context.SetState(entity, EntityState.Modified);
-            }
+            DbSet.UpdateRange(entities);
             return Task.FromResult(true);
         }
 

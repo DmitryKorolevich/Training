@@ -296,27 +296,14 @@ namespace VitalChoice.Business.Services.Products
             var entity = _mapper.ToEntity(model, optionTypes);
             if (entity != null)
             {
-                //Dictionary<string, ProductOptionType> optionTypesSorted = optionTypes.ToDictionary(o => o.Name, o => o);
-                //IncludeProductOptionTypesByName(entity, optionTypesSorted);
-                //IncludeSkuOptionTypesByName(entity, optionTypesSorted);
-                if (entity.Skus != null)
-                {
-                    int order = 0;
-                    foreach (var sku in entity.Skus)
-                    {
-                        sku.Order = order;
-                        order++;
-                    }
-                }
-
                 entity.OptionTypes = new List<ProductOptionType>();
                 var productRepository = uow.RepositoryAsync<Product>();
 
-                var result = await productRepository.InsertGraphAsync(entity);
+                await productRepository.InsertGraphAsync(entity);
                 await uow.SaveChangesAsync(CancellationToken.None);
 
-                result.OptionTypes = optionTypes;
-                return result;
+                entity.OptionTypes = optionTypes;
+                return entity;
             }
             return null;
         }
@@ -382,9 +369,9 @@ namespace VitalChoice.Business.Services.Products
                     bigValueRepository.InsertRangeAsync(
                         entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
                 await productToCategoryRepository.InsertRangeAsync(entity.ProductsToCategories);
-                var toReturn = await productRepository.UpdateAsync(entity);
+                await productRepository.UpdateAsync(entity);
                 await uow.SaveChangesAsync(CancellationToken.None);
-                return toReturn;
+                return entity;
             }
             return null;
         }

@@ -123,7 +123,7 @@ namespace VitalChoice.Business.Services.Products
                     dbItem.StatusCode = model.StatusCode;
                 }
 
-                dbItem = await giftCertificateRepository.UpdateAsync(dbItem);
+                await giftCertificateRepository.UpdateAsync(dbItem);
             }
 
             return dbItem;

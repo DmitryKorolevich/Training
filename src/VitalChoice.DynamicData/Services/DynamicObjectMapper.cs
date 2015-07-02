@@ -16,7 +16,7 @@ using VitalChoice.DynamicData.Interfaces.Services;
 namespace VitalChoice.DynamicData.Services
 {
     public abstract class DynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> :
-        IDynamicObjectMapper<TDynamic, TEntity, TOptionValue, TOptionType>
+        IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

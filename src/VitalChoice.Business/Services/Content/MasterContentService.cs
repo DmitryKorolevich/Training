@@ -147,11 +147,11 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Id == 0)
                 {
-                    dbItem = await masterContentItemRepository.InsertGraphAsync(dbItem);
+                    await masterContentItemRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await masterContentItemRepository.UpdateAsync(dbItem);
+                    await masterContentItemRepository.UpdateAsync(dbItem);
                 }
 
                 foreach (var processor in model.MasterContentItemToContentProcessors)

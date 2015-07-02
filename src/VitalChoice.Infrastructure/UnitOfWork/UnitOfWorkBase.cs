@@ -46,7 +46,12 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 			return _uow.SaveChanges();
 		}
 
-		public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public Task<int> SaveChangesAsync()
+        {
+            return _uow.SaveChangesAsync();
+        }
+
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
 		{
 			return _uow.SaveChangesAsync(cancellationToken);
 		}

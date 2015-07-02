@@ -141,11 +141,11 @@ namespace VitalChoice.Business.Services.Settings
 
                 if (model.Id == 0)
                 {
-                    dbItem = await countryRepository.InsertAsync(dbItem);
+                    await countryRepository.InsertAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await countryRepository.UpdateAsync(dbItem);
+                    await countryRepository.UpdateAsync(dbItem);
                 }
             }
 
@@ -238,11 +238,11 @@ namespace VitalChoice.Business.Services.Settings
 
                 if (model.Id == 0)
                 {
-                    dbItem = await stateRepository.InsertAsync(dbItem);
+                    await stateRepository.InsertAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await stateRepository.UpdateAsync(dbItem);
+                    await stateRepository.UpdateAsync(dbItem);
                 }
             }
 

@@ -16,26 +16,27 @@ namespace VitalChoice.Data.Repositories
         {
         }
 
-        public virtual TEntity Insert(TEntity entity)
+        public virtual bool Insert(TEntity entity)
         {
             DbSet.Add(entity);
             Context.SaveChanges();
-            return entity;
+            return true;
         }
 
-        public virtual async Task<TEntity> InsertAsync(TEntity entity)
+        public virtual async Task<bool> InsertAsync(TEntity entity)
         {
             return await InsertAsync(CancellationToken.None, entity);
         }
 
-        public virtual async Task<TEntity> InsertAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual async Task<bool> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity != null)
             {
                 DbSet.Add(entity);
                 await Context.SaveChangesAsync(cancellationToken);
+                return true;
             }
-            return entity;
+            return false;
         }
 
         public virtual bool InsertRange(ICollection<TEntity> entities)
@@ -44,8 +45,9 @@ namespace VitalChoice.Data.Repositories
             {
                 DbSet.AddRange(entities);
                 Context.SaveChanges();
+                return true;
             }
-            return true;
+            return false;
         }
 
         public virtual async Task<bool> InsertRangeAsync(ICollection<TEntity> entities)
@@ -65,29 +67,31 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual TEntity InsertGraph(TEntity entity)
+        public virtual bool InsertGraph(TEntity entity)
         {
             if (entity != null)
             {
                 Context.TrackGraphForAdd(entity);
                 Context.SaveChanges();
+                return true;
             }
-            return entity;
+            return false;
         }
 
-        public virtual async Task<TEntity> InsertGraphAsync(TEntity entity)
+        public virtual async Task<bool> InsertGraphAsync(TEntity entity)
         {
             return await InsertGraphAsync(CancellationToken.None, entity);
         }
 
-        public virtual async Task<TEntity> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual async Task<bool> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity != null)
             {
                 Context.TrackGraphForAdd(entity);
                 await Context.SaveChangesAsync(cancellationToken);
+                return true;
             }
-            return entity;
+            return false;
         }
 
         public virtual bool InsertGraphRange(params TEntity[] entities)
@@ -132,29 +136,31 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual TEntity Update(TEntity entity)
+        public virtual bool Update(TEntity entity)
         {
             if (entity != null)
             {
                 DbSet.Update(entity);
                 Context.SaveChanges();
+                return true;
             }
-            return entity;
+            return false;
         }
 
-        public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+        public virtual async Task<bool> UpdateAsync(TEntity entity)
         {
             return await UpdateAsync(CancellationToken.None, entity);
         }
 
-        public virtual async Task<TEntity> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
+        public virtual async Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
         {
             if (entity != null)
             {
                 DbSet.Update(entity);
                 await Context.SaveChangesAsync(cancellationToken);
+                return true;
             }
-            return entity;
+            return false;
         }
 
         public virtual bool UpdateRange(ICollection<TEntity> entities)
@@ -163,8 +169,9 @@ namespace VitalChoice.Data.Repositories
             {
                 DbSet.UpdateRange(entities);
                 Context.SaveChanges();
+                return true;
             }
-            return true;
+            return false;
         }
 
         public virtual async Task<bool> UpdateRangeAsync(ICollection<TEntity> entities)
@@ -179,8 +186,9 @@ namespace VitalChoice.Data.Repositories
             {
                 DbSet.UpdateRange(entities);
                 await Context.SaveChangesAsync(cancellationToken);
+                return true;
             }
-            return true;
+            return false;
         }
 
         public virtual bool Delete(int id)
@@ -202,8 +210,9 @@ namespace VitalChoice.Data.Repositories
             {
                 DbSet.Remove(entity);
                 Context.SaveChanges();
+                return true;
             }
-            return true;
+            return false;
         }
 
         public virtual bool DeleteAll(ICollection<int> ids)

@@ -7,7 +7,6 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData
 {
-    // ReSharper disable UnusedTypeParameter
     public abstract class MappedObject: IModelTypeContainer
     {
         public int Id { get; set; }

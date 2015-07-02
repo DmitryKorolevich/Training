@@ -23,17 +23,17 @@ namespace VitalChoice.Business.Services.Content
 {
     public class ArticleService : IArticleService
     {
-        private readonly IRepositoryAsync<Article> articleRepository;
-        private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> contentItemRepository;
-        private readonly IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
-        private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository;
+        private readonly IRepositoryAsync<Article> _articleRepository;
+        private readonly IRepositoryAsync<ContentCategory> _contentCategoryRepository;
+        private readonly IRepositoryAsync<ContentItem> _contentItemRepository;
+        private readonly IRepositoryAsync<ArticleToContentCategory> _articleToContentCategoryRepository;
+        private readonly IRepositoryAsync<ContentItemToContentProcessor> _contentItemToContentProcessorRepository;
+        private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
+        private readonly IEcommerceRepositoryAsync<ProductOptionType> _optionTypeRepository;
         private readonly IRepositoryAsync<ArticleToProduct> _articleToProductRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
-        private readonly ITtlGlobalCache templatesCache;
-        private readonly ILogger logger;
+        private readonly ITtlGlobalCache _templatesCache;
+        private readonly ILogger _logger;
 
         public ArticleService(IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
             IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
@@ -45,18 +45,18 @@ namespace VitalChoice.Business.Services.Content
             IEcommerceRepositoryAsync<Product> productRepository,
             ILoggerProviderExtended logger, ITtlGlobalCache templatesCache)
         {
-            this.optionTypeRepository = optionTypeRepository;
+            this._optionTypeRepository = optionTypeRepository;
 
-            this.articleRepository = articleRepository;
-            this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
-            this.articleToContentCategoryRepository = articleToContentCategoryRepository;
-            this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
-            this.contentTypeRepository = contentTypeRepository;
+            this._articleRepository = articleRepository;
+            this._contentCategoryRepository = contentCategoryRepository;
+            this._contentItemRepository = contentItemRepository;
+            this._articleToContentCategoryRepository = articleToContentCategoryRepository;
+            this._contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
+            this._contentTypeRepository = contentTypeRepository;
             this._articleToProductRepository = articleToProductRepository;
             this._productRepository = productRepository;
-            this.templatesCache = templatesCache;
-            this.logger = logger.CreateLoggerDefault();
+            this._templatesCache = templatesCache;
+            this._logger = logger.CreateLoggerDefault();
         }
 
         public async Task<PagedList<Article>> GetArticlesAsync(ArticleItemListFilter filter)
@@ -67,7 +67,7 @@ namespace VitalChoice.Business.Services.Content
             {
                 if (filter.CategoryId.Value != -1)
                 {
-                    ids = (await articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.ArticleId).ToList();
+                    ids = (await _articleToContentCategoryRepository.Query(p => p.ContentCategoryId == filter.CategoryId.Value).SelectAsync(false)).Select(p => p.ArticleId).ToList();
                     if(ids.Count==0)
                     {
                         return new PagedList<Article>()
@@ -80,7 +80,7 @@ namespace VitalChoice.Business.Services.Content
                 }
                 else
                 {
-                    ids = (await articleToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.ArticleId).Distinct().ToList();
+                    ids = (await _articleToContentCategoryRepository.Query().SelectAsync(false)).Select(p => p.ArticleId).Distinct().ToList();
                     query = query.NotWithIds(ids);
                 }
             }
@@ -105,7 +105,7 @@ namespace VitalChoice.Business.Services.Content
 						        : x.OrderByDescending(y => y.Url);
 			        break;
 		        case ArticleSortPath.Updated:
-			        articleRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+			        _articleRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
 
 			        sortable =
 				        (x) =>
@@ -115,7 +115,7 @@ namespace VitalChoice.Business.Services.Content
 			        break;
 	        }
 
-	        var toReturn = await articleRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.ArticlesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
+	        var toReturn = await _articleRepository.Query(query).Include(p=>p.ContentItem).Include(p => p.ArticlesToContentCategories).ThenInclude(p => p.ContentCategory).OrderBy(sortable).
                 Include(p => p.User).ThenInclude(p => p.Profile).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return toReturn;
@@ -124,7 +124,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<Article> GetArticleAsync(int id)
         {
             ArticleQuery query = new ArticleQuery().WithId(id).NotDeleted();
-            var toReturn = (await articleRepository.Query(query).Include(p=>p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
+            var toReturn = (await _articleRepository.Query(query).Include(p=>p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
                 Include(p=>p.ArticlesToContentCategories).Include(p => p.User).ThenInclude(p => p.Profile).
                 Include(p => p.ArticlesToProducts).
                 SelectAsync(false)).FirstOrDefault();
@@ -162,7 +162,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
-                var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.Article).SelectAsync()).FirstOrDefault();
+                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Article).SelectAsync()).FirstOrDefault();
                 if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
@@ -171,20 +171,20 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await articleRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
+                dbItem = (await _articleRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
                     SelectAsync()).FirstOrDefault();
                 if (dbItem != null)
                 {
                     foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)
                     {
-                        await contentItemToContentProcessorRepository.DeleteAsync(proccesorRef.Id);
+                        await _contentItemToContentProcessorRepository.DeleteAsync(proccesorRef.Id);
                     }
                 }
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {
-                var urlDublicatesExist = await articleRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+                var urlDublicatesExist = await _articleRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
                     && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
                 if (urlDublicatesExist)
                 {
@@ -216,11 +216,11 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Id == 0)
                 {
-                    dbItem = await articleRepository.InsertGraphAsync(dbItem);
+                    await _articleRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await articleRepository.UpdateAsync(dbItem);
+                    await _articleRepository.UpdateAsync(dbItem);
                 }
 
                 foreach (var item in articlesToProducts)
@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Content
                 {
                     var categories =
                         await
-                            contentCategoryRepository.Query(
+                            _contentCategoryRepository.Query(
                                 p =>
                                     categoryIds.Contains(p.Id) && p.Type == ContentType.ArticleCategory &&
                                     p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
@@ -257,15 +257,7 @@ namespace VitalChoice.Business.Services.Content
                     List<int> forDelete = new List<int>();
                     foreach (var articleToContentCategory in dbItem.ArticlesToContentCategories)
                     {
-                        bool delete = true;
-                        foreach (var category in categories)
-                        {
-                            if (articleToContentCategory.ContentCategoryId == category.Id)
-                            {
-                                delete = false;
-                                break;
-                            }
-                        }
+                        bool delete = categories.All(category => articleToContentCategory.ContentCategoryId != category.Id);
                         if (delete)
                         {
                             forDelete.Add(articleToContentCategory.Id);
@@ -275,15 +267,7 @@ namespace VitalChoice.Business.Services.Content
                     List<int> forAdd = new List<int>();
                     foreach (var category in categories)
                     {
-                        bool add = true;
-                        foreach (var articleToContentCategory in dbItem.ArticlesToContentCategories)
-                        {
-                            if (articleToContentCategory.ContentCategoryId == category.Id)
-                            {
-                                add = false;
-                                break;
-                            }
-                        }
+                        bool add = dbItem.ArticlesToContentCategories.All(articleToContentCategory => articleToContentCategory.ContentCategoryId != category.Id);
                         if (add)
                         {
                             forAdd.Add(category.Id);
@@ -311,19 +295,19 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteArticleAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await articleRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _articleRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;
-                await articleRepository.UpdateAsync(dbItem);
+                await _articleRepository.UpdateAsync(dbItem);
 
                 try
                 {
-                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                    _templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
                 }
                 catch(Exception e)
                 {
-                    logger.LogError(e.ToString());
+                    _logger.LogError(e.ToString());
                 }
                 toReturn = true;
             }

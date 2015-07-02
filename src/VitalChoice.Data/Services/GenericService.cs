@@ -43,13 +43,15 @@ namespace VitalChoice.Data.Services
 		}
 
 	    public virtual TEntity InsertGraph(TEntity entity)
-        {
-			return Repository.Insert(entity);
+	    {
+            Repository.Insert(entity);
+            return entity; 
 		}
 
 	    public virtual async Task<TEntity> InsertGraphAsync(TEntity entity)
 	    {
-			return await Repository.InsertGraphAsync(entity);
+	        await Repository.InsertGraphAsync(entity);
+            return entity;
 		}
 
 	    public virtual bool InsertGraphRange(params TEntity[] entities)
@@ -63,13 +65,15 @@ namespace VitalChoice.Data.Services
 		}
 
 	    public virtual TEntity Update(TEntity entity)
-        {
-			return Repository.Update(entity);
+	    {
+	        Repository.Update(entity);
+            return entity;
 		}
 
 	    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
 	    {
-		    return await Repository.UpdateAsync(entity);
+	        await Repository.UpdateAsync(entity);
+            return entity;
 	    }
 
 	    public virtual void Delete(int id)

@@ -187,11 +187,11 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Id == 0)
                 {
-                    dbItem = await contentPageRepository.InsertGraphAsync(dbItem);
+                    await contentPageRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await contentPageRepository.UpdateAsync(dbItem);
+                    await contentPageRepository.UpdateAsync(dbItem);
                 }
             }
 

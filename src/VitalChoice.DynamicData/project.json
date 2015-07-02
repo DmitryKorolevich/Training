@@ -8,6 +8,7 @@
 
   "dependencies": {
     "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Data": "1.0.0-*",
     "Autofac.Dnx": "4.0.0"
   },
 

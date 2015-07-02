@@ -229,11 +229,11 @@ namespace VitalChoice.Business.Services.Products
                 entity.OptionTypes = new List<DiscountOptionType>();
                 var discountRepository = uow.RepositoryAsync<Discount>();
 
-                var result = await discountRepository.InsertGraphAsync(entity);
+                await discountRepository.InsertGraphAsync(entity);
                 await uow.SaveChangesAsync(CancellationToken.None);
 
-                result.OptionTypes = optionTypes;
-                return result;
+                entity.OptionTypes = optionTypes;
+                return entity;
             }
             return null;
         }
@@ -268,7 +268,7 @@ namespace VitalChoice.Business.Services.Products
                 var discountTiers = entity.DiscountTiers;
                 entity.DiscountTiers = null;
 
-                var toReturn = await discountRepository.UpdateAsync(entity);
+                await discountRepository.UpdateAsync(entity);
 
                 var dbSelectedSkus = await discountToSelectedSkuRepository.Query(c => c.IdDiscount == entity.Id).SelectAsync();
                 await discountToSelectedSkuRepository.DeleteAllAsync(dbSelectedSkus);
@@ -284,18 +284,18 @@ namespace VitalChoice.Business.Services.Products
 
                 var dbDiscountTiers = await discountTierRepository.Query(c => c.IdDiscount == entity.Id).SelectAsync();
                 await discountTierRepository.DeleteAllAsync(dbDiscountTiers);
-                if (toReturn.IdDiscountType == DiscountType.Tiered && discountTiers != null && discountTiers.Count > 0)
+                if (entity.IdDiscountType == DiscountType.Tiered && discountTiers != null && discountTiers.Count > 0)
                 {
                     await discountTierRepository.InsertRangeAsync(discountTiers);
                 }
 
                 await uow.SaveChangesAsync(CancellationToken.None);
 
-                toReturn.DiscountsToSelectedSkus = selectedSkus;
-                toReturn.DiscountsToSkus = skus;
-                toReturn.DiscountsToCategories = categories;
-                toReturn.DiscountTiers = discountTiers;
-                return toReturn;
+                entity.DiscountsToSelectedSkus = selectedSkus;
+                entity.DiscountsToSkus = skus;
+                entity.DiscountsToCategories = categories;
+                entity.DiscountTiers = discountTiers;
+                return entity;
             }
             return null;
         }

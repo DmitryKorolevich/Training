@@ -202,11 +202,11 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Id == 0)
                 {
-                    dbItem = await contentCategoryRepository.InsertGraphAsync(dbItem);
+                    await contentCategoryRepository.InsertGraphAsync(dbItem);
                 }
                 else
                 {
-                    dbItem = await contentCategoryRepository.UpdateAsync(dbItem);
+                    await contentCategoryRepository.UpdateAsync(dbItem);
                 }
             }
 
