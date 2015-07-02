@@ -5,7 +5,7 @@ using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
 
-namespace VitalChoice.DynamicData
+namespace VitalChoice.DynamicData.Services
 {
     public static class DynamicTypeCache
     {

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Autofac.Features.Indexed;
-using Templates.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
+using VitalChoice.DynamicData.Services;
+using System.Reflection;
 
-namespace VitalChoice.DynamicData.Services
+namespace VitalChoice.DynamicData.Base
 {
     public abstract class DynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> :
         IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue>

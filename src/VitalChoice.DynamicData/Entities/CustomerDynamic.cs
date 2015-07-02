@@ -5,6 +5,7 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Entities
 {

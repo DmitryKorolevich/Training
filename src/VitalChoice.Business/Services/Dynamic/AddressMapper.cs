@@ -1,7 +1,9 @@
 using System;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.DynamicData.Services;
 

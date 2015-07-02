@@ -1,4 +1,5 @@
 ﻿using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Entities
 {

@@ -227,7 +227,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
             builder.RegisterInstance(configuration).As<IConfiguration>();
             builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
-            //builder.RegisterType<FrontEndAssetManager>().As<FrontEndAssetManager>().SingleInstance();
             builder.RegisterType<MemoryCache>().As<IMemoryCache>();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
@@ -240,7 +239,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<EmailSender>()
                 .As<IEmailSender>()
                 .WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>())
-                .SingleInstance();
+                .InstancePerLifetimeScope();
             builder.RegisterType<NotificationService>().As<INotificationService>();
             builder.RegisterType<GCService>().As<IGCService>();
             builder.RegisterType<ProductService>().As<IProductService>();

@@ -13,7 +13,7 @@ using VitalChoice.Domain;
 namespace VitalChoice.Data.Repositories
 {
     public class UnitRepositoryAsync<TEntity> : ReadRepositoryAsync<TEntity>,
-        IUnitRepositoryAsync<TEntity> where TEntity : Entity
+        IRepositoryAsync<TEntity> where TEntity : Entity
     {
         public UnitRepositoryAsync(IDataContextAsync context) : base(context)
         {

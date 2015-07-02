@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.DynamicData.Services;
 

@@ -13,6 +13,7 @@ namespace VitalChoice.Data.UnitOfWork
     {
         Task<int> SaveChangesAsync();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-		IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity;
+		IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity;
+        IReadRepositoryAsync<TEntity> ReadRepositoryAsync<TEntity>() where TEntity : Entity;
     }
 }

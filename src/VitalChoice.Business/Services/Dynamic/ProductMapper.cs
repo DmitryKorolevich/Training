@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.DynamicData.Services;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

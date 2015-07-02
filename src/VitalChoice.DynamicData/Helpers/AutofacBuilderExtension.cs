@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Builder;
+using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
 using VitalChoice.DynamicData.Interfaces.Services;
 

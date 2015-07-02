@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.DynamicData.Base;
 
-namespace VitalChoice.DynamicData.Interfaces.Services
+namespace VitalChoice.DynamicData.Interfaces
 {
     public interface IDynamicToModelMapper
     {

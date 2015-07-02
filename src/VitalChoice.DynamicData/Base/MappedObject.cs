@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Interfaces;
 
-namespace VitalChoice.DynamicData
+namespace VitalChoice.DynamicData.Base
 {
     public abstract class MappedObject: IModelTypeContainer
     {

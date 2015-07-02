@@ -21,7 +21,8 @@ namespace VitalChoice.Data.UnitOfWork
 
         private readonly IDataContextAsync _dataContext;
         private bool _disposed;
-        private Dictionary<string, object> _repositories;
+        private Dictionary<Type, object> _repositories;
+        private Dictionary<Type, object> _readRepositories;
 
         #endregion Private Fields
 
@@ -29,7 +30,7 @@ namespace VitalChoice.Data.UnitOfWork
 
         public UnitOfWork(IDataContextAsync dataContext)
         {
-            this._dataContext = dataContext;
+            _dataContext = dataContext;
         }
 
         public void Dispose()
@@ -62,23 +63,37 @@ namespace VitalChoice.Data.UnitOfWork
             return _dataContext.SaveChangesAsync(cancellationToken);
         }
 
-        public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
-        {
-            if (_repositories == null)
-                _repositories = new Dictionary<string, object>();
+	    public IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
+	    {
+	        if (_repositories == null)
+	            _repositories = new Dictionary<Type, object>();
+	        object result;
+	        if (_repositories.TryGetValue(typeof (TEntity), out result))
+	            return (IRepositoryAsync<TEntity>) result;
 
-            var type = typeof (TEntity).Name;
+	        var repositoryType = typeof (UnitRepositoryAsync<>);
+	        result = Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity)), _dataContext);
+	        _repositories.Add(typeof (TEntity), result);
 
-            if (_repositories.ContainsKey(type))
-                return (IUnitRepositoryAsync<TEntity>) _repositories[type];
+	        return (IRepositoryAsync<TEntity>) result;
+	    }
 
-            var repositoryType = typeof (UnitRepositoryAsync<>);
-            _repositories.Add(type, Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity)), _dataContext));
+	    public IReadRepositoryAsync<TEntity> ReadRepositoryAsync<TEntity>() where TEntity : Entity
+	    {
+	        if (_readRepositories == null)
+	            _readRepositories = new Dictionary<Type, object>();
+	        object result;
+	        if (_readRepositories.TryGetValue(typeof (TEntity), out result))
+	            return (IReadRepositoryAsync<TEntity>) result;
 
-            return (IUnitRepositoryAsync<TEntity>) _repositories[type];
-        }
+	        var repositoryType = typeof (ReadRepositoryAsync<>);
+	        result = Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity)), _dataContext);
+	        _readRepositories.Add(typeof (TEntity), result);
 
-        #region Unit of Work Transactions
+	        return (IReadRepositoryAsync<TEntity>) result;
+	    }
+
+	    #region Unit of Work Transactions
 
 	    #endregion
     }

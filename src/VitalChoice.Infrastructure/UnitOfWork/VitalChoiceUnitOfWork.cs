@@ -9,10 +9,9 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 {
     public class VitalChoiceUnitOfWork : UnitOfWorkBase
 	{
-        protected override IUnitOfWorkAsync Init()
+        public VitalChoiceUnitOfWork() : base(new VitalChoiceContext(Options))
         {
-            var context = new VitalChoiceContext(Options);
-			return new Data.UnitOfWork.UnitOfWork(context);
-		}
+            
+        }
 	}
 }

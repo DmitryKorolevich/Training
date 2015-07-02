@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.DynamicData.Services;
 

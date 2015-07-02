@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.DynamicData.Services;
 using VitalChoice.DynamicData.Validation.Abstractions;
 
 namespace VitalChoice.DynamicData.Validation

@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Framework.OptionsModel;
+using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
@@ -12,19 +13,17 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 	{
 		private readonly IUnitOfWorkAsync _uow;
 
-	    protected static IOptions<AppOptions> Options { get; private set; }
+        protected static IOptions<AppOptions> Options;
 
-	    protected UnitOfWorkBase()
+        protected UnitOfWorkBase(IDataContextAsync context)
 	    {
-		    this._uow = this.Init();
+	        _uow = new Data.UnitOfWork.UnitOfWork(context);
 	    }
 
-	    protected abstract IUnitOfWorkAsync Init();
-
-	    public static void SetOptions(IOptions<AppOptions> options)
-	    {
-		    Options = options;
-	    }
+        public static void SetOptions(IOptions<AppOptions> options)
+        {
+            Options = options;
+        }
 
 	    public void Dispose()
 		{
@@ -36,12 +35,17 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 			_uow.Dispose(disposing);
 		}
 
-		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
+		public IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
 		{
 			return _uow.RepositoryAsync<TEntity>();
 		}
 
-		public int SaveChanges()
+        public IReadRepositoryAsync<TEntity> ReadRepositoryAsync<TEntity>() where TEntity : Entity
+        {
+            return _uow.ReadRepositoryAsync<TEntity>();
+        }
+
+        public int SaveChanges()
 		{
 			return _uow.SaveChanges();
 		}

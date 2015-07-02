@@ -8,11 +8,10 @@ using VitalChoice.Infrastructure.Context;
 namespace VitalChoice.Infrastructure.UnitOfWork
 {
     public class EcommerceUnitOfWork : UnitOfWorkBase
-	{
-        protected sealed override IUnitOfWorkAsync Init()
-	    {
-            var context = new EcommerceContext(Options);
-			return new Data.UnitOfWork.UnitOfWork(context);
-		}
-	}
+    {
+        public EcommerceUnitOfWork() : base(new EcommerceContext(Options))
+        {
+
+        }
+    }
 }
