@@ -21,7 +21,7 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
         protected readonly string CollectionName;
         protected string PropertyName;
         protected string ErrorText;
-        protected readonly int[] Indexes;
+        protected int[] Indexes;
         public TProperty Data { get; }
 
         internal static string GetModelName(string dynamicName, Type modelType)

@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Domain.Entities.Options
 {
-    public class Versioning
+    public struct Versioning
 	{
         public bool EnableStaticContentVersioning { get; set; }
 

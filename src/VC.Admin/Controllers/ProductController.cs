@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
+using VC.Admin.Models;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Content;

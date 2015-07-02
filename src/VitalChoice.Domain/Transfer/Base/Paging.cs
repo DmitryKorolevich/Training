@@ -10,7 +10,7 @@ namespace VitalChoice.Domain.Transfer.Base
 		    PageItemCount = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT;
 	    }
 
-	    public int PageIndex { get; set; }
+        public int PageIndex { get; set; }
         public int PageItemCount { get; set; }
     }
 }

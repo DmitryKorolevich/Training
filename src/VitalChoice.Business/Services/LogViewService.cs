@@ -19,13 +19,13 @@ namespace VitalChoice.Business.Services
             this.commonLogItemsRepository = commonLogItemsRepository;
         }
 
-        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? @from = null, DateTime? to = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT, SortFilter sorting = null)
+        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? @from = null, DateTime? to = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT, SortFilter sorting = default(SortFilter))
         {
             var query = new CommonLogQuery();
             query = query.GetItems(logLevel, message, source, from, to);
 
 			Func<IQueryable<CommonLogItem>, IOrderedQueryable<CommonLogItem>> sortable = x => x.OrderByDescending(pp => pp.Date);
-			if (sorting != null)
+			if (sorting.SortOrder != SortOrder.None)
 	        {
 				var sortOrder = sorting.SortOrder;
 				switch (sorting.Path)

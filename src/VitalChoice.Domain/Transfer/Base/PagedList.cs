@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Domain.Transfer.Base
 {
-    public class PagedList<T> where T : class 
+    public struct PagedList<T> where T : class 
     {
         public IList<T> Items { get; set; }
         public int Count { get; set; }
@@ -12,10 +12,5 @@ namespace VitalChoice.Domain.Transfer.Base
             Count = count;
             Items = items;
         }
-
-	    public PagedList()
-	    {
-
-	    }
     }
 }

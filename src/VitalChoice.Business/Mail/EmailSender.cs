@@ -10,24 +10,24 @@ using System;
 
 namespace VitalChoice.Business.Mail
 {
-    public class EmailSender :IEmailSender
+    public class EmailSender :IEmailSender, IDisposable
     {
 #if DNX451
-		private readonly Email configuration;
+		private readonly Email _configuration;
 
-	    private readonly SmtpClient client;
+	    private readonly SmtpClient _client;
 #endif
 		public EmailSender(IOptions<AppOptions> options)
 	    {
 #if DNX451
-			configuration = options.Options.EmailConfiguration;
+			_configuration = options.Options.EmailConfiguration;
 
-			client = new SmtpClient(configuration.Host, configuration.Port)
+			_client = new SmtpClient(_configuration.Host, _configuration.Port)
 			{
 				UseDefaultCredentials = false,
 				DeliveryMethod = SmtpDeliveryMethod.Network,
-				EnableSsl = configuration.Secured,
-				Credentials = new NetworkCredential(configuration.Username, configuration.Password)
+				EnableSsl = _configuration.Secured,
+				Credentials = new NetworkCredential(_configuration.Username, _configuration.Password)
 			};
 #endif
 		}
@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Mail
             bool isBodyHtml=true)
 		{
 #if DNX451
-			var fromAddr = new MailAddress(configuration.From, fromDisplayName, Encoding.UTF8);
+			var fromAddr = new MailAddress(_configuration.From, fromDisplayName, Encoding.UTF8);
 			var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);
             var mailmsg = new MailMessage(fromAddr, toAddr)
 			{
@@ -47,11 +47,36 @@ namespace VitalChoice.Business.Mail
 				SubjectEncoding = Encoding.UTF8,
 			};
 
-			await client.SendMailAsync(mailmsg);
+			await _client.SendMailAsync(mailmsg);
 #else
             await Task.Delay(0);
 #endif
 
         }
+
+        #region IDisposable
+        private bool _disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+#if !DNXCORE50
+                    _client.Dispose();
+#endif
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

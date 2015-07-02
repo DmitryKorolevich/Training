@@ -9,7 +9,7 @@ namespace VitalChoice.DynamicData.Helpers
 {
     internal static class MapperTypeConverter
     {
-        public static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
+        internal static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
             GenericProperty destProperty, bool toModelDirection)
         {
             if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType &&
@@ -25,7 +25,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
+        internal static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
             where TOptionValue: OptionValue<TOptionType> 
             where TOptionType : OptionType
         {
@@ -34,7 +34,7 @@ namespace VitalChoice.DynamicData.Helpers
             return typeId == FieldType.LargeString ? value.BigValue?.Value : ConvertTo(value.Value, typeId);
         }
 
-        public static object ConvertTo(string value, FieldType typeId)
+        internal static object ConvertTo(string value, FieldType typeId)
         {
             if (string.IsNullOrEmpty(value))
                 return null;
@@ -61,7 +61,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        public static void ConvertToOption<TOptionValue, TOptionType>(TOptionValue option, object value, FieldType typeId)
+        internal static void ConvertToOption<TOptionValue, TOptionType>(TOptionValue option, object value, FieldType typeId)
             where TOptionValue : OptionValue<TOptionType>
             where TOptionType : OptionType
         {

@@ -11,6 +11,8 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Domain.Entities.Settings;
 using System.Reflection;
+using Microsoft.Framework.Logging;
+using VitalChoice.Core.Services;
 
 namespace VC.Admin.Models.Setting
 {
@@ -26,7 +28,7 @@ namespace VC.Admin.Models.Setting
 
         public GlobalSettingsManageModel(ICollection<AppSettingItem> items)
         {
-#if DNX451
+#if !DNXCORE50
             foreach (var property in typeof(GlobalSettingsManageModel).GetProperties())
             {
                 AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);
@@ -57,6 +59,8 @@ namespace VC.Admin.Models.Setting
                     }
                     catch (Exception e)
                     {
+                        LoggerService.GetDefault().LogCritical(0, e.Message, e);
+                        throw;
                     }
                 }
             }

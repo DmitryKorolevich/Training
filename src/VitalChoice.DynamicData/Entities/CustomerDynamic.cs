@@ -8,7 +8,7 @@ using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class CustomerDynamic : MappedObject<Customer, CustomerOptionType, CustomerOptionValue>
+    public sealed class CustomerDynamic : MappedObject
     {
 		public User User { get; set; }
 

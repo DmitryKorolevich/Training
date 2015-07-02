@@ -284,7 +284,11 @@ namespace VitalChoice.Business.Services.Customers
 
 			//return toReturn;
 
-			return null;
+			return new PagedList<CustomerDynamic>
+			{
+			    Count = 0,
+                Items = new List<CustomerDynamic>()
+			};
 		}
 	}
 }

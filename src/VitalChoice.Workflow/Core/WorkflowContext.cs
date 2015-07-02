@@ -13,28 +13,27 @@ namespace VitalChoice.Workflow.Core
         protected WorkflowContext()
         {
             _data = new ExpandoObject();
-            ActionRunningList = new HashSet<string>();
-            DictionaryData = new Dictionary<string, T>();
+            _actionRunningList = new HashSet<string>();
         }
 
         public dynamic Data => _data;
 
-        public Dictionary<string, T> DictionaryData { get; }
+        public IDictionary<string, object> DictionaryData => _data as IDictionary<string, object>;
 
-        internal HashSet<string> ActionRunningList { get; }
+        private readonly HashSet<string> _actionRunningList;
 
         internal void ActionLock(string name)
         {
-            if (ActionRunningList.Contains(name))
+            if (_actionRunningList.Contains(name))
                 throw new ApiException("ActionRecursionDetected", name);
-            ActionRunningList.Add(name);
+            _actionRunningList.Add(name);
         }
 
         internal void ActionUnlock(string name)
         {
-            if (!ActionRunningList.Contains(name))
+            if (!_actionRunningList.Contains(name))
                 throw new ApiException("ActionExitedTwice", name);
-            ActionRunningList.Remove(name);
+            _actionRunningList.Remove(name);
         }
 
         internal void ActionSetResult(string actionName, T data)

@@ -7,7 +7,7 @@ using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Core.GlobalFilters
 {
-    public class ApiModelAutoValidationFilter : ActionFilterAttribute
+    public class ApiModelAutoValidationFilterAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext context)
         {

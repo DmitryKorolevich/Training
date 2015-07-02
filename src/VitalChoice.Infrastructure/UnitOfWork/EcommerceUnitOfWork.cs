@@ -9,7 +9,7 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 {
     public class EcommerceUnitOfWork : UnitOfWorkBase
 	{
-        protected override IUnitOfWorkAsync Init()
+        protected sealed override IUnitOfWorkAsync Init()
 	    {
             var context = new EcommerceContext(Options);
 			return new Data.UnitOfWork.UnitOfWork(context);

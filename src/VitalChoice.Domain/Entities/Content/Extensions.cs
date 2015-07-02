@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
-namespace VitalChoice.Domain.Entities
+namespace VitalChoice.Domain.Entities.Content
 {
     public static class Extensions
     {

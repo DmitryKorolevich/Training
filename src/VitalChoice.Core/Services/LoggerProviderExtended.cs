@@ -73,7 +73,7 @@ namespace VitalChoice.Core.Services
                 return _logger.IsEnabled(GetLogLevel(logLevel));
             }
 
-            private global::NLog.LogLevel GetLogLevel(LogLevel logLevel)
+            private static global::NLog.LogLevel GetLogLevel(LogLevel logLevel)
             {
                 switch (logLevel)
                 {

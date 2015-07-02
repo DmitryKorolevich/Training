@@ -10,13 +10,13 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 {
     public abstract class UnitOfWorkBase : IUnitOfWorkAsync
 	{
-		private IUnitOfWorkAsync uow;
+		private readonly IUnitOfWorkAsync _uow;
 
 	    protected static IOptions<AppOptions> Options { get; private set; }
 
-	    public UnitOfWorkBase()
+	    protected UnitOfWorkBase()
 	    {
-		    this.uow = this.Init();
+		    this._uow = this.Init();
 	    }
 
 	    protected abstract IUnitOfWorkAsync Init();
@@ -28,27 +28,27 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 
 	    public void Dispose()
 		{
-			uow.Dispose();
+			_uow.Dispose();
 		}
 
 		public void Dispose(bool disposing)
 		{
-			uow.Dispose(disposing);
+			_uow.Dispose(disposing);
 		}
 
 		public IUnitRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
 		{
-			return uow.RepositoryAsync<TEntity>();
+			return _uow.RepositoryAsync<TEntity>();
 		}
 
 		public int SaveChanges()
 		{
-			return uow.SaveChanges();
+			return _uow.SaveChanges();
 		}
 
 		public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
 		{
-			return uow.SaveChangesAsync(cancellationToken);
+			return _uow.SaveChangesAsync(cancellationToken);
 		}
 	}
 }

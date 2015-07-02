@@ -12,16 +12,10 @@ namespace VC.Admin.Components
 	public class AssetsViewComponent : ViewComponent
 	{
 		private readonly AppOptions appOptions;
-		private readonly FrontEndAssetManager assetManager;
 		private readonly IUrlHelper urlHelper;
 
-		public AssetsViewComponent(FrontEndAssetManager assetManager, IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
+		public AssetsViewComponent(IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
 		{
-			if (assetManager == null)
-			{
-				throw new ArgumentNullException(nameof(assetManager));
-			}
-
 			if (urlHelper == null)
 			{
 				throw new ArgumentNullException(nameof(urlHelper));
@@ -31,8 +25,6 @@ namespace VC.Admin.Components
 			{
 				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
-
-			this.assetManager = assetManager;
 			this.urlHelper = urlHelper;
 			this.appOptions = appOptionsAccessor.Options;
 		}
@@ -46,7 +38,7 @@ namespace VC.Admin.Components
             if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";
-				var assetInfo = assetManager.GetScripts();
+				var assetInfo = FrontEndAssetManager.GetScripts();
 				if (appOptions.EnableBundlingAndMinification)
 				{
 					filePaths.Add(urlHelper.Content(
@@ -63,7 +55,7 @@ namespace VC.Admin.Components
 			else if (assetType.Equals("styles", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Styles";
-				var assetInfo = assetManager.GetStyles();
+				var assetInfo = FrontEndAssetManager.GetStyles();
 				if (appOptions.EnableBundlingAndMinification)
 				{
 					filePaths.Add(urlHelper.Content(

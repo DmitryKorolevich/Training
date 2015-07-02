@@ -8,10 +8,7 @@ using VitalChoice.DynamicData.Interfaces;
 namespace VitalChoice.DynamicData
 {
     // ReSharper disable UnusedTypeParameter
-    public abstract class MappedObject<TEntity, TOptionType, TOptionValue> : IModelTypeContainer
-        where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
-        where TOptionType : OptionType, new()
-        where TOptionValue : OptionValue<TOptionType>, new()
+    public abstract class MappedObject: IModelTypeContainer
     {
         public int Id { get; set; }
         public RecordStatusCode StatusCode { get; set; }

@@ -5,7 +5,7 @@ using VitalChoice.Domain.Entities.Options;
 
 namespace VitalChoice.Core.GlobalFilters
 {
-    public class BuildNumberValidationFilter : ActionFilterAttribute
+    public class BuildNumberValidationFilterAttribute : ActionFilterAttribute
     {
 	    public override void OnActionExecuting(ActionExecutingContext context)
 	    {

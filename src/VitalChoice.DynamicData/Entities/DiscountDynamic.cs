@@ -8,7 +8,7 @@ using System;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class DiscountDynamic : MappedObject<Discount, DiscountOptionType, DiscountOptionValue>
+    public sealed class DiscountDynamic : MappedObject
     {
         public int? IdAddedBy { get; set; }
 

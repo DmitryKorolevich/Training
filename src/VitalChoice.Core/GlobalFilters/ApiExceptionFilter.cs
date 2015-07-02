@@ -7,7 +7,7 @@ using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Core.GlobalFilters
 {
-    public class ApiExceptionFilter : ExceptionFilterAttribute
+    public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)
         {

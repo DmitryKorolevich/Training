@@ -232,12 +232,12 @@ namespace VitalChoice.Business.Services
 
         #region Private
 
-        private string ConvertUrlToPath(string url)
+        private static string ConvertUrlToPath(string url)
         {
             return _rootDir + url.ToLower().Replace("/", @"\").Replace(@"\..","");
         }
 
-        private string ConvertPathToUrl(string path)
+        private static string ConvertPathToUrl(string path)
         {
             return path.ToLower().Replace(_rootDir, "").Replace(@"\", "/");
         }

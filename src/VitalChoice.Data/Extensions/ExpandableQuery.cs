@@ -16,10 +16,11 @@ namespace VitalChoice.Data.Extensions
 	/// </summary>
 	public class ExpandableQuery<T> : IQueryable<T>, IOrderedQueryable<T>, IOrderedQueryable, IAsyncEnumerable<T>
     {
-		ExpandableQueryProvider<T> _provider;
-		IQueryable<T> _inner;
+	    readonly ExpandableQueryProvider<T> _provider;
+	    readonly IQueryable<T> _inner;
 
-		internal IQueryable<T> InnerQuery { get { return _inner; } }			// Original query, that we're wrapping
+		internal IQueryable<T> InnerQuery => _inner;
+// Original query, that we're wrapping
 
 		internal ExpandableQuery (IQueryable<T> inner)
 		{
@@ -27,14 +28,14 @@ namespace VitalChoice.Data.Extensions
 			_provider = new ExpandableQueryProvider<T> (this);
 		}
 
-		Expression IQueryable.Expression { get { return _inner.Expression; } }
-		Type IQueryable.ElementType { get { return typeof (T); } }
-		IQueryProvider IQueryable.Provider { get { return _provider; } }
-		public IEnumerator<T> GetEnumerator () { return _inner.GetEnumerator (); }
-		IEnumerator IEnumerable.GetEnumerator () { return _inner.GetEnumerator (); }
-		public override string ToString () { return _inner.ToString (); }
+		Expression IQueryable.Expression => _inner.Expression;
+	    Type IQueryable.ElementType => typeof (T);
+	    IQueryProvider IQueryable.Provider => _provider;
+	    public IEnumerator<T> GetEnumerator () => _inner.GetEnumerator ();
+	    IEnumerator IEnumerable.GetEnumerator () => _inner.GetEnumerator ();
+	    public override string ToString () => _inner.ToString ();
 
-        IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
+	    IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
         {
             var asyncEnumerable = _inner as IAsyncEnumerable<T>;
             if (asyncEnumerable != null)
@@ -45,7 +46,7 @@ namespace VitalChoice.Data.Extensions
 
 	class ExpandableQueryProvider<T> : IQueryProvider, IAsyncQueryProvider
     {
-		ExpandableQuery<T> _query;
+	    readonly ExpandableQuery<T> _query;
 
 		internal ExpandableQueryProvider (ExpandableQuery<T> query)
 		{
@@ -78,10 +79,7 @@ namespace VitalChoice.Data.Extensions
         public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
             var asyncProvider = _query.InnerQuery.Provider as IAsyncQueryProvider;
-            if (asyncProvider != null)
-                return asyncProvider.ExecuteAsync<TResult>(expression.Expand());
-
-            return null;
+            return asyncProvider?.ExecuteAsync<TResult>(expression.Expand());
         }
 
         public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)

@@ -3,7 +3,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class SkuDynamic : MappedObject<Sku, ProductOptionType, ProductOptionValue>
+    public sealed class SkuDynamic : MappedObject
     {
         public string Code { get; set; }
 

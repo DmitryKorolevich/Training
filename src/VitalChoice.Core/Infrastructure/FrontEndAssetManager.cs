@@ -5,7 +5,7 @@ using VitalChoice.Core.Infrastructure.Models;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public class FrontEndAssetManager
+	public static class FrontEndAssetManager
 	{
 		private const string ScriptsFilePath = "AppConfig/scripts/files.json";
 		private const string StylesFilePath = "AppConfig/styles/files.json";
@@ -24,12 +24,12 @@ namespace VitalChoice.Core.Infrastructure
 			};
 		}
 
-		public AssetInfo GetScripts()
+		public static AssetInfo GetScripts()
 		{
 			return GetAssetInfo(scriptsAppRelativePath);
 		}
 
-		public AssetInfo GetStyles()
+		public static AssetInfo GetStyles()
 		{
 			return GetAssetInfo(stylesAppRelativePath);
 		}

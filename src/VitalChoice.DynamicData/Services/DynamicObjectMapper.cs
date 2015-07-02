@@ -20,7 +20,7 @@ namespace VitalChoice.DynamicData.Services
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
-        where TDynamic : MappedObject<TEntity, TOptionType, TOptionValue>, new()
+        where TDynamic : MappedObject, new()
     {
         private readonly IIndex<Type, IDynamicToModelMapper> _mappers;
         private readonly IModelToDynamicContainer _container;
@@ -104,14 +104,14 @@ namespace VitalChoice.DynamicData.Services
                 return null;
 
             dynamic result = Activator.CreateInstance(modelType);
-            ToModelInternal(dynamic as MappedObject<TEntity, TOptionType, TOptionValue>, result, modelType,
+            ToModelInternal(dynamic, result, modelType,
                 typeof (TDynamic));
             dynamic converter = _container.TryResolve(modelType);
             converter?.DynamicToModel(result, dynamic);
             return result;
         }
 
-        object IDynamicToModelMapper.FromModel(Type modelType, dynamic model)
+        MappedObject IDynamicToModelMapper.FromModel(Type modelType, dynamic model)
         {
             if (model == null)
                 return null;
@@ -163,7 +163,7 @@ namespace VitalChoice.DynamicData.Services
             return entity;
         }
 
-        private void ToModelInternal(MappedObject<TEntity, TOptionType, TOptionValue> dynamic, object result,
+        private void ToModelInternal(MappedObject dynamic, object result,
             Type modelType, Type dynamicType)
         {
             if (dynamic == null)
@@ -202,7 +202,7 @@ namespace VitalChoice.DynamicData.Services
             }
         }
 
-        private void FromModelInternal(MappedObject<TEntity, TOptionType, TOptionValue> dynamic, object model,
+        private void FromModelInternal(MappedObject dynamic, object model,
             Type modelType, Type dynamicType)
         {
             if (dynamic == null)
@@ -237,7 +237,7 @@ namespace VitalChoice.DynamicData.Services
             }
         }
 
-        private void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)
+        private static void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)
         {
             foreach (var data in obj.DynamicData)
             {
@@ -274,7 +274,7 @@ namespace VitalChoice.DynamicData.Services
             if (obj == null)
                 return null;
 
-            if (destType.IsImplementGeneric(typeof (MappedObject<,,>)))
+            if (typeof(MappedObject).IsAssignableFrom(destType))
             {
                 var mapper = _mappers[destType];
                 return mapper.FromModel(sourceType, obj);
@@ -289,7 +289,7 @@ namespace VitalChoice.DynamicData.Services
             if (destElementType != null && srcElementType != null)
             {
                 IList results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
-                if (destElementType.IsImplementGeneric(typeof (MappedObject<,,>)))
+                if (typeof(MappedObject).IsAssignableFrom(destElementType))
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
@@ -312,11 +312,11 @@ namespace VitalChoice.DynamicData.Services
         {
             if (obj == null)
                 return null;
-            Type objectType = obj.GetType();
-            if (objectType.IsImplementGeneric(typeof (MappedObject<,,>)))
+            var mappedObject = obj as MappedObject;
+            if (mappedObject != null)
             {
-                var mapper = _mappers[objectType];
-                return mapper.ToModel(obj, destType);
+                var mapper = _mappers[obj.GetType()];
+                return mapper.ToModel(mappedObject, destType);
             }
             if (destType.IsInstanceOfType(obj))
             {
@@ -324,14 +324,14 @@ namespace VitalChoice.DynamicData.Services
             }
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
-            Type srcElementType = objectType.TryGetElementType(typeof (ICollection<>));
+            Type srcElementType = obj.GetType().TryGetElementType(typeof (ICollection<>));
             if (destElementType != null && srcElementType != null)
             {
                 var results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
-                if (srcElementType.IsImplementGeneric(typeof (MappedObject<,,>)))
+                if (typeof(MappedObject).IsAssignableFrom(srcElementType))
                 {
                     var mapper = _mappers[srcElementType];
-                    foreach (var item in (IEnumerable) obj)
+                    foreach (MappedObject item in (IEnumerable) obj)
                     {
                         results.Add(mapper.ToModel(item, destElementType));
                     }

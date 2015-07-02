@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Data.Transaction;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
@@ -18,12 +17,8 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
-using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Data.Repositories.Customs;
-using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Validation;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
@@ -33,36 +28,26 @@ namespace VitalChoice.Business.Services.Products
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypeRepository;
-        private readonly IEcommerceRepositoryAsync<ProductOptionValue> _productOptionValueRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
-        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
         private readonly IEcommerceRepositoryAsync<BigStringValue> _bigStringValueRepository;
         private readonly ProductMapper _mapper;
-        private readonly EcommerceContext _context;
-        private readonly ILogger _logger;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
-            IEcommerceRepositoryAsync<VSku> _vSkuRepository,
+            IEcommerceRepositoryAsync<VSku> vSkuRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
-            IEcommerceRepositoryAsync<Sku> skuRepository, EcommerceContext context,
-            IEcommerceRepositoryAsync<ProductOptionValue> productOptionValueRepository,
-            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository, ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper)
+            IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper)
         {
             this._vProductSkuRepository = vProductSkuRepository;
-            this._vSkuRepository = _vSkuRepository;
+            this._vSkuRepository = vSkuRepository;
             this._productOptionTypeRepository = productOptionTypeRepository;
             this._lookupRepository = lookupRepository;
             this._productRepository = productRepository;
             this._skuRepository = skuRepository;
-            _context = context;
-            _productOptionValueRepository = productOptionValueRepository;
-            this._productToCategoryRepository = productToCategoryRepository;
             _bigStringValueRepository = bigStringValueRepository;
             _mapper = mapper;
-            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         #region ProductOptions

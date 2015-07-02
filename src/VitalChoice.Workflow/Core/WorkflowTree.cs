@@ -25,16 +25,19 @@ namespace VitalChoice.Workflow.Core
 
         public TResult GetActionResult(string actionName, TContext context)
         {
-            TResult result;
+            object result;
             if (context.DictionaryData.TryGetValue(actionName, out result)) {
-                return result;
+                return (TResult)result;
             }
             return GetAction(actionName).Execute(context);
         }
 
         public bool TryGetActionResult(string actionName, TContext context, out TResult result)
         {
-            return context.DictionaryData.TryGetValue(actionName, out result);
+            object value;
+            var getResult = context.DictionaryData.TryGetValue(actionName, out value);
+            result = (TResult)value;
+            return getResult;
         }
 
         public async Task InitializeTreeAsync()

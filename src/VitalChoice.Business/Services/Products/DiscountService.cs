@@ -32,28 +32,20 @@ namespace VitalChoice.Business.Services.Products
     public class DiscountService : IDiscountService
     {
         private readonly IEcommerceRepositoryAsync<DiscountOptionType> _discountOptionTypeRepository;
-        private readonly IEcommerceRepositoryAsync<DiscountOptionValue> _discountOptionValueRepository;
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        private readonly EcommerceContext _context;
-        private readonly ILogger _logger;
         private readonly DiscountMapper _mapper;
 
         public DiscountService(IEcommerceRepositoryAsync<DiscountOptionType> discountOptionTypeRepository,
-            IEcommerceRepositoryAsync<DiscountOptionValue> discountOptionValueRepository,
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
-            IRepositoryAsync<AdminProfile> adminProfileRepository,
-            EcommerceContext context, ILoggerProviderExtended loggerProvider, DiscountMapper mapper)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, DiscountMapper mapper)
         {
             this._discountOptionTypeRepository = discountOptionTypeRepository;
-            this._discountOptionValueRepository = discountOptionValueRepository;
             this._discountRepository = discountRepository;
             this._skuRepository = skuRepository;
             this._adminProfileRepository = adminProfileRepository;
-            _context = context;
-            _logger = loggerProvider.CreateLoggerDefault();
             _mapper = mapper;
         }
 

@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Domain.Mail
 {
-    public class UserActivation
+    public struct UserActivation
     {
 	    public string FirstName { get; set; }
 	    public string LastName { get; set; }

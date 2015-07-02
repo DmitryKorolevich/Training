@@ -2,7 +2,7 @@
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class AddressDynamic : MappedObject<Address, AddressOptionType, AddressOptionValue>
+    public sealed class AddressDynamic : MappedObject
     {
 		public int IdCustomer { get; set; }
 

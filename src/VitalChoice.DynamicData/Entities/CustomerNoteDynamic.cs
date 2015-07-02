@@ -2,7 +2,7 @@
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class CustomerNoteDynamic : MappedObject<CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
+    public sealed class CustomerNoteDynamic : MappedObject
     {
 		public int IdCustomer { get; set; }
 

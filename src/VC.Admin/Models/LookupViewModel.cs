@@ -10,7 +10,7 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models
 {
     public class LookupViewModel
     {

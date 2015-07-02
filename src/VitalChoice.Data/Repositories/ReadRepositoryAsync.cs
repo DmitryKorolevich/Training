@@ -12,7 +12,7 @@ using VitalChoice.Domain.Entities.Content;
 
 namespace VitalChoice.Data.Repositories
 {
-	public class ReadRepositoryAsync<TEntity> : IReadRepositoryAsync<TEntity> where TEntity : Entity
+	public class ReadRepositoryAsync<TEntity> :IReadRepositoryAsync<TEntity> where TEntity : Entity
 	{
 		public bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
 
@@ -42,7 +42,7 @@ namespace VitalChoice.Data.Repositories
 			return new QueryFluent<TEntity>(this, query);
 		}
 
-        internal IQueryable<TEntity> Select(
+        internal static IQueryable<TEntity> Select(
             IQueryable<TEntity> query,
             Expression<Func<TEntity, bool>> filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

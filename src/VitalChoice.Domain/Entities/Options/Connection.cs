@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Domain.Entities.Options
 {
-    public class Connection
+    public struct Connection
     {
         public string UserName { get; set; }
 

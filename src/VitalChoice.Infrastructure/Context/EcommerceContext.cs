@@ -28,19 +28,10 @@ namespace VitalChoice.Infrastructure.Context
 	public class EcommerceContext : DataContext
     {
 	    private readonly IOptions<AppOptions> _options;
-	    private static bool created;
 
 		public EcommerceContext(IOptions<AppOptions> options)
 		{
 		    _options = options;
-		    // Create the database and schema if it doesn't exist
-			// This is a temporary workaround to create database until Entity Framework database migrations 
-			// are supported in ASP.NET 5
-			if (!created)
-			{
-				//Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
-                created = true;
-			}
 		}
 
 	    public EcommerceContext(IOptions<AppOptions> options, bool uofScoped = false) : this(options)

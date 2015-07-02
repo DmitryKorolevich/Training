@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class ProductDynamic : MappedObject<Product, ProductOptionType, ProductOptionValue>
+    public sealed class ProductDynamic : MappedObject
     {
         public string Name { get; set; }
 
