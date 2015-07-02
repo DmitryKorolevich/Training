@@ -44,7 +44,7 @@ namespace VitalChoice.DynamicData.Services
             return entity;
         }
 
-        protected virtual async Task PostUpdateInternalAsync(TDynamic model, TEntity entity, ICollection<TOptionType> optionTypes, IUnitOfWorkAsync uow)
+        protected virtual async Task PostUpdateInternalAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
         {
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             await
@@ -52,7 +52,7 @@ namespace VitalChoice.DynamicData.Services
                     entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
         }
 
-        protected virtual async Task PreUpdateInternalAsync(TDynamic model, TEntity entity, ICollection<TOptionType> optionTypes, IUnitOfWorkAsync uow)
+        protected virtual async Task PreUpdateInternalAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
         {
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             await SetBigValuesAsync(entity, bigValueRepository, true);
@@ -75,12 +75,12 @@ namespace VitalChoice.DynamicData.Services
             entity.OptionTypes =
                 await _optionTypesRepository.Query(typesQuery).SelectAsync(false);
 
-            await PreUpdateInternalAsync(model, entity, entity.OptionTypes, uow);
+            await PreUpdateInternalAsync(model, entity, uow);
 
             await valueRepository.DeleteAllAsync(entity.OptionValues);
 
             _mapper.UpdateEntity(model, entity);
-            await PostUpdateInternalAsync(model, entity, entity.OptionTypes, uow);
+            await PostUpdateInternalAsync(model, entity, uow);
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
             return entity;
