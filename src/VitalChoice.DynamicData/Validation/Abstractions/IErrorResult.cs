@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.DynamicData.Validation.Abstractions
 {
-    public interface IErrorResult<out TProperty>
+    public interface IErrorResult
     {
-        IErrorResult<TProperty> Error(string error);
+        IErrorResult Error(string error);
 
-        MessageInfo[] Build();
+        List<MessageInfo> Build();
     }
 }

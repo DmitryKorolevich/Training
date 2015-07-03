@@ -34,6 +34,32 @@ namespace VitalChoice.DynamicData.Helpers
             return baseImplementation?.GenericTypeArguments.FirstOrDefault();
         }
 
+        public static Type[] TryGetTypeArguments(this Type type, Type baseType)
+        {
+            if (type == null)
+                return null;
+
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsGenericTypeDefinition)
+                return null;
+
+            if (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == baseType)
+                return type.GenericTypeArguments;
+
+            if (baseType.GetTypeInfo().IsInterface)
+            {
+                var implementation =
+                    typeInfo.ImplementedInterfaces.FirstOrDefault(
+                        t => t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition() == baseType);
+                return implementation?.GenericTypeArguments;
+            }
+            var baseImplementation =
+                type.GetBaseTypes()
+                    .FirstOrDefault(
+                        t => t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition() == baseType);
+            return baseImplementation?.GenericTypeArguments;
+        }
+
         public static bool IsImplementGeneric(this Type type, Type baseType)
         {
             var typeInfo = type.GetTypeInfo();

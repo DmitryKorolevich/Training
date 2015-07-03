@@ -71,6 +71,24 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
+        public void UpdateEntityRange(ICollection<Pair<TDynamic, TEntity>> items)
+        {
+            foreach (var item in items)
+            {
+                UpdateEntity(item.FirstValue, item.SecondValue);
+            }
+        }
+
+        public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes)
+        {
+            return items.Select(i => ToEntity(i, optionTypes)).ToList();
+        }
+
+        public List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false)
+        {
+            return items.Select(i => FromEntity(i, withDefaults)).ToList();
+        }
+
         public TModel ToModel<TModel>(TDynamic dynamic)
             where TModel : class, new()
         {

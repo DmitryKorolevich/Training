@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Queries.Product
     {
         public ProductQuery Excluding(int? id)
         {
-            if (id.HasValue)
+            if (id.HasValue && id.Value > 0)
                 Add(p => p.Id != id.Value);
             return this;
         }

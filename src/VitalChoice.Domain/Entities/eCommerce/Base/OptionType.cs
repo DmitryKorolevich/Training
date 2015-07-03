@@ -10,6 +10,8 @@
 
         public int IdFieldType { get; set; }
 
+        public int? IdObjectType { get; set; }
+
         public string DefaultValue { get; set; }
     }
 }

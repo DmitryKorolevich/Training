@@ -9,6 +9,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
@@ -16,14 +17,16 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : IProductService
+    public class ProductService : DynamicObjectServiceAsync<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
@@ -31,23 +34,149 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
-        private readonly IEcommerceRepositoryAsync<BigStringValue> _bigStringValueRepository;
-        private readonly ProductMapper _mapper;
+        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
+
+        protected override IUnitOfWorkAsync CreateUnitOfWork()
+        {
+            return new EcommerceUnitOfWork();
+        }
+
+        protected override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
+        {
+            return new ProductOptionTypeQuery().WithType((ProductType?) idType);
+        }
+
+        protected override async Task AfterSelect(Product entity)
+        {
+            entity.Skus =
+                await
+                    _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
+                        .Include(p => p.OptionValues)
+                        .SelectAsync(false);
+            entity.ProductsToCategories =
+                await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+        }
+
+        protected async override Task BeforeUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        {
+            var skuRepository = uow.RepositoryAsync<Sku>();
+            var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
+            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
+            entity.Skus =
+                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
+                        .Include(p => p.OptionValues)
+                        .SelectAsync();
+            entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
+            await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
+            foreach (var sku in entity.Skus)
+            {
+                await productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
+            }
+        }
+
+        protected override async Task AfterUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        {
+            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
+            var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
+            foreach (var sku in entity.Skus)
+            {
+                if (sku.StatusCode == RecordStatusCode.Deleted)
+                {
+                    await productOptionValueRepository.InsertRangeAsync(sku.OptionValues);
+                }
+            }
+            await categoriesRepository.InsertRangeAsync(entity.ProductsToCategories);
+        }
+
+        protected override async Task<List<MessageInfo>> Validate(ProductDynamic model)
+        {
+            List<MessageInfo> errors = new List<MessageInfo>();
+
+            var productSameName =
+                await
+                    _productRepository.Query(
+                        new ProductQuery().NotDeleted().Excluding(model.Id).WithName(model.Name))
+                        .SelectAsync(false);
+
+            if (productSameName.Any())
+            {
+                errors.AddRange(
+                    model.CreateError()
+                        .Property(p => p.Name)
+                        .Error("Product name should be unique in the database")
+                        .Build());
+            }
+
+            var productSameUrl =
+                await
+                    _productRepository.Query(
+                        new ProductQuery().NotDeleted().Excluding(model.Id).WithUrl(model.Url))
+                        .SelectAsync(false);
+
+
+            if (productSameUrl.Any())
+            {
+                errors.AddRange(
+                    model.CreateError()
+                        .Property(p => p.Url)
+                        .Error("Product url should be unique in the database")
+                        .Build());
+            }
+
+            var newSet = model.Skus.Select(s => s.Code).ToArray();
+            List<int> existSkus = null;
+            if (model.Id > 0)
+            {
+                existSkus =
+                    (await _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(model.Id))
+                        .SelectAsync(false))
+                        .Select(s => s.Id)
+                        .ToList();
+            }
+            if (newSet.Any())
+            {
+                var skusSameCode = await
+                    _skuRepository.Query(new SkuQuery().NotDeleted().Excluding(existSkus).Including(newSet))
+                        .SelectAsync(false);
+                if (skusSameCode.Any())
+                {
+                    errors.AddRange(model.CreateError()
+                        .Collection(p => p.Skus)
+                        .Property(s => s.Code, skusSameCode, item => item.Code)
+                        .Error("This sku already exists in the database").Build());
+                }
+            }
+            return errors;
+        }
+
+        protected override async Task<List<MessageInfo>> ValidateDelete(int id)
+        {
+            var skuExists =
+                await
+                    _skuRepository.Query(new SkuQuery().WithProductId(id).NotDeleted())
+                        .SelectAnyAsync();
+            if (skuExists)
+            {
+                return CreateError().Error("The given product contains sub products. Delete sub products first.").Build();
+            }
+            return new List<MessageInfo>();
+        }
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
-            IEcommerceRepositoryAsync<Sku> skuRepository, IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper)
+            IEcommerceRepositoryAsync<Sku> skuRepository,
+            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper, IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository)
+            : base(mapper, productRepository, productOptionTypeRepository, bigStringValueRepository)
         {
-            this._vProductSkuRepository = vProductSkuRepository;
-            this._vSkuRepository = vSkuRepository;
-            this._productOptionTypeRepository = productOptionTypeRepository;
-            this._lookupRepository = lookupRepository;
-            this._productRepository = productRepository;
-            this._skuRepository = skuRepository;
-            _bigStringValueRepository = bigStringValueRepository;
-            _mapper = mapper;
+            _vProductSkuRepository = vProductSkuRepository;
+            _vSkuRepository = vSkuRepository;
+            _productOptionTypeRepository = productOptionTypeRepository;
+            _lookupRepository = lookupRepository;
+            _productRepository = productRepository;
+            _skuRepository = skuRepository;
+            _productToCategoriesRepository = productToCategoriesRepository;
         }
 
         #region ProductOptions
@@ -166,312 +295,6 @@ namespace VitalChoice.Business.Services.Products
             return await _vProductSkuRepository.GetProductsAsync(filter);
         }
 
-        public async Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false)
-        {
-            IQueryFluent<Product> res = _productRepository.Query(
-                p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
-                .Include(p => p.OptionValues)
-                .Include(p => p.ProductsToCategories);
-            var entity = (await res.SelectAsync(false)).FirstOrDefault();
-
-            if (entity != null)
-            {
-                await SetBigValuesAsync(entity, _bigStringValueRepository);
-                entity.OptionTypes =
-                    await
-                        _productOptionTypeRepository.Query(o => o.IdProductType == entity.IdProductType)
-                            .SelectAsync(false);
-
-                entity.Skus =
-                    await
-                        _skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
-                            .Include(p => p.OptionValues)
-                            .SelectAsync(false);
-
-                return _mapper.FromEntity(entity, withDefaults);
-            }
-
-            return null;
-        }
-
-        private async Task SetBigValuesAsync(Product entity, IRepositoryAsync<BigStringValue> bigStringValueRepository, bool tracked = false)
-        {
-            var bigIdsList = entity.OptionValues.Where(v => v.IdBigString != null)
-                .Select(v => v.IdBigString.Value)
-                .ToList();
-            var bigValues =
-                (await bigStringValueRepository.Query(b => bigIdsList.Contains(b.IdBigString)).SelectAsync(tracked))
-                    .ToDictionary
-                    (b => b.IdBigString, b => b);
-            foreach (var value in entity.OptionValues)
-            {
-                if (value.IdBigString != null)
-                {
-                    value.BigValue = bigValues[value.IdBigString.Value];
-                }
-            }
-        }
-
-        public async Task<ProductDynamic> UpdateProductAsync(ProductDynamic model)
-        {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-            using (var uow = new EcommerceUnitOfWork())
-            {
-                Product product = null;
-                int idProduct = 0;
-                if (model.Id == 0)
-                {
-                    idProduct = (await InsertProductAsync(model, uow)).Id;
-                }
-                else
-                {
-                    product = await UpdateProductAsync(model, uow);
-                }
-                if (idProduct != 0)
-                    return await GetProductAsync(idProduct);
-                return _mapper.FromEntity(product);
-            }
-        }
-
-        private async Task<List<MessageInfo>> ValidateProductAsync(ProductDynamic model, int? existingProductId = null,
-            ICollection<int> existSkus = null)
-        {
-            List<MessageInfo> errors = new List<MessageInfo>();
-
-            var productSameName =
-                await
-                    _productRepository.Query(
-                        new ProductQuery().NotDeleted().Excluding(existingProductId).WithName(model.Name))
-                        .SelectAsync(false);
-
-            if (productSameName.Any())
-            {
-                errors.AddRange(
-                    model.CreateError()
-                        .Property(p => p.Name)
-                        .Error("Product name should be unique in the database")
-                        .Build());
-            }
-
-            var productSameUrl =
-                await
-                    _productRepository.Query(
-                        new ProductQuery().NotDeleted().Excluding(existingProductId).WithUrl(model.Url))
-                        .SelectAsync(false);
-
-
-            if(productSameUrl.Any())
-            {
-                errors.AddRange(
-                    model.CreateError()
-                        .Property(p => p.Url)
-                        .Error("Product url should be unique in the database")
-                        .Build());
-            }
-
-            var newSet = model.Skus.Select(s => s.Code).ToArray();
-            if (newSet.Any())
-            {
-                var skusSameCode = await
-                    _skuRepository.Query(new SkuQuery().NotDeleted().Excluding(existSkus).Including(newSet))
-                        .SelectAsync(false);
-                if (skusSameCode.Any())
-                {
-                    errors.AddRange(model.CreateError()
-                        .Collection(p => p.Skus)
-                        .Property(s => s.Code, skusSameCode, item => item.Code)
-                        .Error("This sku already exists in the database").Build());
-                }
-            }
-            return errors;
-        }
-
-        private async Task<Product> InsertProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
-        {
-            (await ValidateProductAsync(model)).Raise();
-
-            var optionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
-            var entity = _mapper.ToEntity(model, optionTypes);
-            if (entity != null)
-            {
-                entity.OptionTypes = new List<ProductOptionType>();
-                var productRepository = uow.RepositoryAsync<Product>();
-
-                await productRepository.InsertGraphAsync(entity);
-                await uow.SaveChangesAsync(CancellationToken.None);
-
-                entity.OptionTypes = optionTypes;
-                return entity;
-            }
-            return null;
-        }
-
-        private async Task<Product> UpdateProductAsync(ProductDynamic model, EcommerceUnitOfWork uow)
-        {
-            var productRepository = uow.RepositoryAsync<Product>();
-            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
-            var skuRepository = uow.RepositoryAsync<Sku>();
-            var productToCategoryRepository = uow.RepositoryAsync<ProductToCategory>();
-            var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
-
-            var entity = (await productRepository.Query(
-                p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
-                .Include(p => p.OptionValues)
-                .Include(p => p.ProductsToCategories)
-                .SelectAsync()).FirstOrDefault();
-            if (entity != null)
-            {
-                entity.Skus =
-                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
-                        .Include(p => p.OptionValues)
-                        .SelectAsync();
-                await SetBigValuesAsync(entity, bigValueRepository, true);
-                var oldSet = entity.Skus.Select(s => s.Id).ToArray();
-                (await ValidateProductAsync(model, model.Id, oldSet)).Raise();
-
-                await
-                    bigValueRepository.DeleteAllAsync(
-                        entity.OptionValues.Where(o => o.BigValue != null).Select(o => o.BigValue).ToList());
-                await productToCategoryRepository.DeleteAllAsync(entity.ProductsToCategories);
-                await productOptionValueRepository.DeleteAllAsync(entity.OptionValues);
-
-                entity.OptionTypes =
-                    await _productOptionTypeRepository.Query(o => o.IdProductType == model.Type).SelectAsync(false);
-
-                var skuOptions = new ICollection<ProductOptionValue>[entity.Skus.Count];
-                var optionIndex = 0;
-
-                foreach (var sku in entity.Skus)
-                {
-                    skuOptions[optionIndex] = sku.OptionValues;
-                    optionIndex++;
-                    sku.OptionTypes = entity.OptionTypes;
-                }
-                _mapper.UpdateEntity(model, entity);
-                optionIndex = 0;
-                foreach (var sku in entity.Skus)
-                {
-                    if (optionIndex >= skuOptions.Length)
-                        break;
-                    if (sku.StatusCode == RecordStatusCode.Deleted)
-                    {
-                        sku.OptionValues = skuOptions[optionIndex];
-                    }
-                    else
-                    {
-                        await productOptionValueRepository.DeleteAllAsync(skuOptions[optionIndex]);
-                    }
-                    optionIndex++;
-                }
-                await
-                    bigValueRepository.InsertRangeAsync(
-                        entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
-                await productToCategoryRepository.InsertRangeAsync(entity.ProductsToCategories);
-                await productRepository.UpdateAsync(entity);
-                await uow.SaveChangesAsync(CancellationToken.None);
-                return entity;
-            }
-            return null;
-        }
-
-        public async Task<bool> DeleteProductAsync(int id)
-        {
-
-            var skuExists =
-                await
-                    _skuRepository.Query(p => p.IdProduct == id && p.StatusCode != RecordStatusCode.Deleted)
-                        .SelectAnyAsync();
-            if (skuExists)
-            {
-                throw new AppValidationException(
-                    "The given product contains sub products. Delete sub products first.");
-            }
-            var dbItem =
-                (await
-                    _productRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
-                        .SelectAsync(false)).FirstOrDefault();
-            if (dbItem != null)
-            {
-                dbItem.StatusCode = RecordStatusCode.Deleted;
-                await _productRepository.UpdateAsync(dbItem);
-
-                return true;
-            }
-            return false;
-        }
-
         #endregion
-
-        //private static void IncludeProductOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
-        //{
-        //    foreach (var value in item.OptionValues)
-        //    {
-        //        ProductOptionType optionType;
-        //        value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
-        //    }
-        //}
-
-        //private static void IncludeSkuOptionTypes(Product item, Dictionary<int, ProductOptionType> optionTypes)
-        //{
-        //    foreach (var sku in item.Skus)
-        //    {
-        //        foreach (var value in sku.OptionValues)
-        //        {
-        //            ProductOptionType optionType;
-        //            value.OptionType = optionTypes.TryGetValue(value.IdOptionType, out optionType) ? optionType : null;
-        //        }
-        //    }
-        //}
-
-        //private static void IncludeProductOptionTypesByName(Product item,
-        //    Dictionary<string, ProductOptionType> optionTypes)
-        //{
-        //    var forRemove = new List<ProductOptionValue>();
-        //    foreach (var value in item.OptionValues)
-        //    {
-        //        ProductOptionType optionType;
-        //        optionTypes.TryGetValue(value.OptionType.Name, out optionType);
-        //        if (optionType == null)
-        //        {
-        //            forRemove.Add(value);
-        //        }
-        //        else
-        //        {
-        //            value.OptionType = null;
-        //            value.IdOptionType = optionType.Id;
-        //        }
-        //    }
-        //    foreach (var forRemoveItem in forRemove)
-        //    {
-        //        item.OptionValues.Remove(forRemoveItem);
-        //    }
-        //}
-
-        //private static void IncludeSkuOptionTypesByName(Product item, Dictionary<string, ProductOptionType> optionTypes)
-        //{
-        //    foreach (var sku in item.Skus)
-        //    {
-        //        var forRemove = new List<ProductOptionValue>();
-        //        foreach (var value in sku.OptionValues)
-        //        {
-        //            ProductOptionType optionType;
-        //            if (!optionTypes.TryGetValue(value.OptionType.Name, out optionType))
-        //            {
-        //                forRemove.Add(value);
-        //            }
-        //            else
-        //            {
-        //                value.OptionType = null;
-        //                value.IdOptionType = optionType.Id;
-        //            }
-        //        }
-        //        foreach (var forRemoveItem in forRemove)
-        //        {
-        //            sku.OptionValues.Remove(forRemoveItem);
-        //        }
-        //    }
-        //}
     }
 }

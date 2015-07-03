@@ -17,6 +17,6 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
             Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression) 
             where TResultProperty : class;
 
-        IErrorResult<TProperty> Property(Expression<Func<TProperty, object>> propertyExpression);
+        IErrorResult Property(Expression<Func<TProperty, object>> propertyExpression);
     }
 }

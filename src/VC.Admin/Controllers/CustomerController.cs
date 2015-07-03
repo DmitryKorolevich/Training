@@ -19,6 +19,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customer;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
@@ -31,11 +32,11 @@ namespace VC.Admin.Controllers
     public class CustomerController : BaseApiController
     {
 		private readonly ICountryService _countryService;
-	    private readonly CustomerMapper _customerMapper;
+	    private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
 	    private readonly ICustomerService _customerService;
 
 
-		public CustomerController(ICustomerService customerService, ICountryService countryService, CustomerMapper customerMapper)
+		public CustomerController(ICustomerService customerService, ICountryService countryService, IDynamicToModelMapper<CustomerDynamic> customerMapper)
 		{
 			_customerService = customerService;
 			_countryService = countryService;

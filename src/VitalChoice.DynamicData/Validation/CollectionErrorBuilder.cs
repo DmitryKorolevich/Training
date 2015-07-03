@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Validation.Abstractions;
 
 namespace VitalChoice.DynamicData.Validation
 {
-    public class CollectionErrorBuilder<TCollection, TProperty> : ErrorBuilderBase<TCollection>, ICollectionErrorBuilder<TCollection, TProperty>
+    public class CollectionErrorBuilder<TCollection, TProperty> : ErrorBuilderBase<TCollection>, ICollectionErrorBuilder<TCollection, TProperty>, IErrorResult
         where TProperty : class
         where TCollection : ICollection<TProperty>
     {
@@ -14,7 +16,7 @@ namespace VitalChoice.DynamicData.Validation
         {
         }
 
-        public IErrorResult<TProperty> Property<TEntity, TPropertyResult>(
+        public IErrorResult Property<TEntity, TPropertyResult>(
             Expression<Func<TProperty, TPropertyResult>> propertySelector, ICollection<TEntity> values,
             Expression<Func<TEntity, TPropertyResult>> valueSelector)
         {
@@ -28,10 +30,37 @@ namespace VitalChoice.DynamicData.Validation
             {
                 MemberExpression member = (MemberExpression)fieldSelector;
                 var dynamicFieldName = member.Member.Name;
-                var indexes = CompareCollections(Data, propertySelector, values, valueSelector);
-                return new ErrorResult<TProperty>(CollectionName, indexes.ToArray(), dynamicFieldName);
+                Indexes = CompareCollections(Data, propertySelector, values, valueSelector).ToArray();
+                PropertyName = dynamicFieldName;
+                return this;
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
+        }
+
+        public IErrorResult Error(string error)
+        {
+            ErrorText = error;
+            return this;
+        }
+
+        public MessageInfo[] Build()
+        {
+            if (!string.IsNullOrEmpty(CollectionName))
+            {
+                return Indexes.Select(i => new MessageInfo
+                {
+                    Field = CollectionFormProperty.GetFullName(CollectionName, i, PropertyName),
+                    Message = ErrorText
+                }).ToArray();
+            }
+            return new[]
+            {
+                new MessageInfo
+                {
+                    Field = PropertyName ?? string.Empty,
+                    Message = ErrorText
+                }
+            };
         }
     }
 }

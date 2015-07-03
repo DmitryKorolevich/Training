@@ -12,7 +12,9 @@
     "VitalChoice.Interfaces" : "1.0.0-*",   
     "VitalChoice.DynamicData": "1.0.0-*",
     "Templates": "2.2.3-beta5",
-    "Autofac.Dnx": "4.0.0"
+    "Autofac.Dnx": "4.0.0",
+    "WindowsAzure.ServiceBus": "2.7-*",
+    "Microsoft.WindowsAzure.ConfigurationManager": "3.1-*"
   },
 
   "frameworks": {

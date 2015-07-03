@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Mail
 		public EmailSender(IOptions<AppOptions> options)
 	    {
 #if DNX451
-			_configuration = options.Options.EmailConfiguration;
+            _configuration = options.Options.EmailConfiguration;
 
 			_client = new SmtpClient(_configuration.Host, _configuration.Port)
 			{

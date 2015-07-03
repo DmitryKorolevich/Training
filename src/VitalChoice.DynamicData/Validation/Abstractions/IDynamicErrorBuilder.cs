@@ -8,7 +8,7 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
     public interface IDynamicErrorBuilder<TProperty> : IDataContainer<TProperty>
         where TProperty : class, IModelTypeContainer
     {
-        IErrorResult<TProperty> Property(
+        IErrorResult Property(
             Expression<Func<TProperty, object>> propertyExpression);
 
         IDynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty> Collection<TResultProperty>(

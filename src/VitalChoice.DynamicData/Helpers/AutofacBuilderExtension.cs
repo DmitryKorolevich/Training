@@ -16,17 +16,18 @@ namespace VitalChoice.DynamicData.Helpers
     {
         public static ContainerBuilder RegisterMappers(this ContainerBuilder builder, Assembly containingAssembly)
         {
-            var mappers = containingAssembly
+            var mapperTypes = containingAssembly
                 .GetExportedTypes()
                 .Where(t => t.IsImplementGeneric(typeof(DynamicObjectMapper<,,,>)) && !t.GetTypeInfo().IsAbstract);
-            foreach (var mapper in mappers)
+            foreach (var mapperType in mapperTypes)
             {
-                builder.RegisterTypes(mapper)
-                    .As(typeof(IDynamicObjectMapper<,,,>).MakeGenericType(mapper.GenericTypeArguments))
+                builder.RegisterTypes(mapperType)
+                    .As(typeof(IDynamicObjectMapper<,,,>).MakeGenericType(mapperType.TryGetTypeArguments(typeof(IDynamicObjectMapper<,,,>))))
+                    .As(typeof(IDynamicToModelMapper<>).MakeGenericType(mapperType.TryGetElementType(typeof(IDynamicToModelMapper<>))))
                     .AsSelf()
                     .SingleInstance();
-                builder.RegisterType(mapper)
-                    .Keyed<IDynamicToModelMapper>(mapper.TryGetElementType(typeof(DynamicObjectMapper<,,,>)))
+                builder.RegisterType(mapperType)
+                    .Keyed<IDynamicToModelMapper>(mapperType.TryGetElementType(typeof(DynamicObjectMapper<,,,>)))
                     .SingleInstance();
             }
             return builder;

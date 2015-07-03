@@ -4,11 +4,12 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IProductService
-    {
+	public interface IProductService : IDynamicObjectServiceAsync<ProductDynamic, Domain.Entities.eCommerce.Products.Product>
+	{
         #region Products
 
         Task<List<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names);
@@ -16,6 +17,8 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync();
 
         Task<List<ProductOptionType>> GetProductLookupsAsync();
+
+	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
         #endregion
 
@@ -26,18 +29,6 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<Sku> GetSku(int id);
 
         Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter);
-
-        #endregion
-
-        #region Products
-
-        Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
-
-	    Task<ProductDynamic> GetProductAsync(int id, bool withDefaults = false);
-
-	    Task<ProductDynamic> UpdateProductAsync(ProductDynamic model);
-
-        Task<bool> DeleteProductAsync(int id);
 
         #endregion
     }

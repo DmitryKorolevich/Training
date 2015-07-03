@@ -8,7 +8,7 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
         where TProperty : class
         where TCollection : ICollection<TProperty>
     {
-        IErrorResult<TProperty> Property<T, TPropertyResult>(
+        IErrorResult Property<T, TPropertyResult>(
             Expression<Func<TProperty, TPropertyResult>> propertySelector, ICollection<T> values,
             Expression<Func<T, TPropertyResult>> valueSelector);
     }

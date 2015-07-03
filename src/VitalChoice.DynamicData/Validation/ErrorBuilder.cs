@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Validation.Abstractions;
 
 namespace VitalChoice.DynamicData.Validation
@@ -12,8 +13,6 @@ namespace VitalChoice.DynamicData.Validation
         public ErrorBuilder(TProperty obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null) : base(obj, collectionName, indexes, propertyName, error)
         {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
         }
 
         public IErrorBuilder<TResultProperty> Collection<TResultProperty>(
@@ -25,6 +24,8 @@ namespace VitalChoice.DynamicData.Validation
         public virtual IErrorBuilder<TResultProperty> Collection<TResultProperty>(
             Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression, IEnumerable<int> indexes)
         {
+            if (Data == null)
+                throw new ArgumentException("Object you are trying to compare is null");
             Expression collectionSelector = collectionExpression;
             // ReSharper disable once UseNullPropagation
             if (collectionSelector is LambdaExpression)
@@ -42,12 +43,12 @@ namespace VitalChoice.DynamicData.Validation
             throw new ArgumentException("collectionExpression should contain member access expression");
         }
 
-
-
         public virtual ICollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty> Collection<TResultProperty>(
             Expression<Func<TProperty, ICollection<TResultProperty>>> collectionExpression) 
             where TResultProperty : class
         {
+            if (Data == null)
+                throw new ArgumentException("Object you are trying to compare is null");
             Expression collectionSelector = collectionExpression;
             // ReSharper disable once UseNullPropagation
             if (collectionSelector is LambdaExpression)
@@ -63,7 +64,7 @@ namespace VitalChoice.DynamicData.Validation
             throw new ArgumentException("collectionExpression should contain member access expression");
         }
 
-        public virtual IErrorResult<TProperty> Property(
+        public virtual IErrorResult Property(
             Expression<Func<TProperty, object>> propertyExpression)
         {
             Expression fieldSelector = propertyExpression;
@@ -76,7 +77,8 @@ namespace VitalChoice.DynamicData.Validation
             {
                 MemberExpression member = (MemberExpression) fieldSelector;
                 var memberName = member.Member.Name;
-                return new ErrorResult<TProperty>(CollectionName, Indexes, memberName);
+                PropertyName = memberName;
+                return this;
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
         }

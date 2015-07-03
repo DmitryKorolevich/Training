@@ -7,7 +7,7 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Repositories
 {
-    public interface IReadObjectRepositoryAsync<T, TEntity> : IDisposable
+    public interface IReadObjectRepositoryAsync<T, TEntity>
         where TEntity : Entity
     {
         Task<T> SelectAsync(int id);

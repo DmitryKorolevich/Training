@@ -60,7 +60,7 @@ namespace VitalChoice.Business.Services.Dynamic
             dynamic.Url = entity.Url;
             dynamic.Type = entity.IdProductType;
             dynamic.Hidden = entity.Hidden;
-            dynamic.CategoryIds = entity.ProductsToCategories.Select(p => p.IdCategory).ToList();
+            dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
             dynamic.Skus = new List<SkuDynamic>();
             foreach (var sku in entity.Skus)
             {

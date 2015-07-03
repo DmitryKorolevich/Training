@@ -24,6 +24,7 @@ using System.Security.Claims;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.Interfaces.Services;
 
@@ -34,10 +35,10 @@ namespace VC.Admin.Controllers
     {
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
-        private readonly DiscountMapper _mapper;
+        private readonly IDynamicToModelMapper<DiscountDynamic> _mapper;
         private readonly ILogger _logger;
 
-        public DiscountController(IDiscountService discountService, IProductService productService, ILoggerProviderExtended loggerProvider, DiscountMapper mapper)
+        public DiscountController(IDiscountService discountService, IProductService productService, ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<DiscountDynamic> mapper)
         {
             this._discountService = discountService;
             this._productService = productService;

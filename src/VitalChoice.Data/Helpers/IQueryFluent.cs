@@ -20,6 +20,7 @@ namespace VitalChoice.Data.Helpers
         List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
         List<TEntity> Select(bool tracking = true);
         Task<List<TEntity>> SelectAsync(bool tracking = true);
+        Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true);
         IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
     }
 }

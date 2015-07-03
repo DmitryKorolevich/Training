@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.DynamicData.Validation.Abstractions
 {
-    public abstract class ErrorBuilderBase<TProperty> : IDataContainer<TProperty>
+    public abstract class ErrorBuilderBase<TProperty> : IDataContainer<TProperty>, IErrorResult
     {
         protected ErrorBuilderBase(TProperty obj, string collectionName = null, int[] indexes = null,
             string propertyName = null, string error = null)
@@ -68,6 +69,32 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
                 index++;
             }
             return indexes;
+        }
+
+        public IErrorResult Error(string error)
+        {
+            ErrorText = error;
+            return this;
+        }
+
+        public List<MessageInfo> Build()
+        {
+            if (!string.IsNullOrEmpty(CollectionName))
+            {
+                return Indexes.Select(i => new MessageInfo
+                {
+                    Field = CollectionFormProperty.GetFullName(CollectionName, i, PropertyName),
+                    Message = ErrorText
+                }).ToList();
+            }
+            return new List<MessageInfo>
+            {
+                new MessageInfo
+                {
+                    Field = PropertyName ?? string.Empty,
+                    Message = ErrorText
+                }
+            };
         }
     }
 }

@@ -13,7 +13,7 @@ using VitalChoice.DynamicData.Interfaces.Services;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class ReadDynamicObjectRepositoryAsync<TDynamic, TEntity, TOptionType, TOptionValue> : IReadDynamicObjectRepositoryAsync<TDynamic, TEntity>
+    public abstract class ReadDynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : IReadDynamicObjectRepositoryAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
@@ -23,17 +23,23 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> Mapper;
         protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
-        private readonly IUnitOfWorkAsync _uow;
 
-        protected abstract IQueryObject<TOptionType> OptionTypeQuery { get; }
+        protected abstract IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
 
-        protected ReadDynamicObjectRepositoryAsync(IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper, IUnitOfWorkAsync readUow)
+        protected IQueryObject<TOptionType> GetOptionTypeQuery(TEntity entity)
+        {
+            return GetOptionTypeQuery(entity.IdObjectType);
+        }
+
+        protected ReadDynamicObjectServiceAsync(
+            IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
+            IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
+            IReadRepositoryAsync<BigStringValue> bigStringRepository)
         {
             Mapper = mapper;
-            _uow = readUow;
-            ObjectRepository = readUow.ReadRepositoryAsync<TEntity>();
-            OptionTypesRepository = readUow.ReadRepositoryAsync<TOptionType>();
-            BigStringRepository = readUow.ReadRepositoryAsync<BigStringValue>();
+            ObjectRepository = objectRepository;
+            OptionTypesRepository = optionTypesRepository;
+            BigStringRepository = bigStringRepository;
         }
 
         public async Task<TDynamic> SelectAsync(int id)
@@ -56,7 +62,7 @@ namespace VitalChoice.DynamicData.Base
             return await SelectAsync(query, false);
         }
 
-        public virtual Task AfterSelect(TEntity entity)
+        protected virtual Task AfterSelect(TEntity entity)
         {
             return Task.Delay(0);
         }
@@ -71,7 +77,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity != null)
             {
                 await SetBigValuesAsync(entity, BigStringRepository);
-                entity.OptionTypes = await OptionTypesRepository.Query(OptionTypeQuery).SelectAsync(false);
+                entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
                 await AfterSelect(entity);
                 return Mapper.FromEntity(entity, withDefaults);
             }
@@ -160,27 +166,5 @@ namespace VitalChoice.DynamicData.Base
                 }
             }
         }
-
-        #region IDisposable
-        private bool _disposedValue;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _uow.Dispose();
-                }
-
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
     }
 }

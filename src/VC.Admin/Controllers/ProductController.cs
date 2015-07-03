@@ -22,6 +22,7 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.Controllers
@@ -31,11 +32,11 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
-        private readonly ProductMapper _mapper;
+        private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
-            ILoggerProviderExtended loggerProvider, ProductMapper mapper)
+            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper)
         {
             this.productCategoryService = productCategoryService;
             this.productService = productService;
@@ -106,7 +107,7 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await productService.GetProductAsync(id);
+            var item = await productService.SelectAsync(id);
             
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
@@ -126,7 +127,7 @@ namespace VC.Admin.Controllers
                 item.IdEditedBy = userId;
             }
 
-            item = (await productService.UpdateProductAsync(item));
+            item = (await productService.UpdateAsync(item));
 
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
@@ -135,7 +136,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteProduct(int id)
         {
-            return await productService.DeleteProductAsync(id);
+            return await productService.DeleteAsync(id);
         }
 
         #endregion

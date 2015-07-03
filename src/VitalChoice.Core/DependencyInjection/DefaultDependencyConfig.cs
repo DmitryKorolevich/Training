@@ -264,7 +264,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             builder.RegisterInstance(modelContainer).As<IModelToDynamicContainer>().SingleInstance();
 
-            builder.RegisterMappers(typeof (ProductMapper).GetTypeInfo().Assembly);
+            builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
 
             var container = builder.Build();
 
