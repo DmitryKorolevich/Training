@@ -128,8 +128,10 @@ namespace VC.Admin.Controllers
             {
                 item.IdEditedBy = userId;
             }
-
-            item = (await productService.UpdateAsync(item));
+            if (model.Id > 0)
+                item = (await productService.UpdateAsync(item));
+            else
+                item = (await productService.InsertAsync(item));
 
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;

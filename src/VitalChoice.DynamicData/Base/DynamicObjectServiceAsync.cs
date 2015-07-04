@@ -220,8 +220,7 @@ namespace VitalChoice.DynamicData.Base
             var productRepository = uow.RepositoryAsync<TEntity>();
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-            entity.OptionTypes = optionTypes;
-            return Mapper.FromEntity(entity);
+            return await SelectAsync(entity.Id);
         }
 
         protected virtual Task AfterUpdateAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
