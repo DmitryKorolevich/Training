@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (type.HasValue)
             {
-                Add(x => x.IdDiscountType == type);
+                Add(x => x.IdObjectType == (int?)type);
             }
 
             return this;

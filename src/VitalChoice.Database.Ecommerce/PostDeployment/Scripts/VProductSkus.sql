@@ -14,13 +14,13 @@ SELECT
 	p.DateCreated,
 	p.DateEdited,
 	p.Hidden,
-	p.IdProductType,
+	p.IdObjectType AS IdProductType,
 	p.Name,
 	p.Url,
 	ISNULL(val.Value, opt.DefaultValue) AS Thumbnail
 	FROM Products AS p
 	LEFT JOIN Skus AS s ON p.Id = s.IdProduct
-	LEFT JOIN ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdProductType = p.IdProductType
+	LEFT JOIN ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS val ON val.IdProduct = p.Id AND val.IdOptionType = opt.Id
 
 GO

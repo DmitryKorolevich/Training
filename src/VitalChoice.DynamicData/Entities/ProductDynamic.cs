@@ -13,8 +13,6 @@ namespace VitalChoice.DynamicData.Entities
 
         public string Url { get; set; }
 
-        public ProductType Type { get; set; }
-
         public bool Hidden { get; set; }
 
         public ICollection<SkuDynamic> Skus { get; set; }

@@ -52,7 +52,7 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
-        [Map]
+        [Map("IdObjectType")]
         public ProductType Type { get; set; }
 
         [Map]

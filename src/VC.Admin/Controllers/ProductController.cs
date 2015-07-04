@@ -49,11 +49,13 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
-            ProductEditSettingsModel toReturn = new ProductEditSettingsModel();
-            toReturn.Lookups = (await productService.GetProductLookupsAsync()).Select(p => new LookupViewModel(p.Name,
-                p.IdProductType.HasValue ? (int?)p.IdProductType.Value : null
-                , p.DefaultValue, p.Lookup)).ToList();
-            toReturn.DefaultValues = await productService.GetProductEditDefaultSettingsAsync();
+            ProductEditSettingsModel toReturn = new ProductEditSettingsModel
+            {
+                Lookups =
+                    (await productService.GetProductLookupsAsync()).Select(
+                        p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList(),
+                DefaultValues = await productService.GetProductEditDefaultSettingsAsync()
+            };
             return toReturn;
 
         }

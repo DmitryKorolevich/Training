@@ -32,7 +32,7 @@ namespace VC.Admin.Models.Customer
 			{
 				Id = item.Id;
 
-				var profileAddress = item.Addresses.Single(x => x.AddressType == AddressType.Profile);
+				var profileAddress = item.Addresses.Single(x => (AddressType)(x.IdObjectType ?? 0) == AddressType.Profile);
 
 				Name = $"{profileAddress.Data.LastName}, {profileAddress.Data.FirstNam}";
 				City = profileAddress.Data.City;

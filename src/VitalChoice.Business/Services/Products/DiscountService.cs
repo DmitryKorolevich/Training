@@ -78,8 +78,8 @@ namespace VitalChoice.Business.Services.Products
                     sortable =
                         (x) =>
                             sortOrder == SortOrder.Asc
-                                ? x.OrderBy(y => y.IdDiscountType)
-                                : x.OrderByDescending(y => y.IdDiscountType);
+                                ? x.OrderBy(y => y.IdObjectType)
+                                : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case DiscountSortPath.Assigned:
                     sortable =
@@ -176,7 +176,7 @@ namespace VitalChoice.Business.Services.Products
                     }
                 }
 
-                entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == entity.IdDiscountType).SelectAsync(false);
+                entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdObjectType == entity.IdObjectType).SelectAsync(false);
                 //Dictionary<int, DiscountOptionType> optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
                 entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToList();
                 //IncludeDiscountOptionTypes(entity, optionTypes);
@@ -219,7 +219,7 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Discount> InsertDiscount(DiscountDynamic model, EcommerceUnitOfWork uow)
         {
-            var optionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
+            var optionTypes = await _discountOptionTypeRepository.Query(o => o.IdObjectType == model.IdObjectType).SelectAsync(false);
             var entity = _mapper.ToEntity(model, optionTypes);
             if (entity != null)
             {
@@ -255,7 +255,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 await discountOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
-                entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdDiscountType == model.DiscountType).SelectAsync(false);
+                entity.OptionTypes = await _discountOptionTypeRepository.Query(o => o.IdObjectType == model.IdObjectType).SelectAsync(false);
 
                 _mapper.UpdateEntity(model, entity);
 
@@ -284,7 +284,7 @@ namespace VitalChoice.Business.Services.Products
 
                 var dbDiscountTiers = await discountTierRepository.Query(c => c.IdDiscount == entity.Id).SelectAsync();
                 await discountTierRepository.DeleteAllAsync(dbDiscountTiers);
-                if (entity.IdDiscountType == DiscountType.Tiered && discountTiers != null && discountTiers.Count > 0)
+                if (entity.IdObjectType == (int)DiscountType.Tiered && discountTiers != null && discountTiers.Count > 0)
                 {
                     await discountTierRepository.InsertRangeAsync(discountTiers);
                 }

@@ -103,7 +103,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = _mapper.FromModel(model);
-            if (item.DiscountType == DiscountType.Threshold)
+            if ((DiscountType)(item.IdObjectType ?? 0) == DiscountType.Threshold)
             {
                 var sku = await _productService.GetSku(model.ProductSKU);
                 if (sku == null)

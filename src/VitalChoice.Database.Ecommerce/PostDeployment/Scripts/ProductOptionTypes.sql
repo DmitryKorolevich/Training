@@ -1,27 +1,9 @@
-﻿IF OBJECT_ID(N'[dbo].[ProductOptionTypes]', N'U') IS NULL
-BEGIN
-	CREATE TABLE [dbo].[ProductOptionTypes]
-	(
-		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-		[Name] NVARCHAR(50) NOT NULL, 
-		[IdFieldType] INT NOT NULL, 
-		[IdLookup] INT NULL, 
-		[IdProductType] INT NULL, 
-		[DefaultValue] NVARCHAR(250) NULL, 
-		CONSTRAINT [FK_ProductOptionTypes_ToLookup] FOREIGN KEY ([IdLookup]) REFERENCES [Lookups]([Id]), 
-		CONSTRAINT [FK_ProductOptionTypes_ToFieldType] FOREIGN KEY ([IdFieldType]) REFERENCES [FieldTypes]([Id]), 
-		CONSTRAINT [FK_ProductOptionTypes_ToProductType] FOREIGN KEY ([IdProductType]) REFERENCES [ProductTypes]([Id])
-	);
-
-	CREATE INDEX [IX_ProductOptionTypes_Name] ON [dbo].[ProductOptionTypes] ([Name]) INCLUDE (Id, IdFieldType, IdProductType)
-END
-
-IF NOT EXISTS(SELECT * FROM ProductOptionTypes)
+﻿IF NOT EXISTS(SELECT * FROM ProductOptionTypes)
 BEGIN
 --non-perishable product type
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name)
+	(DefaultValue, IdFieldType, IdObjectType, Name)
 	SELECT NULL, 4, 1, N'Description'
 	UNION
 	SELECT NULL, 4, 1, N'Serving'
@@ -90,19 +72,19 @@ BEGIN
 	SELECT 3, @IdLookup, 'BestSeller'
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT '1', 3, 1, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT '1', 3, 2, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT '1', 3, 3, 'Seller', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT '1', 3, 4, 'Seller', @IdLookup
 
 
@@ -128,19 +110,19 @@ BEGIN
 	SELECT 6, @IdLookup, 'ASMI-W'
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT NULL, 3, 1, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT NULL, 3, 2, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT NULL, 3, 3, 'SpecialIcon', @IdLookup
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
 	SELECT NULL, 3, 4, 'SpecialIcon', @IdLookup
 
 
@@ -230,39 +212,22 @@ BEGIN
 	SELECT 38, @IdLookup, 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Treats'
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 3, 1, 'GoogleCategory', @IdLookup
-
-	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 3, 2, 'GoogleCategory', @IdLookup
-
-	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 3, 3, 'GoogleCategory', @IdLookup
-
-	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name, IdLookup)
-	SELECT NULL, 3, 4, 'GoogleCategory', @IdLookup
+	(DefaultValue, IdFieldType, IdObjectType, Name, IdLookup)
+	VALUES
+	(NULL, 3, 1, 'GoogleCategory', @IdLookup),
+	(NULL, 3, 2, 'GoogleCategory', @IdLookup),
+	(NULL, 3, 3, 'GoogleCategory', @IdLookup),
+	(NULL, 3, 4, 'GoogleCategory', @IdLookup)
 
 END
 
-IF EXISTS(SELECT * FROM ProductOptionTypes WHERE IdLookup IS NOT NULL AND IdFieldType=2)
-BEGIN
-
-  UPDATE ProductOptionTypes
-  SET IdFieldType=3
-  WHERE IdLookup IS NOT NULL AND IdFieldType=2
-
-END
-
-IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE IdProductType=2 AND Name='Description')
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE IdObjectType=2 AND Name='Description')
 BEGIN
 
 --perishable product type
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name)
+	(DefaultValue, IdFieldType, IdObjectType, Name)
 	SELECT NULL, 4, 2, N'Description'
 	UNION
 	SELECT NULL, 4, 2, N'Serving'
@@ -312,7 +277,7 @@ BEGIN
 	--EGC product type
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name)
+	(DefaultValue, IdFieldType, IdObjectType, Name)
 	SELECT NULL, 4, 3, N'Description'
 	UNION
 	SELECT NULL, 4, 3, N'ShortDescription'
@@ -358,7 +323,7 @@ BEGIN
 	--GC product type
 
 	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdProductType, Name)
+	(DefaultValue, IdFieldType, IdObjectType, Name)
 	SELECT NULL, 4, 4, N'Description'
 	UNION
 	SELECT NULL, 4, 4, N'ShortDescription'
@@ -401,4 +366,269 @@ BEGIN
 	UNION
 	SELECT N'0', 5, 4, N'AutoShipFrequency6'
 
+END
+
+IF NOT EXISTS (SELECT * FROM ProductOptionTypes WHERE Name='CrossSellImage1')
+BEGIN
+
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdObjectType, Name)
+	SELECT '/some1.png', 4, 1, N'CrossSellImage1'
+	SELECT '/some2.png', 4, 1, N'CrossSellImage2'
+	UNION
+	SELECT '/some3.png', 4, 1, N'CrossSellImage3'
+	UNION
+	SELECT '/some4.png', 4, 1, N'CrossSellImage4'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 1, N'CrossSellUrl1'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 1, N'CrossSellUrl2'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 1, N'CrossSellUrl3'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 1, N'CrossSellUrl4'
+	UNION
+	SELECT '/some1.png', 4, 1, N'YouTubeImage1'
+	UNION	
+	SELECT '/some2.png', 4, 1, N'YouTubeImage2'
+	UNION
+	SELECT '/some3.png', 4, 1, N'YouTubeImage3'
+	UNION
+	SELECT '/some1.png', 4, 1, N'YouTubeText1'
+	UNION	
+	SELECT '/some2.png', 4, 1, N'YouTubeText2'
+	UNION
+	SELECT '/some3.png', 4, 1, N'YouTubeText3'
+	UNION
+	SELECT 'jGwOsFo8TTg', 4, 1, N'YouTubeVideo1'
+	UNION	
+	SELECT 'btlfoO75kfI', 4, 1, N'YouTubeVideo2'
+	UNION
+	SELECT 'vCsRTamxWuw', 4, 1, N'YouTubeVideo3'
+	UNION
+	SELECT '/some1.png', 4, 2, N'CrossSellImage1'
+	UNION	
+	SELECT '/some2.png', 4, 2, N'CrossSellImage2'
+	UNION
+	SELECT '/some3.png', 4, 2, N'CrossSellImage3'
+	UNION
+	SELECT '/some4.png', 4, 2, N'CrossSellImage4'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 2, N'CrossSellUrl1'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 2, N'CrossSellUrl2'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 2, N'CrossSellUrl3'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 2, N'CrossSellUrl4'
+	UNION
+	SELECT '/some1.png', 4, 2, N'YouTubeImage1'
+	UNION	
+	SELECT '/some2.png', 4, 2, N'YouTubeImage2'
+	UNION
+	SELECT '/some3.png', 4, 2, N'YouTubeImage3'
+	UNION
+	SELECT '/some1.png', 4, 2, N'YouTubeText1'
+	UNION	
+	SELECT '/some2.png', 4, 2, N'YouTubeText2'
+	UNION
+	SELECT '/some3.png', 4, 2, N'YouTubeText3'
+	UNION
+	SELECT 'jGwOsFo8TTg', 4, 2, N'YouTubeVideo1'
+	UNION	
+	SELECT 'btlfoO75kfI', 4, 2, N'YouTubeVideo2'
+	UNION
+	SELECT 'vCsRTamxWuw', 4, 2, N'YouTubeVideo3'
+	UNION
+	SELECT '/some1.png', 4, 3, N'CrossSellImage1'
+	UNION	
+	SELECT '/some2.png', 4, 3, N'CrossSellImage2'
+	UNION
+	SELECT '/some3.png', 4, 3, N'CrossSellImage3'
+	UNION
+	SELECT '/some4.png', 4, 3, N'CrossSellImage4'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 3, N'CrossSellUrl1'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 3, N'CrossSellUrl2'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 3, N'CrossSellUrl3'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 3, N'CrossSellUrl4'
+	UNION
+	SELECT '/some1.png', 4, 3, N'YouTubeImage1'
+	UNION	
+	SELECT '/some2.png', 4, 3, N'YouTubeImage2'
+	UNION
+	SELECT '/some3.png', 4, 3, N'YouTubeImage3'
+	UNION
+	SELECT '/some1.png', 4, 3, N'YouTubeText1'
+	UNION	
+	SELECT '/some2.png', 4, 3, N'YouTubeText2'
+	UNION
+	SELECT '/some3.png', 4, 3, N'YouTubeText3'
+	UNION
+	SELECT 'jGwOsFo8TTg', 4, 3, N'YouTubeVideo1'
+	UNION	
+	SELECT 'btlfoO75kfI', 4, 3, N'YouTubeVideo2'
+	UNION
+	SELECT 'vCsRTamxWuw', 4, 3, N'YouTubeVideo3'
+	UNION
+	SELECT '/some1.png', 4, 4, N'CrossSellImage1'
+	UNION	
+	SELECT '/some2.png', 4, 4, N'CrossSellImage2'
+	UNION
+	SELECT '/some3.png', 4, 4, N'CrossSellImage3'
+	UNION
+	SELECT '/some4.png', 4, 4, N'CrossSellImage4'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 4, N'CrossSellUrl1'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 4, N'CrossSellUrl2'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 4, N'CrossSellUrl3'
+	UNION
+	SELECT 'http://someurl.com/1', 4, 4, N'CrossSellUrl4'
+	UNION
+	SELECT '/some1.png', 4, 4, N'YouTubeImage1'
+	UNION	
+	SELECT '/some2.png', 4, 4, N'YouTubeImage2'
+	UNION
+	SELECT '/some3.png', 4, 4, N'YouTubeImage3'
+	UNION
+	SELECT '/some1.png', 4, 4, N'YouTubeText1'
+	UNION	
+	SELECT '/some2.png', 4, 4, N'YouTubeText2'
+	UNION
+	SELECT '/some3.png', 4, 4, N'YouTubeText3'
+	UNION
+	SELECT 'jGwOsFo8TTg', 4, 4, N'YouTubeVideo1'
+	UNION	
+	SELECT 'btlfoO75kfI', 4, 4, N'YouTubeVideo2'
+	UNION
+	SELECT 'vCsRTamxWuw', 4, 4, N'YouTubeVideo3'
+
+
+END
+
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE IdLookup IS NOT NULL AND IdFieldType=2)
+BEGIN
+
+  UPDATE ProductOptionTypes
+  SET IdFieldType=3
+  WHERE IdLookup IS NOT NULL AND IdFieldType=2
+
+END
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='SubProductGroupName')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 4, 1, N'SubProductGroupName'
+UNION
+SELECT NULL, 4, 2, N'SubProductGroupName'
+UNION
+SELECT NULL, 4, 3, N'SubProductGroupName'
+UNION
+SELECT NULL, 4, 4, N'SubProductGroupName'
+
+UPDATE ProductOptionTypes
+SET Name='Recipes'
+WHERE Name='Recepies'
+
+END
+
+GO
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE IdObjectType=3 AND Name='Stock')
+BEGIN
+
+DELETE ProductOptionTypes
+WHERE (IdObjectType=3 OR IdObjectType=4) AND
+(Name = 'Stock' OR Name='DisregardStock' OR Name='DisallowSingle' OR Name='OrphanType' OR Name='AutoShipProduct' OR
+Name='AutoShipFrequency1' OR Name='AutoShipFrequency2' OR Name='AutoShipFrequency3' OR Name='AutoShipFrequency6' OR Name='OffPercent')
+
+END
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE DefaultValue='2' AND Name='DisregardStock')
+BEGIN
+
+UPDATE ProductOptionTypes
+SET DefaultValue='1'
+WHERE Name='DisregardStock'
+
+END
+
+IF EXISTS(SELECT * FROM ProductOptionTypes WHERE DefaultValue='1' AND Name='DisregardStock')
+BEGIN
+
+UPDATE ProductOptionTypes
+SET DefaultValue='True'
+WHERE IdFieldType=5 AND DefaultValue='1'
+
+UPDATE ProductOptionTypes
+SET DefaultValue='False'
+WHERE IdFieldType=5 AND DefaultValue='0'
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='GoogleFeedTitle')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 4, 1, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 2, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 3, N'GoogleFeedTitle'
+UNION
+SELECT NULL, 4, 4, N'GoogleFeedTitle'
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 4, 1, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 2, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 3, N'GoogleFeedDescription'
+UNION
+SELECT NULL, 4, 4, N'GoogleFeedDescription'
+
+END
+GO
+IF (SELECT TOP 1 IdFieldType FROM ProductOptionTypes WHERE Name = N'AdditionalNotes') <> 8
+BEGIN
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Description'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'ShortDescription'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'ProductNotes'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Serving'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Recipes'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'Ingredients'
+
+	UPDATE ProductOptionTypes
+	SET IdFieldType = 8
+	WHERE Name = N'AdditionalNotes'
 END

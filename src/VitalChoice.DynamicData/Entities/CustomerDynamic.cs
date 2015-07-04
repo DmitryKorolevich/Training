@@ -15,8 +15,6 @@ namespace VitalChoice.DynamicData.Entities
 
 		public string Email { get; set; }
 
-		public CustomerType CustomerType { get; set; }
-
 		public int IdDefaultPaymentMethod { get; set; }
 
 		public ICollection<int> ApprovedPaymentMethods { get; set; }

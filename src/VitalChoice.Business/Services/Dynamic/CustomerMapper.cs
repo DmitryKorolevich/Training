@@ -26,7 +26,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             dynamic.User = entity.User;
             dynamic.Email = entity.Email;
-            dynamic.CustomerType = (CustomerType)entity.IdCustomerType;
             dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
 
             dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
@@ -43,7 +42,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             entity.User = dynamic.User;
             entity.Email = dynamic.Email;
-            entity.IdCustomerType = (int)dynamic.CustomerType;
             entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
 
             entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
@@ -110,7 +108,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             entity.User = dynamic.User;
             entity.Email = dynamic.Email;
-            entity.IdCustomerType = (int)dynamic.CustomerType;
             entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
 
             entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()

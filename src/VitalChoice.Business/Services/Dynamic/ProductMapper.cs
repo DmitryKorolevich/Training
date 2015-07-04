@@ -29,7 +29,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             SetSkuOrdering(dynamic.Skus);
             entity.Hidden = dynamic.Hidden;
-            entity.IdProductType = dynamic.Type;
             entity.Name = dynamic.Name;
             entity.Url = dynamic.Url;
             entity.ProductsToCategories = dynamic.CategoryIds?.Select(c => new ProductToCategory
@@ -58,7 +57,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             dynamic.Name = entity.Name;
             dynamic.Url = entity.Url;
-            dynamic.Type = entity.IdProductType;
             dynamic.Hidden = entity.Hidden;
             dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
             dynamic.Skus = new List<SkuDynamic>();
@@ -90,7 +88,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             SetSkuOrdering(dynamic.Skus);
             entity.Hidden = dynamic.Hidden;
-            entity.IdProductType = dynamic.Type;
             entity.Name = dynamic.Name;
             entity.Url = dynamic.Url;
 
@@ -107,6 +104,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     (skuDynamic, sku) => new { skuDynamic, sku });
                 foreach (var item in itemsToUpdate)
                 {
+                    item.sku.OptionTypes = entity.OptionTypes;
                     _skuMapper.UpdateEntity(item.skuDynamic, item.sku);
                 }
 

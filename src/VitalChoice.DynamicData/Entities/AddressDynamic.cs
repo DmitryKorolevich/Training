@@ -12,7 +12,5 @@ namespace VitalChoice.DynamicData.Entities
 		public string County { get; set; }
 
 		public int? IdState { get; set; }
-
-		public AddressType AddressType { get; set; }
     }
 }

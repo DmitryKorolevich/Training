@@ -571,3 +571,13 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[Customers]', N'U') AND Name = 'IdCustomerType')
+BEGIN
+	EXEC sp_rename 'dbo.Customers.IdCustomerType', 'IdObjectType', 'COLUMN';
+	EXEC sp_rename 'dbo.CustomerOptionTypes.IdCustomerType', 'IdObjectType', 'COLUMN';
+	EXEC sp_rename 'dbo.CustomerPaymentMethods.IdPaymentMethod', 'IdObjectType', 'COLUMN';
+	EXEC sp_rename 'dbo.CustomerPaymentMethodOptionTypes.IdPaymentMethod', 'IdObjectType', 'COLUMN';
+	EXEC sp_rename 'dbo.Addresses.IdAddressType', 'IdObjectType', 'COLUMN';
+	EXEC sp_rename 'dbo.AddressOptionTypes.IdAddressType', 'IdObjectType', 'COLUMN';
+END

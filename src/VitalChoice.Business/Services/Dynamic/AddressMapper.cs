@@ -21,7 +21,6 @@ namespace VitalChoice.Business.Services.Dynamic
             dynamic.IdCountry = entity.IdCountry;
             dynamic.County = entity.County;
             dynamic.IdState = entity.IdState;
-            dynamic.AddressType = entity.IdAddressType;
         }
 
         protected override void UpdateEntityInternal(AddressDynamic dynamic, Address entity)
@@ -30,7 +29,6 @@ namespace VitalChoice.Business.Services.Dynamic
             entity.IdCountry = dynamic.IdCountry;
             entity.County = dynamic.County;
             entity.IdState = dynamic.IdState;
-            entity.IdAddressType = dynamic.AddressType;
             foreach (var value in entity.OptionValues)
             {
                 value.IdAddress = dynamic.Id;
@@ -43,7 +41,6 @@ namespace VitalChoice.Business.Services.Dynamic
             entity.IdCountry = dynamic.IdCountry;
             entity.County = dynamic.County;
             entity.IdState = dynamic.IdState;
-            entity.IdAddressType = dynamic.AddressType;
         }
     }
 }

@@ -17,8 +17,6 @@ namespace VitalChoice.DynamicData.Entities
 
         public string Description { get; set; }
 
-        public DiscountType DiscountType { get; set; }
-
         public CustomerTypeCode Assigned { get; set; }
 
         public DateTime? StartDate { get; set; }

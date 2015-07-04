@@ -53,7 +53,7 @@ GO
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerOptionTypes])
 BEGIN
 	INSERT INTO [dbo].[CustomerOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdCustomerType], [DefaultValue])
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
 	(N'LinkedToAffiliate', 4, NULL, NULL, NULL),
 	(N'DoNotMail', 5, NULL, NULL, NULL),
@@ -76,7 +76,7 @@ BEGIN
 	(2, @IdLookup, 'Sales Tax will be Paid')
 
 	INSERT INTO [dbo].[CustomerOptionTypes]
-	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	([Name], [IdFieldType], [IdObjectType], [IdLookup], [DefaultValue])
 	VALUES
 	(N'TaxExempt', 3, 2, @IdLookup, '1'),
 	(N'Website', 4, 2, NULL, NULL),
@@ -98,7 +98,7 @@ BEGIN
 	(3, @IdLookup, 'Tier 3')
 
 	INSERT INTO [dbo].[CustomerOptionTypes]
-	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	([Name], [IdFieldType], [IdObjectType], [IdLookup], [DefaultValue])
 	VALUES
 	(N'Tier', 3, 2, @IdLookup, '1')
 
@@ -133,7 +133,7 @@ BEGIN
 	(19, @IdLookup, 'International')
 
 	INSERT INTO [dbo].[CustomerOptionTypes]
-	([Name], [IdFieldType], [IdCustomerType], [IdLookup], [DefaultValue])
+	([Name], [IdFieldType], [IdObjectType], [IdLookup], [DefaultValue])
 	VALUES
 	(N'TradeClass', 3, 2, @IdLookup, '1')
 
@@ -142,7 +142,7 @@ END
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes])
 BEGIN
 	INSERT INTO [dbo].[AddressOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdAddressType], [DefaultValue])
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
 	(N'Company', 4, NULL, NULL, NULL),
 	(N'FirstName', 4, NULL, NULL, NULL),
@@ -190,7 +190,7 @@ BEGIN
 	SET @Card = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Credit Card')
 
 	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
-	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
 	VALUES
 	(N'NameOnCard', 4, NULL, @Card, NULL),
 	(N'CardNumber', 4, NULL, @Card, NULL),
@@ -215,7 +215,7 @@ BEGIN
 	(4, @IdLookup, 'Discover')
 
 	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
-	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
 	VALUES
 	(N'CardType', 3, @IdLookup, 1, '1')
 
@@ -224,7 +224,7 @@ BEGIN
 	SET @CheckId = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Check')
 
 	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
-	([Name],[IdFieldType], [IdLookup], [IdPaymentMethod],[DefaultValue])
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
 	VALUES
 	(N'CheckNumber', 4, NULL, @CheckId, NULL),
 	(N'PaidInFull', 5, NULL, @CheckId, NULL)

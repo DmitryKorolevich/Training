@@ -44,8 +44,8 @@ namespace VC.Admin.Models.Product
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
                 AssignedName = StatusEnumHelper.GetAssignedCustomerTypeName(item.Assigned);
-                DiscountType = item.DiscountType;
-                DiscountTypeName = StatusEnumHelper.GetDiscountTypeName(item.DiscountType);
+                DiscountType = (DiscountType)(item.IdObjectType ?? 0);
+                DiscountTypeName = StatusEnumHelper.GetDiscountTypeName((DiscountType)(item.IdObjectType ?? 0));
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;

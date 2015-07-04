@@ -24,8 +24,8 @@ namespace VC.Admin.Models.Customer
 			CustomerNote = new CustomerNoteModel();
         }
 
-		[Map]
-		public CustomerType CustomerType { get; set; }
+        [Map("IdObjectType")]
+        public CustomerType CustomerType { get; set; }
 
 		[Map]
 		public TaxExempt? TaxExempt { get; set; }

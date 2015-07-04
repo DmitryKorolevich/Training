@@ -7,7 +7,7 @@ namespace VitalChoice.Business.Queries.Product
     {
         public ProductOptionTypeQuery WithType(ProductType? type)
         {
-            Add(t => t.IdProductType == type);
+            Add(t => t.IdObjectType == (int?)type);
             return this;
         }
     }

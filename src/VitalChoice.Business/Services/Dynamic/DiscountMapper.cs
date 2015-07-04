@@ -21,7 +21,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             dynamic.Code = entity.Code;
             dynamic.Description = entity.Description;
-            dynamic.DiscountType = entity.IdDiscountType;
             dynamic.Assigned = entity.Assigned;
             dynamic.StartDate = entity.StartDate;
             dynamic.ExpirationDate = entity.ExpirationDate;
@@ -40,7 +39,6 @@ namespace VitalChoice.Business.Services.Dynamic
             SetDiscountTiersOrdering(dynamic.DiscountTiers);
             entity.Code = dynamic.Code;
             entity.Description = dynamic.Description;
-            entity.IdDiscountType = dynamic.DiscountType;
             entity.Assigned = dynamic.Assigned;
             entity.StartDate = dynamic.StartDate;
             entity.ExpirationDate = dynamic.ExpirationDate;
@@ -93,7 +91,6 @@ namespace VitalChoice.Business.Services.Dynamic
             SetDiscountTiersOrdering(dynamic.DiscountTiers);
             entity.Code = dynamic.Code;
             entity.Description = dynamic.Description;
-            entity.IdDiscountType = dynamic.DiscountType;
             entity.Assigned = dynamic.Assigned;
             entity.StartDate = dynamic.StartDate;
             entity.ExpirationDate = dynamic.ExpirationDate;

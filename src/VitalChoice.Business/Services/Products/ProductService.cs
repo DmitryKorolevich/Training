@@ -52,6 +52,7 @@ namespace VitalChoice.Business.Services.Products
                 await
                     _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
                         .Include(p => p.OptionValues)
+                        .OrderBy(skus => skus.OrderBy(s => s.Order))
                         .SelectAsync(false);
             entity.ProductsToCategories =
                 await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
@@ -205,18 +206,18 @@ namespace VitalChoice.Business.Services.Products
             names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
             names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
             var items = await GetProductOptionTypesAsync(names);
-            foreach (var item in items.Where(p => p.IdProductType.HasValue))
+            foreach (var item in items.Where(p => p.IdObjectType.HasValue))
             {
                 Dictionary<string, string> productTypeDefaultValues = null;
-                if (item.IdProductType != null && toReturn.ContainsKey((int)item.IdProductType))
+                if (item.IdObjectType != null && toReturn.ContainsKey(item.IdObjectType.Value))
                 {
-                    productTypeDefaultValues = toReturn[(int)item.IdProductType.Value];
+                    productTypeDefaultValues = toReturn[item.IdObjectType.Value];
                 }
                 else
                 {
                     productTypeDefaultValues = new Dictionary<string, string>();
-                    if (item.IdProductType != null)
-                        toReturn.Add((int)item.IdProductType, productTypeDefaultValues);
+                    if (item.IdObjectType != null)
+                        toReturn.Add(item.IdObjectType.Value, productTypeDefaultValues);
                 }
                 if (!productTypeDefaultValues.ContainsKey(item.Name))
                 {

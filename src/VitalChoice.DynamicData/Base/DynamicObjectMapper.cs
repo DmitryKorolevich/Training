@@ -59,6 +59,7 @@ namespace VitalChoice.DynamicData.Base
             result.DateEdited = entity.DateEdited;
             result.StatusCode = entity.StatusCode;
             result.IdEditedBy = entity.IdEditedBy;
+            result.IdObjectType = entity.IdObjectType;
             if (withDefaults && entity.OptionTypes != null)
             {
                 foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
@@ -156,6 +157,7 @@ namespace VitalChoice.DynamicData.Base
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
+            entity.IdObjectType = dynamic.IdObjectType;
             UpdateEntityInternal(dynamic, entity);
         }
 
@@ -175,6 +177,7 @@ namespace VitalChoice.DynamicData.Base
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
+            entity.IdObjectType = dynamic.IdObjectType;
             FillNewEntity(dynamic, entity);
             return entity;
         }
@@ -299,6 +302,15 @@ namespace VitalChoice.DynamicData.Base
             {
                 return obj;
             }
+            if (destType.GetTypeInfo().IsEnum)
+            {
+                return Enum.Parse(destType, obj.ToString());
+            }
+            if (sourceType.GetTypeInfo().IsEnum)
+            {
+                var enumType = Enum.GetUnderlyingType(sourceType);
+                return destType.IsAssignableFrom(enumType) ? Convert.ChangeType(obj, enumType) : null;
+            }
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
@@ -337,6 +349,10 @@ namespace VitalChoice.DynamicData.Base
             if (destType.IsInstanceOfType(obj))
             {
                 return obj;
+            }
+            if (destType.GetTypeInfo().IsEnum)
+            {
+                return Enum.Parse(destType, obj.ToString());
             }
 
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));

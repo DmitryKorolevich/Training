@@ -126,7 +126,6 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<DiscountOptionType>().Key(p => p.Id);
             builder.Entity<DiscountOptionType>().Table("DiscountOptionTypes");
-		    builder.Entity<DiscountOptionType>().Property(p => p.IdObjectType).Column("IdDiscountType");
             builder.Entity<DiscountOptionType>()
                 .Reference(p => p.Lookup)
                 .InverseCollection()
@@ -161,7 +160,6 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<Discount>().Key(p => p.Id);
             builder.Entity<Discount>().Table("Discounts");
-            builder.Entity<Discount>().Property(p => p.IdObjectType).Column("IdDiscountType");
             builder.Entity<Discount>()
                 .Collection(p => p.OptionValues)
                 .InverseReference()
@@ -224,7 +222,6 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<ProductOptionType>().Key(p => p.Id);
             builder.Entity<ProductOptionType>().Table("ProductOptionTypes");
-            builder.Entity<ProductOptionType>().Property(p => p.IdObjectType).Column("IdProductType");
             builder.Entity<ProductOptionType>()
 		        .Reference(p => p.Lookup)
 		        .InverseCollection()
@@ -269,7 +266,6 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<Product>().Key(p => p.Id);
             builder.Entity<Product>().Table("Products");
-		    builder.Entity<Product>().Property(p => p.IdObjectType).Column("IdProductType");
 
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
@@ -339,14 +335,14 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<Customer>().Key(p => p.Id);
 			builder.Entity<Customer>().Table("Customers");
-            builder.Entity<Customer>().Property(p => p.IdObjectType).Column("IdCustomerType");
             builder.Entity<Customer>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy);
 			builder.Entity<Customer>().Reference(p => p.User).InverseReference().ForeignKey<Customer>(p => p.Id).PrincipalKey<User>(p => p.Id).Required();
 			builder.Entity<Customer>()
 				.Reference(p => p.CustomerType)
 				.InverseCollection(p => p.Customers)
-				.ForeignKey(p => p.IdCustomerType)
-				.PrincipalKey(p => p.Id);
+				.ForeignKey(p => p.IdObjectType)
+				.PrincipalKey(p => p.Id)
+                .Required();
 			builder.Entity<Customer>().Collection(p => p.PaymentMethods).InverseReference(p => p.Customer).ForeignKey(p => p.IdPaymentMethod);
 			builder.Entity<Customer>().Reference(p => p.DefaultPaymentMethod).InverseReference().ForeignKey<Customer>(p => p.Id).PrincipalKey<PaymentMethod>(p => p.Id).Required();
 			builder.Entity<Customer>().Collection(p => p.OrderNotes).InverseReference(p => p.Customer).ForeignKey(p => p.IdCustomer);
@@ -355,7 +351,6 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<Customer>().Collection(p => p.CustomerNotes).InverseReference().ForeignKey(p => p.IdCustomer);
 			builder.Entity<CustomerOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerOptionType>().Table("CustomerOptionTypes");
-            builder.Entity<CustomerOptionType>().Property(p => p.IdObjectType).Column("IdCustomerType");
             builder.Entity<CustomerOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()
@@ -423,12 +418,10 @@ namespace VitalChoice.Infrastructure.Context
 
 			builder.Entity<Address>().Key(p => p.Id);
 			builder.Entity<Address>().Table("Addresses");
-		    builder.Entity<Address>().Property(p => p.IdObjectType).Column("IdAddressType");
             builder.Entity<Address>().Reference(p => p.Сountry).InverseCollection().ForeignKey(p => p.IdCountry);
 			builder.Entity<Address>().Reference(p => p.State).InverseCollection().ForeignKey(p => p.IdState);
 			builder.Entity<AddressOptionType>().Key(p => p.Id);
 			builder.Entity<AddressOptionType>().Table("AddressOptionTypes");
-            builder.Entity<AddressOptionType>().Property(p => p.IdObjectType).Column("IdAddressType");
             builder.Entity<AddressOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()
@@ -492,8 +485,12 @@ namespace VitalChoice.Infrastructure.Context
 
 			builder.Entity<CustomerPaymentMethod>().Key(p => p.Id);
 			builder.Entity<CustomerPaymentMethod>().Table("CustomerPaymentMethods");
-		    builder.Entity<CustomerPaymentMethod>().Property(p => p.IdObjectType).Column("IdPaymentMethod");
-            builder.Entity<CustomerPaymentMethod>().Reference(p => p.PaymentMethod).InverseCollection().ForeignKey(p => p.IdPaymentMethod);
+		    builder.Entity<CustomerPaymentMethod>()
+		        .Reference(p => p.PaymentMethod)
+		        .InverseCollection()
+		        .ForeignKey(p => p.IdObjectType)
+		        .PrincipalKey(p => p.Id)
+		        .Required();
 			builder.Entity<CustomerPaymentMethod>()
 				.Reference(p => p.BillingAddress)
 				.InverseReference()
@@ -501,7 +498,6 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey<Address>(p => p.Id);
 			builder.Entity<CustomerPaymentMethodOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerPaymentMethodOptionType>().Table("CustomerPaymentMethodOptionTypes");
-            builder.Entity<CustomerPaymentMethodOptionType>().Property(p => p.IdObjectType).Column("IdPaymentMethod");
             builder.Entity<CustomerPaymentMethodOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()

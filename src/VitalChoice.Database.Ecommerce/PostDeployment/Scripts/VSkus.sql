@@ -16,7 +16,7 @@ SELECT
 	p.DateCreated,
 	p.DateEdited,
 	p.Hidden,
-	p.IdProductType,
+	p.IdObjectType AS IdProductType,
 	p.Name,
 	p.Url
 	FROM Skus AS s

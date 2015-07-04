@@ -13,7 +13,7 @@ namespace VC.Admin.Models.Customer
 	[ApiValidator(typeof(AddressModelValidator))]
 	public class AddressModel : BaseModel
 	{
-		[Map]
+		[Map("IdObjectType")]
 		public AddressType AddressType { get; set; }
 
 		[Map]

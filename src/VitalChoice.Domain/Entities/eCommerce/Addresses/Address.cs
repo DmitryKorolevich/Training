@@ -16,7 +16,5 @@ namespace VitalChoice.Domain.Entities.eCommerce.Addresses
 	    public int? IdState { get; set; }
 
 	    public State State { get; set; }
-
-	    public AddressType IdAddressType { get; set; }
 	}
 }

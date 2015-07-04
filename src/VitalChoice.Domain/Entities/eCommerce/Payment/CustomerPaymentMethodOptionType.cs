@@ -5,6 +5,5 @@ namespace VitalChoice.Domain.Entities.eCommerce.Payment
 {
     public class CustomerPaymentMethodOptionType : OptionType
     {
-		public int IdPaymentMethod { get; set; }
 	}
 }

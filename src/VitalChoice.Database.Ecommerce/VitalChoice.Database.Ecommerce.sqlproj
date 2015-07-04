@@ -78,6 +78,7 @@
     </None>
     <None Include="Azure.publish.xml" />
     <None Include="PostDeployment\Scripts\WorkflowExecutors.sql" />
+    <None Include="PostDeployment\Scripts\DiscountOptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
@@ -110,9 +111,6 @@
     <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductOptionValues.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\Products.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -122,23 +120,11 @@
     <None Include="PostDeployment\Scripts\ProductTypes.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\Skus.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\VProductSkus.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\YouTubeAndCrossSellsFields.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductOptionTypesNutrition.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\CustomerAreaBasics.sql" />
     <None Include="PostDeployment\Scripts\CustomerAreaBasicsData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductOptionTypesUpdate.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Discounts.sql" />

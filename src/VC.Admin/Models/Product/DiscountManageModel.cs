@@ -32,7 +32,7 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Description)]
         public string Description { get; set; }
 
-        [Map]
+        [Map("IdObjectType")]
         public DiscountType DiscountType { get; set; }
 
         [Map]

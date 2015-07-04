@@ -87,7 +87,7 @@ namespace VitalChoice.Business.Services.Customers
 				await customerOptionValueRepository.DeleteAllAsync(entity.OptionValues);
 
 				entity.OptionTypes =
-					await _customerOptionTypeRepositoryAsync.Query(o => o.IdCustomerType == model.CustomerType).SelectAsync(false);
+					await _customerOptionTypeRepositoryAsync.Query().SelectAsync(false);
 
                 _customerMapper.UpdateEntity(model, entity);
 
@@ -109,7 +109,7 @@ namespace VitalChoice.Business.Services.Customers
 		    (await ValidateCustomerAsync(model)).Raise();
 
 		    var optionTypes =
-			    await _customerOptionTypeRepositoryAsync.Query(o => o.IdCustomerType == model.CustomerType).SelectAsync(false);
+			    await _customerOptionTypeRepositoryAsync.Query().SelectAsync(false);
 		     
 		    var entity = _customerMapper.ToEntity(model, optionTypes);
             if (entity != null)
@@ -178,7 +178,7 @@ namespace VitalChoice.Business.Services.Customers
 				//await SetBigValuesAsync(entity, _bigStringValueRepository);
 				entity.OptionTypes =
 					await
-						_customerOptionTypeRepositoryAsync.Query(o => o.IdCustomerType == (CustomerType)entity.IdCustomerType)
+						_customerOptionTypeRepositoryAsync.Query()
 							.SelectAsync(false);
 
 				return _customerMapper.FromEntity(entity, withDefaults);

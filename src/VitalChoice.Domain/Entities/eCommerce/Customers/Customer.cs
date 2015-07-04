@@ -14,8 +14,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
 	    public string Email { get; set; }
 
-	    public int IdCustomerType { get; set; }
-
 	    public CustomerTypeEntity CustomerType { get; set; }
 
 	    public int IdDefaultPaymentMethod { get; set; }
