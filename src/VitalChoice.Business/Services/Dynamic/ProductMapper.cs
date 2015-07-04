@@ -104,7 +104,6 @@ namespace VitalChoice.Business.Services.Dynamic
                     (skuDynamic, sku) => new { skuDynamic, sku });
                 foreach (var item in itemsToUpdate)
                 {
-                    item.sku.OptionTypes = entity.OptionTypes;
                     _skuMapper.UpdateEntity(item.skuDynamic, item.sku);
                 }
 

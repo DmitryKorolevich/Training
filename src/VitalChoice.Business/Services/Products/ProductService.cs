@@ -67,6 +67,10 @@ namespace VitalChoice.Business.Services.Products
                     await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
                         .SelectAsync();
+            foreach (var sku in entity.Skus)
+            {
+                sku.OptionTypes = entity.OptionTypes;
+            }
             entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
             await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
             foreach (var sku in entity.Skus)
