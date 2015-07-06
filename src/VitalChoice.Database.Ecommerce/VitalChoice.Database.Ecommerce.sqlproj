@@ -65,77 +65,94 @@
     <Folder Include="PostDeployment" />
     <Folder Include="deploy" />
     <Folder Include="PostDeployment\Scripts\" />
+    <Folder Include="PreDeployment" />
+    <Folder Include="PreDeployment\Scripts" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
     <None Include="Local.publish.xml" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Ecommerce.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
     <None Include="Azure.publish.xml" />
-    <None Include="PostDeployment\Scripts\WorkflowExecutors.sql" />
     <None Include="PostDeployment\Scripts\DiscountOptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
-    <None Include="PostDeployment\Scripts\WorkflowTreeActions.sql" />
-    <None Include="PostDeployment\Scripts\WorkflowTrees.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Countries.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\GiftCertificates.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\GiftCetfificatesUpdate.sql" />
-    <None Include="PostDeployment\Scripts\WorkflowResolverPaths.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\FieldTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Lookups.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\LookupVariants.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\Products.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductsToCategories.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\VProductSkus.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CustomerAreaBasics.sql" />
     <None Include="PostDeployment\Scripts\CustomerAreaBasicsData.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\Discounts.sql" />
+    <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\VSkus.sql" />
+    <None Include="PreDeployment\Scripts\CustomerAreaBasics.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ReferencesToUsers.sql" />
+    <None Include="PreDeployment\Scripts\Discounts.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\BigStringValues.sql" />
+    <None Include="PreDeployment\Scripts\Products.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\BigStringValues.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Countries.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\FieldTypes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCertificates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdate.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Lookups.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\LookupVariants.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductCategories.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductsToCategories.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ReferencesToUsers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VProductSkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VSkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\WorkflowTrees.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\WorkflowExecutors.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\WorkflowResolverPaths.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\WorkflowTreeActions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\RecordStatusCodes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\ProductTypes.sql" />
   </ItemGroup>
 </Project>

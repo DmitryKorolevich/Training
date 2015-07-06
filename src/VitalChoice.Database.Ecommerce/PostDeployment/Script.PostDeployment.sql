@@ -10,33 +10,6 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r .\Scripts\BigStringValues.sql
-
-:r .\Scripts\RecordStatusCodes.sql
-
-:r .\Scripts\WorkflowExecutors.sql
-:r .\Scripts\WorkflowTrees.sql
-:r .\Scripts\WorkflowTreeActions.sql
-:r .\Scripts\WorkflowResolverPaths.sql
-
-:r .\Scripts\ProductCategories.sql
-:r .\Scripts\Countries.sql
-:r .\Scripts\GiftCertificates.sql
-:r .\Scripts\GiftCetfificatesUpdate.sql
-
-:r .\Scripts\FieldTypes.sql
-:r .\Scripts\ProductTypes.sql
-:r .\Scripts\Lookups.sql
-:r .\Scripts\LookupVariants.sql
-:r .\Scripts\Products.sql
 :r .\Scripts\ProductOptionTypes.sql
-:r .\Scripts\ProductsToCategories.sql
-:r .\Scripts\VProductSkus.sql
-:r .\Scripts\VSkus.sql
-:r .\Scripts\Discounts.sql
 :r .\Scripts\DiscountOptionTypes.sql
-
-:r .\Scripts\CustomerAreaBasics.sql
 :r .\Scripts\CustomerAreaBasicsData.sql
-
-:r .\Scripts\ReferencesToUsers.sql
