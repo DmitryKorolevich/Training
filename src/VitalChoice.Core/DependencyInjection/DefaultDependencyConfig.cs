@@ -31,7 +31,6 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Framework.Logging;
 using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Customers;
@@ -42,18 +41,16 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Customer;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
-using VitalChoice.Interfaces.Services.Product;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Services;
 using Autofac.Dnx;
-using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Core.DependencyInjection
 {

@@ -62,6 +62,11 @@ namespace VitalChoice.DynamicData.Base
             return await SelectAsync(query, false);
         }
 
+        protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        {
+            return query;
+        }
+
         protected virtual Task AfterSelect(TEntity entity)
         {
             return Task.Delay(0);
@@ -72,6 +77,7 @@ namespace VitalChoice.DynamicData.Base
             IQueryFluent<TEntity> res = ObjectRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
                 .Include(p => p.OptionValues);
+            res = BuildQuery(res);
             var entity = (await res.SelectAsync(false)).FirstOrDefault();
 
             if (entity != null)

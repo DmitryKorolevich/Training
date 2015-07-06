@@ -5,24 +5,16 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Customer;
-using VC.Admin.Models.OrderNote;
-using VC.Admin.Models.Product;
 using VC.Admin.Models.Setting;
-using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Interfaces.Services.Customer;
-using VitalChoice.Interfaces.Services.Order;
-using VitalChoice.Interfaces.Services.Payment;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
 
@@ -101,9 +93,14 @@ namespace VC.Admin.Controllers
 			{
 				item.IdEditedBy = userId;
 			}
-
-			item = (await _customerService.AddUpdateCustomerAsync(item));
-
+		    if (item.Id > 0)
+		    {
+		        item = await _customerService.UpdateAsync(item);
+		    }
+		    else
+		    {
+		        item = await _customerService.InsertAsync(item);
+		    }
 			var toReturn = _customerMapper.ToModel<AddCustomerModel>(item);
 			return toReturn;
 		}

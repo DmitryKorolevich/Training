@@ -4,29 +4,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
 using VC.Admin.Models.Product;
-using VitalChoice.Business.Services;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Interfaces.Services.Product;
-using VitalChoice.DynamicData.Entities;
-using System;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Services;
-using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System.Security.Claims;
-using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.DynamicData.Entities;
+using System;
 
 namespace VC.Admin.Controllers
 {
@@ -83,7 +75,7 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await _discountService.GetDiscountAsync(id);
+            var item = await _discountService.SelectAsync(id);
             DiscountManageModel toReturn = _mapper.ToModel<DiscountManageModel>(item);
             int skuId = 0;
             if(item.DictionaryData.ContainsKey("ProductSKU") && item.DictionaryData["ProductSKU"] is string && Int32.TryParse((string)item.DictionaryData["ProductSKU"],out skuId))
@@ -119,8 +111,14 @@ namespace VC.Admin.Controllers
             {
                 item.IdEditedBy = userId;
             }
-
-            item = (await _discountService.UpdateDiscountAsync(item));
+            if (item.Id > 0)
+            {
+                item = await _discountService.UpdateAsync(item);
+            }
+            else
+            {
+                item = await _discountService.InsertAsync(item);
+            }
 
             return _mapper.ToModel<DiscountManageModel>(item);
         }
@@ -128,7 +126,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteDiscount(int id)
         {
-            return await _discountService.DeleteDiscountAsync(id);
+            return await _discountService.DeleteAsync(id);
         }
 
         #endregion

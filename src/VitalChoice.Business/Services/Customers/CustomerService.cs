@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
@@ -9,49 +8,58 @@ using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
+using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Customer;
+using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: ICustomerService
+    public class CustomerService: DynamicObjectServiceAsync<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<CustomerOptionType> _customerOptionTypeRepositoryAsync;
-        private readonly CustomerMapper _customerMapper;
+
+        protected override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IUnitOfWorkAsync CreateUnitOfWork()
+        {
+            return new EcommerceUnitOfWork();
+        }
 
         public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            CustomerMapper customerMapper)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper)
+            : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
-            _customerOptionTypeRepositoryAsync = customerOptionTypeRepositoryAsync;
-            _customerMapper = customerMapper;
         }
 
-        private async Task<List<MessageInfo>> ValidateCustomerAsync(CustomerDynamic model, int? existingCustomerId = null)
+        protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
 	    {
 			var errors = new List<MessageInfo>();
 
 			var customerSameEmail =
 				await
 					_customerRepositoryAsync.Query(
-						new CustomerQuery().NotDeleted().Excluding(existingCustomerId).WithEmail(model.Email))
+						new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
 						.SelectAsync(false);
 
 			if (customerSameEmail.Any())
@@ -66,67 +74,33 @@ namespace VitalChoice.Business.Services.Customers
 			return errors;
 		}
 
-		private async Task<Customer> UpdateCustomerAsync(CustomerDynamic model, EcommerceUnitOfWork uow)
-		{
-			var customerRepository = uow.RepositoryAsync<Customer>();
-			var customerOptionValueRepository = uow.RepositoryAsync<CustomerOptionValue>();
-			//var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
+        protected override Task<List<MessageInfo>> ValidateDelete(int id)
+        {
+            throw new NotImplementedException();
+        }
 
-			var entity = (await customerRepository.Query(
-				p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
-				.Include(p => p.OptionValues)
-				.SelectAsync()).FirstOrDefault();
-			if (entity != null)
-			{
-				//await SetBigValuesAsync(entity, bigValueRepository, true);
-				(await ValidateCustomerAsync(model, model.Id)).Raise();
+        protected override Task BeforeUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        {
+            throw new NotImplementedException();
+        }
 
-				//await
-				//	bigValueRepository.DeleteAllAsync(
-				//		entity.OptionValues.Where(o => o.BigValue != null).Select(o => o.BigValue).ToList());
-				await customerOptionValueRepository.DeleteAllAsync(entity.OptionValues);
+        protected override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        {
+            throw new NotImplementedException();
+        }
 
-				entity.OptionTypes =
-					await _customerOptionTypeRepositoryAsync.Query().SelectAsync(false);
+        protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
+        {
+            return query.Include(p => p.Addresses)
+                .Include(p => p.CustomerNotes)
+                .Include(p => p.CustomerPaymentMethods)
+                .Include(p => p.DefaultPaymentMethod)
+                .Include(p => p.OrderNotes)
+                .Include(p => p.PaymentMethods)
+                .Include(p => p.User);
+        }
 
-                _customerMapper.UpdateEntity(model, entity);
-
-				//await
-				//	bigValueRepository.InsertRangeAsync(
-				//		entity.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
-				await customerRepository.UpdateAsync(entity);
-
-				await uow.SaveChangesAsync(CancellationToken.None);
-
-				return entity;
-			}
-			return null;
-		}
-
-		public async Task<Customer> InsertCustomerAsync(CustomerDynamic model,
-		    EcommerceUnitOfWork uow)
-	    {
-		    (await ValidateCustomerAsync(model)).Raise();
-
-		    var optionTypes =
-			    await _customerOptionTypeRepositoryAsync.Query().SelectAsync(false);
-		     
-		    var entity = _customerMapper.ToEntity(model, optionTypes);
-            if (entity != null)
-		    {
-			    entity.OptionTypes = new List<CustomerOptionType>();
-			    var customerRepository = uow.RepositoryAsync<Customer>();
-
-			    await customerRepository.InsertGraphAsync(entity);
-			    await uow.SaveChangesAsync(CancellationToken.None);
-
-			    entity.OptionTypes = optionTypes;
-			    return entity;
-		    }
-		    return null;
-	    }
-
-	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
+        public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);
 
@@ -138,69 +112,6 @@ namespace VitalChoice.Business.Services.Customers
 			var condition = new PaymentMethodQuery().NotDeleted().MatchByCustomerType(customerType);
 
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
-		}
-
-		public async Task<CustomerDynamic> AddUpdateCustomerAsync(CustomerDynamic model)
-		{
-			if (model == null)
-				throw new ArgumentNullException(nameof(model));
-			using (var uow = new EcommerceUnitOfWork())
-			{
-				var idCustomer = 0;
-				if (model.Id == 0)
-				{
-					idCustomer = (await InsertCustomerAsync(model, uow)).Id;
-				}
-				var customer = await UpdateCustomerAsync(model, uow);
-				if (idCustomer != 0)
-					return await GetCustomerAsync(idCustomer);
-				return _customerMapper.FromEntity(customer);
-			}
-		}
-
-		public async Task<CustomerDynamic> GetCustomerAsync(int id, bool withDefaults = false)
-		{
-			IQueryFluent<Customer> res = _customerRepositoryAsync.Query(
-				p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
-				.Include(p => p.OptionValues)
-				.Include(p => p.Addresses)
-				.Include(p => p.CustomerNotes)
-				.Include(p => p.CustomerPaymentMethods)
-				.Include(p => p.DefaultPaymentMethod)
-				.Include(p => p.OrderNotes)
-				.Include(p => p.PaymentMethods)
-				.Include(p => p.User);
-
-			var entity = (await res.SelectAsync(false)).FirstOrDefault();
-
-			if (entity != null)
-			{
-				//await SetBigValuesAsync(entity, _bigStringValueRepository);
-				entity.OptionTypes =
-					await
-						_customerOptionTypeRepositoryAsync.Query()
-							.SelectAsync(false);
-
-				return _customerMapper.FromEntity(entity, withDefaults);
-			}
-
-			return null;
-		}
-
-		public async Task<bool> DeleteCustomerAsync(int id)
-		{
-			var dbItem =
-				(await
-					_customerRepositoryAsync.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
-						.SelectAsync(false)).FirstOrDefault();
-			if (dbItem != null)
-			{
-				dbItem.StatusCode = RecordStatusCode.Deleted;
-				await _customerRepositoryAsync.UpdateAsync(dbItem);
-
-				return true;
-			}
-			return false;
 		}
 
 		public async Task<PagedList<CustomerDynamic>> GetCustomersAsync(CustomerFilter filter)
@@ -290,5 +201,5 @@ namespace VitalChoice.Business.Services.Customers
                 Items = new List<CustomerDynamic>()
 			};
 		}
-	}
+    }
 }

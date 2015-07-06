@@ -241,9 +241,11 @@ namespace VitalChoice.DynamicData.Base
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
 
             var ids = models.Select(m => m.Id).ToList();
-            var entities = (await mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != RecordStatusCode.Deleted)
-                .Include(p => p.OptionValues)
-                .SelectAsync());
+            IQueryFluent<TEntity> query =
+                mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != RecordStatusCode.Deleted)
+                    .Include(p => p.OptionValues);
+            query = BuildQuery(query);
+            var entities = (await query.SelectAsync());
             if (!entities.Any())
                 return new List<TDynamic>();
             var items = entities.Join(models, entity => entity.Id, model => model.Id,
@@ -287,10 +289,11 @@ namespace VitalChoice.DynamicData.Base
             var mainRepository = uow.RepositoryAsync<TEntity>();
             var valueRepository = uow.RepositoryAsync<TOptionValue>();
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
-
-            var entity = (await mainRepository.Query(o => o.Id == model.Id && o.StatusCode != RecordStatusCode.Deleted)
-                .Include(p => p.OptionValues)
-                .SelectAsync()).FirstOrDefault();
+            IQueryFluent<TEntity> query =
+                mainRepository.Query(o => o.Id == model.Id && o.StatusCode != RecordStatusCode.Deleted)
+                    .Include(p => p.OptionValues);
+            query = BuildQuery(query);
+            var entity = await query.SelectFirstOrDefaultAsync();
             if (entity == null)
                 return null;
 
