@@ -306,9 +306,8 @@
                                             <div class="form-group">
                                                 <label for="note" class="col-md-3 control-label">Note</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" name="Text" class="form-control" data-ng-model="currentCustomer.CustomerNote.Text" id="note" placeholder="Note" rows="10" required data-ng-maxlength="1000"></textarea>
+                                                    <textarea type="text" name="Text" class="form-control" data-ng-model="currentCustomer.CustomerNote.Text" id="note" placeholder="Note" rows="10" data-ng-maxlength="1000"></textarea>
                                                     <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Text.$invalid">
-                                                        <small class="error" ng-show="forms.customerNote.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
                                                         <small class="error" ng-show="forms.customerNote.Text.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Text", "1000"])}}</small>
                                                         <small class="error" ng-show="forms.customerNote.Text.$error.server">{{serverMessages.GetMessage('Text')}}</small>
                                                     </div>

@@ -76,15 +76,15 @@
 </div>
 <div class="form-group">
 	<label class="col-md-3 control-label">State/Province</label>
-    <div class="col-md-9" data-ng-if="address.Country.States && address.Country.States.length > 0">
-        <select name="State" class="form-control" id="model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in address.Country.States" required>
+    <div class="col-md-9" data-ng-if="model.Address.Country.States && model.Address.Country.States.length > 0">
+        <select name="State" class="form-control" id="model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" required>
         </select>
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].State.$invalid">
             <small class="error" ng-show="forms[model.formName].State.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","State")}}</small>
             <small class="error" ng-show="forms[model.formName].State.$error.server">{{serverMessages.GetMessage('State')}}</small>
         </div>
     </div>
-    <div class="col-md-9" data-ng-if="!(address.Country.States && address.Country.States.length > 0)">
+    <div class="col-md-9" data-ng-if="!(model.Address.Country.States && model.Address.Country.States.length > 0)">
         <input type="text" name="County" id="model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100">
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].County.$invalid">
             <small class="error" ng-show="forms[model.formName].County.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["State", "100"])}}</small>

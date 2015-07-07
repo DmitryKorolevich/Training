@@ -70,15 +70,6 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 
 	function activateTab(formName) {
 		$.each($scope.tabs, function (index, item) {
-			if (formName.indexOf('SKUs') == 0) {
-				formName = 'SKUs';
-			}
-			if (formName.indexOf('CrossSellProducts') == 0) {
-				formName = 'crossSellProductsAndVideos';
-			}
-			if (formName.indexOf('Videos') == 0) {
-				formName = 'crossSellProductsAndVideos';
-			}
 			if (item.formName == formName) {
 				item.active = true;
 				return false;
@@ -111,6 +102,7 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 							}
 						});
 					}
+					messages += value.Message + "<br />";
 				});
 
 				if (formForShowing) {
@@ -142,7 +134,7 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 		if (valid) {
 			$scope.saving = true;
 
-			customerService.createCustomer($scope.currentCustomer, $scope.addTracker).success(function (result) {
+			customerService.createUpdateCustomer($scope.currentCustomer, $scope.addTracker).success(function (result) {
 					successHandler(result);
 				}).
 				error(function(result) {
@@ -156,8 +148,8 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 	};
 
 	$scope.togglePaymentMethodSelection = function (paymentMethod) {
-		if (!$scope.currentCustomer.PaymentMethods) {
-			$scope.currentCustomer.PaymentMethods = [];
+		if (!$scope.currentCustomer.ApprovedPaymentMethods || $scope.currentCustomer.ApprovedPaymentMethods.length == 0) {
+			$scope.currentCustomer.ApprovedPaymentMethods = [];
 			$scope.selectedPaymentMethods = [];
 		}
 
@@ -170,12 +162,12 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 		});
 
 		if (idx > -1) {
-			$scope.currentCustomer.PaymentMethods.splice(idx, 1);
+			$scope.currentCustomer.ApprovedPaymentMethods.splice(idx, 1);
 			$scope.selectedPaymentMethods.splice(idx, 1);
 		}
 		else {
 			$scope.selectedPaymentMethods.push({ Id: paymentMethod.Id, Name: paymentMethod.Name });
-			$scope.currentCustomer.PaymentMethods.push(paymentMethod.Id);
+			$scope.currentCustomer.ApprovedPaymentMethods.push(paymentMethod.Id);
 		}
 	};
 
@@ -196,9 +188,14 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 
 	$scope.makeAsProfileAddress = function() {
 		if ($scope.currentCustomer.sameShipping) {
-			$scope.currentCustomer.Shipping = angular.copy($scope.currentCustomer.ProfileAddress);
+			for (var key in $scope.currentCustomer.ProfileAddress) {
+				$scope.currentCustomer.Shipping[key] = $scope.currentCustomer.ProfileAddress[key];
+			}
+			$scope.currentCustomer.Shipping.Email = $scope.currentCustomer.Email;
+			$scope.currentCustomer.Shipping.AddressType = 3;
 		}
 	};
+
 
 	initialize();
 }]);

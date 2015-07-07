@@ -23,6 +23,6 @@ namespace VitalChoice.DynamicData.Entities
 
 		public ICollection<AddressDynamic> Addresses { get; set; }
 
-		public ICollection<CustomerNote> CustomerNotes { get; set; }
+		public ICollection<CustomerNoteDynamic> CustomerNotes { get; set; }
     }
 }

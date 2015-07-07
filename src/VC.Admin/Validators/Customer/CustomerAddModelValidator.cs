@@ -9,9 +9,9 @@ using VitalChoice.Validation.Logic;
 
 namespace VC.Admin.Validators.Customer
 {
-	public class CustomerAddModelValidator : ModelValidator<AddCustomerModel>
+	public class CustomerAddModelValidator : ModelValidator<AddUpdateCustomerModel>
 	{
-		public override void Validate(AddCustomerModel value)
+		public override void Validate(AddUpdateCustomerModel value)
 		{
 			ValidationErrors.Clear();
 
@@ -26,7 +26,7 @@ namespace VC.Admin.Validators.Customer
 			ParseResults(customerNoteValidator.Validate(value.CustomerNote));
 		}
 
-		private class CustomerModelRules : AbstractValidator<AddCustomerModel>
+		private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
 		{
 			public CustomerModelRules()
 			{
@@ -75,6 +75,7 @@ namespace VC.Admin.Validators.Customer
 					.EmailAddress()
 					.WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
+
 				RuleFor(model => model.EmailConfirm).NotEmpty()
 					.NotEmpty()
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.FieldRequired)
@@ -82,11 +83,9 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
-					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat);
-
-				RuleFor(model => model.Email)
+					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
 					.Equal(x => x.EmailConfirm)
-					.WithMessage(model => model.Email, ValidationMessages.EmailMustMatch);
+					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
 
 				RuleFor(model => model.DefaultPaymentMethod)
 					.Must(model => model.HasValue)
@@ -102,11 +101,11 @@ namespace VC.Admin.Validators.Customer
 
 				RuleFor(model => model.ApprovedPaymentMethods)
 					.Must(model => model.Any())
-					.WithMessage(model => model.ApprovedPaymentMethods, ValidationMessages.AtLeastOneItem);
+					.WithMessage(model => model.ApprovedPaymentMethods, ValidationMessages.AtLeastOnePaymentMethod);
 
 				RuleFor(model => model.OrderNotes)
 					.Must(model => model.Any())
-					.WithMessage(model => model.OrderNotes, ValidationMessages.AtLeastOneItem);
+					.WithMessage(model => model.OrderNotes, ValidationMessages.AtLeastOneOrderNote);
 			}
 		}
 	}

@@ -20,6 +20,8 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         FieldMaxOrEqual = 14,
         Exist = 15,
 		EmailMustMatch = 16,
-		AtLeastOneItem = 17
+		AtLeastOneItem = 17,
+		AtLeastOnePaymentMethod = 18,
+		AtLeastOneOrderNote = 19
 	}
 }

@@ -32,8 +32,8 @@ namespace VitalChoice.Business.Services.Customers
 
         protected override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
         {
-            throw new NotImplementedException();
-        }
+			return new CustomerOptionTypeQuery().WithType((CustomerType?)idType);
+		}
 
         protected override IUnitOfWorkAsync CreateUnitOfWork()
         {

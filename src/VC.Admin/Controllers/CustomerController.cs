@@ -65,9 +65,9 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public Result<AddCustomerModel> CreateCustomerPrototype()
+		public Result<AddUpdateCustomerModel> CreateCustomerPrototype()
 		{
-			return new AddCustomerModel()
+			return new AddUpdateCustomerModel()
 			{
 				CustomerType = CustomerType.Retail,
 				TaxExempt = TaxExempt.YesCurrentCertificate,
@@ -82,11 +82,11 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<Result<AddCustomerModel>> AddCustomer([FromBody] AddCustomerModel addCustomerModel)
+		public async Task<Result<AddUpdateCustomerModel>> AddUpdateCustomer([FromBody] AddUpdateCustomerModel addUpdateCustomerModel)
 		{
-			if (!Validate(addCustomerModel))
+			if (!Validate(addUpdateCustomerModel))
 				return null;
-            var item = _customerMapper.FromModel(addCustomerModel);
+            var item = _customerMapper.FromModel(addUpdateCustomerModel);
             var sUserId = Request.HttpContext.User.GetUserId();
 			int userId;
 			if (int.TryParse(sUserId, out userId))
@@ -101,12 +101,12 @@ namespace VC.Admin.Controllers
 		    {
 		        item = await _customerService.InsertAsync(item);
 		    }
-			var toReturn = _customerMapper.ToModel<AddCustomerModel>(item);
+			var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
 			return toReturn;
 		}
 
 		[HttpPost]
-		public async Task<Result<PagedList<CustomerListItemModel>>> GetDiscounts([FromBody]CustomerFilter filter)
+		public async Task<Result<PagedList<CustomerListItemModel>>> GetCustomers([FromBody]CustomerFilter filter)
 		{
 			var result = await _customerService.GetCustomersAsync(filter);
 

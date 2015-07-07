@@ -23,7 +23,11 @@ namespace VC.Admin.Models.Setting
 
         public IEnumerable<StateListItemModel> States { get; set; }
 
-        public CountryListItemModel(Country item)
+	    public CountryListItemModel()
+	    {
+	    }
+
+	    public CountryListItemModel(Country item)
         {
             if(item!=null)
             {

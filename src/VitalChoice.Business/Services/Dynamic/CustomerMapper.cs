@@ -16,13 +16,15 @@ namespace VitalChoice.Business.Services.Dynamic
     public class CustomerMapper: DynamicObjectMapper<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>
     {
         private readonly AddressMapper _addressMapper;
+	    private readonly CustomerNoteMapper _customerNoteMapper;
 
-        public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container, AddressMapper addressMapper) : base(mappers, container)
-        {
-            _addressMapper = addressMapper;
-        }
+	    public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container, AddressMapper addressMapper, CustomerNoteMapper customerNoteMapper) : base(mappers, container)
+	    {
+		    _addressMapper = addressMapper;
+		    _customerNoteMapper = customerNoteMapper;
+	    }
 
-        protected override void FromEntity(CustomerDynamic dynamic, Customer entity, bool withDefaults = false)
+	    protected override void FromEntity(CustomerDynamic dynamic, Customer entity, bool withDefaults = false)
         {
             dynamic.User = entity.User;
             dynamic.Email = entity.Email;
@@ -30,8 +32,11 @@ namespace VitalChoice.Business.Services.Dynamic
 
             dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
             dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
-            dynamic.CustomerNotes = entity.CustomerNotes?.ToList();
-            dynamic.Addresses = new List<AddressDynamic>();
+			foreach (var customerNoteDynamic in entity.CustomerNotes.Select(x => _customerNoteMapper.FromEntity(x)))
+			{
+				dynamic.CustomerNotes.Add(customerNoteDynamic);
+			}
+			dynamic.Addresses = new List<AddressDynamic>();
             foreach (var addressDynamic in entity.Addresses.Select(address => _addressMapper.FromEntity(address)))
             {
                 dynamic.Addresses.Add(addressDynamic);
@@ -89,16 +94,40 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
             }
 
-            if (dynamic.CustomerNotes != null)
-            {
-                foreach (var item in dynamic.CustomerNotes)
-                {
-                    item.Id = 0;
-                    item.IdCustomer = dynamic.Id;
-                }
-                entity.CustomerNotes = dynamic.CustomerNotes.ToList();
-            }
-            foreach (var value in entity.OptionValues)
+			if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
+			{
+				//Update existing
+				var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
+					(customerNoteDynamic, customerNote) => new { customerNoteDynamic, customerNote });
+				foreach (var item in itemsToUpdate)
+				{
+					_customerNoteMapper.UpdateEntity(item.customerNoteDynamic, item.customerNote);
+				}
+
+				//Delete
+				var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
+				foreach (var sku in toDelete)
+				{
+					sku.StatusCode = RecordStatusCode.Deleted;
+				}
+
+				//Insert
+				//entity.Addresses.AddRange(Addresses.Where(s => s.Id == 0).Select(s =>
+				//{
+				//	var sku = s.ToEntity();
+				//	sku.IdCustomer = Id;
+				//	return sku;
+				//}));
+			}
+			else
+			{
+				foreach (var customerNote in entity.CustomerNotes)
+				{
+					customerNote.StatusCode = RecordStatusCode.Deleted;
+				}
+			}
+
+			foreach (var value in entity.OptionValues)
             {
                 value.IdCustomer = dynamic.Id;
             }
@@ -122,15 +151,15 @@ namespace VitalChoice.Business.Services.Dynamic
                 IdOrderNote = c
             }).ToList();
 
-            if (dynamic.CustomerNotes != null)
-            {
-                foreach (var item in entity.CustomerNotes)
-                {
-                    item.Id = 0;
-                    item.IdCustomer = dynamic.Id;
-                }
-                entity.CustomerNotes = dynamic.CustomerNotes.ToList();
-            }
+            //if (dynamic.CustomerNotes != null)
+            //{
+            //    foreach (var item in entity.CustomerNotes)
+            //    {
+            //        item.Id = 0;
+            //        item.IdCustomer = dynamic.Id;
+            //    }
+            //    entity.CustomerNotes = dynamic.CustomerNotes.ToList();
+            //}
 
             //entity.Addresses = Addresses?.Select(s => s.ToEntity(s.OptionTypes)).ToList() ?? new List<Address>();
         }

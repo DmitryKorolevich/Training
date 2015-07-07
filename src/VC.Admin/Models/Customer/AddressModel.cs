@@ -1,4 +1,5 @@
 ﻿using System;
+using VC.Admin.Models.Setting;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Attributes;
@@ -13,6 +14,11 @@ namespace VC.Admin.Models.Customer
 	[ApiValidator(typeof(AddressModelValidator))]
 	public class AddressModel : BaseModel
 	{
+		public AddressModel()
+		{
+			Country = new CountryListItemModel();
+		}
+
 		[Map("IdObjectType")]
 		public AddressType AddressType { get; set; }
 
@@ -35,7 +41,7 @@ namespace VC.Admin.Models.Customer
 		public string City { get; set; }
 
 		[Map]
-		public int Country { get; set; }
+		public CountryListItemModel Country { get; set; }
 
 		[Map]
 		public string County { get; set; }
