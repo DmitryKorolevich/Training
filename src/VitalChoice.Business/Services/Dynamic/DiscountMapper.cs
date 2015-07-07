@@ -6,14 +6,12 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
-using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
-        public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container) : base(mappers, container)
+        public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container) : base(mappers, container)
         {
         }
 

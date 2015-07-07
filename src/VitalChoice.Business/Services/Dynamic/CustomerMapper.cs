@@ -8,8 +8,6 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
-using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -18,7 +16,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly AddressMapper _addressMapper;
 	    private readonly CustomerNoteMapper _customerNoteMapper;
 
-	    public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container, AddressMapper addressMapper, CustomerNoteMapper customerNoteMapper) : base(mappers, container)
+	    public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container, AddressMapper addressMapper, CustomerNoteMapper customerNoteMapper) : base(mappers, container)
 	    {
 		    _addressMapper = addressMapper;
 		    _customerNoteMapper = customerNoteMapper;

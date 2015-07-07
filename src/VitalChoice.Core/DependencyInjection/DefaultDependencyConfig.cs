@@ -46,10 +46,8 @@ using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.DynamicData.Services;
 using Autofac.Dnx;
 using VitalChoice.DynamicData.Helpers;
-using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -256,12 +254,8 @@ namespace VitalChoice.Core.DependencyInjection
                 LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.Get("App:LogPath")))
                 .As<ILoggerProviderExtended>().SingleInstance();
 
-            var modelContainer = new ModelToDynamicContainer();
-            modelContainer.Register(projectAssembly);
-
-            builder.RegisterInstance(modelContainer).As<IModelToDynamicContainer>().SingleInstance();
-
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
+            builder.RegisterModelConverters(projectAssembly);
 
             var container = builder.Build();
 

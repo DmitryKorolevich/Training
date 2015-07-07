@@ -5,7 +5,12 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IModelToDynamic<in TModel, in TDynamic>
+    public interface IModelToDynamic
+    {
+        
+    }
+
+    public interface IModelToDynamic<in TModel, in TDynamic> : IModelToDynamic
     {
         void DynamicToModel(TModel model, TDynamic dynamic);
         void ModelToDynamic(TModel model, TDynamic dynamic);

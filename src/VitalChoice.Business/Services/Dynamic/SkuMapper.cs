@@ -7,14 +7,12 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
-using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class SkuMapper : DynamicObjectMapper<SkuDynamic, Sku, ProductOptionType, ProductOptionValue>
     {
-        public SkuMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container)
+        public SkuMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container)
             : base(mappers, container)
         {
 

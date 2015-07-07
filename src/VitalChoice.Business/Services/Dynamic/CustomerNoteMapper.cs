@@ -7,14 +7,12 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
-using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class CustomerNoteMapper : DynamicObjectMapper<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
     {
-        public CustomerNoteMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container) : base(mappers, container)
+        public CustomerNoteMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container) : base(mappers, container)
         {
         }
 

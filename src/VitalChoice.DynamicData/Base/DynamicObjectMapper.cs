@@ -7,7 +7,6 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Interfaces.Services;
 using VitalChoice.DynamicData.Services;
 using System.Reflection;
 
@@ -21,12 +20,12 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly IIndex<Type, IDynamicToModelMapper> _mappers;
-        private readonly IModelToDynamicContainer _container;
+        private readonly IIndex<Type, IModelToDynamic> _converters;
 
-        protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers, IModelToDynamicContainer container)
+        protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> converters)
         {
             _mappers = mappers;
-            _container = container;
+            _converters = converters;
         }
 
         protected abstract void FromEntity(TDynamic dynamic, TEntity entity, bool withDefaults = false);
@@ -98,8 +97,13 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TModel();
             ToModelInternal(dynamic, result, typeof (TModel), typeof (TDynamic));
-            var converter = _container.TryResolve<TModel, TDynamic>();
-            converter?.DynamicToModel(result, dynamic);
+            
+            IModelToDynamic conv;
+            if (_converters.TryGetValue(typeof (TModel), out conv))
+            {
+                var converter = conv as IModelToDynamic<TModel, TDynamic>;
+                converter?.DynamicToModel(result, dynamic);
+            }
             return result;
         }
 
@@ -110,8 +114,13 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TDynamic();
             FromModelInternal(result, model, typeof (TModel), typeof (TDynamic));
-            var converter = _container.TryResolve<TModel, TDynamic>();
-            converter?.ModelToDynamic(model, result);
+
+            IModelToDynamic conv;
+            if (_converters.TryGetValue(typeof (TModel), out conv))
+            {
+                var converter = conv as IModelToDynamic<TModel, TDynamic>;
+                converter?.ModelToDynamic(model, result);
+            }
             return result;
         }
 
@@ -123,8 +132,14 @@ namespace VitalChoice.DynamicData.Base
             dynamic result = Activator.CreateInstance(modelType);
             ToModelInternal(dynamic, result, modelType,
                 typeof (TDynamic));
-            dynamic converter = _container.TryResolve(modelType);
-            converter?.DynamicToModel(result, dynamic);
+
+            IModelToDynamic conv;
+            if (_converters.TryGetValue(modelType, out conv))
+            {
+                dynamic converter = conv;
+                converter?.DynamicToModel(result, dynamic);
+            }
+
             return result;
         }
 
@@ -135,8 +150,13 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TDynamic();
             FromModelInternal(result, model, modelType, typeof (TDynamic));
-            dynamic converter = _container.TryResolve(modelType);
-            converter?.ModelToDynamic(model, result);
+
+            IModelToDynamic conv;
+            if (_converters.TryGetValue(modelType, out conv))
+            {
+                dynamic converter = conv;
+                converter?.ModelToDynamic(model, result);
+            }
             return result;
         }
 
