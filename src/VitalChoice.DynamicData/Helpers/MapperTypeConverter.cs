@@ -64,7 +64,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
             catch (Exception e) when(!(e is NotImplementedException))
             {
-                throw new ObjectConvertException($"{value} Cannot be converted to Type:{typeId}", e);
+                throw new ObjectConvertException($"\"{value}\" Cannot be converted to Type:{typeId}", e);
             }
         }
 
