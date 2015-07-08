@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Base;
 
@@ -38,11 +40,13 @@ namespace VitalChoice.DynamicData.Interfaces
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject
     {
+        IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
         void UpdateEntity(TDynamic dynamic, TEntity entity);
-        TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes);
+        TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null);
+        Task<TEntity> ToEntityAsync(TDynamic dynamic, ICollection<TOptionType> optionTypes = null);
         TDynamic FromEntity(TEntity entity, bool withDefaults = false);
         void UpdateEntityRange(ICollection<Pair<TDynamic, TEntity>> items);
-        List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes);
+        List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null);
         List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false);
     }
 }

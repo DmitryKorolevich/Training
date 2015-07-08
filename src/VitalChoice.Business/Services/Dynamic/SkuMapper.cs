@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using VitalChoice.Business.Queries.Product;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
@@ -12,18 +15,23 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class SkuMapper : DynamicObjectMapper<SkuDynamic, Sku, ProductOptionType, ProductOptionValue>
     {
-        public SkuMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container)
-            : base(mappers, container)
+        public SkuMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
+            : base(mappers, container, productRepositoryAsync)
         {
 
         }
 
-        protected override void FillNewEntity(SkuDynamic dynamic, Sku entity)
+        protected override void ToEntityInternal(SkuDynamic dynamic, Sku entity)
         {
             ToEntityStd(dynamic, entity);
         }
 
-        protected override void FromEntity(SkuDynamic dynamic, Sku entity, bool withDefaults = false)
+        public override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
+        {
+            return new ProductOptionTypeQuery().WithType((ProductType?) idType);
+        }
+
+        protected override void FromEntityInternal(SkuDynamic dynamic, Sku entity, bool withDefaults = false)
         {
             dynamic.Code = entity.Code;
             dynamic.Hidden = entity.Hidden;

@@ -1,5 +1,8 @@
 using System;
 using Autofac.Features.Indexed;
+using VitalChoice.Business.Queries.Customer;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Base;
@@ -10,11 +13,18 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class AddressMapper : DynamicObjectMapper<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
-        public AddressMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container) : base(mappers, container)
+        public AddressMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
+            IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
+            : base(mappers, container, optionTypesRepositoryAsync)
         {
         }
 
-        protected override void FromEntity(AddressDynamic dynamic, Address entity, bool withDefaults = false)
+        public override IQueryObject<AddressOptionType> GetOptionTypeQuery(int? idType)
+        {
+            return new AddressOptionTypeQuery().WithType((AddressType?) idType);
+        }
+
+        protected override void FromEntityInternal(AddressDynamic dynamic, Address entity, bool withDefaults = false)
         {
             dynamic.IdCustomer = entity.IdCustomer;
             dynamic.IdCountry = entity.IdCountry;
@@ -34,7 +44,7 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        protected override void FillNewEntity(AddressDynamic dynamic, Address entity)
+        protected override void ToEntityInternal(AddressDynamic dynamic, Address entity)
         {
             entity.IdCustomer = dynamic.IdCustomer;
             entity.IdCountry = dynamic.IdCountry;

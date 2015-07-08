@@ -160,6 +160,14 @@ END
 
 GO
 
+IF (SELECT COUNT(*) FROM [AddressOptionTypes] WHERE Name = 'Company' AND [IdObjectType] IS NULL) > 1
+BEGIN
+	DELETE TOP (1) FROM [AddressOptionTypes]
+	WHERE Name = 'Company' AND [IdObjectType] IS NULL
+END
+
+GO
+
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [Name] = N'Zip' AND [IdFieldType] = 4)
 BEGIN
 	UPDATE [dbo].[AddressOptionTypes]

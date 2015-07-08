@@ -9,6 +9,9 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
 using System.Reflection;
+using System.Threading.Tasks;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -20,17 +23,22 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly IIndex<Type, IDynamicToModelMapper> _mappers;
-        private readonly IIndex<Type, IModelToDynamic> _converters;
+        private readonly IIndex<Type, IModelToDynamicConverter> _converters;
+        private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
 
-        protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> converters)
+        protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<Type, IModelToDynamicConverter> converters,
+            IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
         {
             _mappers = mappers;
             _converters = converters;
+            _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
         }
 
-        protected abstract void FromEntity(TDynamic dynamic, TEntity entity, bool withDefaults = false);
+        public abstract IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
+        protected abstract void FromEntityInternal(TDynamic dynamic, TEntity entity, bool withDefaults = false);
         protected abstract void UpdateEntityInternal(TDynamic dynamic, TEntity entity);
-        protected abstract void FillNewEntity(TDynamic dynamic, TEntity entity);
+        protected abstract void ToEntityInternal(TDynamic dynamic, TEntity entity);
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
         {
@@ -67,7 +75,7 @@ namespace VitalChoice.DynamicData.Base
                         MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
                 }
             }
-            FromEntity(result, entity, withDefaults);
+            FromEntityInternal(result, entity, withDefaults);
             return result;
         }
 
@@ -79,7 +87,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes)
+        public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null)
         {
             return items.Select(i => ToEntity(i, optionTypes)).ToList();
         }
@@ -98,10 +106,10 @@ namespace VitalChoice.DynamicData.Base
             var result = new TModel();
             ToModelInternal(dynamic, result, typeof (TModel), typeof (TDynamic));
             
-            IModelToDynamic conv;
+            IModelToDynamicConverter conv;
             if (_converters.TryGetValue(typeof (TModel), out conv))
             {
-                var converter = conv as IModelToDynamic<TModel, TDynamic>;
+                var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
                 converter?.DynamicToModel(result, dynamic);
             }
             return result;
@@ -115,10 +123,10 @@ namespace VitalChoice.DynamicData.Base
             var result = new TDynamic();
             FromModelInternal(result, model, typeof (TModel), typeof (TDynamic));
 
-            IModelToDynamic conv;
+            IModelToDynamicConverter conv;
             if (_converters.TryGetValue(typeof (TModel), out conv))
             {
-                var converter = conv as IModelToDynamic<TModel, TDynamic>;
+                var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
                 converter?.ModelToDynamic(model, result);
             }
             return result;
@@ -133,7 +141,7 @@ namespace VitalChoice.DynamicData.Base
             ToModelInternal(dynamic, result, modelType,
                 typeof (TDynamic));
 
-            IModelToDynamic conv;
+            IModelToDynamicConverter conv;
             if (_converters.TryGetValue(modelType, out conv))
             {
                 dynamic converter = conv;
@@ -151,7 +159,7 @@ namespace VitalChoice.DynamicData.Base
             var result = new TDynamic();
             FromModelInternal(result, model, modelType, typeof (TDynamic));
 
-            IModelToDynamic conv;
+            IModelToDynamicConverter conv;
             if (_converters.TryGetValue(modelType, out conv))
             {
                 dynamic converter = conv;
@@ -181,16 +189,28 @@ namespace VitalChoice.DynamicData.Base
             UpdateEntityInternal(dynamic, entity);
         }
 
-        public TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes)
+        public TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null)
+        {
+            if (dynamic == null)
+                return null;
+
+            var task = ToEntityAsync(dynamic, optionTypes);
+            task.Wait();
+            return task.Result;
+        }
+
+        public async Task<TEntity> ToEntityAsync(TDynamic dynamic, ICollection<TOptionType> optionTypes = null)
         {
             if (dynamic == null)
                 return null;
 
             if (optionTypes == null)
-                throw new ArgumentNullException(nameof(optionTypes));
-
+            {
+                optionTypes =
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(dynamic.IdObjectType)).SelectAsync(false);
+            }
+            var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
             var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
-            var entity = new TEntity {OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes};
             FillEntityOptions(dynamic, optionTypesCache, entity);
             entity.Id = dynamic.Id;
             entity.DateCreated = DateTime.Now;
@@ -198,7 +218,7 @@ namespace VitalChoice.DynamicData.Base
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
             entity.IdObjectType = dynamic.IdObjectType;
-            FillNewEntity(dynamic, entity);
+            ToEntityInternal(dynamic, entity);
             return entity;
         }
 

@@ -44,11 +44,6 @@ namespace VitalChoice.Business.Services.Products
             _mapper = mapper;
         }
 
-        protected override IQueryObject<DiscountOptionType> GetOptionTypeQuery(int? idType)
-        {
-            return new DiscountOptionTypeQuery().WithType(idType);
-        }
-
         protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
             return new EcommerceUnitOfWork();

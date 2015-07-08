@@ -8,7 +8,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class DiscountModelConverter : IModelToDynamic<DiscountManageModel, DiscountDynamic>
+    public class DiscountModelConverter : IModelToDynamicConverter<DiscountManageModel, DiscountDynamic>
     {
         public void DynamicToModel(DiscountManageModel model, DiscountDynamic dynamic)
         {

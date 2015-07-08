@@ -41,11 +41,6 @@ namespace VitalChoice.Business.Services.Products
             return new EcommerceUnitOfWork();
         }
 
-        protected override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
-        {
-            return new ProductOptionTypeQuery().WithType((ProductType?) idType);
-        }
-
         protected override async Task AfterSelect(Product entity)
         {
             entity.Skus =

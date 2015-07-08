@@ -9,9 +9,10 @@ namespace VitalChoice.Business.Queries.Product
 {
     public class DiscountOptionTypeQuery : QueryObject<DiscountOptionType>
     {
-        public DiscountOptionTypeQuery WithType(int? idType)
+        public DiscountOptionTypeQuery WithType(DiscountType? idType)
         {
-            Add(d => d.IdObjectType == idType);
+            int? idObjectType = (int?)idType;
+            Add(d => d.IdObjectType == idObjectType);
             return this;
         }
     }

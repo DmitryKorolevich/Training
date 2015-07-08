@@ -22,11 +22,14 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
 
-        protected abstract IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
-
-        protected IQueryObject<TOptionType> GetOptionTypeQuery(TEntity entity)
+        public IQueryObject<TOptionType> GetOptionTypeQuery(TEntity entity)
         {
-            return GetOptionTypeQuery(entity.IdObjectType);
+            return Mapper.GetOptionTypeQuery(entity.IdObjectType);
+        }
+
+        public IQueryObject<TOptionType> GetOptionTypeQuery(int? idObjectType)
+        {
+            return Mapper.GetOptionTypeQuery(idObjectType);
         }
 
         protected ReadDynamicObjectServiceAsync(

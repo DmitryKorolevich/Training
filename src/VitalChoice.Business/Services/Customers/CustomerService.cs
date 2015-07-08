@@ -36,11 +36,6 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<CustomerToOrderNote> _customerToOrderNoteRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<CustomerToPaymentMethod> _customerToPaymentMethodRepositoryAsync;
 
-        protected override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
-        {
-			return new CustomerOptionTypeQuery().WithType((CustomerType?)idType);
-		}
-
         protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
             return new EcommerceUnitOfWork();

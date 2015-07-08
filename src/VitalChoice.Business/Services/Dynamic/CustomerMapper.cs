@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using VitalChoice.Business.Queries.Customer;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.DynamicData.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -17,13 +21,21 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly AddressMapper _addressMapper;
 	    private readonly CustomerNoteMapper _customerNoteMapper;
 
-	    public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container, AddressMapper addressMapper, CustomerNoteMapper customerNoteMapper) : base(mappers, container)
-	    {
-		    _addressMapper = addressMapper;
-		    _customerNoteMapper = customerNoteMapper;
-	    }
+        public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<Type, IModelToDynamicConverter> container, AddressMapper addressMapper,
+            CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync)
+            : base(mappers, container, customerRepositoryAsync)
+        {
+            _addressMapper = addressMapper;
+            _customerNoteMapper = customerNoteMapper;
+        }
 
-	    protected override void FromEntity(CustomerDynamic dynamic, Customer entity, bool withDefaults = false)
+        public override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
+        {
+            return new CustomerOptionTypeQuery().WithType((CustomerType?)idType);
+        }
+
+        protected override void FromEntityInternal(CustomerDynamic dynamic, Customer entity, bool withDefaults = false)
         {
             dynamic.User = entity.User;
             dynamic.Email = entity.Email;
@@ -64,7 +76,7 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 //Update existing
                 var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, sd => sd.Id, s => s.Id,
-                    (addressDynamic, address) => new { addressDynamic, address });
+                    (addressDynamic, address) => new {addressDynamic, address});
                 foreach (var item in itemsToUpdate)
                 {
                     _addressMapper.UpdateEntity(item.addressDynamic, item.address);
@@ -78,12 +90,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
 
                 //Insert
-                //entity.Addresses.AddRange(Addresses.Where(s => s.Id == 0).Select(s =>
-                //{
-                //	var sku = s.ToEntity();
-                //	sku.IdCustomer = Id;
-                //	return sku;
-                //}));
+                entity.Addresses.AddRange(dynamic.Addresses.Where(s => s.Id == 0).Select(a =>
+                {
+                    var address = _addressMapper.ToEntity(a);
+                    address.IdCustomer = entity.Id;
+                    return address;
+                }));
             }
             else
             {
@@ -93,7 +105,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
             }
 
-			if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
+            if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
 			{
 				//Update existing
 				var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
@@ -132,7 +144,7 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        protected override void FillNewEntity(CustomerDynamic dynamic, Customer entity)
+        protected override void ToEntityInternal(CustomerDynamic dynamic, Customer entity)
         {
             entity.User = dynamic.User;
             entity.Email = dynamic.Email;
@@ -150,8 +162,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 IdOrderNote = c
             }).ToList();
 
-            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x, new List<AddressOptionType>())).ToList() ?? new List<Address>();
-            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x, new List<CustomerNoteOptionType>())).ToList() ?? new List<CustomerNote>();
+            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ?? new List<Address>();
+            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ?? new List<CustomerNote>();
 
 	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }

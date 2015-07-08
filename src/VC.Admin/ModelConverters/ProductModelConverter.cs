@@ -6,7 +6,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class ProductModelConverter : IModelToDynamic<ProductManageModel, ProductDynamic>
+    public class ProductModelConverter : IModelToDynamicConverter<ProductManageModel, ProductDynamic>
     {
         public void DynamicToModel(ProductManageModel model, ProductDynamic dynamic)
         {

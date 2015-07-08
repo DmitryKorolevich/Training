@@ -5,7 +5,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class SkuModelConverter : IModelToDynamic<SKUManageModel, SkuDynamic>
+    public class SkuModelConverter : IModelToDynamicConverter<SKUManageModel, SkuDynamic>
     {
         public void DynamicToModel(SKUManageModel model, SkuDynamic dynamic)
         {

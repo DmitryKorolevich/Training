@@ -396,7 +396,9 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey(c => c.Id)
 		        .Required();
 
-			builder.Entity<CustomerOptionType>().Key(p => p.Id);
+            builder.Entity<Customer>().Ignore(p => p.OptionTypes);
+
+            builder.Entity<CustomerOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerOptionType>().Table("CustomerOptionTypes");
             builder.Entity<CustomerOptionType>()
 				.Reference(p => p.Lookup)
@@ -430,6 +432,9 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(o => o.IdCustomerNote)
 		        .PrincipalKey(n => n.Id)
 		        .Required(false);
+
+		    builder.Entity<CustomerNote>().Ignore(n => n.OptionTypes);
+
             builder.Entity<CustomerNoteOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerNoteOptionType>().Table("CustomerNoteOptionTypes");
             builder.Entity<CustomerNoteOptionType>().Ignore(p => p.IdObjectType);
@@ -524,11 +529,15 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(p => p.IdEditedBy)
 		        .PrincipalKey(p => p.Id)
 		        .Required(false);
-		    builder.Entity<Address>().Collection(a => a.OptionValues)
+		    builder.Entity<Address>()
+                .Collection(a => a.OptionValues)
 		        .InverseReference()
 		        .ForeignKey(o => o.IdAddress)
 		        .PrincipalKey(a => a.Id)
 		        .Required(false);
+
+		    builder.Entity<Address>().Ignore(a => a.OptionTypes);
+
             builder.Entity<AddressOptionType>().Key(p => p.Id);
 			builder.Entity<AddressOptionType>().Table("AddressOptionTypes");
             builder.Entity<AddressOptionType>()
@@ -590,10 +599,12 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdOrderNote)
 				.PrincipalKey(p => p.Id);
 
-			#endregion
+            
 
-			#region Payment
-			builder.Entity<PaymentMethodToCustomerType>().Key(p => new { p.IdPaymentMethod, p.IdCustomerType });
+            #endregion
+
+            #region Payment
+            builder.Entity<PaymentMethodToCustomerType>().Key(p => new { p.IdPaymentMethod, p.IdCustomerType });
 			builder.Entity<PaymentMethodToCustomerType>().Table("PaymentMethodsToCustomerTypes");
 			builder.Entity<PaymentMethodToCustomerType>().Ignore(p => p.Id);
 
@@ -632,6 +643,9 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(v => v.IdCustomerPaymentMethod)
 		        .PrincipalKey(p => p.Id)
                 .Required(false);
+
+            builder.Entity<CustomerPaymentMethod>().Ignore(a => a.OptionTypes);
+
             builder.Entity<CustomerPaymentMethodOptionType>().Key(p => p.Id);
 			builder.Entity<CustomerPaymentMethodOptionType>().Table("CustomerPaymentMethodOptionTypes");
             builder.Entity<CustomerPaymentMethodOptionType>()

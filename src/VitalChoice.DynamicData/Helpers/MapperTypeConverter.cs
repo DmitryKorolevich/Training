@@ -38,26 +38,33 @@ namespace VitalChoice.DynamicData.Helpers
         {
             if (string.IsNullOrEmpty(value))
                 return null;
-            switch (typeId)
+            try
             {
-                case FieldType.String:
-                    return value;
-                case FieldType.Bool:
-                    return bool.Parse(value);
-                case FieldType.Int:
-                    return int.Parse(value, CultureInfo.InvariantCulture);
-                case FieldType.Decimal:
-                    return decimal.Parse(value, CultureInfo.InvariantCulture);
-                case FieldType.Double:
-                    return double.Parse(value, CultureInfo.InvariantCulture);
-                case FieldType.DateTime:
-                    return DateTime.Parse(value, CultureInfo.InvariantCulture);
-                case FieldType.Int64:
-                    return long.Parse(value, CultureInfo.InvariantCulture);
-                case FieldType.LargeString:
-                    return value;
-                default:
-                    throw new NotImplementedException($"Type conversion for Type:{typeId} is not implemented");
+                switch (typeId)
+                {
+                    case FieldType.String:
+                        return value;
+                    case FieldType.Bool:
+                        return bool.Parse(value);
+                    case FieldType.Int:
+                        return int.Parse(value, CultureInfo.InvariantCulture);
+                    case FieldType.Decimal:
+                        return decimal.Parse(value, CultureInfo.InvariantCulture);
+                    case FieldType.Double:
+                        return double.Parse(value, CultureInfo.InvariantCulture);
+                    case FieldType.DateTime:
+                        return DateTime.Parse(value, CultureInfo.InvariantCulture);
+                    case FieldType.Int64:
+                        return long.Parse(value, CultureInfo.InvariantCulture);
+                    case FieldType.LargeString:
+                        return value;
+                    default:
+                        throw new NotImplementedException($"Type conversion for Type:{typeId} is not implemented");
+                }
+            }
+            catch (Exception e) when(!(e is NotImplementedException))
+            {
+                throw new ObjectConvertException($"{value} Cannot be converted to Type:{typeId}", e);
             }
         }
 

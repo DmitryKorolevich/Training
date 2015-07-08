@@ -6,7 +6,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class CustomerModelConverter : IModelToDynamic<AddUpdateCustomerModel, CustomerDynamic>
+    public class CustomerModelConverter : IModelToDynamicConverter<AddUpdateCustomerModel, CustomerDynamic>
     {
 	    private readonly IDynamicToModelMapper<CustomerNoteDynamic> _customerNoteMapper;
 	    private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;

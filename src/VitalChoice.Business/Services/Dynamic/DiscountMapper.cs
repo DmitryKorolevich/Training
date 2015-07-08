@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac.Features.Indexed;
+using VitalChoice.Business.Queries.Product;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
@@ -11,11 +14,19 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
-        public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamic> container) : base(mappers, container)
+        public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<Type, IModelToDynamicConverter> container,
+            IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync)
+            : base(mappers, container, discountRepositoryAsync)
         {
         }
 
-        protected override void FromEntity(DiscountDynamic dynamic, Discount entity, bool withDefaults = false)
+        public override IQueryObject<DiscountOptionType> GetOptionTypeQuery(int? idType)
+        {
+            return new DiscountOptionTypeQuery().WithType((DiscountType?)idType);
+        }
+
+        protected override void FromEntityInternal(DiscountDynamic dynamic, Discount entity, bool withDefaults = false)
         {
             dynamic.Code = entity.Code;
             dynamic.Description = entity.Description;
@@ -84,7 +95,7 @@ namespace VitalChoice.Business.Services.Dynamic
             }
         }
 
-        protected override void FillNewEntity(DiscountDynamic dynamic, Discount entity)
+        protected override void ToEntityInternal(DiscountDynamic dynamic, Discount entity)
         {
             SetDiscountTiersOrdering(dynamic.DiscountTiers);
             entity.Code = dynamic.Code;
