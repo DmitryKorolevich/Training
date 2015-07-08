@@ -9,6 +9,7 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
@@ -30,6 +31,10 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<Address> _addressesRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<CustomerNote> _customerNotesRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<CustomerToOrderNote> _customerToOrderNoteRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<CustomerToPaymentMethod> _customerToPaymentMethodRepositoryAsync;
 
         protected override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
         {
@@ -45,12 +50,16 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync)
             : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
+            _addressesRepositoryAsync = addressesRepositoryAsync;
+            _customerNotesRepositoryAsync = customerNotesRepositoryAsync;
+            _customerToOrderNoteRepositoryAsync = customerToOrderNoteRepositoryAsync;
+            _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -98,18 +107,40 @@ namespace VitalChoice.Business.Services.Customers
 			await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
 		}
 
+        protected override async Task AfterSelect(Customer entity)
+        {
+            entity.Addresses =
+                await
+                    _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(a => a.OptionValues)
+                        .SelectAsync(false);
+            entity.CustomerNotes =
+                await
+                    _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(n => n.OptionValues)
+                        .SelectAsync(false);
+            entity.OrderNotes =
+                await
+                    _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(n => n.OrderNote)
+                        .SelectAsync(false);
+            entity.PaymentMethods =
+                await
+                    _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
+                        .Include(p => p.PaymentMethod)
+                        .SelectAsync(false);
+        }
+
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
-            return query.Include(p => p.Addresses)
-                .Include(p => p.CustomerNotes)
-                //.Include(p => p.CustomerPaymentMethods)
+            return query //.Include(p => p.CustomerPaymentMethods)
                 .Include(p => p.DefaultPaymentMethod)
-                .Include(p => p.OrderNotes)
-                .Include(p => p.PaymentMethods)
+                //.Include(p => p.OrderNotes)
+                //.Include(p => p.PaymentMethods)
                 .Include(p => p.User);
         }
 
-	    protected async override Task<CustomerDynamic> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+        protected async override Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
 	    {
 			var rand = new Random();
 
@@ -129,9 +160,7 @@ namespace VitalChoice.Business.Services.Customers
 					model.Id = user.Id;
 					model.User.Id = user.Id;
 					var customer = await base.InsertAsync(model, uow);
-
 					transaction.Commit();
-
 				    return customer;
 			    }
 			    catch (Exception)

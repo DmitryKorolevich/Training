@@ -45,6 +45,11 @@ namespace VitalChoice.DynamicData.Base
             return await SelectAsync(id, false);
         }
 
+        public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids)
+        {
+            return await SelectAsync(ids, false);
+        }
+
         public async Task<List<TDynamic>> SelectAsync()
         {
             return await SelectAsync(false);
@@ -70,7 +75,7 @@ namespace VitalChoice.DynamicData.Base
             return Task.Delay(0);
         }
 
-        public async Task<TDynamic> SelectAsync(int id, bool withDefaults)
+        public virtual async Task<TDynamic> SelectAsync(int id, bool withDefaults)
         {
             IQueryFluent<TEntity> res = ObjectRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
@@ -89,17 +94,33 @@ namespace VitalChoice.DynamicData.Base
             return null;
         }
 
-        public Task<List<TDynamic>> SelectAsync(bool withDefaults)
+        public virtual async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults)
+        {
+            IQueryFluent<TEntity> res = ObjectRepository.Query(
+                p => ids.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+                .Include(p => p.OptionValues);
+            res = BuildQuery(res);
+            var entities = await res.SelectAsync(false);
+            foreach (var entity in entities)
+            {
+                await SetBigValuesAsync(entity, BigStringRepository);
+                entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
+                await AfterSelect(entity);
+            }
+            return Mapper.FromEntityRange(entities, withDefaults);
+        }
+
+        public virtual Task<List<TDynamic>> SelectAsync(bool withDefaults)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults)
+        public virtual Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults)
+        public virtual Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults)
         {
             throw new NotImplementedException();
         }
@@ -111,21 +132,33 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
+        public List<TDynamic> Select(ICollection<int> ids)
+        {
+            var task = SelectAsync(ids);
+            task.Wait();
+            return task.Result;
+        }
+
         public List<TDynamic> Select()
         {
-            throw new NotImplementedException();
+            var task = SelectAsync();
+            task.Wait();
+            return task.Result;
         }
 
         public List<TDynamic> Select(IQueryObject<TEntity> queryObject)
         {
-            throw new NotImplementedException();
+            var task = SelectAsync(queryObject);
+            task.Wait();
+            return task.Result;
         }
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query)
         {
-            throw new NotImplementedException();
+            var task = SelectAsync(query);
+            task.Wait();
+            return task.Result;
         }
-
         
 
         public TDynamic Select(int id, bool withDefaults)
@@ -135,19 +168,32 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
+        public List<TDynamic> Select(ICollection<int> ids, bool withDefaults)
+        {
+            var task = SelectAsync(ids, withDefaults);
+            task.Wait();
+            return task.Result;
+        }
+
         public List<TDynamic> Select(bool withDefaults)
         {
-            throw new NotImplementedException();
+            var task = SelectAsync(withDefaults);
+            task.Wait();
+            return task.Result;
         }
 
         public List<TDynamic> Select(IQueryObject<TEntity> queryObject, bool withDefaults)
         {
-            throw new NotImplementedException();
+            var task = SelectAsync(queryObject, withDefaults);
+            task.Wait();
+            return task.Result;
         }
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query, bool withDefaults)
         {
-            throw new NotImplementedException();
+            var task = SelectAsync(query, withDefaults);
+            task.Wait();
+            return task.Result;
         }
 
         protected static async Task SetBigValuesAsync(TEntity entity, IReadRepositoryAsync<BigStringValue> bigStringValueRepository, bool tracked = false)

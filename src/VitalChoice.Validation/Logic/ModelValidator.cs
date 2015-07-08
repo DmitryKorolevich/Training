@@ -10,18 +10,20 @@ namespace VitalChoice.Validation.Logic
     public abstract class ModelValidator<T> : IModelValidator
         where T: IModel
     {
-        protected readonly Dictionary<string, string> ValidationErrors;
+        protected readonly List<KeyValuePair<string, string>> ValidationErrors;
         protected ModelValidator()
         {
-            ValidationErrors = new Dictionary<string, string>();
+            ValidationErrors = new List<KeyValuePair<string, string>>();
         }
 
         protected virtual void ParseResults(ValidationResult validationResult)
         {
             IsValid = IsValid && validationResult.IsValid;
             if (!IsValid) {
-                foreach (var validationError in validationResult.Errors) {
-                    ValidationErrors.Add(validationError.PropertyName , validationError.ErrorMessage);
+                foreach (var validationError in validationResult.Errors)
+                {
+                    ValidationErrors.Add(new KeyValuePair<string, string>(validationError.PropertyName,
+                        validationError.ErrorMessage));
                 }
             }
         }
@@ -33,7 +35,10 @@ namespace VitalChoice.Validation.Logic
             {
                 foreach (var validationError in validationResult.Errors)
                 {
-                    ValidationErrors.Add(CollectionFormProperty.GetFullName(collectionName, index, validationError.PropertyName), validationError.ErrorMessage);
+                    ValidationErrors.Add(
+                        new KeyValuePair<string, string>(
+                            CollectionFormProperty.GetFullName(collectionName, index, validationError.PropertyName),
+                            validationError.ErrorMessage));
                 }
             }
         }
