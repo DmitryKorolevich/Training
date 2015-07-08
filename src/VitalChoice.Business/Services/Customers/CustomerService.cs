@@ -13,6 +13,7 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
@@ -74,33 +75,74 @@ namespace VitalChoice.Business.Services.Customers
 			return errors;
 		}
 
-        protected override Task<List<MessageInfo>> ValidateDelete(int id)
+        //protected override Task<List<MessageInfo>> ValidateDelete(int id)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        protected async override Task BeforeUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
-            throw new NotImplementedException();
+			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
+			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+
+	        await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
+			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
         }
 
-        protected override Task BeforeUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        protected async override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
-            throw new NotImplementedException();
-        }
+			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
+			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
 
-        protected override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
-        {
-            throw new NotImplementedException();
-        }
+			await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
+			await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
+		}
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
             return query.Include(p => p.Addresses)
                 .Include(p => p.CustomerNotes)
-                .Include(p => p.CustomerPaymentMethods)
+                //.Include(p => p.CustomerPaymentMethods)
                 .Include(p => p.DefaultPaymentMethod)
                 .Include(p => p.OrderNotes)
                 .Include(p => p.PaymentMethods)
                 .Include(p => p.User);
         }
 
-        public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
+	    protected async override Task<CustomerDynamic> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+	    {
+			var rand = new Random();
+
+			var userRepository = uow.RepositoryAsync<User>();
+			var user = new User()
+			{
+				Id = rand.Next(1, 100000000) //temp solution
+			};
+
+			using (var transaction = uow.BeginTransaction())
+		    {
+			    try
+			    {
+					await userRepository.InsertAsync(user);
+					await uow.SaveChangesAsync();
+
+					model.Id = user.Id;
+					model.User.Id = user.Id;
+					var customer = await base.InsertAsync(model, uow);
+
+					transaction.Commit();
+
+				    return customer;
+			    }
+			    catch (Exception)
+			    {
+					transaction.Rollback();
+				    throw;
+			    }
+		    }
+	    }
+
+	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);
 

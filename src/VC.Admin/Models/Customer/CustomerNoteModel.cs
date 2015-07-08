@@ -13,7 +13,7 @@ namespace VC.Admin.Models.Customer
 		[Map]
 	    public CustomerNotePriority Priority { get; set; }
 
-		[Map]
+		[Map("Note")]
 	    public string Text { get; set; }
 	}
 }

@@ -1,9 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using NuGet;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.DynamicData.Base;
 
@@ -11,11 +6,22 @@ namespace VitalChoice.DynamicData.Entities
 {
     public sealed class CustomerDynamic : MappedObject
     {
-		public User User { get; set; }
+	    public CustomerDynamic()
+	    {
+			User = new User();
+			ApprovedPaymentMethods = new List<int>();
+			OrderNotes = new List<int>();
+			Addresses = new List<AddressDynamic>();
+			CustomerNotes = new List<CustomerNoteDynamic>();
+        }
+
+	    public User User { get; set; }
 
 		public string Email { get; set; }
 
 		public int IdDefaultPaymentMethod { get; set; }
+
+		public bool SuspendUserAccount { get; set; }
 
 		public ICollection<int> ApprovedPaymentMethods { get; set; }
 

@@ -92,6 +92,14 @@ namespace VC.Admin.Controllers
 			if (int.TryParse(sUserId, out userId))
 			{
 				item.IdEditedBy = userId;
+				foreach (var address in item.Addresses)
+				{
+					address.IdEditedBy = userId;
+				}
+				foreach (var customerNote in item.CustomerNotes)
+				{
+					customerNote.IdEditedBy = userId;
+				}
 			}
 		    if (item.Id > 0)
 		    {

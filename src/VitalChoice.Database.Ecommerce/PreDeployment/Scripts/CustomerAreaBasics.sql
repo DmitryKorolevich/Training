@@ -398,6 +398,15 @@ END
 
 GO
 
+IF COL_LENGTH('[dbo].[CustomerNotes]','Note') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[CustomerNotes]
+	ADD [Note] NVARCHAR(1000) NOT NULL,
+		[StatusCode] INT NOT NULL
+
+	ALTER TABLE [dbo].[CustomerNotes]  WITH CHECK ADD CONSTRAINT [FK_CustomerNotes_RecordStatusCode] FOREIGN KEY ([StatusCode]) REFERENCES [RecordStatusCodes] ([StatusCode])
+END
+
 IF OBJECT_ID(N'[dbo].[CustomerNoteOptionTypes]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[CustomerNoteOptionTypes]
@@ -568,6 +577,9 @@ IF NOT EXISTS (SELECT [Id] FROM [dbo].[Addresses])
 BEGIN
 	ALTER TABLE [dbo].[Addresses]
 		ALTER COLUMN [IdState] INT NULL
+
+	ALTER TABLE [dbo].[Addresses]
+		ALTER COLUMN [County] NVARCHAR(250) NULL
 END
 
 GO

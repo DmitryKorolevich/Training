@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Relational;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
@@ -35,7 +36,12 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 			_uow.Dispose(disposing);
 		}
 
-		public IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
+	    public RelationalTransaction BeginTransaction()
+	    {
+		    return _uow.BeginTransaction();
+	    }
+
+	    public IRepositoryAsync<TEntity> RepositoryAsync<TEntity>() where TEntity : Entity
 		{
 			return _uow.RepositoryAsync<TEntity>();
 		}

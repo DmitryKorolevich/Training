@@ -9,6 +9,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Relational;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Domain;
 
 #endregion
@@ -46,7 +47,12 @@ namespace VitalChoice.Data.UnitOfWork
             _disposed = true;
         }
 
-        #endregion Constuctor/Dispose
+		public RelationalTransaction BeginTransaction()
+		{
+			return new TransactionManager(_dataContext).BeginTransaction();
+		}
+
+		#endregion Constuctor/Dispose
 
         public int SaveChanges()
         {

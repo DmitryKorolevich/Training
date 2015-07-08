@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
@@ -149,17 +150,10 @@ namespace VitalChoice.Business.Services.Dynamic
                 IdOrderNote = c
             }).ToList();
 
-            //if (dynamic.CustomerNotes != null)
-            //{
-            //    foreach (var item in entity.CustomerNotes)
-            //    {
-            //        item.Id = 0;
-            //        item.IdCustomer = dynamic.Id;
-            //    }
-            //    entity.CustomerNotes = dynamic.CustomerNotes.ToList();
-            //}
+            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x, new List<AddressOptionType>())).ToList() ?? new List<Address>();
+            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x, new List<CustomerNoteOptionType>())).ToList() ?? new List<CustomerNote>();
 
-            //entity.Addresses = Addresses?.Select(s => s.ToEntity(s.OptionTypes)).ToList() ?? new List<Address>();
+	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }
     }
 }

@@ -9,6 +9,10 @@ namespace VitalChoice.Business.Queries.Customer
         public CustomerOptionTypeQuery WithType(CustomerType? type)
         {
             Add(t => t.IdObjectType == (int?)type);
+	        if (type.HasValue)
+	        {
+				Or(t => t.IdObjectType == null);
+			}
             return this;
         }
     }

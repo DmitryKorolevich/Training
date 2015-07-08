@@ -21,9 +21,9 @@ namespace VC.Admin.Validators.Customer
 		public CustomerNoteModelRules()
 		{
 			RuleFor(model => model.Text)
-				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+				.Length(0, 1000)
 				.WithMessage(model => model.Text, ValidationMessages.FieldLength,
-					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+					1000);
 		}
 	}
 }

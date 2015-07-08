@@ -209,7 +209,7 @@ namespace VitalChoice.DynamicData.Base
             return Mapper.FromEntityRange(toInsertList);
         }
 
-        private async Task<TDynamic> InsertAsync(TDynamic model, IUnitOfWorkAsync uow)
+        protected virtual async Task<TDynamic> InsertAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
             (await Validate(model)).Raise();
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);

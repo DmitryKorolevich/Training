@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Data.Entity.Relational;
 
 namespace VitalChoice.Data.UnitOfWork
 {
@@ -6,5 +7,6 @@ namespace VitalChoice.Data.UnitOfWork
     {
         int SaveChanges();
         void Dispose(bool disposing);
+	    RelationalTransaction BeginTransaction();
     }
 }

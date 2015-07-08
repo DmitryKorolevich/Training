@@ -1,5 +1,6 @@
 using System;
 using Autofac.Features.Indexed;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
@@ -26,7 +27,7 @@ namespace VitalChoice.Business.Services.Dynamic
             entity.IdCustomer = dynamic.IdCustomer;
             entity.IdCountry = dynamic.IdCountry;
             entity.County = dynamic.County;
-            entity.IdState = dynamic.IdState;
+            entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
             foreach (var value in entity.OptionValues)
             {
                 value.IdAddress = dynamic.Id;
@@ -38,7 +39,8 @@ namespace VitalChoice.Business.Services.Dynamic
             entity.IdCustomer = dynamic.IdCustomer;
             entity.IdCountry = dynamic.IdCountry;
             entity.County = dynamic.County;
-            entity.IdState = dynamic.IdState;
+            entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
+			entity.StatusCode = RecordStatusCode.Active;
         }
     }
 }

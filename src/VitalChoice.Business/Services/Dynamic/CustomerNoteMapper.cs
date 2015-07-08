@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
@@ -36,6 +37,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             entity.IdCustomer = dynamic.IdCustomer;
             entity.Note = dynamic.Note;
+	        entity.StatusCode = RecordStatusCode.Active;
         }
     }
 }
