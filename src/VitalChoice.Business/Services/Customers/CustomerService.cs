@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Payment;
+using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
@@ -15,6 +17,7 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
@@ -35,8 +38,10 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<CustomerNote> _customerNotesRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<CustomerToOrderNote> _customerToOrderNoteRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<CustomerToPaymentMethod> _customerToPaymentMethodRepositoryAsync;
+	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
+		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 
-        protected override IUnitOfWorkAsync CreateUnitOfWork()
+		protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
             return new EcommerceUnitOfWork();
         }
@@ -45,7 +50,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync, IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, IRepositoryAsync<AdminProfile> adminProfileRepository)
             : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
@@ -55,6 +60,8 @@ namespace VitalChoice.Business.Services.Customers
             _customerNotesRepositoryAsync = customerNotesRepositoryAsync;
             _customerToOrderNoteRepositoryAsync = customerToOrderNoteRepositoryAsync;
             _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
+	        _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+	        _adminProfileRepository = adminProfileRepository;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -78,11 +85,6 @@ namespace VitalChoice.Business.Services.Customers
 
 			return errors;
 		}
-
-        //protected override Task<List<MessageInfo>> ValidateDelete(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         protected async override Task BeforeUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
@@ -128,10 +130,8 @@ namespace VitalChoice.Business.Services.Customers
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
-            return query //.Include(p => p.CustomerPaymentMethods)
+            return query
                 .Include(p => p.DefaultPaymentMethod)
-                //.Include(p => p.OrderNotes)
-                //.Include(p => p.PaymentMethods)
                 .Include(p => p.User);
         }
 
@@ -180,92 +180,109 @@ namespace VitalChoice.Business.Services.Customers
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
 		}
 
-		public async Task<PagedList<CustomerDynamic>> GetCustomersAsync(CustomerFilter filter)
+		public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
 		{
-			//var conditions = new DiscountQuery().NotDeleted().WithText(filter.SearchText).WithStatus(filter.Status);
-			//var query = _discountRepository.Query(conditions);
+			var condition =
+				new VCustomerQuery().NotDeleted()
+					.WithId(filter.SearchText)
+					.WithEmail(filter.Email)
+					.WithAddress1(filter.Address1)
+					.WithAddress2(filter.Address2)
+					.WithCity(filter.City)
+					.WithCompany(filter.Company)
+					.WithCountry(filter.Country)
+					.WithFirstName(filter.FirstName)
+					.WithLastName(filter.LastName)
+					.WithPhone(filter.Phone)
+					.WithState(filter.State)
+					.WithZip(filter.Zip);
 
-			//Func<IQueryable<Discount>, IOrderedQueryable<Discount>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-			//var sortOrder = filter.Sorting.SortOrder;
-			//switch (filter.Sorting.Path)
-			//{
-			//	case DiscountSortPath.Code:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.Code)
-			//					: x.OrderByDescending(y => y.Code);
-			//		break;
-			//	case DiscountSortPath.Description:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.Description)
-			//					: x.OrderByDescending(y => y.Description);
-			//		break;
-			//	case DiscountSortPath.IdDiscountType:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.IdDiscountType)
-			//					: x.OrderByDescending(y => y.IdDiscountType);
-			//		break;
-			//	case DiscountSortPath.Assigned:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.Assigned)
-			//					: x.OrderByDescending(y => y.Assigned);
-			//		break;
-			//	case DiscountSortPath.StartDate:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.StartDate)
-			//					: x.OrderByDescending(y => y.StartDate);
-			//		break;
-			//	case DiscountSortPath.ExpirationDate:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.ExpirationDate)
-			//					: x.OrderByDescending(y => y.ExpirationDate);
-			//		break;
-			//	case DiscountSortPath.DateCreated:
-			//		sortable =
-			//			(x) =>
-			//				sortOrder == SortOrder.Asc
-			//					? x.OrderBy(y => y.DateCreated)
-			//					: x.OrderByDescending(y => y.DateCreated);
-			//		break;
-			//}
-
-			//var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-			//PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => new DiscountDynamic(p)).ToList(), result.Count);
-			//if (toReturn.Items.Any())
-			//{
-			//	var ids = result.Items.Select(p => p.IdAddedBy).ToList();
-			//	var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
-			//	foreach (var item in toReturn.Items)
-			//	{
-			//		foreach (var profile in profiles)
-			//		{
-			//			if (item.IdAddedBy == profile.Id)
-			//			{
-			//				item.Data.AddedByAgentId = profile.AgentId;
-			//			}
-			//		}
-			//	}
-			//}
-
-
-			//return toReturn;
-
-			return new PagedList<CustomerDynamic>
+			Func<IQueryable<VCustomer>, IOrderedQueryable<VCustomer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
+			var sortOrder = filter.Sorting.SortOrder;
+			switch (filter.Sorting.Path)
 			{
-			    Count = 0,
-                Items = new List<CustomerDynamic>()
+				case VCustomerSortPath.Name:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.LastName).ThenBy(y => y.FirstName)
+								: x.OrderByDescending(y => y.LastName).ThenByDescending(y => y.FirstName);
+                    break;
+				case VCustomerSortPath.Updated:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.DateEdited)
+								: x.OrderByDescending(y => y.DateEdited);
+					break;
+				case VCustomerSortPath.Country:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.CountryCode)
+								: x.OrderByDescending(y => y.CountryCode);
+					break;
+				case VCustomerSortPath.City:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.City)
+								: x.OrderByDescending(y => y.City);
+					break;
+				case VCustomerSortPath.State:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.StateOrCounty)
+								: x.OrderByDescending(y => y.StateOrCounty);
+					break;
+				case VCustomerSortPath.Status:
+					sortable =
+						(x) =>
+							sortOrder == SortOrder.Asc
+								? x.OrderBy(y => y.StatusCode)
+								: x.OrderByDescending(y => y.StatusCode);
+					break;
+			}
+
+			var customers = await _vCustomerRepositoryAsync.Query(condition).OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+
+			var adminProfileCondition =
+				new AdminProfileQuery().IdInRange(
+					customers.Items.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
+
+			var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
+
+			var result = new PagedList<ExtendedVCustomer>
+			{
+				Items = customers.Items.Select(x => new ExtendedVCustomer()
+				{
+					AdminProfile = adminProfiles.SingleOrDefault(y => y.Id == x.IdEditedBy),
+					IdEditedBy = x.IdEditedBy,
+					FirstName = x.FirstName,
+					LastName = x.LastName,
+					DateEdited = x.DateEdited,
+					IdObjectType = x.IdObjectType,
+					CountryCode = x.CountryCode,
+					StateCode = x.StateCode,
+					StateName = x.StateName,
+					CountryName = x.CountryName,
+					City = x.City,
+					Company = x.Company,
+					Id = x.Id,
+					Address1 = x.Address1,
+					Address2 = x.Address2,
+					Email = x.Email,
+					Phone = x.Phone,
+					Zip = x.Zip,
+					County = x.County,
+					StateOrCounty = x.StateOrCounty,
+					StatusCode = x.StatusCode
+				}).ToList(),
+				Count = customers.Count
 			};
+
+			return result;
 		}
-    }
+	}
 }

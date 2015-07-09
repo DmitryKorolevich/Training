@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Linq;
-using VitalChoice.Business.Helpers;
+using VC.Admin.Models.Setting;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
@@ -18,29 +13,18 @@ namespace VC.Admin.Models.Customer
 
 		public string City { get; set; }
 
-		public int? State { get; set; }
+		public string Country { get; set; }
 
-		public string County { get; set; }
+		public string State { get; set; }
 
-		public DateTime UpdatedDate { get; set; }
+		public DateTime DateEdited { get; set; }
 
-		public string UpdateBy { get; set; }
+		public string EditedBy { get; set; }
 
-		public CustomerListItemModel(CustomerDynamic item)
-		{
-			if (item != null)
-			{
-				Id = item.Id;
+		public DateTime? LastOrderPlaced { get; set; }
 
-				var profileAddress = item.Addresses.Single(x => (AddressType)(x.IdObjectType ?? 0) == AddressType.Profile);
+		public int TotalOrders { get; set; }
 
-				Name = $"{profileAddress.Data.LastName}, {profileAddress.Data.FirstNam}";
-				City = profileAddress.Data.City;
-				State = profileAddress.IdState;
-				County = profileAddress.County;
-				UpdatedDate = item.DateEdited;
-				//UpdateBy ?????
-			}
-		}
+		public RecordStatusCode StatusCode { get; set; }
 	}
 }

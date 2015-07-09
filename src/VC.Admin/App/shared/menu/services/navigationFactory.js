@@ -7,7 +7,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'customer',
 			stateLabel: 'Customer',
 			subMenu: [
-				{ name: 'locateCustomer', stateName: 'index.oneCol.locateCustomer', stateLabel: 'Locate Customer', access: 1 },
+				{ name: 'manageCustomers', stateName: 'index.oneCol.manageCustomers', stateLabel: 'Manage Customers', access: 1 },
 				{ name: 'addNewCustomer', stateName: 'index.oneCol.addCustomer', stateLabel: 'Add New Customer', access: 1 }
 			]
 		},

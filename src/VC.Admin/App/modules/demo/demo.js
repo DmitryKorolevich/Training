@@ -21,21 +21,6 @@ angular.module('app.modules.demo',
 					templateUrl: 'app/modules/demo/partials/dashboard.html',
 					controller: 'dashboardController'
 				})
-				/*customer*/
-				.state('index.oneCol.locateCustomer', {
-					url: '/customers/locate',
-					templateUrl: 'app/modules/demo/partials/searchCustomer.html'
-				})
-				.state('index.oneCol.customersList', {
-					url: '/customers',
-					templateUrl: 'app/modules/demo/partials/customers.html',
-					controller: 'customerListController'
-				})
-				.state('index.oneCol.customerDetail', {
-					url: '/customers/detail/1',
-					templateUrl: 'app/modules/demo/partials/customerDetail.html',
-					controller: 'customerDetailController'
-				})
 				/*orders*/
 				.state('index.oneCol.viewAllOrders', {
 					url: '/orders',

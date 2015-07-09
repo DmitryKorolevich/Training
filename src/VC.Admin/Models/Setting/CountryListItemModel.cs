@@ -25,6 +25,7 @@ namespace VC.Admin.Models.Setting
 
 	    public CountryListItemModel()
 	    {
+		    States = new List<StateListItemModel>();
 	    }
 
 	    public CountryListItemModel(Country item)

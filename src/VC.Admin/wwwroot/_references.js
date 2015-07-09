@@ -1554,3 +1554,6 @@
 /// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
 /// <reference path="app/modules/customer/customer.js" />
 /// <reference path="app/modules/customer/controllers/addCustomerController.js" />
+/// <reference path="app/app.common.js" />
+/// <reference path="../app/modules/customer/controllers/managecustomerscontroller.js" />
+/// <reference path="app/modules/customer/controllers/customermanagementcontroller.js" />

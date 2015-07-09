@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Setting;
+using VitalChoice.Business.Services;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
@@ -25,10 +28,10 @@ namespace VC.Admin.Controllers
     {
 		private readonly ICountryService _countryService;
 	    private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
-	    private readonly ICustomerService _customerService;
+		private readonly ICustomerService _customerService;
 
 
-		public CustomerController(ICustomerService customerService, ICountryService countryService, IDynamicToModelMapper<CustomerDynamic> customerMapper)
+		public CustomerController(ICustomerService customerService, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICountryService countryService)
 		{
 			_customerService = customerService;
 			_countryService = countryService;
@@ -117,10 +120,20 @@ namespace VC.Admin.Controllers
 		public async Task<Result<PagedList<CustomerListItemModel>>> GetCustomers([FromBody]CustomerFilter filter)
 		{
 			var result = await _customerService.GetCustomersAsync(filter);
-
+			
 			var toReturn = new PagedList<CustomerListItemModel>
 			{
-				Items = result.Items.Select(p => new CustomerListItemModel(p)).ToList(),
+				Items = result.Items.Select(p => new CustomerListItemModel()
+					{
+						Id = p.Id,
+						Name = $"{p.LastName}, {p.FirstName}",
+						City = p.City,
+						Country = p.CountryCode,
+						State = p.StateOrCounty,
+						DateEdited = p.DateEdited,
+						EditedBy = p.AdminProfile?.AgentId,
+						StatusCode = p.StatusCode
+					}).ToList(),
 				Count = result.Count,
 			};
 

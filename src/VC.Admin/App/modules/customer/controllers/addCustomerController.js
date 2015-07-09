@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.customer.controllers.addCustomerController', [])
-.controller('addCustomerController', ['$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', function ($scope, customerService, toaster, promiseTracker, $rootScope, $q) {
+.controller('addCustomerController', ['$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', '$state', function ($scope, customerService, toaster, promiseTracker, $rootScope, $q, $state) {
 	$scope.addTracker = promiseTracker("add");
 
 	function initialize() {
@@ -80,6 +80,7 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
+			$state.go("index.oneCol.manageCustomers");
 		} else {
 			var messages = "";
 			if (result.Messages) {

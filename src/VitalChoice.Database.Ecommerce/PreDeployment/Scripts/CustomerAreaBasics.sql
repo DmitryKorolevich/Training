@@ -598,3 +598,24 @@ IF NOT EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[C
 	ALTER TABLE [dbo].[CustomerOptionValues]
 	ADD [IdBigString] BIGINT NULL,
 	CONSTRAINT [FK_CustomerOptionValue_ToBigStringValue] FOREIGN KEY ([IdBigString]) REFERENCES [BigStringValues]([IdBigString]) ON DELETE CASCADE
+
+GO
+
+IF OBJECT_ID(N'[dbo].[VCustomers]', N'V') IS NOT NULL
+	DROP VIEW [dbo].[VCustomers]
+GO
+
+CREATE VIEW [dbo].[VCustomers]
+AS
+SELECT cu.[Id], cu.[Email], options.[FirstName], options.[LastName], cu.[DateEdited], cu.[StatusCode], cu.[IdObjectType], cu.[IdEditedBy], options.[Company], co.[CountryCode], co.[CountryName], st.[StateCode], st.[StateName], ad.[County], options.[City],  options.[Address1], options.[Address2], options.[Phone], options.[Zip], ISNULL(st.[StateCode], ad.[County]) AS StateOrCounty
+FROM   [dbo].[Customers] AS cu 
+LEFT OUTER JOIN [dbo].[Addresses] AS ad ON cu.Id = ad.IdCustomer AND ad.IdObjectType = (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Profile')
+LEFT OUTER JOIN (SELECT [IdAddress], [FirstName], [LastName], [City] , [Company], [Address1], [Address2], [Phone], [Zip]
+FROM (SELECT [IdAddress], [Name], [Value] FROM [dbo].[AddressOptionTypes] AS adt INNER JOIN [dbo].[AddressOptionValues] AS adv on adt.Id = adv.IdOptionType ) AS source
+PIVOT(
+MIN([Value]) FOR [Name] in ([FirstName], [LastName], [City], [Company], [Address1], [Address2], [Phone], [Zip])
+) AS piv) AS options ON ad.Id = options.IdAddress
+LEFT OUTER JOIN [dbo].[Countries] AS co ON ad.IdCountry = co.Id
+LEFT OUTER JOIN [dbo].[States] AS st ON ad.IdState = st.Id  
+
+GO

@@ -329,11 +329,14 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<User>().Key(p => p.Id);
 			builder.Entity<User>().Table("Users");
 
-            #endregion
+			#endregion
 
-            #region Customers
+			#region Customers
 
-            builder.Entity<Customer>().Key(p => p.Id);
+			builder.Entity<VCustomer>().Key(x => x.Id);
+			builder.Entity<VCustomer>().Table("VCustomers");
+
+			builder.Entity<Customer>().Key(p => p.Id);
 			builder.Entity<Customer>().Table("Customers");
 		    builder.Entity<Customer>()
 		        .Reference(p => p.EditedBy)

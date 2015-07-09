@@ -213,6 +213,7 @@
                                             <label for="state" class="col-md-3 control-label">Default Payment Method</label>
                                             <div class="col-md-9">
                                                 <select class="form-control" name="DefaultPaymentMethod" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods" required>
+                                                    <option value="">Select Default Payment Method</option>
                                                 </select>
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.DefaultPaymentMethod.$invalid">
                                                     <small class="error" ng-show="forms.profile.DefaultPaymentMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Default Payment Method")}}</small>

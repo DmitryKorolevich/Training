@@ -23,7 +23,9 @@ namespace VitalChoice.DynamicData.Entities
 
 		public bool SuspendUserAccount { get; set; }
 
-		public ICollection<int> ApprovedPaymentMethods { get; set; }
+	    public string EditedBy { get; set; }
+
+	    public ICollection<int> ApprovedPaymentMethods { get; set; }
 
 		public ICollection<int> OrderNotes { get; set; }
 

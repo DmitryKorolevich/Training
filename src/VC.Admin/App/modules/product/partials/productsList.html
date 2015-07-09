@@ -40,7 +40,7 @@
                         <td>{{item.Name}}</td>
                         <td>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
-                            <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
                         <td>
                             <span data-ng-if="item.Hidden" class="label label-warning font-default">Hidden</span>

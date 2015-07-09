@@ -65,9 +65,9 @@ namespace VC.Admin.Validators.Customer
 				.WithMessage(model => model.City, ValidationMessages.FieldLength,
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
-			RuleFor(model => model.Country.Id)
-				.Must(model => model != 0)
-				.WithMessage(model => model.Country.Id, ValidationMessages.FieldRequired);
+			RuleFor(model => model.Country)
+				.Must(model => model.Id != 0)
+				.WithMessage(model => model.Country, ValidationMessages.FieldRequired);
 
 			RuleFor(model => model.State)
 				.Must(model => model != 0)
