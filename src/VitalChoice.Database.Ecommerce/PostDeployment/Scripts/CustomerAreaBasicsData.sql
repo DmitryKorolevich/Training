@@ -270,3 +270,11 @@ END
 UPDATE [dbo].[CustomerOptionTypes]
 	SET [IdFieldType] = 6
 	WHERE [Name] = N'InceptionDate' AND [IdFieldType] = 4
+GO
+UPDATE [dbo].[CustomerOptionTypes]
+	SET [IdFieldType] = 8
+	WHERE [Name] = N'SuspensionReason' AND [IdFieldType] = 4
+GO
+UPDATE [dbo].[CustomerOptionTypes]
+	SET [IdFieldType] = 8
+	WHERE [Name] = N'PromotingWebsites' AND [IdFieldType] = 4

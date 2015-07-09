@@ -593,3 +593,8 @@ BEGIN
 	EXEC sp_rename 'dbo.Addresses.IdAddressType', 'IdObjectType', 'COLUMN';
 	EXEC sp_rename 'dbo.AddressOptionTypes.IdAddressType', 'IdObjectType', 'COLUMN';
 END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [object_id] = OBJECT_ID(N'[dbo].[CustomerOptionValues]', N'U') AND Name = 'IdBigString')
+	ALTER TABLE [dbo].[CustomerOptionValues]
+	ADD [IdBigString] BIGINT NULL,
+	CONSTRAINT [FK_CustomerOptionValue_ToBigStringValue] FOREIGN KEY ([IdBigString]) REFERENCES [BigStringValues]([IdBigString]) ON DELETE CASCADE

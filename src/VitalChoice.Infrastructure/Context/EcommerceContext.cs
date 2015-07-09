@@ -414,8 +414,6 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(t => t.IdOptionType)
 		        .PrincipalKey(v => v.Id)
 		        .Required();
-            builder.Entity<CustomerOptionValue>().Ignore(c => c.BigValue);
-            builder.Entity<CustomerOptionValue>().Ignore(c => c.IdBigString);
 
             builder.Entity<CustomerNote>().Key(p => p.Id);
 			builder.Entity<CustomerNote>().Table("CustomerNotes");
