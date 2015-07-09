@@ -23,7 +23,7 @@ namespace VC.Admin.ModelConverters
 
 	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
-			if (model.CustomerNote != null)
+			if (!string.IsNullOrWhiteSpace(model.CustomerNote?.Text))
 			{
 				var customerNoteDynamic = _customerNoteMapper.FromModel(model.CustomerNote);
                 dynamic.CustomerNotes.Add(customerNoteDynamic);

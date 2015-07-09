@@ -473,43 +473,19 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdCustomerType)
 				.PrincipalKey(p => p.Id);
 
+			builder.Entity<CustomerToOrderNote>().Ignore(p => p.Id);
 			builder.Entity<CustomerToOrderNote>().Key(p => new { p.IdCustomer, p.IdOrderNote });
 			builder.Entity<CustomerToOrderNote>().Table("CustomersToOrderNotes");
-			builder.Entity<CustomerToOrderNote>().Ignore(p => p.Id);
-		    builder.Entity<CustomerToOrderNote>()
-		        .Reference(n => n.Customer)
-		        .InverseReference()
-		        .ForeignKey<CustomerToOrderNote>(n => n.IdCustomer)
-		        .PrincipalKey<Customer>(c => c.Id)
-		        .Required();
-            builder.Entity<CustomerToOrderNote>()
-                .Reference(n => n.OrderNote)
-                .InverseReference()
-                .ForeignKey<CustomerToOrderNote>(n => n.IdOrderNote)
-                .PrincipalKey<OrderNote>(c => c.Id)
-                .Required();
 
-            builder.Entity<CustomerToPaymentMethod>().Key(p => new { p.IdCustomer, p.IdPaymentMethod });
-			builder.Entity<CustomerToPaymentMethod>().Table("CustomersToPaymentMethods");
 			builder.Entity<CustomerToPaymentMethod>().Ignore(p => p.Id);
-		    builder.Entity<CustomerToPaymentMethod>()
-		        .Reference(p => p.Customer)
-		        .InverseReference()
-		        .ForeignKey<CustomerToPaymentMethod>(n => n.IdCustomer)
-		        .PrincipalKey<Customer>(c => c.Id)
-		        .Required();
-            builder.Entity<CustomerToPaymentMethod>()
-                .Reference(p => p.PaymentMethod)
-                .InverseReference()
-                .ForeignKey<CustomerToPaymentMethod>(p => p.IdPaymentMethod)
-                .PrincipalKey<PaymentMethod>(c => c.Id)
-                .Required();
+			builder.Entity<CustomerToPaymentMethod>().Key(p => new { p.IdCustomer, p.IdPaymentMethod });
+			builder.Entity<CustomerToPaymentMethod>().Table("CustomersToPaymentMethods");
 
-            #endregion
+			#endregion
 
-            #region Addresses
+			#region Addresses
 
-            builder.Entity<Address>().Key(p => p.Id);
+			builder.Entity<Address>().Key(p => p.Id);
 			builder.Entity<Address>().Table("Addresses");
 		    builder.Entity<Address>()
 		        .Reference(p => p.Сountry)
@@ -546,12 +522,6 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdLookup)
 				.PrincipalKey(p => p.Id)
 				.Required(false);
-			//builder.Entity<AddressOptionType>()
-			//	.Reference(p => p.FieldType)
-			//	.InverseCollection()
-			//	.ForeignKey(p => p.IdFieldType)
-			//	.PrincipalKey(p => p.Id)
-			//	.Required();
 			builder.Entity<AddressOptionValue>().Key(o => o.Id);
 			builder.Entity<AddressOptionValue>().Table("AddressOptionValues");
 			builder.Entity<AddressOptionValue>()
@@ -574,32 +544,30 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<OrderNoteToCustomerType>().Table("OrderNotesToCustomerTypes");
 			builder.Entity<OrderNoteToCustomerType>().Ignore(p => p.Id);
 
-		    builder.Entity<OrderNoteToCustomerType>()
-		        .Reference(n => n.CustomerType)
-		        .InverseCollection()
-		        .ForeignKey(n => n.IdCustomerType)
-		        .PrincipalKey(t => t.Id)
-		        .Required();
+		    //builder.Entity<OrderNoteToCustomerType>()
+		    //    .Reference(n => n.CustomerType)
+		    //    .InverseCollection()
+		    //    .ForeignKey(n => n.IdCustomerType)
+		    //    .PrincipalKey(t => t.Id)
+		    //    .Required();
 
             builder.Entity<OrderNote>().Key(p => p.Id);
 			builder.Entity<OrderNote>().Table("OrderNotes");
-		    builder.Entity<OrderNote>()
-		        .Reference(p => p.EditedBy)
-		        .InverseCollection()
-		        .ForeignKey(p => p.IdEditedBy)
-		        .PrincipalKey(p => p.Id)
-		        .Required(false);
+			builder.Entity<OrderNote>()
+				.Reference(p => p.EditedBy)
+				.InverseCollection()
+				.ForeignKey(p => p.IdEditedBy)
+				.PrincipalKey(p => p.Id);
 		    builder.Entity<OrderNote>()
 		        .Collection(p => p.Customers)
 		        .InverseReference(p => p.OrderNote)
-		        .ForeignKey(p => p.IdCustomer);
+		        .ForeignKey(p => p.IdOrderNote)
+				.PrincipalKey(p => p.Id);
 			builder.Entity<OrderNote>()
 				.Collection(p => p.CustomerTypes)
 				.InverseReference(p => p.OrderNote)
 				.ForeignKey(p => p.IdOrderNote)
 				.PrincipalKey(p => p.Id);
-
-            
 
             #endregion
 
@@ -612,7 +580,7 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<PaymentMethod>().Table("PaymentMethods");
 			builder.Entity<PaymentMethod>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id)
 				.Required(false);
-			builder.Entity<PaymentMethod>().Collection(p => p.Customers).InverseReference(p => p.PaymentMethod).ForeignKey(p => p.IdPaymentMethod);
+			builder.Entity<PaymentMethod>().Collection(p => p.Customers).InverseReference(p => p.PaymentMethod).ForeignKey(p => p.IdPaymentMethod).PrincipalKey(p => p.Id);
 			builder.Entity<PaymentMethod>()
 				.Collection(p => p.CustomerTypes)
 				.InverseReference(p => p.PaymentMethod)
@@ -654,12 +622,6 @@ namespace VitalChoice.Infrastructure.Context
 				.ForeignKey(p => p.IdLookup)
 				.PrincipalKey(p => p.Id)
 				.Required(false);
-			//builder.Entity<CustomerPaymentMethodOptionType>()
-			//	.Reference(p => p.FieldType)
-			//	.InverseCollection()
-			//	.ForeignKey(p => p.IdFieldType)
-			//	.PrincipalKey(p => p.Id)
-			//	.Required();
 			builder.Entity<CustomerPaymentMethodOptionValue>().Key(o => o.Id);
 			builder.Entity<CustomerPaymentMethodOptionValue>().Table("CustomerPaymentMethodOptionValues");
 			builder.Entity<CustomerPaymentMethodOptionValue>()
