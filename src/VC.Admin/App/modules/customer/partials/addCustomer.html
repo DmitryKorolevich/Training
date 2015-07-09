@@ -51,6 +51,17 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label for="promoting" class="col-md-3 control-label">Promoting Websites</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="PromotingWebsites" class="form-control" data-ng-model="currentCustomer.PromotingWebsites" id="promoting" placeholder="Promoting Websites" rows="10" required data-ng-maxlength="1000"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.PromotingWebsites.$invalid">
+                                                        <small class="error" ng-show="forms.profile.PromotingWebsites.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Promoting Websites")}}</small>
+                                                        <small class="error" ng-show="forms.profile.PromotingWebsites.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Promoting Websites", "1000"])}}</small>
+                                                        <small class="error" ng-show="forms.profile.PromotingWebsites.$error.server">{{serverMessages.GetMessage('Promoting Websites')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="tier" class="col-md-3 control-label">Tier</label>
                                                 <div class="col-md-9">
                                                     <select class="form-control" id="tier" name="Tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers" required>

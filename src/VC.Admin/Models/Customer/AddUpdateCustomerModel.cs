@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Attributes;
+using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
+using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
@@ -27,13 +31,16 @@ namespace VC.Admin.Models.Customer
         public CustomerType CustomerType { get; set; }
 
 		[Map]
-		public int? TaxExempt { get; set; }
+		public TaxExempt? TaxExempt { get; set; }
 
 		[Map]
 		public string Website { get; set; }
 
 		[Map]
-		public int? Tier { get; set; }
+		public string PromotingWebsites { get; set; }
+
+		[Map]
+		public Tier? Tier { get; set; }
 
 		[Map]
 		public int? TradeClass { get; set; }

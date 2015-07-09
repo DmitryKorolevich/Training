@@ -266,3 +266,7 @@ BEGIN
 	VALUES
 	(1012)
 END
+
+UPDATE [dbo].[CustomerOptionTypes]
+	SET [IdFieldType] = 6
+	WHERE [Name] = N'InceptionDate' AND [IdFieldType] = 4

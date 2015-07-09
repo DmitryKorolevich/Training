@@ -70,8 +70,8 @@ namespace VC.Admin.Controllers
 			return new AddUpdateCustomerModel()
 			{
 				CustomerType = CustomerType.Retail,
-				TaxExempt = (int)TaxExempt.YesCurrentCertificate,
-				Tier = (int)Tier.Tier1,
+				TaxExempt = TaxExempt.YesCurrentCertificate,
+				Tier = Tier.Tier1,
 				InceptionDate = DateTime.Now,
 				TradeClass = 1,
 				CustomerNote = new CustomerNoteModel()

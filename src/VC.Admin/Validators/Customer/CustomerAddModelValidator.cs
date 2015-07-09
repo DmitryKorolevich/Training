@@ -39,6 +39,15 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.Website, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
+				RuleFor(model => model.PromotingWebsites)
+					.NotEmpty()
+					.When(model => model.CustomerType == CustomerType.Wholesale)
+					.WithMessage(model => model.PromotingWebsites, ValidationMessages.FieldRequired)
+					.Length(0, 1000)
+					.When(model => model.CustomerType == CustomerType.Wholesale)
+					.WithMessage(model => model.PromotingWebsites, ValidationMessages.FieldLength,
+						1000);
+
 				RuleFor(model => model.InceptionDate)
 					.Must(model => model.HasValue)
 					.When(model => model.CustomerType == CustomerType.Wholesale)
