@@ -34,6 +34,22 @@ namespace VitalChoice.DynamicData.Helpers
             return baseImplementation?.GenericTypeArguments.FirstOrDefault();
         }
 
+        public static Type UnwrapNullable(this Type type)
+        {
+            return type.IsImplementGeneric(typeof (Nullable<>))
+                ? Nullable.GetUnderlyingType(type)
+                : type;
+        }
+
+        public static Type TryUnwrapEnum(this Type type)
+        {
+            if (type.GetTypeInfo().IsEnum)
+            {
+                return Enum.GetUnderlyingType(type);
+            }
+            return null;
+        }
+
         public static Type[] TryGetTypeArguments(this Type type, Type baseType)
         {
             if (type == null)

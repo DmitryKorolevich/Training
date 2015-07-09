@@ -7,13 +7,12 @@ using VitalChoice.DynamicData.Delegates;
 
 namespace VitalChoice.DynamicData.Helpers
 {
-    internal static class MapperTypeConverter
+    public static class MapperTypeConverter
     {
-        internal static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
+        public static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
             GenericProperty destProperty, bool toModelDirection)
         {
-            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType &&
-                destProperty.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))
+            if (value == null && !destProperty.PropertyType.IsImplementGeneric(typeof(Nullable<>)))
             {
                 throw new ApiException(
                     $"Value is null while it should be a ValueType {destProperty.PropertyType}.\r\n [{modelType} <-> {dynamicType}]");
@@ -25,7 +24,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        internal static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
+        public static object ConvertTo<TOptionValue, TOptionType>(TOptionValue value, FieldType typeId)
             where TOptionValue: OptionValue<TOptionType> 
             where TOptionType : OptionType
         {
@@ -34,7 +33,7 @@ namespace VitalChoice.DynamicData.Helpers
             return typeId == FieldType.LargeString ? value.BigValue?.Value : ConvertTo(value.Value, typeId);
         }
 
-        internal static object ConvertTo(string value, FieldType typeId)
+        public static object ConvertTo(string value, FieldType typeId)
         {
             if (string.IsNullOrEmpty(value))
                 return null;
@@ -68,7 +67,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        internal static void ConvertToOption<TOptionValue, TOptionType>(TOptionValue option, object value, FieldType typeId)
+        public static void ConvertToOption<TOptionValue, TOptionType>(TOptionValue option, object value, FieldType typeId)
             where TOptionValue : OptionValue<TOptionType>
             where TOptionType : OptionType
         {
@@ -84,6 +83,15 @@ namespace VitalChoice.DynamicData.Helpers
                     };
                     break;
                 default:
+                    var valueType = value.GetType();
+                    var underlyingType = valueType.UnwrapNullable();
+                    var enumType = underlyingType.TryUnwrapEnum();
+                    if (enumType != null)
+                    {
+                        option.Value = Convert.ToString(Convert.ChangeType(value, enumType),
+                            CultureInfo.InvariantCulture);
+                        break;
+                    }
                     option.Value = Convert.ToString(value, CultureInfo.InvariantCulture);
                     break;
             }
