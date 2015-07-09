@@ -150,6 +150,9 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 	$scope.togglePaymentMethodSelection = function (paymentMethod) {
 		if (!$scope.currentCustomer.ApprovedPaymentMethods || $scope.currentCustomer.ApprovedPaymentMethods.length == 0) {
 			$scope.currentCustomer.ApprovedPaymentMethods = [];
+		}
+
+		if (!$scope.selectedPaymentMethods) {
 			$scope.selectedPaymentMethods = [];
 		}
 

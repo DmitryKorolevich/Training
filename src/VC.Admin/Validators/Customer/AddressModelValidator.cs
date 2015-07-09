@@ -71,7 +71,7 @@ namespace VC.Admin.Validators.Customer
 
 			RuleFor(model => model.State)
 				.Must(model => model != 0)
-				.When(model => !model.Country.States.Any())
+				.When(model => model.Country.States.Any())
 				.WithMessage(model => model.State, ValidationMessages.FieldRequired);
 
 			RuleFor(model => model.County)
