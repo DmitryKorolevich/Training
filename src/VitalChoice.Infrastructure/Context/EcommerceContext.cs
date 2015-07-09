@@ -306,7 +306,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<LookupVariant>().Table("LookupVariants");
 		    builder.Entity<Lookup>()
 		        .Collection(p => p.LookupVariants)
-		        .InverseReference()
+		        .InverseReference(p => p.Lookup)
 		        .ForeignKey(p => p.IdLookup)
 		        .PrincipalKey(p => p.Id);
 

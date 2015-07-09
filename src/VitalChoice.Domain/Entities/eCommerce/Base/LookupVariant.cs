@@ -4,6 +4,8 @@
     {
         public int IdLookup { get; set; }
 
-        public string ValueVariant { get; set; }
+	    public Lookup Lookup { get; set; }
+
+	    public string ValueVariant { get; set; }
     }
 }

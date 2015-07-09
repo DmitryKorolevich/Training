@@ -7,5 +7,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
         public string LookupValueType { get; set; }
 
         public ICollection<LookupVariant> LookupVariants { get; set; }
-    }
+
+		public string Name { get; set; }
+	}
 }

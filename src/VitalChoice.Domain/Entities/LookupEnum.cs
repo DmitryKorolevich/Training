@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Domain.Entities
 {
-    public enum LookupEnum
+    public static class LookupNames
     {
-		CustomerTaxExempt = 4,
-		CustomerTier = 5,
-		CustomerTradeClass = 6,
-		CustomerNotePriorities = 8
+		public const string  CustomerTaxExempt = "TaxExempt";
+	    public const string CustomerTier = "CustomerTier";
+	    public const string CustomerTradeClass = "TradeClass";
+	    public const string CustomerNotePriorities = "CustomerNotePriority";
     }
 }

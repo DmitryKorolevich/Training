@@ -278,3 +278,27 @@ GO
 UPDATE [dbo].[CustomerOptionTypes]
 	SET [IdFieldType] = 8
 	WHERE [Name] = N'PromotingWebsites' AND [IdFieldType] = 4
+
+GO
+
+IF(NOT EXISTS (SELECT [Name] FROM [dbo].[Lookups] WHERE [Name] <> N'1'))
+BEGIN
+	UPDATE [dbo].[Lookups]
+	SET [Name] = N'CustomerTier'
+	WHERE [Id] = (SELECT [IdLookup] FROM [dbo].[CustomerOptionTypes] WHERE [Name] = N'Tier')
+
+	UPDATE [dbo].[Lookups]
+	SET [Name] = N'TaxExempt'
+	WHERE [Id] = (SELECT [IdLookup] FROM [dbo].[CustomerOptionTypes] WHERE [Name] = N'TaxExempt')
+
+	UPDATE [dbo].[Lookups]
+	SET [Name] = N'TradeClass'
+	WHERE [Id] = (SELECT [IdLookup] FROM [dbo].[CustomerOptionTypes] WHERE [Name] = N'TradeClass')
+
+	UPDATE [dbo].[Lookups]
+	SET [Name] = N'CustomerNotePriority'
+	WHERE [Id] = (SELECT [IdLookup] FROM [dbo].[CustomerNoteOptionTypes] WHERE [Name] = N'Priority')
+
+	--CREATE UNIQUE NONCLUSTERED INDEX [IX_Name_Lookups]
+ --   ON [dbo].[Lookups]([Name] ASC)
+END

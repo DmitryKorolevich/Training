@@ -619,3 +619,12 @@ LEFT OUTER JOIN [dbo].[Countries] AS co ON ad.IdCountry = co.Id
 LEFT OUTER JOIN [dbo].[States] AS st ON ad.IdState = st.Id  
 
 GO
+
+IF COL_LENGTH('[dbo].[Lookups]','Name') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Lookups]
+	ADD [Name] NVARCHAR(100) CONSTRAINT DF_Name_Default DEFAULT(N'1') NOT NULL
+
+END
+
+GO

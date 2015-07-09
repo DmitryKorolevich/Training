@@ -30,10 +30,11 @@ namespace VitalChoice.Business.Services
         private readonly IOptions<AppOptions> appOptionsAccessor;
 	    private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
 	    private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
+	    private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
 
 	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
-            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository)
+            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -43,11 +44,17 @@ namespace VitalChoice.Business.Services
             this.appOptionsAccessor = appOptionsAccessor;
 		    this.customerTypeRepository = customerTypeRepository;
 		    this.lookupVariantRepository = lookupVariantRepository;
+		    this.lookupRepository = lookupRepository;
         }
 
 	    private ReferenceData Populate()
 	    {
-		    var referenceData = new ReferenceData
+		    var tradeLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTradeClass).Select(false).Single().Id;
+		    var taxExemptLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTaxExempt).Select(false).Single().Id;
+		    var priorityLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
+		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
+
+			var referenceData = new ReferenceData
 		    {
 			    Roles = roleManager.Roles.Select(x => new LookupItem<int>
 			    {
@@ -129,25 +136,25 @@ namespace VitalChoice.Business.Services
 					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
 					    .ToList(),
 
-				TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == (int)LookupEnum.CustomerTaxExempt).Select(false).Select(x=> new LookupItem<int>()
+				TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
 				}).ToList(),
 
-				Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerTier).Select(false).Select(x => new LookupItem<int>()
+				Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
 				}).ToList(),
 
-				TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerTradeClass).Select(false).Select(x => new LookupItem<int>()
+				TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
 				}).ToList(),
 
-				CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == (int)LookupEnum.CustomerNotePriorities).Select(false).Select(x => new LookupItem<int>()
+				CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
