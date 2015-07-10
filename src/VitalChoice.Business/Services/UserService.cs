@@ -39,9 +39,10 @@ namespace VitalChoice.Business.Services
 		private readonly IAppInfrastructureService appInfrastructureService;
 		private readonly INotificationService notificationService;
 		private readonly IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync;
+		private readonly IUserValidator<ApplicationUser> userValidator;
 		private readonly AppOptions options;
 
-		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync)
+		public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, IUserValidator<ApplicationUser> userValidator)
 		{
 			this.userManager = userManager;
 			this.roleManager = roleManager;
@@ -50,7 +51,17 @@ namespace VitalChoice.Business.Services
 			this.appInfrastructureService = appInfrastructureService;
 			this.notificationService = notificationService;
 			this.ecommerceRepositoryAsync = ecommerceRepositoryAsync;
+			this.userValidator = userValidator;
 			this.options = options.Options;
+		}
+
+		private async Task ValidateUserInternalAsync(ApplicationUser user)
+		{
+			var validateResult = await userValidator.ValidateAsync(userManager, user);
+			if (!validateResult.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
+			}
 		}
 
 		private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
@@ -159,6 +170,14 @@ namespace VitalChoice.Business.Services
 			user.PublicId = Guid.NewGuid();
 			user.UserName = user.Email;
 
+			await ValidateUserInternalAsync(user);
+
+			var validateResult = await userValidator.ValidateAsync(userManager, user);
+			if (!validateResult.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
+			}
+
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try
@@ -217,6 +236,8 @@ namespace VitalChoice.Business.Services
 
 		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
+			await ValidateUserInternalAsync(user);
+
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try
@@ -355,6 +376,8 @@ namespace VitalChoice.Business.Services
 		public async Task<ApplicationUser> UpdateWithPasswordChangeAsync(ApplicationUser user, string oldPassword,
 			string newPassword, IList<RoleType> roleIds = null)
 		{
+			await ValidateUserInternalAsync(user);
+
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try

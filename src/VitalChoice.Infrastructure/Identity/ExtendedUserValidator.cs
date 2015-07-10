@@ -113,7 +113,7 @@ namespace VitalChoice.Infrastructure.Identity
 			if (manager == null)
 				throw new ArgumentNullException(nameof(manager));
 			if (user == null)
-				throw new ArgumentNullException(nameof(user));
+				throw new ArgumentNullException(nameof(user)); 
 			var errors = new List<IdentityError>();
 
 			await this.ValidateUserName(manager, user, errors);
