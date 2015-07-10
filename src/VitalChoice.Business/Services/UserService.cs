@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Transaction;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Options;
@@ -24,7 +24,6 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.Logging;
-using TransactionManager = VitalChoice.Data.Transaction.TransactionManager;
 
 namespace VitalChoice.Business.Services
 {
@@ -41,13 +40,15 @@ namespace VitalChoice.Business.Services
 		private readonly IAppInfrastructureService appInfrastructureService;
 		private readonly INotificationService notificationService;
 		private readonly IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync;
+		private readonly IUserValidator<ApplicationUser> userValidator;
 		private readonly AppOptions options;
 	    private readonly ILogger _logger;
 
 	    public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager,
 	        IDataContextAsync context, SignInManager<ApplicationUser> signInManager,
 	        IAppInfrastructureService appInfrastructureService, INotificationService notificationService,
-	        IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, ILoggerProviderExtended logger)
+	        IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
+	        IUserValidator<ApplicationUser> userValidator, ILoggerProviderExtended loggerProvider)
 	    {
 	        this.userManager = userManager;
 	        this.roleManager = roleManager;
@@ -56,11 +57,21 @@ namespace VitalChoice.Business.Services
 	        this.appInfrastructureService = appInfrastructureService;
 	        this.notificationService = notificationService;
 	        this.ecommerceRepositoryAsync = ecommerceRepositoryAsync;
-	        _logger = logger.CreateLoggerDefault();
+	        this.userValidator = userValidator;
 	        this.options = options.Options;
+	        _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
-	    private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
+	    private async Task ValidateUserInternalAsync(ApplicationUser user)
+		{
+			var validateResult = await userValidator.ValidateAsync(userManager, user);
+			if (!validateResult.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
+			}
+		}
+
+		private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
 		{
 			return roleManager.Roles.Where(x => roles.Contains((RoleType)x.Id))
 						.Select(x => x.Name)
@@ -157,61 +168,67 @@ namespace VitalChoice.Business.Services
 			}
 		}
 
-	    public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles,
-	        bool sendActivation = true)
-	    {
-	        user.CreateDate = DateTime.Now;
-	        user.UpdatedDate = DateTime.Now;
-	        user.Status = UserStatus.NotActive;
-	        user.LastLoginDate = null;
-	        user.PublicId = Guid.NewGuid();
-	        user.UserName = user.Email;
+		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
+		{
+			user.CreateDate = DateTime.Now;
+			user.UpdatedDate = DateTime.Now;
+			user.Status = UserStatus.NotActive;
+			user.LastLoginDate = null;
+			user.PublicId = Guid.NewGuid();
+			user.UserName = user.Email;
 
-	        using (var transaction = new TransactionManager(context).BeginTransaction(IsolationLevel.ReadUncommitted))
-	        {
-	            try
-	            {
-	                var createResult = await userManager.CreateAsync(user);
-	                if (createResult.Succeeded)
-	                {
-	                    var roleNames = GetRoleNamesByIds(roles);
-	                    if (roleNames.Any())
-	                    {
-	                        var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
-	                        if (!addToRoleResult.Succeeded)
-	                        {
-	                            throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
-	                        }
-	                    }
+			await ValidateUserInternalAsync(user);
 
-	                    await ecommerceRepositoryAsync.InsertAsync(new User() {Id = user.Id});
+			var validateResult = await userValidator.ValidateAsync(userManager, user);
+			if (!validateResult.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
+			}
 
-	                    if (sendActivation)
-	                    {
-	                        var dbUser = await FindAsync(user.Email);
-	                        await SendActivationAsync(dbUser);
-	                    }
+			using (var transaction = new TransactionManager(context).BeginTransaction())
+			{
+				try
+				{
+					var createResult = await userManager.CreateAsync(user);
+					if (createResult.Succeeded)
+					{
+						var roleNames = GetRoleNamesByIds(roles);
+						if (roleNames.Any())
+						{
+							var addToRoleResult = await userManager.AddToRolesAsync(user, roleNames);
+							if (!addToRoleResult.Succeeded)
+							{
+								throw new AppValidationException(AggregateIdentityErrors(addToRoleResult.Errors));
+							}
+						}
 
-	                    transaction.Commit();
+						await ecommerceRepositoryAsync.InsertAsync(new User() {Id = user.Id});
 
-	                    return user;
-	                }
-	                else
-	                {
-	                    throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
-	                }
-	            }
-	            catch (Exception e)
-	            {
-	                _logger.LogError(0, e.Message, e);
-	                transaction.Rollback();
-	                throw;
-	            }
-	        }
-	    }
+						if (sendActivation)
+						{
+							var dbUser = await FindAsync(user.Email);
+							await SendActivationAsync(dbUser);
+						}
 
-	    public
-		    async Task DeleteAsync(ApplicationUser user)
+						transaction.Commit();
+
+						return user;
+					}
+					else
+					{
+						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
+					}
+				}
+				catch (Exception e)
+				{
+                    _logger.LogError(0, e.Message, e);
+                    transaction.Rollback();
+					throw;
+				}
+			}
+		}
+
+		public async Task DeleteAsync(ApplicationUser user)
 		{
 			user.DeletedDate = DateTime.Now;
 			user.Status = UserStatus.Disabled;
@@ -227,6 +244,8 @@ namespace VitalChoice.Business.Services
 
 		public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
+			await ValidateUserInternalAsync(user);
+
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try
@@ -365,6 +384,8 @@ namespace VitalChoice.Business.Services
 		public async Task<ApplicationUser> UpdateWithPasswordChangeAsync(ApplicationUser user, string oldPassword,
 			string newPassword, IList<RoleType> roleIds = null)
 		{
+			await ValidateUserInternalAsync(user);
+
 			using (var transaction = new TransactionManager(context).BeginTransaction())
 			{
 				try

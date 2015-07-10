@@ -19,7 +19,7 @@ namespace VitalChoice.Infrastructure.Identity
             IdentityErrorDescriber errors, IEnumerable<IUserTokenProvider<ApplicationUser>> tokenProviders,
             ILoggerProviderExtended logger, IHttpContextAccessor contextAccessor)
             : base(
-                store, optionsAccessor, passwordHasher, userValidators.Where(x => x is ExtendedUserValidator),
+                store, optionsAccessor, passwordHasher, userValidators.Where(x => x is DummyUserValidator),
                 passwordValidators, keyNormalizer, errors, tokenProviders, new Logger<UserManager<ApplicationUser>>(logger.Factory), contextAccessor)
         {
         }
