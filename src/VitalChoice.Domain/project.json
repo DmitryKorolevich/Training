@@ -1,8 +1,8 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta5",
-    "Templates": "2.2.3-beta5"
+    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Templates": "2.2.3-beta6"
   },
 
   "frameworks": {

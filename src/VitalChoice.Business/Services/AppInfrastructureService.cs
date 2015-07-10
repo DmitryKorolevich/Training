@@ -54,114 +54,92 @@ namespace VitalChoice.Business.Services
 		    var priorityLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
 		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
 
-			var referenceData = new ReferenceData
-		    {
-			    Roles = roleManager.Roles.Select(x => new LookupItem<int>
-			    {
-				    Key = x.Id,
-				    Text = x.Name
-			    }).ToList(),
+			var referenceData = new ReferenceData();
+	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
+	        {
+	            Key = x.Id,
+	            Text = x.Name
+	        }).ToList();
+	        referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ContentTypes = contentTypeRepository.Query().Select(false).Select(x => new LookupItem<int>
+	        {
+	            Key = x.Id,
+	            Text = x.Name
+	        }).ToList();
+	        referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false);
+	        referenceData.Labels = LocalizationService.GetStrings();
+	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
+	            ? appOptionsAccessor.Options.PublicHost
+	            : "http://notdefined/";
+	        referenceData.ContentItemStatusNames = StatusEnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ProductCategoryStatusNames = StatusEnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.GCTypes = StatusEnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.RecordStatuses = StatusEnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ProductTypes = StatusEnumHelper.GetProductTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.DiscountTypes = StatusEnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.AssignedCustomerTypes = StatusEnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ActiveFilterOptions = StatusEnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+	        {
+	            Key = x.Key==-1 ? null : (int?)x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
+	            .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+	            .ToList();
+	        referenceData.TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
 
-			    UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Id,
-				    Text = x.Name
-			    }).ToList(),
-
-			    ContentProcessors = contentProcessorRepository.Query().Select(false).ToList(),
-
-			    Labels = LocalizationService.GetStrings(),
-
-			    PublicHost =
-				    !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
-					    ? appOptionsAccessor.Options.PublicHost
-					    : "http://notdefined/",
-
-			    ContentItemStatusNames = StatusEnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ProductCategoryStatusNames = StatusEnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    GCTypes = StatusEnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    RecordStatuses = StatusEnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ProductTypes = StatusEnumHelper.GetProductTypes().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-                DiscountTypes = StatusEnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
-                {
-                    Key = x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                AssignedCustomerTypes = StatusEnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
-                {
-                    Key = x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                ActiveFilterOptions = StatusEnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
-                {
-                    Key = x.Key==-1 ? null : (int?)x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                CustomerTypes =
-				    customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
-					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
-					    .ToList(),
-
-				TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList()
-			};
-
-			return referenceData;
+	        return referenceData;
 	    }
 
 		public ReferenceData Get()

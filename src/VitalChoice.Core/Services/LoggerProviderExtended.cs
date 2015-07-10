@@ -61,8 +61,7 @@ namespace VitalChoice.Core.Services
                 var message = formatter != null ? formatter(state, exception) : LogFormatter.Formatter(state, exception);
                 if (!string.IsNullOrEmpty(message))
                 {
-                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, exception,
-                        CultureInfo.InvariantCulture, message);
+                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message, exception);
                     eventInfo.Properties["EventId"] = eventId;
                     _logger.Log(eventInfo);
                 }

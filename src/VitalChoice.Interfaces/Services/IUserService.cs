@@ -32,7 +32,7 @@ namespace VitalChoice.Interfaces.Services
 
 		Task<bool> IsSuperAdmin(ApplicationUser user);
 
-		void SignOut(ApplicationUser user);
+		Task SignOutAsync(ApplicationUser user);
 
 	    Task SendActivationAsync(Guid id);
 

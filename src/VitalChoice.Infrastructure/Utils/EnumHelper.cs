@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Data.Entity.Query;
 using VitalChoice.Domain.Entities.Users;
 
@@ -9,19 +10,13 @@ namespace VitalChoice.Infrastructure.Utils
 {
     public static class EnumHelper
     {
-	    public static Dictionary<T, string> GetItemsWithDescription<T>(Type enumType)
-	    {
+        public static Dictionary<T, string> GetItemsWithDescription<T>(Type enumType)
+        {
             var values = Enum.GetValues(enumType);
 
-            return values.Cast<object>().ToDictionary(value => (T) value, value =>
-		    {
-#if DNX451
-			    return ((Enum) value).GetAttributeOfType<DescriptionAttribute>().Description;
-#else
-				return Enum.GetName(enumType, value);
-#endif
-			});
-	    }
+            return values.Cast<object>()
+                .ToDictionary(value => (T) value, value => ((Enum) value).GetEnumDescription());
+        }
 
         public static Dictionary<T, string> GetItems<T>(Type enumType)
         {
@@ -30,16 +25,17 @@ namespace VitalChoice.Infrastructure.Utils
             return values.Cast<object>().ToDictionary(value => (T)value, value => value.ToString() );
         }
 
-        public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute
+
+        public static string GetEnumDescription(this Enum enumVal)
 		{
-#if DNX451
-			var type = enumVal.GetType();
+#if !DNXCORE50
+            var type = enumVal.GetType();
 			var memInfo = type.GetMember(enumVal.ToString());
-			var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);
-			return (attributes.Length > 0) ? (T)attributes[0] : null;
+			var attributes = memInfo[0].GetCustomAttributes<DescriptionAttribute>(false).ToArray();
+			return (attributes.Length > 0) ? attributes[0].Description : enumVal.ToString();
 #else
-			return null;
+            return enumVal.ToString();
 #endif
-		}
-	}
+        }
+    }
 }

@@ -34,7 +34,6 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
-        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
 
         protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
@@ -49,8 +48,6 @@ namespace VitalChoice.Business.Services.Products
                         .Include(p => p.OptionValues)
                         .OrderBy(skus => skus.OrderBy(s => s.Order))
                         .SelectAsync(false);
-            entity.ProductsToCategories =
-                await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
         }
 
         protected async override Task BeforeUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
@@ -66,7 +63,6 @@ namespace VitalChoice.Business.Services.Products
             {
                 sku.OptionTypes = entity.OptionTypes;
             }
-            entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
             await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
             foreach (var sku in entity.Skus)
             {
@@ -176,7 +172,6 @@ namespace VitalChoice.Business.Services.Products
             _lookupRepository = lookupRepository;
             _productRepository = productRepository;
             _skuRepository = skuRepository;
-            _productToCategoriesRepository = productToCategoriesRepository;
         }
 
         #region ProductOptions

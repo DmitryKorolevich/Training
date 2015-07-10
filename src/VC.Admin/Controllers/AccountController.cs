@@ -147,7 +147,7 @@ namespace VC.Admin.Controllers
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}
 
-				userService.SignOut(user);
+				await userService.SignOutAsync(user);
 			}
 
 			return true;

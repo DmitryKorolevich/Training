@@ -78,7 +78,8 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await UpdateAsync(model, uow);
+                var entity = await UpdateAsync(model, uow);
+                return Mapper.FromEntity(entity);
             }
         }
 
@@ -95,7 +96,8 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await UpdateRangeAsync(models, uow);
+                var entities = await UpdateRangeAsync(models, uow);
+                return Mapper.FromEntityRange(entities);
             }
         }
 
@@ -235,7 +237,7 @@ namespace VitalChoice.DynamicData.Base
             return Task.Delay(0);
         }
 
-        protected virtual async Task<List<TDynamic>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
+        protected virtual async Task<List<TEntity>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
             (await ValidateCollection(models)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
@@ -249,7 +251,7 @@ namespace VitalChoice.DynamicData.Base
             query = BuildQuery(query);
             var entities = (await query.SelectAsync());
             if (!entities.Any())
-                return new List<TDynamic>();
+                return new List<TEntity>();
             var items = entities.Join(models, entity => entity.Id, model => model.Id,
                 (entity, model) => new Pair<TDynamic, TEntity> (model, entity));
 
@@ -260,10 +262,10 @@ namespace VitalChoice.DynamicData.Base
             }
             await mainRepository.UpdateRangeAsync(entities);
             await uow.SaveChangesAsync(CancellationToken.None);
-            return Mapper.FromEntityRange(entities);
+            return entities;
         }
 
-        protected virtual async Task<TDynamic> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
+        protected virtual async Task<TEntity> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
             (await Validate(model)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
@@ -282,7 +284,7 @@ namespace VitalChoice.DynamicData.Base
                 UpdateItem(uow, new Pair<TDynamic, TEntity>(model, entity), bigValueRepository, valueRepository);
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-            return Mapper.FromEntity(entity);
+            return entity;
         }
 
         private async Task<bool> DeleteAllAsync(ICollection<int> list, IUnitOfWorkAsync uow)
