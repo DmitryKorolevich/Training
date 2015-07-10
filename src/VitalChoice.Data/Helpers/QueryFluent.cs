@@ -72,7 +72,7 @@ namespace VitalChoice.Data.Helpers
 
         public async Task<bool> SelectAnyAsync()
         {
-            return await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).AnyAsync();
+            return (await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).FirstOrDefaultAsync()) != null;
         }
 
         public async Task<int> SelectCountAsync()

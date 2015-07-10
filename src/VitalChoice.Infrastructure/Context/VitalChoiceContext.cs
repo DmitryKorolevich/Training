@@ -182,7 +182,12 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<AdminProfile>().Key(x => x.Id);
 			builder.Entity<AdminProfile>().Table("AdminProfiles");
-			builder.Entity<AdminProfile>().Reference(x => x.User).InverseReference(x => x.Profile).PrincipalKey<ApplicationUser>(x=>x.Id).Required();
+		    builder.Entity<AdminProfile>()
+		        .Reference(x => x.User)
+		        .InverseReference(x => x.Profile)
+                .ForeignKey<AdminProfile>(a => a.Id)
+		        .PrincipalKey<ApplicationUser>(x => x.Id)
+		        .Required();
 
             #endregion
 

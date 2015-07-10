@@ -133,7 +133,7 @@ namespace VitalChoice.Business.Services
 
 		public async Task ValidateUserOnSignIn(string login)
 		{
-			var disabled = await userManager.Users.AnyAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login) && !x.DeletedDate.HasValue);
+			var disabled = (await userManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login) && !x.DeletedDate.HasValue)) != null;
 
 			if (disabled)
 			{
@@ -193,9 +193,9 @@ namespace VitalChoice.Business.Services
 						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
 					}
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					transaction.Rollback();
+                    transaction.Rollback();
 					throw;
 				}
 			}
