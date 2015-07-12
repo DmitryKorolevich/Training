@@ -212,10 +212,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	$scope.makeAsProfileAddress = function() {
 		if ($scope.currentCustomer.sameShipping) {
 			for (var key in $scope.currentCustomer.ProfileAddress) {
-				$scope.currentCustomer.SelectedShipping[key] = $scope.currentCustomer.ProfileAddress[key];
+				$scope.SelectedShipping[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
-			$scope.currentCustomer.SelectedShipping.Email = $scope.currentCustomer.Email;
-			$scope.currentCustomer.SelectedShipping.AddressType = 3;
+			$scope.SelectedShipping.Email = $scope.currentCustomer.Email;
+			$scope.SelectedShipping.AddressType = 3;
 		}
 	};
 

@@ -3,18 +3,18 @@
         <span class="legend">Shipping Address</span>
         <div class="form-group">
             <div class="col-md-3">
-                <select class="form-control" id="shippingAddresses" data-ng-model="currentCustomer.SelectedShipping" data-ng-options="shippingAddress as (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' ' + shippingAddress.Address1) for shippingAddress in customer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-model="SelectedShipping" data-ng-options="shippingAddress as (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' ' + shippingAddress.Address1) for shippingAddress in customer.Shipping"></select>
             </div>
             <label for="sameAsProfile" class="col-md-3 control-label">Set as Default</label>
             <div class="col-md-3">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" id="setDefault" data-ng-model="currentCustomer.SelectedShipping.Default" data-ng-change="setDefaultAddress();">
+                        <input type="checkbox" id="setDefault" data-ng-model="SelectedShipping.Default" data-ng-change="setDefaultAddress();">
                     </label>
                 </div>
             </div>
             <div class="col-md-3">
-                <button class="btn btn-danger" data-ng-click="deleteSelectedShipping(currentCustomer.SelectedShipping.Id);">Delete</button>
+                <button class="btn btn-danger" data-ng-click="deleteSelectedShipping(SelectedShipping.Id);">Delete</button>
             </div>
         </div>
         <div class="form-group">
