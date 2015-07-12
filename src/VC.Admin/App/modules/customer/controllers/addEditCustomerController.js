@@ -58,8 +58,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							if (result.Success) {
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-								$scope.shippingAddressTab.Addresses = $scope.currentCustomer.Shipping;
-								$scope.SelectedShipping = $scope.shippingAddressTab.Address;
+								$scope.shippingAddressTab.Address = $scope.SelectedShipping = $scope.currentCustomer.Shipping[0];
 							} else {
 								toaster.pop('error', 'Error!', "Can't create customer");
 							}

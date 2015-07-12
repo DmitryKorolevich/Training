@@ -31,8 +31,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
         protected override void FromEntityInternal(CustomerNoteDynamic dynamic, CustomerNote entity, bool withDefaults = false)
         {
-            entity.IdCustomer = dynamic.IdCustomer;
-            entity.Note = dynamic.Note;
+			dynamic.IdCustomer = entity.IdCustomer;
+			dynamic.Note = entity.Note;
         }
 
         protected override void UpdateEntityInternal(CustomerNoteDynamic dynamic, CustomerNote entity)
