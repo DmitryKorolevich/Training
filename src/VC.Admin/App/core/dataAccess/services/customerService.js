@@ -19,11 +19,20 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		createCustomerPrototype: function (tracker) {
 			return $http.post(baseUrl + 'CreateCustomerPrototype', null, getConfig(tracker));
 		},
+		createAddressPrototype: function (tracker) {
+			return $http.post(baseUrl + 'CreateAddressPrototype', null, getConfig(tracker));
+		},
+		createCustomerNotePrototype: function (tracker) {
+			return $http.post(baseUrl + 'CreateCustomerNotePrototype', null, getConfig(tracker));
+		},
 		createUpdateCustomer: function (creatCustomerModel, tracker) {
 			return $http.post(baseUrl + 'AddUpdateCustomer', creatCustomerModel, getConfig(tracker));
 		},
 		getCountries: function (tracker) {
 			return $http.get(baseUrl + 'GetCountries', getConfig(tracker));
+		},
+		getExistingCustomer: function (id, tracker) {
+			return $http.get(baseUrl + 'GetExistingCustomer/' + id, getConfig(tracker));
 		},
 		getPaymentMethods: function (customerType, tracker) {
 			return $http.get(baseUrl + 'GetPaymentMethods/?customerType=' + customerType, getConfig(tracker));

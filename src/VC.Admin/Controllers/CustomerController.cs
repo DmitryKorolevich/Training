@@ -9,9 +9,11 @@ using VC.Admin.Models.Setting;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
 using VitalChoice.DynamicData.Entities;
@@ -77,11 +79,24 @@ namespace VC.Admin.Controllers
 				Tier = Tier.Tier1,
 				InceptionDate = DateTime.Now,
 				TradeClass = 1,
-				CustomerNote = new CustomerNoteModel()
+				CustomerNotes = new List<CustomerNoteModel>() { new CustomerNoteModel()
 				{
 					Priority = CustomerNotePriority.NormalPriority
-				}
+				}},
+				Shipping = new List<AddressModel>() { new AddressModel() }
 			};
+		}
+
+		[HttpPost]
+		public Result<AddressModel> CreateAddressPrototype()
+		{
+			return new AddressModel();
+		}
+
+		[HttpPost]
+		public Result<CustomerNoteModel> CreateCustomerNotePrototype()
+		{
+			return new CustomerNoteModel();
 		}
 
 		[HttpPost]
@@ -139,5 +154,17 @@ namespace VC.Admin.Controllers
 
 			return toReturn;
 		}
-	}
+
+		[HttpGet]
+		public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
+		{
+			var result = await _customerService.SelectAsync(id);
+			if (result == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+			}
+
+			return _customerMapper.ToModel<AddUpdateCustomerModel>(result);
+		}
+    }
 }

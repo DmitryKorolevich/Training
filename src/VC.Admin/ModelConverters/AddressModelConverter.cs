@@ -8,6 +8,7 @@ namespace VC.Admin.ModelConverters
     {
 	    public void DynamicToModel(AddressModel model, AddressDynamic dynamic)
 	    {
+		    model.Country.Id = dynamic.IdCountry;
 	    }
 
 	    public void ModelToDynamic(AddressModel model, AddressDynamic dynamic)

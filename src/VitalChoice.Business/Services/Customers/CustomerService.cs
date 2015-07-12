@@ -166,6 +166,11 @@ namespace VitalChoice.Business.Services.Customers
 		    }
 	    }
 
+	    //protected async override Task<CustomerDynamic> UpdateAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+	    //{
+		   // return null;
+	    //}
+
 	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);

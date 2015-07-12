@@ -43,6 +43,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
             dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
             dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
+
 			foreach (var customerNoteDynamic in entity.CustomerNotes.Select(x => _customerNoteMapper.FromEntity(x)))
 			{
 				dynamic.CustomerNotes.Add(customerNoteDynamic);
@@ -52,7 +53,9 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 dynamic.Addresses.Add(addressDynamic);
             }
-        }
+
+	        dynamic.SuspendUserAccount = entity.StatusCode == RecordStatusCode.NotActive;
+		}
 
         protected override void UpdateEntityInternal(CustomerDynamic dynamic, Customer entity)
         {
@@ -99,9 +102,9 @@ namespace VitalChoice.Business.Services.Dynamic
             }
             else
             {
-                foreach (var sku in entity.Addresses)
+                foreach (var address in entity.Addresses)
                 {
-                    sku.StatusCode = RecordStatusCode.Deleted;
+					address.StatusCode = RecordStatusCode.Deleted;
                 }
             }
 
@@ -123,12 +126,12 @@ namespace VitalChoice.Business.Services.Dynamic
 				}
 
 				//Insert
-				//entity.Addresses.AddRange(Addresses.Where(s => s.Id == 0).Select(s =>
-				//{
-				//	var sku = s.ToEntity();
-				//	sku.IdCustomer = Id;
-				//	return sku;
-				//}));
+                entity.CustomerNotes.AddRange(dynamic.CustomerNotes.Where(s => s.Id == 0).Select(s =>
+				{
+					var customerNote = _customerNoteMapper.ToEntity(s);
+					customerNote.IdCustomer = entity.Id;
+					return customerNote;
+				}));
 			}
 			else
 			{

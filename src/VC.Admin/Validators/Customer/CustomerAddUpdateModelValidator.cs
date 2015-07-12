@@ -9,7 +9,7 @@ using VitalChoice.Validation.Logic;
 
 namespace VC.Admin.Validators.Customer
 {
-	public class CustomerAddModelValidator : ModelValidator<AddUpdateCustomerModel>
+	public class CustomerAddUpdateModelValidator : ModelValidator<AddUpdateCustomerModel>
 	{
 		public override void Validate(AddUpdateCustomerModel value)
 		{
@@ -20,10 +20,16 @@ namespace VC.Admin.Validators.Customer
 
 			var profileAddressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
             ParseResults(profileAddressValidator.Validate(value.ProfileAddress));
-			ParseResults(profileAddressValidator.Validate(value.Shipping));
+			foreach (var shipping in value.Shipping)
+			{
+				ParseResults(profileAddressValidator.Validate(shipping));
+			}
 
 			var customerNoteValidator = ValidatorsFactory.GetValidator<CustomerNoteModelRules>();
-			ParseResults(customerNoteValidator.Validate(value.CustomerNote));
+			foreach (var customerNote in value.CustomerNotes)
+			{
+				ParseResults(customerNoteValidator.Validate(customerNote));
+			}
 		}
 
 		private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>

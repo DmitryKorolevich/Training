@@ -1,0 +1,16 @@
+﻿<form class="form-horizontal" name="forms.shipping" data-ng-submit="save()" data-ng-class="{submitted: forms.shippingSubmitted}" novalidate>
+    <fieldset>
+        <span class="legend">Shipping Address</span>
+        <div class="form-group">
+            <label for="sameAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
+            <div class="col-md-9">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="sameAsProfile" data-ng-model="currentCustomer.sameShipping" data-ng-change="makeAsProfileAddress();">
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [shippingAddressTab]"></div>
+    </fieldset>
+</form>

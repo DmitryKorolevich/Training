@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.customer', [
-	'app.modules.customer.controllers.addCustomerController',
+	'app.modules.customer.controllers.addEditCustomerController',
 	'app.modules.customer.controllers.customerManagementController',
 ])
 .config([
@@ -10,8 +10,8 @@ angular.module('app.modules.customer', [
 			$stateProvider
 				.state('index.oneCol.addCustomer', {
 					url: '/customer/add',
-					templateUrl: 'app/modules/customer/partials/addCustomer.html',
-					controller: 'addCustomerController'
+					templateUrl: 'app/modules/customer/partials/manageCustomer.html',
+					controller: 'addEditCustomerController'
 				})
 				.state('index.oneCol.manageCustomers', {
 					url: '/customers',
@@ -20,8 +20,8 @@ angular.module('app.modules.customer', [
 				})
 				.state('index.oneCol.customerDetail', {
 					url: '/customers/{id:int}',
-					templateUrl: 'app/modules/product/partials/addCustomer.html',
-					controller: 'addCustomerController'
+					templateUrl: 'app/modules/customer/partials/manageCustomer.html',
+					controller: 'addEditCustomerController'
 				});
 		}
 	]);
