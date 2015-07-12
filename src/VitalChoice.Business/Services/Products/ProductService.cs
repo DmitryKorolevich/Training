@@ -34,6 +34,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
+        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
 
         protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
@@ -48,9 +49,11 @@ namespace VitalChoice.Business.Services.Products
                         .Include(p => p.OptionValues)
                         .OrderBy(skus => skus.OrderBy(s => s.Order))
                         .SelectAsync(false);
+            entity.ProductsToCategories =
+                await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
         }
 
-        protected async override Task BeforeUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
@@ -70,7 +73,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected override async Task AfterUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
@@ -163,7 +166,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper, IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper, IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository, IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository)
             : base(mapper, productRepository, productOptionTypeRepository, bigStringValueRepository)
         {
             _vProductSkuRepository = vProductSkuRepository;
@@ -172,6 +175,7 @@ namespace VitalChoice.Business.Services.Products
             _lookupRepository = lookupRepository;
             _productRepository = productRepository;
             _skuRepository = skuRepository;
+            _productToCategoryRepository = productToCategoryRepository;
         }
 
         #region ProductOptions

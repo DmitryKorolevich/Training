@@ -78,7 +78,18 @@ namespace VitalChoice.DynamicData.Base
             return Task.Delay(0);
         }
 
-        public virtual async Task<TDynamic> SelectAsync(int id, bool withDefaults)
+        public async Task<TDynamic> SelectAsync(int id, bool withDefaults)
+        {
+            var entity = await SelectEntityAsync(id);
+            if (entity != null)
+            {
+                return Mapper.FromEntity(entity, withDefaults);
+            }
+
+            return null;
+        }
+
+        protected virtual async Task<TEntity> SelectEntityAsync(int id)
         {
             IQueryFluent<TEntity> res = ObjectRepository.Query(
                 p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted)
@@ -91,7 +102,7 @@ namespace VitalChoice.DynamicData.Base
                 await SetBigValuesAsync(entity, BigStringRepository);
                 entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
                 await AfterSelect(entity);
-                return Mapper.FromEntity(entity, withDefaults);
+                return entity;
             }
 
             return null;
