@@ -45,6 +45,11 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var data = result.DictionaryData;
+            if (entity.OptionTypes == null)
+            {
+                entity.OptionTypes =
+                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).Select(false);
+            }
             var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
             if (entity.OptionValues != null && optionTypes != null)
             {
@@ -172,7 +177,10 @@ namespace VitalChoice.DynamicData.Base
                 throw new ArgumentNullException(nameof(entity));
 
             if (entity.OptionTypes == null)
-                throw new ArgumentException("OptionTypes collection is null");
+            {
+                entity.OptionTypes =
+                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).Select(false);
+            }
 
             var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
             entity.OptionValues = new List<TOptionValue>();
