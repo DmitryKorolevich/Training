@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using VC.Admin.Models.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Entities;
@@ -19,14 +20,39 @@ namespace VC.Admin.ModelConverters
 
 	    public void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
 	    {
+		    if (dynamic.CustomerNotes.Any())
+		    {
+			    foreach (var customerNote in dynamic.CustomerNotes)
+			    {
+					model.CustomerNotes.Add(_customerNoteMapper.ToModel<CustomerNoteModel>(customerNote));
+                }
+		    }
+
+		    if (dynamic.Addresses.Any())
+		    {
+			    foreach (var address in dynamic.Addresses)
+			    {
+				    switch (address.IdObjectType)
+				    {
+					    case (int)AddressType.Shipping:
+						    model.Shipping.Add(_addressMapper.ToModel<AddressModel>(address));
+						    break;
+					    case (int)AddressType.Profile:
+						    model.ProfileAddress = _addressMapper.ToModel<AddressModel>(address);
+						    break;
+				    }
+			    }
+		    }
 	    }
 
 	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
-			if (!string.IsNullOrWhiteSpace(model.CustomerNote?.Text))
+			if (model.CustomerNotes.Any() && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
 			{
-				var customerNoteDynamic = _customerNoteMapper.FromModel(model.CustomerNote);
-                dynamic.CustomerNotes.Add(customerNoteDynamic);
+				foreach (var customerNoteDynamic in model.CustomerNotes.Select(customerNote => _customerNoteMapper.FromModel(customerNote)))
+				{
+					dynamic.CustomerNotes.Add(customerNoteDynamic);
+				}
 			}
 
 			if (model.ProfileAddress != null)
@@ -36,11 +62,13 @@ namespace VC.Admin.ModelConverters
 				dynamic.Addresses.Add(addressDynamic);
 			}
 
-			if (model.Shipping != null)
+			if (model.Shipping.Any())
 			{
-				var addressDynamic = _addressMapper.FromModel(model.Shipping);
-				addressDynamic.IdObjectType = (int)AddressType.Shipping;
-				dynamic.Addresses.Add(addressDynamic);
+				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping)))
+				{
+					addressDynamic.IdObjectType = (int)AddressType.Shipping;
+					dynamic.Addresses.Add(addressDynamic);
+				}
 			}
 		}
 	}

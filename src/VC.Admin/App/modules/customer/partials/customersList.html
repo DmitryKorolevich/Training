@@ -126,7 +126,7 @@
                     </td>
                     <td>{{customer.DateEdited | date:"MM/dd/yy"}}<br />{{customer.DateEdited | date:"h:mm a"}}<br />{{customer.EditedBy}}</td>
                     <td>
-                        <button ui-sref="index.oneCol.customerDetail(customer.Id)" class="btn btn-default btn-success">Edit</button>
+                        <button ui-sref="index.oneCol.customerDetail({id:customer.Id})" ladda="editTracker.active()" class="btn btn-default btn-success">Edit</button>
                     </td>
                 </tr>
                 </tbody>

@@ -1,10 +1,12 @@
 ﻿'use strict';
 
-angular.module('app.modules.customer.controllers.addCustomerController', [])
-.controller('addCustomerController', ['$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', '$state', function ($scope, customerService, toaster, promiseTracker, $rootScope, $q, $state) {
-	$scope.addTracker = promiseTracker("add");
+angular.module('app.modules.customer.controllers.addEditCustomerController', [])
+.controller('addEditCustomerController', ['$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', '$state', '$stateParams', function ($scope, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams) {
+	$scope.addEditTracker = promiseTracker("addEdit");
 
 	function initialize() {
+		$scope.editMode = $stateParams.id != null;
+
 		$scope.inceptionDateOpened = false;
 
 		$scope.currentCustomer = { CustomerType: 1};
@@ -30,24 +32,41 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 
 		$scope.forms = {};
 
-		$q.all({ countriesCall: customerService.getCountries($scope.addTracker), paymentMethodsCall: customerService.getPaymentMethods($scope.currentCustomer.CustomerType, $scope.addTracker), orderNotesCall: customerService.getOrderNotes($scope.currentCustomer.CustomerType, $scope.addTracker) }).then(function (result) {
+		$q.all({ countriesCall: customerService.getCountries($scope.addEditTracker), paymentMethodsCall: customerService.getPaymentMethods($scope.currentCustomer.CustomerType, $scope.addEditTracker), orderNotesCall: customerService.getOrderNotes($scope.currentCustomer.CustomerType, $scope.addEditTracker) }).then(function (result) {
 			if (result.countriesCall.data.Success && result.paymentMethodsCall.data.Success && result.orderNotesCall.data.Success) {
 				$scope.countries = result.countriesCall.data.Data;
 				$scope.paymentMethods = result.paymentMethodsCall.data.Data;
 				$scope.orderNotes = result.orderNotesCall.data.Data;
-				customerService.createCustomerPrototype($scope.addTracker)
-					.success(function (result) {
-						if (result.Success) {
-							$scope.currentCustomer = result.Data;
-							$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-							$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping;
-						} else {
-							toaster.pop('error', 'Error!', "Can't create customer");
-						}
-					}).
-					error(function (result) {
-						toaster.pop('error', "Error!", "Server error ocurred");
-					});
+				if (!$scope.editMode) {
+					customerService.createCustomerPrototype($scope.addEditTracker)
+						.success(function(result) {
+							if (result.Success) {
+								$scope.currentCustomer = result.Data;
+								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
+								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+								$scope.SelectedShipping = $scope.shippingAddressTab.Address;
+							} else {
+								toaster.pop('error', 'Error!', "Can't create customer");
+							}
+						}).
+						error(function(result) {
+							toaster.pop('error', "Error!", "Server error ocurred");
+						});
+				} else {
+					customerService.getExistingCustomer($stateParams.id, $scope.addEditTracker)
+						.success(function (result) {
+							if (result.Success) {
+								$scope.currentCustomer = result.Data;
+								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
+								$scope.shippingAddressTab.Address = $scope.SelectedShipping = $scope.currentCustomer.Shipping[0];
+							} else {
+								toaster.pop('error', 'Error!', "Can't create customer");
+							}
+						}).
+						error(function (result) {
+							toaster.pop('error', "Error!", "Server error ocurred");
+						});
+				}
 			} else {
 				toaster.pop('error', 'Error!', "Can't get reference data");
 			}
@@ -134,8 +153,7 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 
 		if (valid) {
 			$scope.saving = true;
-
-			customerService.createUpdateCustomer($scope.currentCustomer, $scope.addTracker).success(function (result) {
+			customerService.createUpdateCustomer($scope.currentCustomer, $scope.addEditTracker).success(function (result) {
 					successHandler(result);
 				}).
 				error(function(result) {
@@ -193,11 +211,38 @@ angular.module('app.modules.customer.controllers.addCustomerController', [])
 	$scope.makeAsProfileAddress = function() {
 		if ($scope.currentCustomer.sameShipping) {
 			for (var key in $scope.currentCustomer.ProfileAddress) {
-				$scope.currentCustomer.Shipping[key] = $scope.currentCustomer.ProfileAddress[key];
+				$scope.SelectedShipping[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
-			$scope.currentCustomer.Shipping.Email = $scope.currentCustomer.Email;
-			$scope.currentCustomer.Shipping.AddressType = 3;
+			$scope.SelectedShipping.Email = $scope.currentCustomer.Email;
+			$scope.SelectedShipping.AddressType = 3;
 		}
+	};
+
+	$scope.deleteSelectedShipping = function (id) {
+		var idx = -1;
+
+		angular.forEach($scope.currentCustomer.Shipping, function (item, index) {
+			if (item.Id == id) {
+				idx = index;
+				return;
+			}
+		});
+
+		$scope.currentCustomer.Shipping.splice(idx, 1);
+	};
+
+	$scope.addNewShipping = function () {
+		customerService.createAddressPrototype($scope.addEditTracker)
+						.success(function (result) {
+							if (result.Success) {
+								$scope.currentCustomer.Shipping.push(result.Data);
+							} else {
+								toaster.pop('error', 'Error!', "Can't add shipping address");
+							}
+						}).
+						error(function (result) {
+							toaster.pop('error', "Error!", "Server error ocurred");
+						});
 	};
 
 

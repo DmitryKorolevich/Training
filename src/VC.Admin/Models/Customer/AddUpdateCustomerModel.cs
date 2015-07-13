@@ -12,7 +12,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
-	[ApiValidator(typeof(CustomerAddModelValidator))]
+	[ApiValidator(typeof(CustomerAddUpdateModelValidator))]
 	public class AddUpdateCustomerModel : BaseModel
 	{
 	    public AddUpdateCustomerModel()
@@ -20,8 +20,8 @@ namespace VC.Admin.Models.Customer
 			ApprovedPaymentMethods = new List<int>();
 			OrderNotes = new List<int>();
 			ProfileAddress = new AddressModel();
-			Shipping = new AddressModel();
-			CustomerNote = new CustomerNoteModel();
+			Shipping = new List<AddressModel>();
+			CustomerNotes = new List<CustomerNoteModel>();
         }
 
 		[Map]
@@ -80,8 +80,8 @@ namespace VC.Admin.Models.Customer
 
 		public AddressModel ProfileAddress { get; set; }
 
-        public AddressModel Shipping { get; set; }
+        public IList<AddressModel> Shipping { get; set; }
 
-		public CustomerNoteModel CustomerNote { get; set; }
+		public IList<CustomerNoteModel> CustomerNotes { get; set; }
 	}
 }
