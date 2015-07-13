@@ -44,7 +44,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
-								$scope.SelectedShipping = $scope.shippingAddressTab.Address;
 							} else {
 								toaster.pop('error', 'Error!', "Can't create customer");
 							}
@@ -58,7 +57,13 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							if (result.Success) {
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-								$scope.shippingAddressTab.Address = $scope.SelectedShipping = $scope.currentCustomer.Shipping[0];
+								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+
+								angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
+									syncCountry(shippingItem);
+								});
+
+								syncCountry($scope.currentCustomer.ProfileAddress);
 							} else {
 								toaster.pop('error', 'Error!', "Can't create customer");
 							}
@@ -73,6 +78,14 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		}, function(result) {
 			toaster.pop('error', "Error!", "Server error ocurred");
 		});
+	};
+
+	function syncCountry(addressItem) {
+		var selectedCountry = $.grep($scope.countries, function (country) {
+			return country.Id == addressItem.Country.Id;
+		})[0];
+
+		addressItem.Country = selectedCountry;
 	};
 
 	function clearServerValidation() {
@@ -152,6 +165,18 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		});
 
 		if (valid) {
+			if ($scope.newEmail || $scope.emailConfirm) {
+				$scope.currentCustomer.Email = $scope.newEmail;
+				//$scope.currentCustomer.ProfileAddress.Email = $scope.newEmail;
+				$scope.currentCustomer.EmailConfirm = $scope.emailConfirm;
+			} else {
+				$scope.currentCustomer.EmailConfirm = $scope.currentCustomer.Email;
+			}
+
+			if (!$scope.editMode) {
+				$scope.currentCustomer.Shipping[0].Default = true;
+			}
+
 			$scope.saving = true;
 			customerService.createUpdateCustomer($scope.currentCustomer, $scope.addEditTracker).success(function (result) {
 					successHandler(result);
@@ -211,10 +236,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	$scope.makeAsProfileAddress = function() {
 		if ($scope.currentCustomer.sameShipping) {
 			for (var key in $scope.currentCustomer.ProfileAddress) {
-				$scope.SelectedShipping[key] = $scope.currentCustomer.ProfileAddress[key];
+				$scope.shippingAddressTab.Address[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
-			$scope.SelectedShipping.Email = $scope.currentCustomer.Email;
-			$scope.SelectedShipping.AddressType = 3;
+			$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
+			$scope.shippingAddressTab.Address.AddressType = 3;
 		}
 	};
 
@@ -236,13 +261,34 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						.success(function (result) {
 							if (result.Success) {
 								$scope.currentCustomer.Shipping.push(result.Data);
+								$scope.shippingAddressTab.Address = result.Data;
 							} else {
 								toaster.pop('error', 'Error!', "Can't add shipping address");
 							}
 						}).
 						error(function (result) {
 							toaster.pop('error', "Error!", "Server error ocurred");
+						})
+						.then(function() {
+							$scope.forms.shippingSubmitted = false;
+							$scope.forms.submitted = false;
+							$scope.forms.customerNoteSubmitted = false;
+
+							$.each($scope.forms.shipping, function (index, form) {
+								if (form && index.indexOf('i') == 0 && form.Name != undefined) {
+									form.Name.$setValidity("exist", true);
+								}
+							});
 						});
+		return false;
+	};
+
+	$scope.setDefaultAddress = function() {
+		angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
+			if (shippingItem != $scope.shippingAddressTab.Address) {
+				shippingItem.Default = false;
+			}
+		});
 	};
 
 

@@ -139,6 +139,8 @@ BEGIN
 
 END
 
+GO
+
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes])
 BEGIN
 	INSERT INTO [dbo].[AddressOptionTypes]
@@ -156,6 +158,16 @@ BEGIN
 	(N'Fax', 4, NULL, NULL, NULL),
 	(N'Email', 4, NULL, 1, NULL),
 	(N'Email', 4, NULL, 3, NULL)
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [Name] = N'Default')
+BEGIN
+	INSERT INTO [dbo].[AddressOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Default', 5, NULL, 3, 'False')
 END
 
 GO

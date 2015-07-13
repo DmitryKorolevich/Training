@@ -11,6 +11,8 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
@@ -40,8 +42,9 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<CustomerToPaymentMethod> _customerToPaymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
 
-		protected override IUnitOfWorkAsync CreateUnitOfWork()
+	    protected override IUnitOfWorkAsync CreateUnitOfWork()
         {
             return new EcommerceUnitOfWork();
         }
@@ -50,7 +53,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync, IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, IRepositoryAsync<AdminProfile> adminProfileRepository)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync, IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync)
             : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
@@ -62,6 +65,7 @@ namespace VitalChoice.Business.Services.Customers
             _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
 	        _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
 	        _adminProfileRepository = adminProfileRepository;
+	        _userRepositoryAsync = userRepositoryAsync;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -83,6 +87,11 @@ namespace VitalChoice.Business.Services.Customers
 						.Build());
 			}
 
+	        if (model.Addresses.Where(x=>x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted).All(x => !x.Data.Default))
+	        {
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
+			}
+
 			return errors;
 		}
 
@@ -91,7 +100,10 @@ namespace VitalChoice.Business.Services.Customers
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
 
-	        await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
+			entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
+			entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
+
+			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
 			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
         }
 
@@ -126,7 +138,10 @@ namespace VitalChoice.Business.Services.Customers
                     _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
                         .Include(p => p.PaymentMethod)
                         .SelectAsync(false);
-        }
+			entity.User = (await _userRepositoryAsync.Query(p => p.Id == entity.Id)
+						.Include(p => p.Customer)
+						.SelectAsync(false)).Single();
+		}
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
