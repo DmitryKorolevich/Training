@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Setting;
+using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.Permissions;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
@@ -29,15 +33,19 @@ namespace VC.Admin.Controllers
     public class CustomerController : BaseApiController
     {
 		private readonly ICountryService _countryService;
-	    private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
+		private readonly IGenericService<AdminProfile> _adminProfileService;
+		private readonly IHttpContextAccessor _contextAccessor;
+		private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
 		private readonly ICustomerService _customerService;
 
 
-		public CustomerController(ICustomerService customerService, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICountryService countryService)
+		public CustomerController(ICustomerService customerService, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICountryService countryService, IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor)
 		{
 			_customerService = customerService;
 			_countryService = countryService;
-		    _customerMapper = customerMapper;
+			_adminProfileService = adminProfileService;
+			_contextAccessor = contextAccessor;
+			_customerMapper = customerMapper;
 		}
 
 		[HttpGet]
@@ -96,7 +104,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public Result<CustomerNoteModel> CreateCustomerNotePrototype()
 		{
-			return new CustomerNoteModel();
+			return new CustomerNoteModel() { Priority = CustomerNotePriority.NormalPriority, DateEdited = DateTime.Now, EditedBy = _adminProfileService.Query(x => x.Id == Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId())).Single().AgentId };
 		}
 
 		[HttpPost]
@@ -164,7 +172,23 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			return _customerMapper.ToModel<AddUpdateCustomerModel>(result);
+			var customerModel = _customerMapper.ToModel<AddUpdateCustomerModel>(result);
+
+			var adminProfileCondition =
+				new AdminProfileQuery().IdInRange(
+					result.CustomerNotes.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
+
+			var adminProfiles = await _adminProfileService.QueryAsync(adminProfileCondition);
+			foreach (var customerNote in customerModel.CustomerNotes)
+			{
+				customerNote.EditedBy =
+					adminProfiles.SingleOrDefault(y => y.Id == result.CustomerNotes.Single(z => z.Id == customerNote.Id).IdEditedBy)?
+						.AgentId;
+			}
+
+			customerModel.CustomerNotes = customerModel.CustomerNotes.OrderByDescending(x => x.DateEdited).ToList();
+
+			return customerModel;
 		}
     }
 }

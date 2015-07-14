@@ -105,6 +105,8 @@ namespace VitalChoice.Business.Services.Customers
 
 			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
 			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
+
+	        await uow.SaveChangesAsync();
         }
 
         protected async override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)

@@ -24,7 +24,8 @@ namespace VitalChoice.Data.Services
         void Delete(TEntity entity);
 		List<TEntity> Query();
         List<TEntity> Query(IQueryObject<TEntity> queryObject);
-        List<TEntity> Query(Expression<Func<TEntity, bool>> query);
+		Task<List<TEntity>> QueryAsync(IQueryObject<TEntity> queryObject);
+		List<TEntity> Query(Expression<Func<TEntity, bool>> query);
         Task<bool> DeleteAsync(int id);
         Task<bool> DeleteAsync(CancellationToken cancellationToken, int id);
     }
