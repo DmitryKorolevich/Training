@@ -167,10 +167,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 IdOrderNote = c
             }).ToList();
 
-            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ?? new List<Address>();
-            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ?? new List<CustomerNote>();
+            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ??
+                               new List<Address>();
+            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
+                                   new List<CustomerNote>();
 
-	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
+            entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }
     }
 }
