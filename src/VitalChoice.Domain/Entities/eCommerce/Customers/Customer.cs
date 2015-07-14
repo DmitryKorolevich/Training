@@ -10,6 +10,15 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 {
     public class Customer : DynamicDataEntity<CustomerOptionValue, CustomerOptionType>
 	{
+	    public Customer()
+	    {
+			PaymentMethods = new List<CustomerToPaymentMethod>();
+			OrderNotes = new List<CustomerToOrderNote>();
+			Addresses = new List<Address>();
+			CustomerNotes = new List<CustomerNote>();
+			CustomerPaymentMethods = new List<CustomerPaymentMethod>();
+        }
+
 	    public User User { get; set; }
 
 	    public string Email { get; set; }

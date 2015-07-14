@@ -60,5 +60,8 @@ namespace VC.Admin.Models.Customer
 
 		[Map]
 		public string Email { get; set; }
+
+		[Map]
+		public bool Default { get; set; }
 	}
 }

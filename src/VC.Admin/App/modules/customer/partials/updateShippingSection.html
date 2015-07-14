@@ -1,23 +1,23 @@
-﻿<form class="form-horizontal" name="forms.shipping" data-ng-submit="save()" data-ng-class="{submitted: forms.shippingSubmitted}" novalidate>
+﻿<form class="form-horizontal" name="forms.shipping" data-ng-class="{submitted: forms.shippingSubmitted}" novalidate> <!--data-ng-submit="save()"-->
     <fieldset>
         <span class="legend">Shipping Address</span>
         <div class="form-group">
             <div class="col-md-6">
-                <select class="form-control" id="shippingAddresses" data-ng-model="SelectedShipping" data-ng-options="shippingAddress as (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1) for shippingAddress in currentCustomer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.Address" data-ng-options="shippingAddress as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for shippingAddress in currentCustomer.Shipping"></select>
             </div>
             <div class="col-md-3">
-                <label class="checkbox-inline col-md-12">
-                    <input type="checkbox" id="setDefault" data-ng-show="!SelectedShipping.Default" data-ng-model="SelectedShipping.Default" data-ng-change="setDefaultAddress();">
+                <label class="checkbox-inline col-md-12" data-ng-show="!shippingAddressTab.Address.Default">
+                    <input type="checkbox" id="setDefault" data-ng-model="shippingAddressTab.Address.Default" data-ng-change="setDefaultAddress();">
                     Set as Default
                 </label>
             </div>
             <div class="col-md-3">
-                <button class="btn btn-danger pull-right" data-ng-show="!SelectedShipping.Default" data-ng-click="deleteSelectedShipping(SelectedShipping.Id);">Delete</button>
+                <button class="btn btn-danger pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="deleteSelectedShipping(shippingAddressTab.Address.Id);">Delete</button>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-md-3">
-                <button class="btn btn-info" data-ng-click="addNewShipping();">Add New Address</button>
+                <button class="btn btn-info" novalidate data-ng-click="addNewShipping();">Add New Address</button>
             </div>
         </div>
         <div class="form-group">

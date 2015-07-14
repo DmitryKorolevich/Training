@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         protected override void UpdateEntityInternal(CustomerDynamic dynamic, Customer entity)
         {
-            entity.User = dynamic.User;
+            //entity.User = dynamic.User;
             entity.Email = dynamic.Email;
             entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
 
@@ -145,6 +145,8 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 value.IdCustomer = dynamic.Id;
             }
+
+	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.Active : RecordStatusCode.NotActive;
         }
 
         protected override void ToEntityInternal(CustomerDynamic dynamic, Customer entity)
@@ -165,10 +167,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 IdOrderNote = c
             }).ToList();
 
-            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ?? new List<Address>();
-            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ?? new List<CustomerNote>();
+            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ??
+                               new List<Address>();
+            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
+                                   new List<CustomerNote>();
 
-	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
+            entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }
     }
 }
