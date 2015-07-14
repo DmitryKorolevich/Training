@@ -90,7 +90,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public Result<AddressModel> CreateAddressPrototype()
 		{
-			return new AddressModel();
+			return new AddressModel() { AddressType = AddressType.Shipping };
 		}
 
 		[HttpPost]
@@ -125,7 +125,7 @@ namespace VC.Admin.Controllers
 		    }
 		    else
 		    {
-		        item = await _customerService.InsertAsync(item);
+			    item = await _customerService.InsertAsync(item);
 		    }
 			var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
 			return toReturn;

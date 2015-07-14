@@ -26,6 +26,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string TitleTakenAlready = "TitleTakenAlready";
 		    public const string LabelTakenAlready = "LabelTakenAlready";
 		    public const string HasAssignments = "HasAssignments";
+		    public const string AtLeastOneDefaultShipping = "AtLeastOneDefaultShipping";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -48,7 +49,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.CantFindRecord, "Record not found"},
 			{Keys.TitleTakenAlready, "Title is already in use"},
 			{Keys.LabelTakenAlready, "Label is already in use"},
-			{Keys.HasAssignments, "Record cannot be removed because there are references to it"}
+			{Keys.HasAssignments, "Record cannot be removed because there are references to it"},
+			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"}
 		};
     }
 }

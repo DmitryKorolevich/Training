@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         protected override void UpdateEntityInternal(CustomerDynamic dynamic, Customer entity)
         {
-            entity.User = dynamic.User;
+            //entity.User = dynamic.User;
             entity.Email = dynamic.Email;
             entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
 
@@ -145,6 +145,8 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 value.IdCustomer = dynamic.Id;
             }
+
+	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.Active : RecordStatusCode.NotActive;
         }
 
         protected override void ToEntityInternal(CustomerDynamic dynamic, Customer entity)
