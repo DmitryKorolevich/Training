@@ -13,11 +13,11 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Services
 {
-    public abstract class GenericService<TEntity> : IGenericService<TEntity> where TEntity : Entity
+    public class GenericService<TEntity> : IGenericService<TEntity> where TEntity : Entity
     {
 	    protected IRepositoryAsync<TEntity> Repository { get; }
 
-		protected GenericService(IRepositoryAsync<TEntity> repository)
+		public GenericService(IRepositoryAsync<TEntity> repository)
 	    {
 		    this.Repository = repository;
         }
@@ -96,7 +96,12 @@ namespace VitalChoice.Data.Services
             return Repository.Query(queryObject).Select();
         }
 
-		public virtual List<TEntity> Query(Expression<Func<TEntity, bool>> query)
+	    public async Task<List<TEntity>> QueryAsync(IQueryObject<TEntity> queryObject)
+	    {
+			return await Repository.Query(queryObject).SelectAsync();
+		}
+
+	    public virtual List<TEntity> Query(Expression<Func<TEntity, bool>> query)
         {
             return Repository.Query(query).Select();
         }

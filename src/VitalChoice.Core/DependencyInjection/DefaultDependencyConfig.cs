@@ -47,6 +47,7 @@ using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
 using Autofac.Dnx;
+using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services.Customers;
 
@@ -209,6 +210,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (LogsRepositoryAsync<>))
                 .As(typeof (ILogsRepositoryAsync<>))
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
+	        builder.RegisterGeneric(typeof (GenericService<>))
+		        .As(typeof (IGenericService<>));
             builder.RegisterType<ContentViewService>().As<IContentViewService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<MasterContentService>().As<IMasterContentService>();
