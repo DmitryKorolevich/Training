@@ -115,13 +115,15 @@ namespace VitalChoice.Business.Services.Dynamic
 				foreach (var item in itemsToUpdate)
 				{
 					_customerNoteMapper.UpdateEntity(item.customerNoteDynamic, item.customerNote);
-				}
+                    item.customerNote.IdCustomer = dynamic.Id;
+                    item.customerNote.StatusCode = RecordStatusCode.Active;
+                }
 
 				//Delete
 				var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
-				foreach (var sku in toDelete)
+				foreach (var note in toDelete)
 				{
-					sku.StatusCode = RecordStatusCode.Deleted;
+					note.StatusCode = RecordStatusCode.Deleted;
 				}
 
 				//Insert
@@ -129,7 +131,7 @@ namespace VitalChoice.Business.Services.Dynamic
 				{
 					var customerNote = _customerNoteMapper.ToEntity(s);
 					customerNote.IdCustomer = entity.Id;
-					return customerNote;
+                    return customerNote;
 				}));
 			}
 			else

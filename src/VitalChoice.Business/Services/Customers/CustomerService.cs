@@ -134,13 +134,25 @@ namespace VitalChoice.Business.Services.Customers
 
         protected async override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
-			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
-			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+            var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
+            var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
             var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
+            var notesRepositoryAsync = uow.RepositoryAsync<CustomerNote>();
+            var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
+            var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
+            foreach (var address in entity.Addresses.Where(a => a.StatusCode != RecordStatusCode.Deleted))
+            {
+                await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
+            }
+            foreach (var customerNote in entity.CustomerNotes.Where(a => a.StatusCode != RecordStatusCode.Deleted))
+            {
+                await customerNoteOptionValuesRepositoryAsync.InsertRangeAsync(customerNote.OptionValues);
+            }
             await addressesRepositoryAsync.DeleteAllAsync(entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+            await notesRepositoryAsync.DeleteAllAsync(entity.CustomerNotes.Where(a => a.StatusCode == RecordStatusCode.Deleted));
             await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
-			await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
+            await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
         }
 
         protected override async Task AfterSelect(Customer entity)
