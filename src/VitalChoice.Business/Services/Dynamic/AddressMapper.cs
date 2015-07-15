@@ -42,6 +42,7 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 value.IdAddress = dynamic.Id;
             }
+            entity.StatusCode = RecordStatusCode.Active;
         }
 
         protected override void ToEntityInternal(AddressDynamic dynamic, Address entity)

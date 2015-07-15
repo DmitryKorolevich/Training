@@ -39,9 +39,9 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual bool InsertRange(ICollection<TEntity> entities)
+        public virtual bool InsertRange(IEnumerable<TEntity> entities)
         {
-            if (entities != null && entities.Any())
+            if (entities != null)
             {
                 DbSet.AddRange(entities);
                 Context.SaveChanges();
@@ -50,15 +50,15 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> InsertRangeAsync(ICollection<TEntity> entities)
+        public virtual async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
         {
             return await InsertRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> InsertRangeAsync(CancellationToken cancellationToken,
-            ICollection<TEntity> entities)
+            IEnumerable<TEntity> entities)
         {
-            if (entities != null && entities.Any())
+            if (entities != null)
             {
                 DbSet.AddRange(entities);
                 await Context.SaveChangesAsync(cancellationToken);
@@ -120,13 +120,13 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> InsertGraphRangeAsync(ICollection<TEntity> entities)
+        public virtual async Task<bool> InsertGraphRangeAsync(IEnumerable<TEntity> entities)
         {
             return await InsertGraphRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken,
-            ICollection<TEntity> entities)
+            IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
@@ -163,7 +163,7 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual bool UpdateRange(ICollection<TEntity> entities)
+        public virtual bool UpdateRange(IEnumerable<TEntity> entities)
         {
             if (entities != null)
             {
@@ -174,13 +174,13 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> UpdateRangeAsync(ICollection<TEntity> entities)
+        public virtual async Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities)
         {
             return await UpdateRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> UpdateRangeAsync(CancellationToken cancellationToken,
-            ICollection<TEntity> entities)
+            IEnumerable<TEntity> entities)
         {
             if (entities != null)
             {
@@ -229,9 +229,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual bool DeleteAll(ICollection<TEntity> entitySet)
+        public virtual bool DeleteAll(IEnumerable<TEntity> entitySet)
         {
-            if (entitySet == null || !entitySet.Any())
+            if (entitySet == null)
                 return false;
             DbSet.RemoveRange(entitySet);
             Context.SaveChanges();
@@ -286,15 +286,15 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> DeleteAllAsync(ICollection<TEntity> entitySet)
+        public virtual async Task<bool> DeleteAllAsync(IEnumerable<TEntity> entitySet)
         {
             return await DeleteAllAsync(CancellationToken.None, entitySet);
         }
 
         public virtual async Task<bool> DeleteAllAsync(CancellationToken cancellationToken,
-            ICollection<TEntity> entitySet)
+            IEnumerable<TEntity> entitySet)
         {
-            if (entitySet == null || !entitySet.Any())
+            if (entitySet == null)
                 return false;
             DbSet.RemoveRange(entitySet);
             await Context.SaveChangesAsync(cancellationToken);

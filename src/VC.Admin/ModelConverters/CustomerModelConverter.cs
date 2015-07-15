@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using VC.Admin.Models.Customer;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
@@ -43,6 +44,7 @@ namespace VC.Admin.ModelConverters
 				    }
 			    }
 		    }
+	        model.SuspendUserAccount = dynamic.StatusCode == RecordStatusCode.NotActive;
 	    }
 
 	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
@@ -61,7 +63,6 @@ namespace VC.Admin.ModelConverters
 				addressDynamic.IdObjectType = (int)AddressType.Profile;
 				dynamic.Addresses.Add(addressDynamic);
 			}
-
 			if (model.Shipping.Any())
 			{
 				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping)))
@@ -70,6 +71,7 @@ namespace VC.Admin.ModelConverters
 					dynamic.Addresses.Add(addressDynamic);
 				}
 			}
-		}
+	        dynamic.StatusCode = model.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
+        }
 	}
 }

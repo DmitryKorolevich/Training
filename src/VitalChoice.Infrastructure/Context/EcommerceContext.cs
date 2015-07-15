@@ -371,9 +371,9 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<Customer>()
 		        .Reference(p => p.DefaultPaymentMethod)
 		        .InverseReference()
-		        .ForeignKey<PaymentMethod>(p => p.Id)
-		        .PrincipalKey<Customer>(p => p.IdDefaultPaymentMethod)
-		        .Required();
+		        .ForeignKey<Customer>(p => p.IdDefaultPaymentMethod)
+                .PrincipalKey<PaymentMethod>(p => p.Id)
+                .Required();
 		    builder.Entity<Customer>()
 		        .Collection(p => p.OrderNotes)
 		        .InverseReference(p => p.Customer)

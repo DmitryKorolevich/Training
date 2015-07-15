@@ -72,7 +72,6 @@ namespace VC.Admin.Models.Customer
 		[Map]
 		public bool DoNotRent { get; set; }
 
-		[Map]
 		public bool SuspendUserAccount { get; set; }
 
 		[Map]

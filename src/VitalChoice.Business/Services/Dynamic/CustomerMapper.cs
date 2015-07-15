@@ -53,8 +53,6 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 dynamic.Addresses.Add(addressDynamic);
             }
-
-	        dynamic.SuspendUserAccount = entity.StatusCode == RecordStatusCode.NotActive;
 		}
 
         protected override void UpdateEntityInternal(CustomerDynamic dynamic, Customer entity)
@@ -78,11 +76,12 @@ namespace VitalChoice.Business.Services.Dynamic
             if (dynamic.Addresses != null && dynamic.Addresses.Any())
             {
                 //Update existing
-                var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, sd => sd.Id, s => s.Id,
+                var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, addressDynamic => addressDynamic.Id, address => address.Id,
                     (addressDynamic, address) => new {addressDynamic, address});
                 foreach (var item in itemsToUpdate)
                 {
                     _addressMapper.UpdateEntity(item.addressDynamic, item.address);
+                    item.address.IdCustomer = dynamic.Id;
                 }
 
                 //Delete
@@ -145,8 +144,6 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 value.IdCustomer = dynamic.Id;
             }
-
-	        entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.Active : RecordStatusCode.NotActive;
         }
 
         protected override void ToEntityInternal(CustomerDynamic dynamic, Customer entity)
@@ -171,8 +168,6 @@ namespace VitalChoice.Business.Services.Dynamic
                                new List<Address>();
             entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
                                    new List<CustomerNote>();
-
-            entity.StatusCode = dynamic.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }
     }
 }

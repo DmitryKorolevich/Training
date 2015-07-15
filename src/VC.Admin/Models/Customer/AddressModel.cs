@@ -19,6 +19,9 @@ namespace VC.Admin.Models.Customer
 			Country = new CountryListItemModel();
 		}
 
+        [Map]
+	    public int Id { get; set; }
+
 		[Map("IdObjectType")]
 		public AddressType AddressType { get; set; }
 
