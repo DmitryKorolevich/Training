@@ -31,6 +31,16 @@ namespace VitalChoice.DynamicData.Base
 
         protected abstract IUnitOfWorkAsync CreateUnitOfWork();
 
+        protected virtual Task AfterEntityChangesAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
+        {
+            return Task.Delay(0);
+        }
+
+        protected virtual Task BeforeEntityChangesAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
+        {
+            return Task.Delay(0);
+        }
+
         public static ErrorBuilder<TDynamic> CreateError()
         {
             return new ErrorBuilder<TDynamic>(null);
@@ -226,16 +236,6 @@ namespace VitalChoice.DynamicData.Base
             return entity;
         }
 
-        protected virtual Task AfterUpdateAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
-        {
-            return Task.Delay(0);
-        }
-
-        protected virtual Task BeforeUpdateAsync(TDynamic model, TEntity entity, IUnitOfWorkAsync uow)
-        {
-            return Task.Delay(0);
-        }
-
         protected virtual async Task<List<TDynamic>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
             (await ValidateCollection(models)).Raise();
@@ -309,7 +309,7 @@ namespace VitalChoice.DynamicData.Base
             IRepositoryAsync<TOptionValue> valueRepository)
         {
             await SetBigValuesAsync(item.SecondValue, bigValueRepository, true);
-            await BeforeUpdateAsync(item.FirstValue, item.SecondValue, uow);
+            await BeforeEntityChangesAsync(item.FirstValue, item.SecondValue, uow);
 
             await
                 bigValueRepository.DeleteAllAsync(
@@ -323,7 +323,7 @@ namespace VitalChoice.DynamicData.Base
                 bigValueRepository.InsertRangeAsync(
                     item.SecondValue.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
 
-            await AfterUpdateAsync(item.FirstValue, item.SecondValue, uow);
+            await AfterEntityChangesAsync(item.FirstValue, item.SecondValue, uow);
         }
 
         private async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow)

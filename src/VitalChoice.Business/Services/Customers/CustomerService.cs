@@ -95,7 +95,7 @@ namespace VitalChoice.Business.Services.Customers
 			return errors;
 		}
 
-        protected async override Task BeforeUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
@@ -132,7 +132,7 @@ namespace VitalChoice.Business.Services.Customers
             }
         }
 
-        protected async override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
             var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
             var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();

@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Products
                 await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
         }
 
-        protected async override Task BeforeUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
@@ -74,7 +74,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected override async Task AfterUpdateAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
