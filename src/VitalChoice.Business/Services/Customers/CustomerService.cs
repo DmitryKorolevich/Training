@@ -101,6 +101,8 @@ namespace VitalChoice.Business.Services.Customers
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
             var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
             var customerNotesRepositoryAsync = uow.RepositoryAsync<CustomerNote>();
+            var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
+            var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
             entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
 			entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
@@ -120,6 +122,14 @@ namespace VitalChoice.Business.Services.Customers
                     customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(n => n.OptionValues)
                         .SelectAsync();
+            foreach (var address in entity.Addresses)
+            {
+                await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
+            }
+            foreach (var note in entity.CustomerNotes)
+            {
+                await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
+            }
         }
 
         protected async override Task AfterUpdateAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
