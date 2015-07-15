@@ -53,6 +53,7 @@ namespace VitalChoice.Infrastructure.Context
 		{
             #region LocalizationItems
 
+		    builder.UseSqlServerIdentityColumns();
             builder.Entity<LocalizationItem>().Key(p => new { p.GroupId, p.ItemId });
             builder.Entity<LocalizationItemData>().Key(p => new { p.GroupId, p.ItemId, p.CultureId });
             builder.Entity<LocalizationItem>().Collection(p => p.LocalizationItemDatas).InverseReference(p => p.LocalizationItem).ForeignKey(p => new { p.GroupId, p.ItemId }).

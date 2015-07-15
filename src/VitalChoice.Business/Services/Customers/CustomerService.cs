@@ -100,11 +100,9 @@ namespace VitalChoice.Business.Services.Customers
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
 
-			entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
-			entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
-
-			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
-			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
+            await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
+            await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
+            await uow.SaveChangesAsync();
         }
 
         protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
@@ -113,7 +111,7 @@ namespace VitalChoice.Business.Services.Customers
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
 
 			await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
-			await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
+       	    await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
 		}
 
         protected override async Task AfterSelect(Customer entity)
@@ -128,16 +126,6 @@ namespace VitalChoice.Business.Services.Customers
                     _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(n => n.OptionValues)
                         .SelectAsync(false);
-            entity.OrderNotes =
-                await
-                    _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-                        .Include(n => n.OrderNote)
-                        .SelectAsync(false);
-            entity.PaymentMethods =
-                await
-                    _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
-                        .Include(p => p.PaymentMethod)
-                        .SelectAsync(false);
 			entity.User = (await _userRepositoryAsync.Query(p => p.Id == entity.Id)
 						.Include(p => p.Customer)
 						.SelectAsync(false)).Single();
@@ -147,7 +135,9 @@ namespace VitalChoice.Business.Services.Customers
         {
             return query
                 .Include(p => p.DefaultPaymentMethod)
-                .Include(p => p.User);
+                .Include(p => p.User)
+                .Include(p => p.PaymentMethods)
+                .Include(p => p.OrderNotes);
         }
 
         protected async override Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)

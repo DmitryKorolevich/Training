@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "xunit.runner.dnx": "2.1.0-*",
-    "Autofac.Dnx": "4.0.0",
+    "Autofac.Dnx": "4.0.0-alpha4-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*"
   },

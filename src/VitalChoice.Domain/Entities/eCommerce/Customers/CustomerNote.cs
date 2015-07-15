@@ -6,6 +6,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	{
 	    public int IdCustomer { get; set; }
 
+        public Customer Customer { get; set; }
+
 	    public string Note { get; set; }
 	}
 }

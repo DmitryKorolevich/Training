@@ -159,7 +159,7 @@ namespace VitalChoice.Business.Services
 			}
 
 			//stupid ef
-			var temp = await userManager.Users.Include(x => x.Profile).ToListAsync();
+			var temp = await userManager.Users.AsNoTracking().Include(x => x.Profile).ToListAsync();
 			var notConfirmed = temp.Any(x => !x.Profile.IsConfirmed && x.Email.Equals(login) && !x.DeletedDate.HasValue);
 
 			if (notConfirmed)

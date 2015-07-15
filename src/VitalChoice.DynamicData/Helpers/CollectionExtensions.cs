@@ -42,5 +42,16 @@ namespace VitalChoice.DynamicData.Helpers
                 collection.Add(item);
             }
         }
+
+        public static void RemoveAll<T>(this ICollection<T> collection, Func<T, bool> condition)
+        {
+            foreach (var item in collection)
+            {
+                if (condition(item))
+                {
+                    collection.Remove(item);
+                }
+            }
+        }
     }
 }
