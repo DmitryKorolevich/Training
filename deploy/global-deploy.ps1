@@ -21,7 +21,9 @@ ni -itemtype directory -path "empty" -Force
 echo "Clean temp..."
 robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh > clean.log
 echo "Clean deploy directory..."
-robocopy "empty\" "${RootDeploy}\" /xd "logs" "files" /mir /nfl /ndl /njh /xj > clean.log
+rmdir "${RootDeploy}\blue\wwwroot\files"
+rmdir "${RootDeploy}\public\wwwroot\files"
+robocopy "empty\" "${RootDeploy}\" /xd "logs" "files" /mir /nfl /ndl /njh > clean.log
 echo "Copy checkout files to temp..."
 robocopy "${Src}" "${RootBuild}" /xd "artifacts" "bin" "obj" ".git" ".vs" /mir /nfl /ndl /njh /is /it /r:2 /w:1 > copy.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
