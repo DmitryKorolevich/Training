@@ -73,7 +73,7 @@ namespace VitalChoice.DynamicData.Base
             return query;
         }
 
-        protected virtual Task AfterSelect(TEntity entity)
+        protected virtual Task AfterSelect(TEntity entity, bool tracked = false)
         {
             return Task.Delay(0);
         }

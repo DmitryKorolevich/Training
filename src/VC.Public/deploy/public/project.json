@@ -27,7 +27,7 @@
         "Microsoft.Framework.Configuration.Json": "1.0.0-*",
         "Microsoft.Framework.Logging": "1.0.0-*",
         "Microsoft.Framework.Logging.Console": "1.0.0-*",
-        "EntityFramework.Commands": "7.0.0-*",
+        "EntityFramework7.Commands": "7.0.0-*",
         "VitalChoice.Domain": "1.0.0-*",
         "VitalChoice.Data": "1.0.0-*",
         "VitalChoice.Infrastructure": "1.0.0-*",
@@ -49,6 +49,6 @@
 		"web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
 		"kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5010",
 		"gen": "Microsoft.Framework.CodeGeneration",
-		"ef": "EntityFramework.Commands"
+		"ef": "EntityFramework7.Commands"
 	}
 }

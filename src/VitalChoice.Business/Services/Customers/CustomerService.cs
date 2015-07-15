@@ -114,21 +114,18 @@ namespace VitalChoice.Business.Services.Customers
        	    await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
 		}
 
-        protected override async Task AfterSelect(Customer entity)
+        protected override async Task AfterSelect(Customer entity, bool tracked = false)
         {
             entity.Addresses =
                 await
                     _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(a => a.OptionValues)
-                        .SelectAsync(false);
+                        .SelectAsync(tracked);
             entity.CustomerNotes =
                 await
                     _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(n => n.OptionValues)
-                        .SelectAsync(false);
-			entity.User = (await _userRepositoryAsync.Query(p => p.Id == entity.Id)
-						.Include(p => p.Customer)
-						.SelectAsync(false)).Single();
+                        .SelectAsync(tracked);
 		}
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
@@ -136,6 +133,7 @@ namespace VitalChoice.Business.Services.Customers
             return query
                 .Include(p => p.DefaultPaymentMethod)
                 .Include(p => p.User)
+                .ThenInclude(u => u.Customer)
                 .Include(p => p.PaymentMethods)
                 .Include(p => p.OrderNotes);
         }

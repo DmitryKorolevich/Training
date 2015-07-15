@@ -41,27 +41,22 @@ namespace VitalChoice.Business.Services.Products
             return new EcommerceUnitOfWork();
         }
 
-        protected override async Task AfterSelect(Product entity)
+        protected override async Task AfterSelect(Product entity, bool tracked = false)
         {
             entity.Skus =
                 await
                     _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
                         .Include(p => p.OptionValues)
                         .OrderBy(skus => skus.OrderBy(s => s.Order))
-                        .SelectAsync(false);
+                        .SelectAsync(tracked);
             entity.ProductsToCategories =
-                await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+                await _productToCategoryRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(tracked);
         }
 
         protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
-            var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
-            entity.Skus =
-                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
-                        .Include(p => p.OptionValues)
-                        .SelectAsync();
             foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;

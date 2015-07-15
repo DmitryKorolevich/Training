@@ -1430,7 +1430,6 @@
 /// <reference path="../App/modules/customer/customer.js" />
 /// <reference path="../App/modules/customer/controllers/addEditCustomerController.js" />
 /// <reference path="../App/modules/customer/controllers/customerManagementController.js" />
-/// <reference path="../temp/js/app.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/mode-ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/snippets/ttl.js" />
 /// <reference path="lib/ace-builds/src-min-noconflict/worker-ttl.js" />
