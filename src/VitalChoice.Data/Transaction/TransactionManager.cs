@@ -15,9 +15,9 @@ namespace VitalChoice.Data.Transaction
 		    this._dataContext = (DbContext)dataContext;
 	    }
 
-	    public RelationalTransaction BeginTransaction()
+	    public RelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 	    {
-			return _dataContext.Database.AsRelational().Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+			return _dataContext.Database.AsRelational().Connection.BeginTransaction(isolation);
 		}
     }
 }

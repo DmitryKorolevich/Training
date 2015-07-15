@@ -47,9 +47,9 @@ namespace VitalChoice.Data.UnitOfWork
             _disposed = true;
         }
 
-		public RelationalTransaction BeginTransaction()
+	    public RelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 		{
-			return new TransactionManager(_dataContext).BeginTransaction();
+			return new TransactionManager(_dataContext).BeginTransaction(isolation);
 		}
 
 		#endregion Constuctor/Dispose

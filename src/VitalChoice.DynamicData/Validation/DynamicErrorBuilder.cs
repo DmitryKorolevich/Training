@@ -98,30 +98,5 @@ namespace VitalChoice.DynamicData.Validation
             throw new ArgumentException("collectionExpression should contain member access expression");
         }
 
-        public IErrorResult Error(string error)
-        {
-            ErrorText = error;
-            return this;
-        }
-
-        public MessageInfo[] Build()
-        {
-            if (!string.IsNullOrEmpty(CollectionName))
-            {
-                return Indexes.Select(i => new MessageInfo
-                {
-                    Field = CollectionFormProperty.GetFullName(CollectionName, i, PropertyName),
-                    Message = ErrorText
-                }).ToArray();
-            }
-            return new[]
-            {
-                new MessageInfo
-                {
-                    Field = PropertyName ?? string.Empty,
-                    Message = ErrorText
-                }
-            };
-        }
     }
 }

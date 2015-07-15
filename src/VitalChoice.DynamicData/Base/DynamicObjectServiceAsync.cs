@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -251,11 +252,14 @@ namespace VitalChoice.DynamicData.Base
             if (!entities.Any())
                 return new List<TDynamic>();
             var items = entities.Join(models, entity => entity.Id, model => model.Id,
-                (entity, model) => new Pair<TDynamic, TEntity> (model, entity));
-
+                (entity, model) => new Pair<TDynamic, TEntity>(model, entity));
             foreach (var item in items)
             {
-                item.SecondValue.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(item.FirstValue.IdObjectType)).SelectAsync(false); ;
+                item.SecondValue.OptionTypes =
+                    await
+                        OptionTypesRepository.Query(GetOptionTypeQuery(item.FirstValue.IdObjectType))
+                            .SelectAsync(false);
+
                 await UpdateItem(uow, item, bigValueRepository, valueRepository);
             }
             await mainRepository.UpdateRangeAsync(entities);
