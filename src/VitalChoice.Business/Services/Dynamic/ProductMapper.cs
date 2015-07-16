@@ -27,9 +27,9 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
-        public override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
+        public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
         {
-            return new ProductOptionTypeQuery().WithType((ProductType?)idType);
+            return new ProductOptionTypeQuery();
         }
 
         protected async override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)

@@ -18,7 +18,7 @@ namespace VitalChoice.Tests.Mapping
         {
         }
 
-        public override IQueryObject<TestEntityOptionType> GetOptionTypeQuery(int? idType)
+        public override IQueryOptionType<TestEntityOptionType> GetOptionTypeQuery()
         {
             throw new NotImplementedException();
         }

@@ -23,9 +23,9 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override IQueryObject<DiscountOptionType> GetOptionTypeQuery(int? idType)
+        public override IQueryOptionType<DiscountOptionType> GetOptionTypeQuery()
         {
-            return new DiscountOptionTypeQuery().WithType((DiscountType?)idType);
+            return new DiscountOptionTypeQuery();
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)

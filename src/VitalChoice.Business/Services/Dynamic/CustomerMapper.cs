@@ -31,11 +31,6 @@ namespace VitalChoice.Business.Services.Dynamic
             _customerNoteMapper = customerNoteMapper;
         }
 
-        public override IQueryObject<CustomerOptionType> GetOptionTypeQuery(int? idType)
-        {
-            return new CustomerOptionTypeQuery().WithType((CustomerType?)idType);
-        }
-
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)
         {
             items.ForEach(item =>

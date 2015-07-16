@@ -24,12 +24,12 @@ namespace VitalChoice.DynamicData.Base
 
         public IQueryObject<TOptionType> GetOptionTypeQuery(TEntity entity)
         {
-            return Mapper.GetOptionTypeQuery(entity.IdObjectType);
+            return Mapper.GetOptionTypeQuery().WithObjectType(entity.IdObjectType);
         }
 
         public IQueryObject<TOptionType> GetOptionTypeQuery(int? idObjectType)
         {
-            return Mapper.GetOptionTypeQuery(idObjectType);
+            return Mapper.GetOptionTypeQuery().WithObjectType(idObjectType);
         }
 
         protected ReadDynamicObjectServiceAsync(

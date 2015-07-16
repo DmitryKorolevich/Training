@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override IQueryObject<CustomerNoteOptionType> GetOptionTypeQuery(int? idType)
+        public override IQueryOptionType<CustomerNoteOptionType> GetOptionTypeQuery()
         {
             return new CustomerNoteOptionTypeQuery();
         }

@@ -33,7 +33,11 @@ namespace VitalChoice.DynamicData.Base
             _typeConverter = new ModelTypeConverter(mappers);
         }
 
-        public abstract IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
+        public virtual IQueryOptionType<TOptionType> GetOptionTypeQuery()
+        {
+            return new OptionTypeQuery<TOptionType>();
+        }
+
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
@@ -46,7 +50,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).Select(false);
+                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).Select(false);
             }
 
             var result = FromEntityItem(entity, withDefaults);
@@ -65,7 +69,7 @@ namespace VitalChoice.DynamicData.Base
                         dynamic =>
                             new DynamicEntityPair<TDynamic, TEntity>(dynamic,
                                 ToEntityItem(dynamic,
-                                    optionTypes.Where(GetOptionTypeQuery(dynamic.IdObjectType).Query().Compile())
+                                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(dynamic.IdObjectType).Query().Compile())
                                         .ToList())))
                         .ToList();
             }
@@ -89,7 +93,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
                 }
-                pair.Value2 = optionTypes.Where(GetOptionTypeQuery(pair.Value1.IdObjectType).Query().Compile()).ToList();
+                pair.Value2 = optionTypes.Where(GetOptionTypeQuery().WithObjectType(pair.Value1.IdObjectType).Query().Compile()).ToList();
             }
             var results =
                 items.Select(
@@ -112,7 +116,7 @@ namespace VitalChoice.DynamicData.Base
                     optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
                 }
                 entity.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(entity.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(entity.IdObjectType).Query().Compile()).ToList();
             }
             List<DynamicEntityPair<TDynamic, TEntity>> results =
                 items.Select(
@@ -130,7 +134,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
             }
 
             UpdateEntityItem(dynamic, entity);
@@ -216,7 +220,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
             }
 
             UpdateEntityItem(dynamic, entity);
@@ -235,7 +239,7 @@ namespace VitalChoice.DynamicData.Base
                     optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
                 }
                 pair.Entity.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
             }
             foreach (var pair in items)
             {
@@ -330,7 +334,7 @@ namespace VitalChoice.DynamicData.Base
             if (optionTypes == null)
             {
                 optionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(dynamic.IdObjectType)).SelectAsync(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(dynamic.IdObjectType)).SelectAsync(false);
             }
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
             var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
@@ -353,7 +357,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
             }
 
             var result = FromEntityItem(entity, withDefaults);
@@ -373,7 +377,7 @@ namespace VitalChoice.DynamicData.Base
                     optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
                 }
                 pair.Entity.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
             }
             foreach (var pair in items)
             {
@@ -395,7 +399,7 @@ namespace VitalChoice.DynamicData.Base
                         dynamic =>
                             new DynamicEntityPair<TDynamic, TEntity>(dynamic,
                                 ToEntityItem(dynamic,
-                                    optionTypes.Where(GetOptionTypeQuery(dynamic.IdObjectType).Query().Compile())
+                                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(dynamic.IdObjectType).Query().Compile())
                                         .ToList())))
                         .ToList();
             }
@@ -419,7 +423,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
                 }
-                pair.Value2 = optionTypes.Where(GetOptionTypeQuery(pair.Value1.IdObjectType).Query().Compile()).ToList();
+                pair.Value2 = optionTypes.Where(GetOptionTypeQuery().WithObjectType(pair.Value1.IdObjectType).Query().Compile()).ToList();
             }
             var results =
                 items.Select(
@@ -442,7 +446,7 @@ namespace VitalChoice.DynamicData.Base
                     optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
                 }
                 entity.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(entity.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery().WithObjectType(entity.IdObjectType).Query().Compile()).ToList();
             }
             List<DynamicEntityPair<TDynamic, TEntity>> results =
                 items.Select(

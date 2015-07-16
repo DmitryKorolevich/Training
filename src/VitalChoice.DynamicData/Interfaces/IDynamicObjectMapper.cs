@@ -68,7 +68,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject
     {
-        IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
+        IQueryOptionType<TOptionType> GetOptionTypeQuery();
 
         void UpdateEntity(TDynamic dynamic, TEntity entity);
         TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null);

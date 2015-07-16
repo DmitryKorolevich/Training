@@ -8,6 +8,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
@@ -22,9 +23,9 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        public override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
+        public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
         {
-            return new ProductOptionTypeQuery().WithType((ProductType?) idType);
+            throw new ApiException("Cannot get sku option types as they inherited from product, please provide types with entity or as parameter");
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items, bool withDefaults = false)

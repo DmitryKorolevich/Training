@@ -23,11 +23,6 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override IQueryObject<AddressOptionType> GetOptionTypeQuery(int? idType)
-        {
-            return new AddressOptionTypeQuery().WithType((AddressType?) idType);
-        }
-
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<AddressDynamic, Address>> items, bool withDefaults = false)
         {
