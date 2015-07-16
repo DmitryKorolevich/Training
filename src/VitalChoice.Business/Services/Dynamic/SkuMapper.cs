@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
@@ -21,43 +22,69 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        protected override void ToEntityInternal(SkuDynamic dynamic, Sku entity)
-        {
-            ToEntityStd(dynamic, entity);
-        }
-
         public override IQueryObject<ProductOptionType> GetOptionTypeQuery(int? idType)
         {
             return new ProductOptionTypeQuery().WithType((ProductType?) idType);
         }
 
-        protected override void FromEntityInternal(SkuDynamic dynamic, Sku entity, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items, bool withDefaults = false)
         {
-            dynamic.Code = entity.Code;
-            dynamic.Hidden = entity.Hidden;
-            dynamic.Price = entity.Price;
-            dynamic.WholesalePrice = entity.WholesalePrice;
-            dynamic.Order = entity.Order;
-        }
-
-        protected override void UpdateEntityInternal(SkuDynamic dynamic, Sku entity)
-        {
-            ToEntityStd(dynamic, entity);
-
-            //Set key on options
-            foreach (var value in entity.OptionValues)
+            items.ForEach(pair =>
             {
-                value.IdSku = dynamic.Id;
-            }
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                dynamic.Code = entity.Code;
+                dynamic.Hidden = entity.Hidden;
+                dynamic.Price = entity.Price;
+                dynamic.WholesalePrice = entity.WholesalePrice;
+                dynamic.Order = entity.Order;
+            });
+            return Task.Delay(0);
         }
 
-        private static void ToEntityStd(SkuDynamic dynamic, Sku entity)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items)
         {
-            entity.Code = dynamic.Code;
-            entity.Hidden = dynamic.Hidden;
-            entity.Price = dynamic.Price;
-            entity.WholesalePrice = dynamic.WholesalePrice;
-            entity.Order = dynamic.Order;
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                entity.Code = dynamic.Code;
+                entity.Hidden = dynamic.Hidden;
+                entity.Price = dynamic.Price;
+                entity.WholesalePrice = dynamic.WholesalePrice;
+                entity.Order = dynamic.Order;
+
+                //Set key on options
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdSku = dynamic.Id;
+                }
+            });
+            return Task.Delay(0);
+        }
+
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items)
+        {
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                entity.Code = dynamic.Code;
+                entity.Hidden = dynamic.Hidden;
+                entity.Price = dynamic.Price;
+                entity.WholesalePrice = dynamic.WholesalePrice;
+                entity.Order = dynamic.Order;
+
+                //Set key on options
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdSku = dynamic.Id;
+                }
+            });
+            return Task.Delay(0);
         }
     }
 }

@@ -13,6 +13,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -35,141 +36,161 @@ namespace VitalChoice.Business.Services.Dynamic
             return new CustomerOptionTypeQuery().WithType((CustomerType?)idType);
         }
 
-        protected override void FromEntityInternal(CustomerDynamic dynamic, Customer entity, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)
         {
-            dynamic.User = entity.User;
-            dynamic.Email = entity.Email;
-            dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
-
-            dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
-            dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
-
-			foreach (var customerNoteDynamic in entity.CustomerNotes.Select(x => _customerNoteMapper.FromEntity(x)))
-			{
-				dynamic.CustomerNotes.Add(customerNoteDynamic);
-			}
-			dynamic.Addresses = new List<AddressDynamic>();
-            foreach (var addressDynamic in entity.Addresses.Select(address => _addressMapper.FromEntity(address)))
+            items.ForEach(item =>
             {
-                dynamic.Addresses.Add(addressDynamic);
-            }
-		}
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
 
-        protected override void UpdateEntityInternal(CustomerDynamic dynamic, Customer entity)
-        {
-            //entity.User = dynamic.User;
-            entity.Email = dynamic.Email;
-            entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                dynamic.User = entity.User;
+                dynamic.Email = entity.Email;
+                dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
 
-            entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
-            {
-                IdCustomer = dynamic.Id,
-                IdPaymentMethod = c
-            }).ToList();
+                dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
+                dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
 
-            entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
-            {
-                IdCustomer = dynamic.Id,
-                IdOrderNote = c
-            }).ToList();
-
-            if (dynamic.Addresses != null && dynamic.Addresses.Any())
-            {
-                //Update existing
-                var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, addressDynamic => addressDynamic.Id, address => address.Id,
-                    (addressDynamic, address) => new {addressDynamic, address});
-                foreach (var item in itemsToUpdate)
+                foreach (var customerNoteDynamic in entity.CustomerNotes.Select(x => _customerNoteMapper.FromEntity(x)))
                 {
-                    _addressMapper.UpdateEntity(item.addressDynamic, item.address);
-                    item.address.IdCustomer = dynamic.Id;
+                    dynamic.CustomerNotes.Add(customerNoteDynamic);
                 }
-
-                //Delete
-                var toDelete = entity.Addresses.Where(e => dynamic.Addresses.All(s => s.Id != e.Id));
-                foreach (var sku in toDelete)
+                dynamic.Addresses = new List<AddressDynamic>();
+                foreach (var addressDynamic in entity.Addresses.Select(address => _addressMapper.FromEntity(address)))
                 {
-                    sku.StatusCode = RecordStatusCode.Deleted;
+                    dynamic.Addresses.Add(addressDynamic);
                 }
-
-                //Insert
-                entity.Addresses.AddRange(dynamic.Addresses.Where(s => s.Id == 0).Select(a =>
-                {
-                    var address = _addressMapper.ToEntity(a);
-                    address.IdCustomer = entity.Id;
-                    return address;
-                }));
-            }
-            else
-            {
-                foreach (var address in entity.Addresses)
-                {
-					address.StatusCode = RecordStatusCode.Deleted;
-                }
-            }
-
-            if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
-			{
-				//Update existing
-				var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
-					(customerNoteDynamic, customerNote) => new { customerNoteDynamic, customerNote });
-				foreach (var item in itemsToUpdate)
-				{
-					_customerNoteMapper.UpdateEntity(item.customerNoteDynamic, item.customerNote);
-                    item.customerNote.IdCustomer = dynamic.Id;
-                    item.customerNote.StatusCode = RecordStatusCode.Active;
-                }
-
-				//Delete
-				var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
-				foreach (var note in toDelete)
-				{
-					note.StatusCode = RecordStatusCode.Deleted;
-				}
-
-				//Insert
-                entity.CustomerNotes.AddRange(dynamic.CustomerNotes.Where(s => s.Id == 0).Select(s =>
-				{
-					var customerNote = _customerNoteMapper.ToEntity(s);
-					customerNote.IdCustomer = entity.Id;
-                    return customerNote;
-				}));
-			}
-			else
-			{
-				foreach (var customerNote in entity.CustomerNotes)
-				{
-					customerNote.StatusCode = RecordStatusCode.Deleted;
-				}
-			}
-
-			foreach (var value in entity.OptionValues)
-            {
-                value.IdCustomer = dynamic.Id;
-            }
+            });
+            return Task.Delay(0);
         }
 
-        protected override void ToEntityInternal(CustomerDynamic dynamic, Customer entity)
+        protected async override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
         {
-            entity.User = dynamic.User;
-            entity.Email = dynamic.Email;
-            entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
-
-            entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
+            await items.ForEachAsync(async pair =>
             {
-                IdCustomer = dynamic.Id,
-                IdPaymentMethod = c
-            }).ToList();
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
 
-            entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
+                entity.Email = dynamic.Email;
+                entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+
+                entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
+                {
+                    IdCustomer = dynamic.Id,
+                    IdPaymentMethod = c
+                }).ToList();
+
+                entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
+                {
+                    IdCustomer = dynamic.Id,
+                    IdOrderNote = c
+                }).ToList();
+
+                if (dynamic.Addresses != null && dynamic.Addresses.Any())
+                {
+                    //Update existing
+                    var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, addressDynamic => addressDynamic.Id, address => address.Id,
+                        (addressDynamic, address) => new { addressDynamic, address });
+                    foreach (var item in itemsToUpdate)
+                    {
+                        await _addressMapper.UpdateEntityAsync(item.addressDynamic, item.address);
+                        item.address.IdCustomer = dynamic.Id;
+                    }
+
+                    //Delete
+                    var toDelete = entity.Addresses.Where(e => dynamic.Addresses.All(s => s.Id != e.Id));
+                    foreach (var sku in toDelete)
+                    {
+                        sku.StatusCode = RecordStatusCode.Deleted;
+                    }
+
+                    //Insert
+                    await entity.Addresses.AddRangeAsync(dynamic.Addresses.Where(s => s.Id == 0).Select(async a =>
+                    {
+                        var address = await _addressMapper.ToEntityAsync(a);
+                        address.IdCustomer = entity.Id;
+                        return address;
+                    }));
+                }
+                else
+                {
+                    foreach (var address in entity.Addresses)
+                    {
+                        address.StatusCode = RecordStatusCode.Deleted;
+                    }
+                }
+
+                if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
+                {
+                    //Update existing
+                    var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
+                        (customerNoteDynamic, customerNote) => new { customerNoteDynamic, customerNote });
+                    foreach (var item in itemsToUpdate)
+                    {
+                        await _customerNoteMapper.UpdateEntityAsync(item.customerNoteDynamic, item.customerNote);
+                        item.customerNote.IdCustomer = dynamic.Id;
+                        item.customerNote.StatusCode = RecordStatusCode.Active;
+                    }
+
+                    //Delete
+                    var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
+                    foreach (var note in toDelete)
+                    {
+                        note.StatusCode = RecordStatusCode.Deleted;
+                    }
+
+                    //Insert
+                    await entity.CustomerNotes.AddRangeAsync(dynamic.CustomerNotes.Where(s => s.Id == 0).Select(async s =>
+                    {
+                        var customerNote = await _customerNoteMapper.ToEntityAsync(s);
+                        customerNote.IdCustomer = entity.Id;
+                        return customerNote;
+                    }));
+                }
+                else
+                {
+                    foreach (var customerNote in entity.CustomerNotes)
+                    {
+                        customerNote.StatusCode = RecordStatusCode.Deleted;
+                    }
+                }
+
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdCustomer = dynamic.Id;
+                }
+            });
+        }
+
+        protected override Task ToEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
+        {
+            items.ForEach(item =>
             {
-                IdCustomer = dynamic.Id,
-                IdOrderNote = c
-            }).ToList();
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
 
-            entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ??
-                               new List<Address>();
-            entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
-                                   new List<CustomerNote>();
+                entity.User = dynamic.User;
+                entity.Email = dynamic.Email;
+                entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+
+                entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
+                {
+                    IdCustomer = dynamic.Id,
+                    IdPaymentMethod = c
+                }).ToList();
+
+                entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
+                {
+                    IdCustomer = dynamic.Id,
+                    IdOrderNote = c
+                }).ToList();
+
+                entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ??
+                                   new List<Address>();
+                entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
+                                       new List<CustomerNote>();
+            });
+            return Task.Delay(0);
         }
     }
 }

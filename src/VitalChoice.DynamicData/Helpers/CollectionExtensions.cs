@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VitalChoice.DynamicData.Helpers
 {
@@ -40,6 +41,14 @@ namespace VitalChoice.DynamicData.Helpers
             foreach (var item in items)
             {
                 collection.Add(item);
+            }
+        }
+
+        public static async Task AddRangeAsync<T>(this ICollection<T> collection, IEnumerable<Task<T>> items)
+        {
+            foreach (var item in items)
+            {
+                collection.Add(await item);
             }
         }
     }

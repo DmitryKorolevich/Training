@@ -23,17 +23,17 @@ namespace VitalChoice.Tests.Mapping
             throw new NotImplementedException();
         }
 
-        protected override void FromEntityInternal(TestDynamic dynamic, TestEntity entity, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TestDynamic, TestEntity>> items, bool withDefaults = false)
         {
             throw new NotImplementedException();
         }
 
-        protected override void UpdateEntityInternal(TestDynamic dynamic, TestEntity entity)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TestDynamic, TestEntity>> items)
         {
             throw new NotImplementedException();
         }
 
-        protected override void ToEntityInternal(TestDynamic dynamic, TestEntity entity)
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TestDynamic, TestEntity>> items)
         {
             throw new NotImplementedException();
         }

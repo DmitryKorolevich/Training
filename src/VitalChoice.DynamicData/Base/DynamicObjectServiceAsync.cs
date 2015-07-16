@@ -89,7 +89,7 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await UpdateAsync(model, uow);
+                return Mapper.FromEntity(await UpdateAsync(model, uow));
             }
         }
 
@@ -106,7 +106,7 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await UpdateRangeAsync(models, uow);
+                return Mapper.FromEntityRange(await UpdateRangeAsync(models, uow));
             }
         }
 
@@ -201,22 +201,27 @@ namespace VitalChoice.DynamicData.Base
         protected virtual async Task<List<TEntity>> InsertRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
             (await ValidateCollection(models)).Raise();
-            List<Pair<TEntity, List<TOptionType>>> entities = new List<Pair<TEntity, List<TOptionType>>>();
+            List<GenericPair<TEntity, List<TOptionType>>> entities = new List<GenericPair<TEntity, List<TOptionType>>>();
             var productRepository = uow.RepositoryAsync<TEntity>();
-            foreach (var model in models)
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+            var toInsert =
+                models.Select(
+                    d =>
+                        new GenericPair<TDynamic, ICollection<TOptionType>>(d,
+                            optionTypes.Where(GetOptionTypeQuery(d.IdObjectType).Query().Compile()).ToList())).ToList();
+            var mappedList = await Mapper.ToEntityRangeAsync(toInsert);
+            foreach (var entity in mappedList)
             {
-                var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
-                var entity = Mapper.ToEntity(model, optionTypes);
                 if (entity == null)
                     continue;
                 entity.OptionTypes = new List<TOptionType>();
-                entities.Add(new Pair<TEntity, List<TOptionType>>(entity, optionTypes));
+                entities.Add(new GenericPair<TEntity, List<TOptionType>>(entity, optionTypes));
             }
-            var toInsertList = entities.Select(e => e.FirstValue).ToList();
+            var toInsertList = entities.Select(e => e.Value1).ToList();
             await productRepository.InsertGraphRangeAsync(toInsertList);
             foreach (var entity in entities)
             {
-                entity.FirstValue.OptionTypes = entity.SecondValue;
+                entity.Value1.OptionTypes = entity.Value2;
             }
             await uow.SaveChangesAsync();
             return toInsertList;
@@ -226,7 +231,7 @@ namespace VitalChoice.DynamicData.Base
         {
             (await Validate(model)).Raise();
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
-            var entity = Mapper.ToEntity(model, optionTypes);
+            var entity = await Mapper.ToEntityAsync(model, optionTypes);
             if (entity == null)
                 return null;
             entity.OptionTypes = new List<TOptionType>();
@@ -236,7 +241,7 @@ namespace VitalChoice.DynamicData.Base
             return entity;
         }
 
-        protected virtual async Task<List<TDynamic>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
+        protected virtual async Task<List<TEntity>> UpdateRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
             (await ValidateCollection(models)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
@@ -250,24 +255,22 @@ namespace VitalChoice.DynamicData.Base
             query = BuildQuery(query);
             var entities = (await query.SelectAsync());
             if (!entities.Any())
-                return new List<TDynamic>();
+                return new List<TEntity>();
             var items = entities.Join(models, entity => entity.Id, model => model.Id,
-                (entity, model) => new Pair<TDynamic, TEntity>(model, entity));
+                (entity, model) => new DynamicEntityPair<TDynamic, TEntity>(model, entity)).ToList();
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
             foreach (var item in items)
             {
-                item.SecondValue.OptionTypes =
-                    await
-                        OptionTypesRepository.Query(GetOptionTypeQuery(item.FirstValue.IdObjectType))
-                            .SelectAsync(false);
-
-                await UpdateItem(uow, item, bigValueRepository, valueRepository);
+                item.Entity.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(item.Dynamic.IdObjectType).Query().Compile()).ToList();
             }
+            await UpdateItems(uow, items, bigValueRepository, valueRepository);
             await mainRepository.UpdateRangeAsync(entities);
             await uow.SaveChangesAsync(CancellationToken.None);
-            return Mapper.FromEntityRange(entities);
+            return entities;
         }
 
-        protected virtual async Task<TDynamic> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
+        protected virtual async Task<TEntity> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
             (await Validate(model)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
@@ -281,12 +284,17 @@ namespace VitalChoice.DynamicData.Base
             if (entity == null)
                 return null;
 
-            entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
+            entity.OptionTypes =
+                await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
             await
-                UpdateItem(uow, new Pair<TDynamic, TEntity>(model, entity), bigValueRepository, valueRepository);
+                UpdateItems(uow,
+                    new List<DynamicEntityPair<TDynamic, TEntity>>
+                    {
+                        new DynamicEntityPair<TDynamic, TEntity>(model, entity)
+                    }, bigValueRepository, valueRepository);
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-            return Mapper.FromEntity(entity);
+            return entity;
         }
 
         private async Task<bool> DeleteAllAsync(ICollection<int> list, IUnitOfWorkAsync uow)
@@ -304,26 +312,33 @@ namespace VitalChoice.DynamicData.Base
             return true;
         }
 
-        private async Task UpdateItem(IUnitOfWorkAsync uow, Pair<TDynamic, TEntity> item,
+        private async Task UpdateItems(IUnitOfWorkAsync uow, ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
             IRepositoryAsync<BigStringValue> bigValueRepository,
             IRepositoryAsync<TOptionValue> valueRepository)
         {
-            await SetBigValuesAsync(item.SecondValue, bigValueRepository, true);
-            await BeforeEntityChangesAsync(item.FirstValue, item.SecondValue, uow);
+            await SetBigValuesAsync(items.Select(i => i.Entity), bigValueRepository, true);
+            foreach (var pair in items)
+            {
+                await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
+            }
+            
 
             await
                 bigValueRepository.DeleteAllAsync(
-                    item.SecondValue.OptionValues.Where(o => o.BigValue != null).Select(o => o.BigValue).ToList());
+                    items.SelectMany(i => i.Entity.OptionValues).Where(o => o.BigValue != null).Select(o => o.BigValue));
 
-            await valueRepository.DeleteAllAsync(item.SecondValue.OptionValues);
+            await valueRepository.DeleteAllAsync(items.SelectMany(i => i.Entity.OptionValues));
 
-            Mapper.UpdateEntity(item.FirstValue, item.SecondValue);
+            await Mapper.UpdateEntityRangeAsync(items);
 
             await
                 bigValueRepository.InsertRangeAsync(
-                    item.SecondValue.OptionValues.Where(b => b.BigValue != null).Select(o => o.BigValue).ToList());
+                    items.SelectMany(i => i.Entity.OptionValues).Where(b => b.BigValue != null).Select(o => o.BigValue));
 
-            await AfterEntityChangesAsync(item.FirstValue, item.SecondValue, uow);
+            foreach (var pair in items)
+            {
+                await AfterEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
+            }
         }
 
         private async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow)

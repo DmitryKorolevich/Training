@@ -34,70 +34,107 @@ namespace VitalChoice.DynamicData.Base
         }
 
         public abstract IQueryObject<TOptionType> GetOptionTypeQuery(int? idType);
-        protected abstract void FromEntityInternal(TDynamic dynamic, TEntity entity, bool withDefaults = false);
-        protected abstract void UpdateEntityInternal(TDynamic dynamic, TEntity entity);
-        protected abstract void ToEntityInternal(TDynamic dynamic, TEntity entity);
+        protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
+        protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
+        protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
         {
-            TDynamic result = new TDynamic();
             if (entity == null)
                 return null;
 
-            var data = result.DictionaryData;
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
                     _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).Select(false);
             }
-            var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
-            if (entity.OptionValues != null && optionTypes != null)
-            {
-                foreach (var value in entity.OptionValues)
-                {
-                    TOptionType optionType;
-                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
-                    {
-                        data.Add(optionType.Name,
-                            MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
-                                (FieldType) optionType.IdFieldType));
-                    }
-                }
-            }
-            result.Id = entity.Id;
-            result.DateCreated = entity.DateCreated;
-            result.DateEdited = entity.DateEdited;
-            result.StatusCode = entity.StatusCode;
-            result.IdEditedBy = entity.IdEditedBy;
-            result.IdObjectType = entity.IdObjectType;
-            if (withDefaults && entity.OptionTypes != null)
-            {
-                foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
-                {
-                    data.Add(optionType.Name,
-                        MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
-                }
-            }
-            FromEntityInternal(result, entity, withDefaults);
-            return result;
-        }
 
-        public void UpdateEntityRange(ICollection<Pair<TDynamic, TEntity>> items)
-        {
-            foreach (var item in items)
-            {
-                UpdateEntity(item.FirstValue, item.SecondValue);
-            }
+            var result = FromEntityItem(entity, withDefaults);
+            FromEntityInternalAsync(result, entity, withDefaults).Wait();
+            return result;
         }
 
         public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null)
         {
-            return items.Select(i => ToEntity(i, optionTypes)).ToList();
+            ICollection<DynamicEntityPair<TDynamic, TEntity>> results;
+            if (optionTypes == null)
+            {
+                optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
+                results =
+                    items.Select(
+                        dynamic =>
+                            new DynamicEntityPair<TDynamic, TEntity>(dynamic,
+                                ToEntityItem(dynamic,
+                                    optionTypes.Where(GetOptionTypeQuery(dynamic.IdObjectType).Query().Compile())
+                                        .ToList())))
+                        .ToList();
+            }
+            else
+            {
+                results =
+                    items.Select(
+                        dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes)))
+                        .ToList();
+            }
+            ToEntityRangeInternalAsync(results).Wait();
+            return results.Select(r => r.Entity).ToList();
+        }
+
+        public List<TEntity> ToEntityRange(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
+        {
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var pair in items.Where(pair => pair.Value2 == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
+                }
+                pair.Value2 = optionTypes.Where(GetOptionTypeQuery(pair.Value1.IdObjectType).Query().Compile()).ToList();
+            }
+            var results =
+                items.Select(
+                    pair =>
+                        new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
+                    .ToList();
+            ToEntityRangeInternalAsync(results).Wait();
+            return results.Select(r => r.Entity).ToList();
         }
 
         public List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false)
         {
-            return items.Select(i => FromEntity(i, withDefaults)).ToList();
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var entity in items.Where(pair => pair.OptionTypes == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
+                }
+                entity.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(entity.IdObjectType).Query().Compile()).ToList();
+            }
+            List<DynamicEntityPair<TDynamic, TEntity>> results =
+                items.Select(
+                    entity => new DynamicEntityPair<TDynamic, TEntity>(FromEntityItem(entity, withDefaults), entity))
+                    .ToList();
+            FromEntityRangeInternalAsync(results, withDefaults).Wait();
+            return results.Select(r => r.Dynamic).ToList();
+        }
+
+        public async Task UpdateEntityAsync(TDynamic dynamic, TEntity entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            if (entity.OptionTypes == null)
+            {
+                entity.OptionTypes =
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
+            }
+
+            UpdateEntityItem(dynamic, entity);
+            await UpdateEntityInternalAsync(dynamic, entity);
         }
 
         public TModel ToModel<TModel>(TDynamic dynamic)
@@ -107,7 +144,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TModel();
-            ToModelInternal(dynamic, result, typeof (TModel), typeof (TDynamic));
+            ToModelItem(dynamic, result, typeof (TModel), typeof (TDynamic));
             
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(typeof (TModel), out conv))
@@ -124,7 +161,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TDynamic();
-            FromModelInternal(result, model, typeof (TModel), typeof (TDynamic));
+            FromModelItem(result, model, typeof (TModel), typeof (TDynamic));
 
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(typeof (TModel), out conv))
@@ -141,7 +178,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             dynamic result = Activator.CreateInstance(modelType);
-            ToModelInternal(dynamic, result, modelType,
+            ToModelItem(dynamic, result, modelType,
                 typeof (TDynamic));
 
             IModelToDynamicConverter conv;
@@ -160,7 +197,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TDynamic();
-            FromModelInternal(result, model, modelType, typeof (TDynamic));
+            FromModelItem(result, model, modelType, typeof (TDynamic));
 
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(modelType, out conv))
@@ -171,7 +208,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public void UpdateEntity(TDynamic dynamic, TEntity entity)
+        public async void UpdateEntity(TDynamic dynamic, TEntity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
@@ -179,9 +216,37 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).Select(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
             }
 
+            UpdateEntityItem(dynamic, entity);
+            await UpdateEntityInternalAsync(dynamic, entity);
+        }
+
+        public async void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
+        {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                }
+                pair.Entity.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
+            }
+            foreach (var pair in items)
+            {
+                UpdateEntityItem(pair);
+            }
+            
+            await UpdateEntityRangeInternalAsync(items);
+        }
+
+        private static void UpdateEntityItem(TDynamic dynamic, TEntity entity)
+        {
             var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
             entity.OptionValues = new List<TOptionValue>();
 
@@ -192,7 +257,59 @@ namespace VitalChoice.DynamicData.Base
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
             entity.IdObjectType = dynamic.IdObjectType;
-            UpdateEntityInternal(dynamic, entity);
+        }
+
+        private static TEntity ToEntityItem(TDynamic dynamic, ICollection<TOptionType> optionTypes)
+        {
+            var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
+            var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
+            FillEntityOptions(dynamic, optionTypesCache, entity);
+            entity.Id = dynamic.Id;
+            entity.DateCreated = DateTime.Now;
+            entity.DateEdited = DateTime.Now;
+            entity.StatusCode = dynamic.StatusCode;
+            entity.IdEditedBy = dynamic.IdEditedBy;
+            entity.IdObjectType = dynamic.IdObjectType;
+            return entity;
+        }
+
+        private static TDynamic FromEntityItem(TEntity entity, bool withDefaults)
+        {
+            var result = new TDynamic();
+            var data = result.DictionaryData;
+            var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
+            if (entity.OptionValues != null && optionTypes != null)
+            {
+                foreach (var value in entity.OptionValues)
+                {
+                    TOptionType optionType;
+                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
+                    {
+                        data.Add(optionType.Name,
+                            MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
+                                (FieldType)optionType.IdFieldType));
+                    }
+                }
+            }
+            result.Id = entity.Id;
+            result.DateCreated = entity.DateCreated;
+            result.DateEdited = entity.DateEdited;
+            result.StatusCode = entity.StatusCode;
+            result.IdEditedBy = entity.IdEditedBy;
+            result.IdObjectType = entity.IdObjectType;
+            if (!withDefaults || entity.OptionTypes == null)
+                return result;
+            foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
+            {
+                data.Add(optionType.Name,
+                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType)optionType.IdFieldType));
+            }
+            return result;
+        }
+
+        private static void UpdateEntityItem(DynamicEntityPair<TDynamic, TEntity> pair)
+        {
+            UpdateEntityItem(pair.Dynamic, pair.Entity);
         }
 
         public TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null)
@@ -224,11 +341,118 @@ namespace VitalChoice.DynamicData.Base
             entity.StatusCode = dynamic.StatusCode;
             entity.IdEditedBy = dynamic.IdEditedBy;
             entity.IdObjectType = dynamic.IdObjectType;
-            ToEntityInternal(dynamic, entity);
+            await ToEntityInternalAsync(dynamic, entity);
             return entity;
         }
 
-        private void ToModelInternal(MappedObject dynamic, object result,
+        public async Task<TDynamic> FromEntityAsync(TEntity entity, bool withDefaults = false)
+        {
+            if (entity == null)
+                return null;
+
+            if (entity.OptionTypes == null)
+            {
+                entity.OptionTypes =
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery(entity.IdObjectType)).SelectAsync(false);
+            }
+
+            var result = FromEntityItem(entity, withDefaults);
+            FromEntityInternalAsync(result, entity, withDefaults).Wait();
+            return result;
+        }
+
+        public async Task UpdateEntityRangeAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
+        {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                }
+                pair.Entity.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(pair.Dynamic.IdObjectType).Query().Compile()).ToList();
+            }
+            foreach (var pair in items)
+            {
+                UpdateEntityItem(pair);
+            }
+
+            await UpdateEntityRangeInternalAsync(items);
+        }
+
+        public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items,
+            ICollection<TOptionType> optionTypes = null)
+        {
+            ICollection<DynamicEntityPair<TDynamic, TEntity>> results;
+            if (optionTypes == null)
+            {
+                optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                results =
+                    items.Select(
+                        dynamic =>
+                            new DynamicEntityPair<TDynamic, TEntity>(dynamic,
+                                ToEntityItem(dynamic,
+                                    optionTypes.Where(GetOptionTypeQuery(dynamic.IdObjectType).Query().Compile())
+                                        .ToList())))
+                        .ToList();
+            }
+            else
+            {
+                results =
+                    items.Select(
+                        dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes)))
+                        .ToList();
+            }
+            await ToEntityRangeInternalAsync(results);
+            return results.Select(r => r.Entity).ToList();
+        }
+
+        public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
+        {
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var pair in items.Where(pair => pair.Value2 == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                }
+                pair.Value2 = optionTypes.Where(GetOptionTypeQuery(pair.Value1.IdObjectType).Query().Compile()).ToList();
+            }
+            var results =
+                items.Select(
+                    pair =>
+                        new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
+                    .ToList();
+            await ToEntityRangeInternalAsync(results);
+            return results.Select(r => r.Entity).ToList();
+        }
+
+        public async Task<List<TDynamic>> FromEntityRangeAsync(ICollection<TEntity> items, bool withDefaults = false)
+        {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+            ICollection<TOptionType> optionTypes = null;
+            foreach (var entity in items.Where(pair => pair.OptionTypes == null))
+            {
+                if (optionTypes == null)
+                {
+                    optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                }
+                entity.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(entity.IdObjectType).Query().Compile()).ToList();
+            }
+            List<DynamicEntityPair<TDynamic, TEntity>> results =
+                items.Select(
+                    entity => new DynamicEntityPair<TDynamic, TEntity>(FromEntityItem(entity, withDefaults), entity))
+                    .ToList();
+            await FromEntityRangeInternalAsync(results, withDefaults);
+            return results.Select(r => r.Dynamic).ToList();
+        }
+
+        private void ToModelItem(MappedObject dynamic, object result,
             Type modelType, Type dynamicType)
         {
             if (dynamic == null)
@@ -267,7 +491,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private void FromModelInternal(MappedObject dynamic, object model,
+        private void FromModelItem(MappedObject dynamic, object model,
             Type modelType, Type dynamicType)
         {
             if (dynamic == null)
@@ -317,6 +541,33 @@ namespace VitalChoice.DynamicData.Base
                 option.IdOptionType = optionType.Id;
                 entity.OptionValues.Add(option);
             }
+        }
+
+        private async Task FromEntityInternalAsync(TDynamic dynamic, TEntity entity, bool withDefaults = false)
+        {
+            await
+                FromEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
+                {
+                    new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity)
+                }, withDefaults);
+        }
+
+        private async Task UpdateEntityInternalAsync(TDynamic dynamic, TEntity entity)
+        {
+            await
+                UpdateEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
+                {
+                    new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity)
+                });
+        }
+
+        private async Task ToEntityInternalAsync(TDynamic dynamic, TEntity entity)
+        {
+            await
+                ToEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
+                {
+                    new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity)
+                });
         }
     }
 }

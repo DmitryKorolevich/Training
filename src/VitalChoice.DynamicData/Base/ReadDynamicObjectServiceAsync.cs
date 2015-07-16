@@ -199,6 +199,34 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
+        protected static async Task SetBigValuesAsync(IEnumerable<TEntity> entities, IReadRepositoryAsync<BigStringValue> bigStringValueRepository, bool tracked = false)
+        {
+            var bigValueIds = new Dictionary<long, List<TOptionValue>>();
+            foreach (var value in entities.SelectMany(entity => entity.OptionValues.Where(v => v.IdBigString.HasValue)))
+            {
+                List<TOptionValue> valuesExist;
+                // ReSharper disable once PossibleInvalidOperationException
+                // ReSharper disable once AssignNullToNotNullAttribute
+                if (bigValueIds.TryGetValue(value.IdBigString.Value, out valuesExist))
+                {
+                    valuesExist.Add(value);
+                }
+                else
+                {
+                    bigValueIds.Add(value.IdBigString.Value, new List<TOptionValue> {value});
+                }
+            }
+            if (bigValueIds.Any())
+            {
+                var bigValues =
+                    (await bigStringValueRepository.Query(b => bigValueIds.Keys.Contains(b.IdBigString)).SelectAsync(tracked));
+                foreach (var bigValue in bigValues)
+                {
+                    bigValueIds[bigValue.IdBigString].ForEach(v => v.BigValue = bigValue);
+                }
+            }
+        }
+
         protected static async Task SetBigValuesAsync(TEntity entity, IReadRepositoryAsync<BigStringValue> bigStringValueRepository, bool tracked = false)
         {
             var bigIdsList = entity.OptionValues.Where(v => v.IdBigString != null)

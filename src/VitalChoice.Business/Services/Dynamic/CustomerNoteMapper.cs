@@ -12,6 +12,7 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -29,27 +30,49 @@ namespace VitalChoice.Business.Services.Dynamic
             return new CustomerNoteOptionTypeQuery();
         }
 
-        protected override void FromEntityInternal(CustomerNoteDynamic dynamic, CustomerNote entity, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items, bool withDefaults = false)
         {
-			dynamic.IdCustomer = entity.IdCustomer;
-			dynamic.Note = entity.Note;
-        }
-
-        protected override void UpdateEntityInternal(CustomerNoteDynamic dynamic, CustomerNote entity)
-        {
-            entity.IdCustomer = dynamic.IdCustomer;
-            entity.Note = dynamic.Note;
-            foreach (var value in entity.OptionValues)
+            items.ForEach(pair =>
             {
-                value.IdCustomerNote = dynamic.Id;
-            }
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                dynamic.IdCustomer = entity.IdCustomer;
+                dynamic.Note = entity.Note;
+            });
+            return Task.Delay(0);
         }
 
-        protected override void ToEntityInternal(CustomerNoteDynamic dynamic, CustomerNote entity)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items)
         {
-            entity.IdCustomer = dynamic.IdCustomer;
-            entity.Note = dynamic.Note;
-	        entity.StatusCode = RecordStatusCode.Active;
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                entity.IdCustomer = dynamic.IdCustomer;
+                entity.Note = dynamic.Note;
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdCustomerNote = dynamic.Id;
+                }
+            });
+            return Task.Delay(0);
+        }
+
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items)
+        {
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                entity.IdCustomer = dynamic.IdCustomer;
+                entity.Note = dynamic.Note;
+                entity.StatusCode = RecordStatusCode.Active;
+            });
+            return Task.Delay(0);
         }
     }
 }

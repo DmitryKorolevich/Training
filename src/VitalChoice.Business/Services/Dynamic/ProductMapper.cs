@@ -12,6 +12,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -31,19 +32,124 @@ namespace VitalChoice.Business.Services.Dynamic
             return new ProductOptionTypeQuery().WithType((ProductType?)idType);
         }
 
-        protected override void ToEntityInternal(ProductDynamic dynamic, Product entity)
+        protected async override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)
         {
-            SetSkuOrdering(dynamic.Skus);
-            entity.Hidden = dynamic.Hidden;
-            entity.Name = dynamic.Name;
-            entity.Url = dynamic.Url;
-            entity.ProductsToCategories = dynamic.CategoryIds?.Select(c => new ProductToCategory
+            await items.ForEachAsync(async pair =>
             {
-                IdCategory = c,
-                IdProduct = dynamic.Id
-            }).ToList();
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
 
-            entity.Skus = dynamic.Skus?.Select(s => _skuMapper.ToEntity(s, entity.OptionTypes)).ToList() ?? new List<Sku>();
+                dynamic.Name = entity.Name;
+                dynamic.Url = entity.Url;
+                dynamic.Hidden = entity.Hidden;
+                dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
+                dynamic.Skus = new List<SkuDynamic>();
+                foreach (var sku in entity.Skus)
+                {
+                    sku.OptionTypes = entity.OptionTypes;
+                    SkuDynamic skuDynamic;
+                    if (withDefaults)
+                    {
+                        //combine product part in skus
+                        foreach (var productValue in entity.OptionValues)
+                        {
+                            if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
+                            {
+                                sku.OptionValues.Add(productValue);
+                            }
+                        }
+                        skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
+                    }
+                    else
+                    {
+                        skuDynamic = await _skuMapper.FromEntityAsync(sku);
+                    }
+                    dynamic.Skus.Add(skuDynamic);
+                }
+            });
+        }
+
+        protected async override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
+        {
+            await items.ForEachAsync(async pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                SetSkuOrdering(dynamic.Skus);
+                entity.Hidden = dynamic.Hidden;
+                entity.Name = dynamic.Name;
+                entity.Url = dynamic.Url;
+
+                entity.ProductsToCategories = dynamic.CategoryIds.Select(c => new ProductToCategory
+                {
+                    IdCategory = c,
+                    IdProduct = dynamic.Id
+                }).ToList();
+
+                if (dynamic.Skus != null && dynamic.Skus.Any())
+                {
+                    //Update existing
+                    var itemsToUpdate = dynamic.Skus.Join(entity.Skus, sd => sd.Id, s => s.Id,
+                        (skuDynamic, sku) => new { skuDynamic, sku });
+                    foreach (var item in itemsToUpdate)
+                    {
+                        await _skuMapper.UpdateEntityAsync(item.skuDynamic, item.sku);
+                    }
+
+                    //Delete
+                    var toDelete = entity.Skus.Where(e => dynamic.Skus.All(s => s.Id != e.Id));
+                    foreach (var sku in toDelete)
+                    {
+                        sku.StatusCode = RecordStatusCode.Deleted;
+                    }
+
+                    //Insert
+                    await entity.Skus.AddRangeAsync(dynamic.Skus.Where(s => s.Id == 0).Select(async s =>
+                    {
+                        var sku = await _skuMapper.ToEntityAsync(s, entity.OptionTypes);
+                        sku.IdProduct = dynamic.Id;
+                        return sku;
+                    }));
+                }
+                else
+                {
+                    foreach (var sku in entity.Skus)
+                    {
+                        sku.StatusCode = RecordStatusCode.Deleted;
+                    }
+                }
+
+                //Set key on options
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdProduct = dynamic.Id;
+                }
+            });
+        }
+
+        protected async override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
+        {
+            await items.ForEachAsync(async pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                SetSkuOrdering(dynamic.Skus);
+                entity.Hidden = dynamic.Hidden;
+                entity.Name = dynamic.Name;
+                entity.Url = dynamic.Url;
+                entity.ProductsToCategories = dynamic.CategoryIds?.Select(c => new ProductToCategory
+                {
+                    IdCategory = c,
+                    IdProduct = dynamic.Id
+                }).ToList();
+
+                entity.Skus = new List<Sku>();
+                await
+                    entity.Skus.AddRangeAsync(
+                        dynamic.Skus?.Select(async s => await _skuMapper.ToEntityAsync(s, entity.OptionTypes)));
+            });
         }
 
         private static void SetSkuOrdering(IEnumerable<SkuDynamic> skus)
@@ -56,90 +162,6 @@ namespace VitalChoice.Business.Services.Dynamic
                     sku.Order = order;
                     order++;
                 }
-            }
-        }
-
-        protected override void FromEntityInternal(ProductDynamic dynamic, Product entity, bool withDefaults = false)
-        {
-            dynamic.Name = entity.Name;
-            dynamic.Url = entity.Url;
-            dynamic.Hidden = entity.Hidden;
-            dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
-            dynamic.Skus = new List<SkuDynamic>();
-            foreach (var sku in entity.Skus)
-            {
-                sku.OptionTypes = entity.OptionTypes;
-                SkuDynamic skuDynamic;
-                if (withDefaults)
-                {
-                    //combine product part in skus
-                    foreach (var productValue in entity.OptionValues)
-                    {
-                        if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
-                        {
-                            sku.OptionValues.Add(productValue);
-                        }
-                    }
-                    skuDynamic = _skuMapper.FromEntity(sku, true);
-                }
-                else
-                {
-                    skuDynamic = _skuMapper.FromEntity(sku);
-                }
-                dynamic.Skus.Add(skuDynamic);
-            }
-        }
-
-        protected override void UpdateEntityInternal(ProductDynamic dynamic, Product entity)
-        {
-            SetSkuOrdering(dynamic.Skus);
-            entity.Hidden = dynamic.Hidden;
-            entity.Name = dynamic.Name;
-            entity.Url = dynamic.Url;
-
-            entity.ProductsToCategories = dynamic.CategoryIds.Select(c => new ProductToCategory
-            {
-                IdCategory = c,
-                IdProduct = dynamic.Id
-            }).ToList();
-
-            if (dynamic.Skus != null && dynamic.Skus.Any())
-            {
-                //Update existing
-                var itemsToUpdate = dynamic.Skus.Join(entity.Skus, sd => sd.Id, s => s.Id,
-                    (skuDynamic, sku) => new { skuDynamic, sku });
-                foreach (var item in itemsToUpdate)
-                {
-                    _skuMapper.UpdateEntity(item.skuDynamic, item.sku);
-                }
-
-                //Delete
-                var toDelete = entity.Skus.Where(e => dynamic.Skus.All(s => s.Id != e.Id));
-                foreach (var sku in toDelete)
-                {
-                    sku.StatusCode = RecordStatusCode.Deleted;
-                }
-
-                //Insert
-                entity.Skus.AddRange(dynamic.Skus.Where(s => s.Id == 0).Select(s =>
-                {
-                    var sku = _skuMapper.ToEntity(s, entity.OptionTypes);
-                    sku.IdProduct = dynamic.Id;
-                    return sku;
-                }));
-            }
-            else
-            {
-                foreach (var sku in entity.Skus)
-                {
-                    sku.StatusCode = RecordStatusCode.Deleted;
-                }
-            }
-
-            //Set key on options
-            foreach (var value in entity.OptionValues)
-            {
-                value.IdProduct = dynamic.Id;
             }
         }
     }

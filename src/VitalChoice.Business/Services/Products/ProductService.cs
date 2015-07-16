@@ -65,13 +65,10 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;
+                await productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
             }
             entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
             await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
-            foreach (var sku in entity.Skus)
-            {
-                await productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
-            }
         }
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
