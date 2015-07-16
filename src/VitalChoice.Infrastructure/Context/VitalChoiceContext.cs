@@ -94,7 +94,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentItem>().Key(p => p.Id);
             builder.Entity<ContentItem>().Table("ContentItems");
             builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
-            builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
+            builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentItemProcessorId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentCategory>().Key(p => p.Id);
             builder.Entity<ContentCategory>().Table("ContentCategories");
@@ -121,6 +121,7 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(t => t.IdRecipe)
                 .PrincipalKey(p => p.Id)
                 .Required();
+
 
             builder.Entity<FAQ>().Key(p => p.Id);
             builder.Entity<FAQ>().Table("FAQs");
