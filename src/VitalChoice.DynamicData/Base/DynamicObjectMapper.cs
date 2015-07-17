@@ -109,7 +109,8 @@ namespace VitalChoice.DynamicData.Base
         public List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                return new List<TDynamic>();
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var entity in items.Where(pair => pair.OptionTypes == null))
             {
@@ -131,7 +132,7 @@ namespace VitalChoice.DynamicData.Base
         public async Task UpdateEntityAsync(TDynamic dynamic, TEntity entity)
         {
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+                return;
 
             if (entity.OptionTypes == null)
             {
@@ -217,7 +218,7 @@ namespace VitalChoice.DynamicData.Base
         public async void UpdateEntity(TDynamic dynamic, TEntity entity)
         {
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+                return;
 
             if (entity.OptionTypes == null)
             {
@@ -232,7 +233,8 @@ namespace VitalChoice.DynamicData.Base
         public async void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                return;
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
             {
@@ -370,7 +372,8 @@ namespace VitalChoice.DynamicData.Base
         public async Task UpdateEntityRangeAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                return;
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
             {
@@ -392,6 +395,9 @@ namespace VitalChoice.DynamicData.Base
         public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items,
             ICollection<TOptionType> optionTypes = null)
         {
+            if (items == null)
+                return new List<TEntity>();
+
             ICollection<DynamicEntityPair<TDynamic, TEntity>> results;
             if (optionTypes == null)
             {
@@ -418,6 +424,9 @@ namespace VitalChoice.DynamicData.Base
 
         public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
         {
+            if (items == null)
+                return new List<TEntity>();
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var pair in items.Where(pair => pair.Value2 == null))
             {
@@ -439,7 +448,8 @@ namespace VitalChoice.DynamicData.Base
         public async Task<List<TDynamic>> FromEntityRangeAsync(ICollection<TEntity> items, bool withDefaults = false)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                return new List<TDynamic>();
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var entity in items.Where(pair => pair.OptionTypes == null))
             {
@@ -463,6 +473,7 @@ namespace VitalChoice.DynamicData.Base
         {
             if (dynamic == null)
                 return;
+
             dynamic.ModelType = modelType;
             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
             var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);
@@ -502,6 +513,7 @@ namespace VitalChoice.DynamicData.Base
         {
             if (dynamic == null)
                 return;
+
             dynamic.ModelType = modelType;
             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
             var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);

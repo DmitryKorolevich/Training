@@ -9,6 +9,12 @@ namespace VitalChoice.DynamicData.Entities
 {
     public sealed class ProductDynamic : MappedObject
     {
+        public ProductDynamic()
+        {
+            Skus = new List<SkuDynamic>();
+            CategoryIds = new List<int>();
+        }
+
         public string Name { get; set; }
 
         public string Url { get; set; }

@@ -97,11 +97,9 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     //Update existing
                     var itemsToUpdate = dynamic.Skus.Join(entity.Skus, sd => sd.Id, s => s.Id,
-                        (skuDynamic, sku) => new { skuDynamic, sku });
-                    foreach (var item in itemsToUpdate)
-                    {
-                        await _skuMapper.UpdateEntityAsync(item.skuDynamic, item.sku);
-                    }
+                        (skuDynamic, sku) => new DynamicEntityPair<SkuDynamic, Sku>(skuDynamic, sku)).ToList();
+
+                    await _skuMapper.UpdateEntityRangeAsync(itemsToUpdate);
 
                     //Delete
                     var toDelete = entity.Skus.Where(e => dynamic.Skus.All(s => s.Id != e.Id));
@@ -111,12 +109,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
 
                     //Insert
-                    await entity.Skus.AddRangeAsync(dynamic.Skus.Where(s => s.Id == 0).Select(async s =>
-                    {
-                        var sku = await _skuMapper.ToEntityAsync(s, entity.OptionTypes);
-                        sku.IdProduct = dynamic.Id;
-                        return sku;
-                    }));
+                    var skus = await _skuMapper.ToEntityRangeAsync(dynamic.Skus.Where(s => s.Id == 0).ToList());
+                    entity.Skus.AddRange(skus);
                 }
                 else
                 {
@@ -134,7 +128,8 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected async override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
+        protected override async Task ToEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
         {
             await items.ForEachAsync(async pair =>
             {
@@ -151,10 +146,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdProduct = dynamic.Id
                 }).ToList();
 
-                entity.Skus = new List<Sku>();
-                await
-                    entity.Skus.AddRangeAsync(
-                        dynamic.Skus?.Select(async s => await _skuMapper.ToEntityAsync(s, entity.OptionTypes)));
+                entity.Skus.AddRange(await _skuMapper.ToEntityRangeAsync(dynamic.Skus));
             });
         }
 

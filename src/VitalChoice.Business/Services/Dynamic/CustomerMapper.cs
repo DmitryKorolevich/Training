@@ -37,9 +37,9 @@ namespace VitalChoice.Business.Services.Dynamic
             get { return c => c.IdCustomer; }
         }
 
-        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)
+        protected async override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)
         {
-            items.ForEach(item =>
+            await items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
@@ -50,18 +50,10 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
                 dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
-
-                foreach (var customerNoteDynamic in entity.CustomerNotes.Select(x => _customerNoteMapper.FromEntity(x)))
-                {
-                    dynamic.CustomerNotes.Add(customerNoteDynamic);
-                }
-                dynamic.Addresses = new List<AddressDynamic>();
-                foreach (var addressDynamic in entity.Addresses.Select(address => _addressMapper.FromEntity(address)))
-                {
-                    dynamic.Addresses.Add(addressDynamic);
-                }
+            
+                dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes));                
+                dynamic.Addresses.AddRange(await _addressMapper.FromEntityRangeAsync(entity.Addresses));
             });
-            return Task.Delay(0);
         }
 
         protected async override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
@@ -90,11 +82,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     //Update existing
                     var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, addressDynamic => addressDynamic.Id, address => address.Id,
-                        (addressDynamic, address) => new { addressDynamic, address });
+                        (addressDynamic, address) => new DynamicEntityPair<AddressDynamic, Address>(addressDynamic, address)).ToList();
+                    await _addressMapper.UpdateEntityRangeAsync(itemsToUpdate);
                     foreach (var item in itemsToUpdate)
                     {
-                        await _addressMapper.UpdateEntityAsync(item.addressDynamic, item.address);
-                        item.address.IdCustomer = dynamic.Id;
+                        item.Entity.IdCustomer = dynamic.Id;
                     }
 
                     //Delete
@@ -105,12 +97,12 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
 
                     //Insert
-                    await entity.Addresses.AddRangeAsync(dynamic.Addresses.Where(s => s.Id == 0).Select(async a =>
+                    var addresses = await _addressMapper.ToEntityRangeAsync(dynamic.Addresses.Where(s => s.Id == 0).ToList());
+                    foreach (var address in addresses)
                     {
-                        var address = await _addressMapper.ToEntityAsync(a);
                         address.IdCustomer = entity.Id;
-                        return address;
-                    }));
+                    }
+                    entity.Addresses.AddRange(addresses);
                 }
                 else
                 {
@@ -124,12 +116,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     //Update existing
                     var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
-                        (customerNoteDynamic, customerNote) => new { customerNoteDynamic, customerNote });
+                        (customerNoteDynamic, customerNote) => new DynamicEntityPair<CustomerNoteDynamic, CustomerNote>(customerNoteDynamic, customerNote)).ToList();
+                    await _customerNoteMapper.UpdateEntityRangeAsync(itemsToUpdate);
                     foreach (var item in itemsToUpdate)
                     {
-                        await _customerNoteMapper.UpdateEntityAsync(item.customerNoteDynamic, item.customerNote);
-                        item.customerNote.IdCustomer = dynamic.Id;
-                        item.customerNote.StatusCode = RecordStatusCode.Active;
+                        item.Entity.IdCustomer = dynamic.Id;
+                        item.Entity.StatusCode = RecordStatusCode.Active;
                     }
 
                     //Delete
@@ -140,12 +132,12 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
 
                     //Insert
-                    await entity.CustomerNotes.AddRangeAsync(dynamic.CustomerNotes.Where(s => s.Id == 0).Select(async s =>
+                    var notes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes.Where(s => s.Id == 0).ToList());
+                    foreach (var customerNote in notes)
                     {
-                        var customerNote = await _customerNoteMapper.ToEntityAsync(s);
                         customerNote.IdCustomer = entity.Id;
-                        return customerNote;
-                    }));
+                    }
+                    entity.CustomerNotes.AddRange(notes);
                 }
                 else
                 {
@@ -162,10 +154,10 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override Task ToEntityRangeInternalAsync(
+        protected async override Task ToEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
         {
-            items.ForEach(item =>
+            await items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
@@ -186,12 +178,9 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrderNote = c
                 }).ToList();
 
-                entity.Addresses = dynamic.Addresses?.Select(x => _addressMapper.ToEntity(x)).ToList() ??
-                                   new List<Address>();
-                entity.CustomerNotes = dynamic.CustomerNotes?.Select(x => _customerNoteMapper.ToEntity(x)).ToList() ??
-                                       new List<CustomerNote>();
+                entity.Addresses = await _addressMapper.ToEntityRangeAsync(dynamic.Addresses);
+                entity.CustomerNotes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes);
             });
-            return Task.Delay(0);
         }
     }
 }
