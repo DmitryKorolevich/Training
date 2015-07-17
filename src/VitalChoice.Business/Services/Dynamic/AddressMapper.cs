@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Customer;
@@ -21,6 +22,11 @@ namespace VitalChoice.Business.Services.Dynamic
             IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
             : base(mappers, container, optionTypesRepositoryAsync)
         {
+        }
+
+        public override Expression<Func<AddressOptionValue, int?>> ObjectIdSelector
+        {
+            get { return a => a.IdAddress; }
         }
 
         protected override Task FromEntityRangeInternalAsync(

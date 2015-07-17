@@ -24,8 +24,9 @@ namespace VitalChoice.DynamicData.Base
     {
         protected DynamicObjectServiceAsync(IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
+            IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository)
-            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository)
+            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync)
         {
         }
 

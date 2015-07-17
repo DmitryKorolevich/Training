@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Product;
@@ -25,6 +26,11 @@ namespace VitalChoice.Business.Services.Dynamic
             : base(mappers, container, productRepositoryAsync)
         {
             _skuMapper = skuMapper;
+        }
+
+        public override Expression<Func<ProductOptionValue, int?>> ObjectIdSelector
+        {
+            get { return c => c.IdProduct; }
         }
 
         public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()

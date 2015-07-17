@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
@@ -69,6 +71,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TDynamic : MappedObject
     {
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
+        Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
 
         void UpdateEntity(TDynamic dynamic, TEntity entity);
         TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null);

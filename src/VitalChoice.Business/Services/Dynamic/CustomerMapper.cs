@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Customer;
@@ -29,6 +30,11 @@ namespace VitalChoice.Business.Services.Dynamic
         {
             _addressMapper = addressMapper;
             _customerNoteMapper = customerNoteMapper;
+        }
+
+        public override Expression<Func<CustomerOptionValue, int?>> ObjectIdSelector
+        {
+            get { return c => c.IdCustomer; }
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)

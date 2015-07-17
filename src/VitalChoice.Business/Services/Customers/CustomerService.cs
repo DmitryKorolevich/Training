@@ -53,8 +53,17 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync, IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync)
-            : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
+            IEcommerceRepositoryAsync<Address> addressesRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync,
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
+            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync,
+            IReadRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync)
+            : base(
+                customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -63,9 +72,9 @@ namespace VitalChoice.Business.Services.Customers
             _customerNotesRepositoryAsync = customerNotesRepositoryAsync;
             _customerToOrderNoteRepositoryAsync = customerToOrderNoteRepositoryAsync;
             _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
-	        _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
-	        _adminProfileRepository = adminProfileRepository;
-	        _userRepositoryAsync = userRepositoryAsync;
+            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+            _adminProfileRepository = adminProfileRepository;
+            _userRepositoryAsync = userRepositoryAsync;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)

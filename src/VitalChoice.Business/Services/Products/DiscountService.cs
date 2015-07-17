@@ -32,11 +32,12 @@ namespace VitalChoice.Business.Services.Products
         private readonly DiscountMapper _mapper;
 
         public DiscountService(IEcommerceRepositoryAsync<DiscountOptionType> discountOptionTypeRepository,
+            IEcommerceRepositoryAsync<DiscountOptionValue> discountOptionValueRepository,
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper)
-            : base(mapper, discountRepository, discountOptionTypeRepository, bigStringRepositoryAsync)
+            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync)
         {
             _discountRepository = discountRepository;
             _skuRepository = skuRepository;

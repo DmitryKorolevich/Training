@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Data.Helpers;
@@ -14,13 +15,18 @@ namespace VitalChoice.Tests.Mapping
 {
     public class TestMapper : DynamicObjectMapper<TestDynamic, TestEntity, TestEntityOptionType, TestEntityOptionValue>
     {
-        public TestMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> converters, IReadRepositoryAsync<TestEntityOptionType> optionTypeRepositoryAsync) : base(mappers, converters, optionTypeRepositoryAsync)
-        {
-        }
 
         public override IQueryOptionType<TestEntityOptionType> GetOptionTypeQuery()
         {
             throw new NotImplementedException();
+        }
+
+        public override Expression<Func<TestEntityOptionValue, int?>> ObjectIdSelector
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TestDynamic, TestEntity>> items, bool withDefaults = false)
@@ -36,6 +42,10 @@ namespace VitalChoice.Tests.Mapping
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TestDynamic, TestEntity>> items)
         {
             throw new NotImplementedException();
+        }
+
+        public TestMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> converters, IReadRepositoryAsync<TestEntityOptionType> optionTypeRepositoryAsync) : base(mappers, converters, optionTypeRepositoryAsync)
+        {
         }
     }
 }

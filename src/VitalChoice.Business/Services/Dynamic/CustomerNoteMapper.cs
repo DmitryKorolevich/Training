@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Customer;
@@ -23,6 +24,11 @@ namespace VitalChoice.Business.Services.Dynamic
             IEcommerceRepositoryAsync<CustomerNoteOptionType> customerNoteRepositoryAsync)
             : base(mappers, container, customerNoteRepositoryAsync)
         {
+        }
+
+        public override Expression<Func<CustomerNoteOptionValue, int?>> ObjectIdSelector
+        {
+            get { return c => c.IdCustomerNote; }
         }
 
         public override IQueryOptionType<CustomerNoteOptionType> GetOptionTypeQuery()

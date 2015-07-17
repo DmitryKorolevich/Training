@@ -164,8 +164,12 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper, IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository)
-            : base(mapper, productRepository, productOptionTypeRepository, bigStringValueRepository)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
+            IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync)
+            : base(
+                mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
+                bigStringValueRepository)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

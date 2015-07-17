@@ -3,7 +3,7 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IDynamicObjectServiceAsync<T, TEntity> : IReadDynamicObjectRepositoryAsync<T, TEntity>, IObjectRepositoryAsync<T, TEntity> 
+    public interface IDynamicObjectServiceAsync<T, TEntity> : IReadDynamicObjectServiceAsync<T, TEntity>, IObjectServiceAsync<T, TEntity> 
         where TEntity : Entity
     {
     }

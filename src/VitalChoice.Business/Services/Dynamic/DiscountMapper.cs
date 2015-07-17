@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Product;
@@ -11,6 +12,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -21,6 +23,11 @@ namespace VitalChoice.Business.Services.Dynamic
             IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync)
             : base(mappers, container, discountRepositoryAsync)
         {
+        }
+
+        public override Expression<Func<DiscountOptionValue, int?>> ObjectIdSelector
+        {
+            get { return c => c.IdDiscount; }
         }
 
         public override IQueryOptionType<DiscountOptionType> GetOptionTypeQuery()

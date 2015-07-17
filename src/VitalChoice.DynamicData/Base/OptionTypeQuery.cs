@@ -1,4 +1,5 @@
-﻿using VitalChoice.Data.Helpers;
+﻿using System.Collections.Generic;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.DynamicData.Base
@@ -13,6 +14,12 @@ namespace VitalChoice.DynamicData.Base
             {
                 Or(t => t.IdObjectType == null);
             }
+            return this;
+        }
+
+        public virtual IQueryOptionType<TOptionType> WithNames(ICollection<string> names)
+        {
+            Add(t => names.Contains(t.Name));
             return this;
         }
     }

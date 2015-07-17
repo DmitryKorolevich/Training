@@ -67,6 +67,26 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
+        public static string ConvertToOptionValue(object value, FieldType typeId)
+        {
+            switch (typeId)
+            {
+                case FieldType.String:
+                case FieldType.LargeString:
+                    return value as string;
+                default:
+                    var valueType = value.GetType();
+                    var underlyingType = valueType.UnwrapNullable();
+                    var enumType = underlyingType.TryUnwrapEnum();
+                    if (enumType != null)
+                    {
+                        return Convert.ToString(Convert.ChangeType(value, enumType),
+                            CultureInfo.InvariantCulture);
+                    }
+                    return Convert.ToString(value, CultureInfo.InvariantCulture);
+            }
+        }
+
         public static void ConvertToOption<TOptionValue, TOptionType>(TOptionValue option, object value, FieldType typeId)
             where TOptionValue : OptionValue<TOptionType>
             where TOptionType : OptionType

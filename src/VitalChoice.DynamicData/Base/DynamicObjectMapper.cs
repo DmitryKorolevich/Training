@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Delegates;
@@ -24,6 +25,11 @@ namespace VitalChoice.DynamicData.Base
         private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
         private readonly ModelTypeConverter _typeConverter;
 
+        protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
+        protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
+        protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
+        public abstract Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
+
         protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<Type, IModelToDynamicConverter> converters,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
@@ -37,10 +43,6 @@ namespace VitalChoice.DynamicData.Base
         {
             return new OptionTypeQuery<TOptionType>();
         }
-
-        protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
-        protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
-        protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
         {
