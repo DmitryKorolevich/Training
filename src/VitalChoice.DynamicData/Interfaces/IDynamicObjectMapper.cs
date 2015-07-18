@@ -71,6 +71,7 @@ namespace VitalChoice.DynamicData.Interfaces
         where TDynamic : MappedObject
     {
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
+        IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
         Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
 
         void UpdateEntity(TDynamic dynamic, TEntity entity);
