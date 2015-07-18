@@ -25,6 +25,12 @@
                 <button class="btn btn-danger pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="deleteSelectedShipping(shippingAddressTab.Address.Id);">Delete</button>
             </div>
         </div>
+        <div class="form-group" data-ng-show="shippingAddressTab.NewAddress">
+            <div class="col-md-3"></div>
+            <div class="col-md-3">
+                <button class="btn btn-info" data-ng-click="addNewShipping();">Add New Address</button>
+            </div>
+        </div>
         <div class="form-group">
             <label for="sameAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
             <div class="col-md-9">
@@ -36,11 +42,5 @@
             </div>
         </div>
         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [shippingAddressTab]"></div>
-        <div class="form-group" data-ng-show="shippingAddressTab.NewAddress">
-            <div class="col-md-3"></div>
-            <div class="col-md-3">
-                <button class="btn btn-info" data-ng-click="addNewShipping();">Add New Address</button>
-            </div>
-        </div>
     </fieldset>
 </form>

@@ -75,8 +75,6 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.TradeClass, ValidationMessages.FieldRequired);
 
 				RuleFor(model => model.LinkedToAffiliate)
-					.NotEmpty()
-					.WithMessage(model => model.LinkedToAffiliate, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.LinkedToAffiliate, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
@@ -117,10 +115,6 @@ namespace VC.Admin.Validators.Customer
 				RuleFor(model => model.ApprovedPaymentMethods)
 					.Must(model => model.Any())
 					.WithMessage(model => model.ApprovedPaymentMethods, ValidationMessages.AtLeastOnePaymentMethod);
-
-				RuleFor(model => model.OrderNotes)
-					.Must(model => model.Any())
-					.WithMessage(model => model.OrderNotes, ValidationMessages.AtLeastOneOrderNote);
 			}
 		}
 	}

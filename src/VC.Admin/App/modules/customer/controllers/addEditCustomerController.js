@@ -44,6 +44,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+								$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 							} else {
 								toaster.pop('error', 'Error!', "Can't create customer");
 							}
@@ -64,6 +65,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								});
 
 								syncCountry($scope.currentCustomer.ProfileAddress);
+
+								syncDefaultPaymentMethod();
 
 								createCustomerNoteProto();
 
@@ -177,10 +180,46 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		});
 	};
 
+	function setCountryValidity() {
+		$.each($scope.forms, function (index, form) {
+			if (form && !(typeof form === 'boolean')) {
+				if (form.Country && form.Country.$viewValue && form.Country.$viewValue.Id == 0) {
+					form.Country.$setValidity("required", false);
+				}
+				if (form.State && form.State.$viewValue == 0) {
+					form.State.$setValidity("required", false);
+				}
+			}
+		});
+	};
+
+	function syncDefaultPaymentMethod() {
+		if (!$scope.currentCustomer.ApprovedPaymentMethods || $scope.currentCustomer.ApprovedPaymentMethods.length == 0) {
+			return;
+		}
+
+		if (!$scope.selectedPaymentMethods) {
+			$scope.selectedPaymentMethods = [];
+		}
+
+		angular.forEach($scope.currentCustomer.ApprovedPaymentMethods, function(approvedPM) {
+			$scope.selectedPaymentMethods.push({ Id: approvedPM, Name: $.grep($scope.paymentMethods, function(pm) {
+				return pm.Id == approvedPM;
+			})[0].Name });
+		});
+	};
+
 	$scope.save = function () {
 		clearServerValidation();
 
+		if ($scope.shippingAddressTab.NewAddress) {
+			addNewShipping();
+		}
+
 		var valid = true;
+
+		setCountryValidity();
+
 		$.each($scope.forms, function (index, form) {
 			if (form && !(typeof form === 'boolean')) {
 				if (!form.$valid && index != 'submitted' && index != 'shippingSubmitted' && index != 'customerNoteSubmitted') {
@@ -265,7 +304,12 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			for (var key in $scope.currentCustomer.ProfileAddress) {
 				$scope.shippingAddressTab.Address[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
-			$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
+			if ($scope.currentCustomer.newEmail) {
+				$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.newEmail;
+			} else {
+				$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
+			}
+
 			$scope.shippingAddressTab.Address.AddressType = 3;
 		}
 	};
@@ -317,8 +361,14 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	$scope.addNewShipping = function () {
 		clearServerValidation();
 
+		setCountryValidity();
+
 		if ($scope.forms.shipping.$valid) {
-			$scope.currentCustomer.Shipping.push(angular.copy($scope.shippingAddressTab.Address));
+			var newAddress = angular.copy($scope.shippingAddressTab.Address);
+			syncCountry(newAddress);
+
+			$scope.currentCustomer.Shipping.push(newAddress);
+
 			$scope.shippingAddressTab.NewAddress = false;
 		} else {
 			$scope.forms.shippingSubmitted = true;

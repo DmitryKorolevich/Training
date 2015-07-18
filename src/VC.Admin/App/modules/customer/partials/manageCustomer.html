@@ -103,9 +103,8 @@
                                         <div class="form-group">
                                             <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                             <div class="col-md-9">
-                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" required data-ng-maxlength="100">
+                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.LinkedToAffiliate.$invalid">
-                                                    <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Linked to Affiliate")}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
                                                 </div>
@@ -294,7 +293,7 @@
 						    <div class="well row">
 						        <div class="col-md-6">
 						            <spinner-overlay data-loading="addEditTracker.active()">
-						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate> <!--data-ng-submit="addNewCustomerNote()"-->
+						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate>
 						                    <fieldset>
 						                        <span class="legend">Customer Notes</span>
 						                        <div class="form-group">
@@ -318,7 +317,7 @@
 						                                </div>
 						                            </div>
 						                        </div>
-						                        <div class="form-group">
+						                        <div class="form-group" data-ng-if="editMode">
 						                            <div class="col-md-3">
 						                                <button class="btn btn-info" data-ng-click="addNewCustomerNote();">Add Customer Note</button>
 						                            </div>
@@ -327,7 +326,7 @@
 						                </form>
 						            </spinner-overlay>
 						        </div>
-						        <div class="col-md-12">
+						        <div class="col-md-12" data-ng-if="editMode">
 						            <table class="table table-striped table-hover ">
 						                <thead>
 						                <tr>

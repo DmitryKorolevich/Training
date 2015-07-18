@@ -114,18 +114,18 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
                 {
-                    //Update existing
-                    var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
-                        (customerNoteDynamic, customerNote) => new DynamicEntityPair<CustomerNoteDynamic, CustomerNote>(customerNoteDynamic, customerNote)).ToList();
-                    await _customerNoteMapper.UpdateEntityRangeAsync(itemsToUpdate);
-                    foreach (var item in itemsToUpdate)
-                    {
-                        item.Entity.IdCustomer = dynamic.Id;
-                        item.Entity.StatusCode = RecordStatusCode.Active;
-                    }
+					//Update existing
+					var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
+						(customerNoteDynamic, customerNote) => new DynamicEntityPair<CustomerNoteDynamic, CustomerNote>(customerNoteDynamic, customerNote)).ToList();
+					await _customerNoteMapper.UpdateEntityRangeAsync(itemsToUpdate);
+					foreach (var item in itemsToUpdate)
+					{
+						item.Entity.IdCustomer = dynamic.Id;
+						item.Entity.StatusCode = RecordStatusCode.Active;
+					}
 
-                    //Delete
-                    var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
+					//Delete
+					var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
                     foreach (var note in toDelete)
                     {
                         note.StatusCode = RecordStatusCode.Deleted;
