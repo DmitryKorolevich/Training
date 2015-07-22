@@ -75,7 +75,7 @@
         </div>
 	</div>
 </div>
-<div class="form-group">
+<div class="form-group" data-ng-if="model.Address.Country.CountryCode">
 	<label class="col-md-3 control-label">State/Province</label>
     <div class="col-md-9" data-ng-if="model.Address.Country.States && model.Address.Country.States.length > 0">
         <select name="State" class="form-control" id="{{model.formName}}_model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" required>

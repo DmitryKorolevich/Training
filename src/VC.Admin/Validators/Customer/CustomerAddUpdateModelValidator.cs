@@ -97,10 +97,10 @@ namespace VC.Admin.Validators.Customer
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
-					.Equal(x => x.EmailConfirm)
+					.Equal(x => x.Email)
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
 
-				RuleFor(model => model.DefaultPaymentMethod)
+                RuleFor(model => model.DefaultPaymentMethod)
 					.Must(model => model.HasValue)
 					.WithMessage(model => model.DefaultPaymentMethod, ValidationMessages.FieldRequired);
 

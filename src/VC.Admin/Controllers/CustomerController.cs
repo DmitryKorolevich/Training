@@ -80,19 +80,22 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public Result<AddUpdateCustomerModel> CreateCustomerPrototype()
 		{
-			return new AddUpdateCustomerModel()
-			{
-				CustomerType = CustomerType.Retail,
-				TaxExempt = TaxExempt.YesCurrentCertificate,
-				Tier = Tier.Tier1,
-				InceptionDate = DateTime.Now,
-				TradeClass = 1,
-				CustomerNotes = new List<CustomerNoteModel>() { new CustomerNoteModel()
-				{
-					Priority = CustomerNotePriority.NormalPriority
-				}},
-				Shipping = new List<AddressModel>() { new AddressModel() }
-			};
+		    return new AddUpdateCustomerModel()
+		    {
+		        CustomerType = CustomerType.Retail,
+		        TaxExempt = TaxExempt.YesCurrentCertificate,
+		        Tier = Tier.Tier1,
+		        InceptionDate = DateTime.Now,
+		        TradeClass = 1,
+		        CustomerNotes = new List<CustomerNoteModel>()
+		        {
+		            new CustomerNoteModel()
+		            {
+		                Priority = CustomerNotePriority.NormalPriority
+		            }
+		        },
+		        Shipping = new List<AddressModel>() {new AddressModel() {AddressType = AddressType.Shipping}}
+		    };
 		}
 
 		[HttpPost]
@@ -104,7 +107,15 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public Result<CustomerNoteModel> CreateCustomerNotePrototype()
 		{
-			return new CustomerNoteModel() { Priority = CustomerNotePriority.NormalPriority, DateEdited = DateTime.Now, EditedBy = _adminProfileService.Query(x => x.Id == Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId())).Single().AgentId };
+		    return new CustomerNoteModel()
+		    {
+		        Priority = CustomerNotePriority.NormalPriority,
+		        DateEdited = DateTime.Now,
+		        EditedBy =
+		            _adminProfileService.Query(x => x.Id == Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId()))
+		                .Single()
+		                .AgentId
+		    };
 		}
 
 		[HttpPost]
