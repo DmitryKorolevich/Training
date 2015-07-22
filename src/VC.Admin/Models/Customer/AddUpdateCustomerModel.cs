@@ -74,7 +74,7 @@ namespace VC.Admin.Models.Customer
 
 		public bool SuspendUserAccount { get; set; }
 
-		[Map]
+		[Map("SuspensionReason")]
 		public string Reason { get; set; }
 
 		public AddressModel ProfileAddress { get; set; }
