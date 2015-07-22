@@ -31,7 +31,7 @@ using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: DynamicObjectServiceAsync<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
+    public class CustomerService: EcommerceDynamicObjectService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
@@ -44,11 +44,6 @@ namespace VitalChoice.Business.Services.Customers
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
 
-	    protected override IUnitOfWorkAsync CreateUnitOfWork()
-        {
-            return new EcommerceUnitOfWork();
-        }
-
         public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
@@ -60,7 +55,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync,
-            IReadRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync)
+            IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
@@ -96,12 +91,16 @@ namespace VitalChoice.Business.Services.Customers
 						.Build());
 			}
 
-	        if (model.Addresses.Where(x=>x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted).All(x => !x.Data.Default))
-	        {
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
-			}
+            if (
+                model.Addresses.Where(
+                    x => x.IdObjectType == (int) AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted)
+                    .All(x => !x.Data.Default))
+            {
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
+            }
 
-			return errors;
+            return errors;
 		}
 
         protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)

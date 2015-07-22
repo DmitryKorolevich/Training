@@ -111,35 +111,35 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public async Task<bool> DeleteAllAsync(ICollection<TDynamic> models)
+        public async Task<bool> DeleteAllAsync(ICollection<TDynamic> models, bool physically = false)
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await DeleteAllAsync(models, uow);
+                return await DeleteAllAsync(models, uow, physically);
             }
         }
 
-        public async Task<bool> DeleteAsync(TDynamic model)
+        public async Task<bool> DeleteAsync(TDynamic model, bool physically = false)
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await DeleteAsync(model, uow);
+                return await DeleteAsync(model, uow, physically);
             }
         }
 
-        public async Task<bool> DeleteAllAsync(ICollection<int> list)
+        public async Task<bool> DeleteAllAsync(ICollection<int> list, bool physically = false)
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await DeleteAllAsync(list, uow);
+                return await DeleteAllAsync(list, uow, physically);
             }
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, bool physically = false)
         {
             using (var uow = CreateUnitOfWork())
             {
-                return await DeleteAsync(id, uow);
+                return await DeleteAsync(id, uow, physically);
             }
         }
 
@@ -171,30 +171,30 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
-        public bool DeleteAll(ICollection<TDynamic> models)
+        public bool DeleteAll(ICollection<TDynamic> models, bool physically = false)
         {
-            var task = DeleteAllAsync(models);
+            var task = DeleteAllAsync(models, physically);
             task.Wait();
             return task.Result;
         }
 
-        public bool Delete(TDynamic model)
+        public bool Delete(TDynamic model, bool physically = false)
         {
-            var task = DeleteAsync(model);
+            var task = DeleteAsync(model, physically);
             task.Wait();
             return task.Result;
         }
 
-        public bool DeleteAll(ICollection<int> list)
+        public bool DeleteAll(ICollection<int> list, bool physically = false)
         {
-            var task = DeleteAllAsync(list);
+            var task = DeleteAllAsync(list, physically);
             task.Wait();
             return task.Result;
         }
 
-        public bool Delete(int id)
+        public bool Delete(int id, bool physically = false)
         {
-            var task = DeleteAsync(id);
+            var task = DeleteAsync(id, physically);
             task.Wait();
             return task.Result;
         }
@@ -297,7 +297,7 @@ namespace VitalChoice.DynamicData.Base
             return entity;
         }
 
-        private async Task<bool> DeleteAllAsync(ICollection<int> list, IUnitOfWorkAsync uow)
+        private async Task<bool> DeleteAllAsync(ICollection<int> list, IUnitOfWorkAsync uow, bool physically)
         {
             (await ValidateDeleteCollection(list)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
@@ -306,7 +306,7 @@ namespace VitalChoice.DynamicData.Base
             var toDelete = await mainRepository.Query(m => list.Contains(m.Id)).SelectAsync();
             if (!toDelete.Any())
                 return false;
-            if (!await DeleteAllAsync(toDelete, mainRepository))
+            if (!await DeleteAllAsync(toDelete, mainRepository, physically))
                 return false;
             await uow.SaveChangesAsync();
             return true;
@@ -341,32 +341,34 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow)
+        private async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
         {
             (await ValidateDelete(id)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
             var toDelete = (await mainRepository.Query(m => m.Id == id).SelectAsync()).FirstOrDefault();
             if (toDelete == null)
                 return false;
-            if (!await DeleteAsync(toDelete, mainRepository))
+            if (!await DeleteAsync(toDelete, mainRepository, physically))
                 return false;
             await uow.SaveChangesAsync();
             return true;
         }
 
-        private async Task<bool> DeleteAllAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
+        private async Task<bool> DeleteAllAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow, bool physically)
         {
             var idList = models.Select(m => m.Id).ToList();
-            return await DeleteAllAsync(idList, uow);
+            return await DeleteAllAsync(idList, uow, physically);
         }
 
-        private async Task<bool> DeleteAsync(TDynamic model, IUnitOfWorkAsync uow)
+        private async Task<bool> DeleteAsync(TDynamic model, IUnitOfWorkAsync uow, bool physically)
         {
-            return await DeleteAsync(model.Id, uow);
+            return await DeleteAsync(model.Id, uow, physically);
         }
 
-        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities, IRepositoryAsync<TEntity> repository)
+        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities, IRepositoryAsync<TEntity> repository, bool physically)
         {
+            if (physically)
+                return await repository.DeleteAllAsync(entities);
             foreach (var entity in entities)
             {
                 entity.StatusCode = RecordStatusCode.Deleted;
@@ -374,11 +376,12 @@ namespace VitalChoice.DynamicData.Base
             return await repository.UpdateRangeAsync(entities);
         }
 
-        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository)
+        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository, bool physically)
         {
+            if (physically)
+                return await repository.DeleteAsync(entity);
             entity.StatusCode = RecordStatusCode.Deleted;
             return await repository.UpdateAsync(entity);
         }
-        
     }
 }

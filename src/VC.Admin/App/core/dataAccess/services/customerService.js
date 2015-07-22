@@ -39,6 +39,12 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		getOrderNotes: function (customerType, tracker) {
 			return $http.get(baseUrl + 'GetOrderNotes/?customerType=' + customerType, getConfig(tracker));
+		},
+		addAddress: function (address, id, tracker) {
+		    return $http.post(baseUrl + 'AddAddress/?idCustomer=' + id, address, getConfig(tracker));
+		},
+		deleteAddress: function (id, tracker) {
+		    return $http.post(baseUrl + 'DeleteAddress/?idAddress=' + id, getConfig(tracker));
 		}
 	};
 }]);

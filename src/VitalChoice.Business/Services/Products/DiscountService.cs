@@ -24,7 +24,7 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class DiscountService : DynamicObjectServiceAsync<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
+    public class DiscountService : EcommerceDynamicObjectService<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
     {
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
@@ -43,11 +43,6 @@ namespace VitalChoice.Business.Services.Products
             _skuRepository = skuRepository;
             _adminProfileRepository = adminProfileRepository;
             _mapper = mapper;
-        }
-
-        protected override IUnitOfWorkAsync CreateUnitOfWork()
-        {
-            return new EcommerceUnitOfWork();
         }
 
         protected override async Task<List<MessageInfo>> Validate(DiscountDynamic dynamic)

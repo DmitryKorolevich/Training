@@ -26,7 +26,7 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : DynamicObjectServiceAsync<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
+    public class ProductService : EcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
@@ -35,11 +35,6 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
-
-        protected override IUnitOfWorkAsync CreateUnitOfWork()
-        {
-            return new EcommerceUnitOfWork();
-        }
 
         protected override async Task AfterSelect(Product entity)
         {

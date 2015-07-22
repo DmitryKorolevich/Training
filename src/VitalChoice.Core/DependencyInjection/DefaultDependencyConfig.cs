@@ -49,6 +49,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using Autofac.Dnx;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -259,6 +260,8 @@ namespace VitalChoice.Core.DependencyInjection
 
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
+            builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))
+                .As(typeof (IEcommerceDynamicObjectService<,,,>));
 
             var container = builder.Build();
 
