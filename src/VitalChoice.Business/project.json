@@ -19,10 +19,8 @@
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] }
     },
     "dnxcore50": {
-      "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.20-*",
         "System.IO.FileSystem": "4.0.0-*",

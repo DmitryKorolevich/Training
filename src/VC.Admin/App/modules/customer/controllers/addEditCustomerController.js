@@ -311,6 +311,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			}
 
 			$scope.shippingAddressTab.Address.AddressType = 3;
+			$scope.shippingAddressTab.Address.Id = 0;
 		}
 	};
 
@@ -423,9 +424,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    if ($scope.forms.shipping.$valid) {
 	        if ($scope.editMode) {
 	            var newAddress = angular.copy($scope.shippingAddressTab.Address);
-	            syncCountry(newAddress);
 	            customerService.addAddress(newAddress, $scope.currentCustomer.Id, $scope.addEditTracker).success(function (result) {
 	                if (result.Success) {
+	                    syncCountry(result.Data);
 	                    $scope.currentCustomer.Shipping.push(result.Data);
 	                    toaster.pop('success', "Success!", "Customer address was succesfully added");
 	                }
@@ -453,7 +454,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		if ($scope.shippingAddressTab.NewAddress) {
 			customerService.createAddressPrototype($scope.addEditTracker)
 				.success(function(result) {
-					if (result.Success) {
+				    if (result.Success) {
 						$scope.shippingAddressTab.Address = result.Data;
 					} else {
 						toaster.pop('error', 'Error!', "Can't add shipping address");

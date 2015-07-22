@@ -42,7 +42,7 @@
                                             <div class="form-group">
                                                 <label for="website" class="col-md-3 control-label">Website</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100">
+                                                    <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted && forms.profile.Website.$invalid">
                                                         <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
                                                         <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
@@ -87,7 +87,7 @@
                                                 <label class="col-md-3 control-label">Inception Date</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required/>
+                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" />
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
@@ -103,7 +103,7 @@
                                         <div class="form-group">
                                             <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                             <div class="col-md-9">
-                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100">
+                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.LinkedToAffiliate.$invalid">
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
@@ -120,7 +120,7 @@
                                         <div class="form-group">
                                             <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100">
+                                                <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.Email.$invalid">
                                                     <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                     <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
@@ -132,7 +132,7 @@
                                         <div class="form-group">
                                             <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100">
+                                                <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.EmailConfirm.$invalid">
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
@@ -209,7 +209,7 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="paymentMethod in paymentMethods">
-                                                    <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1">
+                                                    <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1" autocomplete="off">
                                                     {{paymentMethod.Name}}
                                                 </label>
                                             </div>
@@ -231,7 +231,7 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="orderNote in orderNotes">
-                                                    <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1">
+                                                    <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1" autocomplete="off">
                                                     {{orderNote.Name}}
                                                 </label>
                                             </div>
@@ -241,11 +241,11 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline col-md-3">
-                                                    <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail">
+                                                    <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off">
                                                     Do Not Mail
                                                 </label>
                                                 <label class="checkbox-inline col-md-3">
-                                                    <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent">
+                                                    <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off">
                                                     Do Not Rent
                                                 </label>
                                             </div>
