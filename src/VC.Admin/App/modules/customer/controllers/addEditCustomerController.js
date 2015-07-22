@@ -422,7 +422,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 	    if ($scope.forms.shipping.$valid) {
 	        if ($scope.editMode) {
-	            customerService.addAddress($scope.shippingAddressTab.Address, $scope.currentCustomer.Id, $scope.addEditTracker).success(function (result) {
+	            var newAddress = angular.copy($scope.shippingAddressTab.Address);
+	            syncCountry(newAddress);
+	            customerService.addAddress(newAddress, $scope.currentCustomer.Id, $scope.addEditTracker).success(function (result) {
 	                if (result.Success) {
 	                    $scope.currentCustomer.Shipping.push(result.Data);
 	                    toaster.pop('success', "Success!", "Customer address was succesfully added");
