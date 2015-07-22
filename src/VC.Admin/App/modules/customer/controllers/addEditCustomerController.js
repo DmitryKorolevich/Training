@@ -314,7 +314,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		}
 	};
 
-	$scope.deleteShippingAddressLocal = function (id) {
+	function deleteShippingAddressLocal(id) {
 	    var idx = -1;
 
 	    angular.forEach($scope.currentCustomer.Shipping, function (item, index) {
@@ -332,7 +332,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	        customerService.deleteAddress(id, $scope.addEditTracker)
                 .success(function (result) {
                     if (result.Success) {
-                        $scope.deleteShippingAddressLocal(id);
+                        deleteShippingAddressLocal(id);
                         toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
                     }
                     else {
@@ -349,33 +349,70 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    }
 	};
 
+	function deleteCustomerNoteLocal(id) {
+	    var idx = -1;
+
+	    angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index) {
+	        if (item.Id == id) {
+	            idx = index;
+	            return;
+	        }
+	    });
+
+	    $scope.currentCustomer.CustomerNotes.splice(idx, 1);
+	}
+
 	$scope.deleteCustomerNote = function(id) {
-		var idx = -1;
-
-		angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index) {
-			if (item.Id == id) {
-				idx = index;
-				return;
-			}
-		});
-
-		$scope.currentCustomer.CustomerNotes.splice(idx, 1);
-
-		toaster.pop('success', "Success!", "Customer note was deleted");
+	    if ($scope.editMode) {
+	        customerService.deleteNote(id, $scope.addEditTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        deleteCustomerNoteLocal(id);
+                        toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
+                    }
+                    else {
+                        toaster.pop('error', 'Error!', "Can't delete customer note");
+                    }
+                })
+                .error(function (result) {
+                    toaster.pop('error', "Error!", "Server error ocurred");
+                });
+	    }
+	    else {
+	        deleteCustomerNoteLocal(id);
+	        toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
+	    }
 	};
 
 	$scope.addNewCustomerNote = function () {
-		clearServerValidation();
+	    clearServerValidation();
 
-		if ($scope.forms.customerNote.$valid) {
-			$scope.currentCustomer.CustomerNotes.push(angular.copy($scope.customerNotesTab.CustomerNote));
-
-			updateCustomerNoteUIId();
-
-			createCustomerNoteProto();
-		} else {
-			$scope.forms.customerNoteSubmitted = true;
-		}
+	    if ($scope.forms.customerNote.$valid) {
+	        if ($scope.editMode) {
+	            customerService.addNote($scope.customerNotesTab.CustomerNote, $scope.currentCustomer.Id, $scope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            $scope.currentCustomer.CustomerNotes.push(result.Data);
+                            updateCustomerNoteUIId();
+                            createCustomerNoteProto();
+                            toaster.pop('success', "Success!", "Customer Note was succesfully added");
+                        }
+                        else {
+                            toaster.pop('error', 'Error!', "Can't add Customer Note");
+                        }
+                    })
+                    .error(function (result) {
+                        toaster.pop('error', "Error!", "Server error ocurred");
+                    });
+	        }
+	        else {
+	            $scope.currentCustomer.CustomerNotes.push(angular.copy($scope.customerNotesTab.CustomerNote));
+	            updateCustomerNoteUIId();
+	            createCustomerNoteProto();
+	        }
+	    } else {
+	        $scope.forms.customerNoteSubmitted = true;
+	    }
 	};
 
 	$scope.addNewShipping = function () {

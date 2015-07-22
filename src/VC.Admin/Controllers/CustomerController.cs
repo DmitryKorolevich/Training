@@ -37,17 +37,20 @@ namespace VC.Admin.Controllers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
         private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;
+        private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper; 
         private readonly ICustomerService _customerService;
 
         private readonly IEcommerceDynamicObjectService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
+        private readonly IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
+            _notesService;
 
         public CustomerController(ICustomerService customerService,
             IDynamicToModelMapper<CustomerDynamic> customerMapper,
             IDynamicToModelMapper<AddressDynamic> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
             IEcommerceDynamicObjectService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
-                addressService)
+                addressService, IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService, IDynamicToModelMapper<CustomerNoteDynamic> noteMapper)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -56,6 +59,8 @@ namespace VC.Admin.Controllers
             _customerMapper = customerMapper;
             _addressMapper = addressMapper;
             _addressService = addressService;
+            _notesService = notesService;
+            _noteMapper = noteMapper;
         }
 
         [HttpGet]
@@ -127,6 +132,30 @@ namespace VC.Admin.Controllers
                         .Single()
                         .AgentId
             };
+        }
+
+        [HttpPost]
+        public async Task<Result<CustomerNoteModel>> AddNote([FromBody] CustomerNoteModel model, int idCustomer)
+        {
+            if (!Validate(model))
+                return null;
+            var note = _noteMapper.FromModel(model);
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (int.TryParse(sUserId, out userId))
+            {
+                note.IdEditedBy = userId;
+                note.IdCustomer = idCustomer;
+            }
+            note = await _notesService.InsertAsync(note);
+            var toReturn = _noteMapper.ToModel<CustomerNoteModel>(note);
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteNote(int idNote)
+        {
+            return await _notesService.DeleteAsync(idNote, true);
         }
 
         [HttpPost]

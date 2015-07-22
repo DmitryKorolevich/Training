@@ -45,6 +45,12 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		deleteAddress: function (id, tracker) {
 		    return $http.post(baseUrl + 'DeleteAddress/?idAddress=' + id, getConfig(tracker));
+		},
+        addNote: function (note, id, tracker) {
+            return $http.post(baseUrl + 'AddNote/?idCustomer=' + id, note, getConfig(tracker));
+		},
+		deleteNote: function (id, tracker) {
+		    return $http.post(baseUrl + 'DeleteNote/?idNote=' + id, getConfig(tracker));
 		}
 	};
 }]);

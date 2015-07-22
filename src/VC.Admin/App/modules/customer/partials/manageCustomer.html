@@ -337,12 +337,12 @@
 						                </tr>
 						                </thead>
 						                <tbody>
-						                <tr data-ng-repeat="note in currentCustomer.CustomerNotes track by note.UIId | orderBy:DateEdited:reverse">
+						                <tr data-ng-repeat="note in currentCustomer.CustomerNotes track by note.Id | orderBy:DateEdited:reverse">
 						                    <td>{{getReferenceItem(ReferenceData.CustomerNotePriorities, note.Priority).Text}}</td>
 						                    <td>{{note.Text}}</td>
 						                    <td>{{note.DateEdited | date:"MM/dd/yy"}}<br/>{{note.DateEdited | date:"h:mm a"}}<br/>{{note.EditedBy}}</td>
 						                    <td>
-						                        <button class="btn btn-default btn-danger" data-ng-click="deleteCustomerNote(note.UIId);">Delete</button>
+						                        <button class="btn btn-default btn-danger" data-ng-click="deleteCustomerNote(note.Id);">Delete</button>
 						                    </td>
 						                </tr>
 						                </tbody>
