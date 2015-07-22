@@ -301,12 +301,13 @@ namespace VitalChoice.DynamicData.Base
         {
             (await ValidateDeleteCollection(list)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
+            var valuesRepository = uow.RepositoryAsync<TOptionValue>();
             if (!list.Any())
                 return false;
             var toDelete = await mainRepository.Query(m => list.Contains(m.Id)).SelectAsync();
             if (!toDelete.Any())
                 return false;
-            if (!await DeleteAllAsync(toDelete, mainRepository, physically))
+            if (!await DeleteAllAsync(toDelete, mainRepository, valuesRepository, physically))
                 return false;
             await uow.SaveChangesAsync();
             return true;
@@ -345,10 +346,11 @@ namespace VitalChoice.DynamicData.Base
         {
             (await ValidateDelete(id)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();
+            var valuesRepository = uow.RepositoryAsync<TOptionValue>();
             var toDelete = (await mainRepository.Query(m => m.Id == id).SelectAsync()).FirstOrDefault();
             if (toDelete == null)
                 return false;
-            if (!await DeleteAsync(toDelete, mainRepository, physically))
+            if (!await DeleteAsync(toDelete, mainRepository, valuesRepository, physically))
                 return false;
             await uow.SaveChangesAsync();
             return true;
@@ -365,21 +367,27 @@ namespace VitalChoice.DynamicData.Base
             return await DeleteAsync(model.Id, uow, physically);
         }
 
-        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities, IRepositoryAsync<TEntity> repository, bool physically)
+        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities, IRepositoryAsync<TEntity> mainRepository, IRepositoryAsync<TOptionValue> valueRepository, bool physically)
         {
             if (physically)
-                return await repository.DeleteAllAsync(entities);
+            {
+                await valueRepository.DeleteAllAsync(entities.SelectMany(e => e.OptionValues));
+                return await mainRepository.DeleteAllAsync(entities);
+            }
             foreach (var entity in entities)
             {
                 entity.StatusCode = RecordStatusCode.Deleted;
             }
-            return await repository.UpdateRangeAsync(entities);
+            return await mainRepository.UpdateRangeAsync(entities);
         }
 
-        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository, bool physically)
+        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository, IRepositoryAsync<TOptionValue> valueRepository, bool physically)
         {
             if (physically)
+            {
+                await valueRepository.DeleteAllAsync(entity.OptionValues);
                 return await repository.DeleteAsync(entity);
+            }
             entity.StatusCode = RecordStatusCode.Deleted;
             return await repository.UpdateAsync(entity);
         }
