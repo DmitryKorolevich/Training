@@ -455,6 +455,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			customerService.createAddressPrototype($scope.addEditTracker)
 				.success(function(result) {
 				    if (result.Success) {
+				        $scope.currentCustomer.sameShipping = false;
 						$scope.shippingAddressTab.Address = result.Data;
 					} else {
 						toaster.pop('error', 'Error!', "Can't add shipping address");
