@@ -26,8 +26,6 @@ namespace VC.Admin.Validators.Customer
 		public AddressModelRules()
 		{
 			RuleFor(model => model.Company)
-				.NotEmpty()
-				.WithMessage(model => model.Company, ValidationMessages.FieldRequired)
 				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 				.WithMessage(model => model.Company, ValidationMessages.FieldLength,
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);

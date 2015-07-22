@@ -311,7 +311,6 @@
 						                            <div class="col-md-9">
 						                                <textarea type="text" name="Text" class="form-control" data-ng-model="customerNotesTab.CustomerNote.Text" id="note" placeholder="Note" rows="10"  data-ng-maxlength="1000"></textarea> <!--data-ng-required="editMode"-->
 						                                <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Text.$invalid">
-						                                    <small class="error" ng-show="forms.customerNote.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Note")}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Note", "1000"])}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.server">{{serverMessages.GetMessage('Text')}}</small>
 						                                </div>
@@ -332,7 +331,7 @@
 						                <tr>
 						                    <th>Priority</th>
 						                    <th>Notes</th>
-						                    <th>Agent</th>
+						                    <th>Added</th>
 						                    <th>Actions</th>
 						                </tr>
 						                </thead>

@@ -212,10 +212,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	$scope.save = function () {
 		clearServerValidation();
 
-		//if ($scope.shippingAddressTab.NewAddress) {
-		//	addNewShipping();
-		//}
-
 		var valid = true;
 
 		setCountryValidity();
@@ -337,7 +333,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                         toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
                     }
                     else {
-                        toaster.pop('error', 'Error!', "Can't delete shipping address");
+                        successHandler(result);
+                        //toaster.pop('error', 'Error!', "Can't delete shipping address");
                     }
                 })
                 .error(function (result) {
@@ -372,7 +369,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                         toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
                     }
                     else {
-                        toaster.pop('error', 'Error!', "Can't delete customer note");
+                        successHandler(result);
+                        //toaster.pop('error', 'Error!', "Can't delete customer note");
                     }
                 })
                 .error(function (result) {
@@ -399,7 +397,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                             toaster.pop('success', "Success!", "Customer Note was succesfully added");
                         }
                         else {
-                            toaster.pop('error', 'Error!', "Can't add Customer Note");
+                            successHandler(result);
+                            //toaster.pop('error', 'Error!', "Can't add Customer Note");
                         }
                     })
                     .error(function (result) {
@@ -431,7 +430,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	                    toaster.pop('success', "Success!", "Customer address was succesfully added");
 	                }
 	                else {
-	                    toaster.pop('error', 'Error!', "Can't add shipping address");
+	                    successHandler(result);
+	                    //toaster.pop('error', 'Error!', "Can't add shipping address");
 	                }
 	            }).
                 error(function (result) {
@@ -457,8 +457,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				    if (result.Success) {
 				        $scope.currentCustomer.sameShipping = false;
 						$scope.shippingAddressTab.Address = result.Data;
-					} else {
-						toaster.pop('error', 'Error!', "Can't add shipping address");
+				    } else {
+				        successHandler(result);
+						//toaster.pop('error', 'Error!', "Can't add shipping address");
 					}
 				}).
 				error(function(result) {
