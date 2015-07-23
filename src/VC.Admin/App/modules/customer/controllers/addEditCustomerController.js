@@ -58,10 +58,13 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							if (result.Success) {
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
 
 								angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
-									syncCountry(shippingItem);
+								    syncCountry(shippingItem);
+								    if (shippingItem.Default)
+								    {
+								        $scope.shippingAddressTab.Address = shippingItem;
+								    }
 								});
 
 								syncCountry($scope.currentCustomer.ProfileAddress);
