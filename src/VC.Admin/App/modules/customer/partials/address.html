@@ -1,7 +1,7 @@
 ﻿<div class="form-group">
-	<label for="model_company" class="col-md-3 control-label">Company</label>
+	<label for="{{::model.formName}}_model_company" class="col-md-3 control-label">Company</label>
 	<div class="col-md-9">
-	    <input type="text" name="Company" class="form-control" id="{{model.formName}}_model_company" data-ng-model="model.Address.Company" placeholder="Company" data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="Company" class="form-control" id="{{::model.formName}}_model_company" data-ng-model="model.Address.Company" placeholder="Company" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Company.$invalid">
             <small class="error" ng-show="forms[model.formName].Company.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Company", "100"])}}</small>
             <small class="error" ng-show="forms[model.formName].Company.$error.server">{{serverMessages.GetMessage('Company')}}</small>
@@ -9,9 +9,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_firstname" class="col-md-3 control-label">First Name</label>
+	<label for="{{::model.formName}}_model_firstname" class="col-md-3 control-label">First Name</label>
 	<div class="col-md-9">
-	    <input type="text" name="FirstName" class="form-control" data-ng-model="model.Address.FirstName" id="{{model.formName}}_model_firstname" placeholder="First Name" required data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="FirstName" class="form-control" data-ng-model="model.Address.FirstName" id="{{::model.formName}}_model_firstname" placeholder="First Name" required data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].FirstName.$invalid">
             <small class="error" ng-show="forms[model.formName].FirstName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.FirstName")}}</small>
             <small class="error" ng-show="forms[model.formName].FirstName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.FirstName", "100"])}}</small>
@@ -20,9 +20,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_lastname" class="col-md-3 control-label">Last Name</label>
+	<label for="{{::model.formName}}_model_lastname" class="col-md-3 control-label">Last Name</label>
 	<div class="col-md-9">
-	    <input type="text" name="LastName" class="form-control" id="{{model.formName}}_model_lastname" data-ng-model="model.Address.LastName" placeholder="Last Name" required data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="LastName" class="form-control" id="{{::model.formName}}_model_lastname" data-ng-model="model.Address.LastName" placeholder="Last Name" required data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].LastName.$invalid">
             <small class="error" ng-show="forms[model.formName].LastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
             <small class="error" ng-show="forms[model.formName].LastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>
@@ -31,9 +31,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_address1" class="col-md-3 control-label">Address 1</label>
+	<label for="{{::model.formName}}_model_address1" class="col-md-3 control-label">Address 1</label>
 	<div class="col-md-9">
-	    <input type="text" name="Address1" class="form-control" data-ng-model="model.Address.Address1" id="{{model.formName}}_model_address1" placeholder="Address 1" required data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="Address1" class="form-control" data-ng-model="model.Address.Address1" id="{{::model.formName}}_model_address1" placeholder="Address 1" required data-ng-maxlength="100" autocomplete="off" />
 	    <div class="error-container" ng-show="forms.submitted && forms[model.formName].Address1.$invalid">
             <small class="error" ng-show="forms[model.formName].Address1.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Address1")}}</small>
 	        <small class="error" ng-show="forms[model.formName].Address1.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address1", "100"])}}</small>
@@ -42,9 +42,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_address2" class="col-md-3 control-label">Address 2</label>
+	<label for="{{::model.formName}}_model_address2" class="col-md-3 control-label">Address 2</label>
 	<div class="col-md-9">
-	    <input type="text" name="Address2" class="form-control" data-ng-model="model.Address.Address2" id="{{model.formName}}_model_address2" placeholder="Address 2" data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="Address2" class="form-control" data-ng-model="model.Address.Address2" id="{{::model.formName}}_model_address2" placeholder="Address 2" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Address2.$invalid">
             <small class="error" ng-show="forms[model.formName].Address2.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address2", "100"])}}</small>
             <small class="error" ng-show="forms[model.formName].Address2.$error.server">{{serverMessages.GetMessage('Address2')}}</small>
@@ -52,9 +52,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_city" class="col-md-3 control-label">City</label>
+	<label for="{{::model.formName}}_model_city" class="col-md-3 control-label">City</label>
 	<div class="col-md-9">
-	    <input type="text" name="City" class="form-control" data-ng-model="model.Address.City" id="{{model.formName}}_model_city" placeholder="City" required data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="City" class="form-control" data-ng-model="model.Address.City" id="{{::model.formName}}_model_city" placeholder="City" required data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].City.$invalid">
             <small class="error" ng-show="forms[model.formName].City.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","City")}}</small>
             <small class="error" ng-show="forms[model.formName].City.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["City", "100"])}}</small>
@@ -63,9 +63,9 @@
 	</div>
 </div>
 <div class="form-group">
-	<label for="model_country" class="col-md-3 control-label">Country</label>
+	<label for="{{::model.formName}}_model_country" class="col-md-3 control-label">Country</label>
 	<div class="col-md-9">
-	    <select id="{{model.formName}}_model_country" name="Country" class="form-control" data-ng-model="model.Address.Country" data-ng-options="country as country.CountryName for country in countries" required>
+	    <select id="{{::model.formName}}_model_country" name="Country" class="form-control" data-ng-model="model.Address.Country" data-ng-options="country as country.CountryName for country in countries" required>
             <option value="">Select Country</option>
         </select>
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Country.$invalid">
@@ -77,7 +77,7 @@
 <div class="form-group" data-ng-if="model.Address.Country.CountryCode">
 	<label class="col-md-3 control-label">State/Province</label>
     <div class="col-md-9" data-ng-if="model.Address.Country.States && model.Address.Country.States.length > 0">
-        <select name="State" class="form-control" id="{{model.formName}}_model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" required>
+        <select name="State" class="form-control" id="{{::model.formName}}_model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" required>
             <option value="">Select State</option>
         </select>
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].State.$invalid">
@@ -86,7 +86,7 @@
         </div>
     </div>
     <div class="col-md-9" data-ng-if="!(model.Address.Country.States && model.Address.Country.States.length > 0)">
-        <input type="text" name="County" id="{{model.formName}}_model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100" autocomplete="off" />
+        <input type="text" name="County" id="{{::model.formName}}_model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].County.$invalid">
             <small class="error" ng-show="forms[model.formName].County.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["State", "100"])}}</small>
             <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('State')}}</small>
@@ -94,9 +94,9 @@
     </div>
 </div>
 <div class="form-group">
-	<label for="model_zip" class="col-md-3 control-label">Zip</label>
+	<label for="{{::model.formName}}_model_zip" class="col-md-3 control-label">Zip</label>
     <div class="col-md-9">
-        <input type="text" name="Zip" class="form-control" data-ng-model="model.Address.Zip" id="{{model.formName}}_model_zip" placeholder="Zip" required data-ng-maxlength="100" autocomplete="off" />
+        <input type="text" name="Zip" class="form-control" data-ng-model="model.Address.Zip" id="{{::model.formName}}_model_zip" placeholder="Zip" required data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Zip.$invalid">
             <small class="error" ng-show="forms[model.formName].Zip.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Zip")}}</small>
             <small class="error" ng-show="forms[model.formName].Zip.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Zip", "100"])}}</small>
@@ -105,9 +105,9 @@
     </div>
 </div>
 <div class="form-group">
-	<label for="model_phone" class="col-md-3 control-label">Phone</label>
+	<label for="{{::model.formName}}_model_phone" class="col-md-3 control-label">Phone</label>
     <div class="col-md-9">
-        <input type="text" name="Phone" class="form-control" data-ng-model="model.Address.Phone" id="{{model.formName}}_model_phone" placeholder="Phone" required data-ng-maxlength="100" autocomplete="off" />
+        <input type="text" name="Phone" class="form-control" data-ng-model="model.Address.Phone" id="{{::model.formName}}_model_phone" placeholder="Phone" required data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Phone.$invalid">
             <small class="error" ng-show="forms[model.formName].Phone.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Phone")}}</small>
             <small class="error" ng-show="forms[model.formName].Phone.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Phone", "100"])}}</small>
@@ -116,9 +116,9 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="model_fax" class="col-md-3 control-label">Fax</label>
+    <label for="{{::model.formName}}_model_fax" class="col-md-3 control-label">Fax</label>
     <div class="col-md-9">
-        <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="{{model.formName}}_model_fax" placeholder="Fax" data-ng-maxlength="100" autocomplete="off" />
+        <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="{{::model.formName}}_model_fax" placeholder="Fax" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Fax.$invalid">
             <small class="error" ng-show="forms[model.formName].Fax.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Fax", "100"])}}</small>
             <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax')}}</small>
@@ -126,9 +126,9 @@
     </div>
 </div>
 <div class="form-group" data-ng-if="model.Address.AddressType == 2 || model.Address.AddressType == 3">
-    <label for="model_email" class="col-md-3 control-label">Email</label>
+    <label for="{{::model.formName}}_model_email" class="col-md-3 control-label">Email</label>
     <div class="col-md-9">
-        <input type="email" name="Email" class="form-control" id="{{model.formName}}_model_email" placeholder="Email" data-ng-model="model.Address.Email" data-ng-maxlength="100" autocomplete="off" />
+        <input type="email" name="Email" class="form-control" id="{{::model.formName}}_model_email" placeholder="Email" data-ng-model="model.Address.Email" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted && forms[model.formName].Email.$invalid">
             <small class="error" ng-show="forms[model.formName].Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
             <small class="error" ng-show="forms[model.formName].Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
