@@ -155,7 +155,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteNote(int idNote)
         {
-            return await _notesService.DeleteAsync(idNote, true);
+            if (idNote > 0)
+                return await _notesService.DeleteAsync(idNote, true);
+            throw new AppValidationException("Note cannot be deleted.");
         }
 
         [HttpPost]
@@ -179,7 +181,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteAddress(int idAddress)
         {
-            return await _addressService.DeleteAsync(idAddress, true);
+            if (idAddress > 0)
+                return await _addressService.DeleteAsync(idAddress, true);
+            throw new AppValidationException("Please select address to delete.");
         }
 
         [HttpPost]

@@ -296,8 +296,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	};
 
 	$scope.makeAsProfileAddress = function() {
-		if ($scope.currentCustomer.sameShipping) {
-			for (var key in $scope.currentCustomer.ProfileAddress) {
+	    if ($scope.currentCustomer.sameShipping) {
+	        var defaultValue = $scope.shippingAddressTab.Address.Default;
+		    for (var key in $scope.currentCustomer.ProfileAddress) {
 				$scope.shippingAddressTab.Address[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
 			if ($scope.currentCustomer.newEmail) {
@@ -305,7 +306,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			} else {
 				$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
 			}
-
+			$scope.shippingAddressTab.Address.Default = defaultValue;
 			$scope.shippingAddressTab.Address.AddressType = 3;
 			$scope.shippingAddressTab.Address.Id = 0;
 		}
@@ -322,6 +323,15 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    });
 
 	    $scope.currentCustomer.Shipping.splice(idx, 1);
+	    if (idx < $scope.currentCustomer.Shipping.length) {
+	        $scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[idx];
+	    }
+	    else if ($scope.currentCustomer.Shipping.length > 0) {
+	        $scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+	    }
+	    else {
+	        $scope.setNewAddress();
+	    }
 	}
 
 	$scope.deleteSelectedShipping = function (id) {

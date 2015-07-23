@@ -103,8 +103,9 @@ namespace VC.Admin.Validators.Customer
 				.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 				.WithMessage(model => model.Email, ValidationMessages.FieldLength,
 					BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-				.EmailAddress()
-				.WithMessage(model => model.Email, ValidationMessages.EmailFormat);
+                .EmailAddress()
+                .When(x => !string.IsNullOrWhiteSpace(x.Email))
+                .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 		}
 	}
 }
