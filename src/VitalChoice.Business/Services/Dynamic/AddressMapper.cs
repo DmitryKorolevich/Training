@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Customer;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
@@ -13,44 +17,69 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class AddressMapper : DynamicObjectMapper<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
-        public AddressMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
+        public AddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<Type, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
             : base(mappers, container, optionTypesRepositoryAsync)
         {
         }
 
-        public override IQueryObject<AddressOptionType> GetOptionTypeQuery(int? idType)
+        public override Expression<Func<AddressOptionValue, int?>> ObjectIdSelector
         {
-            return new AddressOptionTypeQuery().WithType((AddressType?) idType);
+            get { return a => a.IdAddress; }
         }
 
-        protected override void FromEntityInternal(AddressDynamic dynamic, Address entity, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<AddressDynamic, Address>> items, bool withDefaults = false)
         {
-            dynamic.IdCustomer = entity.IdCustomer;
-            dynamic.IdCountry = entity.IdCountry;
-            dynamic.County = entity.County;
-            dynamic.IdState = entity.IdState;
-        }
-
-        protected override void UpdateEntityInternal(AddressDynamic dynamic, Address entity)
-        {
-            entity.IdCustomer = dynamic.IdCustomer;
-            entity.IdCountry = dynamic.IdCountry;
-            entity.County = dynamic.County;
-            entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
-            foreach (var value in entity.OptionValues)
+            items.ForEach(item =>
             {
-                value.IdAddress = dynamic.Id;
-            }
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                dynamic.IdCustomer = entity.IdCustomer;
+                dynamic.IdCountry = entity.IdCountry;
+                dynamic.County = entity.County;
+                dynamic.IdState = entity.IdState;
+            });
+            return Task.Delay(0);
         }
 
-        protected override void ToEntityInternal(AddressDynamic dynamic, Address entity)
+        protected override Task UpdateEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
         {
-            entity.IdCustomer = dynamic.IdCustomer;
-            entity.IdCountry = dynamic.IdCountry;
-            entity.County = dynamic.County;
-            entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
-			entity.StatusCode = RecordStatusCode.Active;
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                entity.IdCustomer = dynamic.IdCustomer;
+                entity.IdCountry = dynamic.IdCountry;
+                entity.County = dynamic.County;
+                entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdAddress = dynamic.Id;
+                }
+                entity.StatusCode = RecordStatusCode.Active;
+            });
+            return Task.Delay(0);
+        }
+
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
+        {
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                entity.IdCustomer = dynamic.IdCustomer;
+                entity.IdCountry = dynamic.IdCountry;
+                entity.County = dynamic.County;
+                entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
+                entity.StatusCode = RecordStatusCode.Active;
+            });
+            return Task.Delay(0);
         }
     }
 }

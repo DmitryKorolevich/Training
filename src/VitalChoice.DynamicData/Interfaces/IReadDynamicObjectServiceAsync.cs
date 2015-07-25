@@ -8,7 +8,7 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IReadDynamicObjectRepositoryAsync<T, TEntity> : IReadObjectRepositoryAsync<T, TEntity>
+    public interface IReadDynamicObjectServiceAsync<T, TEntity> : IReadObjectServiceAsync<T, TEntity>
         where TEntity : Entity
     {
         Task<T> SelectAsync(int id, bool withDefaults);
@@ -16,10 +16,14 @@ namespace VitalChoice.DynamicData.Interfaces
         Task<List<T>> SelectAsync(bool withDefaults);
         Task<List<T>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults);
         Task<List<T>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults);
+        Task<List<T>> SelectAsync(IDictionary<string, object> values, bool withDefaults);
+        Task<List<T>> SelectAsync(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults);
         T Select(int id, bool withDefaults);
         List<T> Select(ICollection<int> ids, bool withDefaults);
         List<T> Select(bool withDefaults);
         List<T> Select(IQueryObject<TEntity> queryObject, bool withDefaults);
         List<T> Select(Expression<Func<TEntity, bool>> query, bool withDefaults);
+        List<T> Select(IDictionary<string, object> values, bool withDefaults);
+        List<T> Select(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults);
     }
 }

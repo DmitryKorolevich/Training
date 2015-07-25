@@ -21,6 +21,8 @@ namespace VC.Admin.Validators.Customer
 		public CustomerNoteModelRules()
 		{
 			RuleFor(model => model.Text)
+                .NotEmpty()
+                .WithMessage(model => model.Text, ValidationMessages.FieldRequired)
 				.Length(0, 1000)
 				.WithMessage(model => model.Text, ValidationMessages.FieldLength,
 					1000);

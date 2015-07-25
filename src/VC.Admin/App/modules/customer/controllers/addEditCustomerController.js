@@ -44,6 +44,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+								$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 							} else {
 								toaster.pop('error', 'Error!', "Can't create customer");
 							}
@@ -57,13 +58,18 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							if (result.Success) {
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-								$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
 
 								angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
-									syncCountry(shippingItem);
+								    syncCountry(shippingItem);
+								    if (shippingItem.Default)
+								    {
+								        $scope.shippingAddressTab.Address = shippingItem;
+								    }
 								});
 
 								syncCountry($scope.currentCustomer.ProfileAddress);
+
+								syncDefaultPaymentMethod();
 
 								createCustomerNoteProto();
 
@@ -85,19 +91,19 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	};
 
 	function createCustomerNoteProto() {
-		customerService.createCustomerNotePrototype($scope.addEditTracker)
+	    customerService.createCustomerNotePrototype($scope.addEditTracker)
 									.success(function (result) {
-										if (result.Success) {
-											$scope.customerNotesTab.CustomerNote = result.Data;
-										} else {
-											toaster.pop('error', 'Error!', "Can't process customer notes");
-										}
+									    if (result.Success) {
+									        $scope.customerNotesTab.CustomerNote = result.Data;
+									    } else {
+									        toaster.pop('error', 'Error!', "Can't process customer notes");
+									    }
 									}).
 									error(function (result) {
-										toaster.pop('error', "Error!", "Server error ocurred");
+									    toaster.pop('error', "Error!", "Server error ocurred");
 									})
 									.then(function () {
-										$scope.forms.customerNoteSubmitted = false;
+									    $scope.forms.customerNoteSubmitted = false;
 									});
 	};
 
@@ -177,10 +183,42 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		});
 	};
 
+	function setCountryValidity() {
+		$.each($scope.forms, function (index, form) {
+			if (form && !(typeof form === 'boolean')) {
+				if (form.Country && form.Country.$viewValue && form.Country.$viewValue.Id == 0) {
+					form.Country.$setValidity("required", false);
+				}
+				if (form.State && form.State.$viewValue == 0) {
+					form.State.$setValidity("required", false);
+				}
+			}
+		});
+	};
+
+	function syncDefaultPaymentMethod() {
+		if (!$scope.currentCustomer.ApprovedPaymentMethods || $scope.currentCustomer.ApprovedPaymentMethods.length == 0) {
+			return;
+		}
+
+		if (!$scope.selectedPaymentMethods) {
+			$scope.selectedPaymentMethods = [];
+		}
+
+		angular.forEach($scope.currentCustomer.ApprovedPaymentMethods, function(approvedPM) {
+			$scope.selectedPaymentMethods.push({ Id: approvedPM, Name: $.grep($scope.paymentMethods, function(pm) {
+				return pm.Id == approvedPM;
+			})[0].Name });
+		});
+	};
+
 	$scope.save = function () {
 		clearServerValidation();
 
 		var valid = true;
+
+		setCountryValidity();
+
 		$.each($scope.forms, function (index, form) {
 			if (form && !(typeof form === 'boolean')) {
 				if (!form.$valid && index != 'submitted' && index != 'shippingSubmitted' && index != 'customerNoteSubmitted') {
@@ -261,99 +299,206 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	};
 
 	$scope.makeAsProfileAddress = function() {
-		if ($scope.currentCustomer.sameShipping) {
-			for (var key in $scope.currentCustomer.ProfileAddress) {
+	    if ($scope.currentCustomer.sameShipping) {
+	        var defaultValue = $scope.shippingAddressTab.Address.Default;
+		    for (var key in $scope.currentCustomer.ProfileAddress) {
 				$scope.shippingAddressTab.Address[key] = $scope.currentCustomer.ProfileAddress[key];
 			}
-			$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
+			if ($scope.currentCustomer.newEmail) {
+				$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.newEmail;
+			} else {
+				$scope.shippingAddressTab.Address.Email = $scope.currentCustomer.Email;
+			}
+			$scope.shippingAddressTab.Address.Default = defaultValue;
 			$scope.shippingAddressTab.Address.AddressType = 3;
+			$scope.shippingAddressTab.Address.Id = 0;
 		}
 	};
 
+	function deleteShippingAddressLocal(id) {
+	    var idx = -1;
+
+	    angular.forEach($scope.currentCustomer.Shipping, function (item, index) {
+	        if (item.Id == id) {
+	            idx = index;
+	            return;
+	        }
+	    });
+
+	    $scope.currentCustomer.Shipping.splice(idx, 1);
+	    if (idx < $scope.currentCustomer.Shipping.length) {
+	        $scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[idx];
+	    }
+	    else if ($scope.currentCustomer.Shipping.length > 0) {
+	        $scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+	    }
+	    else {
+	        $scope.setNewAddress();
+	    }
+	}
+
 	$scope.deleteSelectedShipping = function (id) {
-		var idx = -1;
-
-		angular.forEach($scope.currentCustomer.Shipping, function (item, index) {
-			if (item.Id == id) {
-				idx = index;
-				return;
-			}
-		});
-
-		$scope.currentCustomer.Shipping.splice(idx, 1);
-
-		toaster.pop('success', "Success!", "Shipping Address was deleted");
+	    if ($scope.editMode) {
+	        customerService.deleteAddress(id, $scope.addEditTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        deleteShippingAddressLocal(id);
+                        toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
+                    }
+                    else {
+                        successHandler(result);
+                        //toaster.pop('error', 'Error!', "Can't delete shipping address");
+                    }
+                })
+                .error(function (result) {
+                    toaster.pop('error', "Error!", "Server error ocurred");
+                });
+	    }
+	    else {
+	        deleteShippingAddressLocal(id);
+	        toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
+	    }
 	};
 
+	function deleteCustomerNoteLocal(id) {
+	    var idx = -1;
+
+	    angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index) {
+	        if (item.Id == id) {
+	            idx = index;
+	            return;
+	        }
+	    });
+
+	    $scope.currentCustomer.CustomerNotes.splice(idx, 1);
+	}
+
 	$scope.deleteCustomerNote = function(id) {
-		var idx = -1;
-
-		angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index) {
-			if (item.Id == id) {
-				idx = index;
-				return;
-			}
-		});
-
-		$scope.currentCustomer.CustomerNotes.splice(idx, 1);
-
-		toaster.pop('success', "Success!", "Customer note was deleted");
+	    if ($scope.editMode) {
+	        customerService.deleteNote(id, $scope.addEditTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        deleteCustomerNoteLocal(id);
+                        toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
+                    }
+                    else {
+                        successHandler(result);
+                        //toaster.pop('error', 'Error!', "Can't delete customer note");
+                    }
+                })
+                .error(function (result) {
+                    toaster.pop('error', "Error!", "Server error ocurred");
+                });
+	    }
+	    else {
+	        deleteCustomerNoteLocal(id);
+	        toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
+	    }
 	};
 
 	$scope.addNewCustomerNote = function () {
-		clearServerValidation();
+	    clearServerValidation();
 
-		if ($scope.forms.customerNote.$valid) {
-			$scope.currentCustomer.CustomerNotes.push(angular.copy($scope.customerNotesTab.CustomerNote));
+	    if ($scope.forms.customerNote.$valid) {
+	        if ($scope.editMode) {
+	            customerService.addNote($scope.customerNotesTab.CustomerNote, $scope.currentCustomer.Id, $scope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            $scope.currentCustomer.CustomerNotes.push(result.Data);
+                            updateCustomerNoteUIId();
+                            createCustomerNoteProto();
+                            toaster.pop('success', "Success!", "Customer Note was succesfully added");
+                        }
+                        else {
+                            successHandler(result);
+                            //toaster.pop('error', 'Error!', "Can't add Customer Note");
+                        }
+                    })
+                    .error(function (result) {
+                        toaster.pop('error', "Error!", "Server error ocurred");
+                    });
+	        }
+	        else {
+	            $scope.currentCustomer.CustomerNotes.push(angular.copy($scope.customerNotesTab.CustomerNote));
+	            updateCustomerNoteUIId();
+	            createCustomerNoteProto();
+	        }
+	    } else {
+	        $scope.forms.customerNoteSubmitted = true;
+	    }
+	};
 
-			updateCustomerNoteUIId();
-
-			createCustomerNoteProto();
-		} else {
-			$scope.forms.customerNoteSubmitted = true;
-		}
+	$scope.cancelAddNewShipping = function () {
+	    $scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+	    $scope.shippingAddressTab.NewAddress = false;
 	};
 
 	$scope.addNewShipping = function () {
-		clearServerValidation();
+	    clearServerValidation();
 
-		if ($scope.forms.shipping.$valid) {
-			$scope.currentCustomer.Shipping.push(angular.copy($scope.shippingAddressTab.Address));
-			$scope.shippingAddressTab.NewAddress = false;
-		} else {
-			$scope.forms.shippingSubmitted = true;
-		}
+	    setCountryValidity();
+
+	    if ($scope.forms.shipping.$valid) {
+	        if ($scope.editMode) {
+	            customerService.addAddress($scope.shippingAddressTab.Address, $scope.currentCustomer.Id, $scope.addEditTracker).success(function (result) {
+	                if (result.Success) {
+	                    syncCountry(result.Data);
+	                    $scope.currentCustomer.Shipping.push(result.Data);
+	                    $scope.shippingAddressTab.Address = result.Data;
+	                    $scope.shippingAddressTab.NewAddress = false;
+	                    toaster.pop('success', "Success!", "Customer address was succesfully added");
+	                }
+	                else {
+	                    successHandler(result);
+	                    //toaster.pop('error', 'Error!', "Can't add shipping address");
+	                }
+	            }).
+                error(function (result) {
+                    toaster.pop('error', "Error!", "Server error ocurred");
+                });
+	        }
+	        else {
+	            var newAddress = angular.copy($scope.shippingAddressTab.Address);
+	            syncCountry(newAddress);
+	            $scope.currentCustomer.Shipping.push(newAddress);
+	            $scope.shippingAddressTab.NewAddress = false;
+	        }
+	    } else {
+	        $scope.forms.shippingSubmitted = true;
+	    }
 	};
 
 	$scope.setNewAddress = function () {
-		if ($scope.shippingAddressTab.NewAddress) {
-			customerService.createAddressPrototype($scope.addEditTracker)
-				.success(function(result) {
-					if (result.Success) {
-						$scope.shippingAddressTab.Address = result.Data;
-					} else {
-						toaster.pop('error', 'Error!', "Can't add shipping address");
-					}
-				}).
-				error(function(result) {
-					toaster.pop('error', "Error!", "Server error ocurred");
-				})
-				.then(function() {
-					$scope.forms.shippingSubmitted = false;
-					//$scope.forms.submitted = false;
-					//$scope.forms.customerNoteSubmitted = false;
-				});
-		} else {
-			//$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
-		}
-
-		return false;
+	    customerService.createAddressPrototype($scope.addEditTracker)
+            .success(function (result) {
+                if (result.Success) {
+                    $scope.currentCustomer.sameShipping = false;
+                    $scope.shippingAddressTab.NewAddress = true;
+                    $scope.shippingAddressTab.Address = result.Data;
+                } else {
+                    successHandler(result);
+                    //toaster.pop('error', 'Error!', "Can't add shipping address");
+                }
+            }).
+            error(function (result) {
+                toaster.pop('error', "Error!", "Server error ocurred");
+            })
+            .then(function () {
+                $scope.forms.shippingSubmitted = false;
+                //$scope.forms.submitted = false;
+                //$scope.forms.customerNoteSubmitted = false;
+            });
+	    return false;
 	};
 
-	$scope.setDefaultAddress = function() {
+	$scope.setDefaultAddress = function(id) {
 		angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
-			if (shippingItem != $scope.shippingAddressTab.Address) {
+		    if (shippingItem.Id != id && shippingItem.Default) {
 				shippingItem.Default = false;
+			}
+		    else if (shippingItem.Id == id)
+			{
+			    shippingItem.Default = true;
 			}
 		});
 	};

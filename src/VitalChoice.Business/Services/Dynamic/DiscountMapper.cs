@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Helpers;
@@ -9,6 +11,8 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -21,126 +25,152 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override IQueryObject<DiscountOptionType> GetOptionTypeQuery(int? idType)
+        public override Expression<Func<DiscountOptionValue, int?>> ObjectIdSelector
         {
-            return new DiscountOptionTypeQuery().WithType((DiscountType?)idType);
+            get { return c => c.IdDiscount; }
         }
 
-        protected override void FromEntityInternal(DiscountDynamic dynamic, Discount entity, bool withDefaults = false)
+        public override IQueryOptionType<DiscountOptionType> GetOptionTypeQuery()
         {
-            dynamic.Code = entity.Code;
-            dynamic.Description = entity.Description;
-            dynamic.Assigned = entity.Assigned;
-            dynamic.StartDate = entity.StartDate;
-            dynamic.ExpirationDate = entity.ExpirationDate;
-            dynamic.ExcludeSkus = entity.ExcludeSkus;
-            dynamic.ExcludeCategories = entity.ExcludeCategories;
-            dynamic.IdAddedBy = entity.IdAddedBy;
-
-            dynamic.CategoryIds = entity.DiscountsToCategories?.Select(p => p.IdCategory).ToList();
-            dynamic.DiscountsToSkus = entity.DiscountsToSkus?.ToList();
-            dynamic.DiscountsToSelectedSkus = entity.DiscountsToSelectedSkus?.ToList();
-            dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
+            return new DiscountOptionTypeQuery();
         }
 
-        protected override void UpdateEntityInternal(DiscountDynamic dynamic, Discount entity)
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
         {
-            SetDiscountTiersOrdering(dynamic.DiscountTiers);
-            entity.Code = dynamic.Code;
-            entity.Description = dynamic.Description;
-            entity.Assigned = dynamic.Assigned;
-            entity.StartDate = dynamic.StartDate;
-            entity.ExpirationDate = dynamic.ExpirationDate;
-            entity.ExcludeSkus = dynamic.ExcludeSkus;
-            entity.ExcludeCategories = dynamic.ExcludeCategories;
-            entity.IdAddedBy = entity.IdAddedBy;
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
 
-            entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
-            {
-                IdCategory = c,
-                IdDiscount = dynamic.Id
-            }).ToList();
-            if (dynamic.DiscountsToSkus != null)
-            {
-                foreach (var item in dynamic.DiscountsToSkus)
-                {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
-                }
-                entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
-            }
-            if (dynamic.DiscountsToSelectedSkus != null)
-            {
-                foreach (var item in dynamic.DiscountsToSelectedSkus)
-                {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
-                }
-                entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
-            }
-            if (dynamic.DiscountTiers != null)
-            {
-                foreach (var item in dynamic.DiscountTiers)
-                {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
-                }
-                entity.DiscountTiers = dynamic.DiscountTiers.ToList();
-            }
+                dynamic.Code = entity.Code;
+                dynamic.Description = entity.Description;
+                dynamic.Assigned = entity.Assigned;
+                dynamic.StartDate = entity.StartDate;
+                dynamic.ExpirationDate = entity.ExpirationDate;
+                dynamic.ExcludeSkus = entity.ExcludeSkus;
+                dynamic.ExcludeCategories = entity.ExcludeCategories;
+                dynamic.IdAddedBy = entity.IdAddedBy;
 
-            //Set key on options
-            foreach (var value in entity.OptionValues)
-            {
-                value.IdDiscount = dynamic.Id;
-            }
+                dynamic.CategoryIds = entity.DiscountsToCategories?.Select(p => p.IdCategory).ToList();
+                dynamic.DiscountsToSkus = entity.DiscountsToSkus?.ToList();
+                dynamic.DiscountsToSelectedSkus = entity.DiscountsToSelectedSkus?.ToList();
+                dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
+            });
+            return Task.Delay(0);
         }
 
-        protected override void ToEntityInternal(DiscountDynamic dynamic, Discount entity)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items)
         {
-            SetDiscountTiersOrdering(dynamic.DiscountTiers);
-            entity.Code = dynamic.Code;
-            entity.Description = dynamic.Description;
-            entity.Assigned = dynamic.Assigned;
-            entity.StartDate = dynamic.StartDate;
-            entity.ExpirationDate = dynamic.ExpirationDate;
-            entity.ExcludeSkus = dynamic.ExcludeSkus;
-            entity.ExcludeCategories = dynamic.ExcludeCategories;
-            entity.IdAddedBy = entity.IdEditedBy;
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
 
-            entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
-            {
-                IdCategory = c,
-                IdDiscount = dynamic.Id
-            }).ToList();
-            if (dynamic.DiscountsToSkus != null)
-            {
-                foreach (var item in dynamic.DiscountsToSkus)
+                SetDiscountTiersOrdering(dynamic.DiscountTiers);
+                entity.Code = dynamic.Code;
+                entity.Description = dynamic.Description;
+                entity.Assigned = dynamic.Assigned;
+                entity.StartDate = dynamic.StartDate;
+                entity.ExpirationDate = dynamic.ExpirationDate;
+                entity.ExcludeSkus = dynamic.ExcludeSkus;
+                entity.ExcludeCategories = dynamic.ExcludeCategories;
+                entity.IdAddedBy = entity.IdAddedBy;
+
+                entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
                 {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
-                }
-                entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
-            }
-            if (dynamic.DiscountsToSelectedSkus != null)
-            {
-                foreach (var item in dynamic.DiscountsToSelectedSkus)
+                    IdCategory = c,
+                    IdDiscount = dynamic.Id
+                }).ToList();
+                if (dynamic.DiscountsToSkus != null)
                 {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
+                    foreach (var item in dynamic.DiscountsToSkus)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
                 }
-                entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
-            }
-            if (dynamic.DiscountTiers != null)
-            {
-                foreach (var item in dynamic.DiscountTiers)
+                if (dynamic.DiscountsToSelectedSkus != null)
                 {
-                    item.Id = 0;
-                    item.IdDiscount = dynamic.Id;
+                    foreach (var item in dynamic.DiscountsToSelectedSkus)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
                 }
-                entity.DiscountTiers = dynamic.DiscountTiers.ToList();
-            }
+                if (dynamic.DiscountTiers != null)
+                {
+                    foreach (var item in dynamic.DiscountTiers)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountTiers = dynamic.DiscountTiers.ToList();
+                }
+
+                //Set key on options
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdDiscount = dynamic.Id;
+                }
+            });
+            return Task.Delay(0);
         }
 
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items)
+        {
+            items.ForEach(pair =>
+            {
+                var entity = pair.Entity;
+                var dynamic = pair.Dynamic;
+
+                SetDiscountTiersOrdering(dynamic.DiscountTiers);
+                entity.Code = dynamic.Code;
+                entity.Description = dynamic.Description;
+                entity.Assigned = dynamic.Assigned;
+                entity.StartDate = dynamic.StartDate;
+                entity.ExpirationDate = dynamic.ExpirationDate;
+                entity.ExcludeSkus = dynamic.ExcludeSkus;
+                entity.ExcludeCategories = dynamic.ExcludeCategories;
+                entity.IdAddedBy = entity.IdEditedBy;
+
+                entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
+                {
+                    IdCategory = c,
+                    IdDiscount = dynamic.Id
+                }).ToList();
+                if (dynamic.DiscountsToSkus != null)
+                {
+                    foreach (var item in dynamic.DiscountsToSkus)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
+                }
+                if (dynamic.DiscountsToSelectedSkus != null)
+                {
+                    foreach (var item in dynamic.DiscountsToSelectedSkus)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
+                }
+                if (dynamic.DiscountTiers != null)
+                {
+                    foreach (var item in dynamic.DiscountTiers)
+                    {
+                        item.Id = 0;
+                        item.IdDiscount = dynamic.Id;
+                    }
+                    entity.DiscountTiers = dynamic.DiscountTiers.ToList();
+                }
+            });
+            return Task.Delay(0);
+        }
+        
         private static void SetDiscountTiersOrdering(IEnumerable<DiscountTier> tiers)
         {
             int order = 0;

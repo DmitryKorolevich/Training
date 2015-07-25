@@ -79,7 +79,7 @@ namespace VC.Admin.Models.Product
             Updated = item.ContentItem.Updated;
             if (item.ContentItem.ContentItemToContentProcessors != null)
             {
-                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentProcessorId).ToList();
+                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentItemProcessorId).ToList();
             }
             else
             {
@@ -116,7 +116,7 @@ namespace VC.Admin.Models.Product
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
                 {
-                    ContentProcessorId = p,
+                    ContentItemProcessorId = p,
                 }).ToList();
             }
 

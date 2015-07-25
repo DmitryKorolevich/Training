@@ -31,7 +31,7 @@ using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: DynamicObjectServiceAsync<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
+    public class CustomerService: EcommerceDynamicObjectService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
@@ -44,17 +44,21 @@ namespace VitalChoice.Business.Services.Customers
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
 
-	    protected override IUnitOfWorkAsync CreateUnitOfWork()
-        {
-            return new EcommerceUnitOfWork();
-        }
-
         public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper, IEcommerceRepositoryAsync<Address> addressesRepositoryAsync, IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync, IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync, IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync, IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync)
-            : base(customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync, bigStringRepositoryAsync)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
+            IEcommerceRepositoryAsync<Address> addressesRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync,
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
+            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<User> userRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync)
+            : base(
+                customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -63,9 +67,9 @@ namespace VitalChoice.Business.Services.Customers
             _customerNotesRepositoryAsync = customerNotesRepositoryAsync;
             _customerToOrderNoteRepositoryAsync = customerToOrderNoteRepositoryAsync;
             _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
-	        _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
-	        _adminProfileRepository = adminProfileRepository;
-	        _userRepositoryAsync = userRepositoryAsync;
+            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+            _adminProfileRepository = adminProfileRepository;
+            _userRepositoryAsync = userRepositoryAsync;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -87,45 +91,100 @@ namespace VitalChoice.Business.Services.Customers
 						.Build());
 			}
 
-	        if (model.Addresses.Where(x=>x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted).All(x => !x.Data.Default))
-	        {
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
-			}
+            if (
+                model.Addresses.Where(
+                    x => x.IdObjectType == (int) AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted)
+                    .All(x => !x.Data.Default))
+            {
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
+            }
 
-			return errors;
+            return errors;
 		}
 
         protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+            var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
+            var customerNotesRepositoryAsync = uow.RepositoryAsync<CustomerNote>();
+            var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
+            var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-            await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
-            await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
+            entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
+			entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
+
+			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
+			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
+
             await uow.SaveChangesAsync();
+
+            entity.Addresses =
+                await
+                    addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(a => a.OptionValues)
+                        .SelectAsync();
+            entity.CustomerNotes =
+                await
+                    customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(n => n.OptionValues)
+                        .SelectAsync();
+            foreach (var address in entity.Addresses)
+            {
+                await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
+            }
+            foreach (var note in entity.CustomerNotes)
+            {
+                await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
+            }
         }
 
         protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
-			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
-			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+            var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
+            var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+            var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
+            var notesRepositoryAsync = uow.RepositoryAsync<CustomerNote>();
+            var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
+            var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-			await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
-       	    await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
-		}
+            foreach (var address in entity.Addresses.Where(a => a.StatusCode != RecordStatusCode.Deleted))
+            {
+                await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
+            }
+            foreach (var customerNote in entity.CustomerNotes.Where(a => a.StatusCode != RecordStatusCode.Deleted))
+            {
+                await customerNoteOptionValuesRepositoryAsync.InsertRangeAsync(customerNote.OptionValues);
+            }
+            await addressesRepositoryAsync.DeleteAllAsync(entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+            await notesRepositoryAsync.DeleteAllAsync(entity.CustomerNotes.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+            await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
+            await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
+        }
 
-        protected override async Task AfterSelect(Customer entity, bool tracked = false)
+        protected override async Task AfterSelect(Customer entity)
         {
             entity.Addresses =
                 await
                     _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(a => a.OptionValues)
-                        .SelectAsync(tracked);
+                        .SelectAsync(false);
             entity.CustomerNotes =
                 await
                     _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
                         .Include(n => n.OptionValues)
-                        .SelectAsync(tracked);
+                        .SelectAsync(false);
+            entity.OrderNotes =
+                await
+                    _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+                        .Include(n => n.OrderNote)
+                        .SelectAsync(false);
+            entity.PaymentMethods =
+                await
+                    _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
+                        .Include(p => p.PaymentMethod)
+                        .SelectAsync(false);
 		}
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
@@ -133,9 +192,7 @@ namespace VitalChoice.Business.Services.Customers
             return query
                 .Include(p => p.DefaultPaymentMethod)
                 .Include(p => p.User)
-                .ThenInclude(u => u.Customer)
-                .Include(p => p.PaymentMethods)
-                .Include(p => p.OrderNotes);
+                .ThenInclude(p => p.Customer);
         }
 
         protected async override Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VitalChoice.DynamicData.Helpers
 {
@@ -43,14 +44,11 @@ namespace VitalChoice.DynamicData.Helpers
             }
         }
 
-        public static void RemoveAll<T>(this ICollection<T> collection, Func<T, bool> condition)
+        public static async Task AddRangeAsync<T>(this ICollection<T> collection, IEnumerable<Task<T>> items)
         {
-            foreach (var item in collection)
+            foreach (var item in items)
             {
-                if (condition(item))
-                {
-                    collection.Remove(item);
-                }
+                collection.Add(await item);
             }
         }
     }

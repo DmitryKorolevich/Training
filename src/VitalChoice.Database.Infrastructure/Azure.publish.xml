@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>VitalChoice.Infrastructure</TargetDatabaseName>
     <DeployScriptFileName>VitalChoice.Database.Infrastructure.sql</DeployScriptFileName>
-    <TargetConnectionString>Server=tcp:oz449vjvis.database.windows.net,1433;Database=VitalChoice.Infrastructure;User ID=multiarc@oz449vjvis;Password=EWhd59G8cgwEWvRap5AP3JPq;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</TargetConnectionString>
+    <TargetConnectionString>Server=tcp:vw4v86cs0h.database.windows.net,1433;Database=VitalChoice.Infrastructure;User ID=multiarc@vw4v86cs0h;Password=EWhd59G8cgwEWvRap5AP3JPq;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
   </PropertyGroup>
 </Project>

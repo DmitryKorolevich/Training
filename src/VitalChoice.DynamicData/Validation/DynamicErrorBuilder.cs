@@ -9,7 +9,7 @@ using VitalChoice.DynamicData.Validation.Abstractions;
 
 namespace VitalChoice.DynamicData.Validation
 {
-    public class DynamicErrorBuilder<TProperty> : ErrorBuilderBase<TProperty>, IDynamicErrorBuilder<TProperty> 
+    public class DynamicErrorBuilder<TProperty> : ErrorBuilderBase<TProperty>, IDynamicErrorBuilder<TProperty>, IErrorResult 
         where TProperty: class, IModelTypeContainer
     {
         public DynamicErrorBuilder(TProperty obj, string collectionName = null, int[] indexes = null,
@@ -97,5 +97,6 @@ namespace VitalChoice.DynamicData.Validation
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
         }
+
     }
 }

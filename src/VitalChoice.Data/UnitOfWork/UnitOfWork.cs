@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Relational;
-using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;
@@ -48,9 +47,9 @@ namespace VitalChoice.Data.UnitOfWork
             _disposed = true;
         }
 
-		public IRelationalTransaction BeginTransaction()
+	    public RelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 		{
-			return new TransactionManager(_dataContext).BeginTransaction();
+			return new TransactionManager(_dataContext).BeginTransaction(isolation);
 		}
 
 		#endregion Constuctor/Dispose

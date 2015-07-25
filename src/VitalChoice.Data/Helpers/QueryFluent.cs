@@ -48,6 +48,11 @@ namespace VitalChoice.Data.Helpers
             _expression = expression;
         }
 
+        public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
+        {
+            return await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector).ToListAsync();
+        }
+
         public async Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true)
         {
             return (await SelectAsync(tracking)).FirstOrDefault();
@@ -56,6 +61,12 @@ namespace VitalChoice.Data.Helpers
         public IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {
             Query = Query.Where(predicate);
+            return this;
+        }
+
+        public IQueryFluent<TEntity> Distinct()
+        {
+            Query = Query.Distinct();
             return this;
         }
 

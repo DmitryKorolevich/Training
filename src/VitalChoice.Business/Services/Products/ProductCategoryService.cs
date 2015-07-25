@@ -114,7 +114,8 @@ namespace VitalChoice.Business.Services.Products
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
-                var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == model.ParentId && p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
+                var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == model.ParentId && 
+                                                                                      p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
                 if(!parentExist)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");

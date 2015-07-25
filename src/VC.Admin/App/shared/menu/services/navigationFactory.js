@@ -103,7 +103,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageCountries', stateName: 'index.oneCol.manageCountries', stateLabel: 'Manage Countries / States', access: 10 },
 				{ name: 'manageSettings', stateName: 'index.oneCol.manageSettings', stateLabel: 'Global Settings', access: null },
 				{ name: 'managePaymentMethods', stateName: 'index.oneCol.managePaymentMethods', stateLabel: 'Manage Payment Methods', access: null }, //only for super admins
-				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Order Specific Notes', access: null }
+				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Automatic Order Specific Notes', access: null }
 			]
 		},
 		{

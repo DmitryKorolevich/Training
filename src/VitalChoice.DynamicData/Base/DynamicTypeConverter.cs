@@ -8,11 +8,11 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public class DynamicTypeConverter
+    public class ModelTypeConverter
     {
         private readonly IIndex<Type, IDynamicToModelMapper> _mappers;
 
-        public DynamicTypeConverter(IIndex<Type, IDynamicToModelMapper> mappers)
+        public ModelTypeConverter(IIndex<Type, IDynamicToModelMapper> mappers)
         {
             _mappers = mappers;
         }

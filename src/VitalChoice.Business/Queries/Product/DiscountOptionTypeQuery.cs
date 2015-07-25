@@ -4,15 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.Business.Queries.Product
 {
-    public class DiscountOptionTypeQuery : QueryObject<DiscountOptionType>
+    public class DiscountOptionTypeQuery : OptionTypeQuery<DiscountOptionType>
     {
-        public DiscountOptionTypeQuery WithType(DiscountType? idType)
+        public override IQueryOptionType<DiscountOptionType> WithObjectType(int? objectType)
         {
-            int? idObjectType = (int?)idType;
-            Add(d => d.IdObjectType == idObjectType);
+            Add(d => d.IdObjectType == objectType);
             return this;
         }
     }

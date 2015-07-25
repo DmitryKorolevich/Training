@@ -72,7 +72,7 @@ namespace VC.Admin.Models.ContentManagement
             MasterContentItemId = item.MasterContentItemId;
             if (item.ContentItem.ContentItemToContentProcessors != null)
             {
-                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentProcessorId).ToList();
+                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentItemProcessorId).ToList();
             }
             else
             {
@@ -105,7 +105,7 @@ namespace VC.Admin.Models.ContentManagement
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
                 {
-                    ContentProcessorId = p,
+                    ContentItemProcessorId = p,
                 }).ToList();
             }
 

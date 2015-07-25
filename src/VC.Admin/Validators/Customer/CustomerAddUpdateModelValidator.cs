@@ -75,8 +75,6 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.TradeClass, ValidationMessages.FieldRequired);
 
 				RuleFor(model => model.LinkedToAffiliate)
-					.NotEmpty()
-					.WithMessage(model => model.LinkedToAffiliate, ValidationMessages.FieldRequired)
 					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.WithMessage(model => model.LinkedToAffiliate, ValidationMessages.FieldLength,
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
@@ -99,10 +97,10 @@ namespace VC.Admin.Validators.Customer
 						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
 					.EmailAddress()
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
-					.Equal(x => x.EmailConfirm)
+					.Equal(x => x.Email)
 					.WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
 
-				RuleFor(model => model.DefaultPaymentMethod)
+                RuleFor(model => model.DefaultPaymentMethod)
 					.Must(model => model.HasValue)
 					.WithMessage(model => model.DefaultPaymentMethod, ValidationMessages.FieldRequired);
 
@@ -117,10 +115,6 @@ namespace VC.Admin.Validators.Customer
 				RuleFor(model => model.ApprovedPaymentMethods)
 					.Must(model => model.Any())
 					.WithMessage(model => model.ApprovedPaymentMethods, ValidationMessages.AtLeastOnePaymentMethod);
-
-				RuleFor(model => model.OrderNotes)
-					.Must(model => model.Any())
-					.WithMessage(model => model.OrderNotes, ValidationMessages.AtLeastOneOrderNote);
 			}
 		}
 	}

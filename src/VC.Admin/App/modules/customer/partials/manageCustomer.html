@@ -5,7 +5,7 @@
 				<button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
 			</div>
 			<div class="margin-top-10px">
-				<button ui-sref="index.oneCol.customersList" class="btn btn-default width-160px">Cancel</button>
+				<button ui-sref="index.oneCol.manageCustomers" class="btn btn-default width-160px">Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -42,7 +42,7 @@
                                             <div class="form-group">
                                                 <label for="website" class="col-md-3 control-label">Website</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100">
+                                                    <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted && forms.profile.Website.$invalid">
                                                         <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
                                                         <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
@@ -87,7 +87,7 @@
                                                 <label class="col-md-3 control-label">Inception Date</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required/>
+                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" />
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
@@ -103,9 +103,8 @@
                                         <div class="form-group">
                                             <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                             <div class="col-md-9">
-                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" required data-ng-maxlength="100">
+                                                <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.LinkedToAffiliate.$invalid">
-                                                    <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Linked to Affiliate")}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
                                                 </div>
@@ -121,7 +120,7 @@
                                         <div class="form-group">
                                             <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100">
+                                                <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.Email.$invalid">
                                                     <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                     <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
@@ -133,7 +132,7 @@
                                         <div class="form-group">
                                             <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                             <div class="col-md-9">
-                                                <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100">
+                                                <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
                                                 <div class="error-container" ng-show="forms.submitted && forms.profile.EmailConfirm.$invalid">
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
@@ -210,7 +209,7 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="paymentMethod in paymentMethods">
-                                                    <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1">
+                                                    <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1" autocomplete="off">
                                                     {{paymentMethod.Name}}
                                                 </label>
                                             </div>
@@ -232,7 +231,7 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="orderNote in orderNotes">
-                                                    <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1">
+                                                    <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1" autocomplete="off">
                                                     {{orderNote.Name}}
                                                 </label>
                                             </div>
@@ -242,11 +241,11 @@
                                             <div class="col-md-3"></div>
                                             <div class="col-md-9">
                                                 <label class="checkbox-inline col-md-3">
-                                                    <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail">
+                                                    <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off">
                                                     Do Not Mail
                                                 </label>
                                                 <label class="checkbox-inline col-md-3">
-                                                    <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent">
+                                                    <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off">
                                                     Do Not Rent
                                                 </label>
                                             </div>
@@ -294,7 +293,7 @@
 						    <div class="well row">
 						        <div class="col-md-6">
 						            <spinner-overlay data-loading="addEditTracker.active()">
-						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate> <!--data-ng-submit="addNewCustomerNote()"-->
+						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate>
 						                    <fieldset>
 						                        <span class="legend">Customer Notes</span>
 						                        <div class="form-group">
@@ -312,13 +311,12 @@
 						                            <div class="col-md-9">
 						                                <textarea type="text" name="Text" class="form-control" data-ng-model="customerNotesTab.CustomerNote.Text" id="note" placeholder="Note" rows="10"  data-ng-maxlength="1000"></textarea> <!--data-ng-required="editMode"-->
 						                                <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Text.$invalid">
-						                                    <small class="error" ng-show="forms.customerNote.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Note")}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Note", "1000"])}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.server">{{serverMessages.GetMessage('Text')}}</small>
 						                                </div>
 						                            </div>
 						                        </div>
-						                        <div class="form-group">
+						                        <div class="form-group" data-ng-if="editMode">
 						                            <div class="col-md-3">
 						                                <button class="btn btn-info" data-ng-click="addNewCustomerNote();">Add Customer Note</button>
 						                            </div>
@@ -327,23 +325,23 @@
 						                </form>
 						            </spinner-overlay>
 						        </div>
-						        <div class="col-md-12">
+						        <div class="col-md-12" data-ng-if="editMode">
 						            <table class="table table-striped table-hover ">
 						                <thead>
 						                <tr>
 						                    <th>Priority</th>
 						                    <th>Notes</th>
-						                    <th>Agent</th>
+						                    <th>Added</th>
 						                    <th>Actions</th>
 						                </tr>
 						                </thead>
 						                <tbody>
-						                <tr data-ng-repeat="note in currentCustomer.CustomerNotes track by note.UIId | orderBy:DateEdited:reverse">
+						                <tr data-ng-repeat="note in currentCustomer.CustomerNotes track by note.Id | orderBy:DateEdited:reverse">
 						                    <td>{{getReferenceItem(ReferenceData.CustomerNotePriorities, note.Priority).Text}}</td>
 						                    <td>{{note.Text}}</td>
 						                    <td>{{note.DateEdited | date:"MM/dd/yy"}}<br/>{{note.DateEdited | date:"h:mm a"}}<br/>{{note.EditedBy}}</td>
 						                    <td>
-						                        <button class="btn btn-default btn-danger" data-ng-click="deleteCustomerNote(note.UIId);">Delete</button>
+						                        <button class="btn btn-default btn-danger" data-ng-click="deleteCustomerNote(note.Id);">Delete</button>
 						                    </td>
 						                </tr>
 						                </tbody>

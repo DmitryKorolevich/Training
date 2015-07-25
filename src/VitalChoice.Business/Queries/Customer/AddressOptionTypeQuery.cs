@@ -4,16 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.Business.Queries.Customer
 {
-    public class AddressOptionTypeQuery : QueryObject<AddressOptionType>
+    public class AddressOptionTypeQuery : OptionTypeQuery<CustomerNoteOptionType>
     {
-        public AddressOptionTypeQuery WithType(AddressType? type)
+        public override IQueryOptionType<CustomerNoteOptionType> WithObjectType(int? objectType)
         {
-            int? idObjectType = (int?) type;
-            Add(t => t.IdObjectType == idObjectType);
-            if (type.HasValue)
+            Add(t => t.IdObjectType == objectType);
+            if (objectType.HasValue)
             {
                 Or(t => t.IdObjectType == null);
             }
