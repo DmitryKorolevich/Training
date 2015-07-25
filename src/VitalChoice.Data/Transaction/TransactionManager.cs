@@ -2,6 +2,7 @@
 using System.Data;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Relational;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.DataContext;
 
 namespace VitalChoice.Data.Transaction
@@ -15,9 +16,9 @@ namespace VitalChoice.Data.Transaction
 		    this._dataContext = (DbContext)dataContext;
 	    }
 
-	    public RelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 	    {
-			return _dataContext.Database.AsRelational().Connection.BeginTransaction(isolation);
+			return _dataContext.Database.BeginTransaction(isolation);
 		}
     }
 }

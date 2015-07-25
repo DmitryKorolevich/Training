@@ -70,7 +70,7 @@ namespace VitalChoice.Business.Services.Products
                 .Include(p => p.DiscountsToCategories);
         }
 
-        protected override async Task AfterSelect(Discount entity, bool tracked = false)
+        protected override async Task AfterSelect(Discount entity)
         {
             var skuIds = new HashSet<int>(entity.DiscountsToSelectedSkus.Select(p => p.IdSku));
             foreach (var id in entity.DiscountsToSkus.Select(p => p.IdSku))

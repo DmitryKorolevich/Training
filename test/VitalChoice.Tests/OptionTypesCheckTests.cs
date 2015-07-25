@@ -8,7 +8,6 @@ namespace VitalChoice.Tests
 {
     public class OptionTypesCheckTests
     {
-        [Fact]
         public void ProductModelMappingTest()
         {
             

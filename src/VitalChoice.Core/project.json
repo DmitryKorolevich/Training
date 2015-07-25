@@ -15,19 +15,17 @@
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
-    "VitalChoice.Business": "1.0.0-*"
+    "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.DynamicData" : "1.0.0-*"
   },
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] },
       "dependencies": {
         "Microsoft.Framework.Logging.NLog" : "1.0.0-*"
       }
     },
     "dnxcore50": {
-      "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.20-*",
         "System.Diagnostics.Process": "4.0.0-*"
