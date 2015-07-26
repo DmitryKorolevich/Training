@@ -4,6 +4,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Addresses
 {
     public class AddressOptionValue : OptionValue<AddressOptionType>
     {
-        public int? IdAddress { get; set; }
+        public int IdAddress { get; set; }
     }
 }

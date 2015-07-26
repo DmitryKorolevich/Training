@@ -43,5 +43,8 @@ namespace VitalChoice.Domain.Transfer.Base
 	    public List<LookupItem<int>> TradeClasses { get; set; }
 
 	    public List<LookupItem<int>> CustomerNotePriorities { get; set; }
+        public IList<LookupItem<int>> OacTerms { get; set; }
+        public IList<LookupItem<int>> OacFob { get; set; }
+        public IList<LookupItem<int>> CreditCardTypes { get; set; }
     }
 }

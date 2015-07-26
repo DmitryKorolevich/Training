@@ -17,7 +17,7 @@
 						<div class="container container-left">
 						<div class="well row">
                             <spinner-overlay data-loading="addEditTracker.active()">
-                                <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted['profile']}" novalidate>
                                     <fieldset>
                                         <span class="legend">Customer Type</span>
                                         <div class="form-group">
@@ -33,7 +33,7 @@
                                                 <div class="col-md-9">
                                                     <select class="form-control" name="TaxExempt" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts" required>
                                                     </select>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.TaxExempt.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.TaxExempt.$invalid">
                                                         <small class="error" ng-show="forms.profile.TaxExempt.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tax Exempt")}}</small>
                                                         <small class="error" ng-show="forms.profile.TaxExempt.$error.server">{{serverMessages.GetMessage('TaxExempt')}}</small>
                                                     </div>
@@ -43,7 +43,7 @@
                                                 <label for="website" class="col-md-3 control-label">Website</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.Website.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Website.$invalid">
                                                         <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
                                                         <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
                                                         <small class="error" ng-show="forms.profile.Website.$error.server">{{serverMessages.GetMessage('Website')}}</small>
@@ -54,7 +54,7 @@
                                                 <label for="promoting" class="col-md-3 control-label">Promoting Websites</label>
                                                 <div class="col-md-9">
                                                     <textarea type="text" name="PromotingWebsites" class="form-control" data-ng-model="currentCustomer.PromotingWebsites" id="promoting" placeholder="Promoting Websites" rows="10" required data-ng-maxlength="1000"></textarea>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.PromotingWebsites.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.PromotingWebsites.$invalid">
                                                         <small class="error" ng-show="forms.profile.PromotingWebsites.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Promoting Websites")}}</small>
                                                         <small class="error" ng-show="forms.profile.PromotingWebsites.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Promoting Websites", "1000"])}}</small>
                                                         <small class="error" ng-show="forms.profile.PromotingWebsites.$error.server">{{serverMessages.GetMessage('Promoting Websites')}}</small>
@@ -66,7 +66,7 @@
                                                 <div class="col-md-9">
                                                     <select class="form-control" id="tier" name="Tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers" required>
                                                     </select>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.Tier.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Tier.$invalid">
                                                         <small class="error" ng-show="forms.profile.Tier.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tier")}}</small>
                                                         <small class="error" ng-show="forms.profile.Tier.$error.server">{{serverMessages.GetMessage('Tier')}}</small>
                                                     </div>
@@ -77,7 +77,7 @@
                                                 <div class="col-md-9">
                                                     <select class="form-control" name="TradeClass" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses" required>
                                                     </select>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.TradeClass.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.TradeClass.$invalid">
                                                         <small class="error" ng-show="forms.profile.TradeClass.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Trade Class")}}</small>
                                                         <small class="error" ng-show="forms.profile.TradeClass.$error.server">{{serverMessages.GetMessage('TradeClass')}}</small>
                                                     </div>
@@ -92,7 +92,7 @@
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
                                                     </p>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.profile.InceptionDate.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.InceptionDate.$invalid">
                                                         <small class="error" ng-show="forms.profile.InceptionDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Inception Date")}}</small>
                                                         <small class="error" ng-show="forms.profile.InceptionDate.$error.server">{{serverMessages.GetMessage('InceptionDate')}}</small>
                                                     </div>
@@ -104,7 +104,7 @@
                                             <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                             <div class="col-md-9">
                                                 <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off">
-                                                <div class="error-container" ng-show="forms.submitted && forms.profile.LinkedToAffiliate.$invalid">
+                                                <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.LinkedToAffiliate.$invalid">
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
                                                     <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
                                                 </div>
@@ -121,7 +121,7 @@
                                             <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                             <div class="col-md-9">
                                                 <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
-                                                <div class="error-container" ng-show="forms.submitted && forms.profile.Email.$invalid">
+                                                <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Email.$invalid">
                                                     <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                     <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
                                                     <small class="error" ng-show="forms.profile.Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
@@ -133,7 +133,7 @@
                                             <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                             <div class="col-md-9">
                                                 <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
-                                                <div class="error-container" ng-show="forms.submitted && forms.profile.EmailConfirm.$invalid">
+                                                <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
                                                     <small class="error" ng-show="forms.profile.EmailConfirm.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Email Confirmation", "100"])}}</small>
@@ -220,7 +220,7 @@
                                                 <select class="form-control" name="DefaultPaymentMethod" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods" required>
                                                     <option value="">Select Default Payment Method</option>
                                                 </select>
-                                                <div class="error-container" ng-show="forms.submitted && forms.profile.DefaultPaymentMethod.$invalid">
+                                                <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.DefaultPaymentMethod.$invalid">
                                                     <small class="error" ng-show="forms.profile.DefaultPaymentMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Default Payment Method")}}</small>
                                                     <small class="error" ng-show="forms.profile.DefaultPaymentMethod.$error.server">{{serverMessages.GetMessage('DefaultPaymentMethod')}}</small>
                                                 </div>
@@ -265,7 +265,7 @@
                                             <label for="reason" class="col-md-3 control-label">Reason</label>
                                             <div class="col-md-9">
                                                 <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
-                                                <div class="error-container" ng-show="forms.submitted && forms.profile.Reason.$invalid">
+                                                <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
                                                     <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
                                                     <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
                                                     <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
@@ -278,29 +278,163 @@
 						  </div>
 						</div>
 					</tab>
-					<tab heading="Shipping Address" active="shippingAddressTab.active">
-						<div class="container container-left">
-							<div class="well row">
-							    <spinner-overlay data-loading="addEditTracker.active()">
-							        <div data-ng-if="!editMode" data-ng-include="'app/modules/customer/partials/addShippingSection.html'"></div>
-							        <div data-ng-if="editMode" data-ng-include="'app/modules/customer/partials/updateShippingSection.html'"></div>
-							    </spinner-overlay>
-							</div>
-						</div>
-					</tab>
+				    <tab heading="Shipping Address" active="shippingAddressTab.active">
+				        <div class="container container-left">
+				            <div class="well row">
+				                <spinner-overlay data-loading="addEditTracker.active()">
+				                    <div data-ng-if="!editMode" data-ng-include="'app/modules/customer/partials/addShippingSection.html'"></div>
+				                    <div data-ng-if="editMode" data-ng-include="'app/modules/customer/partials/updateShippingSection.html'"></div>
+				                </spinner-overlay>
+				            </div>
+				        </div>
+				    </tab>
+                    <tab heading="Payment Information" active="paymentInfoTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="addEditTracker.active()">
+                                    <form class="form-horizontal">
+                                        <fieldset>
+                                            <span class="legend">Select Payment Method</span>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
+                                                <div class="radio col-md-3">
+                                                    <label>
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="1" id="creditCard">
+                                                        Credit Card
+                                                    </label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" data-ng-model="paymentInfoTab.SelectedCreditCard" 
+                                                            data-ng-options="creditCard as (creditCardTypes[creditCard.CardType] + ', ending in ' && creditCard.CardNumber) for creditCard in currentCustomer.CreditCards">
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3" style="padding-top:9px;">
+                                                    <button class="btn btn-danger pull-right" data-ng-click="deleteSelectedCreditCard(paymentInfoTab.SelectedCreditCard);">Delete</button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-9">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="2" id="oac">
+                                                            On Approved Credit
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(3) >= 0">
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-9">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="3" id="check">
+                                                            Check
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1" data-ng-model="currentCustomer.CredictCards[paymentInfoTab.SelectedCreditCard]">
+                                                <div class="form-group">
+                                                    <label for="nameOnCard" class="col-md-3 control-label">Name on Card</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" id="nameOnCard" data-ng-model="NameOnCard" placeholder="Name on Card">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="cardType" class="col-md-3 control-label">Card Type</label>
+                                                    <div class="col-md-9">
+                                                        <select class="form-control" id="cardType" data-ng-model="CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="cardNumber" class="col-md-3 control-label">Card Number</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" id="cardNumber" data-ng-model="CardNumber" placeholder="CardNumber">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="expirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" class="form-control" id="expirationDateMonth" data-ng-model="ExpirationDateMonth" placeholder="Month">
+                                                    </div>
+                                                    <label class="col-md-1">
+                                                    </label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" class="form-control" id="expirationDateYear" data-ng-model="ExpirationDateYear" placeholder="Year">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 2" data-ng-model="currentCustomer.Oac">
+                                                <div class="form-group">
+                                                    <label for="terms" class="col-md-3 control-label">Terms:</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" id="terms" data-ng-model="Terms">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Paid In Full - Taxes Included</label>
+                                                    <div class="col-md-9">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" class="">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 3" data-ng-model="currentCustomer.Check">
+                                                <div class="form-group">
+                                                    <label for="checkNumber" class="col-md-3 control-label">Check #</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" id="checkNumber" data-ng-model="CheckNumber" placeholder="Check #">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Paid In Full - Taxes Included</label>
+                                                    <div class="col-md-9">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" class="">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 || paymentInfoTab.PaymentMethodType == 2 || paymentInfoTab.PaymentMethodType == 3">
+                                                <span class="legend">Billing Address</span>
+                                                <div class="form-group">
+                                                    <label for="sameBillingAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
+                                                    <div class="col-md-9">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" id="sameBillingAsProfile" data-ng-model="paymentInfoTab.sameBilling" data-ng-change="makeBillingAsProfileAddress();" class="ng-pristine ng-valid ng-touched">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [paymentInfoTab]"></div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
 					<tab heading="Customer Notes" active="customerNotesTab.active">
 						<div class="container-fluid">
 						    <div class="well row">
 						        <div class="col-md-6">
 						            <spinner-overlay data-loading="addEditTracker.active()">
-						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.customerNoteSubmitted}" novalidate>
+						                <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.submitted['customerNote']}" novalidate>
 						                    <fieldset>
 						                        <span class="legend">Customer Notes</span>
 						                        <div class="form-group">
 						                            <label for="priority" class="col-md-3 control-label">Priority</label>
 						                            <div class="col-md-9">
 						                                <select class="form-control" name="Priority" id="priority" data-ng-model="customerNotesTab.CustomerNote.Priority" data-ng-options="priority.Key as priority.Text for priority in ReferenceData.CustomerNotePriorities" required></select>
-						                                <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Priority.$invalid">
+						                                <div class="error-container" ng-show="forms.submitted['customerNote'] && forms.customerNote.Priority.$invalid">
 						                                    <small class="error" ng-show="forms.customerNote.Priority.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Priority")}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Priority.$error.server">{{serverMessages.GetMessage('Priority')}}</small>
 						                                </div>
@@ -310,7 +444,7 @@
 						                            <label for="note" class="col-md-3 control-label">Note</label>
 						                            <div class="col-md-9">
 						                                <textarea type="text" name="Text" class="form-control" data-ng-model="customerNotesTab.CustomerNote.Text" id="note" placeholder="Note" rows="10"  data-ng-maxlength="1000"></textarea> <!--data-ng-required="editMode"-->
-						                                <div class="error-container" ng-show="forms.customerNoteSubmitted && forms.customerNote.Text.$invalid">
+						                                <div class="error-container" ng-show="forms.submitted['customerNote'] && forms.customerNote.Text.$invalid">
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Note", "1000"])}}</small>
 						                                    <small class="error" ng-show="forms.customerNote.Text.$error.server">{{serverMessages.GetMessage('Text')}}</small>
 						                                </div>

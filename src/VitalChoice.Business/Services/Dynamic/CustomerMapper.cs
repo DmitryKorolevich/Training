@@ -15,6 +15,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -22,14 +23,16 @@ namespace VitalChoice.Business.Services.Dynamic
     {
         private readonly AddressMapper _addressMapper;
 	    private readonly CustomerNoteMapper _customerNoteMapper;
+        private readonly CustomerPaymentMethodMapper _paymentMethodMapper;
 
         public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<Type, IModelToDynamicConverter> container, AddressMapper addressMapper,
-            CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync)
+            CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync, CustomerPaymentMethodMapper paymentMethodMapper)
             : base(mappers, container, customerRepositoryAsync)
         {
             _addressMapper = addressMapper;
             _customerNoteMapper = customerNoteMapper;
+            _paymentMethodMapper = paymentMethodMapper;
         }
 
         public override Expression<Func<CustomerOptionValue, int?>> ObjectIdSelector
@@ -51,8 +54,9 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
                 dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
             
-                dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes));                
-                dynamic.Addresses.AddRange(await _addressMapper.FromEntityRangeAsync(entity.Addresses));
+                dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes, withDefaults));                
+                dynamic.Addresses.AddRange(await _addressMapper.FromEntityRangeAsync(entity.Addresses, withDefaults));
+                dynamic.CustomerPaymentMethods.AddRange(await _paymentMethodMapper.FromEntityRangeAsync(entity.CustomerPaymentMethods, withDefaults));
             });
         }
 
@@ -78,73 +82,23 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrderNote = c
                 }).ToList();
 
-                if (dynamic.Addresses != null && dynamic.Addresses.Any())
+                await _addressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
+                foreach (var address in entity.Addresses)
                 {
-                    //Update existing
-                    var itemsToUpdate = dynamic.Addresses.Join(entity.Addresses, addressDynamic => addressDynamic.Id, address => address.Id,
-                        (addressDynamic, address) => new DynamicEntityPair<AddressDynamic, Address>(addressDynamic, address)).ToList();
-                    await _addressMapper.UpdateEntityRangeAsync(itemsToUpdate);
-                    foreach (var item in itemsToUpdate)
-                    {
-                        item.Entity.IdCustomer = dynamic.Id;
-                    }
-
-                    //Delete
-                    var toDelete = entity.Addresses.Where(e => dynamic.Addresses.All(s => s.Id != e.Id));
-                    foreach (var sku in toDelete)
-                    {
-                        sku.StatusCode = RecordStatusCode.Deleted;
-                    }
-
-                    //Insert
-                    var addresses = await _addressMapper.ToEntityRangeAsync(dynamic.Addresses.Where(s => s.Id == 0).ToList());
-                    foreach (var address in addresses)
-                    {
-                        address.IdCustomer = entity.Id;
-                    }
-                    entity.Addresses.AddRange(addresses);
+                    address.IdCustomer = dynamic.Id;
                 }
-                else
+                await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
+                foreach (var note in entity.CustomerNotes)
                 {
-                    foreach (var address in entity.Addresses)
-                    {
-                        address.StatusCode = RecordStatusCode.Deleted;
-                    }
+                    note.IdCustomer = dynamic.Id;
                 }
 
-                if (dynamic.CustomerNotes != null && dynamic.CustomerNotes.Any())
+                await
+                    _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
+                        entity.CustomerPaymentMethods);
+                foreach (var paymentMethod in entity.CustomerPaymentMethods)
                 {
-					//Update existing
-					var itemsToUpdate = dynamic.CustomerNotes.Join(entity.CustomerNotes, sd => sd.Id, s => s.Id,
-						(customerNoteDynamic, customerNote) => new DynamicEntityPair<CustomerNoteDynamic, CustomerNote>(customerNoteDynamic, customerNote)).ToList();
-					await _customerNoteMapper.UpdateEntityRangeAsync(itemsToUpdate);
-					foreach (var item in itemsToUpdate)
-					{
-						item.Entity.IdCustomer = dynamic.Id;
-						item.Entity.StatusCode = RecordStatusCode.Active;
-					}
-
-					//Delete
-					var toDelete = entity.CustomerNotes.Where(e => dynamic.CustomerNotes.All(s => s.Id != e.Id));
-                    foreach (var note in toDelete)
-                    {
-                        note.StatusCode = RecordStatusCode.Deleted;
-                    }
-
-                    //Insert
-                    var notes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes.Where(s => s.Id == 0).ToList());
-                    foreach (var customerNote in notes)
-                    {
-                        customerNote.IdCustomer = entity.Id;
-                    }
-                    entity.CustomerNotes.AddRange(notes);
-                }
-                else
-                {
-                    foreach (var customerNote in entity.CustomerNotes)
-                    {
-                        customerNote.StatusCode = RecordStatusCode.Deleted;
-                    }
+                    paymentMethod.IdCustomer = dynamic.Id;
                 }
 
                 foreach (var value in entity.OptionValues)

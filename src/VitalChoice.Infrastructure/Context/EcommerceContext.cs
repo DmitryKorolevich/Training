@@ -355,7 +355,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(o => o.IdCustomer)
 		        .PrincipalKey(p => p.Id)
-		        .Required(false);
+		        .Required();
             builder.Entity<Customer>()
 				.Reference(p => p.CustomerType)
 				.InverseCollection(p => p.Customers)
@@ -432,7 +432,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(o => o.IdCustomerNote)
 		        .PrincipalKey(n => n.Id)
-		        .Required(false);
+		        .Required();
 
 		    builder.Entity<CustomerNote>().Ignore(n => n.OptionTypes);
 
@@ -511,7 +511,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(o => o.IdAddress)
 		        .PrincipalKey(a => a.Id)
-		        .Required(false);
+		        .Required();
 
 		    builder.Entity<Address>().Ignore(a => a.OptionTypes);
 
@@ -611,7 +611,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseReference()
 		        .ForeignKey(v => v.IdCustomerPaymentMethod)
 		        .PrincipalKey(p => p.Id)
-                .Required(false);
+                .Required();
 
             builder.Entity<CustomerPaymentMethod>().Ignore(a => a.OptionTypes);
 

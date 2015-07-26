@@ -17,6 +17,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Interfaces.Services;
+using EnumHelper = VitalChoice.Business.Helpers.EnumHelper;
 
 namespace VitalChoice.Business.Services
 {
@@ -62,7 +63,7 @@ namespace VitalChoice.Business.Services
 				    Text = x.Name
 			    }).ToList(),
 
-			    UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
+			    UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
 			    {
 				    Key = x.Key,
 				    Text = x.Value
@@ -83,49 +84,49 @@ namespace VitalChoice.Business.Services
 					    ? appOptionsAccessor.Options.PublicHost
 					    : "http://notdefined/",
 
-			    ContentItemStatusNames = StatusEnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+			    ContentItemStatusNames = EnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
 			    {
 				    Key = x.Key,
 				    Text = x.Value
 			    }).ToList(),
 
-			    ProductCategoryStatusNames = StatusEnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+			    ProductCategoryStatusNames = EnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
 			    {
 				    Key = x.Key,
 				    Text = x.Value
 			    }).ToList(),
 
-			    GCTypes = StatusEnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+			    GCTypes = EnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
 			    {
 				    Key = x.Key,
 				    Text = x.Value
 			    }).ToList(),
 
-			    RecordStatuses = StatusEnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+			    RecordStatuses = EnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
 			    {
 				    Key = x.Key,
 				    Text = x.Value
 			    }).ToList(),
 
-			    ProductTypes = StatusEnumHelper.GetProductTypes().Select(x => new LookupItem<int>
+			    ProductTypes = EnumHelper.GetProductTypes().Select(x => new LookupItem<int>
 			    {
 				    Key = x.Key,
 				    Text = x.Value
 			    }).ToList(),
 
-                DiscountTypes = StatusEnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+                DiscountTypes = EnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
                 {
                     Key = x.Key,
                     Text = x.Value
                 }).ToList(),
 
-                AssignedCustomerTypes = StatusEnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+                AssignedCustomerTypes = EnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
                 {
                     Key = x.Key,
                     Text = x.Value
                 }).ToList(),
 
-                ActiveFilterOptions = StatusEnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+                ActiveFilterOptions = EnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
                 {
                     Key = x.Key==-1 ? null : (int?)x.Key,
                     Text = x.Value
@@ -158,7 +159,13 @@ namespace VitalChoice.Business.Services
 				{
 					Key = x.Id,
 					Text = x.ValueVariant
-				}).ToList()
+				}).ToList(),
+
+                CreditCardTypes = EnumHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
+                {
+                    Key = x.Key,
+                    Text = x.Value
+                }).ToList()
 			};
 
 			return referenceData;

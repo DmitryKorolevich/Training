@@ -11,6 +11,7 @@ using VitalChoice.DynamicData.Services;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -37,6 +38,44 @@ namespace VitalChoice.DynamicData.Base
             _converters = converters;
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
             _typeConverter = new ModelTypeConverter(mappers);
+        }
+
+        public virtual async void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities)
+        {
+            await SyncCollectionsAsync(dynamics, entities);
+        }
+
+        public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities)
+        {
+            if (dynamics != null && dynamics.Any())
+            {
+                //Update existing
+                var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => s.Id,
+                    (@dynamic, entity) => new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity)).ToList();
+                await UpdateEntityRangeAsync(itemsToUpdate);
+                foreach (var item in itemsToUpdate)
+                {
+                    item.Entity.StatusCode = RecordStatusCode.Active;
+                }
+
+                //Delete
+                var toDelete = entities.Where(e => dynamics.All(s => s.Id != e.Id));
+                foreach (var paymentMethod in toDelete)
+                {
+                    paymentMethod.StatusCode = RecordStatusCode.Deleted;
+                }
+
+                //Insert
+                var notes = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList());
+                entities.AddRange(notes);
+            }
+            else
+            {
+                foreach (var paymentMethod in entities)
+                {
+                    paymentMethod.StatusCode = RecordStatusCode.Deleted;
+                }
+            }
         }
 
         public virtual IQueryOptionType<TOptionType> GetOptionTypeQuery()

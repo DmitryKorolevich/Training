@@ -62,7 +62,7 @@ namespace VC.Admin.Models.Product
                 {
                     RecipientEmail = $"({item.Email})";
                 }
-                ProductName = StatusEnumHelper.GetGCTypeName(item.GCType);
+                ProductName = EnumHelper.GetGCTypeName(item.GCType);
                 if (item.User?.Profile != null)
                 {
                     AgentId = item.User.Profile.AgentId;

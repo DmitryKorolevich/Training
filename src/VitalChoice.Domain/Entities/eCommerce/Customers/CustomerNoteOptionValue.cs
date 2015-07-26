@@ -4,6 +4,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 {
     public class CustomerNoteOptionValue : OptionValue<CustomerNoteOptionType>
     {
-        public int? IdCustomerNote { get; set; }
+        public int IdCustomerNote { get; set; }
     }
 }

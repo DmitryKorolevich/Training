@@ -4,11 +4,12 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Business.Helpers
 {
-    public static class StatusEnumHelper
+    public static class EnumHelper
     {
         public static string GetContentItemStatusName(CustomerTypeCode code, RecordStatusCode status)
         {
@@ -165,5 +166,17 @@ namespace VitalChoice.Business.Helpers
             };
             return toReturn;
         }
-	}
+
+        public static Dictionary<int, string> GetCreditCardTypes()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) CreditCardType.MasterCard, "MasterCard"},
+                {(int) CreditCardType.Visa, "Visa"},
+                {(int) CreditCardType.AmericanExpress, "American Express"},
+                {(int) CreditCardType.Discover, "Discover"}
+            };
+            return toReturn;
+        }
+    }
 }

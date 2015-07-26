@@ -55,7 +55,10 @@ namespace VC.Admin.Controllers
 					TaxExempts = referenceData.TaxExempts,
 					Tiers = referenceData.Tiers,
 					TradeClasses = referenceData.TradeClasses,
-					CustomerNotePriorities = referenceData.CustomerNotePriorities
+					CustomerNotePriorities = referenceData.CustomerNotePriorities,
+                    CreditCardTypes = referenceData.CreditCardTypes,
+                    OacFob = referenceData.OacFob,
+                    OacTerms = referenceData.OacTerms
                 };
 	        }
 			else

@@ -13,6 +13,7 @@ namespace VitalChoice.DynamicData.Entities
 			OrderNotes = new List<int>();
 			Addresses = new List<AddressDynamic>();
 			CustomerNotes = new List<CustomerNoteDynamic>();
+            CustomerPaymentMethods = new List<CustomerPaymentMethodDynamic>();
         }
 
 	    public User User { get; set; }
@@ -30,5 +31,7 @@ namespace VitalChoice.DynamicData.Entities
 		public ICollection<AddressDynamic> Addresses { get; set; }
 
 		public ICollection<CustomerNoteDynamic> CustomerNotes { get; set; }
+
+        public ICollection<CustomerPaymentMethodDynamic> CustomerPaymentMethods { get; set; }
     }
 }
