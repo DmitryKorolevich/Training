@@ -345,9 +345,9 @@ namespace VitalChoice.Business.Services
 				.Text.Normalize());
 		}
 
-		public void SignOut(ApplicationUser user)
+		public async Task SignOutAsync(ApplicationUser user)
 		{
-			signInManager.SignOut();
+			await signInManager.SignOutAsync();
 		}
 
 		public async Task SendActivationAsync(Guid id)

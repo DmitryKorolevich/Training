@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity.Relational;
+using Microsoft.Data.Entity.Storage;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
@@ -37,7 +38,7 @@ namespace VitalChoice.Infrastructure.UnitOfWork
 			_uow.Dispose(disposing);
 		}
 
-	    public RelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 	    {
 		    return _uow.BeginTransaction(isolation);
 	    }

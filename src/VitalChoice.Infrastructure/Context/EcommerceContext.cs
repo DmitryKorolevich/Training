@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Relational.Metadata;
 using System.Data.SqlClient;
 using System.IO;
 using Microsoft.Framework.OptionsModel;
@@ -39,7 +38,7 @@ namespace VitalChoice.Infrastructure.Context
 	        
 	    }
 
-        protected override void OnConfiguring(EntityOptionsBuilder builder)
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
@@ -60,16 +59,16 @@ namespace VitalChoice.Infrastructure.Context
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            builder.ForSqlServer().UseIdentity();
+            builder.UseSqlServerIdentityColumns();
 
             #region Base
 
             builder.Entity<FieldTypeEntity>().Key(f => f.Id);
-            builder.Entity<FieldTypeEntity>().Table("FieldTypes");
+            builder.Entity<FieldTypeEntity>().ToTable("FieldTypes");
 
 		    builder.Entity<BigStringValue>().Key(b => b.IdBigString);
             builder.Entity<BigStringValue>().Ignore(b => b.Id);
-		    builder.Entity<BigStringValue>().Table("BigStringValues");
+		    builder.Entity<BigStringValue>().ToTable("BigStringValues");
 
             #endregion
 
@@ -77,10 +76,10 @@ namespace VitalChoice.Infrastructure.Context
             #region Workflow
 
             builder.Entity<WorkflowExecutor>().Key(w => w.Id);
-            builder.Entity<WorkflowExecutor>().Table("WorkflowExecutors");
+            builder.Entity<WorkflowExecutor>().ToTable("WorkflowExecutors");
 
             builder.Entity<WorkflowResolverPath>().Key(w => w.Id);
-            builder.Entity<WorkflowResolverPath>().Table("WorkflowResolverPaths");
+            builder.Entity<WorkflowResolverPath>().ToTable("WorkflowResolverPaths");
 		    builder.Entity<WorkflowResolverPath>()
 		        .Reference(resolverPath => resolverPath.Executor)
 		        .InverseCollection()
@@ -92,7 +91,7 @@ namespace VitalChoice.Infrastructure.Context
                 .ForeignKey(w => w.IdResolver);
 
             builder.Entity<WorkflowTree>().Key(w => w.Id);
-            builder.Entity<WorkflowTree>().Table("WorkflowTrees");
+            builder.Entity<WorkflowTree>().ToTable("WorkflowTrees");
 		    builder.Entity<WorkflowTree>()
 		        .Collection(tree => tree.Actions)
 		        .InverseReference()
@@ -100,7 +99,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey(tree => tree.Id);
 
             builder.Entity<WorkflowTreeAction>().Key(w => w.Id);
-            builder.Entity<WorkflowTreeAction>().Table("WorkflowTreeActions");
+            builder.Entity<WorkflowTreeAction>().ToTable("WorkflowTreeActions");
 		    builder.Entity<WorkflowTreeAction>()
 		        .Reference(treeAction => treeAction.Executor)
 		        .InverseCollection()
@@ -117,15 +116,15 @@ namespace VitalChoice.Infrastructure.Context
             #region GiftCertificates
 
             builder.Entity<GiftCertificate>().Key(p => p.Id);
-            builder.Entity<GiftCertificate>().Table("GiftCertificates");
-            builder.Entity<GiftCertificate>().Property(p => p.PublicId).ForSqlServer().UseDefaultValueGeneration();
+            builder.Entity<GiftCertificate>().ToTable("GiftCertificates");
+            builder.Entity<GiftCertificate>().Property(p => p.PublicId).ValueGeneratedOnAdd();
 
             #endregion
 
             #region Discounts
 
             builder.Entity<DiscountOptionType>().Key(p => p.Id);
-            builder.Entity<DiscountOptionType>().Table("DiscountOptionTypes");
+            builder.Entity<DiscountOptionType>().ToTable("DiscountOptionTypes");
             builder.Entity<DiscountOptionType>()
                 .Reference(p => p.Lookup)
                 .InverseCollection()
@@ -134,7 +133,7 @@ namespace VitalChoice.Infrastructure.Context
                 .Required(false);
 
             builder.Entity<DiscountOptionValue>().Key(o => o.Id);
-            builder.Entity<DiscountOptionValue>().Table("DiscountOptionValues");
+            builder.Entity<DiscountOptionValue>().ToTable("DiscountOptionValues");
             builder.Entity<DiscountOptionValue>()
                 .Reference(v => v.OptionType)
                 .InverseCollection()
@@ -145,21 +144,21 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<DiscountOptionValue>().Ignore(d => d.IdBigString);
 
             builder.Entity<DiscountToCategory>().Key(p => p.Id);
-            builder.Entity<DiscountToCategory>().Table("DiscountsToCategories");
+            builder.Entity<DiscountToCategory>().ToTable("DiscountsToCategories");
 
             builder.Entity<DiscountToSku>().Key(p => p.Id);
-            builder.Entity<DiscountToSku>().Table("DiscountsToSkus");
+            builder.Entity<DiscountToSku>().ToTable("DiscountsToSkus");
             builder.Entity<DiscountToSku>().Ignore(p => p.ShortSkuInfo);
 
             builder.Entity<DiscountToSelectedSku>().Key(p => p.Id);
-            builder.Entity<DiscountToSelectedSku>().Table("DiscountsToSelectedSkus");
+            builder.Entity<DiscountToSelectedSku>().ToTable("DiscountsToSelectedSkus");
             builder.Entity<DiscountToSelectedSku>().Ignore(p => p.ShortSkuInfo);
 
             builder.Entity<DiscountTier>().Key(p => p.Id);
-            builder.Entity<DiscountTier>().Table("DiscountTiers");
+            builder.Entity<DiscountTier>().ToTable("DiscountTiers");
 
             builder.Entity<Discount>().Key(p => p.Id);
-            builder.Entity<Discount>().Table("Discounts");
+            builder.Entity<Discount>().ToTable("Discounts");
             builder.Entity<Discount>()
                 .Collection(p => p.OptionValues)
                 .InverseReference()
@@ -205,7 +204,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Products
 
             builder.Entity<ProductCategory>().Key(p => p.Id);
-            builder.Entity<ProductCategory>().Table("ProductCategories");
+            builder.Entity<ProductCategory>().ToTable("ProductCategories");
 		    builder.Entity<ProductCategory>()
 		        .Collection(cat => cat.ProductToCategories)
 		        .InverseReference()
@@ -214,14 +213,14 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<VProductSku>().Key(p => p.IdProduct);
             builder.Entity<VProductSku>().Ignore(x => x.Id);
-            builder.Entity<VProductSku>().Table("VProductSkus");
+            builder.Entity<VProductSku>().ToTable("VProductSkus");
 
             builder.Entity<VSku>().Key(p => new { p.IdProduct, p.SkuId });
             builder.Entity<VSku>().Ignore(x => x.Id);
-            builder.Entity<VSku>().Table("VSkus");
+            builder.Entity<VSku>().ToTable("VSkus");
 
             builder.Entity<ProductOptionType>().Key(p => p.Id);
-            builder.Entity<ProductOptionType>().Table("ProductOptionTypes");
+            builder.Entity<ProductOptionType>().ToTable("ProductOptionTypes");
             builder.Entity<ProductOptionType>()
 		        .Reference(p => p.Lookup)
 		        .InverseCollection()
@@ -230,7 +229,7 @@ namespace VitalChoice.Infrastructure.Context
                 .Required(false);
 
             builder.Entity<ProductOptionValue>().Key(o => o.Id);
-		    builder.Entity<ProductOptionValue>().Table("ProductOptionValues");
+		    builder.Entity<ProductOptionValue>().ToTable("ProductOptionValues");
 		    builder.Entity<ProductOptionValue>()
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
@@ -246,11 +245,11 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductOptionValue>().Property(v => v.IdBigString).Required(false);
 
             builder.Entity<ProductTypeEntity>().Key(t => t.Id);
-		    builder.Entity<ProductTypeEntity>().Table("ProductTypes");
+		    builder.Entity<ProductTypeEntity>().ToTable("ProductTypes");
 
             builder.Entity<Sku>().Key(s => s.Id);
             builder.Entity<Sku>().Ignore(p => p.IdObjectType);
-            builder.Entity<Sku>().Table("Skus");
+            builder.Entity<Sku>().ToTable("Skus");
 		    builder.Entity<Sku>()
 		        .Collection(s => s.OptionValues)
 		        .InverseReference()
@@ -262,10 +261,10 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Sku>().Ignore(p => p.IdEditedBy);
 
             builder.Entity<ProductToCategory>().Key(p => p.Id);
-            builder.Entity<ProductToCategory>().Table("ProductsToCategories");
+            builder.Entity<ProductToCategory>().ToTable("ProductsToCategories");
 
             builder.Entity<Product>().Key(p => p.Id);
-            builder.Entity<Product>().Table("Products");
+            builder.Entity<Product>().ToTable("Products");
 
             builder.Entity<Product>()
                 .Collection(p => p.Skus)
@@ -301,9 +300,9 @@ namespace VitalChoice.Infrastructure.Context
             #region Lookups
 
             builder.Entity<Lookup>().Key(p => p.Id);
-            builder.Entity<Lookup>().Table("Lookups");
+            builder.Entity<Lookup>().ToTable("Lookups");
             builder.Entity<LookupVariant>().Key(p => new { p.Id, p.IdLookup });
-            builder.Entity<LookupVariant>().Table("LookupVariants");
+            builder.Entity<LookupVariant>().ToTable("LookupVariants");
 		    builder.Entity<Lookup>()
 		        .Collection(p => p.LookupVariants)
 		        .InverseReference(p => p.Lookup)
@@ -316,28 +315,28 @@ namespace VitalChoice.Infrastructure.Context
             #region Settings
 
             builder.Entity<Country>().Key(p => p.Id);
-            builder.Entity<Country>().Table("Countries");
+            builder.Entity<Country>().ToTable("Countries");
             builder.Entity<Country>().Ignore(p => p.States);
 
             builder.Entity<State>().Key(p => p.Id);
-            builder.Entity<State>().Table("States");
+            builder.Entity<State>().ToTable("States");
 
 			#endregion
 
 			#region Users
 
 			builder.Entity<User>().Key(p => p.Id);
-			builder.Entity<User>().Table("Users");
+			builder.Entity<User>().ToTable("Users");
 
 			#endregion
 
 			#region Customers
 
 			builder.Entity<VCustomer>().Key(x => x.Id);
-			builder.Entity<VCustomer>().Table("VCustomers");
+			builder.Entity<VCustomer>().ToTable("VCustomers");
 
 			builder.Entity<Customer>().Key(p => p.Id);
-			builder.Entity<Customer>().Table("Customers");
+			builder.Entity<Customer>().ToTable("Customers");
 		    builder.Entity<Customer>()
 		        .Reference(p => p.EditedBy)
 		        .InverseCollection()
@@ -402,7 +401,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Customer>().Ignore(p => p.OptionTypes);
 
             builder.Entity<CustomerOptionType>().Key(p => p.Id);
-			builder.Entity<CustomerOptionType>().Table("CustomerOptionTypes");
+			builder.Entity<CustomerOptionType>().ToTable("CustomerOptionTypes");
             builder.Entity<CustomerOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()
@@ -410,7 +409,7 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<CustomerOptionValue>().Key(o => o.Id);
-			builder.Entity<CustomerOptionValue>().Table("CustomerOptionValues");
+			builder.Entity<CustomerOptionValue>().ToTable("CustomerOptionValues");
 		    builder.Entity<CustomerOptionValue>()
 		        .Reference(v => v.OptionType)
 		        .InverseCollection()
@@ -419,7 +418,7 @@ namespace VitalChoice.Infrastructure.Context
 		        .Required();
 
             builder.Entity<CustomerNote>().Key(p => p.Id);
-			builder.Entity<CustomerNote>().Table("CustomerNotes");
+			builder.Entity<CustomerNote>().ToTable("CustomerNotes");
             builder.Entity<CustomerNote>().Ignore(p => p.IdObjectType);
 		    builder.Entity<CustomerNote>()
 		        .Reference(p => p.EditedBy)
@@ -437,7 +436,7 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<CustomerNote>().Ignore(n => n.OptionTypes);
 
             builder.Entity<CustomerNoteOptionType>().Key(p => p.Id);
-			builder.Entity<CustomerNoteOptionType>().Table("CustomerNoteOptionTypes");
+			builder.Entity<CustomerNoteOptionType>().ToTable("CustomerNoteOptionTypes");
             builder.Entity<CustomerNoteOptionType>().Ignore(p => p.IdObjectType);
             builder.Entity<CustomerNoteOptionType>()
 				.Reference(p => p.Lookup)
@@ -446,7 +445,7 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<CustomerNoteOptionValue>().Key(o => o.Id);
-			builder.Entity<CustomerNoteOptionValue>().Table("CustomerNoteOptionValues");
+			builder.Entity<CustomerNoteOptionValue>().ToTable("CustomerNoteOptionValues");
 			builder.Entity<CustomerNoteOptionValue>()
 				.Reference(v => v.OptionType)
 				.InverseCollection()
@@ -458,7 +457,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerNoteOptionValue>().Ignore(c => c.IdBigString);
 
             builder.Entity<CustomerTypeEntity>().Key(p => p.Id);
-			builder.Entity<CustomerTypeEntity>().Table("CustomerTypes");
+			builder.Entity<CustomerTypeEntity>().ToTable("CustomerTypes");
 		    builder.Entity<CustomerTypeEntity>()
 		        .Reference(p => p.EditedBy)
 		        .InverseCollection()
@@ -476,18 +475,18 @@ namespace VitalChoice.Infrastructure.Context
 
 			builder.Entity<CustomerToOrderNote>().Ignore(p => p.Id);
 			builder.Entity<CustomerToOrderNote>().Key(p => new { p.IdCustomer, p.IdOrderNote });
-			builder.Entity<CustomerToOrderNote>().Table("CustomersToOrderNotes");
+			builder.Entity<CustomerToOrderNote>().ToTable("CustomersToOrderNotes");
 
 			builder.Entity<CustomerToPaymentMethod>().Ignore(p => p.Id);
 			builder.Entity<CustomerToPaymentMethod>().Key(p => new { p.IdCustomer, p.IdPaymentMethod });
-			builder.Entity<CustomerToPaymentMethod>().Table("CustomersToPaymentMethods");
+			builder.Entity<CustomerToPaymentMethod>().ToTable("CustomersToPaymentMethods");
 
 			#endregion
 
 			#region Addresses
 
 			builder.Entity<Address>().Key(p => p.Id);
-			builder.Entity<Address>().Table("Addresses");
+			builder.Entity<Address>().ToTable("Addresses");
 		    builder.Entity<Address>()
 		        .Reference(p => p.Сountry)
 		        .InverseCollection()
@@ -516,7 +515,7 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<Address>().Ignore(a => a.OptionTypes);
 
             builder.Entity<AddressOptionType>().Key(p => p.Id);
-			builder.Entity<AddressOptionType>().Table("AddressOptionTypes");
+			builder.Entity<AddressOptionType>().ToTable("AddressOptionTypes");
             builder.Entity<AddressOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()
@@ -524,7 +523,7 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<AddressOptionValue>().Key(o => o.Id);
-			builder.Entity<AddressOptionValue>().Table("AddressOptionValues");
+			builder.Entity<AddressOptionValue>().ToTable("AddressOptionValues");
 			builder.Entity<AddressOptionValue>()
 				.Reference(v => v.OptionType)
 				.InverseCollection()
@@ -536,13 +535,13 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<AddressOptionValue>().Ignore(c => c.IdBigString);
 
             builder.Entity<AddressTypeEntity>().Key(p => p.Id);
-			builder.Entity<AddressTypeEntity>().Table("AddressTypes");
+			builder.Entity<AddressTypeEntity>().ToTable("AddressTypes");
 
 			#endregion
 
 			#region Orders
 			builder.Entity<OrderNoteToCustomerType>().Key(p => new { p.IdOrderNote, p.IdCustomerType });
-			builder.Entity<OrderNoteToCustomerType>().Table("OrderNotesToCustomerTypes");
+			builder.Entity<OrderNoteToCustomerType>().ToTable("OrderNotesToCustomerTypes");
 			builder.Entity<OrderNoteToCustomerType>().Ignore(p => p.Id);
 
 		    //builder.Entity<OrderNoteToCustomerType>()
@@ -553,7 +552,7 @@ namespace VitalChoice.Infrastructure.Context
 		    //    .Required();
 
             builder.Entity<OrderNote>().Key(p => p.Id);
-			builder.Entity<OrderNote>().Table("OrderNotes");
+			builder.Entity<OrderNote>().ToTable("OrderNotes");
 			builder.Entity<OrderNote>()
 				.Reference(p => p.EditedBy)
 				.InverseCollection()
@@ -574,11 +573,11 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Payment
             builder.Entity<PaymentMethodToCustomerType>().Key(p => new { p.IdPaymentMethod, p.IdCustomerType });
-			builder.Entity<PaymentMethodToCustomerType>().Table("PaymentMethodsToCustomerTypes");
+			builder.Entity<PaymentMethodToCustomerType>().ToTable("PaymentMethodsToCustomerTypes");
 			builder.Entity<PaymentMethodToCustomerType>().Ignore(p => p.Id);
 
 			builder.Entity<PaymentMethod>().Key(p => p.Id);
-			builder.Entity<PaymentMethod>().Table("PaymentMethods");
+			builder.Entity<PaymentMethod>().ToTable("PaymentMethods");
 			builder.Entity<PaymentMethod>().Reference(p => p.EditedBy).InverseCollection().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<PaymentMethod>().Collection(p => p.Customers).InverseReference(p => p.PaymentMethod).ForeignKey(p => p.IdPaymentMethod).PrincipalKey(p => p.Id);
@@ -589,7 +588,7 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id);
 
 			builder.Entity<CustomerPaymentMethod>().Key(p => p.Id);
-			builder.Entity<CustomerPaymentMethod>().Table("CustomerPaymentMethods");
+			builder.Entity<CustomerPaymentMethod>().ToTable("CustomerPaymentMethods");
 			builder.Entity<CustomerPaymentMethod>()
 				.Reference(p => p.EditedBy)
 				.InverseCollection()
@@ -616,7 +615,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerPaymentMethod>().Ignore(a => a.OptionTypes);
 
             builder.Entity<CustomerPaymentMethodOptionType>().Key(p => p.Id);
-			builder.Entity<CustomerPaymentMethodOptionType>().Table("CustomerPaymentMethodOptionTypes");
+			builder.Entity<CustomerPaymentMethodOptionType>().ToTable("CustomerPaymentMethodOptionTypes");
             builder.Entity<CustomerPaymentMethodOptionType>()
 				.Reference(p => p.Lookup)
 				.InverseCollection()
@@ -624,7 +623,7 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<CustomerPaymentMethodOptionValue>().Key(o => o.Id);
-			builder.Entity<CustomerPaymentMethodOptionValue>().Table("CustomerPaymentMethodOptionValues");
+			builder.Entity<CustomerPaymentMethodOptionValue>().ToTable("CustomerPaymentMethodOptionValues");
 			builder.Entity<CustomerPaymentMethodOptionValue>()
 				.Reference(v => v.OptionType)
 				.InverseCollection()

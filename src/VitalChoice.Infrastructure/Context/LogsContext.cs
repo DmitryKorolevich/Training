@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Relational.Metadata;
 using Microsoft.Framework.OptionsModel;
 using System.Data.SqlClient;
 using System.IO;
@@ -35,7 +34,7 @@ namespace VitalChoice.Infrastructure.Context
             }
         }
 
-        protected override void OnConfiguring(EntityOptionsBuilder builder)
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
@@ -56,7 +55,7 @@ namespace VitalChoice.Infrastructure.Context
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
             builder.Entity<CommonLogItem>().Key(p => p.Id);
-		    builder.Entity<CommonLogItem>().ForSqlServer().Table("CommonLogItems");
+		    builder.Entity<CommonLogItem>().ToTable("CommonLogItems");
 
             base.OnModelCreating(builder);
 		}

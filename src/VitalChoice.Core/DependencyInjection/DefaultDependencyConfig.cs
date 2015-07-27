@@ -46,7 +46,7 @@ using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
-using Autofac.Dnx;
+using Autofac.Framework.DependencyInjection;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;

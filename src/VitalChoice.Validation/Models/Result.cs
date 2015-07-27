@@ -47,7 +47,6 @@ namespace VitalChoice.Validation.Models
             _messages.Clear();
         }
 
-        [DataMember]
         public IEnumerable<MessageInfo> Messages => _messages.AsEnumerable();
 
         ///Default to success upon implicit conversion

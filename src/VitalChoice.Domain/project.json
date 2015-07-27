@@ -1,8 +1,8 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta5",
-    "Templates": "2.2.3-beta5"
+    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
+    "Templates": "2.2.4-*"
   },
 
   "frameworks": {
@@ -14,7 +14,8 @@
     "dnxcore50": {
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
-        "System.Runtime": "4.0.20-*"
+        "System.Runtime": "4.0.20-*",
+        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }
     }
   }

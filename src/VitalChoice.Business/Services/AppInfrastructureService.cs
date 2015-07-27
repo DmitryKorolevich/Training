@@ -55,120 +55,97 @@ namespace VitalChoice.Business.Services
 		    var priorityLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
 		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
 
-			var referenceData = new ReferenceData
-		    {
-			    Roles = roleManager.Roles.Select(x => new LookupItem<int>
-			    {
-				    Key = x.Id,
-				    Text = x.Name
-			    }).ToList(),
+			var referenceData = new ReferenceData();
+	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
+	        {
+	            Key = x.Id,
+	            Text = x.Name
+	        }).ToList();
+	        referenceData.UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Id,
+	            Text = x.Name
+	        }).ToList();
+	        referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
+	        referenceData.Labels = LocalizationService.GetStrings();
+	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
+	            ? appOptionsAccessor.Options.PublicHost
+	            : "http://notdefined/";
+	        referenceData.ContentItemStatusNames = EnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ProductCategoryStatusNames = EnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.GCTypes = EnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.RecordStatuses = EnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ProductTypes = EnumHelper.GetProductTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.DiscountTypes = EnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.AssignedCustomerTypes = EnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.ActiveFilterOptions = EnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+	        {
+	            Key = x.Key==-1 ? null : (int?)x.Key,
+	            Text = x.Value
+	        }).ToList();
+	        referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
+	            .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+	            .ToList();
+	        referenceData.TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
+	        {
+	            Key = x.Id,
+	            Text = x.ValueVariant
+	        }).ToList();
+	        referenceData.CreditCardTypes = EnumHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
+	        {
+	            Key = x.Key,
+	            Text = x.Value
+	        }).ToList();
 
-			    UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Id,
-				    Text = x.Name
-			    }).ToList(),
-
-			    ContentProcessors = contentProcessorRepository.Query().Select(false).ToList(),
-
-			    Labels = LocalizationService.GetStrings(),
-
-			    PublicHost =
-				    !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
-					    ? appOptionsAccessor.Options.PublicHost
-					    : "http://notdefined/",
-
-			    ContentItemStatusNames = EnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ProductCategoryStatusNames = EnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    GCTypes = EnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    RecordStatuses = EnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-			    ProductTypes = EnumHelper.GetProductTypes().Select(x => new LookupItem<int>
-			    {
-				    Key = x.Key,
-				    Text = x.Value
-			    }).ToList(),
-
-                DiscountTypes = EnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
-                {
-                    Key = x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                AssignedCustomerTypes = EnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
-                {
-                    Key = x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                ActiveFilterOptions = EnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
-                {
-                    Key = x.Key==-1 ? null : (int?)x.Key,
-                    Text = x.Value
-                }).ToList(),
-
-                CustomerTypes =
-				    customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
-					    .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
-					    .ToList(),
-
-				TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-				CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
-				{
-					Key = x.Id,
-					Text = x.ValueVariant
-				}).ToList(),
-
-                CreditCardTypes = EnumHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
-                {
-                    Key = x.Key,
-                    Text = x.Value
-                }).ToList()
-			};
-
-			return referenceData;
+	        return referenceData;
 	    }
 
 		public ReferenceData Get()

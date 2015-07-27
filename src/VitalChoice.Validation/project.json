@@ -8,7 +8,7 @@
 
   "dependencies": {
     "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "FluentValidation": "5.6.0.5-beta5",
+    "FluentValidation": "5.6.0.5-*",
     "VitalChoice.Domain": "1.0.0-*"
   },
 
@@ -23,7 +23,8 @@
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
         "System.Threading": "4.0.10-*",
-        "Microsoft.CSharp": "4.0.0-*"
+        "Microsoft.CSharp": "4.0.0-*",
+        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }
     }
   }

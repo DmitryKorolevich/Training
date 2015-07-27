@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Relational.Metadata;
 using System.Data.SqlClient;
 using System.IO;
 using Microsoft.Framework.OptionsModel;
@@ -40,7 +39,7 @@ namespace VitalChoice.Infrastructure.Context
 	        
 	    }       
 
-        protected override void OnConfiguring(EntityOptionsBuilder builder)
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
@@ -75,42 +74,42 @@ namespace VitalChoice.Infrastructure.Context
             #region Contents
 
 		    builder.Entity<ContentTypeEntity>().Key(p => p.Id);
-            builder.Entity<ContentTypeEntity>().Table("ContentTypes");
+            builder.Entity<ContentTypeEntity>().ToTable("ContentTypes");
 
             builder.Entity<ContentItemToContentProcessor>().Key(p => p.Id);
-            builder.Entity<ContentItemToContentProcessor>().Table("ContentItemsToContentProcessors");
+            builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors");
             builder.Entity<MasterContentItemToContentProcessor>().Key(p => p.Id);
-            builder.Entity<MasterContentItemToContentProcessor>().Table("MasterContentItemsToContentProcessors");
+            builder.Entity<MasterContentItemToContentProcessor>().ToTable("MasterContentItemsToContentProcessors");
             builder.Entity<ContentProcessor>().Key(p => p.Id);
-            builder.Entity<ContentProcessor>().Table("ContentProcessors");
+            builder.Entity<ContentProcessor>().ToTable("ContentProcessors");
 
             builder.Entity<MasterContentItem>().Key(p => p.Id);
-            builder.Entity<MasterContentItem>().Table("MasterContentItems");
+            builder.Entity<MasterContentItem>().ToTable("MasterContentItems");
             builder.Entity<MasterContentItem>().Reference(p => p.Type).InverseCollection().ForeignKey(p => p.TypeId).PrincipalKey(p => p.Id);
             builder.Entity<MasterContentItem>().Collection(p => p.MasterContentItemToContentProcessors).InverseReference(p => p.MasterContentItem).ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.MasterContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentProcessorId).PrincipalKey(p => p.Id);
             builder.Entity<MasterContentItem>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentItem>().Key(p => p.Id);
-            builder.Entity<ContentItem>().Table("ContentItems");
+            builder.Entity<ContentItem>().ToTable("ContentItems");
             builder.Entity<ContentItem>().Collection(p => p.ContentItemToContentProcessors).InverseReference(p => p.ContentItem).ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentProcessor>().Collection(p => p.ContentItemsToContentProcessors).InverseReference(p => p.ContentProcessor).ForeignKey(p => p.ContentItemProcessorId).PrincipalKey(p => p.Id);
 
             builder.Entity<ContentCategory>().Key(p => p.Id);
-            builder.Entity<ContentCategory>().Table("ContentCategories");
+            builder.Entity<ContentCategory>().ToTable("ContentCategories");
             builder.Entity<ContentCategory>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
             builder.Entity<ContentCategory>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
                 PrincipalKey(p => p.Id);
 
             builder.Entity<RecipeToProduct>().Key(p => p.Id);
-            builder.Entity<RecipeToProduct>().Table("RecipesToProducts");
+            builder.Entity<RecipeToProduct>().ToTable("RecipesToProducts");
             builder.Entity<RecipeToProduct>().Ignore(p => p.ShortProductInfo);
 
             builder.Entity<Recipe>().Key(p => p.Id);
-            builder.Entity<Recipe>().Table("Recipes");
+            builder.Entity<Recipe>().ToTable("Recipes");
             builder.Entity<RecipeToContentCategory>().Key(p => p.Id);
-            builder.Entity<RecipeToContentCategory>().Table("RecipesToContentCategories");
+            builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories");
             builder.Entity<Recipe>().Collection(p => p.RecipesToContentCategories).InverseReference(p => p.Recipe).ForeignKey(p => p.RecipeId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
@@ -124,22 +123,22 @@ namespace VitalChoice.Infrastructure.Context
 
 
             builder.Entity<FAQ>().Key(p => p.Id);
-            builder.Entity<FAQ>().Table("FAQs");
+            builder.Entity<FAQ>().ToTable("FAQs");
             builder.Entity<FAQToContentCategory>().Key(p => p.Id);
-            builder.Entity<FAQToContentCategory>().ForSqlServer().Table("FAQsToContentCategories");
+            builder.Entity<FAQToContentCategory>().ToTable("FAQsToContentCategories");
             builder.Entity<FAQ>().Collection(p => p.FAQsToContentCategories).InverseReference(p => p.FAQ).ForeignKey(p => p.FAQId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<FAQ>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 
             builder.Entity<ArticleToProduct>().Key(p => p.Id);
-            builder.Entity<ArticleToProduct>().Table("ArticlesToProducts");
+            builder.Entity<ArticleToProduct>().ToTable("ArticlesToProducts");
             builder.Entity<ArticleToProduct>().Ignore(p => p.ShortProductInfo);
 
             builder.Entity<Article>().Key(p => p.Id);
-            builder.Entity<Article>().Table("Articles");
+            builder.Entity<Article>().ToTable("Articles");
             builder.Entity<ArticleToContentCategory>().Key(p => p.Id);
-            builder.Entity<ArticleToContentCategory>().Table("ArticlesToContentCategories");
+            builder.Entity<ArticleToContentCategory>().ToTable("ArticlesToContentCategories");
             builder.Entity<Article>().Collection(p => p.ArticlesToContentCategories).InverseReference(p => p.Article).ForeignKey(p => p.ArticleId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Article>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
@@ -152,9 +151,9 @@ namespace VitalChoice.Infrastructure.Context
                 .Required();
 
             builder.Entity<ContentPage>().Key(p => p.Id);
-            builder.Entity<ContentPage>().Table("ContentPages");
+            builder.Entity<ContentPage>().ToTable("ContentPages");
             builder.Entity<ContentPageToContentCategory>().Key(p => p.Id);
-            builder.Entity<ContentPageToContentCategory>().Table("ContentPagesToContentCategories");
+            builder.Entity<ContentPageToContentCategory>().ToTable("ContentPagesToContentCategories");
             builder.Entity<ContentPage>().Collection(p => p.ContentPagesToContentCategories).InverseReference(p => p.ContentPage).ForeignKey(p => p.ContentPageId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
@@ -171,7 +170,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductCategoryContent>().Ignore(x => x.StatusCode);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Assigned);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Order);
-            builder.Entity<ProductCategoryContent>().Table("ProductCategories");
+            builder.Entity<ProductCategoryContent>().ToTable("ProductCategories");
             builder.Entity<ProductCategoryContent>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).
                 PrincipalKey(p => p.Id);
             builder.Entity<ProductCategoryContent>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).
@@ -182,7 +181,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Users
 
             builder.Entity<AdminProfile>().Key(x => x.Id);
-			builder.Entity<AdminProfile>().Table("AdminProfiles");
+			builder.Entity<AdminProfile>().ToTable("AdminProfiles");
 		    builder.Entity<AdminProfile>()
 		        .Reference(x => x.User)
 		        .InverseReference(x => x.Profile)
@@ -195,14 +194,14 @@ namespace VitalChoice.Infrastructure.Context
             #region Settings
 
             builder.Entity<Country>().Key(p => p.Id);
-            builder.Entity<Country>().Table("Countries");
+            builder.Entity<Country>().ToTable("Countries");
             builder.Entity<Country>().Ignore(p => p.States);
 
             builder.Entity<State>().Key(p => p.Id);
-            builder.Entity<State>().Table("States");
+            builder.Entity<State>().ToTable("States");
 
             builder.Entity<AppSettingItem>().Key(p => p.Id);
-            builder.Entity<AppSettingItem>().Table("AppSettings");
+            builder.Entity<AppSettingItem>().ToTable("AppSettings");
 
             #endregion
 

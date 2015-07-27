@@ -11,10 +11,8 @@
     "VitalChoice.Workflow": "1.0.0-*",
     "VitalChoice.Interfaces" : "1.0.0-*",   
     "VitalChoice.DynamicData": "1.0.0-*",
-    "Templates": "2.2.3-beta5",
-    "Autofac.Dnx": "4.0.0",
-    "WindowsAzure.ServiceBus": "2.7-*",
-    "Microsoft.WindowsAzure.ConfigurationManager": "3.1-*"
+    "Templates": "2.2.4-*",
+    "Autofac.Framework.DependencyInjection": "4.0.0-*"
   },
 
   "frameworks": {
@@ -24,7 +22,8 @@
       "dependencies": {
         "System.Runtime": "4.0.20-*",
         "System.IO.FileSystem": "4.0.0-*",
-        "System.IO": "4.0.10-*"
+        "System.IO": "4.0.10-*",
+        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }
     }
   }

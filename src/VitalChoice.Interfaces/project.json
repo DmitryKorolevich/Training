@@ -22,7 +22,8 @@
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
         "System.Threading": "4.0.10-*",
-        "Microsoft.CSharp": "4.0.0-*"
+        "Microsoft.CSharp": "4.0.0-*",
+        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }
     }
   }
