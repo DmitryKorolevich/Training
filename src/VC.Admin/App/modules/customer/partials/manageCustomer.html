@@ -302,9 +302,8 @@
                                                         Credit Card
                                                     </label>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" data-ng-model="paymentInfoTab.SelectedCreditCard" 
-                                                            data-ng-options="creditCard as (creditCardTypes[creditCard.CardType] + ', ending in ' && creditCard.CardNumber) for creditCard in currentCustomer.CreditCards">
+                                                <div class="col-md-6">
+                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" data-ng-model="paymentInfoTab.CreditCard" data-ng-options="creditCard as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + creditCard.CardNumber) for creditCard in currentCustomer.CreditCards track by creditCard.Id">
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3" style="padding-top:9px;">
@@ -312,7 +311,6 @@
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
-                                                <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <div class="radio">
                                                         <label>
@@ -323,7 +321,6 @@
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(3) >= 0">
-                                                <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <div class="radio">
                                                         <label>
@@ -334,43 +331,43 @@
                                                 </div>
                                             </div>
                                             <hr />
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1" data-ng-model="currentCustomer.CredictCards[paymentInfoTab.SelectedCreditCard]">
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 && currentCustomer.ApprovedPaymentMethods.length > 0">
                                                 <div class="form-group">
                                                     <label for="nameOnCard" class="col-md-3 control-label">Name on Card</label>
                                                     <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="nameOnCard" data-ng-model="NameOnCard" placeholder="Name on Card">
+                                                        <input type="text" class="form-control" id="nameOnCard" data-ng-model="paymentInfoTab.CreditCard.NameOnCard" placeholder="Name on Card">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="cardType" class="col-md-3 control-label">Card Type</label>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" id="cardType" data-ng-model="CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes">
+                                                        <select class="form-control" id="cardType" data-ng-model="paymentInfoTab.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes">
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="cardNumber" class="col-md-3 control-label">Card Number</label>
                                                     <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="cardNumber" data-ng-model="CardNumber" placeholder="CardNumber">
+                                                        <input type="text" class="form-control" id="cardNumber" data-ng-model="paymentInfoTab.CreditCard.CardNumber" placeholder="Card Number">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="expirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                     <div class="col-md-4">
-                                                        <input type="text" class="form-control" id="expirationDateMonth" data-ng-model="ExpirationDateMonth" placeholder="Month">
+                                                        <input type="text" class="form-control" id="expirationDateMonth" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateMonth" placeholder="Month">
                                                     </div>
                                                     <label class="col-md-1">
                                                     </label>
                                                     <div class="col-md-4">
-                                                        <input type="text" class="form-control" id="expirationDateYear" data-ng-model="ExpirationDateYear" placeholder="Year">
+                                                        <input type="text" class="form-control" id="expirationDateYear" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateYear" placeholder="Year">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 2" data-ng-model="currentCustomer.Oac">
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0">
                                                 <div class="form-group">
                                                     <label for="terms" class="col-md-3 control-label">Terms:</label>
                                                     <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="terms" data-ng-model="Terms">
+                                                        <input type="text" class="form-control" id="terms" data-ng-model="currentCustomer.Oac.Terms">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -384,11 +381,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 3" data-ng-model="currentCustomer.Check">
+                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0">
                                                 <div class="form-group">
                                                     <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                     <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="checkNumber" data-ng-model="CheckNumber" placeholder="Check #">
+                                                        <input type="text" class="form-control" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -402,7 +399,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 || paymentInfoTab.PaymentMethodType == 2 || paymentInfoTab.PaymentMethodType == 3">
+                                            <div data-ng-if="(paymentInfoTab.PaymentMethodType == 1 || paymentInfoTab.PaymentMethodType == 2 || paymentInfoTab.PaymentMethodType == 3) && currentCustomer.ApprovedPaymentMethods.length > 0">
                                                 <span class="legend">Billing Address</span>
                                                 <div class="form-group">
                                                     <label for="sameBillingAsProfile" class="col-md-3 control-label">Same as Profile Address</label>

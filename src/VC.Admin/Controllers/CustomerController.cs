@@ -15,6 +15,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -113,6 +114,34 @@ namespace VC.Admin.Controllers
             };
         }
 
+        [HttpPost]
+        public Result<CreditCardModel> CreateCreditCardPrototype()
+        {
+            return new CreditCardModel
+            {
+                Address = new AddressModel {AddressType = AddressType.Billing},
+                CardType = CreditCardType.MasterCard
+            };
+        }
+
+        [HttpPost]
+        public Result<OacPaymentModel> CreateOacPrototype()
+        {
+            return new OacPaymentModel
+            {
+                Address = new AddressModel { AddressType = AddressType.Billing }
+            };
+        }
+
+        [HttpPost]
+        public Result<CheckPaymentModel> CreateCheckPrototype()
+        {
+            return new CheckPaymentModel
+            {
+                Address = new AddressModel {AddressType = AddressType.Billing}
+            };
+        }
+            
         [HttpPost]
         public Result<AddressModel> CreateAddressPrototype()
         {

@@ -116,6 +116,14 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									});
 	};
 
+	$scope.getCreditCardTypeName = function(idType) {
+	    for (var idx = 0; idx < $scope.creditCardTypes.length;idx++)
+	    {
+	        if ($scope.creditCardTypes[idx].Key == idType)
+	            return $scope.creditCardTypes[idx].Text;
+	    }
+	}
+
 	function syncCountry(addressItem) {
 		var selectedCountry = $.grep($scope.countries, function (country) {
 			return country.Id == addressItem.Country.Id;
@@ -242,34 +250,109 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    return false;
 	};
 
+	$scope.setNewCreditCard = function (callback) {
+	    customerService.createCreditCardPrototype($scope.addEditTracker)
+            .success(function (result) {
+                if (result.Success) {
+                    $scope.currentCustomer.CreditCards.push(result.Data);
+                    $scope.paymentInfoTab.CreditCard = result.Data;
+                    if (callback)
+                        callback(result.Data);
+                } else {
+                    successHandler(result);
+                }
+            }).
+            error(function (result) {
+                toaster.pop('error', "Error!", "Server error ocurred");
+            })
+            .then(function () {
+                $scope.forms.submitted['billing'] = false;
+            });
+	    return false;
+	};
+
+	$scope.setNewCheck = function (callback) {
+	    customerService.createCheckPrototype($scope.addEditTracker)
+            .success(function (result) {
+                if (result.Success) {
+                    $scope.currentCustomer.Check = result.Data;
+                    if (callback)
+                        callback(result.Data);
+                } else {
+                    successHandler(result);
+                }
+            }).
+            error(function (result) {
+                toaster.pop('error', "Error!", "Server error ocurred");
+            })
+            .then(function () {
+                $scope.forms.submitted['billing'] = false;
+            });
+	    return false;
+	};
+
+	$scope.setNewOac = function (callback) {
+	    customerService.createOacPrototype($scope.addEditTracker)
+            .success(function (result) {
+                if (result.Success) {
+                    $scope.currentCustomer.Oac = result.Data;
+                    if (callback)
+                        callback(result.Data);
+                } else {
+                    successHandler(result);
+                }
+            }).
+            error(function (result) {
+                toaster.pop('error', "Error!", "Server error ocurred");
+            })
+            .then(function () {
+                $scope.forms.submitted['billing'] = false;
+            });
+	    return false;
+	};
+
 	$scope.switchPaymentMethodType = function () {
 	    switch ($scope.paymentInfoTab.PaymentMethodType) {
 	        //CC
 	        case "1":
 	            if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0] && $scope.currentCustomer.CreditCards[0].Address) {
+	                $scope.paymentInfoTab.sameBilling = false;
 	                $scope.paymentInfoTab.Address = $scope.currentCustomer.CreditCards[0].Address;
 	            }
-	            else
-	            {
-	                $scope.setNewBillingAddress();
+	            else {
+	                $scope.setNewCreditCard(function (result) {
+	                    $scope.paymentInfoTab.sameBilling = false;
+	                    $scope.paymentInfoTab.Address = result.Address;
+	                });
 	            }
 	            break;
 
 	            //OAC
 	        case "2":
-	            if ($scope.currentCustomer.Oac && $scope.currentCustomer.Oac.Address)
+	            if ($scope.currentCustomer.Oac && $scope.currentCustomer.Oac.Address) {
+	                $scope.paymentInfoTab.sameBilling = false;
 	                $scope.paymentInfoTab.Address = $scope.currentCustomer.Oac.Address;
+	            }
 	            else {
-	                $scope.setNewBillingAddress();
+	                $scope.setNewOac(function (result) {
+	                    $scope.paymentInfoTab.sameBilling = false;
+	                    $scope.paymentInfoTab.Address = result.Address;
+	                });
 	            }
 	            break;
 
 	            //Check
 	        case "3":
 	            if ($scope.currentCustomer.Check && $scope.currentCustomer.Check.Address)
+	            {
+	                $scope.paymentInfoTab.sameBilling = false;
 	                $scope.paymentInfoTab.Address = $scope.currentCustomer.Check.Address;
+	            }
 	            else {
-	                $scope.setNewBillingAddress();
+	                $scope.setNewCheck(function (result) {
+	                    $scope.paymentInfoTab.sameBilling = false;
+	                    $scope.paymentInfoTab.Address = result.Address;
+	                });
 	            }
 	            break;
 	    }

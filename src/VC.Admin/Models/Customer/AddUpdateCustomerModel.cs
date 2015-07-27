@@ -81,10 +81,10 @@ namespace VC.Admin.Models.Customer
         public IList<CustomerNoteModel> CustomerNotes { get; set; }
 
         [Map("CustomerPaymentMethods")]
-	    public IList<CustomerPaymentMethodModel> CreditCards { get; set; }
+	    public IList<CreditCardModel> CreditCards { get; set; }
 
-	    public CustomerPaymentMethodModel Check { get; set; }
+	    public CheckPaymentModel Check { get; set; }
 
-        public CustomerPaymentMethodModel Oac { get; set; }
+        public OacPaymentModel Oac { get; set; }
     }
 }

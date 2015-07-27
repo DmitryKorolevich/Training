@@ -51,6 +51,15 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		deleteNote: function (id, tracker) {
 		    return $http.post(baseUrl + 'DeleteNote/?idNote=' + id, getConfig(tracker));
+		},
+		createCreditCardPrototype: function (tracker) {
+		    return $http.post(baseUrl + 'CreateCreditCardPrototype', getConfig(tracker));
+		},
+		createOacPrototype: function (tracker) {
+		    return $http.post(baseUrl + 'CreateOacPrototype', getConfig(tracker));
+		},
+		createCheckPrototype: function (tracker) {
+		    return $http.post(baseUrl + 'CreateCheckPrototype', getConfig(tracker));
 		}
 	};
 }]);
