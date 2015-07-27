@@ -25,7 +25,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		};
 		$scope.paymentInfoTab = {
 		    active: false,
-            formName: 'payment'
+            formName: 'billing'
 		};
 		$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 		var tabs = [];
@@ -114,6 +114,15 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									.then(function () {
 									    $scope.forms.submitted['customerNote'] = false;
 									});
+	};
+
+	$scope.getLast4 = function (str) {
+	    if (str == null)
+	        return undefined;
+	    var start = str.length - 4;
+	    if (start < 0)
+	        start = 0;
+	    return str.slice(start, str.length);
 	};
 
 	$scope.getCreditCardTypeName = function(idType) {
@@ -399,6 +408,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		    $scope.forms.submitted['profile'] = true;
 		    $scope.forms.submitted['shipping'] = true;
 		    $scope.forms.submitted['customerNote'] = true;
+		    $scope.forms.submitted['billing'] = true;
 		}
 	};
 

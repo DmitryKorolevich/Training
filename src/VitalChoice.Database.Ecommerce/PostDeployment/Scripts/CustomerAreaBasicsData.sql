@@ -314,3 +314,17 @@ BEGIN
 	--CREATE UNIQUE NONCLUSTERED INDEX [IX_Name_Lookups]
  --   ON [dbo].[Lookups]([Name] ASC)
 END
+
+IF EXISTS(SELECT * FROM [CustomerPaymentMethodOptionTypes] WHERE Name = 'ExpDateMonth')
+BEGIN
+	DECLARE @Card INT
+	SET @Card = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Credit Card')
+
+	DELETE FROM [CustomerPaymentMethodOptionTypes]
+	WHERE Name = 'ExpDateMonth' OR Name = 'ExpDateYear'
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
+	VALUES
+	(N'ExpDate', 6, NULL, @Card, NULL)
+END

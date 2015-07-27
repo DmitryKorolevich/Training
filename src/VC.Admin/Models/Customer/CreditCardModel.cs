@@ -9,11 +9,19 @@ namespace VC.Admin.Models.Customer
 {
     public class CheckPaymentModel
     {
+        public CheckPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.Check;
+        }
+
         [Map]
         public int Id { get; set; }
 
         [Map]
         public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
 
         [Map]
         public string CheckNumber { get; set; }
@@ -24,26 +32,42 @@ namespace VC.Admin.Models.Customer
 
     public class OacPaymentModel
     {
+        public OacPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.Oac;
+        }
+
         [Map]
         public int Id { get; set; }
 
         [Map]
         public AddressModel Address { get; set; }
 
-        [Map]
-        public int? Terms { get; set; }
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
 
         [Map]
-        public int? Fob { get; set; }
+        public int Terms { get; set; }
+
+        [Map]
+        public int Fob { get; set; }
     }
 
     public class CreditCardModel
     {
+        public CreditCardModel()
+        {
+            PaymentMethodType = PaymentMethodType.CreditCard;
+        }
+
         [Map]
         public int Id { get; set; }
 
         [Map]
         public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
 
         [Map]
         public string NameOnCard { get; set; }
@@ -51,11 +75,11 @@ namespace VC.Admin.Models.Customer
         [Map]
         public string CardNumber { get; set; }
 
-        public string ExpirationDateMonth { get; set; }
+        public int ExpirationDateMonth { get; set; }
 
-        public string ExpirationDateYear { get; set; }
+        public int ExpirationDateYear { get; set; }
 
         [Map]
-        public CreditCardType? CardType { get; set; }
+        public CreditCardType CardType { get; set; }
     }
 }
