@@ -8,7 +8,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IProductService : IDynamicObjectServiceAsync<ProductDynamic, Domain.Entities.eCommerce.Products.Product>
+	public interface IProductService : IDynamicObjectServiceAsync<ProductDynamic, Product>
 	{
         #region Products
 
