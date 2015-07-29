@@ -236,7 +236,6 @@
         accept: function (sourceNode, destNodes, destIndex) {
             var data = sourceNode.$modelValue;
             var destType = destNodes.$element.attr('data-type');
-            console.log(data.type +' '+ destType);
             return (data.type == destType); // only accept the same type
         }
     };

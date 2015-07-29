@@ -191,6 +191,9 @@ namespace VC.Admin.Models.Product
         [Map("Skus")]
         public IList<SKUManageModel> SKUs { get; set; }
 
+        [Map]
+        public int? InventoryCategoryId { get; set; }
+
         public ProductManageModel()
         {
             SKUs = new List<SKUManageModel>();

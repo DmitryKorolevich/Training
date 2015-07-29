@@ -49,22 +49,25 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Url = entity.Url;
                 dynamic.Hidden = entity.Hidden;
                 dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
-                foreach (var sku in entity.Skus)
+                if (entity.Skus != null)
                 {
-                    sku.OptionTypes = entity.OptionTypes;
-                    if (withDefaults)
+                    foreach (var sku in entity.Skus)
                     {
-                        //combine product part in skus
-                        foreach (var productValue in entity.OptionValues)
+                        sku.OptionTypes = entity.OptionTypes;
+                        if (withDefaults)
                         {
-                            if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
+                            //combine product part in skus
+                            foreach (var productValue in entity.OptionValues)
                             {
-                                sku.OptionValues.Add(productValue);
+                                if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
+                                {
+                                    sku.OptionValues.Add(productValue);
+                                }
                             }
                         }
                     }
+                    dynamic.Skus.AddRange(await _skuMapper.FromEntityRangeAsync(entity.Skus, withDefaults));
                 }
-                dynamic.Skus.AddRange(await _skuMapper.FromEntityRangeAsync(entity.Skus, withDefaults));
             });
         }
 

@@ -632,3 +632,18 @@ BEGIN
 	SET IdFieldType = 8
 	WHERE Name = N'AdditionalNotes'
 END
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='InventoryCategoryId')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 3, 1, N'InventoryCategoryId'
+UNION
+SELECT NULL, 3, 2, N'InventoryCategoryId'
+UNION
+SELECT NULL, 3, 3, N'InventoryCategoryId'
+UNION
+SELECT NULL, 3, 4, N'InventoryCategoryId'
+
+END

@@ -155,4 +155,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\ProductTypes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\InventoryCategories.sql" />
+  </ItemGroup>
 </Project>

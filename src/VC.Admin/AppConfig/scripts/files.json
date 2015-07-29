@@ -132,6 +132,8 @@
 		"app/modules/setting/setting.js",
 		"app/modules/product/controllers/productCategoriesController.js",
 		"app/modules/product/controllers/productCategoryManageController.js",
+		"app/modules/product/controllers/inventoryCategoriesController.js",
+		"app/modules/product/controllers/inventoryCategoryManageController.js",
 		"app/modules/product/controllers/productsController.js",
 		"app/modules/product/controllers/productManageController.js",
 		"app/modules/product/controllers/addProductPopupController.js",
