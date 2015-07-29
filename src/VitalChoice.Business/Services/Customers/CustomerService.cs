@@ -115,30 +115,32 @@ namespace VitalChoice.Business.Services.Customers
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-            entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
-			entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
+   //         entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
+			//entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
 
 			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
 			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
 
-            await uow.SaveChangesAsync();
+            //await uow.SaveChangesAsync();
 
-            entity.Addresses =
-                await
-                    addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-                        .Include(a => a.OptionValues)
-                        .SelectAsync();
-            entity.CustomerNotes =
-                await
-                    customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-                        .Include(n => n.OptionValues)
-                        .SelectAsync();
-            entity.CustomerPaymentMethods =
-                await
-                    customerPaymentMethodRepository.Query(p => p.IdCustomer == entity.Id)
-                        .Include(p => p.OptionValues)
-                        .Include(p => p.BillingAddress)
-                        .SelectAsync();
+            //var addressType = (int?)AddressType.Billing;
+            //entity.Addresses =
+            //    await
+            //        addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id && a.IdObjectType != addressType)
+            //            .Include(a => a.OptionValues)
+            //            .SelectAsync();
+            //entity.CustomerNotes =
+            //    await
+            //        customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+            //            .Include(n => n.OptionValues)
+            //            .SelectAsync();
+            //entity.CustomerPaymentMethods =
+            //    await
+            //        customerPaymentMethodRepository.Query(p => p.IdCustomer == entity.Id)
+            //            .Include(p => p.OptionValues)
+            //            .Include(p => p.BillingAddress)
+            //            .ThenInclude(a => a.OptionValues)
+            //            .SelectAsync();
             foreach (var address in entity.Addresses)
             {
                 await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
@@ -150,8 +152,6 @@ namespace VitalChoice.Business.Services.Customers
             foreach (var customerPaymentMethod in entity.CustomerPaymentMethods)
             {
                 await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
-                await
-                    addressOptionValuesRepositoryAsync.DeleteAllAsync(customerPaymentMethod.BillingAddress.OptionValues);
             }
         }
 
@@ -165,7 +165,7 @@ namespace VitalChoice.Business.Services.Customers
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-            foreach (var address in entity.Addresses)
+            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int)AddressType.Billing))
             {
                 await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
             }
@@ -176,15 +176,16 @@ namespace VitalChoice.Business.Services.Customers
             foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != RecordStatusCode.Deleted))
             {
                 await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
-                await
-                    addressOptionValuesRepositoryAsync.InsertRangeAsync(
-                        customerPaymentMethod.BillingAddress.OptionValues);
+                if (customerPaymentMethod.BillingAddress.Id == 0)
+                    await addressesRepositoryAsync.InsertGraphAsync(customerPaymentMethod.BillingAddress);
+                else
+                    await addressOptionValuesRepositoryAsync.InsertRangeAsync(customerPaymentMethod.BillingAddress.OptionValues);
             }
 
             var paymentsToDelete =
                 entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
-            await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
             await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Select(p => p.BillingAddress));
+            await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
 
             await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
             await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
@@ -192,32 +193,33 @@ namespace VitalChoice.Business.Services.Customers
 
         protected override async Task AfterSelect(Customer entity)
         {
-            var addressType = (int?) AddressType.Billing;
-            entity.Addresses =
-                await
-                    _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id && a.IdObjectType != addressType)
-                        .Include(a => a.OptionValues)
-                        .SelectAsync(false);
-            entity.CustomerNotes =
-                await
-                    _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-                        .Include(n => n.OptionValues)
-                        .SelectAsync(false);
-            entity.OrderNotes =
-                await
-                    _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-                        .Include(n => n.OrderNote)
-                        .SelectAsync(false);
-            entity.PaymentMethods =
-                await
-                    _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
-                        .Include(p => p.PaymentMethod)
-                        .SelectAsync(false);
-            entity.CustomerPaymentMethods =
-                await _customerPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
-                    .Include(p => p.OptionValues)
-                    .Include(p => p.BillingAddress)
-                    .SelectAsync(false);
+            //var addressType = (int?) AddressType.Billing;
+            //entity.Addresses =
+            //    await
+            //        _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id && a.IdObjectType != addressType)
+            //            .Include(a => a.OptionValues)
+            //            .SelectAsync(false);
+            //entity.CustomerNotes =
+            //    await
+            //        _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+            //            .Include(n => n.OptionValues)
+            //            .SelectAsync(false);
+            //entity.OrderNotes =
+            //    await
+            //        _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
+            //            .Include(n => n.OrderNote)
+            //            .SelectAsync(false);
+            //entity.PaymentMethods =
+            //    await
+            //        _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
+            //            .Include(p => p.PaymentMethod)
+            //            .SelectAsync(false);
+            //entity.CustomerPaymentMethods =
+            //    await _customerPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
+            //        .Include(p => p.OptionValues)
+            //        .Include(p => p.BillingAddress)
+            //        .ThenInclude(a => a.OptionValues)
+            //        .SelectAsync(false);
         }
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
@@ -225,7 +227,18 @@ namespace VitalChoice.Business.Services.Customers
             return query
                 .Include(p => p.DefaultPaymentMethod)
                 .Include(p => p.User)
-                .ThenInclude(p => p.Customer);
+                .ThenInclude(p => p.Customer)
+                .Include(a => a.Addresses)
+                .ThenInclude(a => a.OptionValues)
+                .Include(p => p.CustomerNotes)
+                .ThenInclude(n => n.OptionValues)
+                .Include(p => p.OrderNotes)
+                .Include(p => p.PaymentMethods)
+                .Include(p => p.CustomerPaymentMethods)
+                .ThenInclude(p => p.OptionValues)
+                .Include(p => p.CustomerPaymentMethods)
+                .ThenInclude(p => p.BillingAddress)
+                .ThenInclude(p => p.OptionValues);
         }
 
         protected async override Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)

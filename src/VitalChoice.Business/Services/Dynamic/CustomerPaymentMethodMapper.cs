@@ -57,6 +57,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = pair.Dynamic;
 
                 entity.BillingAddress = await _addressMapper.ToEntityAsync(dynamic.Address);
+                entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
                 entity.IdCustomer = dynamic.IdCustomer;
             });
         }
@@ -73,7 +74,7 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
-
+                entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
                 foreach (var value in entity.OptionValues)
                 {
                     value.IdCustomerPaymentMethod = dynamic.Id;

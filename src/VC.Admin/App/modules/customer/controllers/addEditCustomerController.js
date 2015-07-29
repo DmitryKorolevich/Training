@@ -68,7 +68,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
 								$scope.paymentInfoTab.Address = {};
-								$scope.switchPaymentMethodType();
+								//$scope.switchPaymentMethodType();
 								angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
 								    syncCountry(shippingItem);
 								    if (shippingItem.Default)
@@ -78,6 +78,18 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								});
 
 								syncCountry($scope.currentCustomer.ProfileAddress);
+
+								angular.forEach($scope.currentCustomer.CreditCards, function (creditCard) {
+								    syncCountry(creditCard.Address);
+								});
+
+								if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
+								    $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
+
+                                if ($scope.currentCustomer.Oac)
+                                    syncCountry($scope.currentCustomer.Oac.Address);
+                                if ($scope.currentCustomer.Check)
+								    syncCountry($scope.currentCustomer.Check.Address);
 
 								syncDefaultPaymentMethod();
 								createCustomerNoteProto();
@@ -134,11 +146,13 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	}
 
 	function syncCountry(addressItem) {
-		var selectedCountry = $.grep($scope.countries, function (country) {
-			return country.Id == addressItem.Country.Id;
-		})[0];
+	    if (addressItem) {
+	        var selectedCountry = $.grep($scope.countries, function (country) {
+	            return country.Id == addressItem.Country.Id;
+	        })[0];
 
-		addressItem.Country = selectedCountry;
+	        addressItem.Country = selectedCountry;
+	    }
 	};
 
 	function clearServerValidation() {
@@ -320,52 +334,50 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    return false;
 	};
 
-	$scope.switchPaymentMethodType = function () {
-	    switch ($scope.paymentInfoTab.PaymentMethodType) {
-	        //CC
-	        case "1":
-	            if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0] && $scope.currentCustomer.CreditCards[0].Address) {
-	                $scope.paymentInfoTab.sameBilling = false;
-	                $scope.paymentInfoTab.Address = $scope.currentCustomer.CreditCards[0].Address;
-	            }
-	            else {
-	                $scope.setNewCreditCard(function (result) {
-	                    $scope.paymentInfoTab.sameBilling = false;
-	                    $scope.paymentInfoTab.Address = result.Address;
-	                });
-	            }
-	            break;
+	//$scope.switchPaymentMethodType = function () {
+	//    switch ($scope.paymentInfoTab.PaymentMethodType) {
+	//        //CC
+	//        case "1":
+	//            if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0] && $scope.currentCustomer.CreditCards[0].Address) {
+	//                $scope.paymentInfoTab.sameBilling = false;
+	//                $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
+	//            }
+	//            else {
+	//                $scope.setNewCreditCard(function (result) {
+	//                    syncCountry($scope.paymentInfoTab.CreditCard.Address);
+	//                    $scope.paymentInfoTab.sameBilling = false;
+	//                });
+	//            }
+	//            break;
 
-	            //OAC
-	        case "2":
-	            if ($scope.currentCustomer.Oac && $scope.currentCustomer.Oac.Address) {
-	                $scope.paymentInfoTab.sameBilling = false;
-	                $scope.paymentInfoTab.Address = $scope.currentCustomer.Oac.Address;
-	            }
-	            else {
-	                $scope.setNewOac(function (result) {
-	                    $scope.paymentInfoTab.sameBilling = false;
-	                    $scope.paymentInfoTab.Address = result.Address;
-	                });
-	            }
-	            break;
+	//            //OAC
+	//        case "2":
+	//            if ($scope.currentCustomer.Oac && $scope.currentCustomer.Oac.Address) {
+	//                $scope.paymentInfoTab.sameBilling = false;
+	//            }
+	//            else {
+	//                $scope.setNewOac(function (result) {
+	//                    syncCountry($scope.paymentInfoTab.Oac.Address);
+	//                    $scope.paymentInfoTab.sameBilling = false;
+	//                });
+	//            }
+	//            break;
 
-	            //Check
-	        case "3":
-	            if ($scope.currentCustomer.Check && $scope.currentCustomer.Check.Address)
-	            {
-	                $scope.paymentInfoTab.sameBilling = false;
-	                $scope.paymentInfoTab.Address = $scope.currentCustomer.Check.Address;
-	            }
-	            else {
-	                $scope.setNewCheck(function (result) {
-	                    $scope.paymentInfoTab.sameBilling = false;
-	                    $scope.paymentInfoTab.Address = result.Address;
-	                });
-	            }
-	            break;
-	    }
-	};
+	//            //Check
+	//        case "3":
+	//            if ($scope.currentCustomer.Check && $scope.currentCustomer.Check.Address)
+	//            {
+	//                $scope.paymentInfoTab.sameBilling = false;
+	//            }
+	//            else {
+	//                $scope.setNewCheck(function (result) {
+	//                    syncCountry($scope.paymentInfoTab.Check.Address);
+	//                    $scope.paymentInfoTab.sameBilling = false;
+	//                });
+	//            }
+	//            break;
+	//    }
+	//};
 
 	$scope.save = function () {
 		clearServerValidation();

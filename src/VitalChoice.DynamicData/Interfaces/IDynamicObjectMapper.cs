@@ -25,7 +25,7 @@ namespace VitalChoice.DynamicData.Interfaces
         TDynamic FromModel<TModel>(TModel model);
     }
 
-    public struct DynamicEntityPair<TDynamic, TEntity>
+    public class DynamicEntityPair<TDynamic, TEntity>
         where TEntity: Entity
         where TDynamic: MappedObject
     {

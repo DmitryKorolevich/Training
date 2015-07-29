@@ -8,6 +8,11 @@ namespace VitalChoice.DynamicData.Base
 {
     public abstract class MappedObject: IModelTypeContainer
     {
+        protected MappedObject()
+        {
+            StatusCode = RecordStatusCode.Active;
+        }
+
         public int Id { get; set; }
         public RecordStatusCode StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
