@@ -211,6 +211,9 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(c => c.IdCategory)
 		        .PrincipalKey(cat => cat.Id);
 
+            builder.Entity<InventoryCategory>().Key(p => p.Id);
+            builder.Entity<InventoryCategory>().ToTable("InventoryCategories");
+
             builder.Entity<VProductSku>().Key(p => p.IdProduct);
             builder.Entity<VProductSku>().Ignore(x => x.Id);
             builder.Entity<VProductSku>().ToTable("VProductSkus");

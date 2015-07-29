@@ -16,5 +16,7 @@ namespace VitalChoice.Domain.Constants
         public const string FIELD_NAME_DISREGARD_STOCK = "DisregardStock";
         public const string FIELD_NAME_NON_DISCOUNTABLE = "NonDiscountable";
         public const string FIELD_NAME_HIDE_FROM_DATA_FEED = "HideFromDataFeed";
+
+        public const string FIELD_NAME_INVENTORY_CATEGORY_ID = "InventoryCategoryId";
     }
 }

@@ -30,6 +30,23 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return $http.post(baseUrl + 'DeleteCategory/' + id, getConfig(tracker));
 	    },
 
+	    //inventoryCategories
+	    getInventoryCategoriesTree: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetInventoryCategoriesTree', filter, getConfig(tracker));
+	    },
+	    updateInventoryCategoriesTree: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateInventoryCategoriesTree', model, getConfig(tracker));
+	    },
+	    getInventoryCategory: function (id, tracker) {
+	        return $http.get(baseUrl + 'GetInventoryCategory/' + id, getConfig(tracker));
+	    },
+	    updateInventoryCategory: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateInventoryCategory', model, getConfig(tracker));
+	    },
+	    deleteInventoryCategory: function (id, tracker) {
+	        return $http.post(baseUrl + 'DeleteInventoryCategory/' + id, getConfig(tracker));
+	    },
+
 	    //products  
 	    getSkus: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetSkus', filter, getConfig(tracker));

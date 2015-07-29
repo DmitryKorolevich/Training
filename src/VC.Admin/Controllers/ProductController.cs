@@ -32,13 +32,16 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
+        private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
+            IInventoryCategoryService inventoryCategoryService,
             ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper)
         {
             this.productCategoryService = productCategoryService;
+            this.inventoryCategoryService = inventoryCategoryService;
             this.productService = productService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -145,7 +148,7 @@ namespace VC.Admin.Controllers
 
         #endregion
 
-        #region Categories
+        #region ProductCategories
 
         [HttpPost]
         public async Task<Result<ProductCategoryTreeItemModel>> GetCategoriesTree([FromBody]ProductCategoryTreeFilter filter)
@@ -195,6 +198,62 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteCategory(int id)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
+        }
+
+        #endregion
+
+        #region InventoryCategories
+
+        [HttpPost]
+        public async Task<Result<IList<InventoryCategoryTreeItemModel>>> GetInventoryCategoriesTree([FromBody]InventoryCategoryTreeFilter filter)
+        {
+            var result = await inventoryCategoryService.GetCategoriesTreeAsync(filter);
+
+            return result.Select(p => new InventoryCategoryTreeItemModel(p)).ToList(); 
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> UpdateInventoryCategoriesTree([FromBody]IList<InventoryCategoryTreeItemModel> model)
+        {
+            IList<InventoryCategory> categories = new List<InventoryCategory>();
+            if(categories!=null)
+            {
+                foreach(var modelCategory in model)
+                {
+                    categories.Add(modelCategory.Convert());
+                }
+            }
+
+            return await inventoryCategoryService.UpdateCategoriesTreeAsync(categories);
+        }
+
+        [HttpGet]
+        public async Task<Result<InventoryCategoryManageModel>> GetInventoryCategory(int id)
+        {
+            if (id == 0)
+            {
+                return new InventoryCategoryManageModel()
+                {
+                };
+            }
+            return new InventoryCategoryManageModel((await inventoryCategoryService.GetCategoryAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<InventoryCategoryManageModel>> UpdateInventoryCategory([FromBody]InventoryCategoryManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+            var item = model.Convert();
+            item = await inventoryCategoryService.UpdateCategoryAsync(item);
+
+            return new InventoryCategoryManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteInventoryCategory(int id)
+        {
+            return await inventoryCategoryService.DeleteCategoryAsync(id);
         }
 
         #endregion

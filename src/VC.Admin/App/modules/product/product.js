@@ -3,6 +3,8 @@
 angular.module('app.modules.product', [
 	'app.modules.product.controllers.productCategoriesController',
 	'app.modules.product.controllers.productCategoryManageController',
+	'app.modules.product.controllers.inventoryCategoriesController',
+	'app.modules.product.controllers.inventoryCategoryManageController',
 	'app.modules.product.controllers.productsController',
 	'app.modules.product.controllers.productManageController',
 	'app.modules.product.controllers.addProductPopupController',
@@ -32,6 +34,13 @@ angular.module('app.modules.product', [
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
+                /*inventory categories*/
+		        .state('index.oneCol.manageInventoryCategories', {
+		            url: '/products/inventorycategories',
+		            templateUrl: 'app/modules/product/partials/inventoryCategoriesTreeView.html',
+		            controller: 'inventoryCategoriesController',
+		        })
+		        /*products*/
 		        .state('index.oneCol.manageProducts', {
 		            url: '/products',
 		            templateUrl: 'app/modules/product/partials/productsList.html',
@@ -47,6 +56,7 @@ angular.module('app.modules.product', [
 				    templateUrl: 'app/modules/product/partials/productDetail.html',
 				    controller: 'productManageController'
 				})
+		        /*discounts*/
 		        .state('index.oneCol.manageDiscounts', {
 		            url: '/discounts',
 		            templateUrl: 'app/modules/product/partials/discountsList.html',

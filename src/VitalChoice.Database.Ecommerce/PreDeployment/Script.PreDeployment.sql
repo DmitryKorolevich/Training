@@ -20,6 +20,7 @@
 :r .\Scripts\WorkflowResolverPaths.sql
 
 :r .\Scripts\ProductCategories.sql
+:r .\Scripts\InventoryCategories.sql
 :r .\Scripts\Countries.sql
 :r .\Scripts\GiftCertificates.sql
 :r .\Scripts\GiftCetfificatesUpdate.sql
@@ -37,3 +38,4 @@
 :r .\Scripts\CustomerAreaBasics.sql
 
 :r .\Scripts\ReferencesToUsers.sql
+
