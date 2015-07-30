@@ -296,26 +296,34 @@
                                         <fieldset>
                                             <span class="legend">Select Payment Method</span>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
+                                                <div class="col-md-3">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <button class="btn btn-info" data-ng-show="paymentInfoTab.PaymentMethodType == 1" data-ng-click="setNewCreditCard();">Add New Credit Card</button>
+                                                </div>
+                                                <div class="col-md-3">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
                                                 <div class="radio col-md-3">
-                                                    <label>
-                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="1" id="creditCard">
+                                                    <label class="control-label">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard">
                                                         Credit Card
                                                     </label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" data-ng-model="paymentInfoTab.CreditCard" 
-                                                            data-ng-options="creditCard as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for creditCard in currentCustomer.CreditCards track by creditCard.Id">
-                                                    </select>
+                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 && (!currentCustomer.CreditCards || currentCustomer.CreditCards.length = 0)" data-ng-model="paymentInfoTab.CreditCard"
+                                                            data-ng-options="creditCard as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for creditCard in currentCustomer.CreditCards track by creditCard.Id"></select>
                                                 </div>
-                                                <div class="col-md-3" style="padding-top:9px;">
-                                                    <button class="btn btn-danger pull-right" data-ng-click="deleteSelectedCreditCard(paymentInfoTab.SelectedCreditCard);">Delete</button>
+                                                <div class="col-md-3">
+                                                    <button class="btn btn-danger pull-right" data-ng-show="paymentInfoTab.CreditCard" data-ng-click="deleteSelectedCreditCard(paymentInfoTab.CreditCard.Id);">Delete</button>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
                                                 <div class="col-md-9">
                                                     <div class="radio">
-                                                        <label>
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="2" id="oac">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac">
                                                             On Approved Credit
                                                         </label>
                                                     </div>
@@ -324,14 +332,14 @@
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(3) >= 0">
                                                 <div class="col-md-9">
                                                     <div class="radio">
-                                                        <label>
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" data-ng-click="switchPaymentMethodType();" value="3" id="check">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check">
                                                             Check
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <hr />
+                                            <hr/>
                                             <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 && currentCustomer.ApprovedPaymentMethods.length > 0">
                                                 <div class="form-group">
                                                     <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
@@ -347,8 +355,7 @@
                                                 <div class="form-group">
                                                     <label for="CardType" class="col-md-3 control-label">Card Type</label>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" id="CardType" name="CardType" data-ng-model="paymentInfoTab.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off">
-                                                        </select>
+                                                        <select class="form-control" id="CardType" name="CardType" data-ng-model="paymentInfoTab.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
                                                         <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.CardType.$invalid">
                                                             <small class="error" ng-show="forms.billing.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
                                                             <small class="error" ng-show="forms.billing.CardType.$error.server">{{serverMessages.GetMessage('CardType')}}</small>

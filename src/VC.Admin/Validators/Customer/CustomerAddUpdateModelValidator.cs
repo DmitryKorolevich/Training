@@ -11,28 +11,35 @@ namespace VC.Admin.Validators.Customer
 {
 	public class CustomerAddUpdateModelValidator : ModelValidator<AddUpdateCustomerModel>
 	{
-		public override void Validate(AddUpdateCustomerModel value)
-		{
-			ValidationErrors.Clear();
+	    public override void Validate(AddUpdateCustomerModel value)
+	    {
+	        ValidationErrors.Clear();
 
-			var customerValidator = ValidatorsFactory.GetValidator<CustomerModelRules>();
-			ParseResults(customerValidator.Validate(value));
+	        var customerValidator = ValidatorsFactory.GetValidator<CustomerModelRules>();
+	        ParseResults(customerValidator.Validate(value));
 
-			var profileAddressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
-            ParseResults(profileAddressValidator.Validate(value.ProfileAddress));
-			foreach (var shipping in value.Shipping)
-			{
-				ParseResults(profileAddressValidator.Validate(shipping));
-			}
+	        var profileAddressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
+	        ParseResults(profileAddressValidator.Validate(value.ProfileAddress));
+	        foreach (var shipping in value.Shipping)
+	        {
+	            ParseResults(profileAddressValidator.Validate(shipping));
+	        }
 
-			var customerNoteValidator = ValidatorsFactory.GetValidator<CustomerNoteModelRules>();
-			foreach (var customerNote in value.CustomerNotes)
-			{
-				ParseResults(customerNoteValidator.Validate(customerNote));
-			}
-		}
+	        var customerNoteValidator = ValidatorsFactory.GetValidator<CustomerNoteModelRules>();
+	        foreach (var customerNote in value.CustomerNotes)
+	        {
+	            ParseResults(customerNoteValidator.Validate(customerNote));
+	        }
 
-		private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
+	        var creditCardValidator = ValidatorsFactory.GetValidator<CreditCardModelRules>();
+	        foreach (var creditCard in value.CreditCards)
+	        {
+	            ParseResults(creditCardValidator.Validate(creditCard));
+	            ParseResults(profileAddressValidator.Validate(creditCard.Address));
+	        }
+	    }
+
+	    private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
 		{
 			public CustomerModelRules()
 			{

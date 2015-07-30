@@ -279,6 +279,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                 if (result.Success) {
                     $scope.currentCustomer.CreditCards.push(result.Data);
                     $scope.paymentInfoTab.CreditCard = result.Data;
+                    $scope.paymentInfoTab.sameBilling = false;
                     if (callback)
                         callback(result.Data);
                 } else {
@@ -299,6 +300,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
             .success(function (result) {
                 if (result.Success) {
                     $scope.currentCustomer.Check = result.Data;
+                    $scope.paymentInfoTab.sameBilling = false;
                     if (callback)
                         callback(result.Data);
                 } else {
@@ -319,6 +321,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
             .success(function (result) {
                 if (result.Success) {
                     $scope.currentCustomer.Oac = result.Data;
+                    $scope.paymentInfoTab.sameBilling = false;
                     if (callback)
                         callback(result.Data);
                 } else {
@@ -521,26 +524,26 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	}
 
 	$scope.deleteSelectedCreditCard = function (id) {
-	    if ($scope.editMode) {
-	        customerService.deleteCreditCard(id, $scope.addEditTracker)
-                .success(function (result) {
-                    if (result.Success) {
-                        deleteShippingAddressLocal(id);
-                        toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
-                    }
-                    else {
-                        successHandler(result);
-                        //toaster.pop('error', 'Error!', "Can't delete shipping address");
-                    }
-                })
-                .error(function (result) {
-                    toaster.pop('error', "Error!", "Server error ocurred");
-                });
+	    var idx = -1;
+
+	    angular.forEach($scope.currentCustomer.CreditCards, function (item, index) {
+	        if (item.Id == id) {
+	            idx = index;
+	            return;
+	        }
+	    });
+
+	    $scope.currentCustomer.CreditCards.splice(idx, 1);
+	    if (idx < $scope.currentCustomer.CreditCards.length) {
+	        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[idx];
+	    }
+	    else if ($scope.currentCustomer.CreditCards.length > 0) {
+	        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
 	    }
 	    else {
-	        deleteShippingAddressLocal(id);
-	        toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
+	        $scope.paymentInfoTab.CreditCard = undefined;
 	    }
+	    toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
 	}
 
 	$scope.deleteSelectedShipping = function (id) {
