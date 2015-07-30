@@ -106,7 +106,6 @@ namespace VitalChoice.Business.Services.Products
                         throw new AppValidationException("The category with the given parent id doesn't exist.");
                     }
 
-                    //TODO: check product references
                     var products = await GetProductsAssignedToInvenotyCategory(model.ParentId.Value);
                     if (products.Count > 0)
                     {
@@ -165,8 +164,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     errors.Add(new MessageInfo() { Message = "Category with subcategories can't be deleted." });
                 }
-
-                //TODO: check product references
+                
                 var products = await GetProductsAssignedToInvenotyCategory(id);
                 if (products.Count>0)
                 {
