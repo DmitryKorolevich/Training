@@ -178,7 +178,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
-			$state.go("index.oneCol.manageCustomers");
 		} else {
 			var messages = "";
 			if (result.Messages) {

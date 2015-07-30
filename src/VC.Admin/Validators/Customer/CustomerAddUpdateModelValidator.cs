@@ -25,12 +25,6 @@ namespace VC.Admin.Validators.Customer
 	            ParseResults(profileAddressValidator.Validate(shipping));
 	        }
 
-	        var customerNoteValidator = ValidatorsFactory.GetValidator<CustomerNoteModelRules>();
-	        foreach (var customerNote in value.CustomerNotes)
-	        {
-	            ParseResults(customerNoteValidator.Validate(customerNote));
-	        }
-
 	        var creditCardValidator = ValidatorsFactory.GetValidator<CreditCardModelRules>();
 	        foreach (var creditCard in value.CreditCards)
 	        {
