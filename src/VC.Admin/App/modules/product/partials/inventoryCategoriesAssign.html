@@ -5,7 +5,7 @@
 </div>
 <div ui-tree-handle>
     <div class="ya-treeview-content clearfix">
-        <div class="line">
+        <div class="line" data-ng-class="{'radio-inline': !item.SubItems || item.SubItems.length == 0}">
             <label><input data-ng-if="!item.SubItems || item.SubItems.length == 0" data-ng-model="product.InventoryCategoryId" value="{{item.Id}}" type="radio">{{item.Name}}</label>
         </div>
     </div>
