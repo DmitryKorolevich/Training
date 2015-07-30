@@ -596,7 +596,8 @@ namespace VitalChoice.Infrastructure.Context
 				.Reference(p => p.EditedBy)
 				.InverseCollection()
 				.ForeignKey(p => p.IdEditedBy)
-				.PrincipalKey(p => p.Id);
+				.PrincipalKey(p => p.Id)
+                .Required(false);
             builder.Entity<CustomerPaymentMethod>()
 		        .Reference(p => p.PaymentMethod)
 		        .InverseCollection()
@@ -607,7 +608,8 @@ namespace VitalChoice.Infrastructure.Context
 		        .Reference(p => p.BillingAddress)
 		        .InverseReference()
 		        .ForeignKey<CustomerPaymentMethod>(p => p.IdAddress)
-		        .PrincipalKey<Address>(p => p.Id);
+		        .PrincipalKey<Address>(p => p.Id)
+                .Required(false);
 		    builder.Entity<CustomerPaymentMethod>()
 		        .Collection(p => p.OptionValues)
 		        .InverseReference()
@@ -626,17 +628,19 @@ namespace VitalChoice.Infrastructure.Context
 				.PrincipalKey(p => p.Id)
 				.Required(false);
 			builder.Entity<CustomerPaymentMethodOptionValue>().Key(o => o.Id);
-			builder.Entity<CustomerPaymentMethodOptionValue>().ToTable("CustomerPaymentMethodOptionValues");
+			builder.Entity<CustomerPaymentMethodOptionValue>().ToTable("CustomerPaymentMethodValues");
 			builder.Entity<CustomerPaymentMethodOptionValue>()
 				.Reference(v => v.OptionType)
 				.InverseCollection()
 				.ForeignKey(t => t.IdOptionType)
 				.PrincipalKey(v => v.Id)
 				.Required();
+		    builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.BigValue);
+            builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.IdBigString);
 
-			#endregion
+            #endregion
 
-			base.OnModelCreating(builder);
+            base.OnModelCreating(builder);
 		}
 	}
 }

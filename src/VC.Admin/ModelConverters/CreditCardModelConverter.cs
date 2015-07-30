@@ -13,9 +13,12 @@ namespace VC.Admin.ModelConverters
     {
         public void DynamicToModel(CreditCardModel model, CustomerPaymentMethodDynamic dynamic)
         {
-            DateTime exp = dynamic.Data.ExpDate;
-            model.ExpirationDateMonth = exp.Month;
-            model.ExpirationDateYear = exp.Year % 2000;
+            if (dynamic.DictionaryData.ContainsKey("ExpDate"))
+            {
+                DateTime exp = dynamic.Data.ExpDate;
+                model.ExpirationDateMonth = exp.Month;
+                model.ExpirationDateYear = exp.Year%2000;
+            }
         }
 
         public void ModelToDynamic(CreditCardModel model, CustomerPaymentMethodDynamic dynamic)

@@ -82,24 +82,23 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrderNote = c
                 }).ToList();
 
-                await _addressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
-                foreach (var address in entity.Addresses)
+                foreach (var address in dynamic.Addresses)
                 {
                     address.IdCustomer = dynamic.Id;
                 }
-                await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
-                foreach (var note in entity.CustomerNotes)
+                foreach (var note in dynamic.CustomerNotes)
                 {
                     note.IdCustomer = dynamic.Id;
                 }
-
-                await
-                    _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
-                        entity.CustomerPaymentMethods);
-                foreach (var paymentMethod in entity.CustomerPaymentMethods)
+                foreach (var paymentMethod in dynamic.CustomerPaymentMethods)
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
+                await _addressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
+                await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
+                await
+                    _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
+                        entity.CustomerPaymentMethods);
 
                 foreach (var value in entity.OptionValues)
                 {

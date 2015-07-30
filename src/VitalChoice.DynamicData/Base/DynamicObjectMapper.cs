@@ -47,7 +47,7 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities)
         {
-            if (dynamics != null && dynamics.Any())
+            if (dynamics != null && dynamics.Any() && entities != null)
             {
                 //Update existing
                 var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => s.Id,
@@ -69,7 +69,7 @@ namespace VitalChoice.DynamicData.Base
                 var notes = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList());
                 entities.AddRange(notes);
             }
-            else
+            else if (entities != null)
             {
                 foreach (var paymentMethod in entities)
                 {
@@ -109,12 +109,15 @@ namespace VitalChoice.DynamicData.Base
 
         public List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null)
         {
+            if (items == null)
+                return new List<TEntity>();
+
             ICollection<DynamicEntityPair<TDynamic, TEntity>> results;
             if (optionTypes == null)
             {
                 optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
                 results =
-                    items.Select(
+                    items.Where(e => e != null).Select(
                         dynamic =>
                             new DynamicEntityPair<TDynamic, TEntity>(dynamic,
                                 ToEntityItem(dynamic, FilterByType(optionTypes, dynamic.IdObjectType).ToList())))
@@ -123,7 +126,7 @@ namespace VitalChoice.DynamicData.Base
             else
             {
                 results =
-                    items.Select(
+                    items.Where(e => e != null).Select(
                         dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes)))
                         .ToList();
             }
@@ -133,6 +136,9 @@ namespace VitalChoice.DynamicData.Base
 
         public List<TEntity> ToEntityRange(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
         {
+            if (items == null)
+                return new List<TEntity>();
+
             ICollection<TOptionType> optionTypes = null;
             foreach (var pair in items.Where(pair => pair.Value2 == null))
             {
@@ -143,7 +149,7 @@ namespace VitalChoice.DynamicData.Base
                 pair.Value2 = FilterByType(optionTypes, pair.Value1.IdObjectType).ToList();
             }
             var results =
-                items.Select(
+                items.Where(e => e.Value1 != null).Select(
                     pair =>
                         new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
                     .ToList();
@@ -166,7 +172,7 @@ namespace VitalChoice.DynamicData.Base
                 entity.OptionTypes = FilterByType(optionTypes, entity.IdObjectType).ToList();
             }
             List<DynamicEntityPair<TDynamic, TEntity>> results =
-                items.Select(
+                items.Where(e => e != null).Select(
                     entity => new DynamicEntityPair<TDynamic, TEntity>(FromEntityItem(entity, withDefaults), entity))
                     .ToList();
             FromEntityRangeInternalAsync(results, withDefaults).Wait();
@@ -280,6 +286,7 @@ namespace VitalChoice.DynamicData.Base
                 return;
 
             ICollection<TOptionType> optionTypes = null;
+            items = RemoveInvalidForUpdate(items);
             foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
             {
                 if (optionTypes == null)
@@ -298,6 +305,8 @@ namespace VitalChoice.DynamicData.Base
 
         private static void UpdateEntityItem(TDynamic dynamic, TEntity entity)
         {
+            if (dynamic == null || entity == null)
+                return;
             var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
             entity.OptionValues = new List<TOptionValue>();
 
@@ -312,6 +321,8 @@ namespace VitalChoice.DynamicData.Base
 
         private static TEntity ToEntityItem(TDynamic dynamic, ICollection<TOptionType> optionTypes)
         {
+            if (dynamic == null)
+                return null;
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
             var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
             FillEntityOptions(dynamic, optionTypesCache, entity);
@@ -326,6 +337,8 @@ namespace VitalChoice.DynamicData.Base
 
         private static TDynamic FromEntityItem(TEntity entity, bool withDefaults)
         {
+            if (entity == null)
+                return null;
             var result = new TDynamic();
             var data = result.DictionaryData;
             var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
@@ -418,6 +431,7 @@ namespace VitalChoice.DynamicData.Base
                 return;
 
             ICollection<TOptionType> optionTypes = null;
+            items = RemoveInvalidForUpdate(items);
             foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
             {
                 if (optionTypes == null)
@@ -445,7 +459,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
                 results =
-                    items.Select(
+                    items.Where(d => d != null).Select(
                         dynamic =>
                         {
                             var entity = ToEntityItem(dynamic, FilterByType(optionTypes, dynamic.IdObjectType).ToList());
@@ -456,7 +470,7 @@ namespace VitalChoice.DynamicData.Base
             else
             {
                 results =
-                    items.Select(
+                    items.Where(d => d != null).Select(
                         dynamic => new DynamicEntityPair<TDynamic, TEntity>(dynamic, ToEntityItem(dynamic, optionTypes)))
                         .ToList();
             }
@@ -479,7 +493,7 @@ namespace VitalChoice.DynamicData.Base
                 pair.Value2 = FilterByType(optionTypes, pair.Value1.IdObjectType).ToList();
             }
             var results =
-                items.Select(
+                items.Where(d => d.Value1 != null).Select(
                     pair =>
                         new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
                     .ToList();
@@ -502,7 +516,7 @@ namespace VitalChoice.DynamicData.Base
                 entity.OptionTypes = FilterByType(optionTypes, entity.IdObjectType).ToList();
             }
             List<DynamicEntityPair<TDynamic, TEntity>> results =
-                items.Select(
+                items.Where(e => e != null).Select(
                     entity => new DynamicEntityPair<TDynamic, TEntity>(FromEntityItem(entity, withDefaults), entity))
                     .ToList();
             await FromEntityRangeInternalAsync(results, withDefaults);
@@ -602,8 +616,27 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
+        private ICollection<DynamicEntityPair<TDynamic, TEntity>> RemoveInvalidForUpdate(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
+        {
+            if (items.Any(i => i.Dynamic == null || i.Entity == null))
+            {
+                var intermidiate = items.Where(i => i.Dynamic != null).ToArray();
+                foreach (var pair in intermidiate)
+                {
+                    if (pair.Entity == null)
+                    {
+                        pair.Entity = ToEntity(pair.Dynamic);
+                    }
+                }
+                return intermidiate.ToList();
+            }
+            return items;
+        }
+
         private async Task FromEntityInternalAsync(TDynamic dynamic, TEntity entity, bool withDefaults = false)
         {
+            if (entity == null || dynamic == null)
+                return;
             await
                 FromEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
                 {
@@ -613,6 +646,8 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task UpdateEntityInternalAsync(TDynamic dynamic, TEntity entity)
         {
+            if (entity == null || dynamic == null)
+                return;
             await
                 UpdateEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
                 {
@@ -622,6 +657,8 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task ToEntityInternalAsync(TDynamic dynamic, TEntity entity)
         {
+            if (entity == null || dynamic == null)
+                return;
             await
                 ToEntityRangeInternalAsync(new List<DynamicEntityPair<TDynamic, TEntity>>
                 {

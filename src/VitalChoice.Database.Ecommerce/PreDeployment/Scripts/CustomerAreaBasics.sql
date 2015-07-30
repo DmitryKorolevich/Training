@@ -657,3 +657,12 @@ BEGIN
 	CREATE INDEX [IX_CustomerPaymentMethodValues_Value] ON [dbo].[CustomerPaymentMethodValues] ([Value]) INCLUDE (Id, IdCustomerPaymentMethod, IdOptionType)
 END
 GO
+
+
+IF EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdAddress' AND [object_id] = OBJECT_ID('CustomerPaymentMethods') AND is_nullable = 0)
+BEGIN
+
+	ALTER TABLE CustomerPaymentMethods
+	ALTER COLUMN IdAddress INT NULL
+
+END

@@ -1,5 +1,6 @@
 ﻿#region
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -21,23 +22,31 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool Insert(TEntity entity)
         {
+            if (entity == null)
+                return false;
             DbSet.Add(entity);
             return true;
         }
 
         public virtual Task<bool> InsertAsync(TEntity entity)
         {
+            if (entity == null)
+                return Task.FromResult(false);
             return InsertAsync(CancellationToken.None, entity);
         }
 
         public virtual Task<bool> InsertAsync(CancellationToken cancellationToken, TEntity entity)
         {
+            if (entity == null)
+                return Task.FromResult(false);
             DbSet.Add(entity);
             return Task.FromResult(true);
         }
 
         public virtual bool InsertRange(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+                return false;
             DbSet.AddRange(entities);
             return true;
         }
@@ -49,12 +58,16 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> InsertRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+                return Task.FromResult(false);
             DbSet.AddRange(entities);
             return Task.FromResult(true);
         }
 
         public virtual bool InsertGraph(TEntity entity)
         {
+            if (entity == null)
+                return false;
             Context.TrackGraphForAdd(entity);
             return true;
         }
@@ -66,12 +79,16 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
         {
+            if (entity == null)
+                return Task.FromResult(false);
             Context.TrackGraphForAdd(entity);
             return Task.FromResult(true);
         }
 
         public virtual bool InsertGraphRange(params TEntity[] entities)
         {
+            if (entities == null)
+                return false;
             foreach (var entity in entities)
             {
                 Context.TrackGraphForAdd(entity);
@@ -86,6 +103,8 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, params TEntity[] entities)
         {
+            if (entities == null)
+                return Task.FromResult(false);
             foreach (var entity in entities)
             {
                 Context.TrackGraphForAdd(entity);
@@ -100,6 +119,8 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+                return Task.FromResult(false);
             foreach (var entity in entities)
             {
                 Context.TrackGraphForAdd(entity);
@@ -109,6 +130,8 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool Update(TEntity entity)
         {
+            if (entity == null)
+                return false;
             DbSet.Update(entity);
             return true;
         }
@@ -120,12 +143,16 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
         {
+            if (entity == null)
+                return Task.FromResult(false);
             DbSet.Update(entity);
             return Task.FromResult(true);
         }
 
         public virtual bool UpdateRange(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+                return false;
             DbSet.UpdateRange(entities);
             return true;
         }
@@ -137,6 +164,8 @@ namespace VitalChoice.Data.Repositories
 
         public virtual Task<bool> UpdateRangeAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+                return Task.FromResult(false);
             DbSet.UpdateRange(entities);
             return Task.FromResult(true);
         }
@@ -155,6 +184,8 @@ namespace VitalChoice.Data.Repositories
 
         public virtual bool Delete(TEntity entity)
         {
+            if (entity == null)
+                return false;
             DbSet.Remove(entity);
             return true;
         }
