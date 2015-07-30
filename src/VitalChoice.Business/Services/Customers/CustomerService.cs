@@ -184,8 +184,8 @@ namespace VitalChoice.Business.Services.Customers
 
             var paymentsToDelete =
                 entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
-            await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Select(p => p.BillingAddress));
             await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
+            await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
 
             await customerToPaymentMethodRepository.InsertRangeAsync(entity.PaymentMethods);
             await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
