@@ -68,7 +68,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
 								$scope.paymentInfoTab.Address = {};
-								//$scope.switchPaymentMethodType();
 								angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
 								    syncCountry(shippingItem);
 								    if (shippingItem.Default)
@@ -179,7 +178,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	function successHandler(result) {
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
-			$state.go("index.oneCol.manageCustomers");
 		} else {
 			var messages = "";
 			if (result.Messages) {
@@ -337,51 +335,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    return false;
 	};
 
-	//$scope.switchPaymentMethodType = function () {
-	//    switch ($scope.paymentInfoTab.PaymentMethodType) {
-	//        //CC
-	//        case "1":
-	//            if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0] && $scope.currentCustomer.CreditCards[0].Address) {
-	//                $scope.paymentInfoTab.sameBilling = false;
-	//                $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
-	//            }
-	//            else {
-	//                $scope.setNewCreditCard(function (result) {
-	//                    syncCountry($scope.paymentInfoTab.CreditCard.Address);
-	//                    $scope.paymentInfoTab.sameBilling = false;
-	//                });
-	//            }
-	//            break;
-
-	//            //OAC
-	//        case "2":
-	//            if ($scope.currentCustomer.Oac && $scope.currentCustomer.Oac.Address) {
-	//                $scope.paymentInfoTab.sameBilling = false;
-	//            }
-	//            else {
-	//                $scope.setNewOac(function (result) {
-	//                    syncCountry($scope.paymentInfoTab.Oac.Address);
-	//                    $scope.paymentInfoTab.sameBilling = false;
-	//                });
-	//            }
-	//            break;
-
-	//            //Check
-	//        case "3":
-	//            if ($scope.currentCustomer.Check && $scope.currentCustomer.Check.Address)
-	//            {
-	//                $scope.paymentInfoTab.sameBilling = false;
-	//            }
-	//            else {
-	//                $scope.setNewCheck(function (result) {
-	//                    syncCountry($scope.paymentInfoTab.Check.Address);
-	//                    $scope.paymentInfoTab.sameBilling = false;
-	//                });
-	//            }
-	//            break;
-	//    }
-	//};
-
 	$scope.save = function () {
 		clearServerValidation();
 
@@ -402,7 +355,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		if (valid) {
 			if ($scope.currentCustomer.newEmail || $scope.currentCustomer.emailConfirm) {
 				$scope.currentCustomer.Email = $scope.currentCustomer.newEmail;
-				//$scope.currentCustomer.ProfileAddress.Email = $scope.newEmail;
 				$scope.currentCustomer.EmailConfirm = $scope.currentCustomer.emailConfirm;
 			} else {
 				$scope.currentCustomer.EmailConfirm = $scope.currentCustomer.Email;
@@ -488,16 +440,36 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 	$scope.makeBillingAsProfileAddress = function () {
 	    if ($scope.paymentInfoTab.sameBilling) {
-	        for (var key in $scope.currentCustomer.ProfileAddress) {
-	            $scope.paymentInfoTab.Address[key] = $scope.currentCustomer.ProfileAddress[key];
+	        var address;
+	        switch (String($scope.paymentInfoTab.PaymentMethodType)) {
+	            case "1":
+	                if ($scope.paymentInfoTab.CreditCard) {
+	                    address = $scope.paymentInfoTab.CreditCard.Address;
+	                }
+	                break;
+	            case "2":
+	                if ($scope.currentCustomer.Oac) {
+	                    address = $scope.currentCustomer.Oac.Address;
+	                }
+	                break;
+	            case "3":
+	                if ($scope.currentCustomer.Check) {
+	                    address = $scope.currentCustomer.Check.Address;
+	                }
+	                break;
 	        }
-	        if ($scope.currentCustomer.newEmail) {
-	            $scope.paymentInfoTab.Address.Email = $scope.currentCustomer.newEmail;
-	        } else {
-	            $scope.paymentInfoTab.Address.Email = $scope.currentCustomer.Email;
+	        if (address) {
+	            for (var key in $scope.currentCustomer.ProfileAddress) {
+	                address[key] = $scope.currentCustomer.ProfileAddress[key];
+	            }
+	            if ($scope.currentCustomer.newEmail) {
+	                address.Email = $scope.currentCustomer.newEmail;
+	            } else {
+	                address.Email = $scope.currentCustomer.Email;
+	            }
+	            address.AddressType = 2;
+	            address.Id = 0;
 	        }
-	        $scope.paymentInfoTab.Address.AddressType = 2;
-	        $scope.paymentInfoTab.Address.Id = 0;
 	    }
 	};
 
@@ -543,7 +515,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	    else {
 	        $scope.paymentInfoTab.CreditCard = undefined;
 	    }
-	    toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
 	}
 
 	$scope.deleteSelectedShipping = function (id) {
@@ -556,7 +527,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                     }
                     else {
                         successHandler(result);
-                        //toaster.pop('error', 'Error!', "Can't delete shipping address");
                     }
                 })
                 .error(function (result) {

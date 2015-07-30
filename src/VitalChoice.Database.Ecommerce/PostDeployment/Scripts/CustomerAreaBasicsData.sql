@@ -328,3 +328,52 @@ BEGIN
 	VALUES
 	(N'ExpDate', 6, NULL, @Card, NULL)
 END
+
+IF NOT EXISTS(SELECT * FROM [CustomerPaymentMethodOptionTypes] WHERE Name = 'Terms')
+BEGIN
+	DECLARE @ObjectType INT
+	SET @ObjectType = (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'On Approved Credit')
+
+	DECLARE @IdLookup INT
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], [Name])
+	VALUES
+	(N'string', N'Terms')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup,	N'Net 30'),
+	(2, @IdLookup,	N'Wire Transfer'),
+	(3, @IdLookup,	N'½ down, ½ on shipment'),
+	(4, @IdLookup,	N'½ down, ½ on delivery'),
+	(5, @IdLookup,	N'Net 10'),
+	(6, @IdLookup,	N'Amazon terms: 2% 30, NET 31')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
+	VALUES
+	(N'Terms', 3, @IdLookup, @ObjectType, '1')
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], [Name])
+	VALUES
+	(N'string', N'Fob')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup, 'Ferndale, WA'),
+	(2, @IdLookup, 'Origin'),
+	(3, @IdLookup, 'Destination')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
+	VALUES
+	(N'Fob', 3, @IdLookup, @ObjectType, '1')
+END

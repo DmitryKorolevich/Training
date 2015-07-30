@@ -3,6 +3,7 @@ using System.Linq;
 using VC.Admin.Models.Customer;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 
@@ -11,15 +12,19 @@ namespace VC.Admin.ModelConverters
     public class CustomerModelConverter : IModelToDynamicConverter<AddUpdateCustomerModel, CustomerDynamic>
     {
 	    private readonly IDynamicToModelMapper<CustomerNoteDynamic> _customerNoteMapper;
-	    private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;
+        private readonly IDynamicToModelMapper<CustomerPaymentMethodDynamic> _paymentMethodMapper;
+        private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;
 
-		public CustomerModelConverter(IDynamicToModelMapper<CustomerNoteDynamic> customerNoteMapper, IDynamicToModelMapper<AddressDynamic> addressMapper)
-		{
-			_customerNoteMapper = customerNoteMapper;
-			_addressMapper = addressMapper;
-		}
+        public CustomerModelConverter(IDynamicToModelMapper<CustomerNoteDynamic> customerNoteMapper,
+            IDynamicToModelMapper<AddressDynamic> addressMapper,
+            IDynamicToModelMapper<CustomerPaymentMethodDynamic> paymentMethodMapper)
+        {
+            _customerNoteMapper = customerNoteMapper;
+            _addressMapper = addressMapper;
+            _paymentMethodMapper = paymentMethodMapper;
+        }
 
-	    public void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
+        public void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
 	    {
 		    if (dynamic.CustomerNotes.Any())
 		    {
@@ -44,7 +49,23 @@ namespace VC.Admin.ModelConverters
 				    }
 			    }
 		    }
-	        model.SuspendUserAccount = dynamic.StatusCode == RecordStatusCode.NotActive;
+	        var oacPaymentType =
+	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Oac);
+	        var checkType =
+	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Check);
+	        if (oacPaymentType != null)
+	        {
+	            model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(oacPaymentType);
+	        }
+	        if (checkType != null)
+	        {
+	            model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(checkType);
+	        }
+	        foreach (var creditCard in dynamic.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+	        {
+	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
+	        }
+            model.SuspendUserAccount = dynamic.StatusCode == RecordStatusCode.NotActive;
 	    }
 
 	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
@@ -71,7 +92,22 @@ namespace VC.Admin.ModelConverters
 					dynamic.Addresses.Add(addressDynamic);
 				}
 			}
-	        dynamic.StatusCode = model.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
+	        foreach (var creditCard in model.CreditCards)
+	        {
+                creditCard.PaymentMethodType = PaymentMethodType.CreditCard;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(creditCard));
+	        }
+	        if (model.Oac?.Address != null)
+	        {
+                model.Oac.PaymentMethodType = PaymentMethodType.Oac;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Oac));
+	        }
+            if (model.Check?.Address != null)
+            {
+                model.Check.PaymentMethodType = PaymentMethodType.Check;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Check));
+            }
+            dynamic.StatusCode = model.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
         }
 	}
 }

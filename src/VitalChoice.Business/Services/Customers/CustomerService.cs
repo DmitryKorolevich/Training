@@ -121,7 +121,7 @@ namespace VitalChoice.Business.Services.Customers
 			await customerToPaymentMethodRepository.DeleteAllAsync(entity.PaymentMethods);
 			await customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes);
 
-            //await uow.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             //var addressType = (int?)AddressType.Billing;
             //entity.Addresses =

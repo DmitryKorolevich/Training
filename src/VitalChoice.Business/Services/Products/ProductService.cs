@@ -74,6 +74,10 @@ namespace VitalChoice.Business.Services.Products
             {
                 if (sku.StatusCode == RecordStatusCode.Deleted)
                 {
+                    foreach (var value in sku.OptionValues)
+                    {
+                        value.Id = 0;
+                    }
                     await productOptionValueRepository.InsertRangeAsync(sku.OptionValues);
                 }
             }
