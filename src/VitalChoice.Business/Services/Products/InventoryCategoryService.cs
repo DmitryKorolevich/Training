@@ -22,11 +22,11 @@ namespace VitalChoice.Business.Services.Products
     public class InventoryCategoryService : IInventoryCategoryService
     {
         private readonly IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository;
-        private readonly IProductService productService;
+        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService;
         private readonly ILogger logger;
 
         public InventoryCategoryService(IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository,
-            IProductService productService,
+            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService,
             ILoggerProviderExtended loggerProvider)
         {
             this.inventoryCategoryEcommerceRepository = inventoryCategoryEcommerceRepository;
@@ -115,6 +115,7 @@ namespace VitalChoice.Business.Services.Products
                         {
                             message += product.Name + ", ";
                         }
+                        message=message.Remove(message.Length-3,2);
                         throw new AppValidationException(message);
                     }
                 }
@@ -174,6 +175,7 @@ namespace VitalChoice.Business.Services.Products
                     {
                         message += product.Name+", ";
                     }
+                    message=message.Remove(message.Length - 3, 2);
                     errors.Add(new MessageInfo() { Message = message });
                 }
 

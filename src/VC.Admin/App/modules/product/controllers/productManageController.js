@@ -99,6 +99,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 active: false,
                 formName: 'categories',
             };
+            $scope.salesCategoriesTab = {
+                active: false,
+                formName: 'salesCategories',
+            };
             $scope.crossSellProductsAndVideosTab = {
                 active: false,
                 formName: 'crossSellProductsAndVideos',
@@ -113,11 +117,22 @@ angular.module('app.modules.product.controllers.productManageController', [])
             tabs.push($scope.subProductsTab);
             tabs.push($scope.nutritionalTab);
             tabs.push($scope.categoriesTab);
+            tabs.push($scope.salesCategoriesTab);
             tabs.push($scope.crossSellProductsAndVideosTab);
             tabs.push($scope.inventoryAndShippingTab);
             $scope.tabs = tabs;
 
             loadLookups();
+            loadCategories();
+            loadInventoryCategories();
+        };
+
+        function allowLoadProduct()
+        {
+            if ($scope.lookups && $scope.defaults && $scope.rootCategory && $scope.rootInventoryCategory)
+            {
+                loadProduct();
+            };
         };
 
         function loadLookups() {
@@ -126,7 +141,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     if (result.Success) {
                         $scope.lookups = result.Data.Lookups;
                         $scope.defaults = result.Data.DefaultValues;
-                        loadCategories();
+                        allowLoadProduct();
                     } else {
                         errorHandler(result);
                     }
@@ -141,7 +156,23 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 .success(function (result) {
                     if (result.Success) {
                         $scope.rootCategory = result.Data;
-                        loadProduct();
+                        allowLoadProduct();
+                    } else {
+                        errorHandler(result);
+                    }
+                }).
+                error(function (result) {
+                    errorHandler(result);
+                });
+        };
+
+        function loadInventoryCategories() {
+            productService.getInventoryCategoriesTree({}, $scope.refreshTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        $scope.rootInventoryCategory = {};
+                        $scope.rootInventoryCategory.SubItems = result.Data;
+                        allowLoadProduct();
                     } else {
                         errorHandler(result);
                     }
@@ -166,6 +197,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			                }
 			            }
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
+			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
 			            refreshPossiableProductTypes();
 			            setProductTypeWatch();
 			            initCrossses();
@@ -227,6 +259,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.product.CategoryIds = categoryIds;
+                //$scope.product.InventoryCategoryId = getInventorySelected($scope.rootInventoryCategory);
                 updateCrossses();
                 updateVideos();
 
@@ -243,12 +276,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
             }
         };
 
-        var getCategoriesTreeViewScope = function () {
-            return angular.element($('.categories .ya-treeview').get(0)).scope();
-        };
-
         $scope.updateCategoriesCollapsed = function (expand) {
-            var scope = getCategoriesTreeViewScope();
+            var scope = angular.element($('.categories.public .ya-treeview').get(0)).scope();
             if (expand) {
                 scope.expandAll();
             }
@@ -257,6 +286,17 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 scope.collapseAll();
             }
             $scope.categoriesExpanded = expand;
+        };
+
+        $scope.updateSalesCategoriesCollapsed = function (expand) {
+            var scope = angular.element($('.categories.sales .ya-treeview').get(0)).scope();
+            if (expand) {
+                scope.expandAll();
+            }
+            else {
+                scope.collapseAll();
+            }
+            $scope.salesCategoriesExpanded = expand;
         };
 
         $scope.sortableOptions = {
@@ -387,6 +427,62 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 getSelected(value, ids);
             });
         };
+
+        function setInventorySelected(category, id) {
+            if (id!=null && category.Id == id) {
+                expandInventoryCategory(category.Id);
+            };
+            $.each(category.SubItems, function (index, value) {
+                setInventorySelected(value, id);
+            });
+        };
+
+        function getInventoryRootNodesScopes() {
+            return angular.element($('.categories.sales .ya-treeview').get(0)).scope().$nodesScope.childNodes();
+        }
+
+        function expandInventoryCategory(id) {
+            var parentScopes = getInventoryScopePath(id);
+
+            for (var i = 0; i < parentScopes.length; i++) {
+                parentScopes[i].expand();
+            }
+        }
+
+        function getInventoryScopePath(id) {
+            var toReturn = null;
+            var rootScopes = getInventoryRootNodesScopes();
+            $.each(rootScopes, function (index, scope) {
+                var result = getScopePath(id, scope, []);
+                if (result)
+                {
+                    toReturn = result;
+                    return false;
+                }
+            });
+            return toReturn;
+        }
+
+        function getScopePath(id, scope, parentScopeList) {
+
+            if (!scope) return null;
+
+            var newParentScopeList = parentScopeList.slice();
+            newParentScopeList.push(scope);
+
+            if (scope.$modelValue && scope.$modelValue.Id === id) {
+                return newParentScopeList;
+            }
+
+            var foundScopesPath = null;
+            var childNodes = scope.childNodes();
+
+            for (var i = 0; foundScopesPath === null && i < childNodes.length; i++) {
+                foundScopesPath = getScopePath(id, childNodes[i], newParentScopeList);
+            }
+
+            return foundScopesPath;
+        }
 
         function activateTab(formName) {
             $.each($scope.tabs, function (index, item) {

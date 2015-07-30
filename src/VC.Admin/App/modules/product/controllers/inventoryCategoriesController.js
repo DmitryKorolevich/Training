@@ -56,7 +56,6 @@
 
     function initCategory(category)
     {
-        category.AllowEdit = true;
         category.AllowDelete = !category.SubItems || category.SubItems.length == 0;
         var level = 1;
         var resCategory = null;
