@@ -129,7 +129,9 @@ namespace VC.Admin.Controllers
         {
             return new OacPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing }
+                Address = new AddressModel { AddressType = AddressType.Billing },
+                Fob = 1,
+                Terms = 1
             };
         }
 

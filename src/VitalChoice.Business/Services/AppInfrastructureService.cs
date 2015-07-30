@@ -54,8 +54,10 @@ namespace VitalChoice.Business.Services
 		    var taxExemptLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTaxExempt).Select(false).Single().Id;
 		    var priorityLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
 		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
+            var termsLookup = lookupRepository.Query(x => x.Name == LookupNames.Terms).Select(false).Single().Id;
+            var fobLookup = lookupRepository.Query(x => x.Name == LookupNames.Fob).Select(false).Single().Id;
 
-			var referenceData = new ReferenceData();
+            var referenceData = new ReferenceData();
 	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
 	        {
 	            Key = x.Id,
@@ -144,8 +146,24 @@ namespace VitalChoice.Business.Services
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-
-	        return referenceData;
+	        referenceData.OacTerms =
+	            lookupVariantRepository.Query()
+	                .Where(x => x.IdLookup == termsLookup)
+	                .Select(false)
+	                .Select(x => new LookupItem<int>()
+	                {
+	                    Key = x.Id,
+	                    Text = x.ValueVariant
+	                }).ToList();
+            referenceData.OacFob = lookupVariantRepository.Query()
+                    .Where(x => x.IdLookup == fobLookup)
+                    .Select(false)
+                    .Select(x => new LookupItem<int>()
+                    {
+                        Key = x.Id,
+                        Text = x.ValueVariant
+                    }).ToList();
+            return referenceData;
 	    }
 
 		public ReferenceData Get()

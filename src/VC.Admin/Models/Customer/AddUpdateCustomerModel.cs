@@ -19,6 +19,7 @@ namespace VC.Admin.Models.Customer
 			ProfileAddress = new AddressModel();
 			Shipping = new List<AddressModel>();
 			CustomerNotes = new List<CustomerNoteModel>();
+            CreditCards = new List<CreditCardModel>();
         }
 
 		[Map]
@@ -80,7 +81,6 @@ namespace VC.Admin.Models.Customer
 
         public IList<CustomerNoteModel> CustomerNotes { get; set; }
 
-        [Map("CustomerPaymentMethods")]
 	    public IList<CreditCardModel> CreditCards { get; set; }
 
 	    public CheckPaymentModel Check { get; set; }

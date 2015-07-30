@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.Validation.Logic.Interfaces;
+using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
@@ -55,7 +56,7 @@ namespace VC.Admin.Models.Customer
         public int Fob { get; set; }
     }
 
-    public class CreditCardModel : IModel
+    public class CreditCardModel : BaseModel
     {
         public CreditCardModel()
         {
@@ -83,26 +84,5 @@ namespace VC.Admin.Models.Customer
 
         [Map]
         public CreditCardType CardType { get; set; }
-
-        public IModelValidator Validator
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public IMode ModeData
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 }

@@ -30,11 +30,11 @@ namespace VC.Admin.Validators.Customer
             RuleFor(model => model.CardNumber)
                 .NotEmpty()
                 .WithMessage(model => model.CardNumber, ValidationMessages.FieldRequired)
-                .Length(0, BaseAppConstants.CREDIT_CARD_MAX_LENGTH)
+                .Length(BaseAppConstants.CREDIT_CARD_MAX_LENGTH, BaseAppConstants.CREDIT_CARD_MAX_LENGTH)
                 .When(model => model.CardType != CreditCardType.AmericanExpress)
                 .WithMessage(model => model.CardNumber, ValidationMessages.FieldLength,
                     BaseAppConstants.CREDIT_CARD_MAX_LENGTH)
-                .Length(0, BaseAppConstants.CREDIT_CARD_AM_EXPRESS_MAX_LENGTH)
+                .Length(BaseAppConstants.CREDIT_CARD_AM_EXPRESS_MAX_LENGTH, BaseAppConstants.CREDIT_CARD_AM_EXPRESS_MAX_LENGTH)
                 .When(model => model.CardType == CreditCardType.AmericanExpress)
                 .WithMessage(model => model.CardNumber, ValidationMessages.FieldLength,
                     BaseAppConstants.CREDIT_CARD_AM_EXPRESS_MAX_LENGTH);

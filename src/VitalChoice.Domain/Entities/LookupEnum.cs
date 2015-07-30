@@ -10,6 +10,8 @@ namespace VitalChoice.Domain.Entities
 		public const string  CustomerTaxExempt = "TaxExempt";
 	    public const string CustomerTier = "CustomerTier";
 	    public const string CustomerTradeClass = "TradeClass";
-	    public const string CustomerNotePriorities = "CustomerNotePriority";
+        public const string CustomerNotePriorities = "CustomerNotePriority";
+        public const string Terms = "Terms";
+        public const string Fob = "Fob";
     }
 }
