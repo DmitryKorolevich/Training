@@ -188,20 +188,35 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				$scope.serverMessages = new ServerMessages(result.Messages);
 				var formForShowing = null;
 				$.each(result.Messages, function (index, value) {
-					if (value.Field) {
-						$.each($scope.forms, function(index, form) {
-							if (form && !(typeof form === 'boolean')) {
-								if (form[value.Field] != undefined) {
-									form[value.Field].$setValidity("server", false);
-									if (formForShowing == null) {
-										formForShowing = index;
-									}
-									return false;
-								}
-							}
-						});
-					}
-					messages += value.Message + "<br />";
+				    if (value.Field) {
+				        if (value.Field.indexOf("::") >= 0) {
+				            var arr = value.Field.split("::");
+				            var formName = arr[0];
+				            var fieldName = arr[1];
+				            var form = $scope.forms[formName];
+				            if (form[fieldName] != undefined) {
+				                form[fieldName].$setValidity("server", false);
+				                if (formForShowing == null) {
+				                    formForShowing = formName;
+				                }
+				                return false;
+				            }
+				        }
+				        else {
+				            $.each($scope.forms, function (index, form) {
+				                if (form && index !== "submitted") {
+				                    if (form[value.Field] != undefined) {
+				                        form[value.Field].$setValidity("server", false);
+				                        if (formForShowing == null) {
+				                            formForShowing = index;
+				                        }
+				                        return false;
+				                    }
+				                }
+				            });
+				        }
+				    }
+				    messages += value.Message + "<br />";
 				});
 
 				if (formForShowing) {

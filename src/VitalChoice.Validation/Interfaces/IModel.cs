@@ -1,6 +1,6 @@
-﻿using VitalChoice.Validation.Logic.Interfaces;
+﻿using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Validation.Models.Interfaces
+namespace VitalChoice.Validation.Interfaces
 {
     public interface IModel
     {

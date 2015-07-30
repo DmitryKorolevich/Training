@@ -248,12 +248,16 @@ function ServerMessages(data) {
     self.Messages = data;
 };
 
-ServerMessages.prototype.GetMessage = function (field, collectionName, index) {
+ServerMessages.prototype.GetMessage = function (field, collectionName, index, formName) {
     var toReturn = '';
     var fieldName = field;
     if (collectionName != undefined && index != undefined)
     {
         fieldName = '{0}.i{1}.{2}'.format(collectionName, index, field);
+    }
+    if (formName != undefined)
+    {
+        fieldName = formName + "::" + fieldName;
     }
     $.each(this.Messages, function (index, message) {
         if (message.Field == fieldName) {
@@ -263,5 +267,3 @@ ServerMessages.prototype.GetMessage = function (field, collectionName, index) {
     });
     return toReturn;
 };
-
-

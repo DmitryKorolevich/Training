@@ -12,7 +12,7 @@
                 <button class="btn btn-success pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="setDefaultAddress(shippingAddressTab.Address.Id);">Set as Default</button>
             </div>
             <div class="col-md-7">
-                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.Address" data-ng-options="shippingAddress as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for shippingAddress in currentCustomer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.Address" data-ng-options="shippingAddress as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for shippingAddress in currentCustomer.Shipping track by shippingAddress.Id"></select>
             </div>
             <div class="col-md-2">
                 <button class="btn btn-danger pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="deleteSelectedShipping(shippingAddressTab.Address.Id);">Delete</button>

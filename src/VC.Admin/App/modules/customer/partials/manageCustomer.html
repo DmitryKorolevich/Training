@@ -313,7 +313,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCard"
-                                                            data-ng-options="creditCard as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for creditCard in currentCustomer.CreditCards track by creditCard.Id"></select>
+                                                            data-ng-options="creditCard as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for creditCard in currentCustomer.CreditCards"></select>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <button class="btn btn-danger pull-right" data-ng-show="paymentInfoTab.CreditCard && paymentInfoTab.PaymentMethodType == 1" data-ng-click="deleteSelectedCreditCard(paymentInfoTab.CreditCard.Id);">Delete</button>
@@ -446,12 +446,12 @@
                                                 <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Oac]"></div>
                                             </div>
                                             <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
-                                                <div class="form-group">
+                                                <!--<div class="form-group">
                                                     <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                     <div class="col-md-9">
                                                         <input type="text" class="form-control" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" required>
                                                     </div>
-                                                </div>
+                                                </div>-->
                                                 <div class="form-group">
                                                     <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
                                                     <div class="col-md-9">

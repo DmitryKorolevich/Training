@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Helpers;
+using VitalChoice.Validation.Interfaces;
 using VitalChoice.Validation.Logic.Interfaces;
 using VitalChoice.Validation.Models.Interfaces;
 
@@ -16,19 +17,21 @@ namespace VitalChoice.Validation.Logic
             ValidationErrors = new List<KeyValuePair<string, string>>();
         }
 
-        protected virtual void ParseResults(ValidationResult validationResult)
+        protected virtual void ParseResults(ValidationResult validationResult, string formName = null)
         {
             IsValid = IsValid && validationResult.IsValid;
             if (!IsValid) {
                 foreach (var validationError in validationResult.Errors)
                 {
-                    ValidationErrors.Add(new KeyValuePair<string, string>(validationError.PropertyName,
-                        validationError.ErrorMessage));
+                    ValidationErrors.Add(
+                        new KeyValuePair<string, string>(
+                            ErrorFieldFormatter.Form(formName, validationError.PropertyName),
+                            validationError.ErrorMessage));
                 }
             }
         }
 
-        protected virtual void ParseResults(ValidationResult validationResult,string collectionName,int index)
+        protected virtual void ParseResults(ValidationResult validationResult, string collectionName,int index, string formName = null)
         {
             IsValid = IsValid && validationResult.IsValid;
             if (!IsValid)
@@ -37,7 +40,7 @@ namespace VitalChoice.Validation.Logic
                 {
                     ValidationErrors.Add(
                         new KeyValuePair<string, string>(
-                            CollectionFormProperty.GetFullName(collectionName, index, validationError.PropertyName),
+                            ErrorFieldFormatter.Form(formName, ErrorFieldFormatter.Collection(collectionName, index, validationError.PropertyName)),
                             validationError.ErrorMessage));
                 }
             }

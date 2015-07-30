@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Validation.Models.Interfaces;
 
-namespace VitalChoice.Validation.Logic.Interfaces
+namespace VitalChoice.Validation.Interfaces
 {
     public interface IModelValidator
     {

@@ -83,7 +83,7 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
             {
                 return Indexes.Select(i => new MessageInfo
                 {
-                    Field = CollectionFormProperty.GetFullName(CollectionName, i, PropertyName),
+                    Field = ErrorFieldFormatter.Collection(CollectionName, i, PropertyName),
                     Message = ErrorText
                 }).ToList();
             }

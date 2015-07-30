@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Interfaces;
 using VitalChoice.Validation.Logic.Interfaces;
 using VitalChoice.Validation.Models.Interfaces;
 
