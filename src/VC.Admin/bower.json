@@ -17,7 +17,8 @@
     "ngprogress": "~1.0.7",
     "angular-ladda": "~0.2.2",
     "angular-promise-tracker": "~2.1.0",
-    "css-spinners": "~1.0.3"
+    "css-spinners": "~1.0.3",
+    "jquery.maskedinput": "~1.4.1"
   },
   "exportsOverride": {
     "bootstrap": {
