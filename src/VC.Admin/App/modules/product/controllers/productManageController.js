@@ -107,10 +107,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 active: false,
                 formName: 'crossSellProductsAndVideos',
             };
-            $scope.inventoryAndShippingTab = {
-                active: false,
-                formName: 'inventoryAndShipping',
-            };
             var tabs = [];
             tabs.push($scope.parentDetailsTab);
             tabs.push($scope.imagesTab);
@@ -119,7 +115,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
             tabs.push($scope.categoriesTab);
             tabs.push($scope.salesCategoriesTab);
             tabs.push($scope.crossSellProductsAndVideosTab);
-            tabs.push($scope.inventoryAndShippingTab);
             $scope.tabs = tabs;
 
             loadLookups();

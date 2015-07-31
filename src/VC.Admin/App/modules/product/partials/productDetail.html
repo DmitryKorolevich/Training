@@ -747,23 +747,6 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Sales Categories" active="salesCategoriesTab.active">
-                        <div class="container container-left">
-                            <div class="well row categories sales">
-                                <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Sales Categories</span>
-                                    <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
-                                    <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
-                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
-                                        <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
-                                            <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
-                                            </li>
-                                        </ol>
-                                    </div>
-                                </spinner-overlay>
-                            </div>
-                        </div>
-                    </tab>
                     <tab heading="Cross Sell & Videos" active="crossSellProductsAndVideosTab.active">
                         <div class="container container-left">
                             <div class="well row">
@@ -948,11 +931,19 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Inventory & Shipping" active="inventoryAndShippingTab.active">
+                    <tab heading="Sales Category" active="salesCategoriesTab.active">
                         <div class="container container-left">
-                            <div class="well row">
+                            <div class="well row categories sales">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Inventory & Shipping</span>
+                                    <span class="legend">Sales Category</span>
+                                    <button data-ng-if="!salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
+                                    <button data-ng-if="salesCategoriesExpanded" data-ng-click="updateSalesCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
+                                    <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                        <ol ui-tree-nodes="" data-ng-model="rootInventoryCategory.SubItems">
+                                            <li ng-repeat="item in rootInventoryCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/inventoryCategoriesAssign.html'">
+                                            </li>
+                                        </ol>
+                                    </div>
                                 </spinner-overlay>
                             </div>
                         </div>
