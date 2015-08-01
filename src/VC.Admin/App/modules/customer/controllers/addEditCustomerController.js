@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.customer.controllers.addEditCustomerController', [])
-.controller('addEditCustomerController', ['$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', '$state', '$stateParams', function ($scope, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams) {
+.controller('addEditCustomerController', ['$scope', '$injector', '$filter', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q', '$state', '$stateParams', function ($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams) {
 	$scope.addEditTracker = promiseTracker("addEdit");
 
 	function initialize() {
@@ -54,7 +54,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 								$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 								$scope.paymentInfoTab.Address = {};
 							} else {
-								toaster.pop('error', 'Error!', "Can't create customer");
+								toaster.pop('error', 'Error!', "Can't load customer prototype");
 							}
 						}).
 						error(function(result) {
@@ -63,7 +63,17 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				} else {
 					customerService.getExistingCustomer($stateParams.id, $scope.addEditTracker)
 						.success(function (result) {
-							if (result.Success) {
+						    if (result.Success) {
+						        var highPriNotes = [];
+						        angular.forEach(result.Data.CustomerNotes, function (noteItem) {
+						            if (noteItem.Priority == 1) {
+						                highPriNotes.push('<p>Date: ' + $filter('date')(noteItem.DateEdited, 'short') + '</p>' + '<p>Agent: ' + noteItem.EditedBy + '</p>' + '<p>Notes: <p class="container">' + noteItem.Text + '</p></p>');
+						            }
+						        });
+						        if (highPriNotes.length > 0) {
+						            var infoPopupUtil = $injector.get('infoPopupUtil');
+						            infoPopupUtil.info('High Priority Notes', highPriNotes.join('<hr />'));
+						        }
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 								$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
@@ -95,7 +105,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 								updateCustomerNoteUIId();
 							} else {
-								toaster.pop('error', 'Error!', "Can't create customer");
+								toaster.pop('error', 'Error!', "Can't load customer");
 							}
 						}).
 						error(function (result) {

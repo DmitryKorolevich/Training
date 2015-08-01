@@ -37,10 +37,8 @@
   },
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] }
     },
     "dnxcore50": {
-      "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.20-*",
 	"System.Security.Cryptography.Encoding": "4.0.0-beta-*"

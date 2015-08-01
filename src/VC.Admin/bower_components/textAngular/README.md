@@ -1,4 +1,4 @@
-textAngular v1.3.0
+textAngular v1.4.0
 ===========
 
 [![Build Status](https://travis-ci.org/fraywing/textAngular.png?branch=master)](https://travis-ci.org/fraywing/textAngular) [![Coverage Status](https://coveralls.io/repos/fraywing/textAngular/badge.png)](https://coveralls.io/r/fraywing/textAngular)
@@ -15,10 +15,11 @@ To upgrade from version 1.2.2 or earlier you need to follow these steps:
 
 ## Requirements
 
-1. `AngularJS` ≥ `1.2.x`
-2. `Rangy` ≥ `1.2.x`, Both rangy-core and rangy-saveselection are required. (There is a minified combination of these two included in the dist folder)
+1. `AngularJS` ≥ `1.3.x` 
+2. `Rangy` ≥ `1.3.x`, Both rangy-core and rangy-saveselection are required. (There is a minified combination of these two included in the dist folder)
 3. `Font-Awesome` ≥ `4.x` for the default icons on the toolbar
 1. `Bootstrap` ≥ `3.x` for the default styles (Can use `bootstrap-css-only`, you must add this to your bower or include this manually)
+5. NOTE: please check the requirements for earlier releases, if these are an issue.
 
 ### Where to get it
 

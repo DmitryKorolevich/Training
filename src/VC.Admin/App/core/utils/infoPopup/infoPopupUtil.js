@@ -7,7 +7,6 @@ angular.module('app.core.utils.infoPopup.infoPopupUtil', [])
 			var modalInstance = $modal.open({
 				templateUrl: "app/core/utils/infoPopup/info.html",
 				controller: "infoPopupController",
-				animation: false, //temp solution until angular-ui-botstrap arrives
 				resolve: {
 					data: function () {
 						var data = {

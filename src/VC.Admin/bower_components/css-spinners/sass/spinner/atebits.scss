@@ -1,12 +1,12 @@
-@import "base";
+@import "compass/css3";
 
-$atebits-size: 33px;
-$atebits-color: rgba(black, 0.5);
-$atebits-speed: 8s;
+$atebits-loader-size: 33px !default;
+$atebits-loader-color: rgba(black, 0.5) !default;
+$atebits-loader-speed: 8s !default;
 
-$atebits-segment: $atebits-size / 11;
+$atebits-loader-segment: $atebits-loader-size / 11 !default;
 
-@include keyframes(atebits) {
+@include keyframes(atebits-loader) {
   0%    { @include rotateZ(0deg); }
 
   3%    { @include rotateZ(90deg); }
@@ -40,28 +40,27 @@ $atebits-segment: $atebits-size / 11;
 }
 
 /* :not(:required) hides this rule from IE9 and below */
-.atebits:not(:required) {
-  background: $atebits-color;
+.atebits-loader:not(:required) {
+  background: $atebits-loader-color;
   display: inline-block;
-  width: $atebits-segment * 3;
-  height: $atebits-segment * 3;
+  width: $atebits-loader-segment * 3;
+  height: $atebits-loader-segment * 3;
   overflow: hidden;
   position: relative;
   text-indent: -9999px;
 
   @include box-shadow(
-    $atebits-color (-4 * $atebits-segment) (-4 * $atebits-segment) 0 0,
-    $atebits-color ( 4 * $atebits-segment) (-4 * $atebits-segment) 0 0,
+    $atebits-loader-color (-4 * $atebits-loader-segment) (-4 * $atebits-loader-segment) 0 0,
+    $atebits-loader-color ( 4 * $atebits-loader-segment) (-4 * $atebits-loader-segment) 0 0,
 
-    $atebits-color (-4 * $atebits-segment) 0                       0 0,
-    $atebits-color ( 4 * $atebits-segment) 0                       0 0,
+    $atebits-loader-color (-4 * $atebits-loader-segment) 0                              0 0,
+    $atebits-loader-color ( 4 * $atebits-loader-segment) 0                              0 0,
 
-    $atebits-color (-4 * $atebits-segment) ( 4 * $atebits-segment) 0 0,
-    $atebits-color 0                       ( 4 * $atebits-segment) 0 0,
-    $atebits-color ( 4 * $atebits-segment) ( 4 * $atebits-segment) 0 0
+    $atebits-loader-color (-4 * $atebits-loader-segment) ( 4 * $atebits-loader-segment) 0 0,
+    $atebits-loader-color 0                              ( 4 * $atebits-loader-segment) 0 0,
+    $atebits-loader-color ( 4 * $atebits-loader-segment) ( 4 * $atebits-loader-segment) 0 0
   );
 
-  @include animation(atebits $atebits-speed infinite ease-in-out);
+  @include animation(atebits-loader $atebits-loader-speed infinite ease-in-out);
   @include transform-origin(50%, 50%);
 }
-
