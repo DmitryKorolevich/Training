@@ -3,10 +3,16 @@
 angular.module('app.core.utils.infoPopup.infoPopupUtil', [])
 .service('infoPopupUtil', ['$modal', '$log', function ($modal, $log) {
 	return {
-		info: function (title, text, optionalOkHandler) {
+	    info: function (title, text, optionalOkHandler, preventClose) {
+	        if (preventClose === undefined || preventClose === null)
+	        {
+	            preventClose = false;
+	        }
 			var modalInstance = $modal.open({
 				templateUrl: "app/core/utils/infoPopup/info.html",
 				controller: "infoPopupController",
+				backdrop: preventClose ? 'static' : true,
+				keyboard: preventClose ? false : true,
 				resolve: {
 					data: function () {
 						var data = {

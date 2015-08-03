@@ -72,7 +72,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						        });
 						        if (highPriNotes.length > 0) {
 						            var infoPopupUtil = $injector.get('infoPopupUtil');
-						            infoPopupUtil.info('High Priority Notes', highPriNotes.join('<hr />'));
+						            infoPopupUtil.info('High Priority Notes', highPriNotes.join('<hr />'), undefined, true);
 						        }
 								$scope.currentCustomer = result.Data;
 								$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
