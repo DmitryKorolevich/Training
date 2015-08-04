@@ -394,6 +394,7 @@
                                                     <div class="col-md-4">
                                                         <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
                                                         <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateMonth.$invalid">
+                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth')}}</small>
                                                         </div>
@@ -403,6 +404,7 @@
                                                     <div class="col-md-4">
                                                         <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
                                                         <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateYear.$invalid">
+                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear')}}</small>
                                                         </div>
