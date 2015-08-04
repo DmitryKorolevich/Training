@@ -12,6 +12,10 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.discountManageController',
 	'app.modules.product.controllers.skusSearchController',
 	'app.modules.product.controllers.productsSearchController',
+	'app.modules.product.controllers.productsWithReviewsController',
+	'app.modules.product.controllers.pendingProductReviewsController',
+	'app.modules.product.controllers.productReviewManageController',
+	'app.modules.product.controllers.activeProductReviewsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -19,58 +23,79 @@ angular.module('app.modules.product', [
 
 		    $stateProvider
 		        /*product categories*/
-		        .state('index.oneCol.manageProductCategories', {
+		        .state('index.oneCol.manageProductCategories',{
 		            url: '/products/categories',
 		            templateUrl: 'app/modules/product/partials/productCategoriesTreeView.html',
 		            controller: 'productCategoriesController',
 		        })
-		        .state('index.oneCol.addNewProductCategory', {
+		        .state('index.oneCol.addNewProductCategory',{
 		            url: '/products/categories/add?{categoryid:int}',
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
-		        .state('index.oneCol.productCategoryDetail', {
+		        .state('index.oneCol.productCategoryDetail',{
 		            url: '/products/categories/{id:int}',
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
                 /*inventory categories*/
-		        .state('index.oneCol.manageInventoryCategories', {
+		        .state('index.oneCol.manageInventoryCategories',{
 		            url: '/products/inventorycategories',
 		            templateUrl: 'app/modules/product/partials/inventoryCategoriesTreeView.html',
 		            controller: 'inventoryCategoriesController',
 		        })
 		        /*products*/
-		        .state('index.oneCol.manageProducts', {
+		        .state('index.oneCol.manageProducts',{
 		            url: '/products',
 		            templateUrl: 'app/modules/product/partials/productsList.html',
 		            controller: 'productsController'
 		        })
-		        .state('index.oneCol.addNewProduct', {
+		        .state('index.oneCol.addNewProduct',{
 		            url: '/products/add?{type:int}',
 		            templateUrl: 'app/modules/product/partials/productDetail.html',
 		            controller: 'productManageController'
 		        })
-				.state('index.oneCol.productDetail', {
+				.state('index.oneCol.productDetail',{
 				    url: '/products/{id:int}',
 				    templateUrl: 'app/modules/product/partials/productDetail.html',
 				    controller: 'productManageController'
 				})
 		        /*discounts*/
-		        .state('index.oneCol.manageDiscounts', {
+		        .state('index.oneCol.manageDiscounts',{
 		            url: '/discounts',
 		            templateUrl: 'app/modules/product/partials/discountsList.html',
 		            controller: 'discountsController'
 		        })
-		        .state('index.oneCol.addNewDiscount', {
+		        .state('index.oneCol.addNewDiscount',{
 		            url: '/discounts/add',
 		            templateUrl: 'app/modules/product/partials/discountDetail.html',
 		            controller: 'discountManageController'
 		        })
-				.state('index.oneCol.discountDetail', {
+				.state('index.oneCol.discountDetail',{
 				    url: '/discounts/{id:int}',
 				    templateUrl: 'app/modules/product/partials/discountDetail.html',
 				    controller: 'discountManageController'
+				})
+            	/*product reviews*/
+		        .state('index.oneCol.manageProductReviews',{
+		            url: '/products/reviews',
+		            templateUrl: 'app/modules/product/partials/productsWithReviewsList.html',
+		            controller: 'productsWithReviewsController'
+		        })
+		        .state('index.oneCol.managePendingProductReviews',{
+		            url: '/products/pendingreviews',
+		            templateUrl: 'app/modules/product/partials/pendingProductReviewsList.html',
+		            controller: 'pendingProductReviewsController'
+		        })
+		        .state('index.oneCol.productDetailManageReviews',{
+		            url: '/products/{idproduct:int}/reviews',
+		            templateUrl: 'app/modules/product/partials/activeProductReviewsList.html',
+		            controller: 'activeProductReviewsController'
+		        })
+				.state('index.oneCol.productReviewDetail',{
+				    url: '/products/reviews/{id:int}?{:idproduct:int}',
+				    templateUrl: 'app/modules/product/partials/productReviewDetail.html',
+				    controller: 'productReviewManageController'
 				});
 		}
 ]);

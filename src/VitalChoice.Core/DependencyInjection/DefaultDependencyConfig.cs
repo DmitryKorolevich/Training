@@ -233,6 +233,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ProductViewService>().As<IProductViewService>();
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
+            builder.RegisterType<ProductReviewService>().As<IProductReviewService>();
             builder.RegisterType<CountryService>().As<ICountryService>();
             builder.RegisterType<SettingService>().As<ISettingService>();
             builder.RegisterType<FileService>().As<IFileService>();

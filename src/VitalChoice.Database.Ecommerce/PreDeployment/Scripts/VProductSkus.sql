@@ -13,6 +13,7 @@ SELECT
 	p.Id AS IdProduct,
 	p.DateCreated,
 	p.DateEdited,
+	p.IdEditedBy,
 	p.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,

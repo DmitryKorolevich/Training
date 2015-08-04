@@ -216,11 +216,16 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<VProductSku>().Key(p => p.IdProduct);
             builder.Entity<VProductSku>().Ignore(x => x.Id);
+            builder.Entity<VProductSku>().Ignore(x => x.EditedByAgentId);
             builder.Entity<VProductSku>().ToTable("VProductSkus");
 
             builder.Entity<VSku>().Key(p => new { p.IdProduct, p.SkuId });
             builder.Entity<VSku>().Ignore(x => x.Id);
             builder.Entity<VSku>().ToTable("VSkus");
+
+            builder.Entity<VProductsWithReview>().Key(p => p.IdProduct);
+            builder.Entity<VProductsWithReview>().Ignore(x => x.Id);
+            builder.Entity<VProductsWithReview>().ToTable("VProductsWithReviews");
 
             builder.Entity<ProductOptionType>().Key(p => p.Id);
             builder.Entity<ProductOptionType>().ToTable("ProductOptionTypes");
@@ -296,6 +301,16 @@ namespace VitalChoice.Infrastructure.Context
 		        .ForeignKey(t => t.IdProduct)
 		        .PrincipalKey(p => p.Id)
 		        .Required();
+
+            builder.Entity<ProductReview>().Key(p => p.Id);
+            builder.Entity<ProductReview>().ToTable("ProductReviews");
+
+            builder.Entity<ProductReview>()
+                .Reference(p => p.Product)
+                .InverseCollection()
+                .ForeignKey(s => s.IdProduct)
+                .PrincipalKey(p => p.Id)
+                .Required();
 
             #endregion
 

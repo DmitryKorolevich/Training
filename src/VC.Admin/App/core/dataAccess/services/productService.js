@@ -66,5 +66,22 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    deleteProduct: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteProduct/' + id, getConfig(tracker));
 	    },
+
+	    //product reviews
+	    getProductsWithReviews: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetProductsWithReviews', filter, getConfig(tracker));
+	    },
+	    getProductReviews: function (filter, tracker) {
+	        return $http.post(baseUrl + 'GetProductReviews', filter, getConfig(tracker));
+	    },
+	    getProductReview: function (id, tracker) {
+	        return $http.get(baseUrl + 'GetProductReview/' + id, getConfig(tracker));
+	    },
+	    updateProductReview: function (model, tracker) {
+	        return $http.post(baseUrl + 'UpdateProductReview', model, getConfig(tracker));
+	    },
+	    deleteProductReview: function (id, tracker) {
+	        return $http.post(baseUrl + 'DeleteProductReview/' + id, getConfig(tracker));
+	    },
 	};
 }]);

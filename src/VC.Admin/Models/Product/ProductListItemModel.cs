@@ -27,6 +27,10 @@ namespace VC.Admin.Models.Product
 
         public ProductType IdProductType { get; set; }
 
+        public DateTime DateEdited { get; set; }
+
+        public string EditedByAgentId {get;set;}
+
         public ProductListItemModel(VProductSku item)
         {
             if(item!=null)
@@ -38,6 +42,8 @@ namespace VC.Admin.Models.Product
                 StatusCode = item.StatusCode;
                 Hidden = item.Hidden;
                 IdProductType = item.IdProductType;
+                DateEdited = item.DateEdited;
+                EditedByAgentId = item.EditedByAgentId ?? String.Empty;
             }
         }
     }

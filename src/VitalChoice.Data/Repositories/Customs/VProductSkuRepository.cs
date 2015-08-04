@@ -37,6 +37,13 @@ namespace VitalChoice.Data.Repositories.Customs
                                 ? x.OrderBy(y => y.Name)
                                 : x.OrderByDescending(y => y.Name);
                     break;
+                case VProductSkuSortPath.DateEdited:
+                    sortable =
+                        x =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.DateEdited)
+                                : x.OrderByDescending(y => y.DateEdited);
+                    break;
             }
 
             query = query.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
@@ -46,6 +53,8 @@ namespace VitalChoice.Data.Repositories.Customs
                 Thumbnail = g.Min(p => p.Thumbnail),
                 StatusCode = g.Min(p => p.StatusCode),
                 Hidden = g.Min(p => p.Hidden),
+                DateEdited= g.Min(p => p.DateEdited),
+                IdEditedBy = g.Min(p => p.IdEditedBy),
                 IdProductType = g.Min(p => p.IdProductType),
             });
             var count = await query.CountAsync();

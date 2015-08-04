@@ -24,6 +24,10 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public DateTime DateEdited { get; set; }
 
+        public int? IdEditedBy { get; set; }
+
+        public string EditedByAgentId { get; set; }
+
         public bool Hidden { get; set; }
 
         public ProductType IdProductType { get; set; }

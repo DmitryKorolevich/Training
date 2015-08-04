@@ -34,6 +34,8 @@
 :r .\Scripts\VProductSkus.sql
 :r .\Scripts\VSkus.sql
 :r .\Scripts\Discounts.sql
+:r .\Scripts\ProductReviews.sql
+:r .\Scripts\VProductsWithReviews.sql
 
 :r .\Scripts\CustomerAreaBasics.sql
 

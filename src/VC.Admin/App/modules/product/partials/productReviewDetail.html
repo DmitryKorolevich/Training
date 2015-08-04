@@ -1,0 +1,98 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-default btn-danger width-160px" ladda="editTracker.active()" data-ng-click="delete();">Delete</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-default width-160px" data-ng-click="goBack()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <div class="well row">
+                        <spinner-overlay data-loading="refreshTracker.active()">
+                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+                                <fieldset>
+                                    <span class="legend">Product Review Details</span>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Product Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="ProductName" class="form-control" placeholder="Quantity" data-ng-model="productReview.ProductName" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Active/Approved</label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label><input type="checkbox" name="Active" placeholder="Active" data-ng-model="productReview.StatusCode" data-ng-true-value="2" data-ng-false-value="1" /></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Customer Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="CustomerName" class="form-control" placeholder="Customer Name" data-ng-model="productReview.CustomerName" required>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerName.$invalid">
+                                                <small class="error" ng-show="forms.form.CustomerName.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Customer Name")}}</small>
+                                                <small class="error" ng-show="forms.form.CustomerName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Customer Name")}}</small>
+                                                <small class="error" ng-show="forms.form.CustomerName.$error.server">{{serverMessages.GetMessage('CustomerName')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Email</label>
+                                        <div class="col-md-9">
+                                            <input type="email" name="Email" class="form-control" placeholder="Email" data-ng-model="productReview.Email" required>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Email.$invalid">
+                                                <small class="error" ng-show="forms.form.Email.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+                                                <small class="error" ng-show="forms.form.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
+                                                <small class="error" ng-show="forms.form.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+                                                <small class="error" ng-show="forms.form.Email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Review Title</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="Title" class="form-control" placeholder="Review Title" data-ng-model="productReview.Title" required>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Title.$invalid">
+                                                <small class="error" ng-show="forms.form.Title.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Title")}}</small>
+                                                <small class="error" ng-show="forms.form.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Title")}}</small>
+                                                <small class="error" ng-show="forms.form.Title.$error.server">{{serverMessages.GetMessage('Title')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Rating</label>
+                                        <div class="col-md-9 input-label">
+                                            <rating data-ng-model="productReview.Rating" max="5"></rating>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Review</label>
+                                        <div class="col-md-9">
+                                            <textarea type="text" name="Description" class="form-control" placeholder="Review" rows="10" data-ng-model="productReview.Description" required></textarea>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Description.$invalid">
+                                                <small class="error" ng-show="forms.form.Description.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Review")}}</small>
+                                                <small class="error" ng-show="forms.form.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Review")}}</small>
+                                                <small class="error" ng-show="forms.form.Description.$error.server">{{serverMessages.GetMessage('Description')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </spinner-overlay>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

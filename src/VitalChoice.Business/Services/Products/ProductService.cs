@@ -14,6 +14,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
@@ -35,6 +36,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
+        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 
         protected override async Task AfterSelect(Product entity)
         {
@@ -165,7 +167,8 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
-            IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync)
+            IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
+            IRepositoryAsync<AdminProfile> adminProfileRepository)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
                 bigStringValueRepository)
@@ -177,6 +180,7 @@ namespace VitalChoice.Business.Services.Products
             _productRepository = productRepository;
             _skuRepository = skuRepository;
             _productToCategoriesRepository = productToCategoriesRepository;
+            _adminProfileRepository = adminProfileRepository;
         }
 
         #region ProductOptions
@@ -292,7 +296,25 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
         {
-            return await _vProductSkuRepository.GetProductsAsync(filter);
+            var toReturn = await _vProductSkuRepository.GetProductsAsync(filter);
+
+            if (toReturn.Items.Any())
+            {
+                var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                foreach (var item in toReturn.Items)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.IdEditedBy == profile.Id)
+                        {
+                            item.EditedByAgentId = profile.AgentId;
+                        }
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         #endregion

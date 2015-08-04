@@ -219,7 +219,6 @@ namespace VitalChoice.Business.Services.Products
                 }
             }
 
-
             return toReturn;
         }
 

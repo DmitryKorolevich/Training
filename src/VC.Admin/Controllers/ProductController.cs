@@ -33,16 +33,18 @@ namespace VC.Admin.Controllers
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
         private readonly IInventoryCategoryService inventoryCategoryService;
+        private readonly IProductReviewService productReviewService;
         private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
-            IInventoryCategoryService inventoryCategoryService,
+            IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
             ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
             this.productService = productService;
+            this.productReviewService = productReviewService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
@@ -254,6 +256,69 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteInventoryCategory(int id)
         {
             return await inventoryCategoryService.DeleteCategoryAsync(id);
+        }
+
+        #endregion
+
+        #region ProductReviews
+
+        [HttpPost]
+        public async Task<Result<PagedList<VProductsWithReviewListItemModel>>> GetProductsWithReviews([FromBody]VProductsWithReviewFilter filter)
+        {
+            var result = await productReviewService.GetVProductsWithReviewsAsync(filter);
+
+            var toReturn = new PagedList<VProductsWithReviewListItemModel>
+            {
+                Items = result.Items.Select(p => new VProductsWithReviewListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<ProductReviewListItemModel>>> GetProductReviews([FromBody]ProductReviewFilter filter)
+        {
+            var result = await productReviewService.GetProductReviewsAsync(filter);
+
+            var toReturn = new PagedList<ProductReviewListItemModel>
+            {
+                Items = result.Items.Select(p => new ProductReviewListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<ProductReviewManageModel>> GetProductReview(int id)
+        {
+            if (id == 0)
+            {
+                return new ProductReviewManageModel()
+                {
+                    StatusCode = RecordStatusCode.NotActive,
+                    Rating = 5,
+                };
+            }
+            return new ProductReviewManageModel((await productReviewService.GetProductReviewAsync(id)));
+        }
+
+        [HttpPost]
+        public async Task<Result<ProductReviewManageModel>> UpdateProductReview([FromBody]ProductReviewManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+            var item = model.Convert();
+            item = await productReviewService.UpdateProductReviewAsync(item);
+
+            return new ProductReviewManageModel(item);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteProductReview(int id)
+        {
+            return await productReviewService.DeleteProductReviewAsync(id);
         }
 
         #endregion
