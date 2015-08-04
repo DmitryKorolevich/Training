@@ -1,10 +1,10 @@
-@import "base";
+@import "compass/css3";
 
-$gauge-size: 64px;
-$gauge-speed: 4000ms;
-$gauge-color: #6ca;
+$gauge-loader-size: 64px !default;
+$gauge-loader-speed: 4000ms !default;
+$gauge-loader-color: #6ca !default;
 
-@include keyframes(gauge) {
+@include keyframes(gauge-loader) {
   0%   { @include rotateZ(-50deg); }
   
   10%  { @include rotateZ(20deg); }
@@ -29,37 +29,37 @@ $gauge-color: #6ca;
 }
 
 /* :not(:required) hides this rule from IE9 and below */
-.gauge:not(:required) {
-  background: $gauge-color;
-  @include border-top-radius($gauge-size / 2);
+.gauge-loader:not(:required) {
+  background: $gauge-loader-color;
+  @include border-top-radius($gauge-loader-size / 2);
   display: inline-block;
-  width: $gauge-size;
-  height: $gauge-size / 2;
+  width: $gauge-loader-size;
+  height: $gauge-loader-size / 2;
   overflow: hidden;
   position: relative;
   text-indent: -9999px;
   
   &::before {
-    @include animation(gauge $gauge-speed infinite ease);
+    @include animation(gauge-loader $gauge-loader-speed infinite ease);
     background: white;
-    @include border-radius($gauge-size / 32);
+    @include border-radius($gauge-loader-size / 32);
     content: '';
     position: absolute;
-    left: ($gauge-size / 2) - ($gauge-size / 32);
-    top: ($gauge-size / 12);
-    width: ($gauge-size / 16);
-    height: (5 * $gauge-size / 12);
+    left: ($gauge-loader-size / 2) - ($gauge-loader-size / 32);
+    top: ($gauge-loader-size / 12);
+    width: ($gauge-loader-size / 16);
+    height: (5 * $gauge-loader-size / 12);
     @include transform-origin(50%, 100%);
   }
   
   &::after {
     content: '';
     background: white;
-    @include border-radius($gauge-size / 8);
+    @include border-radius($gauge-loader-size / 8);
     position: absolute;
-    left: ($gauge-size / 2) - ($gauge-size / 10);
-    top: ($gauge-size / 2) - ($gauge-size / 10);
-    width: ($gauge-size / 5);
-    height: ($gauge-size / 5);
+    left: ($gauge-loader-size / 2) - ($gauge-loader-size / 10);
+    top: ($gauge-loader-size / 2) - ($gauge-loader-size / 10);
+    width: ($gauge-loader-size / 5);
+    height: ($gauge-loader-size / 5);
   }
 }

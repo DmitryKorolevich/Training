@@ -87,7 +87,7 @@
                                                 <label class="col-md-3 control-label">Inception Date</label>
                                                 <div class="col-md-9">
                                                     <p class="input-group">
-                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" />
+                                                        <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off"/>
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                         </span>
@@ -395,17 +395,17 @@
                                                         <input type="text" class="form-control" id="ExpirationDateMonth" name="ExpirationDateMonth" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateMonth" placeholder="Month" data-ng-maxlength="2" required autocomplete="off">
                                                         <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateMonth.$invalid">
                                                             <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.ExpirationDateMonth", "100"])}}</small>
+                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.ExpirationDateMonth", "2"])}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth')}}</small>
                                                         </div>
                                                     </div>
                                                     <label class="col-md-1">
                                                     </label>
                                                     <div class="col-md-4">
-                                                        <input type="text" class="form-control" id="ExpirationDateYear" name="ExpirationDateYear" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateYear" placeholder="Year" data-ng-maxlength="4" required autocomplete="off">
+                                                        <input type="text" class="form-control" id="ExpirationDateYear" name="ExpirationDateYear" data-ng-model="paymentInfoTab.CreditCard.ExpirationDateYear" placeholder="Year" data-ng-maxlength="2" required autocomplete="off">
                                                         <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateYear.$invalid">
                                                             <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.ExpirationDateYear", "100"])}}</small>
+                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.ExpirationDateYear", "2"])}}</small>
                                                             <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear')}}</small>
                                                         </div>
                                                     </div>

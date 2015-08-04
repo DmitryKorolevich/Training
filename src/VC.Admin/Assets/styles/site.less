@@ -673,7 +673,7 @@ form .form-group p {
 	position:relative;
 }
 
-.ball:not(:required) {
+.ball-loader:not(:required) {
 	z-index: 1000;
 	position: fixed;
 	background: @brand-primary;
@@ -684,13 +684,13 @@ form .form-group p {
 	right: 0;
 }
 
-.ball:not(:required).ng-hide{
+.ball-loader:not(:required).ng-hide{
 	/*-moz-animation: ball 0ms none linear;
   -webkit-animation: ball 0s none linear;
   animation: ball 0ms none linear;*/
 }
 
-.ball:not(:required)::after{
+.ball-loader:not(:required)::after{
 	background: @brand-info;
 }
 

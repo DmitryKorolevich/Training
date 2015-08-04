@@ -1,6 +1,6 @@
 {
   "name": "css-spinners",
-  "version": "1.0.3",
+  "version": "2.1.0",
   "main": [
     "./css/spinners.css",
     "./css/spinner/*.css",
@@ -11,13 +11,13 @@
     "**/.*"
   ],
   "homepage": "https://github.com/jlong/css-spinners",
-  "_release": "1.0.3",
+  "_release": "2.1.0",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.3",
-    "commit": "af9828b9606b7829933c93778ea133f795c5a679"
+    "tag": "v2.1.0",
+    "commit": "bc2ed648812b4011e4d425f11b0d3deeb4f42795"
   },
   "_source": "git://github.com/jlong/css-spinners.git",
-  "_target": "~1.0.3",
+  "_target": "~2.1.0",
   "_originalSource": "css-spinners"
 }

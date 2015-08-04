@@ -1,4 +1,4 @@
-@-moz-keyframes heartbeat {
+@-moz-keyframes heartbeat-loader {
   0% {
     -moz-transform: rotate(45deg) scale(1);
     transform: rotate(45deg) scale(1);
@@ -20,7 +20,7 @@
     transform: rotate(45deg) scale(1);
   }
 }
-@-webkit-keyframes heartbeat {
+@-webkit-keyframes heartbeat-loader {
   0% {
     -webkit-transform: rotate(45deg) scale(1);
     transform: rotate(45deg) scale(1);
@@ -42,7 +42,7 @@
     transform: rotate(45deg) scale(1);
   }
 }
-@keyframes heartbeat {
+@keyframes heartbeat-loader {
   0% {
     -moz-transform: rotate(45deg) scale(1);
     -ms-transform: rotate(45deg) scale(1);
@@ -75,10 +75,10 @@
   }
 }
 /* :not(:required) hides this rule from IE9 and below */
-.heartbeat:not(:required) {
-  -moz-animation: heartbeat 1300ms ease 0s infinite normal;
-  -webkit-animation: heartbeat 1300ms ease 0s infinite normal;
-  animation: heartbeat 1300ms ease 0s infinite normal;
+.heartbeat-loader:not(:required) {
+  -moz-animation: heartbeat-loader 1300ms ease 0s infinite normal;
+  -webkit-animation: heartbeat-loader 1300ms ease 0s infinite normal;
+  animation: heartbeat-loader 1300ms ease 0s infinite normal;
   display: inline-block;
   position: relative;
   overflow: hidden;
@@ -94,12 +94,12 @@
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
 }
-.heartbeat:not(:required):after, .heartbeat:not(:required):before {
+.heartbeat-loader:not(:required):after, .heartbeat-loader:not(:required):before {
   position: absolute;
   content: "";
   background: #e87;
 }
-.heartbeat:not(:required):before {
+.heartbeat-loader:not(:required):before {
   -moz-border-radius-topleft: 12px;
   -webkit-border-top-left-radius: 12px;
   border-top-left-radius: 12px;
@@ -111,7 +111,7 @@
   width: 36px;
   height: 24px;
 }
-.heartbeat:not(:required):after {
+.heartbeat-loader:not(:required):after {
   -moz-border-radius-topleft: 12px;
   -webkit-border-top-left-radius: 12px;
   border-top-left-radius: 12px;

@@ -61,6 +61,7 @@ namespace VC.Admin.Models.Customer
         public CreditCardModel()
         {
             PaymentMethodType = PaymentMethodType.CreditCard;
+            CardType = CreditCardType.MasterCard;
         }
 
         [Map]
@@ -78,9 +79,9 @@ namespace VC.Admin.Models.Customer
         [Map]
         public string CardNumber { get; set; }
 
-        public int ExpirationDateMonth { get; set; }
+        public int? ExpirationDateMonth { get; set; }
 
-        public int ExpirationDateYear { get; set; }
+        public int? ExpirationDateYear { get; set; }
 
         [Map]
         public CreditCardType CardType { get; set; }
