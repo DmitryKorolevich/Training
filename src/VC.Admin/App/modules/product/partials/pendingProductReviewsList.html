@@ -1,9 +1,9 @@
 ﻿<div class="container-fluid">
     <div class="well">
-        <span class="legend">Manage Pending Product Reviews</span>
+        <span class="legend">Manage All Pending Reviews</span>
         <div class="row form-group">
             <div class="col-md-12">
-                <button class="btn btn-info btn-right width-180px" ui-sref="index.oneCol.manageProductReviews">View Live Reviews</button>
+                <button class="btn btn-info btn-right width-180px" ui-sref="index.oneCol.manageProductReviews">Manage All Live Reviews</button>
             </div>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
@@ -18,7 +18,7 @@
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateCreated')">
-                            <span>Last Review Posted</span>
+                            <span>Submitted</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateCreated'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>

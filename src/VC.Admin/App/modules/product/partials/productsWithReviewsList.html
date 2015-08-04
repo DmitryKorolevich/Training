@@ -3,7 +3,7 @@
         <span class="legend">Manage Live Product Reviews</span>
         <div class="row form-group">
             <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Title" data-ng-model="filter.SearchText">
+                <input type="text" class="form-control" placeholder="Product Name" data-ng-model="filter.SearchText">
             </div>
         </div>
         <div class="row form-group">
@@ -14,7 +14,7 @@
         <hr />
         <div class="row form-group">
             <div class="col-md-12">
-                <button class="btn btn-info btn-right width-180px" ui-sref="index.oneCol.managePendingProductReviews">View Pending Reviews</button>
+                <button class="btn btn-primary-orange btn-right width-180px" ui-sref="index.oneCol.managePendingProductReviews">Manage All Pending Reviews</button>
             </div>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
@@ -31,19 +31,19 @@
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Count')">
                             <span># Reviews</span>
                             <span data-ng-if="filter.Sorting.Path == 'Count'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Count'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Count'"></i>
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateCreated')">
-                            <span>Last Review Posted</span>
+                            <span>Latest Review</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateCreated'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Rating')">
-                            <span>Rating</span>
+                            <span>Avg Rating</span>
                             <span data-ng-if="filter.Sorting.Path == 'Rating'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>

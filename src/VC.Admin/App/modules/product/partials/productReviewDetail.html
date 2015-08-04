@@ -5,7 +5,7 @@
                 <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-default btn-danger width-160px" ladda="editTracker.active()" data-ng-click="delete();">Delete</button>
+                <button class="btn btn-danger width-160px" ladda="editTracker.active()" data-ng-click="delete();">Delete</button>
             </div>
             <div class="margin-top-10px">
                 <button class="btn btn-default width-160px" data-ng-click="goBack()">Cancel</button>
@@ -59,6 +59,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="col-md-3 control-label">Rating</label>
+                                        <div class="col-md-9 input-label">
+                                            <rating data-ng-model="productReview.Rating" max="5"></rating>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="col-md-3 control-label">Review Title</label>
                                         <div class="col-md-9">
                                             <input type="text" name="Title" class="form-control" placeholder="Review Title" data-ng-model="productReview.Title" required>
@@ -67,12 +73,6 @@
                                                 <small class="error" ng-show="forms.form.Title.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Title")}}</small>
                                                 <small class="error" ng-show="forms.form.Title.$error.server">{{serverMessages.GetMessage('Title')}}</small>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label">Rating</label>
-                                        <div class="col-md-9 input-label">
-                                            <rating data-ng-model="productReview.Rating" max="5"></rating>
                                         </div>
                                     </div>
                                     <div class="form-group">

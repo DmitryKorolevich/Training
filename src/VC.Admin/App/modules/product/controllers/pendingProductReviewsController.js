@@ -27,7 +27,7 @@
 	    $scope.filter = {
             StatusCode: 1,//pending
             Paging: { PageIndex: 1, PageItemCount: 100 },
-            Sorting: gridSorterUtil.resolve(refreshProductReviews,"DateCreated","Desc")
+            Sorting: gridSorterUtil.resolve(refreshProductReviews,"DateCreated","Asc")
 	    };
 
 	    refreshProductReviews();

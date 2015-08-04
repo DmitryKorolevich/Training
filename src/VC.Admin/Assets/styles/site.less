@@ -90,6 +90,30 @@ img.thumb {
     border: 1px solid red;
 }
 
+.btn-primary-orange {
+  background-image: -webkit-linear-gradient(#f88848, #f66e21 60%, #f5610d);
+  background-image: -o-linear-gradient(#f88848, #f66e21 60%, #f5610d);
+  background-image: linear-gradient(#f88848, #f66e21 60%, #f5610d);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff88848', endColorstr='#fff5610d', GradientType=0);
+  filter: none;
+  border-bottom: 1px solid #db5509;
+  color: #ffffff;
+  background-color: #db5509;
+  border-color: #d15108;
+}
+
+.btn-primary-orange:hover,
+.btn-primary-orange:focus,
+.btn-primary-orange.focus,
+.btn-primary-orange:active,
+.btn-primary-orange.active,
+.open > .dropdown-toggle.btn-primary-orange {
+  color: #ffffff;
+  background-color: #db5509;
+  border-color: #d15108;
+}
+
 .angular-ui-tree-placeholder {
     border: 2px dashed @brand-info;
     -webkit-box-sizing: border-box;
@@ -924,3 +948,8 @@ th.sortable-column {
 .categories .expand-button { position: absolute; right: 0; z-index:1;}
 
 .discount-edit .tiers .form-group { margin-bottom: 0px;} 
+
+.active-product-reviews .legend
+{
+    margin-bottom: 30px;
+}
