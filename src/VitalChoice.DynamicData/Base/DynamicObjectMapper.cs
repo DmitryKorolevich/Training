@@ -40,18 +40,23 @@ namespace VitalChoice.DynamicData.Base
             _typeConverter = new ModelTypeConverter(mappers);
         }
 
-        public virtual async void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities)
+        public virtual async void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
         {
-            await SyncCollectionsAsync(dynamics, entities);
+            await SyncCollectionsAsync(dynamics, entities, optionTypes);
         }
 
-        public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities)
+        public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
         {
             if (dynamics != null && dynamics.Any() && entities != null)
             {
                 //Update existing
                 var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => s.Id,
-                    (@dynamic, entity) => new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity)).ToList();
+                    (@dynamic, entity) =>
+                    {
+                        if (optionTypes != null)
+                            entity.OptionTypes = optionTypes;
+                        return new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity);
+                    }).ToList();
                 await UpdateEntityRangeAsync(itemsToUpdate);
                 foreach (var item in itemsToUpdate)
                 {
@@ -66,7 +71,7 @@ namespace VitalChoice.DynamicData.Base
                 }
 
                 //Insert
-                var notes = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList());
+                var notes = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList(), optionTypes);
                 entities.AddRange(notes);
             }
             else if (entities != null)

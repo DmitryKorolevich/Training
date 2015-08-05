@@ -66,6 +66,8 @@ namespace VitalChoice.Business.Services.Dynamic
                             }
                         }
                     }
+                    if (dynamic.Skus == null)
+                        dynamic.Skus = new List<SkuDynamic>();
                     dynamic.Skus.AddRange(await _skuMapper.FromEntityRangeAsync(entity.Skus, withDefaults));
                 }
             });
@@ -89,7 +91,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdProduct = dynamic.Id
                 }).ToList();
 
-                await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus);
+                await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus, entity.OptionTypes);
 
                 //Set key on options
                 foreach (var value in entity.OptionValues)
@@ -117,6 +119,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdProduct = dynamic.Id
                 }).ToList();
 
+                if (entity.Skus == null)
+                    entity.Skus = new List<Sku>();
                 entity.Skus.AddRange(await _skuMapper.ToEntityRangeAsync(dynamic.Skus, entity.OptionTypes));
             });
         }
