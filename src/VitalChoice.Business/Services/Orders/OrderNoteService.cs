@@ -222,14 +222,12 @@ namespace VitalChoice.Business.Services.Orders
 
 		public async Task<bool> DeleteOrderNoteAsync(int id)
 		{
-			var condition = new OrderNoteQuery().NotDeleted().MatchByid(id);
-
-			if (await _orderNoteRepository.Query(condition.HasCustomerAssignments()).SelectAnyAsync())
+			if (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id).HasCustomerAssignments()).Include(n => n.Customers).SelectAnyAsync())
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.HasAssignments]);
 			}
 
-			var orderNote = (await _orderNoteRepository.Query(condition).SelectAsync(false)).SingleOrDefault();
+			var orderNote = (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id)).SelectAsync(false)).SingleOrDefault();
 
 			if (orderNote != null)
 			{
