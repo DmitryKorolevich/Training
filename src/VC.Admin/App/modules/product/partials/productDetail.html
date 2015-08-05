@@ -285,7 +285,7 @@
                                             <div ui-sortable="sortableOptionsSKU" data-ng-model="product.SKUs">
                                                 <!--<accordion-group>
                                                 <accordion-heading>-->
-                                                <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default">
+                                                <div data-ng-repeat="subSku in product.SKUs" class="panel panel-default skus">
                                                     <div class="form-horizontal" ng-form="i{{$index}}" novalidate>
                                                         <fieldset>
                                                             <div class="panel-heading">
@@ -299,15 +299,21 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-md-11">
-                                                                                    <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">SKU</label>
                                                                                         <div class="col-md-1">
-                                                                                            <input type="text" name="Name" class="form-control" placeholder="SKU" data-ng-model="subSku.Name" required>
-                                                                                            <div class="error-container" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Name.$invalid">
+                                                                                            <input type="text" name="Name" class="form-control sku" placeholder="SKU" data-ng-model="subSku.Name" required>
+                                                                                            <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Name.$invalid">
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.SKU")}}</small>
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.exist">{{getValidationMessage("ValidationMessages.Exist","GeneralFieldNames.SKU")}}</small>
                                                                                                 <small class="error" ng-show="forms.SKUs.i{{$index}}.Name.$error.server">{{serverMessages.GetMessage('Name','SKUs',$index)}}</small>
                                                                                             </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+                                                                                        <label class="control-label">QTY</label>
+                                                                                        <div class="col-md-1">
+                                                                                            <input type="text" name="QTY" class="form-control qty" placeholder="QTY" data-ng-model="subSku.QTY">
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">

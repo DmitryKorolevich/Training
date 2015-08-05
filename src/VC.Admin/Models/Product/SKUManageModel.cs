@@ -22,6 +22,9 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.SKU)]
         public string Name { get; set; }
 
+        [Map]
+        public string QTY { get; set; }
+
         public bool Active { get; set; }
 
         [Map]

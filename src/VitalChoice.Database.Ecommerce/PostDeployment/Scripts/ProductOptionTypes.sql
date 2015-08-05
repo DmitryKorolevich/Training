@@ -647,3 +647,22 @@ UNION
 SELECT NULL, 3, 4, N'InventoryCategoryId'
 
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='QTY')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 4, 1, N'QTY'
+UNION
+SELECT NULL, 4, 2, N'QTY'
+UNION
+SELECT NULL, 4, 3, N'QTY'
+UNION
+SELECT NULL, 4, 4, N'QTY'
+
+END
+
+GO
