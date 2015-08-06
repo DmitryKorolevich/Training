@@ -12,4 +12,5 @@ foreach ($target in $targetNames) {
 	GruntTask -taskName "bower-install"
 	GruntTask -taskName "release"
 	DnuAll -deployPath "${RootDeploy}\${target}"
+	RestoreRuntime -deployPath "${RootDeploy}\${target}"
 }

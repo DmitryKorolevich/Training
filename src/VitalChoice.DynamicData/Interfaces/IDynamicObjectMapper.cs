@@ -73,8 +73,8 @@ namespace VitalChoice.DynamicData.Interfaces
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
         IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
         Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
-        Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities);
-        void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities);
+        Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);
+        void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);
 
         void UpdateEntity(TDynamic dynamic, TEntity entity);
         TEntity ToEntity(TDynamic dynamic, ICollection<TOptionType> optionTypes = null);

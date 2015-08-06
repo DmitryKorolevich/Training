@@ -62,3 +62,16 @@ function Any($name, $inlist) {
 	}
 	return $FALSE;
 }
+
+function RestoreRuntime($deployPath) {
+	echo "Restoring missed runtimes..."
+	ls -Path "${deployPath}\approot\runtimes" | `
+	foreach{
+	if ($_.GetType().Name.Equals("DirectoryInfo")) {
+			$runtimeName = $_.Name
+			if (-Not(test-path "${deployPath}\${runtimeName}\bin\dnx.clr.managed.dll")) {
+				cp "${env:USERPROFILE}\.dnx\runtimes\${runtimeName}" "${deployPath}\approot\runtimes" -Force -Recurse
+			}
+		}
+	}
+}

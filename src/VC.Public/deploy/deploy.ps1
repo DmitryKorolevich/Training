@@ -9,4 +9,5 @@ foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
 #	GruntTask -taskName "development"
 	DnuAll -deployPath "${RootDeploy}\${target}"
+	RestoreRuntime -deployPath "${RootDeploy}\${target}"
 }

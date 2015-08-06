@@ -303,7 +303,7 @@ namespace VitalChoice.Business.Services.Content
 
                 try
                 {
-                    _templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                    await _templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
                 }
                 catch(Exception e)
                 {

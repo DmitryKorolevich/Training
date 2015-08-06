@@ -191,37 +191,6 @@ namespace VitalChoice.Business.Services.Customers
             await customerToOrderNoteRepository.InsertRangeAsync(entity.OrderNotes);
         }
 
-        protected override async Task AfterSelect(Customer entity)
-        {
-            //var addressType = (int?) AddressType.Billing;
-            //entity.Addresses =
-            //    await
-            //        _addressesRepositoryAsync.Query(a => a.IdCustomer == entity.Id && a.IdObjectType != addressType)
-            //            .Include(a => a.OptionValues)
-            //            .SelectAsync(false);
-            //entity.CustomerNotes =
-            //    await
-            //        _customerNotesRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-            //            .Include(n => n.OptionValues)
-            //            .SelectAsync(false);
-            //entity.OrderNotes =
-            //    await
-            //        _customerToOrderNoteRepositoryAsync.Query(a => a.IdCustomer == entity.Id)
-            //            .Include(n => n.OrderNote)
-            //            .SelectAsync(false);
-            //entity.PaymentMethods =
-            //    await
-            //        _customerToPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
-            //            .Include(p => p.PaymentMethod)
-            //            .SelectAsync(false);
-            //entity.CustomerPaymentMethods =
-            //    await _customerPaymentMethodRepositoryAsync.Query(p => p.IdCustomer == entity.Id)
-            //        .Include(p => p.OptionValues)
-            //        .Include(p => p.BillingAddress)
-            //        .ThenInclude(a => a.OptionValues)
-            //        .SelectAsync(false);
-        }
-
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
             return query
