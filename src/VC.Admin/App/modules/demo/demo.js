@@ -22,10 +22,6 @@ angular.module('app.modules.demo',
 					controller: 'dashboardController'
 				})
 				/*orders*/
-				.state('index.oneCol.viewAllOrders', {
-					url: '/orders',
-					template: '<h2>View Add Orders</h2>'
-				})
 				.state('index.oneCol.locateOrder', {
 					url: '/orders/locate',
 					template: '<h2>Locate Order</h2>'

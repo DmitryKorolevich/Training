@@ -36,7 +36,7 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, productService, to
 
         $scope.forms = {};
 
-        $scope.productReview = [];
+        $scope.productReview={};
 
         productService.getProductReview($scope.id, $scope.refreshTracker).success(function(result) {
             if (result.Success) {

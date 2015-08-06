@@ -5,6 +5,7 @@
 @darker-gray: #EDEDED;
 @selected-light-blue: #DDF0FB;
 @hover-light-gray: #EDEDED;
+@table-warning: #FFD9DC;
 
 body{
 	min-width: 1100px;
@@ -20,6 +21,10 @@ a.block{ display:block;}
 	background-color: @selected-light-blue;
 }
 
+.table > tbody > tr.warning > td{
+	background-color: @table-warning;
+}
+
 .nav, .pagination, .carousel, .panel-title a {
      cursor: pointer; }
 
@@ -31,6 +36,10 @@ a.block{ display:block;}
 
 .modal-sm {
   width: 900px;
+}
+
+.form-horizontal .control-label.left {
+    text-align:left;
 }
 
 form.submitted p.ng-invalid input {
@@ -52,6 +61,10 @@ form.submitted p.ng-invalid input {
 
 .container.big-container{
 	width:900px;
+}
+
+.container.xbig-container{
+	width:1000px;
 }
 
 .container.sub-container {
@@ -334,6 +347,10 @@ hr { border-top: 1px solid #e5e5e5;}
 	margin-bottom:15px;
 }
 
+.margin-bottom-0px{
+	margin-bottom:0px;
+}
+
 .margin-bottom-10px{
 	margin-bottom:10px;
 }
@@ -360,6 +377,10 @@ hr { border-top: 1px solid #e5e5e5;}
 
 .margin-right-8px{
 	margin-right:8px;
+}
+
+.padding-0px {
+    padding: 0;
 }
 
 .custom-navbar-bottom{
@@ -956,3 +977,26 @@ th.sortable-column {
 
 .product-edit .skus .form-control.sku { width: 130px;}
 .product-edit .skus .form-control.qty { width: 70px;}
+
+.order-edit .gcs .code {margin-bottom: 5px;}
+.order-edit .gcs a.btn { margin-top: 8px; margin-left: 5px;}
+.order-edit .options-row { margin-bottom: 15px;}
+.order-edit .options-row .auto-ship-frequency{ position: absolute; width: 110px; z-index:1;}
+.order-edit .options-row .checkbox-inline{ margin-right: 20px;}
+.order-edit .products-buttons { margin-bottom: 15px;}
+.order-edit .products-buttons .btn-primary { margin-right: 10px;}
+.order-edit .products table th.sku { width: 130px; }
+.order-edit .products table th.type { width: 35px; }
+.order-edit .products table th.qty { width: 60px;}
+.order-edit .products table th.price { width: 130px;}
+.order-edit .products table th.amount { width: 80px;}
+.order-edit .products table th.del { width: 40px;}
+.order-edit .products table .perishable{color: #063; margin-top: 8px; display: block;}
+.order-edit .products table .not-perishable{ color:#CCC; margin-top: 8px; display: block;}
+.order-edit .products table a.btn { margin-top: 8px;}
+.order-edit .products table .amount { margin-top: 8px;}
+.order-edit .products table label.perishable-threshold-message { font-weight: normal;}
+.order-edit .products table { border:1px solid #dddddd;}
+.order-edit .products table .message { margin-right: 10px;}
+.order-edit .products table > thead > tr > th, .order-edit .products table > tbody > tr > td {border-right:1px solid #dddddd;}
+.order-edit .legend .item { margin-right: 10px;}

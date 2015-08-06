@@ -1,0 +1,27 @@
+﻿<div class="container-fluid">
+    <div class="well">
+        <span class="legend">Manage Orders</span>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover ">
+                <thead>
+                    <tr>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="order in orders">
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <pagination boundary-links="true"
+                    total-items="totalItems"
+                    items-per-page="filter.Paging.PageItemCount"
+                    data-ng-model="filter.Paging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    data-ng-change="pageChanged()">
+        </pagination>
+    </div>
+</div>
