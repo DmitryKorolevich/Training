@@ -26,32 +26,32 @@
                         <div class="container container-left xbig-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <div class="col-md-2">
-                                    </div>
-                                    <div class="col-md-10 options-row form-horizontal">
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" data-ng-model="order.OnHold">Place Order On Hold
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" data-ng-model="order.IsGift">This Order is a Gift
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" data-ng-model="order.AutoShipOrder">Auto-Ship Order
-                                            <select data-ng-if="order.AutoShipOrder" class="form-control auto-ship-frequency" name="AutoShipOrderFrequency" data-ng-model="order.AutoShipOrderFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies">
-                                                <option value="" ng-if="false"></option>
-                                            </select>
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" data-ng-model="order.MailOrder">Mail Order
-                                        </label>
+                                    <div class="col-md-12">
+                                        <div class="options-row form-horizontal">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" data-ng-model="order.OnHold">Hold Order
+                                            </label>
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" data-ng-model="order.AutoShipOrder">Auto-Ship Order
+                                                <select data-ng-if="order.AutoShipOrder" class="form-control auto-ship-frequency" name="AutoShipOrderFrequency" data-ng-model="order.AutoShipOrderFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies">
+                                                    <option value="" ng-if="false"></option>
+                                                </select>
+                                            </label>
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" data-ng-model="order.IsGift">Gift Order
+                                            </label>
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" data-ng-model="order.MailOrder">Mail Order
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="col-md-12 products-buttons">
-                                        <button data-ng-click="productAdd()" class="btn btn-primary width-160px">Add Product</button>
-                                        <button data-ng-click="topPurchasedProducts()" class="btn btn-info width-200px">Top Purchased Products</button>
+                                        <button data-ng-click="productAdd()" class="btn btn-primary-orange width-160px">Add Product</button>
+                                        <button data-ng-click="topPurchasedProducts()" class="btn btn-info btn-right width-200px">Top Purchased Products</button>
                                     </div>
                                     <div class="col-md-12 form-horizontal products">
                                         <table class="table table-striped">
-                                            <thead>
+                                            <!--<thead>
                                                 <tr>
                                                     <th class="sku">SKU</th>
                                                     <th class="type"></th>
@@ -61,23 +61,23 @@
                                                     <th class="amount">Amount</th>
                                                     <th class="del">Del</th>
                                                 </tr>
-                                            </thead>
+                                            </thead>-->
                                             <tbody>
                                                 <tr data-ng-class="{warning: item.Messages.length>0}" data-ng-repeat-start="item in order.Products">
-                                                    <td>
+                                                    <td class="sku">
                                                         <input name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.SKU">
                                                     </td>
-                                                    <td>
+                                                    <td class="type">
                                                         <span data-ng-if="item.IdProductType==2" class="perishable">P</span>
                                                         <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
                                                     </td>
-                                                    <td>
+                                                    <td class="qty">
                                                         <input name="QTY{{$index}}" class="form-control" placeholder="" data-ng-model="item.QTY">
                                                     </td>
-                                                    <td>
+                                                    <td class="product-name">
                                                         <input name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName">
                                                     </td>
-                                                    <td>
+                                                    <td class="price">
                                                         <div class="col-md-12 padding-0px">
                                                             <div class="input-group">
                                                                 <span class="input-group-addon">$</span>
@@ -85,10 +85,10 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    <td class="amount">
                                                         <div class="amount">{{item.Amount | currency}}</div>
                                                     </td>
-                                                    <td>
+                                                    <td class="del">
                                                         <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);"><i class="glyphicon glyphicon-remove"></i></a>
                                                     </td>
                                                 </tr>
@@ -108,7 +108,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 left-section">
                                         <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm.submitted}" novalidate>
                                             <fieldset>
                                                 <div class="form-group">
@@ -144,15 +144,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="form-group">
-                                                    <div class="col-md-12">
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <span class="legend">Ship Delay</span>
                                                 <div class="form-group">
                                                     <label class="col-md-12 control-label left">Ship Delay Order?</label>
                                                     <div class="col-md-12">
@@ -203,6 +195,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <span class="legend">Notes</span>
                                                 <div class="form-group">
                                                     <label class="col-md-12 control-label left">Order Specific Notes (*Will appear on invoice)</label>
                                                     <div class="col-md-12">
@@ -221,10 +215,21 @@
                                                         <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions"></textarea>
                                                     </div>
                                                 </div>
+
+                                                <span class="legend">Newsletter</span>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </fieldset>
                                         </form>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 right-section">
                                         <form class="form-horizontal" name="forms.mainForm2" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm2.submitted}" novalidate>
                                             <fieldset>
                                                 <div class="form-group margin-bottom-0px">
@@ -343,40 +348,42 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Discount</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.Discount}}%</span>
+                                                <div class="total-section">
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Discount</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.Discount}}%</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Discount Amount</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.DiscountAmount | currency}}</span>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Discount Amount</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.DiscountAmount | currency}}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Discounted Subtotal</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.DiscountedSubtotal | currency}}</span>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Discounted Subtotal</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.DiscountedSubtotal | currency}}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Shipping Total</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.ShippingTotal | currency}}</span>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Shipping Total</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.ShippingTotal | currency}}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Tax</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.Tax | currency}}</span>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Tax</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.Tax | currency}}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group margin-bottom-0px">
-                                                    <label for="type" class="col-md-7 control-label">Grand Total</label>
-                                                    <div class="col-md-5 form-control-static">
-                                                        <span>{{order.GrandTotal | currency}}</span>
+                                                    <div class="form-group margin-bottom-0px">
+                                                        <label for="type" class="col-md-7 control-label">Grand Total</label>
+                                                        <div class="col-md-5 form-control-static">
+                                                            <span>{{order.GrandTotal | currency}}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </fieldset>

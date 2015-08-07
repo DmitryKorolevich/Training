@@ -45,6 +45,7 @@ function($scope,$rootScope,$state,$stateParams,$timeout,orderService,productServ
             {
                 Source: 'test',
                 SourceShowText: true,
+                ShipDelay: 0,
 
                 AlaskaHawaiiSurcharge: 0,
                 CanadaSurcharge: 0,
@@ -64,9 +65,9 @@ function($scope,$rootScope,$state,$stateParams,$timeout,orderService,productServ
                 AutoShipOrderFrequency: 1,
 
                 Products: [
-                    { SKU: '',SKUId: 1,QTY: '',ProductName: '',Price: null,Amount: '',IdProductType: 1,Messages: ['Out of stock','Duplicate SKU'] }
+                    { SKU: '',SKUId: 1,QTY: '',ProductName: '',Price: null,Amount: '',IdProductType: 1,Messages: [] }
                 ],
-                ProductsPerishableThreshold: true,
+                ProductsPerishableThreshold: false,
             };
 
         $scope.legend={};
