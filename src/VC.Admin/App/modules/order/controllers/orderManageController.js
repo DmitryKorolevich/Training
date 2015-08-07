@@ -41,6 +41,16 @@ function($scope,$rootScope,$state,$stateParams,$timeout,orderService,productServ
         $scope.minimumPerishableThreshold=65;//should be loaded on edit open
         $scope.ignoneMinimumPerishableThreshold=false;
 
+        $scope.discountFilter={
+            Code: '',
+            Paging: { PageIndex: 1,PageItemCount: 20 },
+        };
+
+        $scope.gcFilter={
+            Code: '',
+            Paging: { PageIndex: 1,PageItemCount: 20 },
+        };
+
         $scope.order=
             {
                 Source: 'test',
@@ -97,6 +107,40 @@ function($scope,$rootScope,$state,$stateParams,$timeout,orderService,productServ
         //TODO: set needed data to the legend row
         $scope.legend.CustomerName="Test";
         $scope.legend.CustomerId=1;
+    };
+
+    $scope.requestRecalculate=function()
+    {
+        console.log('rec');
+    };
+
+    $scope.gcLostFocus=function(index, code)
+    {
+        if(index!=0 && !code)
+        {
+            $scope.order.GCs.splice(index,1);
+        }
+        $scope.requestRecalculate();
+    };
+
+    $scope.getGCs=function(val) {
+        $scope.gcFilter.Code=val;
+        return gcService.getGiftCertificates($scope.gcFilter)
+            .then(function(result) {
+                return result.data.Data.Items.map(function(item) {
+                    return item.Code;
+                });
+            });
+    };
+
+    $scope.getDiscounts=function(val) {
+        $scope.discountFilter.Code=val;
+        return discountService.getDiscounts($scope.discountFilter)
+            .then(function(result) {
+                return result.data.Data.Items.map(function(item) {
+                    return item.Code;
+                });
+            });
     };
 
     $scope.productAdd=function()

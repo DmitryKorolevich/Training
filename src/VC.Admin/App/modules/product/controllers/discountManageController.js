@@ -59,7 +59,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 
             $scope.skuFilter = {
                 Code: '',
-                Paging: { PageIndex: 1, PageItemCount: 10 },
+                Paging: { PageIndex: 1, PageItemCount: 20 },
             };
 
             $scope.forms = {};

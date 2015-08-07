@@ -20,6 +20,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public VSkuQuery WithDescriptionName(string descriptionName)
+        {
+            if (!string.IsNullOrEmpty(descriptionName))
+            {
+                Add(x => x.DescriptionName.Contains(descriptionName));
+            }
+            return this;
+        }
+
         public VSkuQuery WithCode(string code)
         {
             if (!string.IsNullOrEmpty(code))

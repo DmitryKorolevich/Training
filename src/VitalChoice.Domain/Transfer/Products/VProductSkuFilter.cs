@@ -5,5 +5,7 @@ namespace VitalChoice.Domain.Transfer.Products
     public class VProductSkuFilter : FilterBase
     {
         public string Code { get; set; }
+
+        public string DescriptionName { get; set; }
     }
 }

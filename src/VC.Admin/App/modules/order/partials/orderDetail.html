@@ -203,7 +203,7 @@
                                                         <textarea type="text" name="OrderSpecificNotes" class="form-control" placeholder="Order Specific Notes" rows="5" data-ng-model="order.OrderSpecificNotes"></textarea>
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
+                                                <div data-ng-if="order.IsGift" class="form-group">
                                                     <label class="col-md-12 control-label left">Gift Message (*Will appear on invoice)</label>
                                                     <div class="col-md-12">
                                                         <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage"></textarea>
@@ -321,7 +321,14 @@
                                                 <div class="form-group">
                                                     <label for="type" class="col-md-7 control-label">Discount Code</label>
                                                     <div class="col-md-5">
-                                                        <input name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="order.DiscountCode">
+                                                        <div class="input-group autocomplete">
+                                                            <input type="text" name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="order.DiscountCode"
+                                                                   typeahead-min-length="1" typeahead="code for code in getDiscounts($viewValue)" typeahead-loading="loadingDiscounts" data-ng-blur="requestRecalculate()"
+                                                                   typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100">
+                                                        </div>
+                                                        <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.DiscountCode.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm2.DiscountCode.$error.server">{{serverMessages.GetMessage('DiscountCode')}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </fieldset>
@@ -335,7 +342,14 @@
                                                         <div data-ng-repeat="gc in order.GCs" class="gcs">
                                                             <div class="form-horizontal item" ng-form="i{{$index}}" novalidate>
                                                                 <div class="col-md-10 padding-0px">
-                                                                    <input type="text" name="Code" class="form-control code" placeholder="Gift Certificate" data-ng-model="gc.Code" required>
+                                                                    <div class="input-group autocomplete code">
+                                                                        <input type="text" name="Code" class="form-control" placeholder="Gift Certificate" data-ng-model="gc.Code"
+                                                                               typeahead-min-length="1" typeahead="code for code in getGCs($viewValue)" typeahead-loading="loadingGCs" data-ng-blur="gcLostFocus($index, gc.Code)"
+                                                                               typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100">
+                                                                    </div>
+                                                                    <div class="error-container small-block" ng-show="forms.GCs.skussubmitted && forms.GCs.i{{$index}}.Code.$invalid">
+                                                                        <small class="error" ng-show="forms.GCs.i{{$index}}.Code.$error.server">{{serverMessages.GetMessage('Code','GCs',$index)}}</small>
+                                                                    </div>
                                                                 </div>
                                                                 <div data-ng-if="$index==0" class="col-md-2 padding-0px">
                                                                     <a class="btn btn-success btn-xs" title="Add" data-ng-click="gcAdd();"><i class="glyphicon glyphicon-plus"></i></a>
