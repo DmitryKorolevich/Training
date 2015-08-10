@@ -13,5 +13,8 @@ namespace VitalChoice.Domain.Entities
         public const string CustomerNotePriorities = "CustomerNotePriority";
         public const string Terms = "Terms";
         public const string Fob = "Fob";
+
+        public const string OrderSources = "OrderSources";
+        public const string OrderSourcesCelebrityHealthAdvocate = "OrderSourcesCelebrityHealthAdvocate";
     }
 }

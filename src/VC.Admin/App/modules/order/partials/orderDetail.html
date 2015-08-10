@@ -55,37 +55,35 @@
                                     </div>
                                     <div class="col-md-12 form-horizontal products">
                                         <table class="table table-striped">
-                                            <!--<thead>
-                                                <tr>
-                                                    <th class="sku">SKU</th>
-                                                    <th class="type"></th>
-                                                    <th class="qty">QTY</th>
-                                                    <th class="product-name">Product Name</th>
-                                                    <th class="price">Price</th>
-                                                    <th class="amount">Amount</th>
-                                                    <th class="del">Del</th>
-                                                </tr>
-                                            </thead>-->
                                             <tbody>
                                                 <tr data-ng-class="{warning: item.Messages.length>0}" data-ng-repeat-start="item in order.Products">
                                                     <td class="sku">
-                                                        <input name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.SKU">
+                                                        <div class="input-group autocomplete">
+                                                            <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
+                                                                   typeahead-min-length="1" typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                                                   typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
+                                                                   typeahead-wait-ms="100">
+                                                        </div>
                                                     </td>
                                                     <td class="type">
                                                         <span data-ng-if="item.IdProductType==2" class="perishable">P</span>
                                                         <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
                                                     </td>
                                                     <td class="qty">
-                                                        <input name="QTY{{$index}}" class="form-control" placeholder="QTY" data-ng-model="item.QTY">
+                                                        <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()">
                                                     </td>
                                                     <td class="product-name">
-                                                        <input name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName">
+                                                        <div class="input-group autocomplete">
+                                                            <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
+                                                                   typeahead-min-length="1" typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
+                                                                   typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100">
+                                                        </div>
                                                     </td>
                                                     <td class="price">
                                                         <div class="col-md-12 padding-0px">
                                                             <div class="input-group">
                                                                 <span class="input-group-addon">$</span>
-                                                                <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money min="0.00" max="100000" data-ng-model="item.Price">
+                                                                <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money min="0.00" max="100000" data-ng-model="item.Price" data-ng-blur="requestRecalculate()">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -121,30 +119,45 @@
                                                         <span>{{order.SourceValue}}</span>
                                                     </div>
                                                     <div data-ng-if="!order.SourceValue" class="col-md-9">
-                                                        <select class="form-control" name="Source" data-ng-model="order.Source" ng-options="source.Key as source.Text for source in sources">
+                                                        <select class="form-control" name="Source" data-ng-model="order.Source" ng-options="source.Key as source.Text for source in orderSources" required>
                                                             <option value="" ng-if="false"></option>
                                                         </select>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Source.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.Source.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Source")}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div data-ng-if="!order.SourceValue && order.Source" class="form-group">
+                                                <div data-ng-if="!order.SourceValue && order.Source && (order.Source==4 || order.Source==10)" class="form-group">
                                                     <label for="type" class="col-md-3 control-label">Details</label>
                                                     <div class="col-md-9">
-                                                        <input data-ng-if="order.SourceShowText" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="order.SourceDetails">
-                                                        <select data-ng-if="order.SourceShowCelebrity" class="form-control" name="SourceDetailsCelebrity" data-ng-model="order.SourceDetails" ng-options="sourceCelebrity.Key as sourceCelebrity.Text for sourceCelebrity in sourceCelebrities">
+                                                        <input data-ng-if="order.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="order.SourceDetails" required>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsText.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.SourceDetailsText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
+                                                        </div>
+                                                        <select data-ng-if="order.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="order.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" required>
                                                             <option value="" ng-if="false"></option>
                                                         </select>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsCelebrity.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.SourceDetailsCelebrity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="type" class="col-md-3 control-label">PO#</label>
                                                     <div class="col-md-9">
-                                                        <input name="PO" class="form-control" placeholder="PO#" data-ng-model="order.PO">
+                                                        <input name="PO" class="form-control" placeholder="PO#" data-ng-model="order.PO" required>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PO.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.PO.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","#PO")}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="type" class="col-md-3 control-label">Key Code</label>
                                                     <div class="col-md-9">
-                                                        <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode">
+                                                        <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" required>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.KeyCode.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.KeyCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Key Code")}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
 

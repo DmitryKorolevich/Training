@@ -56,6 +56,8 @@ namespace VitalChoice.Business.Services
 		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
             var termsLookup = lookupRepository.Query(x => x.Name == LookupNames.Terms).Select(false).Single().Id;
             var fobLookup = lookupRepository.Query(x => x.Name == LookupNames.Fob).Select(false).Single().Id;
+            var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
+            var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
 	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
@@ -163,6 +165,22 @@ namespace VitalChoice.Business.Services
                         Key = x.Id,
                         Text = x.ValueVariant
                     }).ToList();
+            referenceData.OrderSources = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == orderSourcesLookup)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.OrderSourcesCelebrityHealthAdvocate = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == orderSourcesCelebrityHealthAdvocateLookup)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
             return referenceData;
 	    }
 

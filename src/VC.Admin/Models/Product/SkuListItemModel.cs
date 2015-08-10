@@ -28,6 +28,8 @@ namespace VC.Admin.Models.Product
 
         public ProductType ProductType { get; set; }
 
+        public string DescriptionName { get; set; }
+
         public SkuListItemModel(VSku item)
         {
             if(item!=null)
@@ -39,6 +41,7 @@ namespace VC.Admin.Models.Product
                 Price = item.Price;
                 WholesalePrice = item.WholesalePrice;
                 ProductType = item.IdProductType;
+                DescriptionName = item.DescriptionName;
             }
         }
     }

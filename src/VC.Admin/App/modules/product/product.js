@@ -16,6 +16,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.pendingProductReviewsController',
 	'app.modules.product.controllers.productReviewManageController',
 	'app.modules.product.controllers.activeProductReviewsController',
+	'app.modules.product.controllers.topPurchasedProductsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

@@ -4,7 +4,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
     public class VSku : Entity
     {
-        public int? SkuId { get; set; }
+        public int SkuId { get; set; }
 
         public string Code { get; set; }
 

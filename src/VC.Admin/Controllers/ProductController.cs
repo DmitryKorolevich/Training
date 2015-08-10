@@ -66,11 +66,51 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        public async Task<Result<SkuListItemModel>> GetSku([FromBody]VProductSkuFilter filter)
+        {
+            var result = await productService.GetSkusAsync(filter);
+
+            return result.Select(p => new SkuListItemModel(p)).FirstOrDefault();
+        }
+
+        [HttpPost]
         public async Task<Result<ICollection<SkuListItemModel>>> GetSkus([FromBody]VProductSkuFilter filter)
         {
             var result = await productService.GetSkusAsync(filter);
 
             return result.Select(p => new SkuListItemModel(p)).ToArray();
+        }
+
+        [HttpGet]
+        public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus()
+        {
+            ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
+            //TODO - get top sku ids
+            Dictionary<int, int> items = new Dictionary<int, int>();
+            items.Add(54, 20);
+            items.Add(55, 5);
+            items.Add(25, 10);
+            items.Add(1, 1);
+
+            VProductSkuFilter filter = new VProductSkuFilter();
+            filter.Ids = items.Select(p => p.Key).ToList();
+            filter.Paging.PageIndex = 1;
+            filter.Paging.PageItemCount = 20;
+
+            var result = await productService.GetSkusAsync(filter);
+            foreach (var sku in result)
+            {
+                foreach (var item in items)
+                {
+                    if(sku.SkuId==item.Key)
+                    {
+                        toReturn.Add(new SkuWithStatisticListItemModel(sku,item.Value));
+                        break;
+                    }
+                }
+            }
+
+            return toReturn.ToArray();
         }
 
         [HttpPost]
