@@ -79,6 +79,7 @@
     </None>
     <None Include="Azure.publish.xml" />
     <None Include="PostDeployment\Scripts\DiscountOptionTypes.sql" />
+    <None Include="PreDeployment\Scripts\Orders.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
