@@ -13,3 +13,4 @@ Post-Deployment Script Template
 :r .\Scripts\ProductOptionTypes.sql
 :r .\Scripts\DiscountOptionTypes.sql
 :r .\Scripts\CustomerAreaBasicsData.sql
+:r .\Scripts\OrderLookups.sql

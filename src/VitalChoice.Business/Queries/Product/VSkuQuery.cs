@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
@@ -16,6 +17,24 @@ namespace VitalChoice.Business.Queries.Product
             if (!string.IsNullOrEmpty(text))
             {
                 Add(x => x.Code.Contains(text) || x.Name.Contains(text));
+            }
+            return this;
+        }
+
+        public VSkuQuery WithExactDescriptionName(string descriptionName)
+        {
+            if (!string.IsNullOrEmpty(descriptionName))
+            {
+                Add(x => x.DescriptionName == descriptionName);
+            }
+            return this;
+        }
+
+        public VSkuQuery WithExactCode(string code)
+        {
+            if (!string.IsNullOrEmpty(code))
+            {
+                Add(x => x.Code == code);
             }
             return this;
         }
@@ -62,6 +81,16 @@ namespace VitalChoice.Business.Queries.Product
             if (type.HasValue)
             {
                 Add(x => x.IdProductType == type);
+            }
+
+            return this;
+        }
+
+        public VSkuQuery WithIds(IList<int> ids)
+        {
+            if (ids!=null)
+            {
+                Add(x => ids.Contains(x.SkuId));
             }
 
             return this;

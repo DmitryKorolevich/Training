@@ -149,6 +149,7 @@
 		"app/modules/product/controllers/pendingProductReviewsController.js",
 		"app/modules/product/controllers/productReviewManageController.js",
 		"app/modules/product/controllers/activeProductReviewsController.js",
+		"app/modules/product/controllers/topPurchasedProductsController.js",
     "app/modules/product/product.js",
     "app/modules/order/controllers/ordersController.js",
 		"app/modules/order/controllers/orderManageController.js",

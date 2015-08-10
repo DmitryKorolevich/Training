@@ -58,7 +58,9 @@ namespace VC.Admin.Controllers
 					CustomerNotePriorities = referenceData.CustomerNotePriorities,
                     CreditCardTypes = referenceData.CreditCardTypes,
                     OacFob = referenceData.OacFob,
-                    OacTerms = referenceData.OacTerms
+                    OacTerms = referenceData.OacTerms,
+                    OrderSources = referenceData.OrderSources,
+                    OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
                 };
 	        }
 			else

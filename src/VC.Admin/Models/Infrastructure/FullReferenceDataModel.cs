@@ -27,5 +27,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> OacTerms { get; set; }
         public IList<LookupItem<int>> OacFob { get; set; }
         public IList<LookupItem<int>> CreditCardTypes { get; set; }
+        public IList<LookupItem<int>> OrderSources { get; set; }
+        public IList<LookupItem<int>> OrderSourcesCelebrityHealthAdvocate { get; set; }
     }
 }

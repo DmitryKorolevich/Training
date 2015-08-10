@@ -165,4 +165,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\VProductsWithReviews.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\OrderLookups.sql" />
+  </ItemGroup>
 </Project>
