@@ -628,28 +628,32 @@ END
 
 IF EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdCustomer' AND [object_id] = OBJECT_ID('CustomerOptionValues') AND is_nullable = 1)
 BEGIN
-	DROP INDEX [IX_CustomerOptionValues_Value] ON [dbo].[CustomerOptionValues]
+	IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerOptionValues]') AND name = N'IX_CustomerOptionValues_Value')
+		DROP INDEX [IX_CustomerOptionValues_Value] ON [dbo].[CustomerOptionValues]
 
 	ALTER TABLE CustomerOptionValues
 	ALTER COLUMN IdCustomer INT NOT NULL
 
 	CREATE INDEX [IX_CustomerOptionValues_Value] ON [dbo].[CustomerOptionValues] ([Value]) INCLUDE (Id, IdCustomer, IdOptionType)
 
-	DROP INDEX [IX_CustomerNoteOptionValues_Value] ON [dbo].[CustomerNoteOptionValues]
+	IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerNoteOptionValues]') AND name = N'IX_CustomerNoteOptionValues_Value')
+		DROP INDEX [IX_CustomerNoteOptionValues_Value] ON [dbo].[CustomerNoteOptionValues]
 
 	ALTER TABLE CustomerNoteOptionValues
 	ALTER COLUMN IdCustomerNote INT NOT NULL
 
 	CREATE INDEX [IX_CustomerNoteOptionValues_Value] ON [dbo].[CustomerNoteOptionValues] ([Value]) INCLUDE (Id, IdCustomerNote, IdOptionType)
 
-	DROP INDEX [IX_AddressOptionValues_Value] ON [dbo].[AddressOptionValues]
+	IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[AddressOptionValues]') AND name = N'IX_AddressOptionValues_Value')
+		DROP INDEX [IX_AddressOptionValues_Value] ON [dbo].[AddressOptionValues]
 
 	ALTER TABLE AddressOptionValues
 	ALTER COLUMN IdAddress INT NOT NULL
 
 	CREATE INDEX [IX_AddressOptionValues_Value] ON [dbo].[AddressOptionValues] ([Value]) INCLUDE (Id, IdAddress, IdOptionType)
 
-	DROP INDEX [IX_CustomerPaymentMethodValues_Value] ON [dbo].[CustomerPaymentMethodValues]
+	IF EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerPaymentMethodValues]') AND name = N'IX_CustomerPaymentMethodValues_Value')
+		DROP INDEX [IX_CustomerPaymentMethodValues_Value] ON [dbo].[CustomerPaymentMethodValues]
 
 	ALTER TABLE [CustomerPaymentMethodValues]
 	ALTER COLUMN IdCustomerPaymentMethod INT NOT NULL

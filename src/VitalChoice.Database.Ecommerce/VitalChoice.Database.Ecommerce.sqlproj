@@ -133,9 +133,6 @@
     <None Include="PreDeployment\Scripts\ReferencesToUsers.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\VProductSkus.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PreDeployment\Scripts\VSkus.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -167,5 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\OrderLookups.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VProductSkus.sql" />
   </ItemGroup>
 </Project>

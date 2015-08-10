@@ -31,7 +31,6 @@
 :r .\Scripts\LookupVariants.sql
 :r .\Scripts\Products.sql
 :r .\Scripts\ProductsToCategories.sql
-:r .\Scripts\VProductSkus.sql
 :r .\Scripts\VSkus.sql
 :r .\Scripts\Discounts.sql
 :r .\Scripts\ProductReviews.sql
