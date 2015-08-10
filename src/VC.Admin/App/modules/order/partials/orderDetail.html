@@ -30,18 +30,22 @@
                                         <div class="options-row form-horizontal">
                                             <label class="checkbox-inline">
                                                 <input type="checkbox" data-ng-model="order.OnHold">Hold Order
+                                                <i class="fa fa-pause"></i>
                                             </label>
                                             <label class="checkbox-inline">
                                                 <input type="checkbox" data-ng-model="order.AutoShipOrder">Auto-Ship Order
+                                                <i class="fa fa-history"></i>
                                                 <select data-ng-if="order.AutoShipOrder" class="form-control auto-ship-frequency" name="AutoShipOrderFrequency" data-ng-model="order.AutoShipOrderFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies">
                                                     <option value="" ng-if="false"></option>
                                                 </select>
                                             </label>
                                             <label class="checkbox-inline">
                                                 <input type="checkbox" data-ng-model="order.IsGift">Gift Order
+                                                <i class="fa fa-gift"></i>
                                             </label>
                                             <label class="checkbox-inline">
                                                 <input type="checkbox" data-ng-model="order.MailOrder">Mail Order
+                                                <i class="fa fa-envelope"></i>
                                             </label>
                                         </div>
                                     </div>
@@ -72,7 +76,7 @@
                                                         <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
                                                     </td>
                                                     <td class="qty">
-                                                        <input name="QTY{{$index}}" class="form-control" placeholder="" data-ng-model="item.QTY">
+                                                        <input name="QTY{{$index}}" class="form-control" placeholder="QTY" data-ng-model="item.QTY">
                                                     </td>
                                                     <td class="product-name">
                                                         <input name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName">
@@ -364,38 +368,38 @@
 
                                                 <div class="total-section">
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Discount</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Discount</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.Discount}}%</span>
                                                         </div>
                                                     </div>
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Discount Amount</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Discount Amount</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.DiscountAmount | currency}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Discounted Subtotal</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Discounted Subtotal</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.DiscountedSubtotal | currency}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Shipping Total</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Shipping Total</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.ShippingTotal | currency}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Tax</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Tax</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.Tax | currency}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="form-group margin-bottom-0px">
-                                                        <label for="type" class="col-md-7 control-label">Grand Total</label>
-                                                        <div class="col-md-5 form-control-static">
+                                                        <label for="type" class="col-md-6 control-label">Grand Total</label>
+                                                        <div class="col-md-6 form-control-static">
                                                             <span>{{order.GrandTotal | currency}}</span>
                                                         </div>
                                                     </div>
