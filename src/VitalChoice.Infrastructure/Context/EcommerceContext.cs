@@ -655,6 +655,105 @@ namespace VitalChoice.Infrastructure.Context
 
             #endregion
 
+            #region Orders
+
+		    builder.Entity<OrderTypeEntity>(entity =>
+		    {
+		        entity.Key(t => t.Id);
+		        entity.ToTable("OrderTypes");
+		    });
+
+            builder.Entity<Order>(entity =>
+            {
+                entity.Key(o => o.Id);
+                entity.ToTable("Orders");
+                entity.Reference(o => o.Customer)
+                    .InverseCollection()
+                    .ForeignKey(o => o.IdCustomer)
+                    .PrincipalKey(c => c.Id)
+                    .Required();
+                entity.Collection(o => o.Skus)
+                    .InverseReference()
+                    .ForeignKey(s => s.IdOrder)
+                    .PrincipalKey(o => o.Id)
+                    .Required();
+                entity.Collection(o => o.GiftCertificates)
+                    .InverseReference()
+                    .ForeignKey(g => g.IdOrder)
+                    .PrincipalKey(o => o.Id)
+                    .Required();
+                entity.Reference(o => o.Discount)
+                    .InverseCollection()
+                    .ForeignKey(o => o.IdDiscount)
+                    .PrincipalKey(d => d.Id)
+                    .Required(false);
+                entity.Collection(o => o.OptionValues)
+                    .InverseReference()
+                    .ForeignKey(v => v.IdOrder)
+                    .PrincipalKey(o => o.Id)
+                    .Required();
+            });
+
+            builder.Entity<OrderOptionValue>(entity =>
+            {
+                entity.Key(o => o.Id);
+                entity.ToTable("OrderOptionValues");
+                entity.Reference(v => v.OptionType)
+                    .InverseReference()
+                    .ForeignKey<OrderOptionValue>(v => v.IdOptionType)
+                    .PrincipalKey<OrderOptionType>(t => t.Id)
+                    .Required();
+                entity.Ignore(v => v.BigValue);
+                entity.Ignore(v => v.IdBigString);
+            });
+
+		    builder.Entity<OrderOptionType>(entity =>
+		    {
+		        entity.Key(t => t.Id);
+		        entity.ToTable("OrderOptionTypes");
+		        entity.Reference(t => t.Lookup)
+		            .InverseReference()
+		            .ForeignKey<OrderOptionType>(t => t.IdLookup)
+		            .PrincipalKey<Lookup>(l => l.Id)
+		            .Required(false);
+		    });
+
+		    builder.Entity<OrderToGiftCertificate>(entity =>
+		    {
+		        entity.Key(g => g.Id);
+		        entity.ToTable("OrderToGiftCertificates");
+		        entity.Reference(g => g.GiftCertificate)
+		            .InverseReference()
+		            .ForeignKey<OrderToGiftCertificate>(g => g.IdGiftCertificate)
+		            .PrincipalKey<GiftCertificate>(g => g.Id);
+		        entity.Reference(g => g.Order)
+		            .InverseReference()
+		            .ForeignKey<OrderToGiftCertificate>(g => g.IdOrder)
+		            .PrincipalKey<Order>(o => o.Id);
+		    });
+
+		    builder.Entity<OrderToSku>(entity =>
+		    {
+		        entity.Key(s => new {s.IdOrder, s.IdSku});
+		        entity.ToTable("OrderToSkus");
+		        entity.Reference(s => s.Order)
+		            .InverseReference()
+		            .ForeignKey<OrderToSku>(s => s.IdOrder)
+		            .PrincipalKey<Order>(o => o.Id);
+		        entity.Reference(s => s.Sku)
+		            .InverseReference()
+		            .ForeignKey<OrderToSku>(s => s.IdSku)
+		            .PrincipalKey<Sku>(s => s.Id);
+		    });
+
+		    builder.Entity<OrderStatusEntity>(entity =>
+		    {
+		        entity.Key(s => s.Id);
+		        entity.ToTable("OrderStatuses");
+		    });
+
+            #endregion
+
             base.OnModelCreating(builder);
 		}
 	}
