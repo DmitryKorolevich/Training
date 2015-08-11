@@ -1,40 +1,53 @@
 ﻿'use strict';
 
-angular.module('app.modules.order.controllers.orderManageController',[])
-.controller('orderManageController',['$scope','$rootScope','$state','$stateParams','$timeout','modalUtil','orderService',
-    'productService','gcService','discountService','toaster','confirmUtil','promiseTracker',
-function($scope,$rootScope,$state,$stateParams,$timeout,modalUtil,orderService,productService,gcService,discountService,
-    toaster,confirmUtil,promiseTracker) {
-    $scope.refreshTracker=promiseTracker("get");
-    $scope.editTracker=promiseTracker("edit");
+angular.module('app.modules.order.controllers.orderManageController', [])
+.controller('orderManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
+    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker',
+function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
+    toaster, confirmUtil, promiseTracker)
+{
+    $scope.refreshTracker = promiseTracker("get");
+    $scope.editTracker = promiseTracker("edit");
 
-    function successSaveHandler(result) {
-        if(result.Success) {
-            toaster.pop('success',"Success!","Successfully saved.");
+    function successSaveHandler(result)
+    {
+        if (result.Success)
+        {
+            toaster.pop('success', "Success!", "Successfully saved.");
             $scope.goBack();
         }
-        else {
-            var messages="";
-            if(result.Messages) {
-                $scope.forms.mainForm.submitted=true;
-                $scope.forms.mainForm2.submitted=true;
-                $scope.serverMessages=new ServerMessages(result.Messages);
-                var formForShowing=null;
-                $.each(result.Messages,function(index,value) {
-                    if(value.Field) {
-                        if(value.Field.indexOf('.')>-1) {
-                            var items=value.Field.split(".");
-                            $scope.forms[items[0]][items[1]][items[2]].$setValidity("server",false);
-                            formForShowing=items[0];
+        else
+        {
+            var messages = "";
+            if (result.Messages)
+            {
+                $scope.forms.mainForm.submitted = true;
+                $scope.forms.mainForm2.submitted = true;
+                $scope.serverMessages = new ServerMessages(result.Messages);
+                var formForShowing = null;
+                $.each(result.Messages, function (index, value)
+                {
+                    if (value.Field)
+                    {
+                        if (value.Field.indexOf('.') > -1)
+                        {
+                            var items = value.Field.split(".");
+                            $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                            formForShowing = items[0];
                             openSKUs();
                         }
-                        else {
-                            $.each($scope.forms,function(index,form) {
-                                if(form) {
-                                    if(form[value.Field]!=undefined) {
-                                        form[value.Field].$setValidity("server",false);
-                                        if(formForShowing==null) {
-                                            formForShowing=index;
+                        else
+                        {
+                            $.each($scope.forms, function (index, form)
+                            {
+                                if (form)
+                                {
+                                    if (form[value.Field] != undefined)
+                                    {
+                                        form[value.Field].$setValidity("server", false);
+                                        if (formForShowing == null)
+                                        {
+                                            formForShowing = index;
                                         }
                                         return false;
                                     }
@@ -44,154 +57,228 @@ function($scope,$rootScope,$state,$stateParams,$timeout,modalUtil,orderService,p
                     }
                 });
 
-                if(formForShowing) {
+                if (formForShowing)
+                {
                     activateTab(formForShowing);
                 }
             }
-            toaster.pop('error',"Error!",messages,null,'trustedHtml');
+            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         }
     };
 
-    function activateTab(formName) {
-        if(formName.indexOf('GCs')==0) {
-            formName='GCs';
+    function activateTab(formName)
+    {
+        if (formName.indexOf('GCs') == 0)
+        {
+            formName = 'GCs';
         }
-        $.each($scope.tabs,function(index,item) {            
-            $.each(item.formNames,function(index,form) {
-                if(form==formName) {
-                    item.active=true;
+        $.each($scope.tabs, function (index, item)
+        {
+            $.each(item.formNames, function (index, form)
+            {
+                if (form == formName)
+                {
+                    item.active = true;
                     return false;
                 }
             });
-            if(item.active)
+            if (item.active)
             {
                 return false;
             }
         });
     };
 
-    function errorHandler(result) {
-        toaster.pop('error',"Error!","Server error occured");
+    function errorHandler(result)
+    {
+        toaster.pop('error', "Error!", "Server error occured");
     };
 
-    function initialize() {
-        $scope.id=$stateParams.id?$stateParams.id:0;
-        $scope.idCustomer=$stateParams.idcustomer?$stateParams.idcustomer:0;
+    function initialize()
+    {
+        $scope.id = $stateParams.id ? $stateParams.id : 0;
+        $scope.idCustomer = $stateParams.idcustomer ? $stateParams.idcustomer : 0;
 
-        $scope.forms={};
+        $scope.forms = {};
 
-        $scope.autoShipOrderFrequencies=[
-            { Key: 1,Text: '1 Month' },
-            { Key: 2,Text: '2 Months' },
-            { Key: 3,Text: '3 Months' },
-            { Key: 6,Text: '6 Months' }
+        $scope.autoShipOrderFrequencies = [
+            { Key: 1, Text: '1 Month' },
+            { Key: 2, Text: '2 Months' },
+            { Key: 3, Text: '3 Months' },
+            { Key: 6, Text: '6 Months' }
         ];
 
-        $scope.minimumPerishableThreshold=65;//should be loaded on edit open
-        $scope.ignoneMinimumPerishableThreshold=false;
-        $scope.orderSources=$rootScope.ReferenceData.OrderSources;
-        $scope.orderSourcesCelebrityHealthAdvocate=$rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
-        $scope.customerType=1//Retail - TODO: should be from real data
+        $scope.minimumPerishableThreshold = 65;//should be loaded on edit open
+        $scope.ignoneMinimumPerishableThreshold = false;
+        $scope.orderSources = $rootScope.ReferenceData.OrderSources;
+        $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
 
-        $scope.discountsFilter={
+        $scope.discountsFilter = {
             Code: '',
-            Paging: { PageIndex: 1,PageItemCount: 20 },
+            Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
-        $scope.gcsFilter={
+        $scope.gcsFilter = {
             Code: '',
-            Paging: { PageIndex: 1,PageItemCount: 20 },
+            Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
-        $scope.skusFilter={
+        $scope.skusFilter = {
             Code: '',
             DescriptionName: '',
-            Paging: { PageIndex: 1,PageItemCount: 20 },
+            Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
-        $scope.skuFilter={
+        $scope.skuFilter = {
             ExactCode: '',
             ExactDescriptionName: '',
-            Paging: { PageIndex: 1,PageItemCount: 1 },
+            Paging: { PageIndex: 1, PageItemCount: 1 },
         };
 
-        $scope.order=
-            {
-                Source: null,
-                ShipDelay: 0,
+        $scope.legend = {};
 
-                AlaskaHawaiiSurcharge: 0,
-                CanadaSurcharge: 0,
-                StandardShippingCharges: 0,
-                TotalShipping: 0,
-
-                ProductSubtotal: 0,
-                Discount: 0,
-                DiscountAmount: 0,
-                DiscountedSubtotal: 0,
-                ShippingTotal: 0,
-                Tax: 0,
-                GrandTotal: 0,
-
-                GCs: [{ Code: '' }],
-
-                AutoShipOrderFrequency: 1,
-
-                Products: [
-                    { Code: '',Id: null,QTY: '',ProductName: '',Price: null,Amount: '',IdProductType: null,Messages: [] }
-                ],
-                ProductsPerishableThreshold: false,
-            };
-
-        $scope.legend={};
-
-        initOrder();
-
-        $scope.mainTab={
+        $scope.mainTab = {
             active: true,
-            formNames: ['mainForm','mainForm2','GCs'],
-            name: $scope.id?'Edit Order':'New Order',
+            formNames: ['mainForm', 'mainForm2', 'GCs'],
+            name: $scope.id ? 'Edit Order' : 'New Order',
         };
-        var tabs=[];
+        $scope.customerNotesTab = {
+            active: false,
+            formNames: ['customerNote'],
+        };
+        var tabs = [];
         tabs.push($scope.mainTab);
-        $scope.tabs=tabs;
+        tabs.push($scope.customerNote);
+        $scope.tabs = tabs;
+
+        loadOrder();
     };
 
-    var initOrder=function() {
-        $scope.order.OnHold=$scope.order.StatusCode=3;//on hold status
-        $scope.$watch('order.OnHold',function(newValue,oldValue) {
-            if(!newValue) {
+    var loadOrder = function ()
+    {
+        $scope.order =
+        {
+            Source: null,
+            ShipDelay: 0,
+
+            AlaskaHawaiiSurcharge: 0,
+            CanadaSurcharge: 0,
+            StandardShippingCharges: 0,
+            TotalShipping: 0,
+
+            ProductSubtotal: 0,
+            Discount: 0,
+            DiscountAmount: 0,
+            DiscountedSubtotal: 0,
+            ShippingTotal: 0,
+            Tax: 0,
+            GrandTotal: 0,
+
+            GCs: [{ Code: '' }],
+
+            AutoShipOrderFrequency: 1,
+
+            Products: [
+                { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] }
+            ],
+            ProductsPerishableThreshold: false,
+        };
+
+        if ($scope.id)
+        {
+            $scope.idCustomer = $scope.order.IdCustomer;
+        }
+
+        loadReferencedData();
+    };
+
+    var loadReferencedData = function()
+    {
+        $q.all({ countriesCall: customerService.getCountries($scope.refreshTracker), 
+            customerNotePrototypeCall: customerService.createCustomerNotePrototype($scope.refreshTracker),            
+            customerGetCall: customerService.getExistingCustomer($scope.idCustomer, $scope.refreshTracker)
+        }).then(function (result)
+        {
+                if (result.countriesCall.data.Success && result.customerNotePrototypeCall.data.Success && result.customerGetCall.data.Success) {
+                    
+                    $scope.countries = result.countriesCall.data.Data;
+
+                    $scope.customerNotePrototype = result.customerNotePrototypeCall.data.Data;
+                    $scope.customerNote = $scope.customerNotePrototype;
+                    
+                    $scope.currentCustomer = result.customerGetCall.data.Data;
+                    var highPriNotes = [];
+                    angular.forEach($scope.currentCustomer.CustomerNotes, function (noteItem) {
+                        if (noteItem.Priority == 1) {
+                            highPriNotes.push('<p>Date: ' + $filter('date')(noteItem.DateEdited, 'short') + '</p>' + '<p>Agent: ' + noteItem.EditedBy + '</p>' + '<p>Notes: <p class="container">' + noteItem.Text + '</p></p>');
+                        }
+                    });
+                    if (highPriNotes.length > 0) {
+                        var infoPopupUtil = $injector.get('infoPopupUtil');
+                        infoPopupUtil.info('High Priority Notes', highPriNotes.join('<hr />'), undefined, true);
+                    }
+
+                    initOrder();
+                }
+                else
+                {
+                    errorHandler(result);
+                }
+            }, function(result) {
+                errorHandler(result);
+            });
+    };
+
+    var initOrder = function ()
+    {
+        $scope.order.OnHold = $scope.order.StatusCode = 3;//on hold status
+        $scope.$watch('order.OnHold', function (newValue, oldValue)
+        {
+            if (!newValue)
+            {
                 //TODO: set status
             }
         });
 
         //TODO: set needed data to the legend row
-        $scope.legend.CustomerName="Test";
-        $scope.legend.CustomerId=1;
+        $scope.legend.CustomerName = "Test";
+        $scope.legend.CustomerId = $scope.idCustomer;
     };
 
-    $scope.requestRecalculate=function() {
+    $scope.requestRecalculate = function ()
+    {
         console.log('rec');
     };
 
-    var clearServerValidation=function() {
-        $.each($scope.forms,function(index,form) {
-            if(form) {
-                if(index=="GCs") {
-                    $.each(form,function(index,subForm) {
-                        if(index.indexOf('i')==0) {
-                            $.each(subForm,function(index,element) {
-                                if(element&&element.$name==index) {
-                                    element.$setValidity("server",true);
+    var clearServerValidation = function ()
+    {
+        $.each($scope.forms, function (index, form)
+        {
+            if (form)
+            {
+                if (index == "GCs")
+                {
+                    $.each(form, function (index, subForm)
+                    {
+                        if (index.indexOf('i') == 0)
+                        {
+                            $.each(subForm, function (index, element)
+                            {
+                                if (element && element.$name == index)
+                                {
+                                    element.$setValidity("server", true);
                                 }
                             });
                         }
                     });
                 }
-                else {
-                    $.each(form,function(index,element) {
-                        if(element&&element.$name==index) {
-                            element.$setValidity("server",true);
+                else
+                {
+                    $.each(form, function (index, element)
+                    {
+                        if (element && element.$name == index)
+                        {
+                            element.$setValidity("server", true);
                         }
                     });
                 }
@@ -199,106 +286,194 @@ function($scope,$rootScope,$state,$stateParams,$timeout,modalUtil,orderService,p
         });
     };
 
-    $scope.save=function() {
+    $scope.save = function ()
+    {
         clearServerValidation();
 
-        var valid=true;
-        $.each($scope.forms,function(index,form) {
-            if(form) {
-                if(!form.$valid) {
-                    valid=false;
+        var valid = true;
+        $.each($scope.forms, function (index, form)
+        {
+            if (form)
+            {
+                if (!form.$valid)
+                {
+                    valid = false;
                     activateTab(index);
                     return false;
                 }
             }
         });
 
-        if(valid) {
+        if (valid)
+        {
 
-        } else {
-            $scope.forms.mainForm.submitted=true;
-            $scope.forms.mainForm2.submitted=true;
+        } else
+        {
+            $scope.forms.mainForm.submitted = true;
+            $scope.forms.mainForm2.submitted = true;
         }
     };
 
-    $scope.gcLostFocus=function(index,code) {
-        if(index!=0&&!code) {
-            $scope.order.GCs.splice(index,1);
+    function deleteCustomerNoteLocal(id)
+    {
+        var idx = -1;
+
+        angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index)
+        {
+            if (item.Id == id)
+            {
+                idx = index;
+                return;
+            }
+        });
+
+        $scope.currentCustomer.CustomerNotes.splice(idx, 1);
+    }
+
+    $scope.deleteCustomerNote = function (id)
+    {
+        customerService.deleteNote(id, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    deleteCustomerNoteLocal(id);
+                    toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
+    $scope.addNewCustomerNote = function ()
+    {
+        clearServerValidation();
+        if ($scope.forms.customerNote.$valid)
+        {
+            customerService.addNote($scope.customerNote, $scope.currentCustomer.Id, $scope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.currentCustomer.CustomerNotes.push(result.Data);
+                        $scope.customerNote = $scope.customerNotePrototype;
+                        toaster.pop('success', "Success!", "Customer Note was succesfully added");
+                    }
+                    else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        } else
+        {
+            $scope.forms.customerNote.submitted = true;
+        }
+    };
+
+    $scope.gcLostFocus = function (index, code)
+    {
+        if (index != 0 && !code)
+        {
+            $scope.order.GCs.splice(index, 1);
         }
         $scope.requestRecalculate();
     };
 
-    $scope.getGCs=function(val) {
-        $scope.gcsFilter.Code=val;
+    $scope.getGCs = function (val)
+    {
+        $scope.gcsFilter.Code = val;
         return gcService.getGiftCertificates($scope.gcsFilter)
-            .then(function(result) {
-                return result.data.Data.Items.map(function(item) {
+            .then(function (result)
+            {
+                return result.data.Data.Items.map(function (item)
+                {
                     return item.Code;
                 });
             });
     };
 
-    $scope.getDiscounts=function(val) {
-        $scope.discountsFilter.Code=val;
+    $scope.getDiscounts = function (val)
+    {
+        $scope.discountsFilter.Code = val;
         return discountService.getDiscounts($scope.discountsFilter)
-            .then(function(result) {
-                return result.data.Data.Items.map(function(item) {
+            .then(function (result)
+            {
+                return result.data.Data.Items.map(function (item)
+                {
                     return item.Code;
                 });
             });
     };
 
-    $scope.productAdd=function() {
-        if($scope.order.Products.length>0 && !$scope.order.Products[$scope.order.Products.length-1].Code)
+    $scope.productAdd = function ()
+    {
+        if ($scope.order.Products.length > 0 && !$scope.order.Products[$scope.order.Products.length - 1].Code)
         {
             return;
         }
-        var product={ Code: '',Id: null,QTY: '',ProductName: '',Price: null,Amount: '',IdProductType: null,Messages: [] };
+        var product = { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] };
         $scope.order.Products.push(product);
     };
 
-    $scope.productDelete=function(index) {
-        if($scope.order.Products.length==1) {
-            $scope.order.Products.splice(index,1);
+    $scope.productDelete = function (index)
+    {
+        if ($scope.order.Products.length == 1)
+        {
+            $scope.order.Products.splice(index, 1);
             $scope.productAdd();
         }
-        else {
-            $scope.order.Products.splice(index,1);
+        else
+        {
+            $scope.order.Products.splice(index, 1);
         }
         $scope.requestRecalculate();
     };
 
-    $scope.topPurchasedProducts=function() {
-        modalUtil.open('app/modules/product/partials/topPurchasedProductsPopup.html','topPurchasedProductsController',{
-            products: $scope.order.Products,thenCallback: function(data) {
-                var newProducts=data;
-                $.each(newProducts,function(index,newProduct) {
-                    var add=true;
-                    $.each($scope.order.Products,function(index,product) {
-                        if(newProduct.Code==product.Code) {
-                            add=false;
+    $scope.topPurchasedProducts = function ()
+    {
+        modalUtil.open('app/modules/product/partials/topPurchasedProductsPopup.html', 'topPurchasedProductsController', {
+            products: $scope.order.Products, thenCallback: function (data)
+            {
+                var newProducts = data;
+                $.each(newProducts, function (index, newProduct)
+                {
+                    var add = true;
+                    $.each($scope.order.Products, function (index, product)
+                    {
+                        if (newProduct.Code == product.Code)
+                        {
+                            add = false;
                             return false;
                         }
                     });
 
-                    if(add)
+                    if (add)
                     {
-                        if($scope.order.Products.length>0 && !$scope.order.Products[$scope.order.Products.length-1].Code) {
-                            $scope.order.Products.splice($scope.order.Products.length-1, 1);
+                        if ($scope.order.Products.length > 0 && !$scope.order.Products[$scope.order.Products.length - 1].Code)
+                        {
+                            $scope.order.Products.splice($scope.order.Products.length - 1, 1);
                         }
 
-                        var product={};
-                        product.QTY=1;
-                        product.Code=newProduct.Code;
-                        product.IdProductType=newProduct.ProductType;
-                        product.ProductName=newProduct.DescriptionName;
-                        if($scope.customerType==1) {
-                            product.Price=newProduct.Price;
+                        var product = {};
+                        product.QTY = 1;
+                        product.Code = newProduct.Code;
+                        product.IdProductType = newProduct.ProductType;
+                        product.ProductName = newProduct.DescriptionName;
+                        if ($scope.currentCustomer.CustomerType == 1)
+                        {
+                            product.Price = newProduct.Price;
                         }
-                        else if($scope.customerType==2) {
-                            product.Price=newProduct.WholesalePrice;
+                        else if ($scope.currentCustomer.CustomerType == 2)
+                        {
+                            product.Price = newProduct.WholesalePrice;
                         }
-                        product.Amount=product.Price;
+                        product.Amount = product.Price;
 
                         $scope.order.Products.push(product);
                     }
@@ -309,106 +484,134 @@ function($scope,$rootScope,$state,$stateParams,$timeout,modalUtil,orderService,p
         });
     };
 
-    $scope.gcAdd=function() {
+    $scope.gcAdd = function ()
+    {
         $scope.order.GCs.push({ Code: '' });
     };
 
-    $scope.gcDelete=function(index) {
-        $scope.order.GCs.splice(index,1);
+    $scope.gcDelete = function (index)
+    {
+        $scope.order.GCs.splice(index, 1);
     };
 
-    $scope.getSKUsBySKU=function(val) {
-        $scope.skusFilter.Code=val;
-        $scope.skusFilter.DescriptionName='';
+    $scope.getSKUsBySKU = function (val)
+    {
+        $scope.skusFilter.Code = val;
+        $scope.skusFilter.DescriptionName = '';
         return productService.getSkus($scope.skusFilter)
-            .then(function(result) {
-                return result.data.Data.map(function(item) {
+            .then(function (result)
+            {
+                return result.data.Data.map(function (item)
+                {
                     return item;
                 });
             });
     };
 
-    var skuChangedRequest=null;
+    var skuChangedRequest = null;
 
-    $scope.skuChanged=function(index) {
+    $scope.skuChanged = function (index)
+    {
         //resolving issue with additional load after lost focus from the input if time of selecting a new element
-        if(skuChangedRequest) {
+        if (skuChangedRequest)
+        {
             $timeout.cancel(skuChangedRequest);
         }
-        skuChangedRequest=$timeout(function() {
-            var product=$scope.order.Products[index];
-            if(product&&($scope.skuFilter.ExactCode!=product.Code||$scope.skuFilter.ExactDescriptionName!='')) {
-                $scope.skuFilter.ExactCode=product.Code;
-                $scope.skuFilter.ExactDescriptionName='';
+        skuChangedRequest = $timeout(function ()
+        {
+            var product = $scope.order.Products[index];
+            if (product && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.ExactDescriptionName != ''))
+            {
+                $scope.skuFilter.ExactCode = product.Code;
+                $scope.skuFilter.ExactDescriptionName = '';
                 productService.getSku($scope.skuFilter)
-                    .success(function(result) {
-                        if(result.Success) {
-                            if(result.Data) {
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            if (result.Data)
+                            {
 
-                                product.QTY=1;
-                                product.IdProductType=result.Data.ProductType;
-                                product.ProductName=result.Data.DescriptionName;
-                                if($scope.customerType==1) {
-                                    product.Price=result.Data.Price;
+                                product.QTY = 1;
+                                product.IdProductType = result.Data.ProductType;
+                                product.ProductName = result.Data.DescriptionName;
+                                if ($scope.currentCustomer.CustomerType == 1)
+                                {
+                                    product.Price = result.Data.Price;
                                 }
-                                else if($scope.customerType==2) {
-                                    product.Price=result.Data.WholesalePrice;
+                                else if ($scope.currentCustomer.CustomerType == 2)
+                                {
+                                    product.Price = result.Data.WholesalePrice;
                                 }
-                                product.Amount=product.Price;
+                                product.Amount = product.Price;
 
                                 $scope.requestRecalculate();
                             }
-                        } else {
+                        } else
+                        {
                             errorHandler(result);
                         }
                     })
-                    .error(function(result) {
+                    .error(function (result)
+                    {
                         errorHandler(result);
                     });
-                skuChangedRequest=null;
+                skuChangedRequest = null;
             }
-        },100);
+        }, 100);
     };
 
-    $scope.getSKUsByProductName=function(val) {
-        $scope.skusFilter.Code='';
-        $scope.skusFilter.DescriptionName=val;
+    $scope.getSKUsByProductName = function (val)
+    {
+        $scope.skusFilter.Code = '';
+        $scope.skusFilter.DescriptionName = val;
         return productService.getSkus($scope.skusFilter)
-            .then(function(result) {
-                return result.data.Data.map(function(item) {
+            .then(function (result)
+            {
+                return result.data.Data.map(function (item)
+                {
                     return item;
                 });
             });
     };
 
-    $scope.productNameChanged=function(index) {
-        var product=$scope.order.Products[index];
-        if(product) {
-            $scope.skuFilter.ExactCode='';
-            $scope.skuFilter.ExactDescriptionName=product.ProductName;
+    $scope.productNameChanged = function (index)
+    {
+        var product = $scope.order.Products[index];
+        if (product)
+        {
+            $scope.skuFilter.ExactCode = '';
+            $scope.skuFilter.ExactDescriptionName = product.ProductName;
             productService.getSku($scope.skuFilter)
-                .success(function(result) {
-                    if(result.Success) {
-                        if(result.Data) {
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        if (result.Data)
+                        {
 
-                            product.QTY=1;
-                            product.IdProductType=result.Data.ProductType;
-                            product.Code=result.Data.Code;
-                            if($scope.customerType==1) {
-                                product.Price=result.Data.Price;
+                            product.QTY = 1;
+                            product.IdProductType = result.Data.ProductType;
+                            product.Code = result.Data.Code;
+                            if ($scope.currentCustomer.CustomerType == 1)
+                            {
+                                product.Price = result.Data.Price;
                             }
-                            else if($scope.customerType==2) {
-                                product.Price=result.Data.WholesalePrice;
+                            else if ($scope.currentCustomer.CustomerType == 2)
+                            {
+                                product.Price = result.Data.WholesalePrice;
                             }
-                            product.Amount=product.Price;
+                            product.Amount = product.Price;
 
                             $scope.requestRecalculate();
                         }
-                    } else {
+                    } else
+                    {
                         errorHandler(result);
                     }
                 })
-                .error(function(result) {
+                .error(function (result)
+                {
                     errorHandler(result);
                 });
         }

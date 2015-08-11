@@ -156,12 +156,6 @@ namespace VC.Admin.Controllers
             return new CustomerNoteModel()
             {
                 Priority = CustomerNotePriority.NormalPriority,
-                DateEdited = DateTime.Now,
-                EditedBy =
-                    _adminProfileService.Query(
-                        x => x.Id == Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId()))
-                        .Single()
-                        .AgentId
             };
         }
 
