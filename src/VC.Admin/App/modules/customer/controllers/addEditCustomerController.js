@@ -137,6 +137,28 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									});
 	};
 
+	$scope.$watch("currentCustomer.CustomerType", function(newValue, oldValue) {
+		if (newValue && oldValue && $scope.paymentMethods && $scope.orderNotes) {
+			$q.all(
+			{
+				paymentMethodsCall: customerService.getPaymentMethods($scope.currentCustomer.CustomerType, $scope.addEditTracker),
+				orderNotesCall: customerService.getOrderNotes($scope.currentCustomer.CustomerType, $scope.addEditTracker)
+			}).then(function(result) {
+				if (result.paymentMethodsCall.data.Success && result.orderNotesCall.data.Success) {
+					$scope.paymentMethods = result.paymentMethodsCall.data.Data;
+					$scope.orderNotes = result.orderNotesCall.data.Data;
+
+					$scope.currentCustomer.OrderNotes = [];
+					$scope.currentCustomer.ApprovedPaymentMethods = [];
+				} else {
+					toaster.pop('error', 'Error!', "Can't get reference data");
+				}
+			});
+		}
+	}, function(result) {
+		toaster.pop('error', "Error!", "Server error ocurred");
+	});
+
 	$scope.getLast4 = function (str) {
 	    if (str == null)
 	        return undefined;
