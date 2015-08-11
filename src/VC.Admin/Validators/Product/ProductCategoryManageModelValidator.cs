@@ -35,6 +35,16 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.Url)
                     .Matches(ValidationPatterns.ContentUrlPattern)
                     .WithMessage(model => model.Url, ValidationMessages.FieldContentUrlInvalidFormat);
+
+                RuleFor(model => model.Title)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Title, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.MetaDescription)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.MetaDescription, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                RuleFor(model => model.Description)
+                    .Length(0, BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.MetaDescription, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

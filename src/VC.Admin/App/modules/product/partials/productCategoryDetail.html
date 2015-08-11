@@ -54,7 +54,10 @@
                                             <div class="form-group">
                                                 <label for="shortDescription" class="col-md-3 control-label">Short Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Short Description" rows="10" data-ng-model="productCategory.Description"></textarea>
+                                                    <textarea type="text" name="Description" class="form-control" placeholder="Short Description" rows="10" data-ng-model="productCategory.Description"></textarea>
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.Description.$invalid">
+                                                        <small class="error" ng-show="forms.form.Description.$error.server">{{serverMessages.GetMessage('Description')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -104,13 +107,19 @@
                                             <div class="form-group">
                                                 <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="productCategory.Title">
+                                                    <input type="text" name="Title" class="form-control" placeholder="Meta Title" data-ng-model="productCategory.Title">
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.Title.$invalid">
+                                                        <small class="error" ng-show="forms.form.Title.$error.server">{{serverMessages.GetMessage('Title')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="productCategory.MetaDescription"></textarea>
+                                                    <textarea type="text" name="MetaDescription" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="productCategory.MetaDescription"></textarea>
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.MetaDescription.$invalid">
+                                                        <small class="error" ng-show="forms.form.MetaDescription.$error.server">{{serverMessages.GetMessage('MetaDescription')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </fieldset>
