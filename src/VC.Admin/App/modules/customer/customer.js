@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.customer', [
+	'app.modules.customer.services.customerEditService',
 	'app.modules.customer.controllers.addEditCustomerController',
 	'app.modules.customer.controllers.customerManagementController',
 ])

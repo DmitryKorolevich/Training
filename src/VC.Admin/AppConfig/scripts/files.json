@@ -163,6 +163,7 @@
 		"app/modules/gc/controllers/gcDetailController.js",
 		"app/modules/gc/controllers/gcsAddController.js",
     "app/modules/gc/gc.js",
+    "app/modules/customer/services/customerEditService.js",
     "app/modules/customer/controllers/addEditCustomerController.js",
     "app/modules/customer/controllers/customerManagementController.js",
 		"app/modules/customer/customer.js"

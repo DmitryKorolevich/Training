@@ -2,12 +2,11 @@
 
 angular.module('app.modules.order.controllers.orderManageController', [])
 .controller('orderManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
-    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker',
+    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService',
 function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
-    toaster, confirmUtil, promiseTracker)
+    toaster, confirmUtil, promiseTracker, customerEditService)
 {
-    $scope.refreshTracker = promiseTracker("get");
-    $scope.editTracker = promiseTracker("edit");
+    $scope.addEditTracker = promiseTracker("addEdit");
 
     function successSaveHandler(result)
     {
@@ -23,6 +22,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 $scope.forms.mainForm.submitted = true;
                 $scope.forms.mainForm2.submitted = true;
+                $scope.forms.submitted['profile'] = true;
+                $scope.forms.submitted['shipping'] = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
                 $.each(result.Messages, function (index, value)
@@ -74,14 +75,21 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         }
         $.each($scope.tabs, function (index, item)
         {
-            $.each(item.formNames, function (index, form)
+            if (item.formName == formName)
             {
-                if (form == formName)
+                item.active = true;
+            }
+            if (item.formNames)
+            {
+                $.each(item.formNames, function (index, form)
                 {
-                    item.active = true;
-                    return false;
-                }
-            });
+                    if (form == formName)
+                    {
+                        item.active = true;
+                        return false;
+                    }
+                });
+            }
             if (item.active)
             {
                 return false;
@@ -99,7 +107,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.id = $stateParams.id ? $stateParams.id : 0;
         $scope.idCustomer = $stateParams.idcustomer ? $stateParams.idcustomer : 0;
 
-        $scope.forms = {};
+        $scope.forms = { submitted: []};
 
         $scope.autoShipOrderFrequencies = [
             { Key: 1, Text: '1 Month' },
@@ -142,12 +150,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             formNames: ['mainForm', 'mainForm2', 'GCs'],
             name: $scope.id ? 'Edit Order' : 'New Order',
         };
+        $scope.accountProfileTab = {
+            active: false,
+            formName: 'profile',
+        };
+        $scope.shippingAddressTab = {
+            active: false,
+            formName: 'shipping',
+        };
         $scope.customerNotesTab = {
             active: false,
-            formNames: ['customerNote'],
+            formName: 'customerNote',
         };
         var tabs = [];
         tabs.push($scope.mainTab);
+        tabs.push($scope.accountProfileTab);
+        tabs.push($scope.shippingAddressTab);
         tabs.push($scope.customerNote);
         $scope.tabs = tabs;
 
@@ -158,6 +176,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     {
         $scope.order =
         {
+            IdCustomer: 7888921,
             Source: null,
             ShipDelay: 0,
 
@@ -182,51 +201,76 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] }
             ],
             ProductsPerishableThreshold: false,
-        };
 
+            Shipping: {},
+        };
+        
         if ($scope.id)
         {
             $scope.idCustomer = $scope.order.IdCustomer;
+        }
+        else
+        {
+            customerEditService.initCustomerEdit($scope, $scope.addEditTracker);
+            $scope.order.UpdateShippingAddressForCustomer = true;
         }
 
         loadReferencedData();
     };
 
-    var loadReferencedData = function()
+    var loadReferencedData = function ()
     {
-        $q.all({ countriesCall: customerService.getCountries($scope.refreshTracker), 
-            customerNotePrototypeCall: customerService.createCustomerNotePrototype($scope.refreshTracker),            
-            customerGetCall: customerService.getExistingCustomer($scope.idCustomer, $scope.refreshTracker)
+        $q.all({
+            countriesCall: customerService.getCountries($scope.addEditTracker),
+            customerNotePrototypeCall: customerService.createCustomerNotePrototype($scope.addEditTracker),
+            customerGetCall: customerService.getExistingCustomer($scope.idCustomer, $scope.addEditTracker)
         }).then(function (result)
         {
-                if (result.countriesCall.data.Success && result.customerNotePrototypeCall.data.Success && result.customerGetCall.data.Success) {
-                    
-                    $scope.countries = result.countriesCall.data.Data;
+            if (result.countriesCall.data.Success && result.customerNotePrototypeCall.data.Success && result.customerGetCall.data.Success)
+            {
+                $scope.countries = result.countriesCall.data.Data;
 
-                    $scope.customerNotePrototype = result.customerNotePrototypeCall.data.Data;
-                    $scope.customerNote = $scope.customerNotePrototype;
-                    
-                    $scope.currentCustomer = result.customerGetCall.data.Data;
-                    var highPriNotes = [];
-                    angular.forEach($scope.currentCustomer.CustomerNotes, function (noteItem) {
-                        if (noteItem.Priority == 1) {
-                            highPriNotes.push('<p>Date: ' + $filter('date')(noteItem.DateEdited, 'short') + '</p>' + '<p>Agent: ' + noteItem.EditedBy + '</p>' + '<p>Notes: <p class="container">' + noteItem.Text + '</p></p>');
-                        }
-                    });
-                    if (highPriNotes.length > 0) {
-                        var infoPopupUtil = $injector.get('infoPopupUtil');
-                        infoPopupUtil.info('High Priority Notes', highPriNotes.join('<hr />'), undefined, true);
-                    }
+                $scope.customerNotePrototype = result.customerNotePrototypeCall.data.Data;
+                $scope.customerNote = $scope.customerNotePrototype;
 
-                    initOrder();
+                $scope.currentCustomer = result.customerGetCall.data.Data;
+                $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
+                customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
+                                
+                customerEditService.syncCountry($scope, $scope.order.Shipping);
+                angular.forEach($scope.currentCustomer.Shipping, function (shippingItem)
+                {
+                    customerEditService.syncCountry($scope, shippingItem);
+                });
+
+                if($scope.id)
+                {
+                    $scope.shippingAddressTab.Address = $scope.order.Shipping;
                 }
                 else
                 {
-                    errorHandler(result);
+                    angular.forEach($scope.currentCustomer.Shipping, function (shippingItem)
+                    {
+                        if (shippingItem.Default)
+                        {
+                            $scope.shippingAddressTab.Address = shippingItem;
+                        }
+                    });
                 }
-            }, function(result) {
+
+                customerEditService.syncDefaultPaymentMethod($scope);
+                customerEditService.showHighPriNotes($scope);
+
+                initOrder();
+            }
+            else
+            {
                 errorHandler(result);
-            });
+            }
+        }, function (result)
+        {
+            errorHandler(result);
+        });
     };
 
     var initOrder = function ()
@@ -311,6 +355,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.forms.mainForm.submitted = true;
             $scope.forms.mainForm2.submitted = true;
+            $scope.forms.submitted['profile'] = true;
+            $scope.forms.submitted['shipping'] = true;
         }
     };
 
