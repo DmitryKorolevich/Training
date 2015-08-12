@@ -720,8 +720,9 @@ namespace VitalChoice.Infrastructure.Context
 
 		    builder.Entity<OrderToGiftCertificate>(entity =>
 		    {
-		        entity.Key(g => g.Id);
-		        entity.ToTable("OrderToGiftCertificates");
+                entity.Ignore(s => s.Id);
+		        entity.Key(s => new {s.IdOrder, s.IdGiftCertificate});
+                entity.ToTable("OrderToGiftCertificates");
 		        entity.Reference(g => g.GiftCertificate)
 		            .InverseReference()
 		            .ForeignKey<OrderToGiftCertificate>(g => g.IdGiftCertificate)
@@ -734,7 +735,8 @@ namespace VitalChoice.Infrastructure.Context
 
 		    builder.Entity<OrderToSku>(entity =>
 		    {
-		        entity.Key(s => new {s.IdOrder, s.IdSku});
+		        entity.Ignore(s => s.Id);
+                entity.Key(s => new {s.IdOrder, s.IdSku});
 		        entity.ToTable("OrderToSkus");
 		        entity.Reference(s => s.Order)
 		            .InverseReference()
@@ -750,6 +752,51 @@ namespace VitalChoice.Infrastructure.Context
 		    {
 		        entity.Key(s => s.Id);
 		        entity.ToTable("OrderStatuses");
+		    });
+
+		    builder.Entity<OrderPaymentMethod>(entity =>
+		    {
+                entity.Key(o => o.Id);
+                entity.ToTable("OrderPaymentMethods");
+                entity.Reference(o => o.BillingAddress)
+                    .InverseCollection()
+                    .ForeignKey(o => o.IdAddress)
+                    .PrincipalKey(c => c.Id)
+                    .Required(false);
+                entity.Reference(o => o.PaymentMethod)
+                    .InverseReference()
+                    .ForeignKey<OrderPaymentMethod>(s => s.IdObjectType)
+                    .PrincipalKey<PaymentMethod>(o => o.Id)
+                    .Required(false);
+                entity.Collection(o => o.OptionValues)
+                    .InverseReference()
+                    .ForeignKey(g => g.IdOrderPaymentMethod)
+                    .PrincipalKey(o => o.Id)
+                    .Required();
+            });
+
+            builder.Entity<OrderPaymentMethodOptionValue>(entity =>
+            {
+                entity.Key(o => o.Id);
+                entity.ToTable("OrderPaymentMethodOptionValues");
+                entity.Reference(v => v.OptionType)
+                    .InverseReference()
+                    .ForeignKey<OrderOptionValue>(v => v.IdOptionType)
+                    .PrincipalKey<OrderOptionType>(t => t.Id)
+                    .Required();
+                entity.Ignore(v => v.BigValue);
+                entity.Ignore(v => v.IdBigString);
+            });
+
+		    builder.Entity<OrderPaymentMethodOptionType>(entity =>
+		    {
+		        entity.Key(t => t.Id);
+		        entity.ToTable("OrderPaymentMethodOptionTypes");
+		        entity.Reference(t => t.Lookup)
+		            .InverseReference()
+		            .ForeignKey<OrderOptionType>(t => t.IdLookup)
+		            .PrincipalKey<Lookup>(l => l.Id)
+		            .Required(false);
 		    });
 
             #endregion
