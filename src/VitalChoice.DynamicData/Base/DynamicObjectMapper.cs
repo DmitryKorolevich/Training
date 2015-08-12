@@ -71,8 +71,8 @@ namespace VitalChoice.DynamicData.Base
                 }
 
                 //Insert
-                var notes = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList(), optionTypes);
-                entities.AddRange(notes);
+                var list = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList(), optionTypes);
+                entities.AddRange(list);
             }
             else if (entities != null)
             {

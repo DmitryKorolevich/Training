@@ -80,8 +80,8 @@ namespace VitalChoice.Business.Services.Products
                     {
                         value.Id = 0;
                     }
-                    await productOptionValueRepository.InsertRangeAsync(sku.OptionValues);
                 }
+                await productOptionValueRepository.InsertRangeAsync(sku.OptionValues);
             }
             await categoriesRepository.InsertRangeAsync(entity.ProductsToCategories);
         }

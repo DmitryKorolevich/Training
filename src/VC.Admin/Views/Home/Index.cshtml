@@ -1,4 +1,4 @@
-﻿@using VitalChoice.Domain.Entities.Options
+﻿@using VitalChoice.Domain.Entities.Options;
 @inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
 <!DOCTYPE html>
 <html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Options.Versioning.BuildNumber'">
