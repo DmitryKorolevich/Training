@@ -1,4 +1,4 @@
-﻿IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='OrderSources' AND Name='OrderSourcesCelebrityHealthAdvocate')
+﻿IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='OrderSources')
 BEGIN
 
 	INSERT INTO [dbo].[Lookups]
