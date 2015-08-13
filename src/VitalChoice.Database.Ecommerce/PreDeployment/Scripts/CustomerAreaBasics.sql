@@ -697,8 +697,11 @@ END
 IF COL_LENGTH('[dbo].[Customers]','PublicId') IS NULL
 BEGIN
 	ALTER TABLE [dbo].[Customers]
-	ADD [PublicId] UNIQUEIDENTIFIER NOT NULL
+	ADD [PublicId] UNIQUEIDENTIFIER CONSTRAINT DF_PublicId_Default DEFAULT(NEWID()) NOT NULL
 
 	ALTER TABLE [dbo].[Customers]
 	ADD CONSTRAINT UQ_Customer UNIQUE(PublicId)
+
+	ALTER TABLE [dbo].[Customers]
+	DROP CONSTRAINT DF_PublicId_Default
 END
