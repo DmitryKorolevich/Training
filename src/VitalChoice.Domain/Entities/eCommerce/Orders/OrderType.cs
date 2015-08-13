@@ -7,7 +7,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 {
     public enum OrderType
     {
-        NormalOrder = 1,
+        RetailOrder = 1,
         AutoShip = 2,
         DropShip = 3,
         GiftListOrder = 4,

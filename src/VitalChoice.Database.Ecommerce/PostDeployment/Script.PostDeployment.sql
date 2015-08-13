@@ -15,3 +15,4 @@ Post-Deployment Script Template
 :r .\Scripts\CustomerAreaBasicsData.sql
 :r .\Scripts\OrderLookups.sql
 :r .\Scripts\VProductSkus.sql
+:r .\Scripts\OrdersData.sql

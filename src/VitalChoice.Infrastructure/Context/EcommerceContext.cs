@@ -790,17 +790,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(v => v.IdBigString);
             });
 
-		    builder.Entity<OrderPaymentMethodOptionType>(entity =>
-		    {
-		        entity.Key(t => t.Id);
-		        entity.ToTable("OrderPaymentMethodOptionTypes");
-		        entity.Reference(t => t.Lookup)
-		            .InverseReference()
-		            .ForeignKey<OrderOptionType>(t => t.IdLookup)
-		            .PrincipalKey<Lookup>(l => l.Id)
-		            .Required(false);
-		    });
-
 		    builder.Entity<OrderAddress>(entity =>
 		    {
 		        entity.Key(p => p.Id);
@@ -838,6 +827,38 @@ namespace VitalChoice.Infrastructure.Context
 		            .PrincipalKey(v => v.Id)
 		            .Required();
 		    });
+
+		    builder.Entity<RefundSku>(entity =>
+		    {
+		        entity.Key(r => new {r.IdOrder, r.IdSku});
+		        entity.ToTable("RefundSkus");
+		        entity.Reference(r => r.Order)
+		            .InverseCollection()
+		            .ForeignKey(r => r.IdOrder)
+		            .PrincipalKey(o => o.Id)
+                    .Required();
+                entity.Reference(r => r.Sku)
+                    .InverseCollection()
+                    .ForeignKey(r => r.IdSku)
+                    .PrincipalKey(s => s.Id)
+                    .Required();
+            });
+
+            builder.Entity<ReshipProblemSku>(entity =>
+            {
+                entity.Key(r => new { r.IdOrder, r.IdSku });
+                entity.ToTable("ReshipProblemSkus");
+                entity.Reference(r => r.Order)
+                    .InverseCollection()
+                    .ForeignKey(r => r.IdOrder)
+                    .PrincipalKey(o => o.Id)
+                    .Required();
+                entity.Reference(r => r.Sku)
+                    .InverseCollection()
+                    .ForeignKey(r => r.IdSku)
+                    .PrincipalKey(s => s.Id)
+                    .Required();
+            });
 
             #endregion
 

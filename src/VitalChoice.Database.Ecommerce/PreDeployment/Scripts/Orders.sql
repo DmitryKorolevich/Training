@@ -157,3 +157,40 @@ BEGIN
 	CREATE NONCLUSTERED INDEX IX_OrderAddressOptionValues_Value ON OrderAddressOptionValues (Value)
 
 END
+
+IF OBJECT_ID(N'[dbo].[OrderPaymentMethodOptionTypes]', N'U') IS NOT NULL
+BEGIN
+	ALTER TABLE [OrderPaymentMethodOptionValues]
+	DROP CONSTRAINT FK_OrderPaymentMethodOptionValuesToOrderPaymentMethodOptionType
+
+	DROP TABLE [OrderPaymentMethodOptionTypes]
+
+	ALTER TABLE [OrderPaymentMethodOptionValues]
+	ADD CONSTRAINT FK_OrderPaymentMethodOptionValuesToCustomerPaymentMethodOptionType FOREIGN KEY (IdOptionType) REFERENCES dbo.CustomerPaymentMethodOptionTypes (Id)
+END
+
+IF OBJECT_ID(N'[dbo].[ReshipProblemSkus]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[ReshipProblemSkus] (
+		IdOrder INT NOT NULL
+			CONSTRAINT FK_ReshipProblemSkusToOrder FOREIGN KEY (IdOrder) REFERENCES dbo.Orders (Id),
+		IdSku INT NOT NULL
+			CONSTRAINT FK_ReshipProblemSkusToSku FOREIGN KEY (IdSku) REFERENCES dbo.Skus (Id)
+			CONSTRAINT PK_ReshipProblemSkus PRIMARY KEY (IdOrder DESC, IdSku)
+	)
+END
+
+IF OBJECT_ID(N'[dbo].[RefundSkus]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[RefundSkus] (
+		IdOrder INT NOT NULL
+			CONSTRAINT FK_RefundSkusToOrder FOREIGN KEY (IdOrder) REFERENCES dbo.Orders (Id),
+		IdSku INT NOT NULL
+			CONSTRAINT FK_RefundSkusToSku FOREIGN KEY (IdSku) REFERENCES dbo.Skus (Id)
+			CONSTRAINT PK_RefundSkus PRIMARY KEY (IdOrder DESC, IdSku),
+		Redeem INT NOT NULL,
+		Quantity INT NOT NULL,
+		RefundValue MONEY NOT NULL,
+		RefundPercent FLOAT NOT NULL
+	)
+END
