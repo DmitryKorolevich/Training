@@ -10,6 +10,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
         NormalOrder = 1,
         AutoShip = 2,
         DropShip = 3,
-        GiftListOrder = 4
+        GiftListOrder = 4,
+        Reship = 5,
+        Refund = 6
     }
 }
