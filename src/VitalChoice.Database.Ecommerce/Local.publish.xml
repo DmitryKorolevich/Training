@@ -7,7 +7,7 @@
     <TargetConnectionString>Data Source=.\;Integrated Security=True;Pooling=False</TargetConnectionString>
     <ScriptDatabaseOptions>True</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
-    <CreateNewDatabase>True</CreateNewDatabase>
+    <CreateNewDatabase>False</CreateNewDatabase>
     <ProfileVersionNumber>1</ProfileVersionNumber>
   </PropertyGroup>
 </Project>

@@ -57,6 +57,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes, withDefaults));                
                 dynamic.Addresses.AddRange(await _addressMapper.FromEntityRangeAsync(entity.Addresses, withDefaults));
                 dynamic.CustomerPaymentMethods.AddRange(await _paymentMethodMapper.FromEntityRangeAsync(entity.CustomerPaymentMethods, withDefaults));
+	            dynamic.Files = entity.Files;
             });
         }
 
@@ -104,7 +105,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     value.IdCustomer = dynamic.Id;
                 }
-            });
+			});
         }
 
         protected async override Task ToEntityRangeInternalAsync(
@@ -133,7 +134,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 entity.Addresses = await _addressMapper.ToEntityRangeAsync(dynamic.Addresses);
                 entity.CustomerNotes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes);
-            });
+				entity.Files = dynamic.Files;
+			});
         }
     }
 }

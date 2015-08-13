@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using VitalChoice.Domain.Entities.Azure;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
@@ -17,5 +19,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType customerType);
 
 		Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
+
+		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId);
+
+		Task<Blob> DownloadFileAsync(string fileName);
 	}
 }

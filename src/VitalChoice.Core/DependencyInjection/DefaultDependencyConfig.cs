@@ -50,6 +50,7 @@ using Autofac.Framework.DependencyInjection;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -126,15 +127,20 @@ namespace VitalChoice.Core.DependencyInjection
                 options.PublicHost = configuration.Get("App:PublicHost");
                 options.AdminHost = configuration.Get("App:AdminHost");
                 options.FilesRelativePath = configuration.Get("App:FilesRelativePath");
-                options.EmailConfiguration = new Email
-                {
-                    From = configuration.Get("App:Email:From"),
-                    Host = configuration.Get("App:Email:Host"),
-                    Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
-                    Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
-                    Username = configuration.Get("App:Email:Username"),
-                    Password = configuration.Get("App:Email:Password")
-                };
+	            options.EmailConfiguration = new Email
+	            {
+		            From = configuration.Get("App:Email:From"),
+		            Host = configuration.Get("App:Email:Host"),
+		            Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
+		            Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
+		            Username = configuration.Get("App:Email:Username"),
+		            Password = configuration.Get("App:Email:Password")
+	            };
+				options.AzureStorage = new AzureStorage()
+				{
+					StorageConnectionString = configuration.Get("App:AzureStorage:StorageConnectionString"),
+					CustomerContainerName = configuration.Get("App:AzureStorage:CustomerContainerName")
+				};
             });
 
             services.Configure<MvcOptions>(o =>
@@ -254,7 +260,10 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
             builder.RegisterType<CustomerService>().As<ICustomerService>();
-            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+#if DNX451
+			builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
+#endif
+			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
             builder.RegisterInstance(
                 LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.Get("App:LogPath")))

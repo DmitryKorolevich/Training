@@ -16,5 +16,6 @@ namespace VitalChoice.Domain.Entities.Options
         public string FilesRelativePath { get; set; }
         public Email EmailConfiguration { get; set; }
 		public Versioning Versioning { get; set; }
+		public AzureStorage AzureStorage { get; set; }
     }
 }

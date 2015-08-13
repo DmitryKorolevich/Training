@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if DNX451
+using System.Net.Mime;
+#endif
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
+using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Setting;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
@@ -46,12 +52,14 @@ namespace VC.Admin.Controllers
         private readonly IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
             _notesService;
 
-        public CustomerController(ICustomerService customerService,
+		private readonly ILogger logger;
+
+		public CustomerController(ICustomerService customerService,
             IDynamicToModelMapper<CustomerDynamic> customerMapper,
             IDynamicToModelMapper<AddressDynamic> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
             IEcommerceDynamicObjectService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
-                addressService, IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService, IDynamicToModelMapper<CustomerNoteDynamic> noteMapper)
+                addressService, IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService, IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -62,7 +70,8 @@ namespace VC.Admin.Controllers
             _addressService = addressService;
             _notesService = notesService;
             _noteMapper = noteMapper;
-        }
+			this.logger = loggerProvider.CreateLoggerDefault();
+		}
 
         [HttpGet]
         public async Task<Result<IList<OrderNoteModel>>> GetOrderNotes(CustomerType customerType)
@@ -98,6 +107,7 @@ namespace VC.Admin.Controllers
         {
             return new AddUpdateCustomerModel()
             {
+				PublicId = Guid.NewGuid(),
                 CustomerType = CustomerType.Retail,
                 TaxExempt = TaxExempt.YesCurrentCertificate,
                 Tier = Tier.Tier1,
@@ -296,5 +306,50 @@ namespace VC.Admin.Controllers
 
             return customerModel;
         }
-    }
+
+		[HttpPost]
+	    public async Task<Result<CustomerFileModel>> UploadCustomerFile()
+	    {
+		    var form = await Request.ReadFormAsync();
+
+			var publicId = form["data"];
+			
+			var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+		    using (var stream = form.Files[0].OpenReadStream())
+		    {
+			    var fileContent = stream.ReadFully();
+			    try
+			    {
+				    var fileName = await _customerService.UploadFileAsync(fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId);
+
+					return new CustomerFileModel() { FileName = fileName, UploadDate = DateTime.Now };
+				}
+				catch (Exception ex)
+			    {
+				    this.logger.LogError(ex.ToString());
+				    throw;
+			    }
+		    }
+	    }
+
+
+	    public async Task<FileResult> GetFile(string fileName, bool viewMode)
+	    {
+#if DNX451
+			var blob = await _customerService.DownloadFileAsync(fileName);
+
+		    var contentDisposition = new ContentDisposition()
+		    {
+				FileName = fileName,
+				Inline = viewMode
+			};
+
+			Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+			return File(blob.File, blob.ContentType);
+#else
+			return null;
+#endif
+
+		}
+	}
 }

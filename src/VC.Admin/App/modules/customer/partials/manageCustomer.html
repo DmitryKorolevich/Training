@@ -141,14 +141,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<span class="legend">Customer Files</span>
-                                        <div class="form-group">
+                                       <span class="legend" data-ng-if="currentCustomer.Files.length > 0">Customer Files</span>
+                                        <div class="form-group" data-ng-if="currentCustomer.Files.length > 0">
                                             <div class="container-fluid">
                                                 <div class="">
                                                     <table class="table table-striped table-hover ">
                                                         <thead>
                                                             <tr>
-                                                                <th></th>
                                                                 <th>Upload Date</th>
                                                                 <th>Description</th>
                                                                 <th>File Name</th>
@@ -156,39 +155,33 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr data-ng-repeat="file in currentCustomer.Files" data-ng-class="{success: order.RowStatus == 1, info: order.RowStatus == 2, warning: order.RowStatus == 3}">
-                                                                <td><input type="checkbox"></td>
-                                                                <td>{{file.UploadDate}}</td>
+                                                            <tr data-ng-repeat="(fileIndex, file) in currentCustomer.Files">
+                                                                <td><a target="_blank" data-ng-href="/api/Customer/GetFile?fileName={{currentCustomer.PublicId}}/{{file.FileName}}&viewMode=true">{{file.FileName}}</a></td>
+                                                                <td>{{file.UploadDate | date:"MM/dd/yy"}}</td>
                                                                 <td>{{file.Description}}</td>
-                                                                <td>{{file.FileName}}</td>
                                                                 <td>
-                                                                    <button ui-sref="index.col.dashboard" class="btn btn-default btn-primary">View</button>
-                                                                    <button ui-sref="index.col.dashboard" class="btn btn-default btn-info">Download</button>
+                                                                    <a class="btn btn-default btn-info" target="_self" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&viewMode=false"> <!--{{currentCustomer.PublicId}}/-->
+                                                                        Download
+                                                                    </a>
+                                                                    <button class="btn btn-danger" data-ng-click="deleteFile(fileIndex)">Delete</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <button ui-sref="index.col.dashboard" class="btn btn-danger">Delete</button>
                                             </div>
                                         </div>
                                         <span class="legend">Upload New File</span>
                                         <div class="form-group">
-                                            <label for="fileDescription" class="col-md-3 control-label">Description</label>
+                                            <label class="col-md-3 control-label">Description</label>
                                             <div class="col-md-9">
-                                                <input type="text" class="form-control" id="fileDescription" placeholder="Description">
+                                                <input type="text" class="form-control" maxlength="500" placeholder="Description" data-ng-model="currentCustomer.currentFileDescription">
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                       <div class="form-group">
                                             <label class="col-md-3 control-label"></label>
                                             <div class="col-md-9">
-                                                <input type="file" class="" id="" placeholder="Choose File">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="col-md-3 control-label"></label>
-                                            <div class="col-md-9">
-                                                <button class="btn btn-primary">Upload</button>
+                                                <button class="btn btn-primary" ngf-select ngf-change="upload($files)">Upload</button>
                                             </div>
                                         </div>
                                         <span class="legend">Update Password</span>
@@ -203,7 +196,7 @@
                                             <div class="col-md-9">
                                                 <input type="text" class="form-control" id="reEnterPassword" placeholder="Re-enter New Password">
                                             </div>
-                                        </div>-->
+                                        </div>
                                         <span class="legend">Approved Payment Methods</span>
                                         <div class="form-group">
                                             <div class="col-md-3"></div>

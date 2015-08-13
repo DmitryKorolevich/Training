@@ -88,7 +88,7 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                throw new AppValidationException("Directory", "The directory with this name is already exist.");
+                throw new AppValidationException("Directory", "The directory with this name already exists.");
             }
             return toReturn;
         }

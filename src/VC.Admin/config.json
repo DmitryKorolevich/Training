@@ -27,6 +27,10 @@
       "Secured": true,
       "Username": "admin.staging@g2designgroup.com",
       "Password": "vcstaging123"
+    },
+    "AzureStorage": {
+      "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",
+      "CustomerContainerName": "customer-files"
     }
   }
 }

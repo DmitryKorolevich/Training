@@ -8,6 +8,6 @@
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>True</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
-    <CreateNewDatabase>True</CreateNewDatabase>
+    <CreateNewDatabase>False</CreateNewDatabase>
   </PropertyGroup>
 </Project>

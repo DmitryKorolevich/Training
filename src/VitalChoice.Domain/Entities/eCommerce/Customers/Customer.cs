@@ -23,6 +23,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
 	    public string Email { get; set; }
 
+	    public Guid PublicId { get; set; }
+
 	    public CustomerTypeEntity CustomerType { get; set; }
 
 	    public int IdDefaultPaymentMethod { get; set; }
@@ -38,5 +40,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    public ICollection<CustomerNote> CustomerNotes { get; set; }
 
 	    public ICollection<CustomerPaymentMethod> CustomerPaymentMethods { get; set; }
+
+	    public ICollection<CustomerFile> Files { get; set; }
 	}
 }

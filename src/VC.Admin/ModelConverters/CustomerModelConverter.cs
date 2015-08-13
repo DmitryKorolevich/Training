@@ -3,6 +3,7 @@ using System.Linq;
 using VC.Admin.Models.Customer;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
@@ -66,7 +67,21 @@ namespace VC.Admin.ModelConverters
 	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
 	        }
             model.SuspendUserAccount = dynamic.StatusCode == RecordStatusCode.NotActive;
-	    }
+
+			if (dynamic.Files.Any())
+			{
+				foreach (var fileDynamic in dynamic.Files.Select(x => new CustomerFileModel()
+				{
+					Id = x.Id,
+					Description = x.Description,
+					FileName = x.FileName,
+					UploadDate = x.UploadDate
+				}))
+				{
+					model.Files.Add(fileDynamic);
+				}
+			}
+		}
 
 	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
@@ -108,6 +123,21 @@ namespace VC.Admin.ModelConverters
                 dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Check));
             }
             dynamic.StatusCode = model.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
-        }
+
+			if (model.Files.Any())
+			{
+				foreach (var fileModel in model.Files.Select(x => new CustomerFile()
+				{
+					Id = x.Id,
+					Description = x.Description,
+					FileName = x.FileName,
+					IdCustomer = model.Id,
+					UploadDate = x.UploadDate
+				}))
+				{
+					dynamic.Files.Add(fileModel);
+				}
+			}
+		}
 	}
 }

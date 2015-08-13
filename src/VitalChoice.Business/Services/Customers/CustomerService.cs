@@ -13,6 +13,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Azure;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
@@ -26,6 +27,7 @@ using VitalChoice.Domain.Transfer.Customers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Validation;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Customers;
 
@@ -43,8 +45,9 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<CustomerPaymentMethod> _customerPaymentMethodRepositoryAsync;
+	    private readonly IBlobStorageClient _storageClient;
 
-        public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
+	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
@@ -56,7 +59,8 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync)
+            IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync,
+			IBlobStorageClient storageClient)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
@@ -71,6 +75,7 @@ namespace VitalChoice.Business.Services.Customers
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _adminProfileRepository = adminProfileRepository;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
+		    _storageClient = storageClient;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -114,6 +119,7 @@ namespace VitalChoice.Business.Services.Customers
             var customerNotesRepositoryAsync = uow.RepositoryAsync<CustomerNote>();
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
+            var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
 
    //         entity.PaymentMethods = customerToPaymentMethodRepository.Query(c => c.IdCustomer == model.Id).Select();
 			//entity.OrderNotes = customerToOrderNoteRepository.Query(c => c.IdCustomer == model.Id).Select();
@@ -153,7 +159,29 @@ namespace VitalChoice.Business.Services.Customers
             {
                 await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
             }
-        }
+
+			if (model.Files != null && model.Files.Any() && entity.Files != null)
+			{
+				//Update
+				var toUpdate = entity.Files.Where(e => model.Files.Select(x=>x.Id).Contains(e.Id));
+				await customerFileRepositoryAsync.UpdateRangeAsync(toUpdate);
+
+				//Delete
+				var toDelete = entity.Files.Where(e => model.Files.All(s => s.Id != e.Id));
+				await customerFileRepositoryAsync.DeleteAllAsync(toDelete);
+
+				//Insert
+				var list = model.Files.Where(s => s.Id == 0).ToList();
+				await customerFileRepositoryAsync.InsertRangeAsync(list);
+			}
+			else if (entity.Files != null)
+			{
+				foreach (var file in entity.Files)
+				{
+					await customerFileRepositoryAsync.DeleteAsync(file.Id);
+				}
+			}
+		}
 
         protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
         {
@@ -194,6 +222,7 @@ namespace VitalChoice.Business.Services.Customers
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
         {
             return query
+				.Include(p => p.Files)
                 .Include(p => p.DefaultPaymentMethod)
                 .Include(p => p.User)
                 .ThenInclude(p => p.Customer)
@@ -359,5 +388,28 @@ namespace VitalChoice.Business.Services.Customers
 
 			return result;
 		}
-	}
+
+	    public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId)
+	    {
+		    var i = 0;
+		    string blobname;
+		    string generatedFileName;
+		    do
+		    {
+				generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
+
+			    blobname = $"{customerPublicId}/{generatedFileName}";
+			    i++;
+		    } while (await _storageClient.BlobExistsAsync(blobname));
+
+		    await _storageClient.UploadBlobAsync(blobname, file);
+
+		    return generatedFileName;
+	    }
+
+	    public async Task<Blob> DownloadFileAsync(string fileName)
+	    {
+		    return await _storageClient.DownloadBlobAsync(fileName);
+	    }
+    }
 }

@@ -20,7 +20,11 @@ namespace VC.Admin.Models.Customer
 			Shipping = new List<AddressModel>();
 			CustomerNotes = new List<CustomerNoteModel>();
             CreditCards = new List<CreditCardModel>();
+			Files = new List<CustomerFileModel>();
         }
+
+		[Map]
+		public Guid PublicId { get; set; }
 
 		[Map]
 		public int Id { get; set; }
@@ -86,5 +90,7 @@ namespace VC.Admin.Models.Customer
 	    public CheckPaymentModel Check { get; set; }
 
         public OacPaymentModel Oac { get; set; }
-    }
+
+		public IList<CustomerFileModel> Files { get; set; }
+	}
 }

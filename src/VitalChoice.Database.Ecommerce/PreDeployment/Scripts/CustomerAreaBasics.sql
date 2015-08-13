@@ -670,3 +670,35 @@ BEGIN
 	ALTER COLUMN IdAddress INT NULL
 
 END
+
+IF OBJECT_ID(N'[dbo].[CustomerFiles]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[CustomerFiles](
+		[Id] [int] IDENTITY(1,1) NOT NULL,
+		[IdCustomer] [int] NOT NULL,
+		[UploadDate] [datetime2](7) NOT NULL,
+		[FileName] [nvarchar](250) NOT NULL,
+		[Description] [nvarchar](500) NOT NULL
+	 CONSTRAINT [PK_CustomerFiles] PRIMARY KEY CLUSTERED 
+	(
+		[Id] ASC
+	)
+	) ON [PRIMARY]
+
+
+	ALTER TABLE [dbo].[CustomerFiles]  WITH CHECK ADD  CONSTRAINT [FK_CustomerFiles_Customers] FOREIGN KEY([IdCustomer])
+	REFERENCES [dbo].[Customers] ([Id])
+
+
+	ALTER TABLE [dbo].[CustomerFiles] CHECK CONSTRAINT [FK_CustomerFiles_Customers]
+
+END
+
+IF COL_LENGTH('[dbo].[Customers]','PublicId') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Customers]
+	ADD [PublicId] UNIQUEIDENTIFIER NOT NULL
+
+	ALTER TABLE [dbo].[Customers]
+	ADD CONSTRAINT UQ_Customer UNIQUE(PublicId)
+END

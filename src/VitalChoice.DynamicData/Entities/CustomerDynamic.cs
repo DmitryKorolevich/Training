@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.DynamicData.Base;
 
@@ -14,6 +15,7 @@ namespace VitalChoice.DynamicData.Entities
 			Addresses = new List<AddressDynamic>();
 			CustomerNotes = new List<CustomerNoteDynamic>();
             CustomerPaymentMethods = new List<CustomerPaymentMethodDynamic>();
+			Files = new List<CustomerFile>();
         }
 
 	    public User User { get; set; }
@@ -33,5 +35,7 @@ namespace VitalChoice.DynamicData.Entities
 		public ICollection<CustomerNoteDynamic> CustomerNotes { get; set; }
 
         public ICollection<CustomerPaymentMethodDynamic> CustomerPaymentMethods { get; set; }
+
+	    public ICollection<CustomerFile> Files { get; set; }
     }
 }
