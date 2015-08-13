@@ -557,7 +557,7 @@ namespace VitalChoice.Infrastructure.Context
 
 			#endregion
 
-			#region Orders
+			#region Orders Notes
 			builder.Entity<OrderNoteToCustomerType>().Key(p => new { p.IdOrderNote, p.IdCustomerType });
 			builder.Entity<OrderNoteToCustomerType>().ToTable("OrderNotesToCustomerTypes");
 			builder.Entity<OrderNoteToCustomerType>().Ignore(p => p.Id);
@@ -687,11 +687,21 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(o => o.IdDiscount)
                     .PrincipalKey(d => d.Id)
                     .Required(false);
+                entity.Reference(o => o.PaymentMethod)
+                    .InverseReference()
+                    .ForeignKey<Order>(o => o.IdPaymentMethod)
+                    .PrincipalKey<OrderPaymentMethod>(p => p.Id)
+                    .Required(false);
                 entity.Collection(o => o.OptionValues)
                     .InverseReference()
                     .ForeignKey(v => v.IdOrder)
                     .PrincipalKey(o => o.Id)
                     .Required();
+                entity.Reference(o => o.ShippingAddress)
+                    .InverseReference()
+                    .ForeignKey<Order>(o => o.IdShippingAddress)
+                    .PrincipalKey<OrderAddress>(a => a.Id)
+                    .Required(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -783,8 +793,8 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderPaymentMethodOptionValues");
                 entity.Reference(v => v.OptionType)
                     .InverseReference()
-                    .ForeignKey<OrderOptionValue>(v => v.IdOptionType)
-                    .PrincipalKey<OrderOptionType>(t => t.Id)
+                    .ForeignKey<OrderPaymentMethodOptionValue>(v => v.IdOptionType)
+                    .PrincipalKey<CustomerPaymentMethodOptionType>(t => t.Id)
                     .Required();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);

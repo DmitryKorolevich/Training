@@ -10,7 +10,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Payment
 
         public int? IdAddress { get; set; }
 
-        public Address BillingAddress { get; set; }
+        public OrderAddress BillingAddress { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
     }

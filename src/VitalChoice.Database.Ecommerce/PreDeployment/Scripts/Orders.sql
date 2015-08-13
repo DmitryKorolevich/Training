@@ -194,3 +194,13 @@ BEGIN
 		RefundPercent FLOAT NOT NULL
 	)
 END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = 'IdPaymentMethod' AND [object_id] = OBJECT_ID(N'[dbo].[Orders]', N'U'))
+BEGIN
+
+	ALTER TABLE dbo.Orders
+	ADD IdPaymentMethod INT NULL
+		CONSTRAINT FK_OrderToOrderPaymentMethod FOREIGN KEY (IdPaymentMethod) REFERENCES dbo.OrderPaymentMethods(Id),
+	IdShippingAddress INT NULL
+		CONSTRAINT FK_OrderToOrderShippingAddress FOREIGN KEY (IdShippingAddress) REFERENCES dbo.OrderAddresses (Id)
+END

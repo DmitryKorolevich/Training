@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Orders
@@ -25,6 +27,14 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
         public Discount Discount { get; set; }
 
         public ICollection<OrderToGiftCertificate> GiftCertificates { get; set; }
+
+        public int? IdPaymentMethod { get; set; }
+
+        public int? IdShippingAddress { get; set; }
+
+        public OrderAddress ShippingAddress { get; set; }
+
+        public OrderPaymentMethod PaymentMethod { get; set; }
 
         public decimal Total { get; set; }
 
