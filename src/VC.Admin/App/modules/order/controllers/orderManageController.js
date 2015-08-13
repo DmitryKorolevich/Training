@@ -24,6 +24,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.mainForm2.submitted = true;
                 $scope.forms.submitted['profile'] = true;
                 $scope.forms.submitted['shipping'] = true;
+                $scope.forms.submitted['billing'] = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
                 $.each(result.Messages, function (index, value)
@@ -120,6 +121,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.ignoneMinimumPerishableThreshold = false;
         $scope.orderSources = $rootScope.ReferenceData.OrderSources;
         $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
+        $scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 
         $scope.discountsFilter = {
             Code: '',
@@ -158,6 +160,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             active: false,
             formName: 'shipping',
         };
+        $scope.paymentInfoTab = {
+            active: false,
+            formName: 'billing'
+        };
         $scope.customerNotesTab = {
             active: false,
             formName: 'customerNote',
@@ -166,7 +172,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         tabs.push($scope.mainTab);
         tabs.push($scope.accountProfileTab);
         tabs.push($scope.shippingAddressTab);
-        tabs.push($scope.customerNote);
+        tabs.push($scope.paymentInfoTab);
+        tabs.push($scope.customerNotesTab);
         $scope.tabs = tabs;
 
         loadOrder();
@@ -203,16 +210,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             ProductsPerishableThreshold: false,
 
             Shipping: {},
+            IdPaymentMethodType: 1,
+            CreditCard: {},
+            Oac: {},
+            Check: {},
         };
         
+        customerEditService.initBase($scope);
         if ($scope.id)
         {
             $scope.idCustomer = $scope.order.IdCustomer;
+            customerEditService.initOrderEditCustomerParts($scope);
         }
         else
         {
-            customerEditService.initCustomerEdit($scope, $scope.addEditTracker);
             $scope.order.UpdateShippingAddressForCustomer = true;
+            customerEditService.initCustomerEdit($scope);
         }
 
         loadReferencedData();
@@ -242,7 +255,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 {
                     customerEditService.syncCountry($scope, shippingItem);
                 });
-
                 if($scope.id)
                 {
                     $scope.shippingAddressTab.Address = $scope.order.Shipping;
@@ -256,6 +268,52 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             $scope.shippingAddressTab.Address = shippingItem;
                         }
                     });
+                }
+                
+                $scope.paymentInfoTab.Address = {};
+                angular.forEach($scope.currentCustomer.CreditCards, function (creditCard)
+                {
+                    creditCard.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, creditCard.Address);
+                });
+                if ($scope.currentCustomer.Oac)
+                {
+                    $scope.currentCustomer.Oac.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
+                }
+                if ($scope.currentCustomer.Check)
+                {
+                    $scope.currentCustomer.Check.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
+                }
+                
+                if ($scope.order.CreditCard)
+                {
+                    $scope.order.CreditCard.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, $scope.order.CreditCard.Address);
+                }
+                if ($scope.order.Oac)
+                {
+                    $scope.order.Oac.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, $scope.order.Oac.Address);
+                }
+                if ($scope.order.Check)
+                {
+                    $scope.order.Check.formName = $scope.paymentInfoTab.formName;
+                    customerEditService.syncCountry($scope, $scope.order.Check.Address);
+                }
+
+                if ($scope.id)
+                {
+                    $scope.paymentInfoTab.PaymentMethodType = $scope.order.IdPaymentMethodType;
+                    if ($scope.paymentInfoTab.PaymentMethodType==1)
+                        $scope.paymentInfoTab.CreditCard = $scope.order.CreditCard;
+                }
+                else
+                {
+                    $scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
+                    if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
+                        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
                 }
 
                 customerEditService.syncDefaultPaymentMethod($scope);
@@ -337,7 +395,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         var valid = true;
         $.each($scope.forms, function (index, form)
         {
-            if (form)
+            if (form && index != 'submitted')
             {
                 if (!form.$valid)
                 {
@@ -350,13 +408,37 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         if (valid)
         {
+            $scope.order.ShippingAddress = $scope.shippingAddressTab.Address;
 
+            $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
+            if (!$scope.id)
+            {
+                if ($scope.order.IdPaymentMethodType == 1)
+                {
+                    $scope.order.CreditCard = paymentInfoTab.CreditCard;
+                } else if ($scope.order.IdPaymentMethodType == 2)
+                {
+                    $scope.order.Oac = currentCustomer.Oac;
+                } else if ($scope.order.IdPaymentMethodType == 3)
+                {
+                    $scope.order.Check = currentCustomer.Check;
+                }
+            }
+            else
+            {
+                if ($scope.order.IdPaymentMethodType == 1)
+                {
+                    $scope.order.CreditCard = paymentInfoTab.CreditCard;
+                }
+            }
+            //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
         } else
         {
             $scope.forms.mainForm.submitted = true;
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.submitted['profile'] = true;
             $scope.forms.submitted['shipping'] = true;
+            $scope.forms.submitted['billing'] = true;
         }
     };
 

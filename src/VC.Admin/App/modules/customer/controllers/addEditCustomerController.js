@@ -36,7 +36,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		tabs.push($scope.customerNotesTab);
 		$scope.tabs = tabs;
 
-		customerEditService.initCustomerEdit($scope, $scope.addEditTracker);
+		customerEditService.initBase($scope);
+		customerEditService.initCustomerEdit($scope);
 
 		$scope.forms = {};
 
@@ -81,17 +82,25 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 								customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
 
-								angular.forEach($scope.currentCustomer.CreditCards, function (creditCard) {
+								angular.forEach($scope.currentCustomer.CreditCards, function (creditCard)
+								{
+								    creditCard.formName = $scope.paymentInfoTab.formName;
 								    customerEditService.syncCountry($scope, creditCard.Address);
 								});
 
 								if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
 								    $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
 
-                                if ($scope.currentCustomer.Oac)
-                                    customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
-                                if ($scope.currentCustomer.Check)
-                                    customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
+								if ($scope.currentCustomer.Oac)
+								{
+								    $scope.currentCustomer.Oac.formName = $scope.paymentInfoTab.formName;
+								    customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
+								}
+								if ($scope.currentCustomer.Check)
+								{
+								    $scope.currentCustomer.Check.formName = $scope.paymentInfoTab.formName;
+								    customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
+								}
 
                                 customerEditService.syncDefaultPaymentMethod($scope);
                                 createCustomerNoteProto();
@@ -129,22 +138,22 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									});
 	};
 
-	$scope.getLast4 = function (str) {
-	    if (str == null)
-	        return undefined;
-	    var start = str.length - 4;
-	    if (start < 0)
-	        start = 0;
-	    return str.slice(start, str.length);
-	};
+	//$scope.getLast4 = function (str) {
+	//    if (str == null)
+	//        return undefined;
+	//    var start = str.length - 4;
+	//    if (start < 0)
+	//        start = 0;
+	//    return str.slice(start, str.length);
+	//};
 
-	$scope.getCreditCardTypeName = function(idType) {
-	    for (var idx = 0; idx < $scope.creditCardTypes.length;idx++)
-	    {
-	        if ($scope.creditCardTypes[idx].Key == idType)
-	            return $scope.creditCardTypes[idx].Text;
-	    }
-	}
+	//$scope.getCreditCardTypeName = function(idType) {
+	//    for (var idx = 0; idx < $scope.creditCardTypes.length;idx++)
+	//    {
+	//        if ($scope.creditCardTypes[idx].Key == idType)
+	//            return $scope.creditCardTypes[idx].Text;
+	//    }
+	//}
 
 	function clearServerValidation() {
 		$.each($scope.forms, function (index, form) {
@@ -236,89 +245,69 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		});
 	};
 
-	$scope.setNewBillingAddress = function () {
-	    customerService.createAddressPrototype($scope.addEditTracker)
-            .success(function (result) {
-                if (result.Success) {
-                    $scope.paymentInfoTab.sameBilling = false;
-                    result.Data.AddressType = 2;
-                    $scope.paymentInfoTab.Address = result.Data;
-                } else {
-                    successHandler(result);
-                }
-            }).
-            error(function (result) {
-                toaster.pop('error', "Error!", "Server error ocurred");
-            })
-            .then(function () {
-                $scope.forms.submitted['billing'] = false;
-            });
-	    return false;
-	};
+	//$scope.setNewCreditCard = function (callback) {
+	//    customerService.createCreditCardPrototype($scope.addEditTracker)
+    //        .success(function (result) {
+    //            if (result.Success) {
+    //                $scope.currentCustomer.CreditCards.push(result.Data);
+    //                $scope.paymentInfoTab.CreditCard = result.Data;
+    //                $scope.paymentInfoTab.sameBilling = false;
+    //                if (callback)
+    //                    callback(result.Data);
+    //            } else {
+    //                successHandler(result);
+    //            }
+    //        }).
+    //        error(function (result) {
+    //            toaster.pop('error', "Error!", "Server error ocurred");
+    //        })
+    //        .then(function () {
+    //            $scope.forms.submitted['billing'] = false;
+    //        });
+	//    return false;
+	//};
 
-	$scope.setNewCreditCard = function (callback) {
-	    customerService.createCreditCardPrototype($scope.addEditTracker)
-            .success(function (result) {
-                if (result.Success) {
-                    $scope.currentCustomer.CreditCards.push(result.Data);
-                    $scope.paymentInfoTab.CreditCard = result.Data;
-                    $scope.paymentInfoTab.sameBilling = false;
-                    if (callback)
-                        callback(result.Data);
-                } else {
-                    successHandler(result);
-                }
-            }).
-            error(function (result) {
-                toaster.pop('error', "Error!", "Server error ocurred");
-            })
-            .then(function () {
-                $scope.forms.submitted['billing'] = false;
-            });
-	    return false;
-	};
+	//$scope.setNewCheck = function (callback) {
+	//    customerService.createCheckPrototype($scope.addEditTracker)
+    //        .success(function (result) {
+    //            if (result.Success) {
+    //                $scope.currentCustomer.Check = result.Data;
+    //                $scope.paymentInfoTab.sameBilling = false;
+    //                if (callback)
+    //                    callback(result.Data);
+    //            } else {
+    //                successHandler(result);
+    //            }
+    //        }).
+    //        error(function (result) {
+    //            toaster.pop('error', "Error!", "Server error ocurred");
+    //        })
+    //        .then(function () {
+    //            $scope.forms.submitted['billing'] = false;
+    //        });
+	//    return false;
+	//};
 
-	$scope.setNewCheck = function (callback) {
-	    customerService.createCheckPrototype($scope.addEditTracker)
-            .success(function (result) {
-                if (result.Success) {
-                    $scope.currentCustomer.Check = result.Data;
-                    $scope.paymentInfoTab.sameBilling = false;
-                    if (callback)
-                        callback(result.Data);
-                } else {
-                    successHandler(result);
-                }
-            }).
-            error(function (result) {
-                toaster.pop('error', "Error!", "Server error ocurred");
-            })
-            .then(function () {
-                $scope.forms.submitted['billing'] = false;
-            });
-	    return false;
-	};
-
-	$scope.setNewOac = function (callback) {
-	    customerService.createOacPrototype($scope.addEditTracker)
-            .success(function (result) {
-                if (result.Success) {
-                    $scope.currentCustomer.Oac = result.Data;
-                    $scope.paymentInfoTab.sameBilling = false;
-                    if (callback)
-                        callback(result.Data);
-                } else {
-                    successHandler(result);
-                }
-            }).
-            error(function (result) {
-                toaster.pop('error', "Error!", "Server error ocurred");
-            })
-            .then(function () {
-                $scope.forms.submitted['billing'] = false;
-            });
-	    return false;
-	};
+	//$scope.setNewOac = function (callback) {
+	//    customerService.createOacPrototype($scope.addEditTracker)
+    //        .success(function (result) {
+    //            if (result.Success) {
+    //                $scope.currentCustomer.Oac = result.Data;
+    //                $scope.paymentInfoTab.sameBilling = false;
+    //                if (callback)
+    //                    callback(result.Data);
+    //            } else {
+    //                successHandler(result);
+    //            }
+    //        }).
+    //        error(function (result) {
+    //            toaster.pop('error', "Error!", "Server error ocurred");
+    //        })
+    //        .then(function () {
+    //            $scope.forms.submitted['billing'] = false;
+    //        });
+	//    return false;
+	//};
 
 	$scope.save = function () {
 		clearServerValidation();
@@ -381,40 +370,40 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	//	}
 	//};
 
-	$scope.makeBillingAsProfileAddress = function () {
-	    if ($scope.paymentInfoTab.sameBilling) {
-	        var address;
-	        switch (String($scope.paymentInfoTab.PaymentMethodType)) {
-	            case "1":
-	                if ($scope.paymentInfoTab.CreditCard) {
-	                    address = $scope.paymentInfoTab.CreditCard.Address;
-	                }
-	                break;
-	            case "2":
-	                if ($scope.currentCustomer.Oac) {
-	                    address = $scope.currentCustomer.Oac.Address;
-	                }
-	                break;
-	            case "3":
-	                if ($scope.currentCustomer.Check) {
-	                    address = $scope.currentCustomer.Check.Address;
-	                }
-	                break;
-	        }
-	        if (address) {
-	            for (var key in $scope.currentCustomer.ProfileAddress) {
-	                address[key] = $scope.currentCustomer.ProfileAddress[key];
-	            }
-	            if ($scope.currentCustomer.newEmail) {
-	                address.Email = $scope.currentCustomer.newEmail;
-	            } else {
-	                address.Email = $scope.currentCustomer.Email;
-	            }
-	            address.AddressType = 2;
-	            address.Id = 0;
-	        }
-	    }
-	};
+	//$scope.makeBillingAsProfileAddress = function () {
+	//    if ($scope.paymentInfoTab.sameBilling) {
+	//        var address;
+	//        switch (String($scope.paymentInfoTab.PaymentMethodType)) {
+	//            case "1":
+	//                if ($scope.paymentInfoTab.CreditCard) {
+	//                    address = $scope.paymentInfoTab.CreditCard.Address;
+	//                }
+	//                break;
+	//            case "2":
+	//                if ($scope.currentCustomer.Oac) {
+	//                    address = $scope.currentCustomer.Oac.Address;
+	//                }
+	//                break;
+	//            case "3":
+	//                if ($scope.currentCustomer.Check) {
+	//                    address = $scope.currentCustomer.Check.Address;
+	//                }
+	//                break;
+	//        }
+	//        if (address) {
+	//            for (var key in $scope.currentCustomer.ProfileAddress) {
+	//                address[key] = $scope.currentCustomer.ProfileAddress[key];
+	//            }
+	//            if ($scope.currentCustomer.newEmail) {
+	//                address.Email = $scope.currentCustomer.newEmail;
+	//            } else {
+	//                address.Email = $scope.currentCustomer.Email;
+	//            }
+	//            address.AddressType = 2;
+	//            address.Id = 0;
+	//        }
+	//    }
+	//};
 
 	//function deleteShippingAddressLocal(id) {
 	//    var idx = -1;
@@ -438,27 +427,27 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	//    }
 	//}
 
-	$scope.deleteSelectedCreditCard = function (id) {
-	    var idx = -1;
+	//$scope.deleteSelectedCreditCard = function (id) {
+	//    var idx = -1;
 
-	    angular.forEach($scope.currentCustomer.CreditCards, function (item, index) {
-	        if (item.Id == id) {
-	            idx = index;
-	            return;
-	        }
-	    });
+	//    angular.forEach($scope.currentCustomer.CreditCards, function (item, index) {
+	//        if (item.Id == id) {
+	//            idx = index;
+	//            return;
+	//        }
+	//    });
 
-	    $scope.currentCustomer.CreditCards.splice(idx, 1);
-	    if (idx < $scope.currentCustomer.CreditCards.length) {
-	        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[idx];
-	    }
-	    else if ($scope.currentCustomer.CreditCards.length > 0) {
-	        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
-	    }
-	    else {
-	        $scope.paymentInfoTab.CreditCard = undefined;
-	    }
-	}
+	//    $scope.currentCustomer.CreditCards.splice(idx, 1);
+	//    if (idx < $scope.currentCustomer.CreditCards.length) {
+	//        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[idx];
+	//    }
+	//    else if ($scope.currentCustomer.CreditCards.length > 0) {
+	//        $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
+	//    }
+	//    else {
+	//        $scope.paymentInfoTab.CreditCard = undefined;
+	//    }
+	//}
 
 	//$scope.deleteSelectedShipping = function (id) {
 	//    if ($scope.editMode) {
