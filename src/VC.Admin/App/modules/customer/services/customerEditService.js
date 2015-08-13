@@ -43,6 +43,56 @@ angular.module('app.modules.customer.services.customerEditService', [])
         });
     };
 
+    var initBase = function (uiScope)
+    {
+        uiScope.getLast4 = function (str)
+        {
+            if (str == null)
+                return undefined;
+            var start = str.length - 4;
+            if (start < 0)
+                start = 0;
+            return str.slice(start, str.length);
+        };
+
+        uiScope.getCreditCardTypeName = function (idType)
+        {
+            for (var idx = 0; idx < uiScope.creditCardTypes.length; idx++)
+            {
+                if (uiScope.creditCardTypes[idx].Key == idType)
+                    return uiScope.creditCardTypes[idx].Text;
+            }
+        };        
+
+        uiScope.deleteSelectedCreditCard = function (id)
+        {
+            var idx = -1;
+
+            angular.forEach(uiScope.currentCustomer.CreditCards, function (item, index)
+            {
+                if (item.Id == id)
+                {
+                    idx = index;
+                    return;
+                }
+            });
+
+            uiScope.currentCustomer.CreditCards.splice(idx, 1);
+            if (idx < uiScope.currentCustomer.CreditCards.length)
+            {
+                uiScope.paymentInfoTab.CreditCard = uiScope.currentCustomer.CreditCards[idx];
+            }
+            else if (uiScope.currentCustomer.CreditCards.length > 0)
+            {
+                uiScope.paymentInfoTab.CreditCard = uiScope.currentCustomer.CreditCards[0];
+            }
+            else
+            {
+                uiScope.paymentInfoTab.CreditCard = undefined;
+            }
+        };
+    };
+
     var initCustomerEdit = function (uiScope)
     {
         uiScope.togglePaymentMethodSelection = function (paymentMethod)
@@ -324,6 +374,220 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 }
             });
         };
+
+        uiScope.makeBillingAsProfileAddress = function ()
+        {
+            if (uiScope.paymentInfoTab.sameBilling)
+            {
+                var address;
+                switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+                {
+                    case "1":
+                        if (uiScope.paymentInfoTab.CreditCard)
+                        {
+                            address = uiScope.paymentInfoTab.CreditCard.Address;
+                        }
+                        break;
+                    case "2":
+                        if (uiScope.currentCustomer.Oac)
+                        {
+                            address = uiScope.currentCustomer.Oac.Address;
+                        }
+                        break;
+                    case "3":
+                        if (uiScope.currentCustomer.Check)
+                        {
+                            address = uiScope.currentCustomer.Check.Address;
+                        }
+                        break;
+                }
+                if (address)
+                {
+                    for (var key in uiScope.currentCustomer.ProfileAddress)
+                    {
+                        address[key] = uiScope.currentCustomer.ProfileAddress[key];
+                    }
+                    if (uiScope.currentCustomer.newEmail)
+                    {
+                        address.Email = uiScope.currentCustomer.newEmail;
+                    } else
+                    {
+                        address.Email = uiScope.currentCustomer.Email;
+                    }
+                    address.AddressType = 2;
+                    address.Id = 0;
+                }
+            }
+        };
+
+        uiScope.setNewCreditCard = function (callback)
+        {
+            customerService.createCreditCardPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.currentCustomer.CreditCards.push(result.Data);
+                        uiScope.paymentInfoTab.CreditCard = result.Data;
+                        uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
+                        uiScope.paymentInfoTab.sameBilling = false;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
+
+        uiScope.setNewCheck = function (callback)
+        {
+            customerService.createCheckPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.currentCustomer.Check = result.Data;
+                        uiScope.currentCustomer.Check.formName = uiScope.paymentInfoTab.formName;
+                        uiScope.paymentInfoTab.sameBilling = false;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
+
+        uiScope.setNewOac = function (callback)
+        {
+            customerService.createOacPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.currentCustomer.Oac = result.Data;
+                        uiScope.currentCustomer.Oac.formName = uiScope.paymentInfoTab.formName;
+                        uiScope.paymentInfoTab.sameBilling = false;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
+    };
+
+    var initOrderEditCustomerParts = function (uiScope)
+    {
+        uiScope.setNewCreditCard = function (callback)
+        {
+            customerService.createCreditCardPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.paymentInfoTab.CreditCard = result.Data;
+                        uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
+
+        uiScope.setNewCheck = function (callback)
+        {
+            customerService.createCheckPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.order.Check = result.Data;
+                        uiScope.order.Check.formName = uiScope.paymentInfoTab.formName;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
+
+        uiScope.setNewOac = function (callback)
+        {
+            customerService.createOacPrototype(uiScope.addEditTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        uiScope.order.Oac = result.Data;
+                        uiScope.order.Oac.formName = uiScope.paymentInfoTab.formName;
+                        if (callback)
+                            callback(result.Data);
+                    } else
+                    {
+                        successHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                })
+                .then(function ()
+                {
+                    uiScope.forms.submitted['billing'] = false;
+                });
+            return false;
+        };
     };
 
     var syncCountry = function (uiScope, addressItem)
@@ -380,7 +644,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
     };
 
     return {
+        initBase: initBase,
         initCustomerEdit: initCustomerEdit,
+        initOrderEditCustomerParts: initOrderEditCustomerParts,
         syncDefaultPaymentMethod: syncDefaultPaymentMethod,
         syncCountry: syncCountry,
         showHighPriNotes: showHighPriNotes,
