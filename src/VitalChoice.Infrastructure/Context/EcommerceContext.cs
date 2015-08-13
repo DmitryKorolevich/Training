@@ -692,6 +692,7 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(v => v.IdOrder)
                     .PrincipalKey(o => o.Id)
                     .Required();
+                entity.Ignore(o => o.OptionTypes);
             });
 
             builder.Entity<OrderOptionValue>(entity =>
@@ -773,7 +774,8 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(g => g.IdOrderPaymentMethod)
                     .PrincipalKey(o => o.Id)
                     .Required();
-            });
+		        entity.Ignore(o => o.OptionTypes);
+		    });
 
             builder.Entity<OrderPaymentMethodOptionValue>(entity =>
             {
@@ -797,6 +799,44 @@ namespace VitalChoice.Infrastructure.Context
 		            .ForeignKey<OrderOptionType>(t => t.IdLookup)
 		            .PrincipalKey<Lookup>(l => l.Id)
 		            .Required(false);
+		    });
+
+		    builder.Entity<OrderAddress>(entity =>
+		    {
+		        entity.Key(p => p.Id);
+		        entity.ToTable("OrderAddresses");
+		        entity.Reference(p => p.Сountry)
+		            .InverseCollection()
+		            .ForeignKey(p => p.IdCountry)
+		            .PrincipalKey(c => c.Id)
+		            .Required();
+		        entity.Reference(p => p.State)
+		            .InverseCollection()
+		            .ForeignKey(p => p.IdState)
+		            .PrincipalKey(s => s.Id)
+		            .Required(false);
+		        entity.Reference(p => p.EditedBy)
+		            .InverseCollection()
+		            .ForeignKey(p => p.IdEditedBy)
+		            .PrincipalKey(p => p.Id)
+		            .Required(false);
+		        entity.Collection(a => a.OptionValues)
+		            .InverseReference()
+		            .ForeignKey(o => o.IdOrderAddress)
+		            .PrincipalKey(a => a.Id)
+		            .Required();
+		        entity.Ignore(a => a.OptionTypes);
+		    });
+
+		    builder.Entity<OrderAddressOptionValue>(entity =>
+		    {
+		        entity.Key(a => a.Id);
+		        entity.ToTable("OrderAddressOptionValues");
+		        entity.Reference(v => v.OptionType)
+		            .InverseCollection()
+		            .ForeignKey(t => t.IdOptionType)
+		            .PrincipalKey(v => v.Id)
+		            .Required();
 		    });
 
             #endregion

@@ -124,4 +124,36 @@ BEGIN
 
 	CREATE NONCLUSTERED INDEX IX_OrderPaymentMethodOptionValues_Value ON OrderPaymentMethodOptionValues (Value)
 
+	CREATE TABLE [dbo].[OrderAddresses] (
+		[Id] INT NOT NULL
+			CONSTRAINT PK_OrderAddresses PRIMARY KEY (Id) IDENTITY,
+		[IdOrder] INT NOT NULL
+			CONSTRAINT FK_OrderAddressToOrder FOREIGN KEY (IdOrder) REFERENCES dbo.Orders (Id),
+		[IdCountry] INT NOT NULL
+			CONSTRAINT FK_OrderAddressesToCountry FOREIGN KEY (IdCountry) REFERENCES dbo.Countries (Id),
+		[IdState] INT NOT NULL
+			CONSTRAINT FK_OrderAddressesToState FOREIGN KEY (IdState) REFERENCES dbo.States (Id),
+		[IdObjectType] INT NOT NULL
+			CONSTRAINT FK_OrderAddressesToAddressType FOREIGN KEY (IdObjectType) REFERENCES dbo.AddressTypes (Id),
+		[County] NVARCHAR(250) NOT NULL,
+		[DateCreated] [datetime2](7) NOT NULL,
+		[DateEdited] [datetime2](7) NOT NULL,
+		[IdEditedBy] [int] NULL
+			CONSTRAINT FK_OrderAddressesToUser FOREIGN KEY (IdEditedBy) REFERENCES dbo.Users (Id),
+		[StatusCode] INT NOT NULL
+			CONSTRAINT FK_OrderAddressesToRecordStatusCode FOREIGN KEY (StatusCode) REFERENCES dbo.RecordStatusCodes (StatusCode)
+	)
+
+	CREATE TABLE [dbo].[OrderAddressOptionValues] (
+		[Id] INT NOT NULL
+			CONSTRAINT PK_OrderAddressOptionValues PRIMARY KEY (Id) IDENTITY,
+		[IdOptionType] INT NOT NULL
+			CONSTRAINT FK_OrderAddressOptionValuesToAddressOptionType FOREIGN KEY (IdOptionType) REFERENCES dbo.AddressOptionTypes (Id),
+		[IdOrderAddress] INT NOT NULL
+			CONSTRAINT FK_OrderAddressOptionValuesToOrderAddress FOREIGN KEY (IdOrderAddress) REFERENCES dbo.OrderAddresses (Id),
+		[Value] NVARCHAR(250) NULL
+	)
+
+	CREATE NONCLUSTERED INDEX IX_OrderAddressOptionValues_Value ON OrderAddressOptionValues (Value)
+
 END
