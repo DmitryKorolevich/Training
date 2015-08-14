@@ -662,11 +662,17 @@ namespace VitalChoice.Infrastructure.Context
 		    builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.BigValue);
             builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.IdBigString);
 
-			#endregion
+            #endregion
 
-			#region Orders
+            #region Orders
 
-			builder.Entity<OrderTypeEntity>(entity =>
+            builder.Entity<VOrder>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("VOrders");
+            });
+
+            builder.Entity<OrderTypeEntity>(entity =>
 		    {
 		        entity.Key(t => t.Id);
 		        entity.ToTable("OrderTypes");

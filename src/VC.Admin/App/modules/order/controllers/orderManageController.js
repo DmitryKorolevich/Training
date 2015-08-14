@@ -212,8 +212,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             Shipping: {},
             IdPaymentMethodType: 1,
             CreditCard: {},
-            Oac: {},
-            Check: {},
+            //Oac: {},
+            //Check: {},
         };
         
         customerEditService.initBase($scope);
@@ -306,14 +306,35 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 if ($scope.id)
                 {
                     $scope.paymentInfoTab.PaymentMethodType = $scope.order.IdPaymentMethodType;
-                    if ($scope.paymentInfoTab.PaymentMethodType==1)
+
+                    if (!$scope.order.CreditCard)
+                    {                        
+                        if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
+                        {
+                            $scope.order.CreditCard = $scope.currentCustomer.CreditCards[0];
+                        }
+                    }
+                    if (!$scope.order.Oac)
+                    {
+                        $scope.order.CreditCard = $scope.currentCustomer.Oac;
+                    }
+                    if (!$scope.order.Check)
+                    {
+                        $scope.order.Check = $scope.currentCustomer.Check;
+                    }
+
+                    if ($scope.paymentInfoTab.PaymentMethodType == 1)
+                    {
                         $scope.paymentInfoTab.CreditCard = $scope.order.CreditCard;
+                    }
                 }
                 else
                 {
                     $scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
                     if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
+                    {
                         $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
+                    }
                 }
 
                 customerEditService.syncDefaultPaymentMethod($scope);

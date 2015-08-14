@@ -169,4 +169,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VProductSkus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\VOrders.sql" />
+  </ItemGroup>
 </Project>
