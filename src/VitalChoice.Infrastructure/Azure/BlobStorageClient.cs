@@ -1,5 +1,4 @@
-﻿#if DNX451
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,56 +13,55 @@ namespace VitalChoice.Infrastructure.Azure
 {
     public class BlobStorageClient: IBlobStorageClient
     {
-	    private readonly AzureStorage _appOptions;
 	    private CloudBlobClient _blobClient;
-	    private CloudBlobContainer _container;
 
 	    public BlobStorageClient(IOptions<AppOptions> appOptions)
 	    {
-			_appOptions = appOptions.Options.AzureStorage;
-		    var storageAccount = CloudStorageAccount.Parse(_appOptions.StorageConnectionString);
+		    var storageAccount = CloudStorageAccount.Parse(appOptions.Options.AzureStorage.StorageConnectionString);
 
-			_blobClient = storageAccount.CreateCloudBlobClient();
-			_container = _blobClient.GetContainerReference(_appOptions.CustomerContainerName);
+		    _blobClient = storageAccount.CreateCloudBlobClient();
+		   
+	    }
 
-			_container.CreateIfNotExists();
-			_container.SetPermissions(
+	    private async Task<CloudBlockBlob> ResolveBlob(string containerName, string blobName)
+	    {
+			var container = _blobClient.GetContainerReference(containerName);
+
+			var result = await container.CreateIfNotExistsAsync();
+
+		    if (result)
+		    {
+				await container.SetPermissionsAsync(
 				new BlobContainerPermissions
 				{
 					PublicAccess =
 						BlobContainerPublicAccessType.Off
 				});
-		}
-
-	    public async Task UploadBlobAsync(string blobname, byte[] data)
-	    {
-		    var blockBlob =_container.GetBlockBlobReference(blobname);
-
-		    using (var stream = new MemoryStream(data))
-		    {
-				await blockBlob.UploadFromStreamAsync(stream);
 			}
+
+		    return container.GetBlockBlobReference(blobName); ;
 	    }
 
-	    public IList<string> ListBlobs(string prefix)
+	    public async Task UploadBlobAsync(string containerName, string blobName, byte[] data, string contentType = null)
 	    {
-		    var blobs = _container.ListBlobs(prefix);
+			var blockBlob = await ResolveBlob(containerName, blobName);
 
-		    return blobs.Select(x => x.Uri.ToString()).ToList();
+			blockBlob.Properties.ContentType = contentType;
+			await blockBlob.UploadFromByteArrayAsync(data, 0, data.Length);
 	    }
 
-	    public async Task<bool> BlobExistsAsync(string blobname)
+		public async Task<bool> BlobExistsAsync(string containerName, string blobName)
 	    {
-			var blockBlob = _container.GetBlockBlobReference(blobname);
+			var blockBlob = await ResolveBlob(containerName, blobName);
 
-		    return await blockBlob.ExistsAsync();
+			return await blockBlob.ExistsAsync();
 	    }
 
-	    public async Task<Blob> DownloadBlobAsync(string blobname)
+	    public async Task<Blob> DownloadBlobAsync(string containerName, string blobName)
 	    {
-			var blockBlob = _container.GetBlockBlobReference(blobname);
+			var blockBlob = await ResolveBlob(containerName, blobName);
 
-			blockBlob.FetchAttributes();
+			await blockBlob.FetchAttributesAsync();
 			var fileByteLength = blockBlob.Properties.Length;
 			var fileContent = new byte[fileByteLength];
 			for (var i = 0; i < fileByteLength; i++)
@@ -77,7 +75,12 @@ namespace VitalChoice.Infrastructure.Azure
 			    ContentType = blockBlob.Properties.ContentType
 		    };
 	    }
+
+	    public async Task<bool> DeleteBlobAsync(string containerName, string blobName)
+	    {
+			var blockBlob = await ResolveBlob(containerName, blobName);
+
+			return await blockBlob.DeleteIfExistsAsync();
+	    }
     }
 }
-
-#endif

@@ -705,3 +705,10 @@ BEGIN
 	ALTER TABLE [dbo].[Customers]
 	DROP CONSTRAINT DF_PublicId_Default
 END
+
+GO
+
+ALTER TABLE  [dbo].[CustomerFiles]
+	ALTER COLUMN [Description] [nvarchar](500) NULL
+
+GO

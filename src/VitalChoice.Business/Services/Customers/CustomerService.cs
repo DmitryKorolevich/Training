@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Payment;
@@ -20,6 +21,7 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
@@ -46,6 +48,7 @@ namespace VitalChoice.Business.Services.Customers
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<CustomerPaymentMethod> _customerPaymentMethodRepositoryAsync;
 	    private readonly IBlobStorageClient _storageClient;
+	    private static string _customerContainerName;
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
@@ -60,7 +63,8 @@ namespace VitalChoice.Business.Services.Customers
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync,
-			IBlobStorageClient storageClient)
+			IBlobStorageClient storageClient,
+			IOptions<AppOptions> appOptions)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
@@ -76,6 +80,7 @@ namespace VitalChoice.Business.Services.Customers
             _adminProfileRepository = adminProfileRepository;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
 		    _storageClient = storageClient;
+		    _customerContainerName = appOptions.Options.AzureStorage.CustomerContainerName;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -389,7 +394,7 @@ namespace VitalChoice.Business.Services.Customers
 			return result;
 		}
 
-	    public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId)
+	    public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null)
 	    {
 		    var i = 0;
 		    string blobname;
@@ -400,16 +405,21 @@ namespace VitalChoice.Business.Services.Customers
 
 			    blobname = $"{customerPublicId}/{generatedFileName}";
 			    i++;
-		    } while (await _storageClient.BlobExistsAsync(blobname));
+		    } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
 
-		    await _storageClient.UploadBlobAsync(blobname, file);
+		    await _storageClient.UploadBlobAsync(_customerContainerName, blobname, file, contentType);
 
 		    return generatedFileName;
 	    }
 
-	    public async Task<Blob> DownloadFileAsync(string fileName)
+	    public async Task<Blob> DownloadFileAsync(string fileName, string customerPublicId)
 	    {
-		    return await _storageClient.DownloadBlobAsync(fileName);
+		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
+	    }
+
+	    public async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
+	    {
+		    return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
     }
 }

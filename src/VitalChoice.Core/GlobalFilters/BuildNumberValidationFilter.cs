@@ -12,6 +12,11 @@ namespace VitalChoice.Core.GlobalFilters
 			var optionsAccessor = context.HttpContext.ApplicationServices.GetService<IOptions<AppOptions>>();
 
 			var buildNumber = context.HttpContext.Request.Headers["Build-Number"];
+		    if (string.IsNullOrWhiteSpace(buildNumber))
+		    {
+			    buildNumber = context.HttpContext.Request.Query.Get("buildNumber");
+		    }
+
 		    if (string.IsNullOrWhiteSpace(buildNumber) || !buildNumber.Equals(optionsAccessor.Options.Versioning.BuildNumber))
 		    {
 			    context.Result = new NoContentResult();

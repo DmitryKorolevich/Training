@@ -20,8 +20,10 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 		Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
 
-		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId);
+		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
 
-		Task<Blob> DownloadFileAsync(string fileName);
+		Task<Blob> DownloadFileAsync(string fileName, string customerPublicId);
+
+		Task<bool> DeleteFileAsync(string fileName, string customerPublicId);
 	}
 }

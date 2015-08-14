@@ -294,7 +294,8 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
                         messages += "{0} ".format(INVALID_FILE_SIZE_MESSAGE);
                     }
 
-                    var logRequest = {};
+	                $scope.logFileRequest = {};
+	                var logRequest = $scope.logFileRequest;
                     fileUploadRequestId++;
                     file.index = fileUploadRequestId;
                     logRequest.type = "upload";

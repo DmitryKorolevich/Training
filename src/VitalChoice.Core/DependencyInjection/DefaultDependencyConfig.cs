@@ -260,9 +260,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
             builder.RegisterType<CustomerService>().As<ICustomerService>();
-#if DNX451
 			builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
-#endif
 			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
             builder.RegisterInstance(

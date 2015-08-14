@@ -315,12 +315,14 @@ namespace VC.Admin.Controllers
 			var publicId = form["data"];
 			
 			var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
-		    using (var stream = form.Files[0].OpenReadStream())
+
+			var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
 		    {
 			    var fileContent = stream.ReadFully();
 			    try
 			    {
-				    var fileName = await _customerService.UploadFileAsync(fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId);
+				    var fileName = await _customerService.UploadFileAsync(fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId, contentType);
 
 					return new CustomerFileModel() { FileName = fileName, UploadDate = DateTime.Now };
 				}
@@ -332,13 +334,13 @@ namespace VC.Admin.Controllers
 		    }
 	    }
 
-
-	    public async Task<FileResult> GetFile(string fileName, bool viewMode)
-	    {
 #if DNX451
-			var blob = await _customerService.DownloadFileAsync(fileName);
+		[HttpGet]
+		public async Task<FileResult> GetFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)
+	    {
+			var blob = await _customerService.DownloadFileAsync(fileName, publicId);
 
-		    var contentDisposition = new ContentDisposition()
+			var contentDisposition = new ContentDisposition()
 		    {
 				FileName = fileName,
 				Inline = viewMode
@@ -346,10 +348,15 @@ namespace VC.Admin.Controllers
 
 			Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
 			return File(blob.File, blob.ContentType);
-#else
-			return null;
+		}
 #endif
 
-		}
-	}
+		[HttpPost]
+	    public async Task<Result<bool>> DeleteFile(DeleteCustomerFileModel customerFileModel)
+	    {
+		    await _customerService.DeleteFileAsync(customerFileModel.FileName, customerFileModel.PublicId);
+
+		    return true;
+	    }
+    }
 }

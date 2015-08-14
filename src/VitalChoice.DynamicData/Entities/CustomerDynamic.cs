@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.DynamicData.Base;
@@ -24,7 +25,9 @@ namespace VitalChoice.DynamicData.Entities
 
 		public int IdDefaultPaymentMethod { get; set; }
 
-	    public string EditedBy { get; set; }
+		public Guid PublicId { get; set; }
+
+		public string EditedBy { get; set; }
 
 	    public ICollection<int> ApprovedPaymentMethods { get; set; }
 

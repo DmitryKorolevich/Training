@@ -6,15 +6,15 @@
         "Microsoft.Framework.OptionsModel": "1.0.0-*",
         "VitalChoice.Data": "1.0.0-*",
         "VitalChoice.Domain": "1.0.0-*",
-        "VitalChoice.Interfaces": "1.0.0-*"
+        "VitalChoice.Interfaces": "1.0.0-*",
+        "WindowsAzure.Storage": "5.0.1-preview-*"
     },
 
     "frameworks": {
         "dnx451": {
             "compilationOptions": { "define": [ "DNX451" ] },
             "dependencies": {
-              "NLog": "4.0.1",
-              "WindowsAzure.Storage": "5.0.0-*"
+              "NLog": "4.0.1"
             }
         },
         "dnxcore50": {
