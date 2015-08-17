@@ -186,7 +186,24 @@ namespace VC.Admin.Controllers
                     Template = String.Empty,
                     CategoryIds = new List<int>(),
                     RecipesToProducts = new List<RecipeToProduct>(),
-                };
+					CrossSellRecipes = new List<CrossSellRecipeModel>()
+					{
+						new CrossSellRecipeModel(),
+						new CrossSellRecipeModel(),
+						new CrossSellRecipeModel(),
+					},
+					RelatedRecipes = new List<RelatedRecipeModel>()
+					{
+						new RelatedRecipeModel(),
+						new RelatedRecipeModel(),
+						new RelatedRecipeModel(),
+						new RelatedRecipeModel()
+					},
+					Videos = new List<VideoRecipeModel>()
+					{
+						new VideoRecipeModel()
+					}
+				};
             }
             return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
         }

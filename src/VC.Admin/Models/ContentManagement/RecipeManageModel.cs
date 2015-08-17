@@ -5,9 +5,8 @@ using VC.Admin.Validators.ContentManagement;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.ContentManagement
 {
@@ -49,7 +48,19 @@ namespace VC.Admin.Models.ContentManagement
 
         public IList<RecipeToProduct> RecipesToProducts { get; set; }
 
-        public RecipeManageModel()
+		public IList<CrossSellRecipeModel> CrossSellRecipes { get; set; }
+
+		public IList<RelatedRecipeModel> RelatedRecipes { get; set; }
+
+		public IList<VideoRecipeModel> Videos { get; set; }
+
+	    public string AboutChef { get; set; }
+
+	    public string Ingredients  { get; set; }
+
+	    public string Directions { get; set; }
+
+	    public RecipeManageModel()
         {
         }
 

@@ -16,17 +16,41 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             } else {
                 var messages = "";
                 if (result.Messages) {
-                    $scope.forms.recipeForm.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            $scope.forms.recipeForm[value.Field].$setValidity("server", false);
-                        }
-                        messages += value.Message + "<br />";
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                	$scope.forms.recipeForm.submitted = true;
+                	$scope.forms.crossessubmitted = true;
+                	$scope.forms.relatedsubmitted = true;
+                	$scope.forms.videossubmitted = true;
+
+                	$scope.serverMessages = new ServerMessages(result.Messages);
+                	var formForShowing = null;
+                	$.each(result.Messages, function (index, value) {
+                		if (value.Field) {
+                			if (value.Field.indexOf('.') > -1) {
+                				var items = value.Field.split(".");
+                				$scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                				formForShowing = items[0];
+                			}
+                			else {
+                				$.each($scope.forms, function (index, form) {
+                					if (form && !(typeof form === 'boolean')) {
+                						if (form[value.Field] != undefined) {
+                							form[value.Field].$setValidity("server", false);
+                							if (formForShowing == null) {
+                								formForShowing = index;
+                							}
+                							return false;
+                						}
+                					}
+                				});
+                			}
+                		}
+                	});
+
+                	if (formForShowing) {
+                		activateTab(formForShowing);
+                	}
+				}
+				toaster.pop('error', "Error!", messages, null, 'trustedHtml');
             }
         };
 
@@ -46,21 +70,67 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.previewUrl = null;
 
             $scope.detailsTab = {
-                active: true
+            	active: true,
+				formName: 'details'
             };
+            $scope.crossSellProductsAndVideosTab = {
+            	active: false,
+            	formName: 'crossSellRelatedRecipes',
+            };
+            var tabs = [];
+            tabs.push($scope.detailsTab);
+            tabs.push($scope.crossSellProductsAndVideosTab);
+            $scope.tabs = tabs;
+
             $scope.forms = {};
 
-            $scope.save = function () {
-                $.each($scope.forms.recipeForm, function (index, element) {
-                    if (element && element.$name == index) {
-                        element.$setValidity("server", true);
-                    }
-                });
+            var clearServerValidation = function () {
+            	$.each($scope.forms, function (index, form) {
+            		if (form && !(typeof form === 'boolean')) {
+            			if (index == "RelatedRecipes" || index == "CrossSellRecipes") {
+            				$.each(form, function (index, subForm) {
+            					if (index.indexOf('i') == 0) {
+            						$.each(subForm, function (index, element) {
+            							if (element && element.$name == index) {
+            								element.$setValidity("server", true);
+            							}
+            						});
+            					}
+            				});
+            			}
+            			else {
+            				$.each(form, function (index, element) {
+            					if (element && element.$name == index) {
+            						element.$setValidity("server", true);
+            					}
+            				});
+            			}
+            		}
+            	});
+            };
 
-                if ($scope.forms.recipeForm.$valid) {
+            $scope.save = function () {
+	            clearServerValidation();
+
+	            var valid = true;
+	            $.each($scope.forms, function (index, form) {
+	            	if (form && !(typeof form === 'boolean')) {
+	            		if (!form.$valid && index != 'submitted' && index != 'crossessubmitted' && index != 'videossubmitted' && index != 'relatedsubmitted') {
+	            			valid = false;
+	            			activateTab(index);
+	            			return false;
+	            		}
+	            	}
+	            });
+
+                if (valid) {
                     var categoryIds = [];
                     getSelected($scope.rootCategory, categoryIds);
                     $scope.recipe.CategoryIds = categoryIds;
+
+                    updateCrossses($scope.recipe.CrossSellRecipes);
+                    updateCrossses($scope.recipe.RelatedRecipes);
+                    updateVideos();
 
                     contentService.updateRecipe($scope.recipe, $scope.editTracker).success(function (result) {
                         successSaveHandler(result);
@@ -69,7 +139,11 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                             errorHandler(result);
                         });
                 } else {
-                    $scope.forms.recipeForm.submitted = true;
+                	$scope.forms.recipeForm.submitted = true;
+                	$scope.forms.crossessubmitted = true;
+                	$scope.forms.relatedsubmitted = true;
+                	$scope.forms.videossubmitted = true;
+
                     $scope.detailsTab.active = true;
                 }
             };
@@ -87,6 +161,9 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 			                        };
 			                        setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
 			                        addProductsListWatchers();
+			                        updateCrossRelated($scope.recipe.RelatedRecipes);
+			                        updateCrossRelated($scope.recipe.CrossSellRecipes);
+				                    initVideos();
 			                    } else {
 			                        errorHandler(result);
 			                    }
@@ -190,8 +267,129 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             notifyAboutAddBlockIds('RecipesToProducts');
         };
 
+        function activateTab(formName) {
+        	$.each($scope.tabs, function (index, item) {
+        		if (formName.indexOf('recipeForm') == 0) {
+        			formName = 'recipeForm';
+        		}
+        		if (formName.indexOf('CrossSellRecipes') == 0) {
+        			formName = 'crossSellRelatedRecipes';
+        		}
+        		if (formName.indexOf('RelatedRecipes') == 0) {
+        			formName = 'crossSellRelatedRecipes';
+        		}
+        		if (formName.indexOf('CrossRelatedMiscellaneous') == 0) {
+        			formName = 'crossSellProductsAndVideos';
+        		}
+        		if (item.formName == formName) {
+        			item.active = true;
+        			return false;
+        		}
+        	});
+        };
+
         $scope.deleteRecipesToProducts = function (index) {
             $scope.recipe.RecipesToProducts.splice(index, 1);
+        };
+
+        $scope.setCustomVideo = function (item) {
+        	item.VideoUse = true;
+        	item.ImageUse = true;
+        	item.TextUse = true;
+        };
+
+        $scope.removeCustomVideo = function (item) {
+        	item.VideoUse = false;
+        	item.ImageUse = false;
+        	item.TextUse = false;
+        };
+
+        $scope.setCustomCross = function (item) {
+	        $scope.setCustomRelated(item);
+        	item.SubtitleUse = true;
+        };
+
+        $scope.setCustomRelated = function (item) {
+        	item.ImageUse = true;
+        	item.UrlUse = true;
+        	item.TitleUse = true;
+        };
+
+        $scope.removeCustomRelated = function (item) {
+        	item.ImageUse = false;
+        	item.UrlUse = false;
+        	item.TitleUse = false;
+        };
+
+        $scope.removeCustomCross = function (item) {
+        	$scope.removeCustomRelated(item);
+        	item.SubtitleUse = false;
+        };
+
+        function initCrossRelated (array) {
+        	$.each(array, function (index, item) {
+        		if (item.Image) {
+        			item.ImageUse = true;
+        		}
+        		if (item.Url) {
+        			item.UrlUse = true;
+        		}
+        		if (item.Title) {
+        			item.TitleUse = true;
+        		}
+        		if (item.Subtitle) {
+        			item.SubtitleUse = true;
+        		}
+        	});
+        };
+
+        function updateCrossRelated(array) {
+        	$.each(array, function (index, item) {
+        		if (!item.ImageUse) {
+        			item.Image = null;
+        		}
+        		if (!item.UrlUse) {
+        			item.Url = null;
+        		}
+        		if (!item.TitleUse) {
+        			item.Title = null;
+        		}
+        		if (item.Subtitle !== undefined && !item.SubtitleUse) {
+        			item.Subtitle = null;
+        		}
+        	});
+        };
+
+        function initVideos() {
+        	$.each($scope.recipe.Videos, function (index, item) {
+        		if (item.Video) {
+        			item.VideoUse = true;
+        		}
+        		if (item.Image) {
+        			item.ImageUse = true;
+        		}
+        		if (item.Text) {
+        			item.TextUse = true;
+        		}
+        	});
+        };
+
+        function updateVideos() {
+        	$.each($scope.product.Videos, function (index, item) {
+        		if (!item.VideoUse) {
+        			item.Video = null;
+        		}
+        		if (!item.ImageUse) {
+        			item.Image = null;
+        		}
+        		if (!item.TextUse) {
+        			item.Text = null;
+        		}
+        	});
+        };
+
+        $scope.toggleOpen = function (item, event) {
+        	item.IsOpen = !item.IsOpen;
         };
 
         initialize();
