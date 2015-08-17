@@ -88,8 +88,40 @@ namespace VC.Admin.Controllers
                     IdOrderSource=2,
                     IdPaymentMethod=5,
                 },
+                                new OrderListItemModel(null)
+                {
+                    Company="Test company name4",
+                    StateCode="WA",
+                    Customer="Test4, Customer4",
+                    IdCustomer=7888921,
+                    Id=12345,
+                    Total= (decimal)155.12,
+                    EditedByAgentId="KK",
+                    DateEdited=DateTime.Now,
+                    OrderNotes="Some notes",
+                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.OnHold,
+                    DateCreated=DateTime.Now,
+                    IdOrderSource=1,
+                    IdPaymentMethod=+3,
+                },
+                new OrderListItemModel(null)
+                {
+                    Company="Test company name5",
+                    StateCode="WA",
+                    Customer="Test5, Customer5",
+                    IdCustomer=7888921,
+                    Id=34567,
+                    Total= (decimal)155.12,
+                    EditedByAgentId="KA",
+                    DateEdited=DateTime.Now,
+                    OrderNotes=null,
+                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Cancelled,
+                    DateCreated=DateTime.Now,
+                    IdOrderSource=3,
+                    IdPaymentMethod=5,
+                },
             };
-            toReturn.Count = 2;
+            toReturn.Count = 4;
 
             return toReturn;
         }
