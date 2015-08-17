@@ -17,7 +17,10 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Interfaces.Services;
-using EnumHelper = VitalChoice.Business.Helpers.EnumHelper;
+using LookupHelper = VitalChoice.Business.Helpers.LookupHelper;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
+using System.Collections.Generic;
 
 namespace VitalChoice.Business.Services
 {
@@ -30,12 +33,16 @@ namespace VitalChoice.Business.Services
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
 	    private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
-	    private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
+        private readonly IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository;
+        private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
+        private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
 	    private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
 
 	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
-            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository, IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository)
+            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
+            IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
+            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -44,7 +51,9 @@ namespace VitalChoice.Business.Services
             this.contentTypeRepository = contentTypeRepository;
             this.appOptionsAccessor = appOptionsAccessor;
 		    this.customerTypeRepository = customerTypeRepository;
-		    this.lookupVariantRepository = lookupVariantRepository;
+            this.orderStatusRepository = orderStatusRepository;
+            this.paymentMethodRepository = paymentMethodRepository;
+            this.lookupVariantRepository = lookupVariantRepository;
 		    this.lookupRepository = lookupRepository;
         }
 
@@ -80,42 +89,42 @@ namespace VitalChoice.Business.Services
 	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
 	            ? appOptionsAccessor.Options.PublicHost
 	            : "http://notdefined/";
-	        referenceData.ContentItemStatusNames = EnumHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+	        referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.ProductCategoryStatusNames = EnumHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+	        referenceData.ProductCategoryStatusNames = LookupHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.GCTypes = EnumHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+	        referenceData.GCTypes = LookupHelper.GetGCTypeNames().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.RecordStatuses = EnumHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+	        referenceData.RecordStatuses = LookupHelper.GetRecordStatuses().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.ProductTypes = EnumHelper.GetProductTypes().Select(x => new LookupItem<int>
+	        referenceData.ProductTypes = LookupHelper.GetProductTypes().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.DiscountTypes = EnumHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+	        referenceData.DiscountTypes = LookupHelper.GetDiscountTypes().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.AssignedCustomerTypes = EnumHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+	        referenceData.AssignedCustomerTypes = LookupHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
 	        }).ToList();
-	        referenceData.ActiveFilterOptions = EnumHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+	        referenceData.ActiveFilterOptions = LookupHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
 	        {
 	            Key = x.Key==-1 ? null : (int?)x.Key,
 	            Text = x.Value
@@ -123,7 +132,13 @@ namespace VitalChoice.Business.Services
 	        referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
 	            .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
 	            .ToList();
-	        referenceData.TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
+            referenceData.OrderStatuses = orderStatusRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
+                .ToList();
+            referenceData.PaymentMethods = paymentMethodRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
+                .ToList();
+            var shortPaymentMethods = (new List<LookupItem<int>>(referenceData.PaymentMethods));
+            referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
+            referenceData.TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
 	        {
 	            Key = x.Id,
 	            Text = x.ValueVariant
@@ -143,7 +158,7 @@ namespace VitalChoice.Business.Services
 	            Key = x.Id,
 	            Text = x.ValueVariant
 	        }).ToList();
-	        referenceData.CreditCardTypes = EnumHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
+	        referenceData.CreditCardTypes = LookupHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
 	        {
 	            Key = x.Key,
 	            Text = x.Value

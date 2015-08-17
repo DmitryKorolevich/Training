@@ -11,6 +11,6 @@ namespace VitalChoice.Interfaces.Services.Order
 {
 	public interface IOrderService
     {
-        Task<ICollection<VOrder>> GetSkusAsync(VOrderFilter filter);
+        Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
     }
 }

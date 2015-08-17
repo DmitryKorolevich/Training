@@ -40,7 +40,7 @@ namespace VC.Admin.Models.ContentManagement
                 Name = item.Name;
                 Url = item.Url;
                 StatusCode = item.StatusCode;
-                Status = EnumHelper.GetContentItemStatusName(item.Assigned, item.StatusCode);
+                Status = LookupHelper.GetContentItemStatusName(item.Assigned, item.StatusCode);
                 if (item.ContentPagesToContentCategories != null)
                 {
                     Categories = item.ContentPagesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => p.ContentCategory.Name).ToArray();

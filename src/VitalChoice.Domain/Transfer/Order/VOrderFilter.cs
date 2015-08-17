@@ -11,7 +11,11 @@ namespace VitalChoice.Domain.Transfer.Products
 
         public DateTime? To { get; set; }
 
+        public bool ShipDate { get; set; }
+
         public OrderStatus? OrderStatus { get; set; }
+
+        public int? POrderType { get; set; }
 
         public int? IdOrderSource { get; set; }
 

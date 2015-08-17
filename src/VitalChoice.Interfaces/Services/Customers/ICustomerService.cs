@@ -16,7 +16,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 	{
 		Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
 
-		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType customerType);
+		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType);
 
 		Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
 

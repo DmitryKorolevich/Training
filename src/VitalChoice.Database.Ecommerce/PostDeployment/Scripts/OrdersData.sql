@@ -164,3 +164,23 @@ BEGIN
 	(N'ManualRefundOverride', 1, NULL, 6, NULL),
 	(N'IdOrderRefunded', 3, NULL, 6, NULL)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM OrderStatuses)
+BEGIN
+
+	INSERT INTO [dbo].[OrderStatuses]
+	([Id], [Name])
+	VALUES
+	(1, N'Incomplete'),	
+	(2, N'Processed'),	
+	(3, N'Shipped'),	
+	(4, N'Cancelled'),	
+	(5, N'Exported'),	
+	(6, N'Ship Delayed'),	
+	(7, N'On Hold')
+
+END 
+
+GO

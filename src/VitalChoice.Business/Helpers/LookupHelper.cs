@@ -6,10 +6,11 @@ using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Helpers
 {
-    public static class EnumHelper
+    public static class LookupHelper
     {
         public static string GetContentItemStatusName(CustomerTypeCode code, RecordStatusCode status)
         {
@@ -177,6 +178,32 @@ namespace VitalChoice.Business.Helpers
                 {(int) CreditCardType.Discover, "Discover"}
             };
             return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetShortPaymentMethods(IList<LookupItem<int>> paymentMethods)
+        {
+            foreach(var paymentMethod in paymentMethods)
+            {
+                switch (paymentMethod.Key)
+                {
+                    case 1:
+                        paymentMethod.Text = "CC";
+                        break;
+                    case 2:
+                        paymentMethod.Text = "OAC";
+                        break;
+                    case 3:
+                        paymentMethod.Text = "Check";
+                        break;
+                    case 4:
+                        paymentMethod.Text = "NC";
+                        break;
+                    case 5:
+                        paymentMethod.Text = "PP";
+                        break;
+                }
+            }
+            return paymentMethods;
         }
     }
 }

@@ -7,8 +7,9 @@ CREATE VIEW [dbo].[VOrders]
 AS 
 SELECT 
 	o.Id,
-	o.IdOrderSource,
-	NULL As OrderSource,
+	o.OrderStatus,
+	oval.Value As IdOrderSource,
+	oval.Value As OrderNotes,
 	o.IdPaymentMethod,
 	o.DateCreated,
 	NULL As DateShipped,
@@ -17,6 +18,7 @@ SELECT
 	o.DateEdited,
 	NULL As  POrderType,
 	c.IdObjectType AS IdCustomerType,
+	NULL As IdShippingMethod,
 	c.Id AS IdCustomer,
 	options.Company,
 	options.FirstName+' '+options.LastName As Customer,
@@ -24,6 +26,8 @@ SELECT
 	FROM Orders AS o
 	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderSource' AND oopt.IdObjectType = o.IdObjectType
 	LEFT JOIN OrderOptionValues AS oval ON oval.IdOrder = o.Id AND oval.IdOptionType = oopt.Id
+	LEFT JOIN OrderOptionTypes AS onopt ON onopt.Name = N'OrderNotes' AND onopt.IdObjectType = o.IdObjectType
+	LEFT JOIN OrderOptionValues AS onval ON onval.IdOrder = o.Id AND onval.IdOptionType = onopt.Id
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
 	JOIN Addresses AS ad ON ad.IdCustomer = c.Id
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName], [Company]

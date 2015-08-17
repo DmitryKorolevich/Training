@@ -13,6 +13,10 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	};
 
 	return {
-        //orders
+	    //orders
+	    getOrders: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrders', filter, getConfig(tracker));
+	    },
 	};
 }]);

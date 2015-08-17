@@ -670,6 +670,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.Key(t => t.Id);
                 entity.ToTable("VOrders");
+                entity.Ignore(t => t.EditedByAgentId);
             });
 
             builder.Entity<OrderTypeEntity>(entity =>

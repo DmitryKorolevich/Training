@@ -15,9 +15,12 @@ namespace VitalChoice.Business.Queries.Payment
 			return this;
 		}
 
-		public PaymentMethodQuery MatchByCustomerType(CustomerType customerType)
+		public PaymentMethodQuery MatchByCustomerType(CustomerType? customerType)
 		{
-			Add(x => x.CustomerTypes.Select(y => y.IdCustomerType).Contains((int)customerType));
+            if (customerType.HasValue)
+            {
+                Add(x => x.CustomerTypes.Select(y => y.IdCustomerType).Contains((int)customerType.Value));
+            }
 
 			return this;
 		}

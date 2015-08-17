@@ -1,34 +1,134 @@
 ﻿angular.module('app.modules.order.controllers.ordersController',[])
-.controller('ordersController',['$scope','$state','orderService','toaster','modalUtil','confirmUtil','promiseTracker','gridSorterUtil',
-    function($scope,$state,orderService,toaster,modalUtil,confirmUtil,promiseTracker,gridSorterUtil) {
+.controller('ordersController', ['$scope', '$rootScope', '$state', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, orderService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+    {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
 
-    function errorHandler(result) {
-        toaster.pop('error', "Error!", "Server error occured");
-    };
+        function errorHandler(result) {
+            toaster.pop('error', "Error!", "Server error occured");
+        };
 
-    function refreshOrders() {
+        function refreshOrders() {
+            orderService.getOrders($scope.filter, $scope.refreshTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        $scope.items = result.Data.Items;
+                        $.each($scope.items, function(index, item)
+                        {
+                            item.AllowExport = item.OrderStatus == 1 || item.OrderStatus == 2 || item.OrderStatus == 6 || item.OrderStatus == 7;
+                            item.IsSelected = item.OrderStatus == 3;//Shipped
+                        });
+                        $scope.totalItems = result.Data.Count;
+                    } else {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result) {
+                    errorHandler(result);
+                });
+        };
 
-	};
+        function initialize()
+        {
+            $scope.customerTypes = $rootScope.ReferenceData.CustomerTypes;
+            $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All Customer Types' });
 
-	function initialize() {
-	    $scope.filter = {
-            Paging: { PageIndex: 1, PageItemCount: 100 },
-            Sorting: gridSorterUtil.resolve(refreshOrders,"DateCreated","Desc")
-	    };
+            $scope.orderStatuses = $rootScope.ReferenceData.OrderStatuses;
+            $scope.orderStatuses.splice(0, 0, { Key: null, Text: 'All Order Statuses' });
 
-	    refreshOrders();
-	}
+            $scope.orderTypes = [ 
+                { Key: null, Text: 'All Order Types' },
+                {Key: 1, Text: 'Web'},
+                {Key: 2, Text: 'Phone'},
+                {Key: 3, Text: 'Mail Order'},      
+            ];
+            $scope.pOrderTypes = [ 
+                { Key: null, Text: 'All  P/NP Types' },
+                {Key: 1, Text: 'P Orders'},
+                {Key: 2, Text: 'NP Orders'},
+                {Key: 3, Text: 'P/NP Orders'},                
+                {Key: 4, Text: 'Other'}
+            ];
+            $scope.shippingMethods = [ 
+                { Key: null, Text: 'All Shipping Methods' },
+                {Key: 1, Text: 'Upgraded'},
+                {Key: 2, Text: 'None'}
+            ];
+            $scope.settings = {};
+            $scope.settings.allExport = false;
 
-	$scope.filterOrders = function () {
-	    $scope.filter.Paging.PageIndex = 1;
-	    refreshOrders();
-	};
+            $scope.forms = {};
 
-	$scope.pageChanged = function () {
-	    refreshOrders();
-	};
+            var currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            $scope.filter = {
+                To: currentDate.shiftDate('+1d'),
+                From: currentDate.shiftDate('-1m'),
+                ShipDate: false,
+                OrderStatus: null,
+                IdOrderSource: null,
+                POrderType: null,
+                IdCustomerType: null,
+                IdShippingMethod: null,
+                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Sorting: gridSorterUtil.resolve(refreshOrders,"DateCreated","Desc")
+            };
 
-	initialize();
-}]);
+            $scope.$watch("filter.ShipDate", function (newValue, oldValue)
+            {
+                if(newValue)
+                {
+                    $scope.filter.OrderStatus=3//Shipped
+                }
+            });
+
+            refreshOrders();
+        }
+
+        $scope.filterOrders = function ()
+        {
+            if ($scope.forms.form.$valid)
+            {
+                $scope.filter.Paging.PageIndex = 1;
+                refreshOrders();
+            }
+            else
+            {
+                $scope.forms.form.submitted = true;
+            }
+        };
+
+        $scope.pageChanged = function () {
+            refreshOrders();
+        };
+
+        $scope.delete = function () {
+        };
+
+        $scope.allExportCall = function()
+        {
+            $.each($scope.items, function(index, item)
+            {
+                if (item.AllowExport)
+                {
+                    item.IsSelected = $scope.settings.allExport;
+                }
+            });
+        };
+
+        $scope.itemExportChanged = function (item)
+        {
+            if (!item.IsSelected && $scope.settings.allExport)
+            {
+                $scope.settings.allExport = false;
+            }
+        };
+
+        $scope.exportOrders = function()
+        {
+
+        };
+
+        initialize();
+    }]);

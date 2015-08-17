@@ -6,10 +6,10 @@ namespace VitalChoice.Domain.Transfer.Base
 {
     public class ReferenceData
     {
-	    public IList<LookupItem<int>> Roles { get; set; }
+        public IList<LookupItem<int>> Roles { get; set; }
 
-		public IList<LookupItem<byte>> UserStatuses { get; set; }
-        
+        public IList<LookupItem<byte>> UserStatuses { get; set; }
+
         public IList<LookupItem<int>> ContentTypes { get; set; }
 
         public IList<ContentProcessor> ContentProcessors { get; set; }
@@ -36,7 +36,13 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> CustomerTypes { get; set; }
 
-	    public IList<LookupItem<int>> TaxExempts { get; set; }
+        public IList<LookupItem<int>> OrderStatuses { get; set; }
+
+        public IList<LookupItem<int>> PaymentMethods { get;set; }
+
+        public IList<LookupItem<int>> ShortPaymentMethods { get; set; }
+
+        public IList<LookupItem<int>> TaxExempts { get; set; }
 
 	    public List<LookupItem<int>> Tiers { get; set; }
 

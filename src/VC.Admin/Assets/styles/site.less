@@ -6,10 +6,13 @@
 @selected-light-blue: #DDF0FB;
 @hover-light-gray: #EDEDED;
 @table-warning: #FFD9DC;
+@table-attention: #fffaa3;
 
 body{
 	min-width: 1100px;
 }
+
+a { cursor: pointer;}
 
 a.block{ display:block;}
 
@@ -1007,3 +1010,9 @@ th.sortable-column {
 .order-edit .legend .item { margin-right: 10px;}
 .order-edit .left-section .legend { margin-bottom: 10px; margin-top: 30px;}
 .order-edit .total-section{ background: white; border-radius: 15px; margin-left: 80px;}
+
+.orders .table > tbody > tr.order-notes > td{
+	background-color: @table-attention;
+}
+
+.orders .table > tbody > tr > td > i { margin-right: 5px;}
