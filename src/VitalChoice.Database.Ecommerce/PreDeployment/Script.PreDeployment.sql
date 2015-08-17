@@ -41,3 +41,4 @@
 :r .\Scripts\ReferencesToUsers.sql
 
 :r .\Scripts\Orders.sql
+:r .\Scripts\VOrders.sql
