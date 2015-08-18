@@ -152,7 +152,13 @@
                 <tbody>
                     <tr data-ng-class="{'order-notes': item.OrderNotes}" data-ng-repeat="item in items">
                         <td>
-                            <i class="fa fa-history"></i>
+                            <i data-ng-if="item.OrderStatus==1" class="fa fa-ban"></i>
+                            <i data-ng-if="item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
+                            <i data-ng-if="item.OrderStatus==3" class="fa fa-truck"></i>
+                            <i data-ng-if="item.OrderStatus==4" class="fa fa-minus-circle"></i>
+                            <i data-ng-if="item.OrderStatus==5" class="fa fa-check-circle"></i>
+                            <i data-ng-if="item.OrderStatus==6" class="fa fa-calendar"></i>
+                            <i data-ng-if="item.OrderStatus==7" class="fa fa-pause"></i>
                             <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
                         </td>
                         <td>
