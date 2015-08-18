@@ -31,7 +31,7 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <select class="form-control" placeholder="Order Status" data-ng-model="filter.OrderStatus" data-ng-options="item.Key as item.Text for item in orderStatuses"></select>
+                        <select class="form-control" data-ng-disabled="filter.ShipDate" placeholder="Order Status" data-ng-model="filter.OrderStatus" data-ng-options="item.Key as item.Text for item in orderStatuses"></select>
                     </div>
                     <div class="col-md-2">
                         <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdOrderSource" data-ng-options="item.Key as item.Text for item in orderTypes"></select>

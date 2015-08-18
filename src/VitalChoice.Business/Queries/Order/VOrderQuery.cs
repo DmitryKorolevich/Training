@@ -9,7 +9,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Logs;
 
-namespace VitalChoice.Business.Queries.Product
+namespace VitalChoice.Business.Queries.Order
 {
     public class VOrderQuery : QueryObject<VOrder>
     {

@@ -21,6 +21,7 @@ using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Workflow;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -884,6 +885,45 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(r => r.IdSku)
                     .PrincipalKey(s => s.Id)
                     .Required();
+            });
+
+            #endregion
+
+            #region Affiliates
+
+            builder.Entity<VAffiliate>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("VAffiliates");
+            });
+
+            builder.Entity<AffiliateOptionValue>(entity =>
+            {
+                entity.Key(o => o.Id);
+                entity.ToTable("AffiliateOptionValues");
+                entity.Reference(v => v.OptionType)
+                    .InverseReference()
+                    .ForeignKey<AffiliateOptionValue>(v => v.IdOptionType)
+                    .PrincipalKey<AffiliateOptionType>(t => t.Id)
+                    .Required();
+            });
+
+            builder.Entity<AffiliateOptionType>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("AffiliateOptionType");
+                entity.Reference(t => t.Lookup)
+                    .InverseReference()
+                    .ForeignKey<AffiliateOptionType>(t => t.IdLookup)
+                    .PrincipalKey<Lookup>(l => l.Id)
+                    .Required(false);
+                entity.Ignore(t => t.IdObjectType);
+            });
+
+            builder.Entity<Affiliate>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("Affiliates");
             });
 
             #endregion

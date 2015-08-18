@@ -63,8 +63,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'affiliates',
 			stateLabel: 'Affiliates',
 			subMenu: [
-				{ name: 'locateAffiliate', stateName: 'index.oneCol.locateAffiliate', stateLabel: 'Locate Affiliate', access: 5 },
-				{ name: 'addNewAffiliate', stateName: 'index.oneCol.addNewAffiliate', stateLabel: 'Add New Affilaite', access: 5 }
+				{ name: 'locateAffiliate', stateName: 'index.oneCol.manageAffiliates', stateLabel: 'Manage Affiliates', access: 5 },
+				{ name: 'addNewAffiliate', stateName: 'index.oneCol.affiliateAdd', stateLabel: 'Add New Affilaite', access: 5 }
 			]
 		},
 		{

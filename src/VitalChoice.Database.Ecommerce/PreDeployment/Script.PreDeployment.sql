@@ -42,3 +42,6 @@
 
 :r .\Scripts\Orders.sql
 :r .\Scripts\VOrders.sql
+
+:r .\Scripts\Affiliates.sql
+:r .\Scripts\VAffiliates.sql

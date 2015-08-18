@@ -77,9 +77,13 @@
 
             $scope.$watch("filter.ShipDate", function (newValue, oldValue)
             {
-                if(newValue)
+                if (newValue)
                 {
-                    $scope.filter.OrderStatus=3//Shipped
+                    $scope.filter.OrderStatus = 3;//Shipped
+                }
+                else
+                {
+                    $scope.filter.OrderStatus = null;
                 }
             });
 

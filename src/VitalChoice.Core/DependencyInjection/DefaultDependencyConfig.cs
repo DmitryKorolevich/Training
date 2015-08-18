@@ -52,6 +52,8 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Business.Services.Affiliates;
+using VitalChoice.Interfaces.Services.Affiliates;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -261,6 +263,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
             builder.RegisterType<CustomerService>().As<ICustomerService>();
             builder.RegisterType<OrderService>().As<IOrderService>();
+            builder.RegisterType<AffiliateService>().As<IAffiliateService>();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
 			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
