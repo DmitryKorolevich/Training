@@ -29,7 +29,9 @@ namespace VitalChoice.DynamicData.Entities
 
 		public string EditedBy { get; set; }
 
-	    public ICollection<int> ApprovedPaymentMethods { get; set; }
+        public int? IdAffiliate { get; set; }
+
+        public ICollection<int> ApprovedPaymentMethods { get; set; }
 
 		public ICollection<int> OrderNotes { get; set; }
 

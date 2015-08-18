@@ -26,6 +26,7 @@ namespace VitalChoice.Domain.Entities.Localization.Groups
         OldPassword = 19,
         NewPassword = 20,
         ConfirmNewPassword = 21,
+        Balance = 44,
         Min = 45,
         Max = 47,
         Percent = 48,

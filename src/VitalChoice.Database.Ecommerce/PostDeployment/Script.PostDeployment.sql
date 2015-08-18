@@ -16,3 +16,4 @@ Post-Deployment Script Template
 :r .\Scripts\OrderLookups.sql
 :r .\Scripts\VProductSkus.sql
 :r .\Scripts\OrdersData.sql
+:r .\Scripts\AffiliatesData.sql

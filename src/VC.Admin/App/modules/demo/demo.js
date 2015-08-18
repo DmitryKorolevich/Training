@@ -130,15 +130,6 @@ angular.module('app.modules.demo',
 						}
 					}
 				})
-				/*affiliates*/
-				.state('index.oneCol.locateAffiliate', {
-					url: '/affiliates/locate',
-					template: '<h2>Locate Affiliate</h2>'
-				})
-				.state('index.oneCol.addNewAffiliate', {
-					url: '/affiliates/add',
-					template: '<h2>Add New Affiliate</h2>'
-				})
 				/*content*/
 				.state('index.oneCol.manageRecipesTemp', { 
 					url: '/content/draggablecategories',
