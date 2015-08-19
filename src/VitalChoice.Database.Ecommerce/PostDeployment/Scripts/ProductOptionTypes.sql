@@ -374,6 +374,7 @@ BEGIN
 	INSERT INTO ProductOptionTypes
 	(DefaultValue, IdFieldType, IdObjectType, Name)
 	SELECT '/some1.png', 4, 1, N'CrossSellImage1'
+	UNION
 	SELECT '/some2.png', 4, 1, N'CrossSellImage2'
 	UNION
 	SELECT '/some3.png', 4, 1, N'CrossSellImage3'
