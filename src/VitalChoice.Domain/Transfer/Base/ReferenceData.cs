@@ -55,5 +55,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> OrderSources { get; set; }
         public IList<LookupItem<int>> OrderSourcesCelebrityHealthAdvocate { get; set; }
+
+        public IList<LookupItem<int>> AffiliateProfessionalPractices { get; set; }
+        public IList<LookupItem<int>> AffiliateMonthlyEmailsSentOptions { get; set; }
     }
 }

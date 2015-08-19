@@ -106,7 +106,16 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<RecipeToProduct>().ToTable("RecipesToProducts");
             builder.Entity<RecipeToProduct>().Ignore(p => p.ShortProductInfo);
 
-            builder.Entity<Recipe>().Key(p => p.Id);
+			builder.Entity<RecipeVideo>().Key(p => p.Id);
+			builder.Entity<RecipeVideo>().ToTable("RecipeVideos");
+
+			builder.Entity<RelatedRecipe>().Key(p => p.Id);
+			builder.Entity<RelatedRecipe>().ToTable("RelatedRecipes");
+
+			builder.Entity<RecipeCrossSell>().Key(p => p.Id);
+			builder.Entity<RecipeCrossSell>().ToTable("RecipeCrossSells");
+
+			builder.Entity<Recipe>().Key(p => p.Id);
             builder.Entity<Recipe>().ToTable("Recipes");
             builder.Entity<RecipeToContentCategory>().Key(p => p.Id);
             builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories");
@@ -114,15 +123,20 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Recipe>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<Recipe>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
+			builder.Entity<Recipe>().Collection(p => p.RelatedRecipes).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
+			builder.Entity<Recipe>().Collection(p => p.CrossSells).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
+			builder.Entity<Recipe>().Collection(p => p.Videos).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
+			builder.Entity<Recipe>()
                 .Collection(p => p.RecipesToProducts)
                 .InverseReference()
                 .ForeignKey(t => t.IdRecipe)
                 .PrincipalKey(p => p.Id)
                 .Required();
 
+			builder.Entity<RecipeDefaultSetting>().Key(p => p.Id);
+			builder.Entity<RecipeDefaultSetting>().ToTable("RecipeDefaultSettings");
 
-            builder.Entity<FAQ>().Key(p => p.Id);
+			builder.Entity<FAQ>().Key(p => p.Id);
             builder.Entity<FAQ>().ToTable("FAQs");
             builder.Entity<FAQToContentCategory>().Key(p => p.Id);
             builder.Entity<FAQToContentCategory>().ToTable("FAQsToContentCategories");

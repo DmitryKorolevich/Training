@@ -72,7 +72,7 @@ namespace VC.Admin.Validators.Product
                     .GreaterThan(0)
                     .When(p => p.DiscountType == DiscountType.PercentDiscount)
                     .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Percent, 0)
-                    .LessThanOrEqualTo(100000)
+                    .LessThanOrEqualTo(100)
                     .When(p => p.DiscountType == DiscountType.PercentDiscount)
                     .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Percent, 100);
 

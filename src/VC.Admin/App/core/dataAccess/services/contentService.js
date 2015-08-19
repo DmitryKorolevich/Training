@@ -57,6 +57,9 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		deleteRecipe: function (id,tracker) {
 			return $http.post(baseUrl + 'DeleteRecipe/'+ id, getConfig(tracker));
 		},
+		getRecipeSettings: function(tracker) {
+			return $http.get(baseUrl + 'GetRecipeSettings', getConfig(tracker));
+		},
 
 	    //faq
 		getFAQs: function (filter, tracker) {

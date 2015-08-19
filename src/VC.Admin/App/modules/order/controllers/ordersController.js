@@ -31,10 +31,10 @@
 
         function initialize()
         {
-            $scope.customerTypes = $rootScope.ReferenceData.CustomerTypes;
+            $scope.customerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
             $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All Customer Types' });
 
-            $scope.orderStatuses = $rootScope.ReferenceData.OrderStatuses;
+            $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
             $scope.orderStatuses.splice(0, 0, { Key: null, Text: 'All Order Statuses' });
 
             $scope.orderTypes = [ 
@@ -77,9 +77,13 @@
 
             $scope.$watch("filter.ShipDate", function (newValue, oldValue)
             {
-                if(newValue)
+                if (newValue)
                 {
-                    $scope.filter.OrderStatus=3//Shipped
+                    $scope.filter.OrderStatus = 3;//Shipped
+                }
+                else
+                {
+                    $scope.filter.OrderStatus = null;
                 }
             });
 

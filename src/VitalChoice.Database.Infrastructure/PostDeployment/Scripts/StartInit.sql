@@ -238,7 +238,7 @@ PRINT N'Creating [dbo].[ContentItemsToContentProcessors]...';
 
 CREATE TABLE [dbo].[ContentItemsToContentProcessors] (
     [ContentItemId]      INT NOT NULL,
-    [ContentProcessorId] INT NOT NULL,
+    [ContentItemProcessorId] INT NOT NULL,
     [Id]                 INT IDENTITY (1, 1) NOT NULL,
     CONSTRAINT [PK_ContentItemsToContentProcessors] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

@@ -11,5 +11,6 @@ angular.module('app.modules', [
 	'app.modules.file',
 	'app.modules.gc',
 	'app.modules.customer',
-	'app.modules.order'
+	'app.modules.order',
+	'app.modules.affiliate'
 ]);

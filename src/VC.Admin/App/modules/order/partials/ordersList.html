@@ -31,7 +31,7 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <select class="form-control" placeholder="Order Status" data-ng-model="filter.OrderStatus" data-ng-options="item.Key as item.Text for item in orderStatuses"></select>
+                        <select class="form-control" data-ng-disabled="filter.ShipDate" placeholder="Order Status" data-ng-model="filter.OrderStatus" data-ng-options="item.Key as item.Text for item in orderStatuses"></select>
                     </div>
                     <div class="col-md-2">
                         <select class="form-control" placeholder="Order Type" data-ng-model="filter.IdOrderSource" data-ng-options="item.Key as item.Text for item in orderTypes"></select>
@@ -151,17 +151,31 @@
                 </thead>
                 <tbody>
                     <tr data-ng-class="{'order-notes': item.OrderNotes}" data-ng-repeat="item in items">
-                        <td>
-                            <i class="fa fa-history"></i>
+                        <td data-ng-class="{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
+                            <i data-ng-if="item.OrderStatus==1" class="fa fa-ban"></i>
+                            <i data-ng-if="item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
+                            <i data-ng-if="item.OrderStatus==3" class="fa fa-truck"></i>
+                            <i data-ng-if="item.OrderStatus==4" class="fa fa-minus-circle"></i>
+                            <i data-ng-if="item.OrderStatus==5" class="fa fa-check-circle"></i>
+                            <i data-ng-if="item.OrderStatus==6" class="fa fa-calendar"></i>
+                            <i data-ng-if="item.OrderStatus==7" class="fa fa-pause"></i>
                             <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
                         </td>
-                        <td>
-                            <i class="fa fa-history"></i>
+                        <td class="order-source">
+                            <i data-ng-if="item.IdOrderSource==1" class="fa fa-globe"></i>
+                            <i data-ng-if="item.IdOrderSource==2" class="fa fa-phone"></i>
+                            <i data-ng-if="item.IdOrderSource==3" class="fa fa-envelope"></i>
                             <span>{{getReferenceItem(orderTypes, item.IdOrderSource).Text}}</span>
                         </td>
-                        <td>
-                            <i class="fa fa-history"></i>
-                            <span>{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
+                        <td class="payment-methods">
+                            <i data-ng-if="item.IdPaymentMethod==1" class="fa fa-credit-card"></i>
+                            <i data-ng-if="item.IdPaymentMethod==2" class="fa fa-calendar-check-o"></i>
+                            <i data-ng-if="item.IdPaymentMethod==3" class="fa fa-envelope"></i>
+                            <i data-ng-if="item.IdPaymentMethod==4" class="fa fa-money"></i>
+                            <i data-ng-if="item.IdPaymentMethod==5" class="fa fa-money"></i>
+                            <i data-ng-if="item.IdPaymentMethod==6" class="fa fa-university"></i>
+                            <span data-ng-if="item.IdPaymentMethod!=6">{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
+                            <span data-ng-if="item.IdPaymentMethod==6">WT</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>{{::item.DateShipped | date:"MM/dd/yy"}}<br />{{::item.DateShipped | date:"h:mm a"}}</td>
@@ -175,8 +189,12 @@
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
-                            <button ui-sref="index.oneCol.orderDetail({id:item.Id})" class="btn btn-default btn-success">View</button>
-                            <button data-ng-if="item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7" class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">Delete</button>
+                            <button title="View" ui-sref="index.oneCol.orderDetail({id:item.Id})" class="btn btn-default btn-success btn-xs">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button title="Delete" data-ng-if="item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                         <td>
                             <input data-ng-disabled="!item.AllowExport" data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemExportChanged(item)">

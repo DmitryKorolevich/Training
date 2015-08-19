@@ -51,6 +51,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Email = entity.Email;
                 dynamic.PublicId = entity.PublicId;
                 dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
+                dynamic.IdAffiliate = entity.IdAffiliate;
 
                 dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
                 dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
@@ -72,6 +73,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Email = dynamic.Email;
 				entity.PublicId = dynamic.PublicId;
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                entity.IdAffiliate = dynamic.IdAffiliate;
 
                 entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
                 {
@@ -122,6 +124,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Email = dynamic.Email;
                 entity.PublicId = dynamic.PublicId;
                 entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                entity.IdAffiliate = dynamic.IdAffiliate;
 
                 entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
                 {

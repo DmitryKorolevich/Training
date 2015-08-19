@@ -5,9 +5,8 @@ using VC.Admin.Validators.ContentManagement;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.ContentManagement
 {
@@ -49,8 +48,23 @@ namespace VC.Admin.Models.ContentManagement
 
         public IList<RecipeToProduct> RecipesToProducts { get; set; }
 
-        public RecipeManageModel()
+		public IList<CrossSellRecipeModel> CrossSellRecipes { get; set; }
+
+		public IList<RelatedRecipeModel> RelatedRecipes { get; set; }
+
+		public IList<VideoRecipeModel> Videos { get; set; }
+
+	    public string AboutChef { get; set; }
+
+	    public string Ingredients  { get; set; }
+
+	    public string Directions { get; set; }
+
+	    public RecipeManageModel()
         {
+			CrossSellRecipes = new List<CrossSellRecipeModel>();
+			RelatedRecipes = new List<RelatedRecipeModel>();
+			Videos = new List<VideoRecipeModel>();
         }
 
         public RecipeManageModel(Recipe item)
@@ -67,26 +81,44 @@ namespace VC.Admin.Models.ContentManagement
             MetaDescription = item.ContentItem.MetaDescription;
             Created = item.ContentItem.Created;
             Updated = item.ContentItem.Updated;
+	        AboutChef = item.AboutChef;
+			Ingredients = item.Ingredients;
+			Directions = item.Directions;
             MasterContentItemId = item.MasterContentItemId;
-            if (item.ContentItem.ContentItemToContentProcessors != null)
-            {
-                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentItemProcessorId).ToList();
-            }
-            else
-            {
-                ProcessorIds = new List<int>();
-            }
+            ProcessorIds = item.ContentItem.ContentItemToContentProcessors != null ? item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentItemProcessorId).ToList() : new List<int>();
             if (item.RecipesToContentCategories != null)
             {
                 CategoryIds = item.RecipesToContentCategories.Select(p => p.ContentCategoryId).ToList();
             }
 
             RecipesToProducts = item.RecipesToProducts.ToList();
-        }
+
+	        CrossSellRecipes = item.CrossSells.Select(x => new CrossSellRecipeModel()
+	        {
+				Image = x.Image,
+				Subtitle = x.Subtitle,
+				Title = x.Title,
+				Url = x.Url
+	        }).ToList();
+
+			RelatedRecipes = item.CrossSells.Select(x => new RelatedRecipeModel()
+			{
+				Image = x.Image,
+				Title = x.Title,
+				Url = x.Url
+			}).ToList();
+
+			Videos = item.Videos.Select(x => new VideoRecipeModel()
+			{
+				Image = x.Image,
+				Text = x.Text,
+				Video = x.Video
+			}).ToList();
+		}
 
         public Recipe Convert()
         {
-            Recipe toReturn = new Recipe();
+            var toReturn = new Recipe();
             toReturn.Id = Id;
             toReturn.Name = Name?.Trim();
             toReturn.Url = Url?.Trim();
@@ -98,7 +130,10 @@ namespace VC.Admin.Models.ContentManagement
             toReturn.ContentItem.Title = Title;
             toReturn.ContentItem.MetaKeywords = MetaKeywords;
             toReturn.ContentItem.MetaDescription = MetaDescription;
-            if (ProcessorIds != null)
+			toReturn.AboutChef = AboutChef;
+			toReturn.Ingredients = Ingredients;
+			toReturn.Directions = Directions;
+			if (ProcessorIds != null)
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
                 {
@@ -107,7 +142,29 @@ namespace VC.Admin.Models.ContentManagement
             }
             toReturn.RecipesToProducts = RecipesToProducts;
 
-            return toReturn;
+			toReturn.CrossSells = CrossSellRecipes.Select(x => new RecipeCrossSell()
+			{
+				Image = x.Image,
+				Subtitle = x.Subtitle,
+				Title = x.Title,
+				Url = x.Url
+			}).ToList();
+
+			toReturn.RelatedRecipes = RelatedRecipes.Select(x => new RelatedRecipe()
+			{
+				Image = x.Image,
+				Title = x.Title,
+				Url = x.Url
+			}).ToList();
+
+			toReturn.Videos = Videos.Select(x => new RecipeVideo()
+			{
+				Image = x.Image,
+				Text = x.Text,
+				Video = x.Video
+			}).ToList();
+
+			return toReturn;
         }
     }
 }

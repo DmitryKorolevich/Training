@@ -30,7 +30,8 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<RecipeToProduct> _recipeToProductRepository;
-        private readonly IEcommerceRepositoryAsync<Product> _productRepository;
+	    private readonly IRepositoryAsync<RecipeDefaultSetting> _recipeSettingRepository;
+	    private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -41,7 +42,8 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
-            IEcommerceRepositoryAsync<Product> productRepository,
+			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
+			IEcommerceRepositoryAsync<Product> productRepository,
             ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
         {
             this.recipeRepository = recipeRepository;
@@ -51,7 +53,8 @@ namespace VitalChoice.Business.Services.Content
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this._recipeToProductRepository = recipeToProductRepository;
-            this._productRepository = productRepository;
+			_recipeSettingRepository = recipeSettingRepository;
+	        this._productRepository = productRepository;
             this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
@@ -123,33 +126,43 @@ namespace VitalChoice.Business.Services.Content
         public async Task<Recipe> GetRecipeAsync(int id)
         {
             RecipeQuery query = new RecipeQuery().WithId(id).NotDeleted();
-            var toReturn = (await recipeRepository.Query(query).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
-                Include(p => p.RecipesToContentCategories).Include(p => p.User).ThenInclude(p => p.Profile).
-                Include(p => p.RecipesToProducts).
-                SelectAsync(false)).FirstOrDefault();
+	        var toReturn = (await recipeRepository.Query(query).Include(p => p.RelatedRecipes).
+		        Include(p => p.Videos).
+		        Include(p => p.CrossSells).
+		        Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
+		        Include(p => p.RecipesToContentCategories).
+		        Include(p => p.User).ThenInclude(p => p.Profile).
+		        Include(p => p.RecipesToProducts).
+		        SelectAsync(false)).FirstOrDefault();
 
             var productIds = toReturn.RecipesToProducts.Select(p => p.IdProduct).ToList();
-            if (productIds.Count > 0)
-            {
-                var shortProducts = (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
-                    .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
-                foreach (var product in toReturn.RecipesToProducts)
-                {
-                    foreach (var shortProduct in shortProducts)
-                    {
-                        if (product.IdProduct == shortProduct.Id)
-                        {
-                            product.ShortProductInfo = shortProduct;
-                            break;
-                        }
-                    }
-                }
-            }
+	        if (productIds.Count > 0)
+	        {
+		        var shortProducts =
+			        (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+				        .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
+		        foreach (var product in toReturn.RecipesToProducts)
+		        {
+			        foreach (var shortProduct in shortProducts)
+			        {
+				        if (product.IdProduct == shortProduct.Id)
+				        {
+					        product.ShortProductInfo = shortProduct;
+					        break;
+				        }
+			        }
+		        }
+	        }
 
-            return toReturn;
+	        return toReturn;
         }
 
-        public async Task<Recipe> UpdateRecipeAsync(Recipe model)
+	    public async Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync()
+	    {
+		    return await _recipeSettingRepository.Query().SelectAsync(false);
+	    }
+
+	    public async Task<Recipe> UpdateRecipeAsync(Recipe model)
         {
             Recipe dbItem = null;
             if (model.Id == 0)
@@ -190,10 +203,14 @@ namespace VitalChoice.Business.Services.Content
                     throw new AppValidationException("Url", "Recipe with the same URL already exists, please use a unique URL.");
                 }
 
+				//what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
                 dbItem.UserId = model.UserId;
+	            dbItem.AboutChef = model.AboutChef;
+	            dbItem.Directions = model.Directions;
+	            dbItem.Ingredients = model.Ingredients;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;
@@ -208,6 +225,10 @@ namespace VitalChoice.Business.Services.Content
                     recipesToProducts = model.RecipesToProducts.ToList();
                 }
                 dbItem.RecipesToProducts = null;
+
+	            dbItem.RelatedRecipes = model.RelatedRecipes;
+	            dbItem.CrossSells = model.CrossSells;
+	            dbItem.Videos = model.Videos;
 
                 if (model.Id == 0)
                 {
@@ -312,7 +333,7 @@ namespace VitalChoice.Business.Services.Content
 
                 try
                 {
-                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                    await templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
                 }
                 catch (Exception e)
                 {

@@ -31,7 +31,9 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
 	    public PaymentMethod DefaultPaymentMethod { get; set; }
 
-	    public ICollection<CustomerToPaymentMethod> PaymentMethods { get; set; }
+        public int? IdAffiliate { get; set; }
+
+        public ICollection<CustomerToPaymentMethod> PaymentMethods { get; set; }
 
 	    public ICollection<CustomerToOrderNote> OrderNotes { get; set; }
 

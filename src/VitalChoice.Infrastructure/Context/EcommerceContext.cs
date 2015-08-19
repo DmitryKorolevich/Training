@@ -21,6 +21,7 @@ using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Workflow;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -884,6 +885,62 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(r => r.IdSku)
                     .PrincipalKey(s => s.Id)
                     .Required();
+            });
+
+            #endregion
+
+            #region Affiliates
+
+            builder.Entity<VAffiliate>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("VAffiliates");
+            });
+
+            builder.Entity<AffiliateOptionValue>(entity =>
+            {
+                entity.Key(o => o.Id);
+                entity.ToTable("AffiliateOptionValues");
+                entity.Reference(v => v.OptionType)
+                    .InverseCollection()
+                    .ForeignKey(t => t.IdOptionType)
+                    .PrincipalKey(v => v.Id)
+                    .Required();
+                entity.Reference(v => v.BigValue)
+                    .InverseCollection()
+                    .ForeignKey(v => v.IdBigString)
+                    .PrincipalKey(b => b.IdBigString)
+                    .Required(false);
+                entity.Property(v => v.IdBigString).Required(false);
+            });
+
+            builder.Entity<AffiliateOptionType>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("AffiliateOptionTypes");
+                entity.Reference(p => p.Lookup)
+                    .InverseCollection()
+                    .ForeignKey(p => p.IdLookup)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
+            });
+
+            builder.Entity<Affiliate>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("Affiliates");
+                entity.Collection(p => p.OptionValues)
+                    .InverseReference()
+                    .ForeignKey(o => o.IdAffiliate)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
+                entity.Ignore(p => p.OptionTypes);
+                entity.Reference(p => p.EditedBy)
+                    .InverseCollection()
+                    .ForeignKey(o => o.IdEditedBy)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
+                entity.Ignore(p => p.IdObjectType);
             });
 
             #endregion

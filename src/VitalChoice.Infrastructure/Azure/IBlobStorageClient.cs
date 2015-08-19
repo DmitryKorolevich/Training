@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.Azure;
+﻿using System.Threading.Tasks;
+using VitalChoice.Domain.Transfer.Azure;
 
 namespace VitalChoice.Infrastructure.Azure
 {

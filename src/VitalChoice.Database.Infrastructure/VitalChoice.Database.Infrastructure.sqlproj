@@ -135,4 +135,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ArticlesToProducts.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\RecipeUpdate.sql" />
+  </ItemGroup>
 </Project>
