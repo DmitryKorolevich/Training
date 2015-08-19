@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using VC.Admin.Validators.ContentManagement;
+using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.ContentManagement
 {
-	public class VideoRecipeModel
+	[ApiValidator(typeof(RecipeVideoModelValidator))]
+	public class VideoRecipeModel:BaseModel
 	{
 		public string Image { get; set; }
 

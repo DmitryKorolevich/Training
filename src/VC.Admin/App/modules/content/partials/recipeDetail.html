@@ -180,7 +180,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Cross Sell Image</label>
+                                                                                        <label class="control-label">Image</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellRecipe.ImageUse">
                                                                                             <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellRecipe.Image" required></filefield>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Image.$invalid">
@@ -200,7 +200,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Cross Sell Title</label>
+                                                                                        <label class="control-label">Title</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellRecipe.TitleUse">
                                                                                             <input type="text" name="Title" class="form-control" placeholder="Cross Sell Title" data-ng-model="crossSellRecipe.Title" required>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Title.$invalid">
@@ -217,11 +217,11 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Cross Sell Subtitle</label>
+                                                                                        <label class="control-label">Subtitle</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellRecipe.SubtitleUse">
                                                                                             <input type="text" name="Subtitle" class="form-control" placeholder="Cross Sell Subtitle" data-ng-model="crossSellRecipe.Subtitle" required>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Subtitle.$invalid">
-                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Subtitle")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Subtitle")}}</small>
                                                                                                 <small class="error" ng-show="forms.CrossSellRecipes.i{{$index}}.Subtitle.$error.server">{{serverMessages.GetMessage('Subtitle','CrossSellRecipes',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
@@ -234,7 +234,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">URL Cross Sell</label>
+                                                                                        <label class="control-label">URL</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellRecipe.UrlUse">
                                                                                             <input type="text" name="Url" class="form-control" placeholder="URL Cross Sell" data-ng-model="crossSellRecipe.Url" required>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellRecipes.i{{$index}}.Url.$invalid">
@@ -280,7 +280,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Related Recipe Image</label>
+                                                                                        <label class="control-label">Image</label>
                                                                                         <div class="col-md-1" data-ng-if="relatedRecipe.ImageUse">
                                                                                             <filefield name="Image" placeholder="Related Recipe Image" ng-model="relatedRecipe.Image" required></filefield>
                                                                                             <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Image.$invalid">
@@ -288,7 +288,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!relatedRecipe.ImageUse">
-                                                                                            <filefield name="DefaultImage" placeholder="Related Recipe Image" ng-model="recipeDefaults['CrossSellImage'+($index+1)]" disabled></filefield>
+                                                                                            <filefield name="DefaultImage" placeholder="Related Recipe Image" ng-model="recipeDefaults['RelatedRecipeImage'+($index+1)]" disabled></filefield>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
@@ -300,7 +300,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Related Recipe Title</label>
+                                                                                        <label class="control-label">Title</label>
                                                                                         <div class="col-md-1" data-ng-if="relatedRecipe.TitleUse">
                                                                                             <input type="text" name="Title" class="form-control" placeholder="Related Recipe Title" data-ng-model="relatedRecipe.Title" required>
                                                                                             <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Title.$invalid">
@@ -309,7 +309,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!relatedRecipe.TitleUse">
-                                                                                            <input type="text" name="DefaultTitle" class="form-control" placeholder="Related Recipe Title" data-ng-model="recipeDefaults['CrossSellTitle'+($index+1)]" readonly>
+                                                                                            <input type="text" name="DefaultTitle" class="form-control" placeholder="Related Recipe Title" data-ng-model="recipeDefaults['RelatedRecipeTitle'+($index+1)]" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -317,7 +317,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-11">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">URL Related Recipe</label>
+                                                                                        <label class="control-label">URL</label>
                                                                                         <div class="col-md-1" data-ng-if="relatedRecipe.UrlUse">
                                                                                             <input type="text" name="Url" class="form-control" placeholder="URL Related Recipe" data-ng-model="relatedRecipe.Url" required>
                                                                                             <div class="error-container" ng-show="forms.relatedsubmitted && forms.RelatedRecipes.i{{$index}}.Url.$invalid">
@@ -326,7 +326,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!relatedRecipe.UrlUse">
-                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Related Recipe" data-ng-model="recipeDefaults['CrossSellUrl'+($index+1)]" readonly>
+                                                                                            <input type="text" name="DefaultUrl" class="form-control" placeholder="URL Related Recipe" data-ng-model="recipeDefaults['RelatedRecipeUrl'+($index+1)]" readonly>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -349,7 +349,7 @@
                                             </div>
                                         </div>
                                     </form>
-                                    <!--<span class="legend">YouTube Videos</span>-->
+                                    <span class="legend">YouTube Video</span>
                                     <form name="forms.CrossRelatedMiscellaneous" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" class="form-horizontal" novalidate>
                                         <div class="panel-group sortable-accordion">
                                             <div ui-sortable="sortableOptions" data-ng-model="recipe.Videos">
@@ -363,12 +363,12 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">YouTube Video</label>
+                                                                                        <label class="control-label">Video</label>
                                                                                         <div class="col-md-1" data-ng-if="video.VideoUse">
                                                                                             <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Video.$invalid">
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.VideoUse">
@@ -386,11 +386,11 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">YouTube Image</label>
+                                                                                        <label class="control-label">Image</label>
                                                                                         <div class="col-md-1" data-ng-if="video.ImageUse">
                                                                                             <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Image.$invalid">
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Image.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.ImageUse">
@@ -402,12 +402,12 @@
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">YouTube Text</label>
+                                                                                        <label class="control-label">Text</label>
                                                                                         <div class="col-md-1" data-ng-if="video.TextUse">
                                                                                             <input type="text" name="Text" class="form-control" placeholder="YouTube Text" data-ng-model="video.Text" required>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Text.$invalid">
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
+                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$invalid">
+                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.TextUse">
@@ -433,6 +433,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <span class="legend">Details</span>
                                         <fieldset>
                                             <div class="form-group">
                                                 <label for="AboutChef" class="col-md-3 control-label">About Chef</label>

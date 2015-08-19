@@ -174,7 +174,16 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        [HttpGet]
+	    [HttpGet]
+	    [AdminAuthorize(PermissionType.Content)]
+	    public async Task<Result<Dictionary<string,string>>> GetRecipeSettings()
+	    {
+		    var result = await recipeService.GetRecipeSettingsAsync();
+
+		    return result.ToDictionary(x => x.Key, y => y.Value);
+	    }
+
+	    [HttpGet]
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<RecipeManageModel>> GetRecipe(int id)
         {

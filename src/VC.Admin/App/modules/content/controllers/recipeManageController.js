@@ -83,11 +83,15 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.tabs = tabs;
 
             $scope.forms = {};
+            $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
+            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
+            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+            $scope.previewUrl = null;
 
             var clearServerValidation = function () {
             	$.each($scope.forms, function (index, form) {
             		if (form && !(typeof form === 'boolean')) {
-            			if (index == "RelatedRecipes" || index == "CrossSellRecipes") {
+            			if (index == "RelatedRecipes" || index == "CrossSellRecipes" || index == "Videos") {
             				$.each(form, function (index, subForm) {
             					if (index.indexOf('i') == 0) {
             						$.each(subForm, function (index, element) {
@@ -128,8 +132,8 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                     getSelected($scope.rootCategory, categoryIds);
                     $scope.recipe.CategoryIds = categoryIds;
 
-                    updateCrossses($scope.recipe.CrossSellRecipes);
-                    updateCrossses($scope.recipe.RelatedRecipes);
+                    updateCrossRelated($scope.recipe.CrossSellRecipes);
+                    updateCrossRelated($scope.recipe.RelatedRecipes);
                     updateVideos();
 
                     contentService.updateRecipe($scope.recipe, $scope.editTracker).success(function (result) {
@@ -143,34 +147,44 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 	$scope.forms.crossessubmitted = true;
                 	$scope.forms.relatedsubmitted = true;
                 	$scope.forms.videossubmitted = true;
-
-                    $scope.detailsTab.active = true;
                 }
             };
 
             contentService.getCategoriesTree({ Type: 1 }, $scope.refreshTracker)//recipe categories
                 .success(function (result) {
                     if (result.Success) {
-                        $scope.rootCategory = result.Data;
-                        contentService.getRecipe($scope.id, $scope.refreshTracker)
-			                .success(function (result) {
-			                    if (result.Success) {
-			                        $scope.recipe = result.Data;
-			                        if ($scope.recipe.Url) {
-			                            $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
-			                        };
-			                        setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
-			                        addProductsListWatchers();
-			                        updateCrossRelated($scope.recipe.RelatedRecipes);
-			                        updateCrossRelated($scope.recipe.CrossSellRecipes);
-				                    initVideos();
+                    	$scope.rootCategory = result.Data;
+	                    contentService.getRecipeSettings($scope.refreshTracker)
+		                    .success(function(result) {
+		                    	if (result.Success) {
+				                    $scope.recipeDefaults = result.Data;
+
+				                    contentService.getRecipe($scope.id, $scope.refreshTracker)
+					                    .success(function(result) {
+						                    if (result.Success) {
+							                    $scope.recipe = result.Data;
+							                    if ($scope.recipe.Url) {
+								                    $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
+							                    };
+							                    setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
+							                    addProductsListWatchers();
+							                    initCrossRelated($scope.recipe.RelatedRecipes);
+							                    initCrossRelated($scope.recipe.CrossSellRecipes);
+							                    initVideos();
+						                    } else {
+							                    errorHandler(result);
+						                    }
+					                    }).
+					                    error(function(result) {
+						                    errorHandler(result);
+					                    });
 			                    } else {
-			                        errorHandler(result);
+				                    errorHandler(result);
 			                    }
-			                }).
-			                error(function (result) {
+		                    }).
+		                    error(function(result) {
 			                    errorHandler(result);
-			                });
+		                    });
                     } else {
                         errorHandler(result);
                     }
@@ -270,7 +284,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         function activateTab(formName) {
         	$.each($scope.tabs, function (index, item) {
         		if (formName.indexOf('recipeForm') == 0) {
-        			formName = 'recipeForm';
+        			formName = 'details';
         		}
         		if (formName.indexOf('CrossSellRecipes') == 0) {
         			formName = 'crossSellRelatedRecipes';
@@ -375,7 +389,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         };
 
         function updateVideos() {
-        	$.each($scope.product.Videos, function (index, item) {
+        	$.each($scope.recipe.Videos, function (index, item) {
         		if (!item.VideoUse) {
         			item.Video = null;
         		}

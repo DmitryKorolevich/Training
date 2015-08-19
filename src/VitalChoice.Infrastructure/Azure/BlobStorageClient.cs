@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using VitalChoice.Domain.Entities.Azure;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Transfer.Azure;
 
 namespace VitalChoice.Infrastructure.Azure
 {

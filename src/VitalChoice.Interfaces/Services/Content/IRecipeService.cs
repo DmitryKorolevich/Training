@@ -13,5 +13,6 @@ namespace VitalChoice.Interfaces.Services.Content
         Task<Recipe> UpdateRecipeAsync(Recipe recipe);
         Task<bool> AttachRecipeToCategoriesAsync(int id, IEnumerable<int> categoryIds);
         Task<bool> DeleteRecipeAsync(int id);
+		Task<IList<RecipeDefaultSetting>> GetRecipeSettingsAsync();
     }
 }

@@ -31,3 +31,5 @@ Post-Deployment Script Template
 
 :r .\Scripts\RecipesToProducts.sql
 :r .\Scripts\ArticlesToProducts.sql
+
+:r .\Scripts\RecipeUpdate.sql

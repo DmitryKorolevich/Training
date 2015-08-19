@@ -14,7 +14,6 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Azure;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
@@ -24,13 +23,12 @@ using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Azure;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
-using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.Azure;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Customers

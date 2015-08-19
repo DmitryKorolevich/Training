@@ -14,7 +14,25 @@ namespace VC.Admin.Validators.ContentManagement
         {
             ValidationErrors.Clear();
             ParseResults(ValidatorsFactory.GetValidator<RecipeModelValidator>().Validate(value));
-        }
+
+			var crossSellRecipeValidator = ValidatorsFactory.GetValidator<CrossSellRecipeModelValidator.CrossSellRecipeRules>();
+			foreach (var crossRecipe in value.CrossSellRecipes)
+			{
+				ParseResults(crossSellRecipeValidator.Validate(crossRecipe));
+			}
+
+			var relatedRecipeValidator = ValidatorsFactory.GetValidator<RelatedRecipeModelValidator.RelatedRecipeRules>();
+			foreach (var relatedRecipe in value.RelatedRecipes)
+			{
+				ParseResults(relatedRecipeValidator.Validate(relatedRecipe));
+			}
+
+			var videoRecipeValidator = ValidatorsFactory.GetValidator<RecipeVideoModelValidator.VideoRecipeRules>();
+			foreach (var videoRecipe in value.Videos)
+			{
+				ParseResults(videoRecipeValidator.Validate(videoRecipe));
+			}
+		}
 
         private class RecipeModelValidator : AbstractValidator<RecipeManageModel>
         {
