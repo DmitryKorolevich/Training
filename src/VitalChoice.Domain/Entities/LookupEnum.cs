@@ -16,5 +16,8 @@ namespace VitalChoice.Domain.Entities
 
         public const string OrderSources = "OrderSources";
         public const string OrderSourcesCelebrityHealthAdvocate = "OrderSourcesCelebrityHealthAdvocate";
+
+        public const string AffiliateProfessionalPractices = "AffiliateProfessionalPractices";
+        public const string AffiliateMonthlyEmailsSentOptions = "AffiliateMonthlyEmailsSentOptions";
     }
 }

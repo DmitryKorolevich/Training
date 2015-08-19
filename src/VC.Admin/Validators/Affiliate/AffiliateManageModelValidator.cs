@@ -96,7 +96,7 @@ namespace VC.Admin.Validators.Affiliate
                     .WithMessage(model => model.Address2, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.IdCountry)
-                    .Must(model => model!=0)
+                    .Must(model => model.HasValue)
                     .WithMessage(model => model.IdCountry, ValidationMessages.FieldRequired);
 
                 RuleFor(model => model.IdState)
@@ -105,9 +105,6 @@ namespace VC.Admin.Validators.Affiliate
                     .WithMessage(model => model.IdState, ValidationMessages.FieldRequired);
 
                 RuleFor(model => model.County)
-                    .NotEmpty()
-                    .When(model => !model.IdState.HasValue)
-                    .WithMessage(model => model.County, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .When(model => !model.IdState.HasValue)
                     .WithMessage(model => model.County, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
@@ -165,14 +162,15 @@ namespace VC.Admin.Validators.Affiliate
 
                 RuleFor(model => model.Password)
                     .NotEmpty()
+                    .When(model => model.Id == 0)
                     .WithMessage(model => model.Password, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Password, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.ConfirmPassword)
                     .NotEmpty()
+                    .When(model => model.Id==0)
                     .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldRequired)
-
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 

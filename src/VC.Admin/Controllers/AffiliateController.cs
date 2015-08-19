@@ -70,6 +70,7 @@ namespace VC.Admin.Controllers
                 return new AffiliateManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
+                    PaymentType=1,
                     Tier = 1,
                     CommissionFirst = 5,
                     CommissionAll = 5,

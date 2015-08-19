@@ -64,6 +64,8 @@ namespace VC.Admin.Controllers
                     OacTerms = referenceData.OacTerms,
                     OrderSources = referenceData.OrderSources,
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
+                    AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
+                    AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                 };
 	        }
 			else

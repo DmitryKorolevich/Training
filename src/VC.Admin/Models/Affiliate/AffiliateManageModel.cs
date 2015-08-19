@@ -41,7 +41,7 @@ namespace VC.Admin.Models.Product
         public decimal CommissionAll { get; set; }
 
         [Map]
-        public int IdCountry { get; set; }
+        public int? IdCountry { get; set; }
 
         [Map]
         public int? IdState { get; set; }
@@ -91,6 +91,12 @@ namespace VC.Admin.Models.Product
 
         [Map]
         public bool PromoteByDrSearsLEANCoachAmbassador { get; set; }
+
+        [Map]
+        public bool PromoteByVerticalResponseEmail { get; set; }
+
+        [Map]
+        public bool PromoteByLeanEmail { get; set; }
 
         [Map]
         public string ChecksPayableTo { get; set; }

@@ -1,7 +1,7 @@
 ﻿IF OBJECT_ID(N'[dbo].[Affiliates]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[Affiliates] (
-		Id INT NOT NULL CONSTRAINT PK_Affiliates PRIMARY KEY,
+		Id INT NOT NULL IDENTITY CONSTRAINT PK_Affiliates PRIMARY KEY,
 		Name NVARCHAR(50) NOT NULL,
 		MyAppBalance MONEY NOT NULL DEFAULT(0),
 		[StatusCode] INT NOT NULL
@@ -31,6 +31,7 @@ BEGIN
 			CONSTRAINT FK_AffiliateOptionTypesToLookup FOREIGN KEY (IdLookup) REFERENCES dbo.Lookups (Id),
 		[IdFieldType] INT NOT NULL
 			CONSTRAINT FK_AffiliateOptionTypesToFieldType FOREIGN KEY (IdFieldType) REFERENCES dbo.FieldTypes (Id),
+		[IdObjectType] INT NULL,
 		[DefaultValue] NVARCHAR(250) NULL
 	)
 

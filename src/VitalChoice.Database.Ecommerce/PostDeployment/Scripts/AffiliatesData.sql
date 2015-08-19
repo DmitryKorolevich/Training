@@ -69,6 +69,8 @@ BEGIN
 	(N'PromoteByProfessionalPractice', 5, NULL, N'False'),
 	(N'ProfessionalPractice', 3, @IdAffiliateProfessionalPractices, NULL),
 	(N'PromoteByDrSearsLEANCoachAmbassador', 5, NULL, N'False'),
+	(N'PromoteByVerticalResponseEmail', 5, NULL, N'False'),
+	(N'PromoteByLeanEmail', 5, NULL, N'False'),
 	(N'ChecksPayableTo', 4, NULL, NULL),
 	(N'Email', 4, NULL, NULL),
 	(N'TaxID', 4, NULL, NULL),
