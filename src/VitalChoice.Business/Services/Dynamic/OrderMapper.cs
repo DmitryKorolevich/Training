@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
@@ -19,18 +20,21 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class OrderMapper : DynamicObjectMapper<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
     {
-        public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container, IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync)
+        public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
+            IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync)
             : base(mappers, container, orderRepositoryAsync)
         {
 
         }
 
+        public override IQueryOptionType<OrderOptionType> GetOptionTypeQuery()
+        {
+            return new OrderOptionTypeQuery();
+        }
+
         public override Expression<Func<OrderOptionValue, int?>> ObjectIdSelector
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return v => v.IdOrder; }
         }
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)

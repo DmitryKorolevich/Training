@@ -19,14 +19,14 @@ namespace VitalChoice.Business.Services.Dynamic
             <CustomerPaymentMethodDynamic, CustomerPaymentMethod, CustomerPaymentMethodOptionType,
                 CustomerPaymentMethodOptionValue>
     {
-        private readonly AddressMapper _addressMapper;
+        private readonly CustomerAddressMapper _customerAddressMapper;
 
         public CustomerPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<Type, IModelToDynamicConverter> converters,
-            IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> repo, AddressMapper addressMapper)
+            IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> repo, CustomerAddressMapper customerAddressMapper)
             : base(mappers, converters, repo)
         {
-            _addressMapper = addressMapper;
+            _customerAddressMapper = customerAddressMapper;
         }
 
         public override Expression<Func<CustomerPaymentMethodOptionValue, int?>> ObjectIdSelector
@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                dynamic.Address = await _addressMapper.FromEntityAsync(entity.BillingAddress);
+                dynamic.Address = await _customerAddressMapper.FromEntityAsync(entity.BillingAddress);
                 dynamic.IdCustomer = entity.IdCustomer;
             });
         }
@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
 
-                entity.BillingAddress = await _addressMapper.ToEntityAsync(dynamic.Address);
+                entity.BillingAddress = await _customerAddressMapper.ToEntityAsync(dynamic.Address);
                 entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
                 entity.IdCustomer = dynamic.IdCustomer;
             });
@@ -66,9 +66,9 @@ namespace VitalChoice.Business.Services.Dynamic
             ICollection<DynamicEntityPair<CustomerPaymentMethodDynamic, CustomerPaymentMethod>> items)
         {
             await
-                _addressMapper.UpdateEntityRangeAsync(
+                _customerAddressMapper.UpdateEntityRangeAsync(
                     items.Select(
-                        i => new DynamicEntityPair<AddressDynamic, Address>(i.Dynamic.Address, i.Entity.BillingAddress))
+                        i => new DynamicEntityPair<CustomerAddressDynamic, Address>(i.Dynamic.Address, i.Entity.BillingAddress))
                         .ToList());
             items.ForEach(pair =>
             {

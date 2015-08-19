@@ -4,14 +4,14 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class AddressModelConverter : IModelToDynamicConverter<AddressModel, AddressDynamic>
+    public class AddressModelConverter : IModelToDynamicConverter<AddressModel, CustomerAddressDynamic>
     {
-	    public void DynamicToModel(AddressModel model, AddressDynamic dynamic)
+	    public void DynamicToModel(AddressModel model, CustomerAddressDynamic dynamic)
 	    {
 		    model.Country.Id = dynamic.IdCountry;
 	    }
 
-	    public void ModelToDynamic(AddressModel model, AddressDynamic dynamic)
+	    public void ModelToDynamic(AddressModel model, CustomerAddressDynamic dynamic)
 	    {
 		    dynamic.IdCountry = model.Country.Id;
 	    }

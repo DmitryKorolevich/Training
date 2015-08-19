@@ -15,9 +15,9 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class AddressMapper : DynamicObjectMapper<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
+    public class CustomerAddressMapper : DynamicObjectMapper<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
-        public AddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+        public CustomerAddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<Type, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
             : base(mappers, container, optionTypesRepositoryAsync)
@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Services.Dynamic
         }
 
         protected override Task FromEntityRangeInternalAsync(
-            ICollection<DynamicEntityPair<AddressDynamic, Address>> items, bool withDefaults = false)
+            ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items, bool withDefaults = false)
         {
             items.ForEach(item =>
             {
@@ -46,7 +46,7 @@ namespace VitalChoice.Business.Services.Dynamic
         }
 
         protected override Task UpdateEntityRangeInternalAsync(
-            ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
+            ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items)
         {
             items.ForEach(item =>
             {
@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Services.Dynamic
             return Task.Delay(0);
         }
 
-        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items)
         {
             items.ForEach(item =>
             {

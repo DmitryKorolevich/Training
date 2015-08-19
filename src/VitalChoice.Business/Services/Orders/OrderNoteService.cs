@@ -26,7 +26,7 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Order;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services.Orders
 {

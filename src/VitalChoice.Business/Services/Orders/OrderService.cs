@@ -24,7 +24,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Order;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Orders
