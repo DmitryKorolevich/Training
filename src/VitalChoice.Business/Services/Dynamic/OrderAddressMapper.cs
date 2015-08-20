@@ -9,6 +9,8 @@ using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Data.Extensions;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -20,17 +22,53 @@ namespace VitalChoice.Business.Services.Dynamic
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items, bool withDefaults = false)
         {
-            throw new NotImplementedException();
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                dynamic.IdOrder = entity.IdOrder;
+                dynamic.IdCountry = entity.IdCountry;
+                dynamic.County = entity.County;
+                dynamic.IdState = entity.IdState;
+            });
+            return Task.Delay(0);
         }
 
         protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items)
         {
-            throw new NotImplementedException();
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                entity.IdOrder = dynamic.IdOrder;
+                entity.IdCountry = dynamic.IdCountry;
+                entity.County = dynamic.County;
+                entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
+                foreach (var value in entity.OptionValues)
+                {
+                    value.IdOrderAddress = dynamic.Id;
+                }
+                entity.StatusCode = RecordStatusCode.Active;
+            });
+            return Task.Delay(0);
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items)
         {
-            throw new NotImplementedException();
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                entity.IdOrder = dynamic.IdOrder;
+                entity.IdCountry = dynamic.IdCountry;
+                entity.County = dynamic.County;
+                entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
+                entity.StatusCode = RecordStatusCode.Active;
+            });
+            return Task.Delay(0);
         }
 
         public override Expression<Func<OrderAddressOptionValue, int?>> ObjectIdSelector
