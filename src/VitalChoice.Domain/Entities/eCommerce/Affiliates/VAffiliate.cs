@@ -20,5 +20,13 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
 	    public decimal CommissionFirst { get; set; }
 
 	    public decimal CommissionAll { get; set; }
+
+        public string Tier { get; set; }
+
+        public DateTime DateEdited { get; set; }
+
+        public int? IdEditedBy { get; set; }
+
+        public string EditedByAgentId { get; set; }
     }
 }

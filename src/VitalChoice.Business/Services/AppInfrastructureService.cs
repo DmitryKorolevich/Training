@@ -69,6 +69,7 @@ namespace VitalChoice.Business.Services
             var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
             var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
+            var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
 	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
@@ -208,6 +209,14 @@ namespace VitalChoice.Business.Services
                 }).ToList();
             referenceData.AffiliateMonthlyEmailsSentOptions = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == affiliateMonthlyEmailsSentOptions)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.AffiliateTiers = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == affiliateTiers)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

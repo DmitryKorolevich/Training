@@ -895,6 +895,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.Key(t => t.Id);
                 entity.ToTable("VAffiliates");
+                entity.Ignore(x => x.EditedByAgentId);
             });
 
             builder.Entity<AffiliateOptionValue>(entity =>

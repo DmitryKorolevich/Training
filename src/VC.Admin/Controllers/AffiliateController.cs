@@ -28,6 +28,7 @@ using VitalChoice.Interfaces.Services.Order;
 using VC.Admin.Models.Order;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
+using VitalChoice.Domain.Transfer.Affiliates;
 
 namespace VC.Admin.Controllers
 {
@@ -47,7 +48,7 @@ namespace VC.Admin.Controllers
         }
         
         [HttpPost]
-        public async Task<Result<PagedList<AffiliateListItemModel>>> GetAffiliates([FromBody]FilterBase filter)
+        public async Task<Result<PagedList<AffiliateListItemModel>>> GetAffiliates([FromBody]VAffiliateFilter filter)
         {
             var result = await _affiliateService.GetAffiliatesAsync(filter);
 

@@ -30,6 +30,12 @@ namespace VC.Admin.Models.Affiliate
 
         public decimal CommissionAll { get; set; }
 
+        public string Tier { get; set; }
+
+        public DateTime DateEdited { get; set; }
+
+        public string EditedByAgentId { get; set; }
+
         public AffiliateListItemModel(VAffiliate item)
         {
             if(item!=null)
@@ -41,6 +47,9 @@ namespace VC.Admin.Models.Affiliate
                 WebSite = item.WebSite;
                 CommissionFirst = item.CommissionFirst;
                 CommissionAll = item.CommissionAll;
+                Tier = item.Tier;
+                DateEdited = item.DateEdited;
+                EditedByAgentId = item.EditedByAgentId;
             }
         }
     }

@@ -29,6 +29,7 @@ using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Affiliates;
+using VitalChoice.Domain.Transfer.Affiliates;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -52,13 +53,14 @@ namespace VitalChoice.Business.Services.Affiliates
             _adminProfileRepository = adminProfileRepository;
         }
 
-        public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(FilterBase filter)
+        public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
         {
-            var conditions = new VAffiliateQuery().NotDeleted();
+            var conditions = new VAffiliateQuery().NotDeleted().WithId(filter.Id).WithTier(filter.Tier).WithName(filter.Name).
+                WithCompany(filter.Company);
 
             var query = _vAffiliateRepository.Query(conditions);
 
-            Func<IQueryable<VAffiliate>, IOrderedQueryable<VAffiliate>> sortable = x => x.OrderByDescending(y => y.Id);
+            Func<IQueryable<VAffiliate>, IOrderedQueryable<VAffiliate>> sortable = x => x.OrderByDescending(y => y.DateEdited);
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
             {
@@ -104,9 +106,38 @@ namespace VitalChoice.Business.Services.Affiliates
                                 ? x.OrderBy(y => y.CommissionAll)
                                 : x.OrderByDescending(y => y.CommissionAll);
                     break;
+                case VAffiliateSortPath.DateEdited:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.DateEdited)
+                                : x.OrderByDescending(y => y.DateEdited);
+                    break;
+                case VAffiliateSortPath.Tier:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Tier)
+                                : x.OrderByDescending(y => y.Tier);
+                    break;
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            if (toReturn.Items.Any())
+            {
+                var ids = toReturn.Items.Where(p=>p.IdEditedBy.HasValue).Select(p => p.IdEditedBy).ToList();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                foreach (var item in toReturn.Items)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.IdEditedBy == profile.Id)
+                        {
+                            item.EditedByAgentId = profile.AgentId;
+                        }
+                    }
+                }
+            }
 
             return toReturn;
         }

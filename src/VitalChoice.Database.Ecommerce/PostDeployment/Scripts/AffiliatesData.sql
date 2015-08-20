@@ -92,3 +92,27 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='AffiliateTiers')
+BEGIN
+
+	DECLARE @IdAffiliateTiers INT
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], [Name])
+	VALUES
+	(N'string', N'AffiliateTiers')
+
+	SET @IdAffiliateTiers = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdAffiliateTiers,	N'1'),
+	(2, @IdAffiliateTiers,	N'2'),
+	(3, @IdAffiliateTiers,	N'3'),
+	(4, @IdAffiliateTiers,	N'4')
+
+END
+
+GO

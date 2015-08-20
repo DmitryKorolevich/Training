@@ -34,5 +34,6 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> OrderSourcesCelebrityHealthAdvocate { get; set; }
         public IList<LookupItem<int>> AffiliateProfessionalPractices { get; set; }
         public IList<LookupItem<int>> AffiliateMonthlyEmailsSentOptions { get; set; }
+        public IList<LookupItem<int>> AffiliateTiers { get; set; }        
     }
 }

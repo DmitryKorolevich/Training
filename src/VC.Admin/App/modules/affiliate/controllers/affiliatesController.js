@@ -31,11 +31,18 @@
                 });
         };
 
-        function initialize() {
+        function initialize()
+        {
+            $scope.affiliateTiers = angular.copy($rootScope.ReferenceData.AffiliateTiers);
+            $scope.affiliateTiers.splice(0, 0, { Key: null, Text: 'All Tiers' });
+
             $scope.filter = {
-                SearchText: '',
+                Id: null,
+                Tier: null,
+                Name: null,
+                Company: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
-                Sorting: gridSorterUtil.resolve(refreshAffiliates, "Id", "Desc")
+                Sorting: gridSorterUtil.resolve(refreshAffiliates, "DateEdited", "Desc")
             };
 
             refreshAffiliates();
@@ -74,7 +81,7 @@
                     .error(function (result) {
                         errorHandler(result);
                     });
-            }, 'Are you sure you want to delete this discount?');
+            }, 'Are you sure you want to delete this affiliate?');
         };
 
         initialize();

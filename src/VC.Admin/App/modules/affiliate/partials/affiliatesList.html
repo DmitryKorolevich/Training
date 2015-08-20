@@ -2,6 +2,20 @@
     <div class="well">
         <span class="legend">Manage Affiliates</span>
         <div class="row form-group">
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="ID" numbers-only data-ng-model="filter.Id">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Name" data-ng-model="filter.Name">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Company" data-ng-model="filter.Company">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" placeholder="Tier" data-ng-model="filter.Tier" data-ng-options="item.Key as item.Text for item in affiliateTiers"></select>
+            </div>
+        </div>
+        <div class="row form-group">
             <div class="col-md-4">
                 <button class="btn btn-info" data-ng-click="filterAffiliates();" type="button">Filter</button>
             </div>
@@ -56,6 +70,20 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Tier')">
+                            <span>Tier</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Tier'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
+                            <span>Last Updated</span>
+                            <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -65,14 +93,20 @@
                         <td>{{item.Name}}</td>
                         <td>{{item.Company}}</td>
                         <td>{{item.WebSite}}</td>
-                        <td>{{item.CommissionAll | number:2}}%</td>
+                        <td>{{item.CommissionFirst | number:2}}% / {{item.CommissionAll | number:2}}%</td>
                         <td>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
+                        <td>{{item.Tier}}</td>
+                        <td>{{item.DateEdited | date:"MM/dd/yy"}}<br />{{item.DateEdited | date:"h:mm a"}}<br />{{item.EditedByAgentId}}</td>
                         <td>
-                            <button class="btn btn-default btn-success" data-ng-click="open(item.Id);">Edit</button>
-                            <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">Delete</button>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
