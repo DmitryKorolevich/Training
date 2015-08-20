@@ -121,9 +121,39 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
+        protected override async Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
-            throw new NotImplementedException();
+            await items.ForEachAsync(async item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                entity.DiscountTotal = dynamic.DiscountTotal;
+                entity.OrderStatus = dynamic.OrderStatus;
+                entity.ProductsSubtotal = dynamic.ProductsSubtotal;
+                entity.ShippingTotal = dynamic.ShippingTotal;
+                entity.TaxTotal = dynamic.TaxTotal;
+                entity.Total = dynamic.Total;
+
+                await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
+
+                entity.IdCustomer = dynamic.Customer.Id;
+                entity.GiftCertificates = new List<OrderToGiftCertificate>(dynamic.GiftCertificates.Select(g => new OrderToGiftCertificate
+                {
+                    Amount = g.Amount,
+                    IdOrder = dynamic.Id,
+                    IdGiftCertificate = g.GiftCertificate.Id
+                }));
+                entity.IdDiscount = dynamic.Discount?.Id;
+                await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
+                entity.Skus = new List<OrderToSku>(dynamic.Skus.Select(s => new OrderToSku
+                {
+                    Amount = s.Amount,
+                    Quantity = s.Quantity,
+                    IdOrder = dynamic.Id,
+                    IdSku = s.Sku.Id
+                }));
+            });
         }
     }
 }

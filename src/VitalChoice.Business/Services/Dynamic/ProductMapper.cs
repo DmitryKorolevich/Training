@@ -92,12 +92,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 }).ToList();
 
                 await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus, entity.OptionTypes);
-
-                //Set key on options
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdProduct = dynamic.Id;
-                }
             });
         }
 

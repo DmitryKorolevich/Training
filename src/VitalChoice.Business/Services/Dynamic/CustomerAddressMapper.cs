@@ -57,10 +57,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdCountry = dynamic.IdCountry;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdAddress = dynamic.Id;
-                }
                 entity.StatusCode = RecordStatusCode.Active;
             });
             return Task.Delay(0);

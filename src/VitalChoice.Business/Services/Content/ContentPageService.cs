@@ -269,7 +269,7 @@ namespace VitalChoice.Business.Services.Content
 
                 try
                 {
-                    templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
+                    await templatesCache.RemoveFromCache(dbItem.MasterContentItemId, dbItem.ContentItemId);
                 }
                 catch(Exception e)
                 {

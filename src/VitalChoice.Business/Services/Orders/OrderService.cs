@@ -35,6 +35,8 @@ namespace VitalChoice.Business.Services.Orders
     {
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
+        private readonly ProductMapper _productMapper;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -43,13 +45,55 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;
+            _productOptionTypesRepository = productOptionTypesRepository;
+            _productMapper = productMapper;
+        }
+
+        protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
+        {
+            return
+                query.Include(o => o.Discount)
+                    .ThenInclude(d => d.OptionValues)
+                    .Include(o => o.Customer)
+                    .ThenInclude(c => c.OptionValues)
+                    .Include(o => o.GiftCertificates)
+                    .ThenInclude(g => g.GiftCertificate)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.BillingAddress)
+                    .ThenInclude(a => a.OptionValues)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(o => o.PaymentMethod)
+                    .ThenInclude(p => p.PaymentMethod)
+                    .Include(o => o.ShippingAddress)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(o => o.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.Product);
+        }
+
+        protected override async Task AfterSelect(Order entity)
+        {
+            var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
+            foreach (var orderToSku in entity.Skus)
+            {
+                orderToSku.Sku.OptionTypes =
+                    productOptionTypes.Where(
+                        _productMapper.GetOptionTypeQuery()
+                            .WithObjectType(orderToSku.Sku.Product.IdObjectType)
+                            .Query()
+                            .Compile()).ToList();
+            }
         }
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)

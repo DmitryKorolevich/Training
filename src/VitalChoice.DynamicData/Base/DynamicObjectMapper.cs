@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Autofac.Features.Indexed;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.DynamicData.Delegates;
@@ -9,6 +10,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
 using System.Threading.Tasks;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
@@ -30,6 +32,7 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         public abstract Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
+        private Action<TOptionValue, int> _valueSetter;
 
         protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<Type, IModelToDynamicConverter> converters,
@@ -38,6 +41,30 @@ namespace VitalChoice.DynamicData.Base
             _converters = converters;
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
             _typeConverter = new ModelTypeConverter(mappers);
+        }
+
+        public Action<TOptionValue, int> GetValueObjectIdSetter()
+        {
+            if (_valueSetter != null)
+                return _valueSetter;
+            var memberExpression = ObjectIdSelector.Body as MemberExpression;
+            if (memberExpression?.Member is PropertyInfo)
+            {
+                var property = (PropertyInfo) memberExpression.Member;
+                if (property.CanWrite)
+                {
+                    _valueSetter = property.SetMethod.CompileVoidAccessor<TOptionValue, int>();
+                }
+                else
+                {
+                    throw new MemberAccessException($"Property {property} doesn't have any public setter");
+                }
+            }
+            else
+            {
+                throw new MemberAccessException($"Expression {memberExpression} doesn't have property selection");
+            }
+            return _valueSetter;
         }
 
         public virtual async void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
@@ -197,6 +224,11 @@ namespace VitalChoice.DynamicData.Base
 
             UpdateEntityItem(dynamic, entity);
             await UpdateEntityInternalAsync(dynamic, entity);
+            var valueObjectIdSetter = GetValueObjectIdSetter();
+            foreach (var value in entity.OptionValues)
+            {
+                valueObjectIdSetter(value, dynamic.Id);
+            }
         }
 
         public TModel ToModel<TModel>(TDynamic dynamic)
@@ -283,6 +315,11 @@ namespace VitalChoice.DynamicData.Base
 
             UpdateEntityItem(dynamic, entity);
             await UpdateEntityInternalAsync(dynamic, entity);
+            var valueObjectIdSetter = GetValueObjectIdSetter();
+            foreach (var value in entity.OptionValues)
+            {
+                valueObjectIdSetter(value, dynamic.Id);
+            }
         }
 
         public async void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
@@ -306,6 +343,17 @@ namespace VitalChoice.DynamicData.Base
             }
             
             await UpdateEntityRangeInternalAsync(items);
+            var valueObjectIdSetter = GetValueObjectIdSetter();
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                foreach (var value in entity.OptionValues)
+                {
+                    valueObjectIdSetter(value, dynamic.Id);
+                }
+            });
         }
 
         private static void UpdateEntityItem(TDynamic dynamic, TEntity entity)
@@ -451,6 +499,17 @@ namespace VitalChoice.DynamicData.Base
             }
 
             await UpdateEntityRangeInternalAsync(items);
+            var valueObjectIdSetter = GetValueObjectIdSetter();
+            items.ForEach(item =>
+            {
+                var entity = item.Entity;
+                var dynamic = item.Dynamic;
+
+                foreach (var value in entity.OptionValues)
+                {
+                    valueObjectIdSetter(value, dynamic.Id);
+                }
+            });
         }
 
         public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items,

@@ -108,12 +108,6 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                     entity.DiscountTiers = dynamic.DiscountTiers.ToList();
                 }
-
-                //Set key on options
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdDiscount = dynamic.Id;
-                }
             });
             return Task.Delay(0);
         }

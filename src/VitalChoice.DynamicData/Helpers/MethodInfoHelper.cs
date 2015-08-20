@@ -32,34 +32,34 @@ namespace VitalChoice.DynamicData.Helpers
             return (Func<TResult>) dynamic.CreateDelegate(typeof (Func<TResult>));
         }
 
-        public static VoidFunc<T> CompileVoidAccessor<T>(this MethodInfo method)
+        public static Action<T> CompileVoidAccessor<T>(this MethodInfo method)
         {
             var dynamic = EmitDynamic(typeof(void), method, typeof(T));
-            return (VoidFunc<T>)dynamic.CreateDelegate(typeof(VoidFunc<T>));
+            return (Action<T>)dynamic.CreateDelegate(typeof(Action<T>));
         }
 
-        public static VoidFunc<T1, T2> CompileVoidAccessor<T1, T2>(this MethodInfo method)
+        public static Action<T1, T2> CompileVoidAccessor<T1, T2>(this MethodInfo method)
         {
             var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2));
-            return (VoidFunc<T1, T2>)dynamic.CreateDelegate(typeof(VoidFunc<T1, T2>));
+            return (Action<T1, T2>)dynamic.CreateDelegate(typeof(Action<T1, T2>));
         }
 
-        public static VoidFunc<T1, T2, T3> CompileVoidAccessor<T1, T2, T3>(this MethodInfo method)
+        public static Action<T1, T2, T3> CompileVoidAccessor<T1, T2, T3>(this MethodInfo method)
         {
             var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3));
-            return (VoidFunc<T1, T2, T3>)dynamic.CreateDelegate(typeof(VoidFunc<T1, T2, T3>));
+            return (Action<T1, T2, T3>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3>));
         }
 
-        public static VoidFunc<T1, T2, T3, T4> CompileVoidAccessor<T1, T2, T3, T4>(this MethodInfo method)
+        public static Action<T1, T2, T3, T4> CompileVoidAccessor<T1, T2, T3, T4>(this MethodInfo method)
         {
             var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
-            return (VoidFunc<T1, T2, T3, T4>)dynamic.CreateDelegate(typeof(VoidFunc<T1, T2, T3, T4>));
+            return (Action<T1, T2, T3, T4>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3, T4>));
         }
 
-        public static VoidFunc<T1, T2, T3, T4, T5> CompileVoidAccessor<T1, T2, T3, T4, T5>(this MethodInfo method)
+        public static Action<T1, T2, T3, T4, T5> CompileVoidAccessor<T1, T2, T3, T4, T5>(this MethodInfo method)
         {
             var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
-            return (VoidFunc<T1, T2, T3, T4, T5>)dynamic.CreateDelegate(typeof(VoidFunc<T1, T2, T3, T4, T5>));
+            return (Action<T1, T2, T3, T4, T5>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3, T4, T5>));
         }
 
         /// <summary>
@@ -195,6 +195,24 @@ namespace VitalChoice.DynamicData.Helpers
                 if (toOther == typeof (object))
                 {
                     il.Emit(OpCodes.Box, one);
+                    return;
+                }
+                if (toOther.IsImplementGeneric(typeof (Nullable<>)) && !one.IsImplementGeneric(typeof(Nullable<>)))
+                {
+                    var constructor = toOther.GetConstructor(new[] {toOther.UnwrapNullable()});
+                    if (constructor != null)
+                    {
+                        il.Emit(OpCodes.Newobj, constructor);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"{toOther} Type doesn't have parameterless constructor.");
+                    }
+                    return;
+                }
+                if (one.IsImplementGeneric(typeof(Nullable<>)) && !toOther.IsImplementGeneric(typeof(Nullable<>)))
+                {
+                    il.Emit(OpCodes.Call, one.GetProperty("Value").GetGetMethod());
                     return;
                 }
                 throw new InvalidOperationException("The ValueType parameters cast isn't allowed with this compiler");

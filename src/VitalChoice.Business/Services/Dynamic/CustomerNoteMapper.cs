@@ -59,10 +59,6 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 entity.IdCustomer = dynamic.IdCustomer;
                 entity.Note = dynamic.Note;
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdCustomerNote = dynamic.Id;
-                }
             });
             return Task.Delay(0);
         }

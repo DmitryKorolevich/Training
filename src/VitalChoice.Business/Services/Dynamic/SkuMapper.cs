@@ -62,12 +62,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
-
-                //Set key on options
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdSku = dynamic.Id;
-                }
             });
             return Task.Delay(0);
         }

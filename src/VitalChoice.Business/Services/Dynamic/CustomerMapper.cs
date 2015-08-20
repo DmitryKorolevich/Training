@@ -104,11 +104,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
                         entity.CustomerPaymentMethods);
-
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdCustomer = dynamic.Id;
-                }
 			});
         }
 

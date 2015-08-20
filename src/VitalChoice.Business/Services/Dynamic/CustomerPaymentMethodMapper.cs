@@ -75,10 +75,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
                 entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdCustomerPaymentMethod = dynamic.Id;
-                }
             });
         }
     }
