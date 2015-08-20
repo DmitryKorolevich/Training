@@ -8,7 +8,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Interfaces.Services.Order;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers

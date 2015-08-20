@@ -21,16 +21,16 @@ namespace VitalChoice.Business.Services.Dynamic
 {
     public class CustomerMapper: DynamicObjectMapper<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>
     {
-        private readonly AddressMapper _addressMapper;
+        private readonly CustomerAddressMapper _customerAddressMapper;
 	    private readonly CustomerNoteMapper _customerNoteMapper;
         private readonly CustomerPaymentMethodMapper _paymentMethodMapper;
 
         public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container, AddressMapper addressMapper,
+            IIndex<Type, IModelToDynamicConverter> container, CustomerAddressMapper customerAddressMapper,
             CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync, CustomerPaymentMethodMapper paymentMethodMapper)
             : base(mappers, container, customerRepositoryAsync)
         {
-            _addressMapper = addressMapper;
+            _customerAddressMapper = customerAddressMapper;
             _customerNoteMapper = customerNoteMapper;
             _paymentMethodMapper = paymentMethodMapper;
         }
@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
             
                 dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes, withDefaults));                
-                dynamic.Addresses.AddRange(await _addressMapper.FromEntityRangeAsync(entity.Addresses, withDefaults));
+                dynamic.Addresses.AddRange(await _customerAddressMapper.FromEntityRangeAsync(entity.Addresses, withDefaults));
                 dynamic.CustomerPaymentMethods.AddRange(await _paymentMethodMapper.FromEntityRangeAsync(entity.CustomerPaymentMethods, withDefaults));
 	            dynamic.Files = entity.Files;
             });
@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
-                await _addressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
+                await _customerAddressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
@@ -138,7 +138,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrderNote = c
                 }).ToList();
 
-                entity.Addresses = await _addressMapper.ToEntityRangeAsync(dynamic.Addresses);
+                entity.Addresses = await _customerAddressMapper.ToEntityRangeAsync(dynamic.Addresses);
                 entity.CustomerNotes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes);
 				entity.Files = dynamic.Files;
 			});

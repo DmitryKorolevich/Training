@@ -3,7 +3,7 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class AddressDynamic : MappedObject
+    public sealed class CustomerAddressDynamic : MappedObject
     {
 		public int IdCustomer { get; set; }
 

@@ -41,7 +41,6 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Order;
 using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
@@ -52,6 +51,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Affiliates;
 

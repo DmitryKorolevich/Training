@@ -20,13 +20,13 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Order;
+using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Order;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services.Orders
 {

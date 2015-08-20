@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Domain.Transfer.Products
+namespace VitalChoice.Domain.Transfer.Orders
 {
     public class VOrderFilter : FilterBase
     {

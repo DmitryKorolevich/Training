@@ -24,8 +24,9 @@ using System.Security.Claims;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Order;
 using VC.Admin.Models.Order;
+using VitalChoice.Domain.Transfer.Orders;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Admin.Controllers
 {

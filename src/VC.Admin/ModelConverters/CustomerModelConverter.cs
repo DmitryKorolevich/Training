@@ -14,10 +14,10 @@ namespace VC.Admin.ModelConverters
     {
 	    private readonly IDynamicToModelMapper<CustomerNoteDynamic> _customerNoteMapper;
         private readonly IDynamicToModelMapper<CustomerPaymentMethodDynamic> _paymentMethodMapper;
-        private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;
+        private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
 
         public CustomerModelConverter(IDynamicToModelMapper<CustomerNoteDynamic> customerNoteMapper,
-            IDynamicToModelMapper<AddressDynamic> addressMapper,
+            IDynamicToModelMapper<CustomerAddressDynamic> addressMapper,
             IDynamicToModelMapper<CustomerPaymentMethodDynamic> paymentMethodMapper)
         {
             _customerNoteMapper = customerNoteMapper;

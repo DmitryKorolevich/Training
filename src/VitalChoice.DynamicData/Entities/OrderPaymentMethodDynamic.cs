@@ -6,10 +6,10 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public class CustomerPaymentMethodDynamic : MappedObject
+    public sealed class OrderPaymentMethodDynamic : MappedObject
     {
-        public CustomerAddressDynamic Address { get; set; }
+        public OrderAddressDynamic Address { get; set; }
 
-        public int IdCustomer { get; set; }
+        public int IdOrder { get; set; }
     }
 }

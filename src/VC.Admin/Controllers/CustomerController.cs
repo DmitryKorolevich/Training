@@ -43,11 +43,11 @@ namespace VC.Admin.Controllers
         private readonly IGenericService<AdminProfile> _adminProfileService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
-        private readonly IDynamicToModelMapper<AddressDynamic> _addressMapper;
+        private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
         private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper; 
         private readonly ICustomerService _customerService;
 
-        private readonly IEcommerceDynamicObjectService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
+        private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
         private readonly IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
             _notesService;
@@ -56,9 +56,9 @@ namespace VC.Admin.Controllers
 
 		public CustomerController(ICustomerService customerService,
             IDynamicToModelMapper<CustomerDynamic> customerMapper,
-            IDynamicToModelMapper<AddressDynamic> addressMapper, ICountryService countryService,
+            IDynamicToModelMapper<CustomerAddressDynamic> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
-            IEcommerceDynamicObjectService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
+            IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
                 addressService, IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService, IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider)
         {
             _customerService = customerService;
