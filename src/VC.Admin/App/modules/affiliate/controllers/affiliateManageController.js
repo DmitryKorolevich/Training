@@ -54,7 +54,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         {
             $scope.id = $stateParams.id ? $stateParams.id : 0;
 
-            $scope.tiers = [{ Id: 1 }, { Id: 2 }, { Id: 3 }, { Id: 4 }];
+            $scope.affiliateTiers = $rootScope.ReferenceData.AffiliateTiers;
 
             $scope.forms = {};
             $scope.detailsTab = {

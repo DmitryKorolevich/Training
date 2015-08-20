@@ -66,6 +66,7 @@ namespace VC.Admin.Controllers
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
                     AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
+                    AffiliateTiers = referenceData.AffiliateTiers,
                 };
 	        }
 			else

@@ -8,5 +8,7 @@
         public const string WebSite = "WebSite";
         public const string StatusCode = "StatusCode";
         public const string CommissionAll = "CommissionAll";
+        public const string DateEdited = "DateEdited";
+        public const string Tier = "Tier";
     }
 }

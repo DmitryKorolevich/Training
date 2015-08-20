@@ -14,6 +14,43 @@ namespace VitalChoice.Business.Queries.Affiliate
 {
     public class VAffiliateQuery : QueryObject<VAffiliate>
     {
+        public VAffiliateQuery WithId(int? id)
+        {
+            if (id.HasValue)
+            {
+                And(x => x.Id==id);
+            }
+            return this;
+        }
+
+        public VAffiliateQuery WithName(string name)
+        {
+            if (!String.IsNullOrEmpty(name))
+            {
+                And(x => x.Name.Contains(name));
+            }
+            return this;
+        }
+
+        public VAffiliateQuery WithCompany(string company)
+        {
+            if (!String.IsNullOrEmpty(company))
+            {
+                And(x => x.Company.Contains(company));
+            }
+            return this;
+        }
+
+        public VAffiliateQuery WithTier(int? tier)
+        {
+            if (tier.HasValue)
+            {
+                string value = tier.Value.ToString();
+                And(x => x.Tier == value);
+            }
+            return this;
+        }
+
         public VAffiliateQuery NotDeleted()
         {
             And(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
