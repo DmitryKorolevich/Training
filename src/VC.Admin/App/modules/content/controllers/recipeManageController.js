@@ -19,7 +19,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 	$scope.forms.recipeForm.submitted = true;
                 	$scope.forms.crossessubmitted = true;
                 	$scope.forms.relatedsubmitted = true;
-                	$scope.forms.videossubmitted = true;
 
                 	$scope.serverMessages = new ServerMessages(result.Messages);
                 	var formForShowing = null;
@@ -92,7 +91,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             var clearServerValidation = function () {
             	$.each($scope.forms, function (index, form) {
             		if (form && !(typeof form === 'boolean')) {
-            			if (index == "RelatedRecipes" || index == "CrossSellRecipes" || index == "Videos") {
+            			if (index == "RelatedRecipes" || index == "CrossSellRecipes") {
             				$.each(form, function (index, subForm) {
             					if (index.indexOf('i') == 0) {
             						$.each(subForm, function (index, element) {
@@ -120,7 +119,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 	            var valid = true;
 	            $.each($scope.forms, function (index, form) {
 	            	if (form && !(typeof form === 'boolean')) {
-	            		if (!form.$valid && index != 'submitted' && index != 'crossessubmitted' && index != 'videossubmitted' && index != 'relatedsubmitted') {
+	            		if (!form.$valid && index != 'submitted' && index != 'crossessubmitted' && index != 'relatedsubmitted') {
 	            			valid = false;
 	            			activateTab(index);
 	            			return false;
@@ -135,7 +134,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 
                     updateCrossRelated($scope.recipe.CrossSellRecipes);
                     updateCrossRelated($scope.recipe.RelatedRecipes);
-                    updateVideos();
 
                     contentService.updateRecipe($scope.recipe, $scope.editTracker).success(function (result) {
                         successSaveHandler(result);
@@ -147,7 +145,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 	$scope.forms.recipeForm.submitted = true;
                 	$scope.forms.crossessubmitted = true;
                 	$scope.forms.relatedsubmitted = true;
-                	$scope.forms.videossubmitted = true;
                 }
             };
 
@@ -291,9 +288,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         		if (formName.indexOf('RelatedRecipes') == 0) {
         			temp = 'crossSellRelatedRecipes';
         		}
-        		if (formName.indexOf('CrossRelatedMiscellaneous') == 0) {
-        			temp = 'crossSellRelatedRecipes';
-        		}
         		if (item.formName == temp) {
         			item.active = true;
         			return false;
@@ -326,17 +320,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         	});
         };
 
-        function updateVideos() {
-        	$.each($scope.recipe.Videos, function (index, item) {
-        		if (!item.InUse) {
-        			item.Video = null;
-        			item.Image = null;
-        			item.Text = null;
-        		}
-        	});
-        };
-
-        $scope.toggleOpen = function (item, event) {
+       $scope.toggleOpen = function (item, event) {
         	item.IsOpen = !item.IsOpen;
         };
 

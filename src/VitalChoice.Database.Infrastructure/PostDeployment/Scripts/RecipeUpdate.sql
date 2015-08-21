@@ -197,3 +197,32 @@ BEGIN
 	)
 
 END
+
+IF COL_LENGTH('[dbo].[Recipes]','Subtitle') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Recipes]
+	ADD [Subtitle] NVARCHAR(250) CONSTRAINT DF_Recipes_Subtitle DEFAULT(N'Subtitle') NOT NULL
+
+	ALTER TABLE [dbo].[Recipes]
+	DROP CONSTRAINT DF_Recipes_Subtitle
+END
+
+IF COL_LENGTH('[dbo].[Recipes]','YoutubeImage') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Recipes]
+	ADD [YoutubeImage] [nvarchar](250) CONSTRAINT DF_Recipes_YoutubeImage DEFAULT(N'Image') NOT NULL
+
+	ALTER TABLE [dbo].[Recipes]
+	DROP CONSTRAINT DF_Recipes_YoutubeImage
+
+	ALTER TABLE [dbo].[Recipes]
+	ADD [YoutubeVideo] [nvarchar](250) CONSTRAINT DF_Recipes_YoutubeVideo DEFAULT(N'Video') NOT NULL
+
+	ALTER TABLE [dbo].[Recipes]
+	DROP CONSTRAINT DF_Recipes_YoutubeVideo
+END
+
+IF OBJECT_ID(N'[dbo].[RecipeVideos]', N'U') IS NOT NULL
+BEGIN
+	DROP TABLE [dbo].[RecipeVideos]
+END

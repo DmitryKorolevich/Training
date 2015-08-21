@@ -15,14 +15,15 @@ namespace VC.Admin.Models.ContentManagement
     {
 	    public const short RelatedRecipesMaxCount = 4;
 		public const short CrossSellRecipesMaxCount = 3;
-		public const short VideosMaxCount = 1;
 
         public int Id { get; set; }
 
         [Localized(GeneralFieldNames.Title)]
         public string Name { get; set; }
 
-        [Localized(GeneralFieldNames.Url)]
+	    public string Subtitle { get; set; }
+
+	    [Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
         [Localized(GeneralFieldNames.Description)]
@@ -56,25 +57,29 @@ namespace VC.Admin.Models.ContentManagement
 
 		public IList<RelatedRecipeModel> RelatedRecipes { get; set; }
 
-		public IList<VideoRecipeModel> Videos { get; set; }
-
 	    public string AboutChef { get; set; }
 
 	    public string Ingredients  { get; set; }
 
 	    public string Directions { get; set; }
 
-	    public RecipeManageModel()
+		public string YoutubeVideo { get; set; }
+
+		public string YoutubeImage { get; set; }
+
+		public RecipeManageModel()
         {
 			CrossSellRecipes = new List<CrossSellRecipeModel>();
 			RelatedRecipes = new List<RelatedRecipeModel>();
-			Videos = new List<VideoRecipeModel>();
         }
 
         public RecipeManageModel(Recipe item):this()
         {
             Id = item.Id;
             Name = item.Name;
+            Subtitle = item.Subtitle;
+			YoutubeVideo = item.YoutubeVideo;
+			YoutubeImage = item.YoutubeImage;
             Url = item.Url;
             FileUrl = item.FileUrl;
             StatusCode = item.StatusCode;
@@ -131,23 +136,6 @@ namespace VC.Admin.Models.ContentManagement
 
 				RelatedRecipes.Add(model);
 			}
-
-			for (short i = 0; i < VideosMaxCount; i++)
-			{
-				var curNumber = (byte)(i + 1);
-
-				var overridenItem = item.Videos.SingleOrDefault(x => x.Number == curNumber);
-				var model = new VideoRecipeModel() { Number = curNumber, InUse = false };
-				if (overridenItem != null)
-				{
-					model.Image = overridenItem.Image;
-					model.Text = overridenItem.Text;
-					model.Video = overridenItem.Video;
-					model.InUse = true;
-				}
-
-				Videos.Add(model);
-			}
 		}
 
         public Recipe Convert()
@@ -155,6 +143,9 @@ namespace VC.Admin.Models.ContentManagement
             var toReturn = new Recipe();
             toReturn.Id = Id;
             toReturn.Name = Name?.Trim();
+            toReturn.Subtitle = Subtitle?.Trim();
+            toReturn.YoutubeImage = YoutubeImage?.Trim();
+            toReturn.YoutubeVideo = YoutubeVideo?.Trim();
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
             toReturn.FileUrl = FileUrl?.Trim();
@@ -195,16 +186,6 @@ namespace VC.Admin.Models.ContentManagement
 				Image = x.Image,
 				Title = x.Title,
 				Url = x.Url
-			}).ToList();
-
-			toReturn.Videos = Videos.Where(x => x.InUse).Select(x => new RecipeVideo()
-			{
-				Id = 0,
-				IdRecipe = Id,
-				Number = x.Number,
-				Image = x.Image,
-				Text = x.Text,
-				Video = x.Video
 			}).ToList();
 
 			return toReturn;

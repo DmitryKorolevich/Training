@@ -106,9 +106,6 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<RecipeToProduct>().ToTable("RecipesToProducts");
             builder.Entity<RecipeToProduct>().Ignore(p => p.ShortProductInfo);
 
-			builder.Entity<RecipeVideo>().Key(p => p.Id);
-			builder.Entity<RecipeVideo>().ToTable("RecipeVideos");
-
 			builder.Entity<RelatedRecipe>().Key(p => p.Id);
 			builder.Entity<RelatedRecipe>().ToTable("RelatedRecipes");
 
@@ -125,7 +122,6 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Recipe>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
 			builder.Entity<Recipe>().Collection(p => p.RelatedRecipes).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
 			builder.Entity<Recipe>().Collection(p => p.CrossSells).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
-			builder.Entity<Recipe>().Collection(p => p.Videos).InverseReference().ForeignKey(p => p.IdRecipe).PrincipalKey(p => p.Id);
 			builder.Entity<Recipe>()
                 .Collection(p => p.RecipesToProducts)
                 .InverseReference()

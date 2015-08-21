@@ -28,7 +28,6 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<Recipe> recipeRepository;
 	    private readonly IRepositoryAsync<RecipeCrossSell> _crossSellRepository;
 	    private readonly IRepositoryAsync<RelatedRecipe> _relatedRecipeRepository;
-	    private readonly IRepositoryAsync<RecipeVideo> _recipeVideoRepository;
 	    private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
@@ -40,7 +39,7 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly IDataContextAsync _context;
 	    private readonly ILogger logger;
 
-        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository, IRepositoryAsync<RecipeVideo> recipeVideoRepository,
+        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository,
 			IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
@@ -53,7 +52,6 @@ namespace VitalChoice.Business.Services.Content
             this.recipeRepository = recipeRepository;
 	        _crossSellRepository = crossSellRepository;
 	        _relatedRecipeRepository = relatedRecipeRepository;
-	        _recipeVideoRepository = recipeVideoRepository;
 	        this.contentCategoryRepository = contentCategoryRepository;
             this.recipeToContentCategoryRepository = recipeToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
@@ -134,7 +132,6 @@ namespace VitalChoice.Business.Services.Content
         {
             RecipeQuery query = new RecipeQuery().WithId(id).NotDeleted();
 	        var toReturn = (await recipeRepository.Query(query).Include(p => p.RelatedRecipes).
-		        Include(p => p.Videos).
 		        Include(p => p.CrossSells).
 		        Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
 		        Include(p => p.RecipesToContentCategories).
@@ -213,6 +210,9 @@ namespace VitalChoice.Business.Services.Content
 
 			    //what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
 			    dbItem.Name = model.Name;
+			    dbItem.Subtitle = model.Subtitle;
+			    dbItem.YoutubeVideo = model.YoutubeVideo;
+			    dbItem.YoutubeImage = model.YoutubeImage;
 			    dbItem.Url = model.Url;
 			    dbItem.FileUrl = model.FileUrl;
 			    dbItem.UserId = model.UserId;
@@ -267,18 +267,10 @@ namespace VitalChoice.Business.Services.Content
 								await _relatedRecipeRepository.InsertRangeAsync(relatedToUpdate);
 							}
 
-						    var videosToUpdate = model.Videos.ToList();
-                            var videos = await _recipeVideoRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
-						    if (videos.Any())
-						    {
-							    await _recipeVideoRepository.DeleteAllAsync(videos);
-						    }
-							if (videosToUpdate.Any())
-							{
-								await _recipeVideoRepository.InsertRangeAsync(videosToUpdate);
-							}
+						    await recipeRepository.UpdateAsync(dbItem);
 
-							await recipeRepository.UpdateAsync(dbItem);
+						    dbItem.CrossSells = crossSellsToUpdate;
+						    dbItem.RelatedRecipes = relatedToUpdate;
 					    }
 
 					    foreach (var item in recipesToProducts)

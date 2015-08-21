@@ -204,10 +204,6 @@ namespace VC.Admin.Controllers
 				{
 					model.RelatedRecipes.Add(new RelatedRecipeModel { Number = (byte)(i + 1) });
 				}
-				for (short i = 0; i < RecipeManageModel.VideosMaxCount; i++)
-				{
-					model.Videos.Add(new VideoRecipeModel { Number = (byte)(i + 1) });
-				}
 
 				return model;
             }
@@ -220,7 +216,6 @@ namespace VC.Admin.Controllers
         {
 			model.CrossSellRecipes = model.CrossSellRecipes.Where(x => x.InUse).ToList();
 			model.RelatedRecipes = model.RelatedRecipes.Where(x => x.InUse).ToList();
-			model.Videos = model.Videos.Where(x => x.InUse).ToList();
 
             if (!Validate(model))
                 return null;

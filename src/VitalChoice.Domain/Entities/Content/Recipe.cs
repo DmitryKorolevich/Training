@@ -9,7 +9,6 @@ namespace VitalChoice.Domain.Entities.Content
 	    {
 			CrossSells = new List<RecipeCrossSell>();
 			RelatedRecipes = new List<RelatedRecipe>();
-			Videos = new List<RecipeVideo>();
         }
 
 	    public virtual ICollection<RecipeToContentCategory> RecipesToContentCategories { get; set; }
@@ -20,12 +19,16 @@ namespace VitalChoice.Domain.Entities.Content
 
 	    public ICollection<RelatedRecipe> RelatedRecipes { get; set; }
 
-	    public ICollection<RecipeVideo> Videos { get; set; }
-
 	    public string AboutChef { get; set; }
 
 	    public string Ingredients { get; set; }
 
 	    public string Directions { get; set; }
+
+	    public string Subtitle { get; set; }
+
+	    public string YoutubeVideo { get; set; }
+
+	    public string YoutubeImage { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.ContentManagement;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Validation.Logic;
@@ -26,12 +27,6 @@ namespace VC.Admin.Validators.ContentManagement
 			{
 				ParseResults(relatedRecipeValidator.Validate(value.RelatedRecipes[i]), "RelatedRecipes", i);
 			}
-
-			var videoRecipeValidator = ValidatorsFactory.GetValidator<RecipeVideoModelValidator.VideoRecipeRules>();
-			for (int i = 0; i < value.Videos.Count; i++)
-			{
-				ParseResults(videoRecipeValidator.Validate(value.Videos[i]), "CrossRelatedMiscellaneous", i);
-			}
 		}
 
         private class RecipeModelValidator : AbstractValidator<RecipeManageModel>
@@ -40,9 +35,19 @@ namespace VC.Admin.Validators.ContentManagement
             {
                 RuleFor(model => model.Name)
                     .NotEmpty()
-                    .WithMessage(model => model.Name, ValidationMessages.FieldRequired);
+                    .WithMessage(model => model.Name, ValidationMessages.FieldRequired)
+					.Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+				   .WithMessage(model => model.Name, ValidationMessages.FieldLength,
+					   BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
 
-                RuleFor(model => model.Url)
+	            RuleFor(model => model.Name)
+		            .NotEmpty()
+		            .WithMessage(model => model.Subtitle, ValidationMessages.FieldRequired)
+					.Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+					.WithMessage(model => model.Subtitle, ValidationMessages.FieldLength,
+			            BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+
+				RuleFor(model => model.Url)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .NotEmpty()
                     .WithMessage(model => model.Url, ValidationMessages.FieldRequired)
@@ -52,7 +57,18 @@ namespace VC.Admin.Validators.ContentManagement
                 RuleFor(model => model.Description)
                     .NotEmpty()
                     .WithMessage(model => model.Description, ValidationMessages.FieldRequired);
-            }
+
+				RuleFor(model => model.YoutubeImage)
+					.NotEmpty()
+					.WithMessage(model => model.YoutubeImage, ValidationMessages.FieldRequired);
+
+				RuleFor(model => model.YoutubeVideo)
+				   .NotEmpty()
+				   .WithMessage(model => model.YoutubeVideo, ValidationMessages.FieldRequired)
+				   .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+				   .WithMessage(model => model.YoutubeVideo, ValidationMessages.FieldLength,
+					   BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+			}
         }
     }
 }

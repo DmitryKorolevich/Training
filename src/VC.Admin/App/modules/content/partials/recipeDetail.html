@@ -35,6 +35,15 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label for="subtitle" class="col-md-3 control-label">Subtitle</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Subtitle" class="form-control" placeholder="Subtitle" data-ng-model="recipe.Subtitle" required>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Subtitle.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.Subtitle.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Subtitle")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="url" class="col-md-3 control-label">URL</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="recipe.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
@@ -46,6 +55,30 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label class="control-label  col-md-3">Video Image</label>
+                                                <div class="col-md-9">
+                                                    <filefield name="YoutubeImage" placeholder="Video Image" ng-model="recipe.YoutubeImage" required></filefield>
+                                                    <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.YoutubeImage.$invalid">
+                                                        <small class="error" ng-show="forms.recipeForm.YoutubeImage.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Video Image")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">Video</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <input type="text" name="YoutubeVideo" class="form-control" placeholder="Video" data-ng-model="recipe.YoutubeVideo" required>
+                                                        <span class="input-group-btn">
+                                                            <a target="_blank" data-ng-href="{{recipe.YoutubeVideo ? youTubeBaseUrl.format(recipe.YoutubeVideo) : ''}}" class="btn btn-default"><i class="glyphicon glyphicon-eye-open"></i></a>
+                                                        </span>
+                                                    </div>
+                                                        <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.YoutubeVideo.$invalid">
+                                                            <small class="error" ng-show="forms.recipeForm.YoutubeVideo.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Video")}}</small>
+                                                            <small class="error" ng-show="forms.recipeForm.YoutubeVideo.$error.server">{{serverMessages.GetMessage('YoutubeVideo')}}</small>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                           <div class="form-group">
                                                 <label for="description" class="col-md-3 control-label">Description</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!descriptionExpanded">
@@ -63,13 +96,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="Image" class="col-md-3 control-label">Image</label>
-                                                <div class="col-md-9">
-                                                    <filefield Name="Image" placeholder="Image" ng-model="recipe.FileUrl"></filefield>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
+                                           <div class="form-group">
                                                 <label for="AboutChef" class="col-md-3 control-label">About Chef</label>
                                                 <div class="col-md-9">
                                                     <div class="input-group" data-ng-show="!AboutChefExpanded">
@@ -112,6 +139,12 @@
                                                         <a data-ng-click="toogleEditorState('DirectionsExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
                                                     <div data-ng-show="DirectionsExpanded" text-angular data-ng-model="recipe.Directions"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Image" class="col-md-3 control-label">Image</label>
+                                                <div class="col-md-9">
+                                                    <filefield Name="Image" placeholder="Image" ng-model="recipe.FileUrl"></filefield>
                                                 </div>
                                             </div>
                                             <span class="legend">SEO</span>
@@ -380,91 +413,6 @@
                                                                 </h4>
                                                             </div>
                                                             <div class="panel-collapse" data-ng-class="{collapse: !relatedRecipe.IsOpen}">
-                                                                <div class="panel-body">
-                                                                    <div class="form-horizontal">
-                                                                        <div class="form-group">
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </fieldset>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <span class="legend">YouTube Video</span>
-                                    <form name="forms.CrossRelatedMiscellaneous" data-ng-submit="save()" data-ng-class="{submitted: forms.videossubmitted}" class="form-horizontal" novalidate>
-                                        <div class="panel-group sortable-accordion">
-                                            <div data-ng-model="recipe.Videos">
-                                                <div data-ng-repeat="video in recipe.Videos" class="panel panel-default">
-                                                    <div class="form-horizontal" ng-form="i{{$index}}">
-                                                        <fieldset>
-                                                            <div class="panel-heading">
-                                                                <h4 class="panel-title">
-                                                                    <div class="accordion-toggle">
-                                                                        <div class="form-horizontal">
-                                                                            <div class="row">
-                                                                                <div class="col-md-12">
-                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Video</label>
-                                                                                        <div class="col-md-1" data-ng-if="video.InUse">
-                                                                                            <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$invalid">
-                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
-                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-md-1" data-ng-if="!video.InUse">
-                                                                                            <input type="text" name="DefaultVideo" class="form-control" placeholder="YouTube Video" data-ng-model="recipeDefaults['YouTubeVideo'+($index+1)]" readonly>
-                                                                                        </div>
-                                                                                        <a data-ng-if="!video.InUse" target="_blank" data-ng-href="{{youTubeBaseUrl.format(recipeDefaults['YouTubeVideo'+($index+1)])}}" class="edit-link">view</a>
-                                                                                        <a data-ng-if="video.InUse" target="_blank" data-ng-href="{{video.Video ? youTubeBaseUrl.format(video.Video) : ''}}" class="edit-link">view</a>
-                                                                                    </div>
-                                                                                    <div class="fixed-accordion-row pull-right" data-ng-click="$event.stopPropagation()">
-                                                                                        <button data-ng-if="!video.InUse" class="btn btn-info width-80px" data-ng-click="setCustom(video)">Set</button>
-                                                                                        <button data-ng-if="video.InUse" class="btn btn-info width-80px" data-ng-click="removeCustom(video)">Remove</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-md-12">
-                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Image</label>
-                                                                                        <div class="col-md-1" data-ng-if="video.InUse">
-                                                                                            <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Image.$invalid">
-                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-md-1" data-ng-if="!video.InUse">
-                                                                                            <filefield name="DefaultImage" placeholder="YouTube Image" ng-model="recipeDefaults['YouTubeImage'+($index+1)]" disabled></filefield>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-md-12">
-                                                                                    <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
-                                                                                        <label class="control-label">Text</label>
-                                                                                        <div class="col-md-1" data-ng-if="video.InUse">
-                                                                                            <input type="text" name="Text" class="form-control" placeholder="YouTube Text" data-ng-model="video.Text" required>
-                                                                                            <div class="error-container" ng-show="forms.videossubmitted && forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$invalid">
-                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Text")}}</small>
-                                                                                                <small class="error" ng-show="forms.CrossRelatedMiscellaneous.i{{$index}}.Text.$error.server">{{serverMessages.GetMessage('Text','Videos',$index)}}</small>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="col-md-1" data-ng-if="!video.InUse">
-                                                                                            <input type="text" name="DefaultText" class="form-control" placeholder="YouTube Text" data-ng-model="recipeDefaults['YouTubeText'+($index+1)]" readonly>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </h4>
-                                                            </div>
-                                                            <div class="panel-collapse" data-ng-class="{collapse: !video.IsOpen}">
                                                                 <div class="panel-body">
                                                                     <div class="form-horizontal">
                                                                         <div class="form-group">
