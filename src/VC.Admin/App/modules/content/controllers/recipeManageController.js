@@ -44,6 +44,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 				});
                 			}
                 		}
+                		messages += value.Message + "<br />";
                 	});
 
                 	if (formForShowing) {
@@ -168,9 +169,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 							                    };
 							                    setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
 							                    addProductsListWatchers();
-							                    initCrossRelated($scope.recipe.RelatedRecipes);
-							                    initCrossRelated($scope.recipe.CrossSellRecipes);
-							                    initVideos();
 						                    } else {
 							                    errorHandler(result);
 						                    }
@@ -283,19 +281,20 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 
         function activateTab(formName) {
         	$.each($scope.tabs, function (index, item) {
+		        var temp = "";
         		if (formName.indexOf('recipeForm') == 0) {
-        			formName = 'details';
+        			temp = 'details';
         		}
         		if (formName.indexOf('CrossSellRecipes') == 0) {
-        			formName = 'crossSellRelatedRecipes';
+        			temp = 'crossSellRelatedRecipes';
         		}
         		if (formName.indexOf('RelatedRecipes') == 0) {
-        			formName = 'crossSellRelatedRecipes';
+        			temp = 'crossSellRelatedRecipes';
         		}
         		if (formName.indexOf('CrossRelatedMiscellaneous') == 0) {
-        			formName = 'crossSellProductsAndVideos';
+        			temp = 'crossSellRelatedRecipes';
         		}
-        		if (item.formName == formName) {
+        		if (item.formName == temp) {
         			item.active = true;
         			return false;
         		}
@@ -306,97 +305,32 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.recipe.RecipesToProducts.splice(index, 1);
         };
 
-        $scope.setCustomVideo = function (item) {
-        	item.VideoUse = true;
-        	item.ImageUse = true;
-        	item.TextUse = true;
+        $scope.setCustom = function (item) {
+        	item.InUse = true;
         };
 
-        $scope.removeCustomVideo = function (item) {
-        	item.VideoUse = false;
-        	item.ImageUse = false;
-        	item.TextUse = false;
-        };
-
-        $scope.setCustomCross = function (item) {
-	        $scope.setCustomRelated(item);
-        	item.SubtitleUse = true;
-        };
-
-        $scope.setCustomRelated = function (item) {
-        	item.ImageUse = true;
-        	item.UrlUse = true;
-        	item.TitleUse = true;
-        };
-
-        $scope.removeCustomRelated = function (item) {
-        	item.ImageUse = false;
-        	item.UrlUse = false;
-        	item.TitleUse = false;
-        };
-
-        $scope.removeCustomCross = function (item) {
-        	$scope.removeCustomRelated(item);
-        	item.SubtitleUse = false;
-        };
-
-        function initCrossRelated (array) {
-        	$.each(array, function (index, item) {
-        		if (item.Image) {
-        			item.ImageUse = true;
-        		}
-        		if (item.Url) {
-        			item.UrlUse = true;
-        		}
-        		if (item.Title) {
-        			item.TitleUse = true;
-        		}
-        		if (item.Subtitle) {
-        			item.SubtitleUse = true;
-        		}
-        	});
+        $scope.removeCustom = function (item) {
+        	item.InUse = false;
         };
 
         function updateCrossRelated(array) {
         	$.each(array, function (index, item) {
-        		if (!item.ImageUse) {
-        			item.Image = null;
-        		}
-        		if (!item.UrlUse) {
-        			item.Url = null;
-        		}
-        		if (!item.TitleUse) {
-        			item.Title = null;
-        		}
-        		if (item.Subtitle !== undefined && !item.SubtitleUse) {
-        			item.Subtitle = null;
-        		}
-        	});
-        };
-
-        function initVideos() {
-        	$.each($scope.recipe.Videos, function (index, item) {
-        		if (item.Video) {
-        			item.VideoUse = true;
-        		}
-        		if (item.Image) {
-        			item.ImageUse = true;
-        		}
-        		if (item.Text) {
-        			item.TextUse = true;
-        		}
+		        if (!item.InUse) {
+			        item.Image = null;
+			        item.Url = null;
+			        item.Title = null;
+			        if (item.Subtitle !== undefined) {
+				        item.Subtitle = null;
+			        }
+		        }
         	});
         };
 
         function updateVideos() {
         	$.each($scope.recipe.Videos, function (index, item) {
-        		if (!item.VideoUse) {
+        		if (!item.InUse) {
         			item.Video = null;
-        		}
-        		if (!item.ImageUse) {
         			item.Image = null;
-        		}
-        		if (!item.TextUse) {
         			item.Text = null;
         		}
         	});

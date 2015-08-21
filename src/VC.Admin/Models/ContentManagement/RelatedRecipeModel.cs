@@ -10,7 +10,7 @@ using VitalChoice.Validation.Models;
 namespace VC.Admin.Models.ContentManagement
 {
 	[ApiValidator(typeof(RelatedRecipeModelValidator))]
-	public class RelatedRecipeModel:BaseModel
+	public class RelatedRecipeModel:DefaultModeRecipeItem
 	{
 		public string Image { get; set; }
 

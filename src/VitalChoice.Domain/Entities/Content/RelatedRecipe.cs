@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VitalChoice.Domain.Entities.Content
+﻿namespace VitalChoice.Domain.Entities.Content
 {
     public class RelatedRecipe: Entity
     {
@@ -14,5 +9,7 @@ namespace VitalChoice.Domain.Entities.Content
 		public string Image { get; set; }
 
 		public string Title { get; set; }
+
+		public byte Number { get; set; }
 	}
 }

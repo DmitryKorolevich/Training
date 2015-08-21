@@ -156,3 +156,44 @@ BEGIN
 	UNION
 	SELECT 'vCsRTamxWuw', N'YouTubeVideo3'
 END
+
+IF COL_LENGTH('[dbo].[RecipeCrossSells]','Number') IS NULL
+BEGIN
+	DELETE FROM [dbo].[RecipeCrossSells]
+	DELETE FROM [dbo].[RecipeVideos]
+	DELETE FROM [dbo].[RelatedRecipes]
+
+	ALTER TABLE [dbo].[RecipeCrossSells]
+	ADD [Number] [TINYINT] NOT NULL
+
+	ALTER TABLE [dbo].[RelatedRecipes]
+	ADD [Number] [TINYINT] NOT NULL
+
+	ALTER TABLE [dbo].[RecipeVideos]
+	ADD [Number] [TINYINT] NOT NULL
+
+	ALTER TABLE [dbo].[RecipeCrossSells]
+	ADD CONSTRAINT
+	UQ_RecipeCrossSells_Number UNIQUE NONCLUSTERED
+	(
+		IdRecipe,
+		Number
+	)
+
+	ALTER TABLE [dbo].[RelatedRecipes]
+	ADD CONSTRAINT
+	UQ_RelatedRecipes_Number UNIQUE NONCLUSTERED
+	(
+		IdRecipe,
+		Number
+	)
+
+	ALTER TABLE [dbo].[RecipeVideos]
+	ADD CONSTRAINT
+	UQ_RecipeVideos_Number UNIQUE NONCLUSTERED
+	(
+		IdRecipe,
+		Number
+	)
+
+END

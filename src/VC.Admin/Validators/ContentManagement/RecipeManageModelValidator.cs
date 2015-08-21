@@ -16,21 +16,21 @@ namespace VC.Admin.Validators.ContentManagement
             ParseResults(ValidatorsFactory.GetValidator<RecipeModelValidator>().Validate(value));
 
 			var crossSellRecipeValidator = ValidatorsFactory.GetValidator<CrossSellRecipeModelValidator.CrossSellRecipeRules>();
-			foreach (var crossRecipe in value.CrossSellRecipes)
+			for (int i = 0; i < value.CrossSellRecipes.Count; i++)
 			{
-				ParseResults(crossSellRecipeValidator.Validate(crossRecipe));
+				ParseResults(crossSellRecipeValidator.Validate(value.CrossSellRecipes[i]), "CrossSellRecipes", i);
 			}
 
 			var relatedRecipeValidator = ValidatorsFactory.GetValidator<RelatedRecipeModelValidator.RelatedRecipeRules>();
-			foreach (var relatedRecipe in value.RelatedRecipes)
+			for (int i = 0; i < value.RelatedRecipes.Count; i++)
 			{
-				ParseResults(relatedRecipeValidator.Validate(relatedRecipe));
+				ParseResults(relatedRecipeValidator.Validate(value.RelatedRecipes[i]), "RelatedRecipes", i);
 			}
 
 			var videoRecipeValidator = ValidatorsFactory.GetValidator<RecipeVideoModelValidator.VideoRecipeRules>();
-			foreach (var videoRecipe in value.Videos)
+			for (int i = 0; i < value.Videos.Count; i++)
 			{
-				ParseResults(videoRecipeValidator.Validate(videoRecipe));
+				ParseResults(videoRecipeValidator.Validate(value.Videos[i]), "CrossRelatedMiscellaneous", i);
 			}
 		}
 

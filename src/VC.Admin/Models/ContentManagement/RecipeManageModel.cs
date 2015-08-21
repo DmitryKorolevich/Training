@@ -13,6 +13,10 @@ namespace VC.Admin.Models.ContentManagement
     [ApiValidator(typeof(RecipeManageModelValidator))]
     public class RecipeManageModel : BaseModel
     {
+	    public const short RelatedRecipesMaxCount = 4;
+		public const short CrossSellRecipesMaxCount = 3;
+		public const short VideosMaxCount = 1;
+
         public int Id { get; set; }
 
         [Localized(GeneralFieldNames.Title)]
@@ -67,7 +71,7 @@ namespace VC.Admin.Models.ContentManagement
 			Videos = new List<VideoRecipeModel>();
         }
 
-        public RecipeManageModel(Recipe item)
+        public RecipeManageModel(Recipe item):this()
         {
             Id = item.Id;
             Name = item.Name;
@@ -93,27 +97,57 @@ namespace VC.Admin.Models.ContentManagement
 
             RecipesToProducts = item.RecipesToProducts.ToList();
 
-	        CrossSellRecipes = item.CrossSells.Select(x => new CrossSellRecipeModel()
+	        for (short i = 0; i < CrossSellRecipesMaxCount; i++)
 	        {
-				Image = x.Image,
-				Subtitle = x.Subtitle,
-				Title = x.Title,
-				Url = x.Url
-	        }).ToList();
+		        var curNumber = (byte)(i + 1);
 
-			RelatedRecipes = item.CrossSells.Select(x => new RelatedRecipeModel()
-			{
-				Image = x.Image,
-				Title = x.Title,
-				Url = x.Url
-			}).ToList();
+		        var overridenItem = item.CrossSells.SingleOrDefault(x => x.Number == curNumber);
+		        var model = new CrossSellRecipeModel() {Number = curNumber, InUse = false};
+		        if (overridenItem != null)
+		        {
+			        model.Image = overridenItem.Image;
+			        model.Subtitle = overridenItem.Subtitle;
+			        model.Title = overridenItem.Title;
+			        model.Url = overridenItem.Url;
+			        model.InUse = true;
+		        }
 
-			Videos = item.Videos.Select(x => new VideoRecipeModel()
+		        CrossSellRecipes.Add(model);
+            }
+
+			for (short i = 0; i < RelatedRecipesMaxCount; i++)
 			{
-				Image = x.Image,
-				Text = x.Text,
-				Video = x.Video
-			}).ToList();
+				var curNumber = (byte)(i + 1);
+
+				var overridenItem = item.RelatedRecipes.SingleOrDefault(x => x.Number == curNumber);
+				var model = new RelatedRecipeModel() { Number = curNumber, InUse = false };
+				if (overridenItem != null)
+				{
+					model.Image = overridenItem.Image;
+					model.Title = overridenItem.Title;
+					model.Url = overridenItem.Url;
+					model.InUse = true;
+				}
+
+				RelatedRecipes.Add(model);
+			}
+
+			for (short i = 0; i < VideosMaxCount; i++)
+			{
+				var curNumber = (byte)(i + 1);
+
+				var overridenItem = item.Videos.SingleOrDefault(x => x.Number == curNumber);
+				var model = new VideoRecipeModel() { Number = curNumber, InUse = false };
+				if (overridenItem != null)
+				{
+					model.Image = overridenItem.Image;
+					model.Text = overridenItem.Text;
+					model.Video = overridenItem.Video;
+					model.InUse = true;
+				}
+
+				Videos.Add(model);
+			}
 		}
 
         public Recipe Convert()
@@ -142,23 +176,32 @@ namespace VC.Admin.Models.ContentManagement
             }
             toReturn.RecipesToProducts = RecipesToProducts;
 
-			toReturn.CrossSells = CrossSellRecipes.Select(x => new RecipeCrossSell()
+			toReturn.CrossSells = CrossSellRecipes.Where(x=>x.InUse).Select(x => new RecipeCrossSell()
 			{
+				Id = 0,
+				IdRecipe = Id,
+				Number = x.Number,
 				Image = x.Image,
 				Subtitle = x.Subtitle,
 				Title = x.Title,
 				Url = x.Url
 			}).ToList();
 
-			toReturn.RelatedRecipes = RelatedRecipes.Select(x => new RelatedRecipe()
+			toReturn.RelatedRecipes = RelatedRecipes.Where(x => x.InUse).Select(x => new RelatedRecipe()
 			{
+				Id = 0,
+				IdRecipe = Id,
+				Number = x.Number,
 				Image = x.Image,
 				Title = x.Title,
 				Url = x.Url
 			}).ToList();
 
-			toReturn.Videos = Videos.Select(x => new RecipeVideo()
+			toReturn.Videos = Videos.Where(x => x.InUse).Select(x => new RecipeVideo()
 			{
+				Id = 0,
+				IdRecipe = Id,
+				Number = x.Number,
 				Image = x.Image,
 				Text = x.Text,
 				Video = x.Video

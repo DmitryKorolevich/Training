@@ -189,38 +189,39 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var now = DateTime.Now;
-                return new RecipeManageModel()
+	            var model = new RecipeManageModel()
                 {
-                    Template = String.Empty,
+                    Template = string.Empty,
                     CategoryIds = new List<int>(),
-                    RecipesToProducts = new List<RecipeToProduct>(),
-					CrossSellRecipes = new List<CrossSellRecipeModel>()
-					{
-						new CrossSellRecipeModel(),
-						new CrossSellRecipeModel(),
-						new CrossSellRecipeModel(),
-					},
-					RelatedRecipes = new List<RelatedRecipeModel>()
-					{
-						new RelatedRecipeModel(),
-						new RelatedRecipeModel(),
-						new RelatedRecipeModel(),
-						new RelatedRecipeModel()
-					},
-					Videos = new List<VideoRecipeModel>()
-					{
-						new VideoRecipeModel()
-					}
+                    RecipesToProducts = new List<RecipeToProduct>()
 				};
+
+	            for (short i = 0; i < RecipeManageModel.CrossSellRecipesMaxCount; i++)
+	            {
+					model.CrossSellRecipes.Add(new CrossSellRecipeModel { Number = (byte)(i + 1) });
+	            }
+				for (short i = 0; i < RecipeManageModel.RelatedRecipesMaxCount; i++)
+				{
+					model.RelatedRecipes.Add(new RelatedRecipeModel { Number = (byte)(i + 1) });
+				}
+				for (short i = 0; i < RecipeManageModel.VideosMaxCount; i++)
+				{
+					model.Videos.Add(new VideoRecipeModel { Number = (byte)(i + 1) });
+				}
+
+				return model;
             }
-            return new RecipeManageModel((await recipeService.GetRecipeAsync(id)));
+            return new RecipeManageModel(await recipeService.GetRecipeAsync(id));
         }
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
         public async Task<Result<RecipeManageModel>> UpdateRecipe([FromBody]RecipeManageModel model)
         {
+			model.CrossSellRecipes = model.CrossSellRecipes.Where(x => x.InUse).ToList();
+			model.RelatedRecipes = model.RelatedRecipes.Where(x => x.InUse).ToList();
+			model.Videos = model.Videos.Where(x => x.InUse).ToList();
+
             if (!Validate(model))
                 return null;
             var item = model.Convert();

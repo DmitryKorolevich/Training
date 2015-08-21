@@ -18,14 +18,18 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
+using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Transaction;
 
 namespace VitalChoice.Business.Services.Content
 {
     public class RecipeService : IRecipeService
     {
         private readonly IRepositoryAsync<Recipe> recipeRepository;
-        private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
-        private readonly IRepositoryAsync<ContentItem> contentItemRepository;
+	    private readonly IRepositoryAsync<RecipeCrossSell> _crossSellRepository;
+	    private readonly IRepositoryAsync<RelatedRecipe> _relatedRecipeRepository;
+	    private readonly IRepositoryAsync<RecipeVideo> _recipeVideoRepository;
+	    private readonly IRepositoryAsync<ContentCategory> contentCategoryRepository;
         private readonly IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
@@ -33,22 +37,24 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly IRepositoryAsync<RecipeDefaultSetting> _recipeSettingRepository;
 	    private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache templatesCache;
-        private readonly ILogger logger;
+	    private readonly IDataContextAsync _context;
+	    private readonly ILogger logger;
 
-        public RecipeService(IRepositoryAsync<Recipe> recipeRepository,
-            IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
+        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository, IRepositoryAsync<RecipeVideo> recipeVideoRepository,
+			IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
 			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
 			IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
+            ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache, IDataContextAsync context)
         {
             this.recipeRepository = recipeRepository;
-            this.contentCategoryRepository = contentCategoryRepository;
-            this.contentItemRepository = contentItemRepository;
+	        _crossSellRepository = crossSellRepository;
+	        _relatedRecipeRepository = relatedRecipeRepository;
+	        _recipeVideoRepository = recipeVideoRepository;
+	        this.contentCategoryRepository = contentCategoryRepository;
             this.recipeToContentCategoryRepository = recipeToContentCategoryRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
@@ -56,7 +62,8 @@ namespace VitalChoice.Business.Services.Content
 			_recipeSettingRepository = recipeSettingRepository;
 	        this._productRepository = productRepository;
             this.templatesCache = templatesCache;
-            logger = loggerProvider.CreateLoggerDefault();
+			_context = context;
+	        logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task<PagedList<Recipe>> GetRecipesAsync(RecipeListFilter filter)
@@ -194,63 +201,108 @@ namespace VitalChoice.Business.Services.Content
                 }
             }
 
-            if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
-            {
-                var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
-                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
-                if (urlDublicatesExist)
-                {
-                    throw new AppValidationException("Url", "Recipe with the same URL already exists, please use a unique URL.");
-                }
+		    if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
+		    {
+			    var urlDublicatesExist = await recipeRepository.Query(p => p.Url == model.Url && p.Id != dbItem.Id
+			                                                               && p.StatusCode != RecordStatusCode.Deleted)
+				    .SelectAnyAsync();
+			    if (urlDublicatesExist)
+			    {
+				    throw new AppValidationException("Url", "Recipe with the same URL already exists, please use a unique URL.");
+			    }
 
-				//what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
-                dbItem.Name = model.Name;
-                dbItem.Url = model.Url;
-                dbItem.FileUrl = model.FileUrl;
-                dbItem.UserId = model.UserId;
-	            dbItem.AboutChef = model.AboutChef;
-	            dbItem.Directions = model.Directions;
-	            dbItem.Ingredients = model.Ingredients;
-                dbItem.ContentItem.Updated = DateTime.Now;
-                dbItem.ContentItem.Template = model.ContentItem.Template;
-                dbItem.ContentItem.Description = model.ContentItem.Description;
-                dbItem.ContentItem.Title = model.ContentItem.Title;
-                dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
-                dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
-                dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
+			    //what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
+			    dbItem.Name = model.Name;
+			    dbItem.Url = model.Url;
+			    dbItem.FileUrl = model.FileUrl;
+			    dbItem.UserId = model.UserId;
+			    dbItem.AboutChef = model.AboutChef;
+			    dbItem.Directions = model.Directions;
+			    dbItem.Ingredients = model.Ingredients;
+			    dbItem.ContentItem.Updated = DateTime.Now;
+			    dbItem.ContentItem.Template = model.ContentItem.Template;
+			    dbItem.ContentItem.Description = model.ContentItem.Description;
+			    dbItem.ContentItem.Title = model.ContentItem.Title;
+			    dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
+			    dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
+			    dbItem.ContentItem.ContentItemToContentProcessors = model.ContentItem.ContentItemToContentProcessors;
 
-                ICollection<RecipeToProduct> recipesToProducts = new List<RecipeToProduct>();
-                if (model.RecipesToProducts != null)
-                {
-                    recipesToProducts = model.RecipesToProducts.ToList();
-                }
-                dbItem.RecipesToProducts = null;
+			    ICollection<RecipeToProduct> recipesToProducts = new List<RecipeToProduct>();
+			    if (model.RecipesToProducts != null)
+			    {
+				    recipesToProducts = model.RecipesToProducts.ToList();
+			    }
+			    dbItem.RecipesToProducts = null;
 
-	            dbItem.RelatedRecipes = model.RelatedRecipes;
-	            dbItem.CrossSells = model.CrossSells;
-	            dbItem.Videos = model.Videos;
+			    using (var transaction = new TransactionManager(_context).BeginTransaction())
+			    {
+				    try
+				    {
 
-                if (model.Id == 0)
-                {
-                    await recipeRepository.InsertGraphAsync(dbItem);
-                }
-                else
-                {
-                    await recipeRepository.UpdateAsync(dbItem);
-                }
+					    if (model.Id == 0)
+					    {
+						    await recipeRepository.InsertGraphAsync(dbItem);
+					    }
+					    else
+					    {
+							var crossSellsToUpdate = model.CrossSells.ToList();
+							var crossSells = await _crossSellRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
+						    if (crossSells.Any())
+						    {
+							    await _crossSellRepository.DeleteAllAsync(crossSells);
+						    }
+						    if (crossSellsToUpdate.Any())
+						    {
+								await _crossSellRepository.InsertRangeAsync(crossSellsToUpdate);
+							}
 
-                foreach (var item in recipesToProducts)
-                {
-                    item.Id = 0;
-                    item.IdRecipe = dbItem.Id;
-                }
-                var dbProducts = await _recipeToProductRepository.Query(c => c.IdRecipe == dbItem.Id).SelectAsync();
-                await _recipeToProductRepository.DeleteAllAsync(dbProducts);
-                await _recipeToProductRepository.InsertRangeAsync(recipesToProducts);
-                dbItem.RecipesToProducts = recipesToProducts;
-            }
+							var relatedToUpdate = model.RelatedRecipes.ToList();
+							var relatedRecipes = await _relatedRecipeRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
+						    if (relatedRecipes.Any())
+						    {
+							    await _relatedRecipeRepository.DeleteAllAsync(relatedRecipes);
+						    }
+							if (relatedToUpdate.Any())
+							{
+								await _relatedRecipeRepository.InsertRangeAsync(relatedToUpdate);
+							}
 
-            return dbItem;
+						    var videosToUpdate = model.Videos.ToList();
+                            var videos = await _recipeVideoRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
+						    if (videos.Any())
+						    {
+							    await _recipeVideoRepository.DeleteAllAsync(videos);
+						    }
+							if (videosToUpdate.Any())
+							{
+								await _recipeVideoRepository.InsertRangeAsync(videosToUpdate);
+							}
+
+							await recipeRepository.UpdateAsync(dbItem);
+					    }
+
+					    foreach (var item in recipesToProducts)
+					    {
+						    item.Id = 0;
+						    item.IdRecipe = dbItem.Id;
+					    }
+
+					    var dbProducts = await _recipeToProductRepository.Query(c => c.IdRecipe == dbItem.Id).SelectAsync();
+					    await _recipeToProductRepository.DeleteAllAsync(dbProducts);
+					    await _recipeToProductRepository.InsertRangeAsync(recipesToProducts);
+					    dbItem.RecipesToProducts = recipesToProducts;
+
+					    transaction.Commit();
+				    }
+				    catch (Exception e)
+				    {
+					    transaction.Rollback();
+					    throw;
+				    }
+			    }
+		    }
+
+		    return dbItem;
         }
 
         public async Task<bool> AttachRecipeToCategoriesAsync(int id, IEnumerable<int> categoryIds)
