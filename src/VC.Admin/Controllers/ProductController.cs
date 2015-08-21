@@ -140,16 +140,16 @@ namespace VC.Admin.Controllers
                     SKUs = new List<SKUManageModel>(),
                     CrossSellProducts = new List<CrossSellProductModel>()
                     {
-                        new CrossSellProductModel(),
-                        new CrossSellProductModel(),
-                        new CrossSellProductModel(),
-                        new CrossSellProductModel(),
+                        new CrossSellProductModel() { IsDefault=true},
+                        new CrossSellProductModel() { IsDefault=true},
+                        new CrossSellProductModel() { IsDefault=true},
+                        new CrossSellProductModel() { IsDefault=true},
                     },
                     Videos = new List<VideoModel>()
                     {
-                        new VideoModel(),
-                        new VideoModel(),
-                        new VideoModel(),
+                        new VideoModel() { IsDefault=true},
+                        new VideoModel() { IsDefault=true},
+                        new VideoModel() { IsDefault=true},
                     },
                 };
             }
@@ -157,6 +157,20 @@ namespace VC.Admin.Controllers
             var item = await productService.SelectAsync(id);
             
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
+            if (toReturn.CrossSellProducts != null)
+            {
+                foreach (var product in toReturn.CrossSellProducts)
+                {
+                    product.IsDefault = String.IsNullOrEmpty(product.Image) && String.IsNullOrEmpty(product.Url);
+                }
+            }
+            if (toReturn.Videos != null)
+            {
+                foreach (var video in toReturn.Videos)
+                {
+                    video.IsDefault = String.IsNullOrEmpty(video.Image) && String.IsNullOrEmpty(video.Video) && String.IsNullOrEmpty(video.Text);
+                }
+            }
             return toReturn;
         }
 

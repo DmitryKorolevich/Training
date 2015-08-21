@@ -501,22 +501,26 @@ angular.module('app.modules.product.controllers.productManageController', [])
             item.VideoUse = true;
             item.ImageUse = true;
             item.TextUse = true;
+            item.IsDefault = false;
         };
 
         $scope.removeCustomVideo = function (item) {
             item.VideoUse = false;
             item.ImageUse = false;
             item.TextUse = false;
+            item.IsDefault = true;
         };
 
         $scope.setCustomCross = function (item) {
             item.ImageUse = true;
             item.UrlUse = true;
+            item.IsDefault = false;
         };
 
         $scope.removeCustomCross = function (item) {
             item.ImageUse = false;
             item.UrlUse = false;
+            item.IsDefault = true;
         };
 
         $scope.deleteSKU = function (index) {

@@ -30,6 +30,8 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Domain.Transfer.Affiliates;
+using VitalChoice.Domain.Mail;
+using VitalChoice.Business.Mail;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -37,6 +39,7 @@ namespace VitalChoice.Business.Services.Affiliates
     {
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly INotificationService _notificationService;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
             IEcommerceRepositoryAsync<AffiliateOptionType> affiliateOptionTypeRepository,
@@ -44,13 +47,14 @@ namespace VitalChoice.Business.Services.Affiliates
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             AffiliateMapper mapper,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService)
             : base(
                 mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
                 bigStringValueRepository)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
@@ -140,6 +144,12 @@ namespace VitalChoice.Business.Services.Affiliates
             }
 
             return toReturn;
+        }
+
+        public async Task<bool> SendAffiliateEmailAsync(BasicEmail model)
+        {
+            await _notificationService.SendBasicEmailAsync(model);
+            return true;
         }
     }
 }

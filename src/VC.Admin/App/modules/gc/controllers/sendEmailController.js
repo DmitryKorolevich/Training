@@ -56,7 +56,8 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	        });
 
 		    if ($scope.forms.form.$valid) {
-		        gcService.senfGiftCertificateEmail($scope.email, $scope.saveTracker).success(function (result) {
+		        gcService.sendGiftCertificateEmail($scope.email, $scope.saveTracker).success(function (result)
+		        {
 		            successSaveHandler(result);
 		        }).
                 error(function (result) {

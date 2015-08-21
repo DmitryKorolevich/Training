@@ -92,7 +92,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> SenfGiftCertificateEmail([FromBody]GCEmailModel model)
+        public async Task<Result<bool>> SendGiftCertificateEmail([FromBody]GCEmailModel model)
         {
             if (!Validate(model))
                 return false;

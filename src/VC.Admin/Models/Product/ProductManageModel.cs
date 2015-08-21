@@ -20,6 +20,8 @@ namespace VC.Admin.Models.Product
 
         public string Url { get; set; }
 
+        public bool IsDefault { get; set; }
+
         public CrossSellProductModel()
         {
         }
@@ -32,6 +34,8 @@ namespace VC.Admin.Models.Product
         public string Video { get; set; }
 
         public string Text { get; set; }
+
+        public bool IsDefault { get; set; }
 
         public VideoModel()
         {

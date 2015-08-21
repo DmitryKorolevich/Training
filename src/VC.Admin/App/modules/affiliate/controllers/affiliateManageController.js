@@ -2,8 +2,8 @@
 
 angular.module('app.modules.affiliate.controllers.affiliateManageController', [])
 .controller('affiliateManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal',
-    'affiliateService', 'customerService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, affiliateService, customerService, toaster, confirmUtil, promiseTracker)
+    'affiliateService', 'customerService', 'modalUtil', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, affiliateService, customerService, modalUtil, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
 
@@ -161,6 +161,28 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 }
             }
             return states;
+        };
+
+        $scope.notify = function ()
+        {
+            var data =
+                {
+                    Type: 1,//notify
+                    ToName: $scope.affiliate.Name,
+                    ToEmail: $scope.affiliate.Email,
+                };
+            modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
+        };
+
+        $scope.email = function ()
+        {
+            var data =
+                {
+                    Type: 2,//email
+                    ToName: $scope.affiliate.Name,
+                    ToEmail: $scope.affiliate.Email,
+                };
+            modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
         };
 
         initialize();

@@ -108,6 +108,34 @@ namespace VC.Admin.Controllers
             return _mapper.ToModel<AffiliateManageModel>(item);
         }
 
+        [HttpGet]
+        public Task<Result<AffiliateEmailModel>> GetAffiliateEmail(int id)
+        {
+            AffiliateEmailModel toReturn = new AffiliateEmailModel();
+            toReturn.FromName = "Vital Choice";
+            toReturn.FromEmail = "affiliatesupport@vitalchoice.com";
+            toReturn.Subject = "Your Vital Choice affiliate account is ready.";
+            if (id == 1)//notify
+            {
+                toReturn.Message = "Notify";
+            }
+            else if (id == 2)//email
+            {
+                toReturn.Message = "Email";
+            }
+
+            return Task.FromResult<Result<AffiliateEmailModel>>(toReturn);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> SendAffiliateEmail([FromBody]AffiliateEmailModel model)
+        {
+            if (!Validate(model))
+                return false;
+            var item = model.Convert();
+            return await _affiliateService.SendAffiliateEmailAsync(item);
+        }
+
         [HttpPost]
         public async Task<Result<bool>> DeleteAffiliate(int id)
         {

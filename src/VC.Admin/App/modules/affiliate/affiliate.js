@@ -3,6 +3,7 @@
 angular.module('app.modules.affiliate', [
 	'app.modules.affiliate.controllers.affiliatesController',
 	'app.modules.affiliate.controllers.affiliateManageController',
+	'app.modules.affiliate.controllers.affiliateSendEmailController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

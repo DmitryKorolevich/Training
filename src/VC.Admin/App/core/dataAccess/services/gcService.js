@@ -28,8 +28,8 @@ angular.module('app.core.dataAccess.services.gcService', [])
         updateGiftCertificate: function (model, tracker) {
             return $http.post(baseUrl + 'UpdateGiftCertificate', model, getConfig(tracker));
         },
-        senfGiftCertificateEmail: function (model, tracker) {
-            return $http.post(baseUrl + 'SenfGiftCertificateEmail', model, getConfig(tracker));
+        sendGiftCertificateEmail: function (model, tracker) {
+            return $http.post(baseUrl + 'SendGiftCertificateEmail', model, getConfig(tracker));
         },
         deleteGiftCertificate: function (id, tracker) {
             return $http.post(baseUrl + 'DeleteGiftCertificate/' + id, getConfig(tracker));

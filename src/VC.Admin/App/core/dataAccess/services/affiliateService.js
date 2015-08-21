@@ -27,6 +27,14 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.post(baseUrl + 'UpdateAffiliate', model, getConfig(tracker));
 	    },
+	    getAffiliateEmail: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetAffiliateEmail/' + id, getConfig(tracker));
+	    },
+	    sendAffiliateEmail: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'SendAffiliateEmail', model, getConfig(tracker));
+	    },
 	    deleteAffiliate: function (id, tracker)
 	    {
 	        return $http.post(baseUrl + 'DeleteAffiliate/' + id, getConfig(tracker));

@@ -8,12 +8,14 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VC.Admin.Validators.Affiliate;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Mail;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Affiliate
 {
-    [ApiValidator(typeof(GCManageEmailModelValidator))]
-    public class GCEmailModel : BaseModel
+    [ApiValidator(typeof(AffiliateEmailManageModelValidator))]
+    public class AffiliateEmailModel : BaseModel
     {
         public string ToName { get; set; }
 
@@ -21,6 +23,11 @@ namespace VC.Admin.Models.Product
         public string ToEmail { get; set; }
 
         public string FromName { get; set; }
+
+        [Localized(GeneralFieldNames.Email)]
+        public string FromEmail { get; set; }
+
+        public string Subject { get; set; }
 
         [Localized(GeneralFieldNames.Message)]
         public string Message { get; set; }
@@ -32,7 +39,8 @@ namespace VC.Admin.Models.Product
                 ToName = ToName,
                 ToEmail = ToEmail,
                 FromName = FromName,
-                Subject = "Your Vital Choice Gift Certificate(s)",
+                FromEmail = FromEmail,
+                Subject = Subject,
                 Body = Message,
                 IsHTML=false,
             };

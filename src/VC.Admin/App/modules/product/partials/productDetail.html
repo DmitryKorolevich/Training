@@ -782,9 +782,10 @@
                                                                                     <div class="fixed-accordion-row extra-spacing one-line" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">Cross Sell Image</label>
                                                                                         <div class="col-md-1" data-ng-if="crossSellProduct.ImageUse">
-                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" required></filefield>
+                                                                                            <filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.Image" requided></filefield>
                                                                                             <div class="error-container" ng-show="forms.crossessubmitted && forms.CrossSellProducts.i{{$index}}.Image.$invalid">
                                                                                                 <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                                <small class="error" ng-show="forms.CrossSellProducts.i{{$index}}.Image.$error.server">{{serverMessages.GetMessage('Image','CrossSellProducts',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!crossSellProduct.ImageUse">
@@ -863,7 +864,7 @@
                                                                                             <input type="text" name="Video" class="form-control" placeholder="YouTube Video" data-ng-model="video.Video" required>
                                                                                             <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Video.$invalid">
                                                                                                 <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","YouTube Video")}}</small>
-                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('YouTube Video','Videos',$index)}}</small>
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Video.$error.server">{{serverMessages.GetMessage('Video','Videos',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.VideoUse">
@@ -888,6 +889,7 @@
                                                                                             <filefield name="Image" placeholder="YouTube Image" ng-model="video.Image" required></filefield>
                                                                                             <div class="error-container" ng-show="forms.videossubmitted && forms.Videos.i{{$index}}.Image.$invalid">
                                                                                                 <small class="error" ng-show="forms.Videos.i{{$index}}.Image.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
+                                                                                                <small class="error" ng-show="forms.Videos.i{{$index}}.Image.$error.server">{{serverMessages.GetMessage('Image','Videos',$index)}}</small>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-md-1" data-ng-if="!video.ImageUse">

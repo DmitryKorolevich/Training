@@ -149,17 +149,9 @@ namespace VitalChoice.Business.Services.Products
             return items;
         }
 
-        public async Task<bool> SendGiftCertificateEmailAsync(GiftCertificateEmail model)
+        public async Task<bool> SendGiftCertificateEmailAsync(BasicEmail model)
         {
-            await notificationService.SendBasicEmailAsync(new BasicEmail()
-            {
-                FromName=model.FromName,
-                ToEmail=model.ToEmail,
-                ToName=model.ToName,
-                Subject= "Your Vital Choice Gift Certificate(s)",
-                Body =model.Message,
-                IsHTML=false,
-            });
+            await notificationService.SendBasicEmailAsync(model);
             return true;
         }
 

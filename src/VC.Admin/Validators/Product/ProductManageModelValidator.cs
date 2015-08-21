@@ -9,6 +9,49 @@ using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Validators.Product
 {
+    public class CrossSellProductModelValidator : AbstractValidator<CrossSellProductModel>
+    {
+        public CrossSellProductModelValidator()
+        {
+            RuleFor(model => model.Image)
+                .NotEmpty()
+                .WithMessage(model => model.Image, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+
+            RuleFor(model => model.Url)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty()
+                .WithMessage(model => model.Url, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .WithMessage(model => model.Url, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+        }
+    }
+
+    public class VideoModelValidator : AbstractValidator<VideoModel>
+    {
+        public VideoModelValidator()
+        {
+            RuleFor(model => model.Image)
+                .NotEmpty()
+                .WithMessage(model => model.Image, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+
+            RuleFor(model => model.Video)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty()
+                .WithMessage(model => model.Video, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .WithMessage(model => model.Video, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+
+            RuleFor(model => model.Text)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty()
+                .WithMessage(model => model.Text, ValidationMessages.FieldRequired)
+                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .WithMessage(model => model.Text, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+        }
+    }
+
     public class ProductManageModelValidator : ModelValidator<ProductManageModel>
     {
         public override void Validate(ProductManageModel value)
@@ -20,6 +63,24 @@ namespace VC.Admin.Validators.Product
                 for (int i = 0; i < value.SKUs.Count; i++)
                 {
                     ParseResults(ValidatorsFactory.GetValidator<SKUModelValidator>().Validate(value.SKUs[i]), "SKUs", i);
+                }
+            }
+
+            var crossSellProductModelValidator = ValidatorsFactory.GetValidator<CrossSellProductModelValidator>();
+            for (int i = 0; i < value.CrossSellProducts.Count; i++)
+            {
+                if (!value.CrossSellProducts[i].IsDefault)
+                {
+                    ParseResults(crossSellProductModelValidator.Validate(value.CrossSellProducts[i]), "CrossSellProducts", i);
+                }
+            }
+
+            var videoModelValidator = ValidatorsFactory.GetValidator<VideoModelValidator>();
+            for (int i = 0; i < value.Videos.Count; i++)
+            {
+                if (!value.Videos[i].IsDefault)
+                {
+                    ParseResults(videoModelValidator.Validate(value.Videos[i]), "Videos", i);
                 }
             }
         }

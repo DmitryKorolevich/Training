@@ -5,10 +5,10 @@
                 <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
             </div>
             <div data-ng-if="affiliate.Id" class="margin-top-10px">
-                <button class="btn btn-primary-orange width-160px" ui-sref="index.oneCol.manageAffiliates">Email</button>
+                <button class="btn btn-info width-160px" data-ng-click="notify()">Notify</button>
             </div>
             <div data-ng-if="affiliate.Id" class="margin-top-10px">
-                <button class="btn btn-info width-160px" ui-sref="index.oneCol.manageAffiliates">Notify</button>
+                <button class="btn btn-primary-orange width-160px" data-ng-click="email()">Email</button>
             </div>
             <div class="btn-group margin-top-10px">
                 <button ui-sref="index.oneCol.manageAffiliates" class="btn btn-default width-160px">Cancel</button>
