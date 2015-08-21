@@ -241,7 +241,9 @@ namespace VitalChoice.Business.Services.Content
 
 					    if (model.Id == 0)
 					    {
-						    await recipeRepository.InsertGraphAsync(dbItem);
+							dbItem.RelatedRecipes = model.RelatedRecipes;
+							dbItem.CrossSells = model.CrossSells;
+							await recipeRepository.InsertGraphAsync(dbItem);
 					    }
 					    else
 					    {
