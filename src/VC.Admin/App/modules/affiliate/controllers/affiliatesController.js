@@ -42,7 +42,7 @@
                 Name: null,
                 Company: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
-                Sorting: gridSorterUtil.resolve(refreshAffiliates, "DateEdited", "Desc")
+                Sorting: gridSorterUtil.resolve(refreshAffiliates, "Name", "Asc")
             };
 
             refreshAffiliates();

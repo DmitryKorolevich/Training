@@ -29,6 +29,7 @@ using VC.Admin.Models.Order;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
 using VitalChoice.Domain.Transfer.Affiliates;
+using System.Text;
 
 namespace VC.Admin.Controllers
 {
@@ -71,9 +72,9 @@ namespace VC.Admin.Controllers
                 return new AffiliateManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    PaymentType=1,
+                    PaymentType=2,//Credit
                     Tier = 1,
-                    CommissionFirst = 5,
+                    CommissionFirst = 8,
                     CommissionAll = 5,
                 };
             }
@@ -117,11 +118,35 @@ namespace VC.Admin.Controllers
             toReturn.Subject = "Your Vital Choice affiliate account is ready.";
             if (id == 1)//notify
             {
-                toReturn.Message = "Notify";
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine("Dear {0},");
+                builder.AppendLine();
+                builder.AppendLine("Your Vital Choice Affiliate account is ready for use. Your User Name is your e-mail address ({1}).  You can log into your account at https://www.vitalchoice.com/shop/pc/AffiliateLogin.asp to retrieve special links of Vital Choice text and banner ads that contain your affiliate ID.");
+                builder.AppendLine();
+                builder.AppendLine("Program overview: http://www.vitalchoice.com/shop/pc/viewContent.asp?idpage=22");
+                builder.AppendLine();
+                builder.AppendLine("We appreciate your advocacy and interest in promoting wild seafood nutrition. Looking forward to working together.");
+                builder.AppendLine();
+                builder.AppendLine("Questions or comments? Contact us at affiliatesupport@vitalchoice.com");
+                builder.AppendLine();
+                builder.AppendLine("Kind regards,");
+                builder.AppendLine();
+                builder.AppendLine("The Vital Choice Team");
+                toReturn.Message = builder.ToString();
             }
             else if (id == 2)//email
             {
-                toReturn.Message = "Email";
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine("Dear {0},");
+                builder.AppendLine();
+                builder.AppendLine();
+                builder.AppendLine();
+                builder.AppendLine("Questions or comments? Contact us at affiliatesupport@vitalchoice.com");
+                builder.AppendLine();
+                builder.AppendLine("Kind regards,");
+                builder.AppendLine();
+                builder.AppendLine("The Vital Choice Team");
+                toReturn.Message = builder.ToString();
             }
 
             return Task.FromResult<Result<AffiliateEmailModel>>(toReturn);

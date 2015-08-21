@@ -46,6 +46,7 @@ angular.module('app.modules.affiliate.controllers.affiliateSendEmailController',
 	            $scope.email = result.Data;
 	            $scope.email.ToName = $scope.data.ToName;
 	            $scope.email.ToEmail = $scope.data.ToEmail;
+	            $scope.email.Message = $scope.email.Message.format($scope.data.ToName, $scope.data.ToEmail);
 	        }
 	        else
 	        {

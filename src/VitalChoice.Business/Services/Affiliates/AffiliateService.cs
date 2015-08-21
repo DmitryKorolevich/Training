@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
             var query = _vAffiliateRepository.Query(conditions);
 
-            Func<IQueryable<VAffiliate>, IOrderedQueryable<VAffiliate>> sortable = x => x.OrderByDescending(y => y.DateEdited);
+            Func<IQueryable<VAffiliate>, IOrderedQueryable<VAffiliate>> sortable = x => x.OrderBy(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
             {

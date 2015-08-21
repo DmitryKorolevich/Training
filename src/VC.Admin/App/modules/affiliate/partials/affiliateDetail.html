@@ -4,11 +4,9 @@
             <div>
                 <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
             </div>
-            <div data-ng-if="affiliate.Id" class="margin-top-10px">
-                <button class="btn btn-info width-160px" data-ng-click="notify()">Notify</button>
-            </div>
-            <div data-ng-if="affiliate.Id" class="margin-top-10px">
-                <button class="btn btn-primary-orange width-160px" data-ng-click="email()">Email</button>
+            <div data-ng-if="affiliate.Id" class="btn-group margin-top-10px">
+                <button class="btn btn-info width-80px" data-ng-click="notify()">Notify</button>
+                <button class="btn btn-primary-orange width-80px" data-ng-click="email()">Email</button>
             </div>
             <div class="btn-group margin-top-10px">
                 <button ui-sref="index.oneCol.manageAffiliates" class="btn btn-default width-160px">Cancel</button>
@@ -148,7 +146,8 @@
                                                         <label><input type="checkbox" name="PromoteByProfessionalPractice" data-ng-model="affiliate.PromoteByProfessionalPractice" /></label>
                                                     </div>
                                                 </div>
-                                                <div data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-8">
+                                                <label data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-3 control-label">Practice</label>
+                                                <div data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-5">
                                                     <select class="form-control" name="ProfessionalPractice" data-ng-model="affiliate.ProfessionalPractice" ng-options="item.Key as item.Text for item in ReferenceData.AffiliateProfessionalPractices" required></select>
                                                     </select>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.ProfessionalPractice.$invalid">
@@ -231,7 +230,7 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Tier</label>
                                                 <div class="col-md-9">
-                                                    <select name="Tier" class="form-control" data-ng-model="affiliate.Tier" data-ng-options="tier.Id as tier.Id for tier in affiliateTiers" required>
+                                                    <select name="Tier" class="form-control" data-ng-model="affiliate.Tier" data-ng-options="tier.Key as tier.Text for tier in affiliateTiers" required>
                                                         <option value="" ng-if="false"></option>
                                                     </select>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.Tier.$invalid">
