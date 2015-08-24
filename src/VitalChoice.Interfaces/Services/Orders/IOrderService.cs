@@ -4,11 +4,15 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
 	public interface IOrderService: IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
 	{
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
-    }
+	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
+	    Task<OrderContext> CalculateOrder(OrderDynamic order);
+
+	}
 }

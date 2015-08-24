@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -14,6 +15,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
@@ -26,8 +28,10 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -37,6 +41,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
         private readonly ProductMapper _productMapper;
+        private readonly ICustomerService _customerService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -45,7 +50,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper, ICustomerService customerService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
@@ -54,6 +59,7 @@ namespace VitalChoice.Business.Services.Orders
             _adminProfileRepository = adminProfileRepository;
             _productOptionTypesRepository = productOptionTypesRepository;
             _productMapper = productMapper;
+            _customerService = customerService;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -61,8 +67,6 @@ namespace VitalChoice.Business.Services.Orders
             return
                 query.Include(o => o.Discount)
                     .ThenInclude(d => d.OptionValues)
-                    .Include(o => o.Customer)
-                    .ThenInclude(c => c.OptionValues)
                     .Include(o => o.GiftCertificates)
                     .ThenInclude(g => g.GiftCertificate)
                     .Include(o => o.PaymentMethod)
@@ -79,7 +83,8 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(s => s.OptionValues)
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.Sku)
-                    .ThenInclude(s => s.Product);
+                    .ThenInclude(s => s.Product)
+                    .Include(p => p.OptionValues);
         }
 
         protected override async Task AfterSelect(Order entity)
@@ -87,13 +92,54 @@ namespace VitalChoice.Business.Services.Orders
             var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
             foreach (var orderToSku in entity.Skus)
             {
-                orderToSku.Sku.OptionTypes =
-                    productOptionTypes.Where(
-                        _productMapper.GetOptionTypeQuery()
-                            .WithObjectType(orderToSku.Sku.Product.IdObjectType)
-                            .Query()
-                            .Compile()).ToList();
+                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
+                    .WithObjectType(orderToSku.Sku.Product.IdObjectType)
+                    .Query()
+                    .Compile()).ToList();
+                orderToSku.Sku.OptionTypes = optionTypes;
+                orderToSku.Sku.Product.OptionTypes = optionTypes;
             }
+        }
+
+        public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
+        {
+            var order = await SelectAsync(id, withDefaults);
+            order.Customer = await _customerService.SelectAsync(order.Customer.Id, withDefaults);
+            return order;
+        }
+
+        public Task<OrderContext> CalculateOrder(OrderDynamic order)
+        {
+            return Task.FromResult(new OrderContext
+            {
+                Order = order
+            });
+        }
+
+        protected override async Task BeforeEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
+        {
+            var orderToGcRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
+            var orderToSkuRepository = uow.RepositoryAsync<OrderToSku>();
+            await orderToGcRepository.DeleteAllAsync(entity.GiftCertificates);
+            await orderToSkuRepository.DeleteAllAsync(entity.Skus);
+        }
+
+        protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
+        {
+            var orderToGcRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
+            var orderToSkuRepository = uow.RepositoryAsync<OrderToSku>();
+            await orderToGcRepository.InsertRangeAsync(entity.GiftCertificates);
+            await orderToSkuRepository.InsertRangeAsync(entity.Skus);
+        }
+
+        protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
+        {
+            return base.Validate(dynamic);
+        }
+
+        protected override Task<List<MessageInfo>> ValidateDelete(int id)
+        {
+            return base.ValidateDelete(id);
         }
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)

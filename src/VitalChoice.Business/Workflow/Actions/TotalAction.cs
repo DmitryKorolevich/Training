@@ -1,5 +1,5 @@
-﻿using VitalChoice.Business.Workflow.Contexts;
-using VitalChoice.Workflow.Base;
+﻿using VitalChoice.Workflow.Base;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Workflow.Actions
 {
