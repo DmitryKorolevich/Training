@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.core.utils.appBootstrap', [])
-	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', 'webStorageUtil', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress, webStorageUtil) {
+	.service('appBootstrap', ['infrastructureService', '$rootScope', 'toaster', 'authenticationService', '$location', 'ngProgress', 'webStorageUtil', 'confirmUtil', function (infrastructureService, $rootScope, toaster, authenticationService, $location, ngProgress, webStorageUtil, confirmUtil) {
 	    function getReferenceItem(lookup, key) {
 	        return $.grep(lookup, function (elem) {
 	            return elem.Key === key;
@@ -144,7 +144,7 @@ angular.module('app.core.utils.appBootstrap', [])
 	                event.preventDefault();
 	            }
 	            else {
-	                ngProgress.start();
+					ngProgress.start();
 
 	                if ($rootScope.lastRemediationKey) {
 	                    webStorageUtil.removeSession($rootScope.lastRemediationKey);
