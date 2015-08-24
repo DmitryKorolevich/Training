@@ -67,6 +67,7 @@ angular.module('app.core.utils.textAngular', [
 			['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'justifyLeft', 'justifyCenter', 'justifyRight', 'indent', 'outdent'],
 			['quote', 'bold', 'italics', 'underline', 'strikeThrough', 'ul', 'ol', 'redo', 'undo', 'clear', 'html', 'insertLink', 'insertVideo', 'image']
 		];
+		taOptions.keyMappings = []; 
 
 		return taOptions;
 	}]);
