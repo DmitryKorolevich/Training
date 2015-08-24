@@ -89,8 +89,12 @@
                         <td>{{item.ExpirationDate | date:"MM/dd/yy"}}</td>
                         <td>{{item.DateCreated | date:"MM/dd/yy"}}<br />{{item.DateCreated | date:"h:mm a"}}<br />{{item.AddedByAgentId}}</td>
                         <td>
-                            <button class="btn btn-default btn-success" data-ng-click="open(item.Id);">Edit</button>
-                            <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">Delete</button>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>

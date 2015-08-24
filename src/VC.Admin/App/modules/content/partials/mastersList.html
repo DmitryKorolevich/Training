@@ -57,8 +57,12 @@
                         </div>
                     </td>
                     <td>
-                        <button class="btn btn-default btn-success" data-ng-click="open(master.Id);">Edit</button>
-                        <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(master.Id);">Delete</button>
+                        <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(master.Id);">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(master.Id);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
                     </td>
                 </tr>
                 </tbody>

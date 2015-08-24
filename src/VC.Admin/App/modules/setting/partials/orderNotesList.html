@@ -47,8 +47,12 @@
                     <td><input type="checkbox" data-ng-checked="orderNote.CustomerTypes.indexOf(2) > -1" disabled="disabled"></td>
                     <td>{{orderNote.DateEdited | date:"MM/dd/yy"}}<br />{{orderNote.DateEdited | date:"h:mm a"}}<br />{{orderNote.EditedBy}}</td>
 					<td>
-						<button class="btn btn-default btn-success" ladda="editTracker.active()" data-ng-click="open(true, orderNote.Id);">Edit</button>
-						<button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(orderNote.Title, orderNote.Id);">Delete</button>
+						<button title="Edit" class="btn btn-default btn-success btn-xs" ladda="editTracker.active()" data-ng-click="open(true, orderNote.Id);">
+                            <i class="fa fa-search"></i>
+                        </button>
+						<button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(orderNote.Title, orderNote.Id);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
 					</td>
 				</tr>
 				</tbody>

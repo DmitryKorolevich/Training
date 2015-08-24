@@ -72,8 +72,12 @@
 					</td>
 					<td>{{user.LastLoginDate | date:"MM/dd/yy"}}<br/>{{user.LastLoginDate | date:"h:mm a"}}</td>
 					<td>
-						<button class="btn btn-default btn-success" ladda="editTracker.active()" data-ng-click="open(true, user.PublicId);">Edit</button>
-						<button data-ng-if="currentUser && currentUser.Email != user.Email" class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(user.FullName, user.PublicId);">Delete</button>
+						<button title="Edit" class="btn btn-default btn-success btn-xs" ladda="editTracker.active()" data-ng-click="open(true, user.PublicId);">
+                            <i class="fa fa-search"></i>
+                        </button>
+						<button title="Delete" data-ng-if="currentUser && currentUser.Email != user.Email" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(user.FullName, user.PublicId);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
 					</td>
 				</tr>
 				</tbody>

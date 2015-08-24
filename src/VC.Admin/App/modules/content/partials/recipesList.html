@@ -64,8 +64,12 @@
                     </td>
                     <td>{{recipe.Updated | date:"MM/dd/yy"}}<br />{{recipe.Updated | date:"h:mm a"}}<br />{{recipe.AgentId}}</td>
                     <td>
-                        <button class="btn btn-default btn-success" data-ng-click="open(recipe.Id);">Edit</button>
-                        <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(recipe.Id);">Delete</button>
+                        <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(recipe.Id);">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(recipe.Id);">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
                     </td>
                 </tr>
                 </tbody>
