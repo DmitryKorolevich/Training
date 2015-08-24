@@ -2,10 +2,10 @@
 	<div class="left-pane-controls">
 		<div class="well container-fluid">
 			<div>
-				<button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
+				<button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
 			</div>
 			<div class="margin-top-10px">
-				<button ui-sref="index.oneCol.manageCustomers" class="btn btn-default width-160px">Cancel</button>
+				<button cancel-button-default-state="index.oneCol.manageCustomers" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -17,7 +17,7 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
-                                    <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted['profile']}" novalidate>
+                                    <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted['profile']}" novalidate unsaved-warning-form>
                                         <fieldset>
                                             <span class="legend">Customer Type</span>
                                             <div class="form-group">
@@ -238,7 +238,7 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
-                                    <form class="form-horizontal" name="forms.billing" data-ng-class="{submitted: forms.submitted['billing']}" novalidate>
+                                    <form class="form-horizontal" name="forms.billing" data-ng-class="{submitted: forms.submitted['billing']}" novalidate unsaved-warning-form>
                                         <fieldset>
                                             <span class="legend">Select Payment Method</span>
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
@@ -430,7 +430,7 @@
                             <div class="well row">
                                 <div class="col-md-6">
                                     <spinner-overlay data-loading="addEditTracker.active()">
-                                        <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.submitted['customerNote']}" novalidate>
+                                        <form class="form-horizontal" name="forms.customerNote" data-ng-class="{submitted: forms.submitted['customerNote']}" novalidate unsaved-warning-form>
                                             <fieldset>
                                                 <span class="legend">Notes</span>
                                                 <div class="form-group">
@@ -493,7 +493,7 @@
                         <div class="well row">
                             <div class="col-md-6">
                                 <spinner-overlay data-loading="addEditTracker.active()">
-                                    <form class="form-horizontal">
+                                    <form class="form-horizontal" unsaved-warning-form>
                                         <fieldset>
                                             <span class="legend">Upload New File</span>
                                             <div class="form-group">
