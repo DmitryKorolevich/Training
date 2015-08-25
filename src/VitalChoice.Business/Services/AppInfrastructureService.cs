@@ -67,6 +67,7 @@ namespace VitalChoice.Business.Services
             var fobLookup = lookupRepository.Query(x => x.Name == LookupNames.Fob).Select(false).Single().Id;
             var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
             var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
+            var orderPreferredShipMethod = lookupRepository.Query(x => x.Name == LookupNames.OrderPreferredShipMethod).Select(false).Single().Id;
             var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
@@ -193,6 +194,14 @@ namespace VitalChoice.Business.Services
                 }).ToList();
             referenceData.OrderSourcesCelebrityHealthAdvocate = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == orderSourcesCelebrityHealthAdvocateLookup)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.OrderPreferredShipMethod = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == orderPreferredShipMethod)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

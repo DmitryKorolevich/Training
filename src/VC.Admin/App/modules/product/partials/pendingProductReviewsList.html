@@ -42,8 +42,12 @@
                             <stars data-ng-model="productReview.Rating"></stars>
                         </td>
                         <td>
-                            <button class="btn btn-default btn-success" data-ng-click="edit(productReview.Id);">View</button>
-                            <button class="btn btn-default btn-danger" ladda="deleteTracker.active()" data-ng-click="delete(productReview.Id);">Delete</button>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="edit(productReview.Id);">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </button>
+                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(productReview.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>

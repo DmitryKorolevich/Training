@@ -27,6 +27,8 @@ using VitalChoice.Interfaces.Services;
 using VC.Admin.Models.Order;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Workflow.Contexts;
+using System.Threading;
 
 namespace VC.Admin.Controllers
 {
@@ -171,6 +173,61 @@ namespace VC.Admin.Controllers
                 },
             };
             toReturn.Count = 4;
+
+            return toReturn;
+        }
+
+        [HttpGet]
+        public async Task<Result<OrderManageModel>> GetOrder(int id)
+        {
+            if (id == 0)
+            {
+                return new OrderManageModel()
+                {
+
+                };
+            }
+
+            var item = await orderService.SelectAsync(id);
+
+            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderCalculateModel>> CalculateOrder(OrderManageModel model)
+        {
+            return null;
+
+            var item = _mapper.FromModel(model);
+
+            var orderContext = await orderService.CalculateOrder(item);
+
+            OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<OrderManageModel>> UpdateOrder(OrderManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+
+            var item = _mapper.FromModel(model);
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.IdEditedBy = userId;
+            }
+            if (model.Id > 0)
+                item = (await orderService.UpdateAsync(item));
+            else
+                item = (await orderService.InsertAsync(item));
+
+            OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
             return toReturn;
         }

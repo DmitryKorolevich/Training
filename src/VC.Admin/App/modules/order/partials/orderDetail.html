@@ -322,9 +322,12 @@
                                                 <div class="form-group">
                                                     <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
                                                     <div class="col-md-5">
-                                                        <select class="form-control" name="Preferred Ship Method" data-ng-model="order.PreferredShipMethod" ng-options="shipMethod.Key as shipMethod.Text for shipMethod in shipMethods">
+                                                        <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required>
                                                             <option value="" ng-if="false"></option>
                                                         </select>
+                                                        <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PreferredShipMethod.$invalid">
+                                                            <small class="error" ng-show="forms.mainForm.Source.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","PreferredShipMethod")}}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
 

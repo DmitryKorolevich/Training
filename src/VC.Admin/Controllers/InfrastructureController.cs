@@ -64,6 +64,7 @@ namespace VC.Admin.Controllers
                     OacTerms = referenceData.OacTerms,
                     OrderSources = referenceData.OrderSources,
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
+                    OrderPreferredShipMethod = referenceData.OrderPreferredShipMethod,
                     AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                     AffiliateTiers = referenceData.AffiliateTiers,

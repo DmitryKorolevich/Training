@@ -121,6 +121,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.ignoneMinimumPerishableThreshold = false;
         $scope.orderSources = $rootScope.ReferenceData.OrderSources;
         $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
+        $scope.orderPreferredShipMethod = $rootScope.ReferenceData.OrderPreferredShipMethod;
         $scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 
         $scope.discountsFilter = {
@@ -368,9 +369,49 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.legend.CustomerId = $scope.idCustomer;
     };
 
+    var oldOrderForCalculating = null;
+
     $scope.requestRecalculate = function ()
     {
-        console.log('rec');
+        var orderForCalculating = angular.copy($scope.order);
+        if (angular.equals(oldOrderForCalculating, orderForCalculating))
+        {
+            return;
+        }
+
+        oldOrderForCalculating = orderForCalculating;
+        if ($scope.currectCalculateCanceller)
+        {
+            $scope.currectCalculateCanceller.resolve("canceled");
+        }
+        $scope.currectCalculateCanceller = $q.defer();
+        orderService.calculateOrder(orderForCalculating, $scope.currectCalculateCanceller)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                } else
+                {
+                    errorHandler(result);
+                }
+                if ($scope.currectCalculateCanceller)
+                {
+                    $scope.currectCalculateCanceller.reject();
+                    $scope.currectCalculateCanceller = null;
+                }
+            })
+            .error(function (result)
+            {
+                if (result == "canceled")
+                {
+                    errorHandler(result);
+                    if ($scope.currectCalculateCanceller)
+                    {
+                        $scope.currectCalculateCanceller.reject();
+                        $scope.currectCalculateCanceller = null;
+                    }
+                }
+            });
     };
 
     var clearServerValidation = function ()
