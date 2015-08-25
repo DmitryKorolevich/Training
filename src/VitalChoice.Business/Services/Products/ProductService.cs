@@ -50,14 +50,6 @@ namespace VitalChoice.Business.Services.Products
                 await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
         }
 
-        protected override async Task AfterSelect(List<Product> entities)
-        {
-            foreach(var item in entities)
-            {
-                await AfterSelect(item);
-            }
-        }
-
         protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();

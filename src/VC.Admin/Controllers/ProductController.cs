@@ -32,18 +32,21 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
+        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService;
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
         private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
+            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
             IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
             ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
             this.productService = productService;
+            this.productUniversalService = productUniversalService;
             this.productReviewService = productReviewService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -214,7 +217,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> UpdateProductTaxCodes([FromBody]ICollection<ProductListItemModel> items)
         {
-            var products = await productService.SelectAsync(items.Select(p => p.ProductId).ToArray(), false);
+            var products = await productUniversalService.SelectAsync(items.Select(p => p.ProductId).ToArray(), false);
             foreach (var product in products)
             {
                 foreach (var item in items)
@@ -225,7 +228,7 @@ namespace VC.Admin.Controllers
                     }
                 }
             }
-            var toReturn = await productService.UpdateRangeAsync(products);
+            var toReturn = await productUniversalService.UpdateRangeAsync(products);
 
             return true;
         }

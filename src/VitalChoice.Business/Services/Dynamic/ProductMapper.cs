@@ -84,12 +84,15 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Hidden = dynamic.Hidden;
                 entity.Name = dynamic.Name;
                 entity.Url = dynamic.Url;
-                
-                entity.ProductsToCategories = dynamic.CategoryIds.Select(c => new ProductToCategory
+
+                if (dynamic.CategoryIds != null)
                 {
-                    IdCategory = c,
-                    IdProduct = dynamic.Id
-                }).ToList();
+                    entity.ProductsToCategories = dynamic.CategoryIds.Select(c => new ProductToCategory
+                    {
+                        IdCategory = c,
+                        IdProduct = dynamic.Id
+                    }).ToList();
+                }
 
                 await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus, entity.OptionTypes);
             });
