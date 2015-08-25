@@ -25,6 +25,9 @@
       "js": "dist/js/*.*",
       "fonts": "dist/fonts/*.*"
     },
+    "font-awesome": {
+      ".": "css/*.*"
+    },
     "ladda": {
       ".": [
         "./dist/ladda-themeless.min.css",
@@ -40,6 +43,6 @@
   },
   "resolutions": {
     "angular": "~1.4.4",
-    "d3": "~3.5.6"
+    "d3": "~3.4.1"
   }
 }
