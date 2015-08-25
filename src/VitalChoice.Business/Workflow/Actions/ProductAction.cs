@@ -1,6 +1,6 @@
-﻿using VitalChoice.Business.Workflow.Contexts;
-using VitalChoice.Workflow.Base;
+﻿using VitalChoice.Workflow.Base;
 using System.Linq;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Workflow.Actions
 {
@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            return context.ProductCosts.Sum();
+            return context.Order.Skus.Sum(s => s.Amount * s.Quantity);
         }
     }
 }

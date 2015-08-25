@@ -9,7 +9,8 @@
   "dependencies": {
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
-    "VitalChoice.DynamicData": "1.0.0-*"
+    "VitalChoice.DynamicData": "1.0.0-*",
+    "VitalChoice.Workflow": "1.0.0-*"
   },
 
   "frameworks": {

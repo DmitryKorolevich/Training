@@ -11,6 +11,7 @@ angular.module('app.utils', [
 	'ajoslin.promise-tracker',
     'ngFileUpload',
     'fiestah.money',
+    'app.core.utils.unsavedChanges.unsavedChangesFacilities',
 	'app.core.utils.httpInterceptor',
 	'app.core.utils.appBootstrap',
 	'app.core.utils.modalUtil',
@@ -27,6 +28,7 @@ angular.module('app.utils', [
 	'app.core.utils.parts.numbersOnlyDirective',
 	'app.core.utils.parts.maskDirective',
 	'app.core.utils.parts.starsDirective',
+	'app.core.utils.parts.cancelDirective',
 	'app.core.utils.textAngular',
 	'app.core.utils.webStorageUtil',
 	'app.core.utils.dataStateRemediator'

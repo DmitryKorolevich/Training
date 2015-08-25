@@ -1,5 +1,5 @@
-﻿using VitalChoice.Business.Workflow.Contexts;
-using VitalChoice.Workflow.Base;
+﻿using VitalChoice.Workflow.Base;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Workflow.Actions
 {
@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            return (decimal) (-context.DiscountPercent*(double) Tree.GetActionResult("Products", context));
+            return 0; //(decimal) (-context.Order.Discount*(double) Tree.GetActionResult("Products", context));
         }
     }
 }

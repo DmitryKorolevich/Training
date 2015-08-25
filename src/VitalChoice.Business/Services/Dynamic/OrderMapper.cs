@@ -29,9 +29,10 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly DiscountMapper _discountMapper;
         private readonly OrderPaymentMethodMapper _orderPaymentMethodMapper;
         private readonly SkuMapper _skuMapper;
+        private readonly ProductMapper _productMapper;
 
         public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
-            IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper, CustomerMapper customerMapper, DiscountMapper discountMapper, OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper)
+            IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper, CustomerMapper customerMapper, DiscountMapper discountMapper, OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper)
             : base(mappers, container, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -39,6 +40,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _discountMapper = discountMapper;
             _orderPaymentMethodMapper = orderPaymentMethodMapper;
             _skuMapper = skuMapper;
+            _productMapper = productMapper;
         }
 
         public override IQueryOptionType<OrderOptionType> GetOptionTypeQuery()
@@ -51,7 +53,8 @@ namespace VitalChoice.Business.Services.Dynamic
             get { return v => v.IdOrder; }
         }
 
-        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)
         {
             await items.ForEachAsync(async item =>
             {
@@ -68,6 +71,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.ShippingAddress =
                     await _orderAddressMapper.FromEntityAsync(entity.ShippingAddress, withDefaults);
                 dynamic.Customer = await _customerMapper.FromEntityAsync(entity.Customer, withDefaults);
+                if (dynamic.Customer == null || dynamic.Customer.Id == 0)
+                {
+                    dynamic.Customer = new CustomerDynamic
+                    {
+                        Id = entity.IdCustomer
+                    };
+                }
                 dynamic.GiftCertificates.AddRange(entity.GiftCertificates.Select(g => new GiftCertificateInOrder
                 {
                     Amount = g.Amount,
@@ -80,7 +90,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     Amount = s.Amount,
                     Quantity = s.Quantity,
-                    Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults)
+                    Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
+                    ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku.Product, withDefaults)
                 }));
             });
         }
