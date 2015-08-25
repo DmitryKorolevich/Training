@@ -17,6 +17,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.productReviewManageController',
 	'app.modules.product.controllers.activeProductReviewsController',
 	'app.modules.product.controllers.topPurchasedProductsController',
+	'app.modules.product.controllers.productTaxCodesController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -61,6 +62,11 @@ angular.module('app.modules.product', [
 				    templateUrl: 'app/modules/product/partials/productDetail.html',
 				    controller: 'productManageController'
 				})
+		        .state('index.oneCol.manageProductTaxCodes', {
+		            url: '/tools/producttaxcodes',
+		            templateUrl: 'app/modules/product/partials/productTaxCodesList.html',
+		            controller: 'productTaxCodesController'
+		        })
 		        /*discounts*/
 		        .state('index.oneCol.manageDiscounts',{
 		            url: '/discounts',

@@ -69,6 +69,10 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    updateProduct: function (model, tracker) {
 	        return $http.post(baseUrl + 'UpdateProduct', model, getConfig(tracker));
 	    },
+	    updateProductTaxCodes: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateProductTaxCodes', model, getConfig(tracker));
+	    },
 	    deleteProduct: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteProduct/' + id, getConfig(tracker));
 	    },

@@ -83,7 +83,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'tools',
 			stateLabel: 'Tools',
 			subMenu: [
-				{ name: 'productTaxCodes', stateName: 'index.oneCol.productTaxCodes', stateLabel: 'Product Tax Codes', access: 8 },
+				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
 				{ name: 'emailAddressProfiles', stateName: 'index.oneCol.emailAddressProfiles', stateLabel: 'Multiple Email Address Profiles', access: 8 },
 				{ name: 'reassignTransaction', stateName: 'index.oneCol.reassignTransaction', stateLabel: 'Reassign Transaction', access: 8 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },

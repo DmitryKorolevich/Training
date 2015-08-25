@@ -19,6 +19,8 @@ namespace VC.Admin.Models.Product
 
         public string Thumbnail { get; set; }
 
+        public string TaxCode { get; set; }
+
         public string Name { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
@@ -31,6 +33,8 @@ namespace VC.Admin.Models.Product
 
         public string EditedByAgentId {get;set;}
 
+        public IList<SkuListItemModel> SKUs { get; set; }
+
         public ProductListItemModel(VProductSku item)
         {
             if(item!=null)
@@ -39,6 +43,7 @@ namespace VC.Admin.Models.Product
                 ProductId = item.IdProduct;
                 Name = item.Name;
                 Thumbnail = item.Thumbnail;
+                TaxCode = item.TaxCode;
                 StatusCode = item.StatusCode;
                 Hidden = item.Hidden;
                 IdProductType = item.IdProductType;

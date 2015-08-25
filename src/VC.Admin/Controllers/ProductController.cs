@@ -124,6 +124,21 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
+            VProductSkuFilter skuFilter = new VProductSkuFilter();
+            skuFilter.IdProducts = toReturn.Items.Select(p => p.ProductId).ToList();
+            var skus = await productService.GetSkusAsync(skuFilter);
+            foreach (var item in toReturn.Items)
+            {
+                item.SKUs = new List<SkuListItemModel>();
+                foreach (var sku in skus)
+                {
+                    if(item.ProductId==sku.IdProduct)
+                    {
+                        item.SKUs.Add(new SkuListItemModel(sku));
+                    }
+                }
+            }
+
             return toReturn;
         }
 
@@ -194,6 +209,25 @@ namespace VC.Admin.Controllers
 
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> UpdateProductTaxCodes([FromBody]ICollection<ProductListItemModel> items)
+        {
+            var products = await productService.SelectAsync(items.Select(p => p.ProductId).ToArray(), false);
+            foreach (var product in products)
+            {
+                foreach (var item in items)
+                {
+                    if(product.Id==item.ProductId)
+                    {
+                        product.Data.TaxCode = item.TaxCode;
+                    }
+                }
+            }
+            var toReturn = await productService.UpdateRangeAsync(products);
+
+            return true;
         }
 
         [HttpPost]

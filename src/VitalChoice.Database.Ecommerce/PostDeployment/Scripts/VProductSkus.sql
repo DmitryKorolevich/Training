@@ -18,10 +18,13 @@ SELECT
 	p.IdObjectType AS IdProductType,
 	p.Name,
 	p.Url,
-	ISNULL(val.Value, opt.DefaultValue) AS Thumbnail
+	ISNULL(val.Value, opt.DefaultValue) AS Thumbnail,	
+	ISNULL(tval.Value, topt.DefaultValue) AS TaxCode
 	FROM Products AS p
 	LEFT JOIN Skus AS s ON p.Id = s.IdProduct
 	LEFT JOIN ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS val ON val.IdProduct = p.Id AND val.IdOptionType = opt.Id
+	LEFT JOIN ProductOptionTypes AS topt ON topt.Name = N'TaxCode' AND topt.IdObjectType = p.IdObjectType
+	LEFT JOIN ProductOptionValues AS tval ON tval.IdProduct = p.Id AND tval.IdOptionType = topt.Id
 
 GO

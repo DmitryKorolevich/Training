@@ -50,6 +50,14 @@ namespace VitalChoice.Business.Services.Products
                 await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
         }
 
+        protected override async Task AfterSelect(List<Product> entities)
+        {
+            foreach(var item in entities)
+            {
+                await AfterSelect(item);
+            }
+        }
+
         protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();
@@ -264,7 +272,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
             var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code).WithDescriptionName(filter.DescriptionName)
-                .WithExactCode(filter.ExactCode).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids);
+                .WithExactCode(filter.ExactCode).WithExactDescriptionName(filter.ExactDescriptionName).WithIds(filter.Ids).WithIdProducts(filter.IdProducts);
             var query = _vSkuRepository.Query(conditions);
 
             Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);

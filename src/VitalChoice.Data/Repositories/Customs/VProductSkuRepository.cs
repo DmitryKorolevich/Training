@@ -51,6 +51,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 IdProduct = g.Key,
                 Name = g.Min(p => p.Name),
                 Thumbnail = g.Min(p => p.Thumbnail),
+                TaxCode = g.Min(p => p.TaxCode),
                 StatusCode = g.Min(p => p.StatusCode),
                 Hidden = g.Min(p => p.Hidden),
                 DateEdited= g.Min(p => p.DateEdited),

@@ -1,5 +1,5 @@
-﻿angular.module('app.modules.product.controllers.productsController', [])
-.controller('productsController', ['$scope', '$rootScope', '$state', 'productService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+﻿angular.module('app.modules.product.controllers.productTaxCodesController', [])
+.controller('productTaxCodesController', ['$scope', '$rootScope', '$state', 'productService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
     function ($scope, $rootScope, $state, productService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -17,11 +17,11 @@
         function refreshProducts() {
             productService.getProducts($scope.filter, $scope.refreshTracker)
                 .success(function (result) {
-                    if (result.Success) {
-                        $.each(result.Data.Items, function (index, item) {
-                            if (item.Thumbnail) {
-                                item.ThumbnailUrl = self.baseUrl.format(item.Thumbnail);
-                            }
+                    if (result.Success)
+                    {
+                        $.each(result.Data.Items, function (index, item)
+                        {
+                            item.NewTaxCode = item.TaxCode;
                         });
                         $scope.products = result.Data.Items;
                         $scope.totalItems = result.Data.Count;
@@ -56,34 +56,27 @@
             refreshProducts();
         };
 
-        $scope.open = function (id) {
-            if (id) {
-                $state.go('index.oneCol.productDetail', { id: id });
-            }
-            else {
-                modalUtil.open('app/modules/product/partials/addProductPopup.html', 'addProductPopupController', {
-                    thenCallback: function (data) {
-                        $state.go('index.oneCol.addNewProduct', { type: data });
-                    }
+        $scope.update = function ()
+        {
+            var productsForUpdate = [];
+            $.each($scope.products, function (index, item)
+            {
+                if (item.NewTaxCode != item.TaxCode)
+                {
+                    var productForUpdate = angular.copy(item);
+                    productForUpdate.TaxCode = productForUpdate.NewTaxCode;
+                    productsForUpdate.push(productForUpdate);
+                }
+            });
+            if (productsForUpdate.length>0)
+            {
+                productService.updateProductTaxCodes(productsForUpdate, $scope.refreshTracker).success(function (result)
+                {
+                    refreshProducts();
+                }).error(function (result) {
+                    errorHandler(result);
                 });
             }
-        };
-
-        $scope.delete = function (id) {
-            confirmUtil.confirm(function () {
-                productService.deleteProduct(id, $scope.deleteTracker)
-                    .success(function (result) {
-                        if (result.Success) {
-                            toaster.pop('success', "Success!", "Successfully deleted.");
-                            refreshProducts();
-                        } else {
-                            errorHandler(result);
-                        }
-                    })
-                    .error(function (result) {
-                        errorHandler(result);
-                    });
-            }, 'Are you sure you want to delete this product?');
         };
 
         initialize();

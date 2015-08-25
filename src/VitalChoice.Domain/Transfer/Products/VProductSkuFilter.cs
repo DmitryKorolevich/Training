@@ -14,5 +14,7 @@ namespace VitalChoice.Domain.Transfer.Products
         public string ExactDescriptionName { get; set; }
 
         public IList<int> Ids { get; set; }
+
+        public IList<int> IdProducts { get; set; }
     }
 }

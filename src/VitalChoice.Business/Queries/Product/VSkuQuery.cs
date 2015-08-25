@@ -88,9 +88,19 @@ namespace VitalChoice.Business.Queries.Product
 
         public VSkuQuery WithIds(IList<int> ids)
         {
-            if (ids!=null)
+            if (ids!=null && ids.Count > 0)
             {
                 Add(x => ids.Contains(x.SkuId));
+            }
+
+            return this;
+        }
+
+        public VSkuQuery WithIdProducts(IList<int> idProducts)
+        {
+            if (idProducts!=null && idProducts.Count>0)
+            {
+                Add(x => idProducts.Contains(x.IdProduct));
             }
 
             return this;
