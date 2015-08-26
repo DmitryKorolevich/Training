@@ -259,6 +259,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
             builder.RegisterType<VProductSkuRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+            builder.RegisterType<OrderSkusRepository>()
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
             builder.RegisterType<CustomerService>().As<ICustomerService>();

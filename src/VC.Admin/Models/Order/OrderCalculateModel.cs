@@ -12,13 +12,69 @@ using VitalChoice.DynamicData;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Workflow.Contexts;
+using VC.Admin.Models.Product;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VC.Admin.Models.Order
 {
     public class OrderCalculateModel : BaseModel
-    {        
+    {
+        public decimal AlaskaHawaiiSurcharge { get; set; }
+
+        public decimal CanadaSurcharge { get; set; }
+
+        public decimal StandardShippingCharges { get; set; }
+
+        public IList<LookupItem<int>> ShippingUpgradePOptions { get; set; }
+
+        public IList<LookupItem<int>> ShippingUpgradeNPOptions { get; set; }
+
+        public decimal ShippingTotal { get; set; }
+
+        public decimal ProductsSubtotal { get; set; }
+
+        public decimal DiscountTotal { get; set; }
+
+        public decimal DiscountedSubtotal { get; set; }
+
+        public string DiscountMessage { get; set; }
+
+        public decimal TaxTotal { get; set; }
+
+        public decimal Total { get; set; }
+
+        public bool ProductsPerishableThresholdIssue { get; set; }
+
+        public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
+
+        public IList<MessageInfo> Messages { get; set; }
+
         public OrderCalculateModel(OrderContext context)
         {
+            AlaskaHawaiiSurcharge = context.AlaskaHawaiiSurcharge;
+            CanadaSurcharge = context.CanadaSurcharge;
+            StandardShippingCharges = context.StandardShippingCharges;
+            ShippingUpgradePOptions = context.ShippingUpgradePOptions;
+            ShippingUpgradeNPOptions = context.ShippingUpgradeNPOptions;
+            ShippingTotal = context.ShippingTotal;
+            ProductsSubtotal = context.ProductsSubtotal;
+            DiscountTotal = context.DiscountTotal;
+            DiscountedSubtotal = context.DiscountedSubtotal;
+            DiscountMessage = context.DiscountMessage;
+            TaxTotal = context.TaxTotal;
+            Total = context.Total;
+
+            if (context.SkuOrdereds != null)
+            {
+                SkuOrdereds = new List<SkuOrderedManageModel>();
+                foreach (var item in context.SkuOrdereds)
+                {
+                    SkuOrdereds.Add(new SkuOrderedManageModel(item));
+                }
+            }
+
+            Messages = context.Messages;
         }
 
     }

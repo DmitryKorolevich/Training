@@ -377,3 +377,17 @@ BEGIN
 	VALUES
 	(N'Fob', 3, @IdLookup, @ObjectType, '1')
 END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerOptionTypes] Where Name='Source')
+BEGIN
+	INSERT INTO [dbo].[CustomerOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Source', 3, NULL, NULL, NULL),
+	(N'SourceDetails', 4, NULL, NULL, NULL)
+
+END
+
+GO

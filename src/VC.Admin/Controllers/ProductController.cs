@@ -88,12 +88,15 @@ namespace VC.Admin.Controllers
         public async Task<Result<ICollection<SkuWithStatisticListItemModel>>> GetTopPurchasedSkus()
         {
             ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
-            //TODO - get top sku ids
-            Dictionary<int, int> items = new Dictionary<int, int>();
-            items.Add(54, 20);
-            items.Add(55, 5);
-            items.Add(25, 10);
-            items.Add(1, 1);
+
+            FilterBase idsFilter = new FilterBase();
+            idsFilter.Paging.PageIndex = 1;
+            idsFilter.Paging.PageItemCount = 20;
+            Dictionary<int, int> items =await productService.GetTopPurchasedSkuIdsAsync(idsFilter);
+            //items.Add(54, 20);
+            //items.Add(55, 5);
+            //items.Add(25, 10);
+            //items.Add(1, 1);
 
             VProductSkuFilter filter = new VProductSkuFilter();
             filter.Ids = items.Select(p => p.Key).ToList();

@@ -50,7 +50,8 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper, ICustomerService customerService)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
+            ICustomerService customerService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
@@ -112,6 +113,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             return Task.FromResult(new OrderContext
             {
+                SkuOrdereds=order.Skus.ToList(),//temp - should be returned from the calculation engine
                 Order = order
             });
         }
