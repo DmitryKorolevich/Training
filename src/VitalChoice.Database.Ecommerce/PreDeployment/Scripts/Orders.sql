@@ -195,7 +195,7 @@ BEGIN
 	)
 END
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = 'IdPaymentMethod' AND [object_id] = OBJECT_ID(N'[dbo].[Orders]', N'U'))
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = N'IdPaymentMethod' AND [object_id] = OBJECT_ID(N'[dbo].[Orders]', N'U'))
 BEGIN
 
 	ALTER TABLE dbo.Orders
@@ -203,4 +203,13 @@ BEGIN
 		CONSTRAINT FK_OrderToOrderPaymentMethod FOREIGN KEY (IdPaymentMethod) REFERENCES dbo.OrderPaymentMethods(Id),
 	IdShippingAddress INT NULL
 		CONSTRAINT FK_OrderToOrderShippingAddress FOREIGN KEY (IdShippingAddress) REFERENCES dbo.OrderAddresses (Id)
+END
+
+IF EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'OrderToSkus') AND Name = N'Quantity' AND system_type_id = TYPE_ID(N'MONEY'))
+BEGIN
+	ALTER TABLE OrderToSkus
+	DROP COLUMN Quantity
+
+	ALTER TABLE OrderToSkus
+	ADD Quantity INT NOT NULL
 END
