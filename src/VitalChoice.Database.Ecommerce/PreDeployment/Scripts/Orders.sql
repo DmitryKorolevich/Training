@@ -211,5 +211,11 @@ BEGIN
 	DROP COLUMN Quantity
 
 	ALTER TABLE OrderToSkus
-	ADD Quantity INT NOT NULL
+	ADD Quantity INT NULL
+
+	UPDATE OrderToSkus
+	SET Quantity = 0
+
+	ALTER TABLE OrderToSkus
+	ALTER COLUMN Quantity INT NOT NULL
 END
