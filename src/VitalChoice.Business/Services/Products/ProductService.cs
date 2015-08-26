@@ -37,6 +37,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly OrderSkusRepository _orderSkusRepositoryRepository;
 
         protected override async Task AfterSelect(Product entity)
         {
@@ -168,7 +169,8 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository)
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
+            OrderSkusRepository orderSkusRepositoryRepository)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
                 bigStringValueRepository)
@@ -181,6 +183,7 @@ namespace VitalChoice.Business.Services.Products
             _skuRepository = skuRepository;
             _productToCategoriesRepository = productToCategoriesRepository;
             _adminProfileRepository = adminProfileRepository;
+            _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
         }
 
         #region ProductOptions
@@ -260,6 +263,11 @@ namespace VitalChoice.Business.Services.Products
         #endregion
 
         #region Skus
+
+        public async Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter)
+        {
+            return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter);
+        }
 
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {

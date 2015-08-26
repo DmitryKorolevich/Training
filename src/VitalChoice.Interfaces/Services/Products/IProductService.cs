@@ -24,6 +24,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         #region Skus
 
+        Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter);
+
         Task<Sku> GetSku(string code);
 
         Task<Sku> GetSku(int id);

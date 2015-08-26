@@ -74,7 +74,13 @@ namespace VC.Admin.Models.Customer
 		[Map]
 		public bool DoNotRent { get; set; }
 
-		public bool SuspendUserAccount { get; set; }
+        [Map]
+        public int? Source { get; set; }
+
+        [Map]
+        public string SourceDetails { get; set; }
+
+        public bool SuspendUserAccount { get; set; }
 
 		[Map("SuspensionReason")]
 		public string Reason { get; set; }

@@ -22,10 +22,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 $scope.forms.mainForm.submitted = true;
                 $scope.forms.mainForm2.submitted = true;
+                forms.GCs.skussubmitted = true;
                 $scope.forms.submitted['profile'] = true;
                 $scope.forms.submitted['shipping'] = true;
                 $scope.forms.submitted['billing'] = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
+                $scope.calculateServerMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
                 $.each(result.Messages, function (index, value)
                 {
@@ -108,7 +110,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.id = $stateParams.id ? $stateParams.id : 0;
         $scope.idCustomer = $stateParams.idcustomer ? $stateParams.idcustomer : 0;
 
-        $scope.forms = { submitted: []};
+        $scope.forms = { submitted: [] };
 
         $scope.autoShipOrderFrequencies = [
             { Key: 1, Text: '1 Month' },
@@ -182,54 +184,34 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var loadOrder = function ()
     {
-        $scope.order =
-        {
-            IdCustomer: 7888921,
-            Source: null,
-            ShipDelay: 0,
+        orderService.getOrder($scope.id, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.order=result.Data;
 
-            AlaskaHawaiiSurcharge: 0,
-            CanadaSurcharge: 0,
-            StandardShippingCharges: 0,
-            TotalShipping: 0,
-
-            ProductSubtotal: 0,
-            Discount: 0,
-            DiscountAmount: 0,
-            DiscountedSubtotal: 0,
-            ShippingTotal: 0,
-            Tax: 0,
-            GrandTotal: 0,
-
-            GCs: [{ Code: '' }],
-
-            AutoShipOrderFrequency: 1,
-
-            Products: [
-                { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] }
-            ],
-            ProductsPerishableThreshold: false,
-
-            Shipping: {},
-            IdPaymentMethodType: 1,
-            CreditCard: {},
-            //Oac: {},
-            //Check: {},
-        };
-        
-        customerEditService.initBase($scope);
-        if ($scope.id)
-        {
-            $scope.idCustomer = $scope.order.IdCustomer;
-            customerEditService.initOrderEditCustomerParts($scope);
-        }
-        else
-        {
-            $scope.order.UpdateShippingAddressForCustomer = true;
-            customerEditService.initCustomerEdit($scope);
-        }
-
-        loadReferencedData();
+                    customerEditService.initBase($scope);
+                    if ($scope.id)
+                    {
+                        $scope.idCustomer = $scope.order.IdCustomer;
+                        customerEditService.initOrderEditCustomerParts($scope);
+                    }
+                    else
+                    {
+                        $scope.order.UpdateShippingAddressForCustomer = true;
+                        customerEditService.initCustomerEdit($scope);
+                    }
+                    loadReferencedData();
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
     };
 
     var loadReferencedData = function ()
@@ -248,15 +230,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.customerNote = $scope.customerNotePrototype;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                if ($scope.currentCustomer.SourceDetails)
+                {
+                    $scope.currentCustomer.SourceValue = $scope.currentCustomer.SourceDetails;
+                } else if ($scope.currentCustomer.Source)
+                {
+                    $scope.currentCustomer.SourceValue = $scope.currentCustomer.Source;
+                }
                 $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
                 customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
-                                
+
                 customerEditService.syncCountry($scope, $scope.order.Shipping);
                 angular.forEach($scope.currentCustomer.Shipping, function (shippingItem)
                 {
                     customerEditService.syncCountry($scope, shippingItem);
                 });
-                if($scope.id)
+                if ($scope.id)
                 {
                     $scope.shippingAddressTab.Address = $scope.order.Shipping;
                 }
@@ -270,7 +259,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         }
                     });
                 }
-                
+
                 $scope.paymentInfoTab.Address = {};
                 angular.forEach($scope.currentCustomer.CreditCards, function (creditCard)
                 {
@@ -287,7 +276,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.currentCustomer.Check.formName = $scope.paymentInfoTab.formName;
                     customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
                 }
-                
+
                 if ($scope.order.CreditCard)
                 {
                     $scope.order.CreditCard.formName = $scope.paymentInfoTab.formName;
@@ -309,7 +298,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.paymentInfoTab.PaymentMethodType = $scope.order.IdPaymentMethodType;
 
                     if (!$scope.order.CreditCard)
-                    {                        
+                    {
                         if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
                         {
                             $scope.order.CreditCard = $scope.currentCustomer.CreditCards[0];
@@ -356,11 +345,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     var initOrder = function ()
     {
         $scope.order.OnHold = $scope.order.StatusCode = 3;//on hold status
+        $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
         $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
-            if (!newValue)
+            if (newValue)
             {
-                //TODO: set status
+                $scope.order.StatusCode = 3;
             }
         });
 
@@ -390,6 +380,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 if (result.Success)
                 {
+                    successCalculateHandler(result.Data);
                 } else
                 {
                     errorHandler(result);
@@ -413,6 +404,108 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 }
             });
     };
+
+    function successCalculateHandler(data)
+    {
+        $scope.order.AlaskaHawaiiSurcharge = data.AlaskaHawaiiSurcharge;
+        $scope.order.CanadaSurcharge = data.CanadaSurcharge;
+        $scope.order.StandardShippingCharges = data.StandardShippingCharges;
+        $scope.order.ShippingTotal = data.ShippingTotal;
+        $scope.order.ProductsSubtotal = data.ProductsSubtotal;
+        $scope.order.DiscountTotal = data.DiscountTotal;
+        $scope.order.DiscountedSubtotal = data.DiscountedSubtotal;
+        $scope.order.DiscountMessage = data.DiscountMessage;
+        $scope.order.TaxTotal = data.TaxTotal;
+        $scope.order.Total = data.Total;
+
+        $scope.shippingUpgradePOptions = data.ShippingUpgradePOptions;
+        $scope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
+
+        $scope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
+
+        $.each($scope.order.SkuOrdereds, function (index, uiSku)
+        {
+            $.each(data.SkuOrdereds, function (index, sku)
+            {
+                if (uiSku.Code == sku.Code)
+                {
+                    uiSku.Amount = sku.Amount;
+                    uiSku.Messages = sku.Messages;
+                    return false;
+                }
+            });
+        });
+
+        //clear the main tab left part validation
+        $.each($scope.forms, function (index, form)
+        {
+            if (form)
+            {
+                if (index == "GCs")
+                {
+                    $.each(form, function (index, subForm)
+                    {
+                        if (index.indexOf('i') == 0)
+                        {
+                            $.each(subForm, function (index, element)
+                            {
+                                if (element && element.$name == index)
+                                {
+                                    element.$setValidity("server", true);
+                                }
+                            });
+                        }
+                    });
+                }
+                else if(index=="mainForm2")
+                {
+                    $.each(form, function (index, element)
+                    {
+                        if (element && element.$name == index)
+                        {
+                            element.$setValidity("server", true);
+                        }
+                    });
+                }
+            }
+        });
+
+        //set server validation for the main tab left part 
+        if (data.Messages)
+        {
+            $scope.forms.mainForm2.submitted = true;
+            forms.GCs.skussubmitted = true;
+            $scope.calculateServerMessages = new ServerMessages(result.Messages);
+            var formForShowing = null;
+            $.each(data.Messages, function (index, value)
+            {
+                if (value.Field)
+                {
+                    if (value.Field.indexOf('.') > -1)
+                    {
+                        var items = value.Field.split(".");
+                        $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                        formForShowing = items[0];
+                        openSKUs();
+                    }
+                    else
+                    {
+                        $.each($scope.forms, function (index, form)
+                        {
+                            if (form)
+                            {
+                                if (form[value.Field] != undefined)
+                                {
+                                    form[value.Field].$setValidity("server", false);
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
 
     var clearServerValidation = function ()
     {
@@ -603,24 +696,24 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.productAdd = function ()
     {
-        if ($scope.order.Products.length > 0 && !$scope.order.Products[$scope.order.Products.length - 1].Code)
+        if ($scope.order.SkuOrdereds.length > 0 && !$scope.order.SkuOrdereds[$scope.order.SkuOrdereds.length - 1].Code)
         {
             return;
         }
         var product = { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] };
-        $scope.order.Products.push(product);
+        $scope.order.SkuOrdereds.push(product);
     };
 
     $scope.productDelete = function (index)
     {
-        if ($scope.order.Products.length == 1)
+        if ($scope.order.SkuOrdereds.length == 1)
         {
-            $scope.order.Products.splice(index, 1);
+            $scope.order.SkuOrdereds.splice(index, 1);
             $scope.productAdd();
         }
         else
         {
-            $scope.order.Products.splice(index, 1);
+            $scope.order.SkuOrdereds.splice(index, 1);
         }
         $scope.requestRecalculate();
     };
@@ -628,13 +721,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     $scope.topPurchasedProducts = function ()
     {
         modalUtil.open('app/modules/product/partials/topPurchasedProductsPopup.html', 'topPurchasedProductsController', {
-            products: $scope.order.Products, thenCallback: function (data)
+            products: $scope.order.SkuOrdereds, thenCallback: function (data)
             {
                 var newProducts = data;
                 $.each(newProducts, function (index, newProduct)
                 {
                     var add = true;
-                    $.each($scope.order.Products, function (index, product)
+                    $.each($scope.order.SkuOrdereds, function (index, product)
                     {
                         if (newProduct.Code == product.Code)
                         {
@@ -645,9 +738,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                     if (add)
                     {
-                        if ($scope.order.Products.length > 0 && !$scope.order.Products[$scope.order.Products.length - 1].Code)
+                        if ($scope.order.SkuOrdereds.length > 0 && !$scope.order.SkuOrdereds[$scope.order.SkuOrdereds.length - 1].Code)
                         {
-                            $scope.order.Products.splice($scope.order.Products.length - 1, 1);
+                            $scope.order.SkuOrdereds.splice($scope.order.SkuOrdereds.length - 1, 1);
                         }
 
                         var product = {};
@@ -665,7 +758,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         }
                         product.Amount = product.Price;
 
-                        $scope.order.Products.push(product);
+                        $scope.order.SkuOrdereds.push(product);
                     }
                 });
 
@@ -686,16 +779,19 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.getSKUsBySKU = function (val)
     {
-        $scope.skusFilter.Code = val;
-        $scope.skusFilter.DescriptionName = '';
-        return productService.getSkus($scope.skusFilter)
-            .then(function (result)
-            {
-                return result.data.Data.map(function (item)
+        if (val)
+        {
+            $scope.skusFilter.Code = val;
+            $scope.skusFilter.DescriptionName = '';
+            return productService.getSkus($scope.skusFilter)
+                .then(function (result)
                 {
-                    return item;
+                    return result.data.Data.map(function (item)
+                    {
+                        return item;
+                    });
                 });
-            });
+        }
     };
 
     var skuChangedRequest = null;
@@ -709,8 +805,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         }
         skuChangedRequest = $timeout(function ()
         {
-            var product = $scope.order.Products[index];
-            if (product && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.ExactDescriptionName != ''))
+            var product = $scope.order.SkuOrdereds[index];
+            if (product.RequestedCode == product.Code)
+            {
+                return;
+            }
+            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.ExactDescriptionName != ''))
             {
                 $scope.skuFilter.ExactCode = product.Code;
                 $scope.skuFilter.ExactDescriptionName = '';
@@ -721,7 +821,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         {
                             if (result.Data)
                             {
-
+                                product.RequestedCode = $scope.skuFilter.ExactCode;
                                 product.QTY = 1;
                                 product.IdProductType = result.Data.ProductType;
                                 product.ProductName = result.Data.DescriptionName;
@@ -753,21 +853,24 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.getSKUsByProductName = function (val)
     {
-        $scope.skusFilter.Code = '';
-        $scope.skusFilter.DescriptionName = val;
-        return productService.getSkus($scope.skusFilter)
-            .then(function (result)
-            {
-                return result.data.Data.map(function (item)
+        if (val)
+        {
+            $scope.skusFilter.Code = '';
+            $scope.skusFilter.DescriptionName = val;
+            return productService.getSkus($scope.skusFilter)
+                .then(function (result)
                 {
-                    return item;
+                    return result.data.Data.map(function (item)
+                    {
+                        return item;
+                    });
                 });
-            });
+        }
     };
 
     $scope.productNameChanged = function (index)
     {
-        var product = $scope.order.Products[index];
+        var product = $scope.order.SkuOrdereds[index];
         if (product)
         {
             $scope.skuFilter.ExactCode = '';
@@ -779,10 +882,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     {
                         if (result.Data)
                         {
-
                             product.QTY = 1;
                             product.IdProductType = result.Data.ProductType;
                             product.Code = result.Data.Code;
+                            product.RequestedCode = product.Code;
                             if ($scope.currentCustomer.CustomerType == 1)
                             {
                                 product.Price = result.Data.Price;
@@ -808,4 +911,5 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     };
 
     initialize();
+
 }]);

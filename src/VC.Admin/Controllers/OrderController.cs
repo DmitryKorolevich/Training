@@ -184,7 +184,12 @@ namespace VC.Admin.Controllers
             {
                 return new OrderManageModel()
                 {
-
+                    IdObjectType=1,//normal
+                    IdCustomer= 7888921,
+                    GCs=new List<GCListItemModel>() { new GCListItemModel(null)},
+                    SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
+                    PreferredShipMethod = 1,
+                    ShipDelayType=0,
                 };
             }
 
@@ -196,9 +201,9 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<OrderCalculateModel>> CalculateOrder(OrderManageModel model)
+        public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
-            return null;
+            Thread.Sleep(1000);
 
             var item = _mapper.FromModel(model);
 
@@ -210,7 +215,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<OrderManageModel>> UpdateOrder(OrderManageModel model)
+        public async Task<Result<OrderManageModel>> UpdateOrder([FromBody]OrderManageModel model)
         {
             if (!Validate(model))
                 return null;
@@ -228,6 +233,8 @@ namespace VC.Admin.Controllers
                 item = (await orderService.InsertAsync(item));
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
+
+            //TODO - add sign up for newsletter(SignUpNewsletter)
 
             return toReturn;
         }

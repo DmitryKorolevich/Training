@@ -184,3 +184,17 @@ BEGIN
 END 
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='AlaskaHawaiiSurcharge')
+BEGIN
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'AlaskaHawaiiSurcharge', 1, NULL, 1, NULL),
+	(N'CanadaSurcharge', 1, NULL, 1, NULL),	
+	(N'StandardShippingCharges', 1, NULL, 1, NULL)
+
+END
+
+GO
+
