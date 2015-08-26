@@ -11,6 +11,9 @@ namespace VitalChoice.DynamicData.Interfaces
     public interface IReadDynamicObjectServiceAsync<T, TEntity> : IReadObjectServiceAsync<T, TEntity>
         where TEntity : Entity
     {
+        Task<T> CreatePrototypeAsync(int? idObjectType = null);
+        Task<TModel> CreatePrototypeForAsync<TModel>(int? idObjectType = null)
+            where TModel : class, new();
         Task<T> SelectAsync(int id, bool withDefaults);
         Task<List<T>> SelectAsync(ICollection<int> ids, bool withDefaults);
         Task<List<T>> SelectAsync(bool withDefaults);
@@ -18,6 +21,9 @@ namespace VitalChoice.DynamicData.Interfaces
         Task<List<T>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults);
         Task<List<T>> SelectAsync(IDictionary<string, object> values, bool withDefaults);
         Task<List<T>> SelectAsync(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults);
+        T CreatePrototype(int? idObjectType = null);
+        TModel CreatePrototypeFor<TModel>(int? idObjectType = null)
+            where TModel : class, new();
         T Select(int id, bool withDefaults);
         List<T> Select(ICollection<int> ids, bool withDefaults);
         List<T> Select(bool withDefaults);
@@ -25,5 +31,6 @@ namespace VitalChoice.DynamicData.Interfaces
         List<T> Select(Expression<Func<TEntity, bool>> query, bool withDefaults);
         List<T> Select(IDictionary<string, object> values, bool withDefaults);
         List<T> Select(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults);
+
     }
 }

@@ -56,6 +56,19 @@ namespace VitalChoice.DynamicData.Base
 
         #endregion
 
+        public virtual async Task<TDynamic> CreatePrototypeAsync(int? idObjectType = null)
+        {
+            var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
+            var entity = new TEntity {OptionTypes = optionTypes};
+            return await Mapper.FromEntityAsync(entity, true);
+        }
+
+        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int? idObjectType = null) 
+            where TModel : class, new()
+        {
+            return Mapper.ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
+        }
+
         public virtual async Task<TDynamic> SelectAsync(int id, bool withDefaults)
         {
             IQueryFluent<TEntity> res = ObjectRepository.Query(
@@ -188,6 +201,21 @@ namespace VitalChoice.DynamicData.Base
             await SetBigValuesAsync(entities, BigStringRepository);
             await AfterSelect(entities);
             return Mapper.FromEntityRange(entities, withDefaults);
+        }
+
+        public TDynamic CreatePrototype(int? idObjectType = null)
+        {
+            var task = CreatePrototypeAsync(idObjectType);
+            task.Wait();
+            return task.Result;
+        }
+
+        public TModel CreatePrototypeFor<TModel>(int? idObjectType = null)
+            where TModel : class, new()
+        {
+            var task = CreatePrototypeForAsync<TModel>(idObjectType);
+            task.Wait();
+            return task.Result;
         }
 
         #region Synchronous Operations
