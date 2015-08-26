@@ -1,6 +1,8 @@
 ﻿IF NOT EXISTS(SELECT * FROM Lookups WHERE Name='OrderSources')
 BEGIN
 
+	DECLARE @IdLookup INT
+	
 	INSERT INTO [dbo].[Lookups]
 	([LookupValueType], [Name])
 	VALUES

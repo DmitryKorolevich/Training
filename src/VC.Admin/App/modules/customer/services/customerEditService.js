@@ -214,33 +214,30 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.makeAsProfileAddress = function ()
         {
-            if (uiScope.currentCustomer.sameShipping)
+            var defaultValue = uiScope.shippingAddressTab.Address.Default;
+            for (var key in uiScope.currentCustomer.ProfileAddress)
             {
-                var defaultValue = uiScope.shippingAddressTab.Address.Default;
-                for (var key in uiScope.currentCustomer.ProfileAddress)
-                {
-                    uiScope.shippingAddressTab.Address[key] = uiScope.currentCustomer.ProfileAddress[key];
-                }
-                if (uiScope.currentCustomer.newEmail)
-                {
-                    uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.newEmail;
-                } else
-                {
-                    uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.Email;
-                }
-                uiScope.shippingAddressTab.Address.Default = defaultValue;
-                uiScope.shippingAddressTab.Address.AddressType = 3;
-                uiScope.shippingAddressTab.Address.Id = 0;
+                uiScope.shippingAddressTab.Address[key] = uiScope.currentCustomer.ProfileAddress[key];
             }
+            if (uiScope.currentCustomer.newEmail)
+            {
+                uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.newEmail;
+            } else
+            {
+                uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.Email;
+            }
+            uiScope.shippingAddressTab.Address.Default = defaultValue;
+            uiScope.shippingAddressTab.Address.AddressType = 3;
+            uiScope.shippingAddressTab.Address.Id = 0;
         };
 
-        function deleteShippingAddressLocal(id)
+        uiScope.deleteShippingAddress = function ()
         {
             var idx = -1;
 
             angular.forEach(uiScope.currentCustomer.Shipping, function (item, index)
             {
-                if (item.Id == id)
+                if (item == uiScope.shippingAddressTab.Address)
                 {
                     idx = index;
                     return;
@@ -262,246 +259,165 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
         };
 
-        uiScope.deleteSelectedShipping = function (id)
-        {
-            customerService.deleteAddress(id, uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        deleteShippingAddressLocal(id);
-                        toaster.pop('success', "Success!", "Shipping Address was succesfully deleted");
-                    }
-                    else
-                    {
-                        errorHandler(result);
-                    }
-                })
-                .error(function (result)
-                {
-                    errorHandler(result);
-                });
-        };
-
-        uiScope.cancelAddNewShipping = function ()
-        {
-            uiScope.shippingAddressTab.Address = uiScope.currentCustomer.Shipping[0];
-            uiScope.shippingAddressTab.NewAddress = false;
-        };
-
-        uiScope.addNewShipping = function ()
-        {
-            clearServerValidation(uiScope);
-
-            setCountryValidity(uiScope);
-
-            if (uiScope.forms.shipping.$valid)
-            {
-                if (uiScope.editMode)
-                {
-                    customerService.addAddress(uiScope.shippingAddressTab.Address, uiScope.currentCustomer.Id, uiScope.addEditTracker).success(function (result)
-                    {
-                        if (result.Success)
-                        {
-                            syncCountry(uiScope, result.Data);
-                            uiScope.currentCustomer.Shipping.push(result.Data);
-                            uiScope.shippingAddressTab.Address = result.Data;
-                            uiScope.shippingAddressTab.NewAddress = false;
-                            toaster.pop('success', "Success!", "Customer address was succesfully added");
-                        }
-                        else
-                        {
-                            errorHandler(result);
-                            //toaster.pop('error', 'Error!', "Can't add shipping address");
-                        }
-                    }).
-                    error(function (result)
-                    {
-                        errorHandler(result);
-                    });
-                }
-                else
-                {
-                    var newAddress = angular.copy(uiScope.shippingAddressTab.Address);
-                    syncCountry(uiScope, newAddress);
-                    uiScope.currentCustomer.Shipping.push(newAddress);
-                    uiScope.shippingAddressTab.NewAddress = false;
-                }
-            } else
-            {
-                uiScope.forms.submitted['shipping'] = true;
-            }
-        };
-
         uiScope.setNewAddress = function ()
         {
-            customerService.createAddressPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.currentCustomer.sameShipping = false;
-                        uiScope.shippingAddressTab.NewAddress = true;
-                        uiScope.shippingAddressTab.Address = result.Data;
-                    } else
-                    {
+            if (uiScope.forms.shipping.$valid) {
+                customerService.createAddressPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.currentCustomer.sameShipping = false;
+                            uiScope.shippingAddressTab.NewAddress = true;
+                            uiScope.shippingAddressTab.Address = result.Data;
+                            syncCountry(uiScope, result.Data);
+                            uiScope.currentCustomer.Shipping.push(result.Data);
+                        } else {
+                            errorHandler(result);
+                        }
+                    }).
+                    error(function (result) {
                         errorHandler(result);
-                        //toaster.pop('error', 'Error!', "Can't add shipping address");
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['shipping'] = false;
-                });
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['shipping'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['shipping'] = true;
+            }
             return false;
         };
 
-        uiScope.setDefaultAddress = function (id)
+        uiScope.setDefaultAddress = function ()
         {
             angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem)
             {
-                if (shippingItem.Id != id && shippingItem.Default)
+                if (shippingItem != uiScope.shippingAddressTab.Address && shippingItem.Default)
                 {
                     shippingItem.Default = false;
                 }
-                else if (shippingItem.Id == id)
+                else if (shippingItem == uiScope.shippingAddressTab.Address)
                 {
                     shippingItem.Default = true;
                 }
             });
         };
 
-        uiScope.makeBillingAsProfileAddress = function ()
-        {
-            if (uiScope.paymentInfoTab.sameBilling)
-            {
-                var address;
-                switch (String(uiScope.paymentInfoTab.PaymentMethodType))
-                {
-                    case "1":
-                        if (uiScope.paymentInfoTab.CreditCard)
-                        {
-                            address = uiScope.paymentInfoTab.CreditCard.Address;
-                        }
-                        break;
-                    case "2":
-                        if (uiScope.currentCustomer.Oac)
-                        {
-                            address = uiScope.currentCustomer.Oac.Address;
-                        }
-                        break;
-                    case "3":
-                        if (uiScope.currentCustomer.Check)
-                        {
-                            address = uiScope.currentCustomer.Check.Address;
-                        }
-                        break;
-                }
-                if (address)
-                {
-                    for (var key in uiScope.currentCustomer.ProfileAddress)
-                    {
-                        address[key] = uiScope.currentCustomer.ProfileAddress[key];
+        uiScope.makeBillingAsProfileAddress = function () {
+            var address;
+            switch (String(uiScope.paymentInfoTab.PaymentMethodType)) {
+                case "1":
+                    if (uiScope.paymentInfoTab.CreditCard) {
+                        address = uiScope.paymentInfoTab.CreditCard.Address;
                     }
-                    if (uiScope.currentCustomer.newEmail)
-                    {
-                        address.Email = uiScope.currentCustomer.newEmail;
-                    } else
-                    {
-                        address.Email = uiScope.currentCustomer.Email;
+                    break;
+                case "2":
+                    if (uiScope.currentCustomer.Oac) {
+                        address = uiScope.currentCustomer.Oac.Address;
                     }
-                    address.AddressType = 2;
-                    address.Id = 0;
+                    break;
+                case "3":
+                    if (uiScope.currentCustomer.Check) {
+                        address = uiScope.currentCustomer.Check.Address;
+                    }
+                    break;
+            }
+            if (address) {
+                for (var key in uiScope.currentCustomer.ProfileAddress) {
+                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
                 }
+                if (uiScope.currentCustomer.newEmail) {
+                    address.Email = uiScope.currentCustomer.newEmail;
+                } else {
+                    address.Email = uiScope.currentCustomer.Email;
+                }
+                address.AddressType = 2;
+                address.Id = 0;
             }
         };
 
         uiScope.setNewCreditCard = function (callback)
         {
-            customerService.createCreditCardPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.currentCustomer.CreditCards.push(result.Data);
-                        uiScope.paymentInfoTab.CreditCard = result.Data;
-                        uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
-                        uiScope.paymentInfoTab.sameBilling = false;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createCreditCardPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.currentCustomer.CreditCards.push(result.Data);
+                            uiScope.paymentInfoTab.CreditCard = result.Data;
+                            uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
+                            uiScope.paymentInfoTab.sameBilling = false;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
 
         uiScope.setNewCheck = function (callback)
         {
-            customerService.createCheckPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.currentCustomer.Check = result.Data;
-                        uiScope.currentCustomer.Check.formName = uiScope.paymentInfoTab.formName;
-                        uiScope.paymentInfoTab.sameBilling = false;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createCheckPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.currentCustomer.Check = result.Data;
+                            uiScope.currentCustomer.Check.formName = uiScope.paymentInfoTab.formName;
+                            uiScope.paymentInfoTab.sameBilling = false;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
 
         uiScope.setNewOac = function (callback)
         {
-            customerService.createOacPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.currentCustomer.Oac = result.Data;
-                        uiScope.currentCustomer.Oac.formName = uiScope.paymentInfoTab.formName;
-                        uiScope.paymentInfoTab.sameBilling = false;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createOacPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.currentCustomer.Oac = result.Data;
+                            uiScope.currentCustomer.Oac.formName = uiScope.paymentInfoTab.formName;
+                            uiScope.paymentInfoTab.sameBilling = false;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
     };
@@ -510,82 +426,82 @@ angular.module('app.modules.customer.services.customerEditService', [])
     {
         uiScope.setNewCreditCard = function (callback)
         {
-            customerService.createCreditCardPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.paymentInfoTab.CreditCard = result.Data;
-                        uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createCreditCardPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.paymentInfoTab.CreditCard = result.Data;
+                            uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
 
         uiScope.setNewCheck = function (callback)
         {
-            customerService.createCheckPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.order.Check = result.Data;
-                        uiScope.order.Check.formName = uiScope.paymentInfoTab.formName;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createCheckPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.order.Check = result.Data;
+                            uiScope.order.Check.formName = uiScope.paymentInfoTab.formName;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
 
         uiScope.setNewOac = function (callback)
         {
-            customerService.createOacPrototype(uiScope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        uiScope.order.Oac = result.Data;
-                        uiScope.order.Oac.formName = uiScope.paymentInfoTab.formName;
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    uiScope.forms.submitted['billing'] = false;
-                });
+            if (uiScope.forms.billing.$valid) {
+                customerService.createOacPrototype(uiScope.addEditTracker)
+                    .success(function (result) {
+                        if (result.Success) {
+                            uiScope.order.Oac = result.Data;
+                            uiScope.order.Oac.formName = uiScope.paymentInfoTab.formName;
+                            if (callback)
+                                callback(result.Data);
+                        } else {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result) {
+                        errorHandler(result);
+                    })
+                    .then(function () {
+                        uiScope.forms.submitted['billing'] = false;
+                    });
+            }
+            else {
+                uiScope.forms.submitted['billing'] = true;
+            }
             return false;
         };
     };

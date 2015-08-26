@@ -47,7 +47,16 @@ namespace VitalChoice.DynamicData.Base
         {
             if (_valueSetter != null)
                 return _valueSetter;
-            var memberExpression = ObjectIdSelector.Body as MemberExpression;
+            MemberExpression memberExpression;
+            var expressionBody = ObjectIdSelector.Body;
+            if (expressionBody.NodeType == ExpressionType.Convert)
+            {
+                memberExpression = ((UnaryExpression) expressionBody).Operand as MemberExpression;
+            }
+            else
+            {
+                memberExpression = expressionBody as MemberExpression;
+            }
             if (memberExpression?.Member is PropertyInfo)
             {
                 var property = (PropertyInfo) memberExpression.Member;

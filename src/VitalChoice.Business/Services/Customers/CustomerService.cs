@@ -162,6 +162,12 @@ namespace VitalChoice.Business.Services.Customers
             {
                 await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
             }
+            await
+                addressesRepositoryAsync.DeleteAllAsync(
+                    entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+            await
+                customerNotesRepositoryAsync.DeleteAllAsync(
+                    entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
 
 			if (model.Files != null && model.Files.Any() && entity.Files != null)
 			{
@@ -196,9 +202,13 @@ namespace VitalChoice.Business.Services.Customers
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int)AddressType.Billing))
+            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int)AddressType.Billing && a.Id != 0))
             {
                 await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
+            }
+            foreach (var address in entity.Addresses.Where(a => a.Id == 0))
+            {
+                await addressesRepositoryAsync.InsertGraphAsync(address);
             }
             foreach (var customerNote in entity.CustomerNotes)
             {
@@ -209,10 +219,7 @@ namespace VitalChoice.Business.Services.Customers
                 await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
                 if (customerPaymentMethod.BillingAddress.Id == 0)
                     await addressesRepositoryAsync.InsertGraphAsync(customerPaymentMethod.BillingAddress);
-                else
-                    await addressOptionValuesRepositoryAsync.InsertRangeAsync(customerPaymentMethod.BillingAddress.OptionValues);
             }
-
             var paymentsToDelete =
                 entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
             await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);

@@ -358,11 +358,10 @@
                                                 </div>
                                                 <span class="legend">Billing Address</span>
                                                 <div class="form-group">
-                                                    <label for="sameCreditCardAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
-                                                    <div class="col-md-9">
-                                                        <div class="checkbox">
-                                                            <input type="checkbox" id="sameCreditCardAsProfile" data-ng-model="paymentInfoTab.sameBilling" data-ng-change="makeBillingAsProfileAddress();" class="ng-pristine ng-valid ng-touched">
-                                                        </div>
+                                                    <div class="col-md-3">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                     </div>
                                                 </div>
                                                 <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [paymentInfoTab.CreditCard]"></div>
@@ -382,11 +381,10 @@
                                                 </div>
                                                 <span class="legend">Billing Address</span>
                                                 <div class="form-group">
-                                                    <label for="sameOacAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
-                                                    <div class="col-md-9">
-                                                        <div class="checkbox">
-                                                            <input type="checkbox" id="sameOacAsProfile" data-ng-model="paymentInfoTab.sameBilling" data-ng-change="makeBillingAsProfileAddress();" class="ng-pristine ng-valid ng-touched">
-                                                        </div>
+                                                    <div class="col-md-3">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                     </div>
                                                 </div>
                                                 <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Oac]"></div>
@@ -410,11 +408,10 @@
                                                 </div>
                                                 <span class="legend">Billing Address</span>
                                                 <div class="form-group">
-                                                    <label for="sameCheckAsProfile" class="col-md-3 control-label">Same as Profile Address</label>
-                                                    <div class="col-md-9">
-                                                        <div class="checkbox">
-                                                            <input type="checkbox" id="sameCheckAsProfile" data-ng-model="paymentInfoTab.sameBilling" data-ng-change="makeBillingAsProfileAddress();" class="ng-pristine ng-valid ng-touched">
-                                                        </div>
+                                                    <div class="col-md-3">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                     </div>
                                                 </div>
                                                 <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Check]"></div>
@@ -474,7 +471,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr data-ng-repeat="note in currentCustomer.CustomerNotes track by note.Id | orderBy:DateEdited:reverse">
+                                    <tr data-ng-repeat="note in currentCustomer.CustomerNotes | orderBy:DateEdited:reverse">
                                         <td>{{getReferenceItem(ReferenceData.CustomerNotePriorities, note.Priority).Text}}</td>
                                         <td>{{note.Text}}</td>
                                         <td>{{note.DateEdited | date:"MM/dd/yy"}}<br/>{{note.DateEdited | date:"h:mm a"}}<br/>{{note.EditedBy}}</td>
