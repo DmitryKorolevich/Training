@@ -27,6 +27,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th>SKUs</th>
                         <th>Status</th>
                         <th>View </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
@@ -45,6 +46,9 @@
                             <img ng-if="item.ThumbnailUrl" class="thumb" ng-src="{{item.Thumbnail}}" />
                         </td>
                         <td>{{item.Name}}</td>
+                        <td>
+                            <span data-ng-repeat="sku in item.SKUs">{{sku.Code}}{{$last!=true ? " / " : ""}}</span>
+                        </td>
                         <td>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>

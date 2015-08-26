@@ -44,6 +44,13 @@ namespace VitalChoice.Data.Repositories.Customs
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
                     break;
+                case VProductSkuSortPath.TaxCode:
+                    sortable =
+                        x =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.TaxCode)
+                                : x.OrderByDescending(y => y.TaxCode);
+                    break;
             }
 
             query = query.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
