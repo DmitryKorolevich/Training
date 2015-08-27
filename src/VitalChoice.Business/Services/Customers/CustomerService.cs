@@ -202,7 +202,7 @@ namespace VitalChoice.Business.Services.Customers
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 
-            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int)AddressType.Billing && a.Id != 0))
+            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int?)AddressType.Billing && a.Id != 0 && a.StatusCode != RecordStatusCode.Deleted))
             {
                 await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
             }
