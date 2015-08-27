@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.modules.customer.services.customerEditService', [])
-.factory('customerEditService', ['$q', 'customerService', 'toaster', '$filter', '$injector', function ($q, customerService, toaster, $filter, $injector)
+.factory('customerEditService', ['$q', '$filter', '$injector', 'customerService', 'toaster', function ($q, $filter, $injector, customerService, toaster)
 {
     function errorHandler(result)
     {

@@ -4,6 +4,8 @@ angular.module('app.modules.customer', [
 	'app.modules.customer.services.customerEditService',
 	'app.modules.customer.controllers.addEditCustomerController',
 	'app.modules.customer.controllers.customerManagementController',
+	'app.modules.customer.controllers.manageCustomerFilesController',
+	'app.modules.customer.controllers.manageCustomerNotesController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

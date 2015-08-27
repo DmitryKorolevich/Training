@@ -118,6 +118,9 @@
                         <button title="Edit" ui-sref="index.oneCol.customerDetail({id:customer.Id})" ladda="editTracker.active()" class="btn btn-default btn-success btn-xs">
                             <i class="glyphicon glyphicon-edit"></i>
                         </button>
+                        <button title="Place Order" class="btn btn-default btn-primary btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:customer.Id})">
+                            <i class="glyphicon glyphicon-plus"></i>
+                        </button>
                     </td>
                 </tr>
                 </tbody>

@@ -115,10 +115,6 @@ namespace VC.Admin.Controllers
                 TradeClass = 1,
                 CustomerNotes = new List<CustomerNoteModel>()
                 {
-                    new CustomerNoteModel()
-                    {
-                        Priority = CustomerNotePriority.NormalPriority
-                    }
                 },
                 Shipping = new List<AddressModel>() {new AddressModel() {AddressType = AddressType.Shipping}}
             };
@@ -161,12 +157,26 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public Result<CustomerNoteModel> CreateCustomerNotePrototype()
+        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype()
         {
-            return new CustomerNoteModel()
+            var toReturn = new CustomerNoteModel()
             {
                 Priority = CustomerNotePriority.NormalPriority,
+                DateEdited = DateTime.Now,
             };
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                var adminProfileCondition = new AdminProfileQuery().WithId(userId);
+                var adminProfile = (await _adminProfileService.QueryAsync(adminProfileCondition)).FirstOrDefault();
+                if (adminProfile != null)
+                {
+                    toReturn.EditedBy = adminProfile.AgentId;
+                }
+            }
+
+            return toReturn;
         }
 
         [HttpPost]
