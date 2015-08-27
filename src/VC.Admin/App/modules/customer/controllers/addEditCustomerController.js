@@ -27,7 +27,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				};
 				$scope.paymentInfoTab = {
 					active: false,
-					formName: 'billing'
+					formName: 'billing',
+					AddressEditModels: {}
 				};
 				$scope.customerFilesTab = {
 					active: false,
@@ -95,7 +96,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										});
 
 										if ($scope.currentCustomer.CreditCards && $scope.currentCustomer.CreditCards[0])
-											$scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[0];
+											$scope.paymentInfoTab.CreditCardIndex = "0";
 
 										if ($scope.currentCustomer.Oac) {
 											$scope.currentCustomer.Oac.formName = $scope.paymentInfoTab.formName;
@@ -202,8 +203,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									            }
 									            break;
 									        case 'CreditCards':
-									            var collectionIndex = parseInt(indexWithName.split('i')[1]);
-									            $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[collectionIndex];
+									            var collectionIndex = indexWithName.split('i')[1];
+									            $scope.paymentInfoTab.CreditCardIndex = collectionIndex;
 									            form = $scope.forms[formName];
 									            fieldName = arr[2];
 									            if (form[fieldName] != undefined) {

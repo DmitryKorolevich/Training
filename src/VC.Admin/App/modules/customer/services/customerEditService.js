@@ -64,31 +64,16 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
         };        
 
-        uiScope.deleteSelectedCreditCard = function (id)
+        uiScope.deleteSelectedCreditCard = function ()
         {
-            var idx = -1;
-
-            angular.forEach(uiScope.currentCustomer.CreditCards, function (item, index)
+            uiScope.currentCustomer.CreditCards.splice(uiScope.paymentInfoTab.CreditCardIndex, 1);
+            if (uiScope.currentCustomer.CreditCards.length > 0 && uiScope.paymentInfoTab.CreditCardIndex >= uiScope.currentCustomer.CreditCards.length)
             {
-                if (item.Id == id)
-                {
-                    idx = index;
-                    return;
-                }
-            });
-
-            uiScope.currentCustomer.CreditCards.splice(idx, 1);
-            if (idx < uiScope.currentCustomer.CreditCards.length)
-            {
-                uiScope.paymentInfoTab.CreditCard = uiScope.currentCustomer.CreditCards[idx];
-            }
-            else if (uiScope.currentCustomer.CreditCards.length > 0)
-            {
-                uiScope.paymentInfoTab.CreditCard = uiScope.currentCustomer.CreditCards[0];
+                uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length - 1).toString();
             }
             else
             {
-                uiScope.paymentInfoTab.CreditCard = undefined;
+                uiScope.paymentInfoTab.CreditCardIndex = undefined;
             }
         };
     };
@@ -103,6 +88,15 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping' };
             }
             return uiScope.shippingAddressTab.ShippingEditModels[index];
+        }
+
+        uiScope.buildCreditCardAddressForPartial = function (collection, index) {
+            if (collection === undefined || collection[index] === undefined || collection[index].Address === undefined || uiScope.paymentInfoTab.AddressEditModels === undefined)
+                return undefined;
+            if (uiScope.paymentInfoTab.AddressEditModels[index] === undefined) {
+                uiScope.paymentInfoTab.AddressEditModels[index] = { Address: collection[index].Address, formName: 'billing', index: index, collectionName: 'CreditCards' };
+            }
+            return uiScope.paymentInfoTab.AddressEditModels[index];
         }
 
         uiScope.togglePaymentMethodSelection = function (paymentMethod)
@@ -244,9 +238,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
         uiScope.deleteShippingAddress = function ()
         {
             uiScope.currentCustomer.Shipping.splice(uiScope.shippingAddressTab.AddressIndex, 1);
-            if (uiScope.currentCustomer.Shipping.length > 0)
+            if (uiScope.currentCustomer.Shipping.length > 0 && uiScope.shippingAddressTab.AddressIndex >= uiScope.currentCustomer.Shipping.length)
             {
-                uiScope.shippingAddressTab.AddressIndex = "0";
+                uiScope.shippingAddressTab.AddressIndex = (uiScope.currentCustomer.Shipping.length - 1).toString();
             }
             else
             {
@@ -301,8 +295,8 @@ angular.module('app.modules.customer.services.customerEditService', [])
             var address;
             switch (String(uiScope.paymentInfoTab.PaymentMethodType)) {
                 case "1":
-                    if (uiScope.paymentInfoTab.CreditCard) {
-                        address = uiScope.paymentInfoTab.CreditCard.Address;
+                    if (uiScope.paymentInfoTab.CreditCardIndex) {
+                        address = uiScope.currentCustomer.CreditCards[uiScope.paymentInfoTab.CreditCardIndex].Address;
                     }
                     break;
                 case "2":
@@ -337,9 +331,12 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     .success(function (result) {
                         if (result.Success) {
                             uiScope.currentCustomer.CreditCards.push(result.Data);
-                            uiScope.paymentInfoTab.CreditCard = result.Data;
-                            uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
-                            uiScope.paymentInfoTab.sameBilling = false;
+                            if (uiScope.paymentInfoTab.CreditCardIndex === undefined) {
+                                uiScope.paymentInfoTab.CreditCardIndex = "0";
+                            }
+                            else {
+                                uiScope.paymentInfoTab.CreditCardIndex = (parseInt(uiScope.paymentInfoTab.CreditCardIndex) + 1).toString();
+                            }
                             if (callback)
                                 callback(result.Data);
                         } else {
@@ -368,7 +365,6 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success) {
                             uiScope.currentCustomer.Check = result.Data;
                             uiScope.currentCustomer.Check.formName = uiScope.paymentInfoTab.formName;
-                            uiScope.paymentInfoTab.sameBilling = false;
                             if (callback)
                                 callback(result.Data);
                         } else {
@@ -396,7 +392,6 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success) {
                             uiScope.currentCustomer.Oac = result.Data;
                             uiScope.currentCustomer.Oac.formName = uiScope.paymentInfoTab.formName;
-                            uiScope.paymentInfoTab.sameBilling = false;
                             if (callback)
                                 callback(result.Data);
                         } else {
