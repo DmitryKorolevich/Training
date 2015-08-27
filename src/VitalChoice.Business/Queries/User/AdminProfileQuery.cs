@@ -12,5 +12,12 @@ namespace VitalChoice.Business.Queries.User
 
 		    return this;
 	    }
+
+        public AdminProfileQuery WithId(int id)
+        {
+            Add(x => id == x.Id);
+
+            return this;
+        }
     }
 }

@@ -1,0 +1,61 @@
+﻿<spinner-overlay data-loading="addEditTracker.active()">
+    <div class="well row">
+        <div class="col-md-6">
+            <form class="form-horizontal" unsaved-warning-form>
+                <fieldset>
+                    <span class="legend">Upload New File</span>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Description</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" maxlength="500" placeholder="Description" data-ng-model="options.currentFileDescription">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label"></label>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" ngf-select ngf-change="upload($files)" ladda="uploading">Upload</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div ng-if="logFileRequest.state=='progress'">
+                                <progressbar animate="true" value="logFileRequest.progress" type="success"><b>{{logFileRequest.progress}}%</b></progressbar>
+                            </div>
+                            <div ng-if="logFileRequest.state=='done'">
+                                <progressbar animate="true" value="100" type="success"><b>Done</b></progressbar>
+                            </div>
+                            <div ng-if="logFileRequest.state=='error'">
+                                <progressbar animate="true" value="100" type="danger"><b>Error</b></progressbar>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-striped table-hover ">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Upload Date</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="(fileIndex, file) in files | orderBy:'FileName'">
+                        <td><a target="_blank" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&publicId={{publicId}}&viewMode=true&buildNumber={{buildNumber}}">{{file.FileName}}</a></td>
+                        <td>{{file.UploadDate | date:"MM/dd/yy"}}</td>
+                        <td>{{file.Description}}</td>
+                        <td>
+                            <a class="btn btn-default btn-info" target="_self" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&publicId={{publicId}}&viewMode=false&buildNumber={{buildNumber}}">
+                                Download
+                            </a>
+                            <button class="btn btn-danger" data-ng-click="deleteFile(fileIndex, file.FileName)" ladda="deleteFileTracker.active()">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</spinner-overlay>

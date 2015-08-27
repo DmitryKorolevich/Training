@@ -171,12 +171,17 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             active: false,
             formName: 'customerNote',
         };
+        $scope.customerFilesTab = {
+            active: false,
+            formName: 'customerFile'
+        };
         var tabs = [];
         tabs.push($scope.mainTab);
         tabs.push($scope.accountProfileTab);
         tabs.push($scope.shippingAddressTab);
         tabs.push($scope.paymentInfoTab);
         tabs.push($scope.customerNotesTab);
+        tabs.push($scope.customerFilesTab);
         $scope.tabs = tabs;
 
         loadOrder();
@@ -218,16 +223,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     {
         $q.all({
             countriesCall: customerService.getCountries($scope.addEditTracker),
-            customerNotePrototypeCall: customerService.createCustomerNotePrototype($scope.addEditTracker),
             customerGetCall: customerService.getExistingCustomer($scope.idCustomer, $scope.addEditTracker)
         }).then(function (result)
         {
-            if (result.countriesCall.data.Success && result.customerNotePrototypeCall.data.Success && result.customerGetCall.data.Success)
+            if (result.countriesCall.data.Success && result.customerGetCall.data.Success)
             {
                 $scope.countries = result.countriesCall.data.Data;
-
-                $scope.customerNotePrototype = result.customerNotePrototypeCall.data.Data;
-                $scope.customerNote = $scope.customerNotePrototype;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
                 if ($scope.currentCustomer.SourceDetails)
@@ -331,6 +332,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 customerEditService.showHighPriNotes($scope);
 
                 initOrder();
+                initCustomerFiles();
+                initCustomerNotes();
             }
             else
             {
@@ -357,6 +360,23 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         //TODO: set needed data to the legend row
         $scope.legend.CustomerName = "Test";
         $scope.legend.CustomerId = $scope.idCustomer;
+    };
+    
+    function initCustomerFiles()
+    {
+        var data = {};
+        data.files = $scope.currentCustomer.Files;
+        data.publicId = $scope.currentCustomer.PublicId;
+        data.addEditTracker = $scope.addEditTracker;
+        $scope.$broadcast('customerFiles#in#init', data);
+    };
+
+    function initCustomerNotes()
+    {
+        var data = {};
+        data.customerNotes = $scope.currentCustomer.CustomerNotes;
+        data.addEditTracker = $scope.addEditTracker;
+        $scope.$broadcast('customerNotess#in#init', data);
     };
 
     var oldOrderForCalculating = null;
@@ -594,68 +614,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.forms.submitted['profile'] = true;
             $scope.forms.submitted['shipping'] = true;
             $scope.forms.submitted['billing'] = true;
-        }
-    };
-
-    function deleteCustomerNoteLocal(id)
-    {
-        var idx = -1;
-
-        angular.forEach($scope.currentCustomer.CustomerNotes, function (item, index)
-        {
-            if (item.Id == id)
-            {
-                idx = index;
-                return;
-            }
-        });
-
-        $scope.currentCustomer.CustomerNotes.splice(idx, 1);
-    }
-
-    $scope.deleteCustomerNote = function (id)
-    {
-        customerService.deleteNote(id, $scope.addEditTracker)
-            .success(function (result)
-            {
-                if (result.Success)
-                {
-                    deleteCustomerNoteLocal(id);
-                    toaster.pop('success', "Success!", "Customer Note was succesfully deleted");
-                }
-            })
-            .error(function (result)
-            {
-                errorHandler(result);
-            });
-    };
-
-    $scope.addNewCustomerNote = function ()
-    {
-        clearServerValidation();
-        if ($scope.forms.customerNote.$valid)
-        {
-            customerService.addNote($scope.customerNote, $scope.currentCustomer.Id, $scope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        $scope.currentCustomer.CustomerNotes.push(result.Data);
-                        $scope.customerNote = $scope.customerNotePrototype;
-                        toaster.pop('success', "Success!", "Customer Note was succesfully added");
-                    }
-                    else
-                    {
-                        errorHandler(result);
-                    }
-                })
-                .error(function (result)
-                {
-                    errorHandler(result);
-                });
-        } else
-        {
-            $scope.forms.customerNote.submitted = true;
         }
     };
 
