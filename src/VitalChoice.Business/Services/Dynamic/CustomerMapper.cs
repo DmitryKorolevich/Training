@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
-                await _customerAddressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses.Where(a => a.IdObjectType != (int?)AddressType.Billing).ToList());
+                await _customerAddressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,

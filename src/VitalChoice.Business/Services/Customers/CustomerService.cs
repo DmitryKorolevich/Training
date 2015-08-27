@@ -162,12 +162,6 @@ namespace VitalChoice.Business.Services.Customers
             {
                 await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
             }
-            await
-                addressesRepositoryAsync.DeleteAllAsync(
-                    entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
-            await
-                customerNotesRepositoryAsync.DeleteAllAsync(
-                    entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
 
 			if (model.Files != null && model.Files.Any() && entity.Files != null)
 			{
@@ -201,19 +195,36 @@ namespace VitalChoice.Business.Services.Customers
             var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
             var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
             var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
+            var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
 
-            foreach (var address in entity.Addresses.Where(a => a.IdObjectType != (int?)AddressType.Billing && a.Id != 0 && a.StatusCode != RecordStatusCode.Deleted))
-            {
-                await addressOptionValuesRepositoryAsync.InsertRangeAsync(address.OptionValues);
-            }
-            foreach (var address in entity.Addresses.Where(a => a.Id == 0))
-            {
-                await addressesRepositoryAsync.InsertGraphAsync(address);
-            }
-            foreach (var customerNote in entity.CustomerNotes)
-            {
-                await customerNoteOptionValuesRepositoryAsync.InsertRangeAsync(customerNote.OptionValues);
-            }
+            await
+                addressesRepositoryAsync.DeleteAllAsync(
+                    entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+            await
+                customerNoteRepository.DeleteAllAsync(
+                    entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
+
+            await
+                addressOptionValuesRepositoryAsync.InsertRangeAsync(
+                    entity.Addresses.Where(
+                        a =>
+                            a.IdObjectType != (int?) AddressType.Billing && a.Id != 0 &&
+                            a.StatusCode != RecordStatusCode.Deleted).SelectMany(a => a.OptionValues));
+            
+            await
+                addressesRepositoryAsync.InsertGraphRangeAsync(
+                    entity.Addresses.Where(
+                        a =>
+                            a.Id == 0 && a.IdObjectType != (int?) AddressType.Billing &&
+                            a.StatusCode != RecordStatusCode.Deleted));
+            await
+                customerNoteOptionValuesRepositoryAsync.InsertRangeAsync(
+                    entity.CustomerNotes.Where(n => n.StatusCode != RecordStatusCode.Deleted && n.Id != 0)
+                        .SelectMany(n => n.OptionValues));
+            await
+                customerNoteRepository.InsertGraphRangeAsync(
+                    entity.CustomerNotes.Where(n => n.StatusCode != RecordStatusCode.Deleted && n.Id == 0));
+
             foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != RecordStatusCode.Deleted))
             {
                 await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
