@@ -18,7 +18,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				};
 				$scope.shippingAddressTab = {
 					active: false,
-					formName: 'shipping'
+					formName: 'shipping',
+					ShippingEditModels: {}
 				};
 				$scope.customerNotesTab = {
 					active: false,
@@ -58,7 +59,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 									if (result.Success) {
 										$scope.currentCustomer = result.Data;
 										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
-										$scope.shippingAddressTab.Address = $scope.currentCustomer.Shipping[0];
+										$scope.shippingAddressTab.AddressIndex = "0";
 										$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 										$scope.paymentInfoTab.Address = {};
 
@@ -79,10 +80,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 										$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
 										$scope.paymentInfoTab.Address = {};
-										angular.forEach($scope.currentCustomer.Shipping, function(shippingItem) {
+										angular.forEach($scope.currentCustomer.Shipping, function(shippingItem, index) {
 											customerEditService.syncCountry($scope, shippingItem);
 											if (shippingItem.Default) {
-												$scope.shippingAddressTab.Address = shippingItem;
+											    $scope.shippingAddressTab.AddressIndex = index.toString();
 											}
 										});
 
@@ -175,13 +176,46 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						$scope.forms.submitted['billing'] = true;
 						$scope.serverMessages = new ServerMessages(result.Messages);
 						var formForShowing = null;
+						var form;
 						$.each(result.Messages, function(index, value) {
 							if (value.Field) {
 								if (value.Field.indexOf("::") >= 0) {
 									var arr = value.Field.split("::");
 									var formName = arr[0];
 									var fieldName = arr[1];
-									var form = $scope.forms[formName];
+									if (fieldName.indexOf(".") >= 0) {
+									    arr = fieldName.split('.');
+									    var collectionName = arr[0];
+									    var indexWithName = arr[1];
+									    switch(collectionName)
+									    {
+									        case 'Shipping':
+									            var collectionIndex = indexWithName.split('i')[1];
+									            $scope.shippingAddressTab.AddressIndex = collectionIndex;
+									            form = $scope.forms[formName];
+									            fieldName = arr[2];
+									            if (form[fieldName] != undefined) {
+									                form[fieldName].$setValidity("server", false);
+									                if (formForShowing == null) {
+									                    formForShowing = formName;
+									                }
+									            }
+									            break;
+									        case 'CreditCards':
+									            var collectionIndex = parseInt(indexWithName.split('i')[1]);
+									            $scope.paymentInfoTab.CreditCard = $scope.currentCustomer.CreditCards[collectionIndex];
+									            form = $scope.forms[formName];
+									            fieldName = arr[2];
+									            if (form[fieldName] != undefined) {
+									                form[fieldName].$setValidity("server", false);
+									                if (formForShowing == null) {
+									                    formForShowing = formName;
+									                }
+									            }
+									            break;
+									    }
+									}
+									form = $scope.forms[formName];
 									if (form[fieldName] != undefined) {
 										form[fieldName].$setValidity("server", false);
 										if (formForShowing == null) {

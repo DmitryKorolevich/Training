@@ -95,6 +95,16 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
     var initCustomerEdit = function (uiScope)
     {
+        uiScope.buildShippingAddressForPartial = function (collection, index) {
+            if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
+                return undefined;
+            if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined)
+            {
+                uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping' };
+            }
+            return uiScope.shippingAddressTab.ShippingEditModels[index];
+        }
+
         uiScope.togglePaymentMethodSelection = function (paymentMethod)
         {
             if (!uiScope.currentCustomer.ApprovedPaymentMethods || uiScope.currentCustomer.ApprovedPaymentMethods.length == 0)
@@ -214,44 +224,29 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.makeAsProfileAddress = function ()
         {
-            var defaultValue = uiScope.shippingAddressTab.Address.Default;
+            var defaultValue = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default;
             for (var key in uiScope.currentCustomer.ProfileAddress)
             {
-                uiScope.shippingAddressTab.Address[key] = uiScope.currentCustomer.ProfileAddress[key];
+                uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex][key] = uiScope.currentCustomer.ProfileAddress[key];
             }
             if (uiScope.currentCustomer.newEmail)
             {
-                uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.newEmail;
+                uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Email = uiScope.currentCustomer.newEmail;
             } else
             {
-                uiScope.shippingAddressTab.Address.Email = uiScope.currentCustomer.Email;
+                uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Email = uiScope.currentCustomer.Email;
             }
-            uiScope.shippingAddressTab.Address.Default = defaultValue;
-            uiScope.shippingAddressTab.Address.AddressType = 3;
-            uiScope.shippingAddressTab.Address.Id = 0;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default = defaultValue;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].AddressType = 3;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Id = 0;
         };
 
         uiScope.deleteShippingAddress = function ()
         {
-            var idx = -1;
-
-            angular.forEach(uiScope.currentCustomer.Shipping, function (item, index)
+            uiScope.currentCustomer.Shipping.splice(uiScope.shippingAddressTab.AddressIndex, 1);
+            if (uiScope.currentCustomer.Shipping.length > 0)
             {
-                if (item == uiScope.shippingAddressTab.Address)
-                {
-                    idx = index;
-                    return;
-                }
-            });
-
-            uiScope.currentCustomer.Shipping.splice(idx, 1);
-            if (idx < uiScope.currentCustomer.Shipping.length)
-            {
-                uiScope.shippingAddressTab.Address = uiScope.currentCustomer.Shipping[idx];
-            }
-            else if (uiScope.currentCustomer.Shipping.length > 0)
-            {
-                uiScope.shippingAddressTab.Address = uiScope.currentCustomer.Shipping[0];
+                uiScope.shippingAddressTab.AddressIndex = "0";
             }
             else
             {
@@ -267,9 +262,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         if (result.Success) {
                             uiScope.currentCustomer.sameShipping = false;
                             uiScope.shippingAddressTab.NewAddress = true;
-                            uiScope.shippingAddressTab.Address = result.Data;
                             syncCountry(uiScope, result.Data);
                             uiScope.currentCustomer.Shipping.push(result.Data);
+                            uiScope.shippingAddressTab.AddressIndex = (parseInt(uiScope.shippingAddressTab.AddressIndex) + 1).toString();
                         } else {
                             errorHandler(result);
                         }
@@ -289,13 +284,13 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.setDefaultAddress = function ()
         {
-            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem)
+            angular.forEach(uiScope.currentCustomer.Shipping, function (shippingItem, index)
             {
-                if (shippingItem != uiScope.shippingAddressTab.Address && shippingItem.Default)
+                if (index != uiScope.shippingAddressTab.AddressIndex && shippingItem.Default)
                 {
                     shippingItem.Default = false;
                 }
-                else if (shippingItem == uiScope.shippingAddressTab.Address)
+                else if (index == uiScope.shippingAddressTab.AddressIndex)
                 {
                     shippingItem.Default = true;
                 }

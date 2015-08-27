@@ -9,13 +9,13 @@
         </div>
         <div class="form-group">
             <div class="col-md-3">
-                <button class="btn btn-success pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="setDefaultAddress();">Set as Default</button>
+                <button class="btn btn-success pull-right" data-ng-show="!currentCustomer.Shipping[shippingAddressTab.AddressIndex].Default" data-ng-click="setDefaultAddress();">Set as Default</button>
             </div>
             <div class="col-md-7">
-                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.Address" data-ng-options="shippingAddress as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for shippingAddress in currentCustomer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.AddressIndex" data-ng-options="idx as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for (idx, shippingAddress) in currentCustomer.Shipping"></select>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-danger pull-right" data-ng-show="!shippingAddressTab.Address.Default" data-ng-click="deleteShippingAddress();">Delete</button>
+                <button class="btn btn-danger pull-right" data-ng-show="!currentCustomer.Shipping[shippingAddressTab.AddressIndex].Default" data-ng-click="deleteShippingAddress();">Delete</button>
             </div>
         </div>
         <div class="form-group">
@@ -25,6 +25,6 @@
                 <button class="btn btn-info" id="sameAsProfile" data-ng-click="makeAsProfileAddress();">Copy Profile</button>
             </div>
         </div>
-        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [shippingAddressTab]"></div>
+        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildShippingAddressForPartial(currentCustomer.Shipping, shippingAddressTab.AddressIndex)]"></div>
     </fieldset>
 </form>

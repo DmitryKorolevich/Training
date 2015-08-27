@@ -20,16 +20,20 @@ namespace VC.Admin.Validators.Customer
 
 	        var profileAddressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
 	        ParseResults(profileAddressValidator.Validate(value.ProfileAddress), "profile");
+	        int index = 0;
 	        foreach (var shipping in value.Shipping)
 	        {
-	            ParseResults(profileAddressValidator.Validate(shipping), "shipping");
+	            ParseResults(profileAddressValidator.Validate(shipping), "Shipping", index, "shipping");
+	            index++;
 	        }
 
 	        var creditCardValidator = ValidatorsFactory.GetValidator<CreditCardModelRules>();
-	        foreach (var creditCard in value.CreditCards)
+	        index = 0;
+            foreach (var creditCard in value.CreditCards)
 	        {
 	            ParseResults(creditCardValidator.Validate(creditCard));
-	            ParseResults(profileAddressValidator.Validate(creditCard.Address), "billing");
+	            ParseResults(profileAddressValidator.Validate(creditCard.Address), "CreditCards", index, "billing");
+	            index++;
 	        }
 	    }
 

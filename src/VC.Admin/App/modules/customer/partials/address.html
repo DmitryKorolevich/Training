@@ -4,7 +4,7 @@
 	    <input type="text" name="Company" class="form-control" id="{{::model.formName}}_model_company" data-ng-model="model.Address.Company" placeholder="Company" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Company.$invalid">
             <small class="error" ng-show="forms[model.formName].Company.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Company", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Company.$error.server">{{serverMessages.GetMessage('Company', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Company.$error.server">{{serverMessages.GetMessage('Company', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -15,7 +15,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].FirstName.$invalid">
             <small class="error" ng-show="forms[model.formName].FirstName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.FirstName")}}</small>
             <small class="error" ng-show="forms[model.formName].FirstName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.FirstName", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].FirstName.$error.server">{{serverMessages.GetMessage('FirstName', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].FirstName.$error.server">{{serverMessages.GetMessage('FirstName', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -26,7 +26,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].LastName.$invalid">
             <small class="error" ng-show="forms[model.formName].LastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
             <small class="error" ng-show="forms[model.formName].LastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].LastName.$error.server">{{serverMessages.GetMessage('LastName', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].LastName.$error.server">{{serverMessages.GetMessage('LastName', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -37,7 +37,7 @@
 	    <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Address1.$invalid">
             <small class="error" ng-show="forms[model.formName].Address1.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Address1")}}</small>
 	        <small class="error" ng-show="forms[model.formName].Address1.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address1", "100"])}}</small>
-	        <small class="error" ng-show="forms[model.formName].Address1.$error.server">{{serverMessages.GetMessage('Address1', undefined, indefined, model.formName)}}</small>
+	        <small class="error" ng-show="forms[model.formName].Address1.$error.server">{{serverMessages.GetMessage('Address1', model.collectionName, model.index, model.formName)}}</small>
 	    </div>
 	</div>
 </div>
@@ -47,7 +47,7 @@
 	    <input type="text" name="Address2" class="form-control" data-ng-model="model.Address.Address2" id="{{::model.formName}}_model_address2" placeholder="Address 2" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Address2.$invalid">
             <small class="error" ng-show="forms[model.formName].Address2.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Address2", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Address2.$error.server">{{serverMessages.GetMessage('Address2', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Address2.$error.server">{{serverMessages.GetMessage('Address2', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -58,7 +58,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].City.$invalid">
             <small class="error" ng-show="forms[model.formName].City.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","City")}}</small>
             <small class="error" ng-show="forms[model.formName].City.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["City", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].City.$error.server">{{serverMessages.GetMessage('City', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].City.$error.server">{{serverMessages.GetMessage('City', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -70,7 +70,7 @@
         </select>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Country.$invalid">
             <small class="error" ng-show="forms[model.formName].Country.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Country")}}</small>
-            <small class="error" ng-show="forms[model.formName].Country.$error.server">{{serverMessages.GetMessage('Country', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Country.$error.server">{{serverMessages.GetMessage('Country', model.collectionName, model.index, model.formName)}}</small>
         </div>
 	</div>
 </div>
@@ -82,14 +82,14 @@
         </select>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].State.$invalid">
             <small class="error" ng-show="forms[model.formName].State.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","State")}}</small>
-            <small class="error" ng-show="forms[model.formName].State.$error.server">{{serverMessages.GetMessage('State', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].State.$error.server">{{serverMessages.GetMessage('State', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
     <div class="col-md-9" data-ng-if="!(model.Address.Country.States && model.Address.Country.States.length > 0)">
         <input type="text" name="County" id="{{::model.formName}}_model_county" class="form-control" data-ng-model="model.Address.County" placeholder="State" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].County.$invalid">
             <small class="error" ng-show="forms[model.formName].County.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["State", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('State', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].County.$error.server">{{serverMessages.GetMessage('State', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>
@@ -100,7 +100,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Zip.$invalid">
             <small class="error" ng-show="forms[model.formName].Zip.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Zip")}}</small>
             <small class="error" ng-show="forms[model.formName].Zip.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Zip", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Zip.$error.server">{{serverMessages.GetMessage('Zip', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Zip.$error.server">{{serverMessages.GetMessage('Zip', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>
@@ -111,7 +111,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Phone.$invalid">
             <small class="error" ng-show="forms[model.formName].Phone.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Phone")}}</small>
             <small class="error" ng-show="forms[model.formName].Phone.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Phone", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Phone.$error.server">{{serverMessages.GetMessage('Phone', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Phone.$error.server">{{serverMessages.GetMessage('Phone', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>
@@ -121,7 +121,7 @@
         <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="{{::model.formName}}_model_fax" placeholder="Fax" data-mask="(999) 999-9999? x99999" data-clean="true" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Fax.$invalid">
             <small class="error" ng-show="forms[model.formName].Fax.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Fax", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>
@@ -132,7 +132,7 @@
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Email.$invalid">
             <small class="error" ng-show="forms[model.formName].Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
             <small class="error" ng-show="forms[model.formName].Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Email.$error.server">{{serverMessages.GetMessage('Email', undefined, indefined, model.formName)}}</small>
+            <small class="error" ng-show="forms[model.formName].Email.$error.server">{{serverMessages.GetMessage('Email', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>
 </div>
