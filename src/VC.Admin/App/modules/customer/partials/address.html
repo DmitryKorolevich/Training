@@ -22,7 +22,7 @@
 <div class="form-group">
 	<label for="{{::model.formName}}_model_lastname" class="col-md-3 control-label">Last Name</label>
 	<div class="col-md-9">
-	    <input type="text" name="LastName" class="form-control" id="{{::model.formName}}_model_lastname" data-ng-model="model.Address.LastName" placeholder="Last Name" required data-ng-maxlength="100" autocomplete="off" />
+	    <input type="text" name="LastName" class="form-control" id="{{::model.formName}}_model_lastname" data-ng-model="model.Address.LastName" placeholder="Last Name" data-ng-maxlength="100" autocomplete="off" />
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].LastName.$invalid">
             <small class="error" ng-show="forms[model.formName].LastName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.LastName")}}</small>
             <small class="error" ng-show="forms[model.formName].LastName.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.LastName", "100"])}}</small>

@@ -29,6 +29,7 @@ using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Contexts;
 using System.Threading;
+using VC.Admin.Models.Customer;
 
 namespace VC.Admin.Controllers
 {
@@ -190,6 +191,19 @@ namespace VC.Admin.Controllers
                     SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
                     PreferredShipMethod = 1,
                     ShipDelayType=0,
+                };
+            }
+            else
+            {
+                return new OrderManageModel()
+                {
+                    IdObjectType = 1,//normal
+                    IdCustomer = 7888921,
+                    GCs = new List<GCListItemModel>() { new GCListItemModel(null) },
+                    SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
+                    PreferredShipMethod = 1,
+                    ShipDelayType = 0,
+                    Shipping=new AddressModel(),
                 };
             }
 

@@ -29,22 +29,68 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $scope.calculateServerMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
+                var form;
                 $.each(result.Messages, function (index, value)
                 {
                     if (value.Field)
                     {
-                        if (value.Field.indexOf('.') > -1)
+                        if (value.Field.indexOf("::") >= 0)
                         {
-                            var items = value.Field.split(".");
-                            $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                            formForShowing = items[0];
-                            openSKUs();
-                        }
-                        else
+                            var arr = value.Field.split("::");
+                            var formName = arr[0];
+                            var fieldName = arr[1];
+                            if (fieldName.indexOf(".") >= 0)
+                            {
+                                arr = fieldName.split('.');
+                                var collectionName = arr[0];
+                                var indexWithName = arr[1];
+                                switch (collectionName)
+                                {
+                                    case 'Shipping':
+                                        var collectionIndex = indexWithName.split('i')[1];
+                                        $scope.shippingAddressTab.AddressIndex = collectionIndex;
+                                        form = $scope.forms[formName];
+                                        fieldName = arr[2];
+                                        if (form[fieldName] != undefined)
+                                        {
+                                            form[fieldName].$setValidity("server", false);
+                                            if (formForShowing == null)
+                                            {
+                                                formForShowing = formName;
+                                            }
+                                        }
+                                        break;
+                                    case 'CreditCards':
+                                        var collectionIndex = indexWithName.split('i')[1];
+                                        $scope.paymentInfoTab.CreditCardIndex = collectionIndex;
+                                        form = $scope.forms[formName];
+                                        fieldName = arr[2];
+                                        if (form[fieldName] != undefined)
+                                        {
+                                            form[fieldName].$setValidity("server", false);
+                                            if (formForShowing == null)
+                                            {
+                                                formForShowing = formName;
+                                            }
+                                        }
+                                        break;
+                                }
+                            }
+                            form = $scope.forms[formName];
+                            if (form[fieldName] != undefined)
+                            {
+                                form[fieldName].$setValidity("server", false);
+                                if (formForShowing == null)
+                                {
+                                    formForShowing = formName;
+                                }
+                                return false;
+                            }
+                        } else
                         {
                             $.each($scope.forms, function (index, form)
                             {
-                                if (form)
+                                if (form && index !== "submitted")
                                 {
                                     if (form[value.Field] != undefined)
                                     {
@@ -59,6 +105,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             });
                         }
                     }
+                    messages += value.Message + "<br />";
                 });
 
                 if (formForShowing)
@@ -76,28 +123,33 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             formName = 'GCs';
         }
-        $.each($scope.tabs, function (index, item)
+        function activateTab(formName)
         {
-            if (item.formName == formName)
+            $.each($scope.tabs, function (index, item)
             {
-                item.active = true;
-            }
-            if (item.formNames)
-            {
-                $.each(item.formNames, function (index, form)
+                var itemForActive = null;
+                if (item.formName == formName)
                 {
-                    if (form == formName)
+                    itemForActive = item;
+                }
+                if (item.formNames)
+                {
+                    $.each(item.formNames, function (index, form)
                     {
-                        item.active = true;
-                        return false;
-                    }
-                });
-            }
-            if (item.active)
-            {
-                return false;
-            }
-        });
+                        if (form == formName)
+                        {
+                            itemForActive = item;
+                            return false;
+                        }
+                    });
+                }
+                if (itemForActive)
+                {
+                    itemForActive.active = true;
+                    return false;
+                }
+            });
+        };
     };
 
     function errorHandler(result)
@@ -162,10 +214,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.shippingAddressTab = {
             active: false,
             formName: 'shipping',
+            ShippingEditModels: {}
         };
         $scope.paymentInfoTab = {
             active: false,
-            formName: 'billing'
+            formNames: ['card', 'oac', 'check'],
+            AddressEditModels: {}
         };
         $scope.customerNotesTab = {
             active: false,
@@ -248,15 +302,23 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 });
                 if ($scope.id)
                 {
-                    $scope.shippingAddressTab.Address = $scope.order.Shipping;
+                    $scope.shippingAddressTab.AddressIndex = "0";
+                    $scope.$watch('shippingAddressTab.AddressIndex', function (newValue, oldValue)
+                    {
+                        if (newValue && oldValue != newValue)
+                        {
+                            $scope.order.Shipping = angular.copy($scope.currentCustomer.Shipping[parseInt(newValue)]);
+                        }
+                    });
                 }
                 else
                 {
-                    angular.forEach($scope.currentCustomer.Shipping, function (shippingItem)
+                    angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
                     {
+                        customerEditService.syncCountry($scope, shippingItem);
                         if (shippingItem.Default)
                         {
-                            $scope.shippingAddressTab.Address = shippingItem;
+                            $scope.shippingAddressTab.AddressIndex = index.toString();
                         }
                     });
                 }
@@ -344,6 +406,17 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             errorHandler(result);
         });
     };
+
+    $scope.buildOrderShippingAddressForPartial = function ()
+    {
+        if ($scope.order.Shipping === undefined)
+            return undefined;
+        if ($scope.shippingAddressTab.OrderShippingEditModel === undefined)
+        {
+            $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping' };
+        }
+        return $scope.shippingAddressTab.OrderShippingEditModel;
+    }
 
     var initOrder = function ()
     {
@@ -583,7 +656,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         if (valid)
         {
-            $scope.order.ShippingAddress = $scope.shippingAddressTab.Address;
+            angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
+            {
+                shippingItem.IsSelected = shippingItem.toString() == $scope.shippingAddressTab.AddressInde;
+            });
 
             $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
             if (!$scope.id)

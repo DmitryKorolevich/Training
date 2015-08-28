@@ -238,186 +238,190 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
-                                    <form class="form-horizontal" name="forms.billing" data-ng-class="{submitted: forms.submitted['billing']}" novalidate unsaved-warning-form>
-                                        <fieldset>
-                                            <span class="legend">Select Payment Method</span>
-                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
-                                                <div class="col-md-3">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <button class="btn btn-info" data-ng-show="paymentInfoTab.PaymentMethodType == 1" data-ng-click="setNewCreditCard();">Add New Credit Card</button>
-                                                </div>
-                                                <div class="col-md-3">
-                                                </div>
+                                    <div class="form-horizontal">
+                                        <span class="legend">Select Payment Method</span>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
+                                            <div class="col-md-3">
                                             </div>
-                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
-                                                <div class="radio col-md-3">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-info" data-ng-show="paymentInfoTab.PaymentMethodType == 1" data-ng-click="setNewCreditCard();">Add New Credit Card</button>
+                                            </div>
+                                            <div class="col-md-3">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
+                                            <div class="radio col-md-3">
+                                                <label class="control-label">
+                                                    <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard">
+                                                    Credit Card
+                                                </label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCardIndex"
+                                                        data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for (idx, creditCard) in currentCustomer.CreditCards"></select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1" data-ng-click="deleteSelectedCreditCard();">Delete</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
+                                            <div class="col-md-3">
+                                                <div class="radio">
                                                     <label class="control-label">
-                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard">
-                                                        Credit Card
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac">
+                                                        On Approved Credit
                                                     </label>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCardIndex"
-                                                            data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for (idx, creditCard) in currentCustomer.CreditCards"></select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Oac">
+                                                    <button class="btn btn-info" data-ng-click="setNewOac();">Add New OAC</button>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1" data-ng-click="deleteSelectedCreditCard();">Delete</button>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Oac">
+                                                    <button class="btn btn-danger" data-ng-click="currentCustomer.Oac = undefined;">Delete</button>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(2) >= 0">
-                                                <div class="col-md-3">
-                                                    <div class="radio">
-                                                        <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac">
-                                                            On Approved Credit
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Oac">
-                                                        <button class="btn btn-info" data-ng-click="setNewOac();">Add New OAC</button>
-                                                    </div>
-                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Oac">
-                                                        <button class="btn btn-danger" data-ng-click="currentCustomer.Oac = undefined;">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(3) >= 0">
-                                                <div class="col-md-3">
-                                                    <div class="radio">
-                                                        <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check">
-                                                            Check
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Check">
-                                                        <button class="btn btn-info" data-ng-click="setNewCheck();">Add New Check</button>
-                                                    </div>
-                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
-                                                        <button class="btn btn-danger" data-ng-click="currentCustomer.Check = undefined;">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr />
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex]">
-                                                <div class="form-group">
-                                                    <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" required autocomplete="off">
-                                                        <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.NameOnCard.$invalid">
-                                                            <small class="error" ng-show="forms.billing.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
-                                                            <small class="error" ng-show="forms.billing.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
-                                                            <small class="error" ng-show="forms.billing.NameOnCard.$error.server">{{serverMessages.GetMessage('NameOnCard')}}</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="CardType" class="col-md-3 control-label">Card Type</label>
-                                                    <div class="col-md-9">
-                                                        <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
-                                                        <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.CardType.$invalid">
-                                                            <small class="error" ng-show="forms.billing.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
-                                                            <small class="error" ng-show="forms.billing.CardType.$error.server">{{serverMessages.GetMessage('CardType')}}</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
-                                                        <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.CardNumber.$invalid">
-                                                            <small class="error" ng-show="forms.billing.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
-                                                            <small class="error" ng-show="forms.billing.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
-                                                            <small class="error" ng-show="forms.billing.CardNumber.$error.server">{{serverMessages.GetMessage('CardNumber')}}</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
-                                                    <div class="col-md-4">
-                                                        <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
-                                                        <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateMonth.$invalid">
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth')}}</small>
-                                                        </div>
-                                                    </div>
-                                                    <label class="col-md-1">
+                                        </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(3) >= 0">
+                                            <div class="col-md-3">
+                                                <div class="radio">
+                                                    <label class="control-label">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check">
+                                                        Check
                                                     </label>
-                                                    <div class="col-md-4">
-                                                        <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
-                                                        <div class="error-container" ng-show="forms.submitted['billing'] && forms.billing.ExpirationDateYear.$invalid">
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
-                                                            <small class="error" ng-show="forms.billing.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear')}}</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Check">
+                                                    <button class="btn btn-info" data-ng-click="setNewCheck();">Add New Check</button>
+                                                </div>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
+                                                    <button class="btn btn-danger" data-ng-click="currentCustomer.Check = undefined;">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <form class="form-horizontal" name="forms.card" data-ng-class="{submitted: forms.submitted['card']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex]">
+                                                    <div class="form-group">
+                                                        <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" required autocomplete="off">
+                                                            <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
+                                                                <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
+                                                                <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
+                                                                <small class="error" ng-show="forms.card.NameOnCard.$error.server">{{serverMessages.GetMessage('NameOnCard')}}</small>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <span class="legend">Billing Address</span>
-                                                <div class="form-group">
-                                                    <div class="col-md-3">
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
-                                                    </div>
-                                                </div>
-                                                <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildCreditCardAddressForPartial(currentCustomer.CreditCards, paymentInfoTab.CreditCardIndex)]"></div>
-                                            </div>
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Oac">
-                                                <div class="form-group">
-                                                    <label for="terms" class="col-md-3 control-label">Terms:</label>
-                                                    <div class="col-md-9">
-                                                        <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" required></select>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label" for="Fob">FOB:</label>
-                                                    <div class="col-md-9">
-                                                        <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" required></select>
-                                                    </div>
-                                                </div>
-                                                <span class="legend">Billing Address</span>
-                                                <div class="form-group">
-                                                    <div class="col-md-3">
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
-                                                    </div>
-                                                </div>
-                                                <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Oac]"></div>
-                                            </div>
-                                            <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
-                                                <!--<div class="form-group">
-                                                    <label for="checkNumber" class="col-md-3 control-label">Check #</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" class="form-control" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" required>
-                                                    </div>
-                                                </div>-->
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
-                                                    <div class="col-md-9">
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched">
-                                                            </label>
+                                                    <div class="form-group">
+                                                        <label for="CardType" class="col-md-3 control-label">Card Type</label>
+                                                        <div class="col-md-9">
+                                                            <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
+                                                            <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
+                                                                <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
+                                                                <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType')}}</small>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <span class="legend">Billing Address</span>
-                                                <div class="form-group">
-                                                    <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
+                                                        <div class="col-md-9">
+                                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
+                                                            <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
+                                                                <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
+                                                                <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
+                                                                <small class="error" ng-show="forms.card.CardNumber.$error.server">{{serverMessages.GetMessage('CardNumber')}}</small>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-3">
-                                                        <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                    <div class="form-group">
+                                                        <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
+                                                            <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
+                                                                <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth')}}</small>
+                                                            </div>
+                                                        </div>
+                                                        <label class="col-md-1">
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
+                                                            <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
+                                                                <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear')}}</small>
+                                                            </div>
+                                                        </div>
                                                     </div>
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildCreditCardAddressForPartial(currentCustomer.CreditCards, paymentInfoTab.CreditCardIndex)]"></div>
                                                 </div>
-                                                <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Check]"></div>
-                                            </div>
-                                        </fieldset>
-                                    </form>
+                                            </fieldset>
+                                        </form>
+                                        <form class="form-horizontal" name="forms.oac" data-ng-class="{submitted: forms.submitted['oac']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Oac">
+                                                    <div class="form-group">
+                                                        <label for="terms" class="col-md-3 control-label">Terms:</label>
+                                                        <div class="col-md-9">
+                                                            <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" required></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label" for="Fob">FOB:</label>
+                                                        <div class="col-md-9">
+                                                            <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" required></select>
+                                                        </div>
+                                                    </div>
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Oac]"></div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                        <form class="form-horizontal" name="forms.check" data-ng-class="{submitted: forms.submitted['check']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
+                                                        <div class="col-md-9">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched">
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Check]"></div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </div>
                                 </spinner-overlay>
                             </div>
                         </div>

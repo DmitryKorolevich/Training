@@ -17,6 +17,7 @@ using VC.Admin.Models.Product;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Entities;
+using VC.Admin.Models.Customer;
 
 namespace VC.Admin.Models.Order
 {
@@ -70,6 +71,28 @@ namespace VC.Admin.Models.Order
 
         [Map]
         public int IdCustomer { get; set; }
+
+        public AddUpdateCustomerModel Customer { get; set; }
+        
+        //Only for adding a new one 
+        public bool? UpdateShippingAddressForCustomer {get; set;}
+
+        //Only for adding a new one 
+        public bool? UpdateBillingForCustomer { get; set; }
+
+        //Only for edit
+        public AddressModel Shipping { get; set; }
+
+        //Only for edit
+        public CreditCardModel CreditCard { get; set; }
+
+        //Only for edit
+        public CheckPaymentModel Check { get; set; }
+
+        //Only for edit
+        public OacPaymentModel Oac { get; set; }
+
+        public int? IdPaymentMethodType { get; set; }
 
         [Map]
         public int? IdObjectType { get; set; }

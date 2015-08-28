@@ -31,11 +31,25 @@ namespace VC.Admin.Validators.Customer
 	        index = 0;
             foreach (var creditCard in value.CreditCards)
 	        {
-	            ParseResults(creditCardValidator.Validate(creditCard));
-	            ParseResults(profileAddressValidator.Validate(creditCard.Address), "CreditCards", index, "billing");
+	            ParseResults(creditCardValidator.Validate(creditCard), "CreditCards", index, "card");
+                ParseResults(profileAddressValidator.Validate(creditCard.Address), "CreditCards", index, "card");
 	            index++;
 	        }
-	    }
+
+            if (value.Check != null)
+            {
+                var checkPaymentModelValidator = ValidatorsFactory.GetValidator<CheckPaymentModelRules>();
+                //ParseResults(checkPaymentModelValidator.Validate(value.Check), "check");
+                ParseResults(profileAddressValidator.Validate(value.Check.Address), "check");
+            }
+
+            if (value.Oac != null)
+            {
+                var oacPaymentModelValidator = ValidatorsFactory.GetValidator<OacPaymentModelRules>();
+                ParseResults(oacPaymentModelValidator.Validate(value.Oac), "oac");
+                ParseResults(profileAddressValidator.Validate(value.Oac.Address), "oac");
+            }
+        }
 
 	    private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
 		{

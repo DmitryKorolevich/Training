@@ -66,5 +66,7 @@ namespace VC.Admin.Models.Customer
 
 		[Map]
 		public bool Default { get; set; }
-	}
+
+        public bool IsSelected { get; set; }
+    }
 }

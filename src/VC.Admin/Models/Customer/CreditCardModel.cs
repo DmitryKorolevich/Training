@@ -10,7 +10,7 @@ using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer
 {
-    public class CheckPaymentModel
+    public class CheckPaymentModel : BaseModel
     {
         public CheckPaymentModel()
         {
@@ -33,7 +33,7 @@ namespace VC.Admin.Models.Customer
         public bool PaidInFull { get; set; }
     }
 
-    public class OacPaymentModel
+    public class OacPaymentModel : BaseModel
     {
         public OacPaymentModel()
         {

@@ -27,7 +27,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				};
 				$scope.paymentInfoTab = {
 					active: false,
-					formName: 'billing',
+					formNames: ['card', 'oac', 'check'],
 					AddressEditModels: {}
 				};
 				$scope.customerFilesTab = {
@@ -91,7 +91,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
 
 										angular.forEach($scope.currentCustomer.CreditCards, function (creditCard) {
-											creditCard.formName = $scope.paymentInfoTab.formName;
+											creditCard.formName = 'card';
 											customerEditService.syncCountry($scope, creditCard.Address);
 										});
 
@@ -99,11 +99,11 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 											$scope.paymentInfoTab.CreditCardIndex = "0";
 
 										if ($scope.currentCustomer.Oac) {
-											$scope.currentCustomer.Oac.formName = $scope.paymentInfoTab.formName;
+											$scope.currentCustomer.Oac.formName = 'oac';
 											customerEditService.syncCountry($scope, $scope.currentCustomer.Oac.Address);
 										}
 										if ($scope.currentCustomer.Check) {
-											$scope.currentCustomer.Check.formName = $scope.paymentInfoTab.formName;
+											$scope.currentCustomer.Check.formName = 'check';
 											customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
 										}
 
@@ -158,11 +158,29 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			};
 
 			function activateTab(formName) {
-				$.each($scope.tabs, function(index, item) {
-					if (item.formName == formName) {
-						item.active = true;
-						return false;
-					}
+				$.each($scope.tabs, function (index, item)
+				{
+				    var itemForActive = null;
+				    if (item.formName == formName)
+				    {
+				        itemForActive = item;
+				    }
+				    if (item.formNames)
+				    {
+				        $.each(item.formNames, function (index, form)
+				        {
+				            if (form == formName)
+				            {
+				                itemForActive = item;
+				                return false;
+				            }
+				        });
+				    }
+				    if (itemForActive)
+				    {
+				        itemForActive.active = true;
+				        return false;
+				    }
 				});
 			};
 
@@ -174,7 +192,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					if (result.Messages) {
 						$scope.forms.submitted['profile'] = true;
 						$scope.forms.submitted['shipping'] = true;
-						$scope.forms.submitted['billing'] = true;
+						$scope.forms.submitted['card'] = true;
+						$scope.forms.submitted['oac'] = true;
+						$scope.forms.submitted['check'] = true;
 						$scope.serverMessages = new ServerMessages(result.Messages);
 						var formForShowing = null;
 						var form;
@@ -305,7 +325,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				} else {
 					$scope.forms.submitted['profile'] = true;
 					$scope.forms.submitted['shipping'] = true;
-					$scope.forms.submitted['billing'] = true;
+					$scope.forms.submitted['card'] = true;
+					$scope.forms.submitted['oac'] = true;
+					$scope.forms.submitted['check'] = true;
 				}
 			};
 
