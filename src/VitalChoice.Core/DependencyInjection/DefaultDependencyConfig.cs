@@ -41,7 +41,6 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Payment;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
@@ -54,6 +53,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Affiliates;
+using VitalChoice.Interfaces.Services.Payments;
 
 namespace VitalChoice.Core.DependencyInjection
 {

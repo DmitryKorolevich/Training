@@ -17,7 +17,7 @@ using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Payment;
+using VitalChoice.Interfaces.Services.Payments;
 
 namespace VitalChoice.Business.Services.Payment
 {
