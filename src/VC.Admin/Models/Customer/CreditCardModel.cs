@@ -85,5 +85,7 @@ namespace VC.Admin.Models.Customer
 
         [Map]
         public CreditCardType CardType { get; set; }
+
+        public bool IsSelected { get; set; }
     }
 }

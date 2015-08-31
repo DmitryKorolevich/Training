@@ -76,6 +76,48 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 uiScope.paymentInfoTab.CreditCardIndex = undefined;
             }
         };
+
+        uiScope.makeBillingAsProfileAddress = function ()
+        {
+            var address;
+            switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+            {
+                case "1":
+                    if (uiScope.paymentInfoTab.CreditCardIndex)
+                    {
+                        address = uiScope.currentCustomer.CreditCards[uiScope.paymentInfoTab.CreditCardIndex].Address;
+                    }
+                    break;
+                case "2":
+                    if (uiScope.currentCustomer.Oac)
+                    {
+                        address = uiScope.currentCustomer.Oac.Address;
+                    }
+                    break;
+                case "3":
+                    if (uiScope.currentCustomer.Check)
+                    {
+                        address = uiScope.currentCustomer.Check.Address;
+                    }
+                    break;
+            }
+            if (address)
+            {
+                for (var key in uiScope.currentCustomer.ProfileAddress)
+                {
+                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
+                }
+                if (uiScope.currentCustomer.newEmail)
+                {
+                    address.Email = uiScope.currentCustomer.newEmail;
+                } else
+                {
+                    address.Email = uiScope.currentCustomer.Email;
+                }
+                address.AddressType = 2;
+                address.Id = 0;
+            }
+        };
     };
 
     var initCustomerEdit = function (uiScope)
@@ -291,39 +333,6 @@ angular.module('app.modules.customer.services.customerEditService', [])
             });
         };
 
-        uiScope.makeBillingAsProfileAddress = function () {
-            var address;
-            switch (String(uiScope.paymentInfoTab.PaymentMethodType)) {
-                case "1":
-                    if (uiScope.paymentInfoTab.CreditCardIndex) {
-                        address = uiScope.currentCustomer.CreditCards[uiScope.paymentInfoTab.CreditCardIndex].Address;
-                    }
-                    break;
-                case "2":
-                    if (uiScope.currentCustomer.Oac) {
-                        address = uiScope.currentCustomer.Oac.Address;
-                    }
-                    break;
-                case "3":
-                    if (uiScope.currentCustomer.Check) {
-                        address = uiScope.currentCustomer.Check.Address;
-                    }
-                    break;
-            }
-            if (address) {
-                for (var key in uiScope.currentCustomer.ProfileAddress) {
-                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
-                }
-                if (uiScope.currentCustomer.newEmail) {
-                    address.Email = uiScope.currentCustomer.newEmail;
-                } else {
-                    address.Email = uiScope.currentCustomer.Email;
-                }
-                address.AddressType = 2;
-                address.Id = 0;
-            }
-        };
-
         uiScope.setNewCreditCard = function (callback)
         {
             if (uiScope.forms.card.$valid) {
@@ -423,7 +432,16 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     .success(function (result) {
                         if (result.Success) {
                             uiScope.paymentInfoTab.CreditCard = result.Data;
-                            uiScope.paymentInfoTab.CreditCard.formName = uiScope.paymentInfoTab.formName;
+                            uiScope.paymentInfoTab.CreditCard.formName = "card";
+                            uiScope.currentCustomer.CreditCards.push(uiScope.paymentInfoTab.CreditCard);
+                            if (uiScope.paymentInfoTab.CreditCardIndex === undefined)
+                            {
+                                uiScope.paymentInfoTab.CreditCardIndex = "0";
+                            }
+                            else
+                            {
+                                uiScope.paymentInfoTab.CreditCardIndex = (parseInt(uiScope.paymentInfoTab.CreditCardIndex) + 1).toString();
+                            }
                             if (callback)
                                 callback(result.Data);
                         } else {

@@ -21,6 +21,7 @@ using LookupHelper = VitalChoice.Business.Helpers.LookupHelper;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using System.Collections.Generic;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services
 {
@@ -37,12 +38,13 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
 	    private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
+        private readonly ISettingService settingService;
 
-	    public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
+        public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
-            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository)
+            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService)
         {
 		    this.cache = cache;
 		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -55,6 +57,7 @@ namespace VitalChoice.Business.Services
             this.paymentMethodRepository = paymentMethodRepository;
             this.lookupVariantRepository = lookupVariantRepository;
 		    this.lookupRepository = lookupRepository;
+            this.settingService = settingService;
         }
 
 	    private ReferenceData Populate()
@@ -235,7 +238,13 @@ namespace VitalChoice.Business.Services
             return referenceData;
 	    }
 
-		public ReferenceData Get()
+        private ReferenceData SetAppSettings(ReferenceData referenceData)
+        {
+            referenceData.AppSettings = settingService.GetAppSettingsAsync().Result;
+            return referenceData;
+        }
+
+        public ReferenceData Get()
 		{
 			var referenceData = cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 
@@ -244,8 +253,9 @@ namespace VitalChoice.Business.Services
 				referenceData = Populate();
 				cache.SetItem(CacheKeys.AppInfrastructure, referenceData, expirationTerm);
 			}
+            referenceData = SetAppSettings(referenceData);
 
-			return referenceData;
+            return referenceData;
 	    }
     }
 }

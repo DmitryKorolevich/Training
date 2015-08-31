@@ -191,6 +191,10 @@ namespace VC.Admin.Controllers
                     SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
                     PreferredShipMethod = 1,
                     ShipDelayType=0,
+                    UpdateShippingAddressForCustomer = true,
+                    UpdateCardForCustomer = true,
+                    UpdateCheckForCustomer = true,
+                    UpdateOACForCustomer = true,
                 };
             }
             else
@@ -198,7 +202,7 @@ namespace VC.Admin.Controllers
                 return new OrderManageModel()
                 {
                     IdObjectType = 1,//normal
-                    IdCustomer = 7888921,
+                    IdCustomer = 84920494,
                     GCs = new List<GCListItemModel>() { new GCListItemModel(null) },
                     SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
                     PreferredShipMethod = 1,
@@ -217,8 +221,6 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
-            Thread.Sleep(1000);
-
             var item = _mapper.FromModel(model);
 
             var orderContext = await orderService.CalculateOrder(item);
@@ -235,6 +237,7 @@ namespace VC.Admin.Controllers
                 return null;
 
             var item = _mapper.FromModel(model);
+
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))

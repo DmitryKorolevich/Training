@@ -51,20 +51,29 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             {
                 throw new InvalidOperationException("Only property members accepted.");
             }
-            var attribute =
-                memberExpression.Member.GetCustomAttributes(typeof (LocalizedAttribute), false).FirstOrDefault() as
-                LocalizedAttribute;
             List<object> parameters = new List<object>();
+            parameters = AddFieldNameParam(memberExpression, parameters);
+
+            return optionsChain.WithMessage(GetMessage(messageKey, parameters));
+        }
+
+        private static List<object> AddFieldNameParam(MemberExpression memberExpression, List<object> parameters)
+        {
+            var attribute = memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as LocalizedAttribute;
             if (attribute != null)
             {
                 parameters.Add(GetFieldName((IComparable)attribute.EnumValue));
             }
             else
             {
+                var directNameAttribute = memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as DirectLocalizedAttribute;
+                if (directNameAttribute != null)
+                {
+                    parameters.Add(directNameAttribute.FieldName);
+                }
                 parameters.Add(BaseAppConstants.DEFAULT_FORM_FIELD_NAME);
             }
-
-            return optionsChain.WithMessage(GetMessage(messageKey, parameters));
+            return parameters;
         }
 
         /// <summary>
@@ -90,18 +99,10 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             {
                 throw new InvalidOperationException("Only property members accepted.");
             }
-            var attribute =
-                memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as
-                LocalizedAttribute;
+
             List<object> parameters = new List<object>();
-            if (attribute != null)
-            {
-                parameters.Add(GetFieldName((IComparable)attribute.EnumValue));
-            }
-            else
-            {
-                parameters.Add(BaseAppConstants.DEFAULT_FORM_FIELD_NAME);
-            }
+            parameters = AddFieldNameParam(memberExpression, parameters);
+
             if (args != null)
             {
                 parameters.AddRange(args);

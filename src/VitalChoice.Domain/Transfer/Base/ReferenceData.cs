@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Domain.Transfer.Base
 {
     public class ReferenceData
     {
+        public AppSettings AppSettings { get; set; }
+
         public IList<LookupItem<int>> Roles { get; set; }
 
         public IList<LookupItem<byte>> UserStatuses { get; set; }

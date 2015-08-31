@@ -72,26 +72,38 @@ namespace VC.Admin.Models.Order
         [Map]
         public int IdCustomer { get; set; }
 
+        [DirectLocalized("Customer")]
         public AddUpdateCustomerModel Customer { get; set; }
         
         //Only for adding a new one 
-        public bool? UpdateShippingAddressForCustomer {get; set;}
+        public bool UpdateShippingAddressForCustomer {get; set;}
 
         //Only for adding a new one 
-        public bool? UpdateBillingForCustomer { get; set; }
+        public bool UpdateCardForCustomer { get; set; }
+
+        //Only for adding a new one 
+        public bool UpdateOACForCustomer { get; set; }
+
+        //Only for adding a new one 
+        public bool UpdateCheckForCustomer { get; set; }
 
         //Only for edit
+        [DirectLocalized("Shipping")]
         public AddressModel Shipping { get; set; }
 
         //Only for edit
+        [DirectLocalized("Credit Card")]
         public CreditCardModel CreditCard { get; set; }
 
         //Only for edit
+        [DirectLocalized("Check")]
         public CheckPaymentModel Check { get; set; }
 
         //Only for edit
+        [DirectLocalized("On Approved Credit")]
         public OacPaymentModel Oac { get; set; }
-
+        
+        [DirectLocalized("Payment Method")]
         public int? IdPaymentMethodType { get; set; }
 
         [Map]

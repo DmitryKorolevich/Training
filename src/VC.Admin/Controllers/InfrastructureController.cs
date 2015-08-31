@@ -37,6 +37,7 @@ namespace VC.Admin.Controllers
 	        {
                 referenceDataModel = new FullReferenceDataModel()
                 {
+                    AppSettings=referenceData.AppSettings,
                     Labels = referenceData.Labels,
                     Roles = referenceData.Roles,
                     UserStatuses = referenceData.UserStatuses,

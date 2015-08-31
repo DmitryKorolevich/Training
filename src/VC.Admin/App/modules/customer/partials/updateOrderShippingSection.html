@@ -15,7 +15,7 @@
             <div class="col-md-3">
              </div>
             <div class="col-md-7">
-                <select class="form-control" id="shippingAddresses" data-ng-model="shippingAddressTab.AddressIndex" data-ng-options="idx as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for (idx, shippingAddress) in currentCustomer.Shipping"></select>
+                <select class="form-control" id="shippingAddresses" data-ng-disabled="!shippingCustomerSaved" data-ng-model="shippingAddressTab.AddressIndex" data-ng-options="idx as (shippingAddress.FirstName && shippingAddress.LastName && shippingAddress.Address1 ? (shippingAddress.FirstName + ' ' + shippingAddress.LastName + ' - ' + shippingAddress.Address1 + (shippingAddress.Default ? ' (Default)' : '')) : '') for (idx, shippingAddress) in currentCustomer.Shipping"></select>
             </div>
         </div>
         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderShippingAddressForPartial()]"></div>

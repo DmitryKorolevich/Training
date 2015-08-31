@@ -311,7 +311,7 @@
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
                                                                 <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
                                                                 <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
-                                                                <small class="error" ng-show="forms.card.NameOnCard.$error.server">{{serverMessages.GetMessage('NameOnCard')}}</small>
+                                                                <small class="error" ng-show="forms.card.NameOnCard.$error.server">{{serverMessages.GetMessage('NameOnCard', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -321,7 +321,7 @@
                                                             <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
                                                                 <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
-                                                                <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType')}}</small>
+                                                                <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -332,7 +332,7 @@
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                 <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                 <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
-                                                                <small class="error" ng-show="forms.card.CardNumber.$error.server">{{serverMessages.GetMessage('CardNumber')}}</small>
+                                                                <small class="error" ng-show="forms.card.CardNumber.$error.server">{{serverMessages.GetMessage('CardNumber', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -343,7 +343,7 @@
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                 <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                 <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
-                                                                <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth')}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.server">{{serverMessages.GetMessage('ExpirationDateMonth', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
                                                             </div>
                                                         </div>
                                                         <label class="col-md-1">
@@ -353,7 +353,7 @@
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                 <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                 <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
-                                                                <small class="error" ng-show="forms.card.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear')}}</small>
+                                                                <small class="error" ng-show="forms.card.ExpirationDateYear.$error.server">{{serverMessages.GetMessage('ExpirationDateYear', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
                                                             </div>
                                                         </div>
                                                     </div>

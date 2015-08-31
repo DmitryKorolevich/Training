@@ -26,4 +26,15 @@ namespace VitalChoice.Validation.Models
             return attribute.EnumValue;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+    public sealed class DirectLocalizedAttribute : Attribute
+    {
+        public string FieldName { get; private set; }
+
+        public DirectLocalizedAttribute(string fieldName)
+        {
+            FieldName = fieldName;
+        }
+    }
 }

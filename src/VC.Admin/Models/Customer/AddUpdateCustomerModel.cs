@@ -91,10 +91,13 @@ namespace VC.Admin.Models.Customer
 
         public IList<CustomerNoteModel> CustomerNotes { get; set; }
 
-	    public IList<CreditCardModel> CreditCards { get; set; }
+        [DirectLocalized("Credit Card")]
+        public IList<CreditCardModel> CreditCards { get; set; }
+        
+        [DirectLocalized("Check")]
+        public CheckPaymentModel Check { get; set; }
 
-	    public CheckPaymentModel Check { get; set; }
-
+        [DirectLocalized("On Approved Credit")]
         public OacPaymentModel Oac { get; set; }
 
 		public IList<CustomerFileModel> Files { get; set; }

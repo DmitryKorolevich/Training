@@ -39,7 +39,6 @@ namespace VC.Admin.Validators.Customer
             if (value.Check != null)
             {
                 var checkPaymentModelValidator = ValidatorsFactory.GetValidator<CheckPaymentModelRules>();
-                //ParseResults(checkPaymentModelValidator.Validate(value.Check), "check");
                 ParseResults(profileAddressValidator.Validate(value.Check.Address), "check");
             }
 
@@ -51,7 +50,7 @@ namespace VC.Admin.Validators.Customer
             }
         }
 
-	    private class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
+	    public class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>
 		{
 			public CustomerModelRules()
 			{
