@@ -1,15 +1,18 @@
 {
-	"App": {
-		"ServeCdnContent": false,
-		"CdnServerBaseUrl": "not yet ready",
-		"GenerateLowercaseUrls": true,
-        "EnableBundlingAndMinification": false,
-        "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
-		"DefaultCultureId": "en-US",
-        "Connection": {
+  "App": {
+    "GenerateLowercaseUrls": true,
+    "EnableBundlingAndMinification": false,
+    "Versioning": {
+      "EnableStaticContentVersioning": true,
+      "AutoGenerateBuildNumber": true,
+      "BuildNumber": 1
+    },
+    "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "DefaultCultureId": "en-US",
+   "Connection": {
             "UserName": "dev_vcdb_login",
             "Password": "CCQLaskw3pMFU9XqE6CHp28m",
             "Server": "vw4v86cs0h.database.windows.net"
-        }
-	}
+    }
+  }
 }
