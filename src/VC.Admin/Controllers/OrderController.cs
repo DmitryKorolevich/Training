@@ -183,19 +183,30 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                return new OrderManageModel()
-                {
-                    IdObjectType=1,//normal
-                    IdCustomer= 7888921,
-                    GCs=new List<GCListItemModel>() { new GCListItemModel(null)},
-                    SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                    PreferredShipMethod = 1,
-                    ShipDelayType=0,
-                    UpdateShippingAddressForCustomer = true,
-                    UpdateCardForCustomer = true,
-                    UpdateCheckForCustomer = true,
-                    UpdateOACForCustomer = true,
-                };
+                var model = orderService.CreatePrototypeFor<OrderManageModel>(1);//normal
+                model.IdCustomer = 84920494;
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.PreferredShipMethod = 1;
+                model.ShipDelayType = 0;
+                model.UpdateShippingAddressForCustomer = true;
+                model.UpdateCardForCustomer = true;
+                model.UpdateCheckForCustomer = true;
+                model.UpdateOACForCustomer = true;
+                return model;
+                //return new OrderManageModel()
+                //{
+                //    IdObjectType=1,//normal
+                //    IdCustomer= 84920494,
+                //    GCs=new List<GCListItemModel>() { new GCListItemModel(null)},
+                //    SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
+                //    PreferredShipMethod = 1,
+                //    ShipDelayType=0,
+                //    UpdateShippingAddressForCustomer = true,
+                //    UpdateCardForCustomer = true,
+                //    UpdateCheckForCustomer = true,
+                //    UpdateOACForCustomer = true,
+                //};
             }
             else
             {
