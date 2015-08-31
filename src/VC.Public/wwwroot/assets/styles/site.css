@@ -241,14 +241,21 @@ header .search-area form input[type=image] {
   width: 87px;
 }
 .main-nav ul.first-level > li > a > span {
-  font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
-  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
   display: table-cell;
   vertical-align: middle;
-  line-height: 0.8;
+  line-height: 1;
+  font-weight: bold;
 }
 .main-nav ul.first-level > li:last-child a {
   border-right: 0px solid black;
+}
+html.fontface .main-nav ul.first-level > li > a > span {
+  font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 0.8;
 }
 .top-nav.main-nav ul li .dropdown_1column {
   border-radius: 0px 0px 5px 5px;
@@ -322,12 +329,15 @@ header .search-area form input[type=image] {
 }
 .footer-main .footer-market .market-left a {
   display: block;
+  margin-bottom: 3px;
 }
 .footer-main .footer-market .market-right {
   float: right;
+  padding-right: 2px;
 }
 .footer-main .footer-market .market-right > a {
   display: block;
+  float: right;
 }
 .footer-copyright {
   color: #666;
@@ -338,15 +348,18 @@ header .search-area form input[type=image] {
   text-align: center;
 }
 #socialiconshome-102413 {
-  margin-top: 15px;
+  margin-top: 18px;
   float: right;
-  margin-right: 11px;
+  clear: both;
+  margin-right: 10px;
 }
 .ssl-area {
-  margin-top: 20px;
-  margin-right: 25px;
+  margin-top: 23px;
+  margin-right: 24px;
   display: block;
   margin-left: 25px;
+  float: right;
+  clear: both;
 }
 .ssl-area img {
   padding: 0px;
@@ -359,7 +372,7 @@ header .search-area form input[type=image] {
   width: 100px;
 }
 .ssl-area .security-logo {
-  margin-left: 15px;
+  margin-left: 16px;
 }
 /*old menu*/
 .top-nav ul li .dropdown_1column ul li a {
