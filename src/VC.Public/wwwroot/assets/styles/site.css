@@ -242,22 +242,22 @@ header .search-area form input[type=image] {
   width: 87px;
 }
 .main-nav ul.first-level > li > a > span {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
   display: table-cell;
   vertical-align: middle;
-  line-height: 1;
-  font-weight: bold;
+  font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 0.8;
 }
 .main-nav ul.first-level > li:last-child a,
 .main-nav ul.first-level > li.last-child a {
   border-right: 0px solid black;
 }
-.fontface .main-nav ul.first-level > li > a > span {
-  font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 0.8;
+.lt-ie9 .main-nav ul.first-level > li > a > span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: bold;
 }
 .top-nav.main-nav ul li .dropdown_1column {
   border-radius: 0px 0px 5px 5px;
