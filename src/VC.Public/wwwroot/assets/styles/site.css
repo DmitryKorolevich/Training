@@ -174,7 +174,8 @@ a.see-reviews-link:active {
 .secondary-nav ul li a:active {
   color: #F34D20;
 }
-.secondary-nav ul li:last-child {
+.secondary-nav ul li:last-child,
+.secondary-nav ul li.last-child {
   border-right: none;
 }
 header .search-area {
@@ -248,10 +249,11 @@ header .search-area form input[type=image] {
   line-height: 1;
   font-weight: bold;
 }
-.main-nav ul.first-level > li:last-child a {
+.main-nav ul.first-level > li:last-child a,
+.main-nav ul.first-level > li.last-child a {
   border-right: 0px solid black;
 }
-html.fontface .main-nav ul.first-level > li > a > span {
+.fontface .main-nav ul.first-level > li > a > span {
   font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: normal;
