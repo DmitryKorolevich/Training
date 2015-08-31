@@ -31,8 +31,11 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
 
-        public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
-            IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper, CustomerMapper customerMapper, DiscountMapper discountMapper, OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper)
+        public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<TypePair, IModelToDynamicConverter> container,
+            IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
+            CustomerMapper customerMapper, DiscountMapper discountMapper,
+            OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper)
             : base(mappers, container, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;

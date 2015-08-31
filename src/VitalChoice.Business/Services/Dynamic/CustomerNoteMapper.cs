@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Services.Dynamic
     public class CustomerNoteMapper : DynamicObjectMapper<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
     {
         public CustomerNoteMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container,
+            IIndex<TypePair, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<CustomerNoteOptionType> customerNoteRepositoryAsync)
             : base(mappers, container, customerNoteRepositoryAsync)
         {

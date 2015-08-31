@@ -24,7 +24,7 @@ namespace VitalChoice.DynamicData.Base
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        private readonly IIndex<Type, IModelToDynamicConverter> _converters;
+        private readonly IIndex<TypePair, IModelToDynamicConverter> _converters;
         private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
         private readonly ModelTypeConverter _typeConverter;
 
@@ -35,7 +35,7 @@ namespace VitalChoice.DynamicData.Base
         private Action<TOptionValue, int> _valueSetter;
 
         protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> converters,
+            IIndex<TypePair, IModelToDynamicConverter> converters,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
         {
             _converters = converters;
@@ -250,7 +250,7 @@ namespace VitalChoice.DynamicData.Base
             ToModelItem(dynamic, result, typeof (TModel), typeof (TDynamic));
             
             IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(typeof (TModel), out conv))
+            if (_converters.TryGetValue(new TypePair(typeof (TModel), typeof(TDynamic)), out conv))
             {
                 var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
                 converter?.DynamicToModel(result, dynamic);
@@ -267,7 +267,7 @@ namespace VitalChoice.DynamicData.Base
             FromModelItem(result, model, typeof (TModel), typeof (TDynamic));
 
             IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(typeof (TModel), out conv))
+            if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
             {
                 var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
                 converter?.ModelToDynamic(model, result);
@@ -285,7 +285,7 @@ namespace VitalChoice.DynamicData.Base
                 typeof (TDynamic));
 
             IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(modelType, out conv))
+            if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
             {
                 dynamic converter = conv;
                 converter?.DynamicToModel(result, dynamic);
@@ -303,7 +303,7 @@ namespace VitalChoice.DynamicData.Base
             FromModelItem(result, model, modelType, typeof (TDynamic));
 
             IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(modelType, out conv))
+            if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
             {
                 dynamic converter = conv;
                 converter?.ModelToDynamic(model, result);

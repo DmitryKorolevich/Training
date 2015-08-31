@@ -44,7 +44,10 @@ namespace VitalChoice.Tests.Mapping
             throw new NotImplementedException();
         }
 
-        public TestMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> converters, IReadRepositoryAsync<TestEntityOptionType> optionTypeRepositoryAsync) : base(mappers, converters, optionTypeRepositoryAsync)
+        public TestMapper(IIndex<Type, IDynamicToModelMapper> mappers,
+            IIndex<TypePair, IModelToDynamicConverter> converters,
+            IReadRepositoryAsync<TestEntityOptionType> optionTypeRepositoryAsync)
+            : base(mappers, converters, optionTypeRepositoryAsync)
         {
         }
     }

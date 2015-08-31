@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Services.Dynamic
     public class CustomerAddressMapper : DynamicObjectMapper<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
         public CustomerAddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container,
+            IIndex<TypePair, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
             : base(mappers, container, optionTypesRepositoryAsync)
         {

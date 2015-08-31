@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Services.Dynamic
     public class AffiliateMapper : DynamicObjectMapper<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>
     {
         public AffiliateMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container,
+            IIndex<TypePair, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<AffiliateOptionType> optionTypesRepositoryAsync)
             : base(mappers, container, optionTypesRepositoryAsync)
         {

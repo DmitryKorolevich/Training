@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services.Dynamic
             => v => v.IdOrderPaymentMethod;
 
         public OrderPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> converters,
+            IIndex<TypePair, IModelToDynamicConverter> converters,
             IReadRepositoryAsync<CustomerPaymentMethodOptionType> optionTypeRepositoryAsync,
             OrderAddressMapper orderAddressMapper) : base(mappers, converters, optionTypeRepositoryAsync)
         {

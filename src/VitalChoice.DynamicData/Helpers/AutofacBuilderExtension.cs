@@ -40,12 +40,16 @@ namespace VitalChoice.DynamicData.Helpers
                     t => t.IsImplementGeneric(typeof (IModelToDynamicConverter<,>)) && !t.GetTypeInfo().IsAbstract);
             foreach (var converter in converters)
             {
-                builder.RegisterType(converter)
-                    .As(
-                        typeof (IModelToDynamicConverter<,>).MakeGenericType(
-                            converter.TryGetTypeArguments(typeof (IModelToDynamicConverter<,>))))
-                    .AsSelf()
-                    .Keyed<IModelToDynamicConverter>(converter.TryGetElementType(typeof (IModelToDynamicConverter<,>)));
+                var types = converter.TryGetTypeArguments(typeof (IModelToDynamicConverter<,>));
+                if (types != null && types.Length == 2)
+                {
+                    builder.RegisterType(converter)
+                        .As(
+                            typeof (IModelToDynamicConverter<,>).MakeGenericType(
+                                converter.TryGetTypeArguments(typeof (IModelToDynamicConverter<,>))))
+                        .AsSelf()
+                        .Keyed<IModelToDynamicConverter>(new TypePair(types[0], types[1]));
+                }
             }
             return builder;
         }

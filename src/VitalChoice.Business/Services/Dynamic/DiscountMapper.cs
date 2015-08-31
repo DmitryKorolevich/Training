@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Services.Dynamic
     public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
         public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container,
+            IIndex<TypePair, IModelToDynamicConverter> container,
             IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync)
             : base(mappers, container, discountRepositoryAsync)
         {

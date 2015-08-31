@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly CustomerPaymentMethodMapper _paymentMethodMapper;
 
         public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> container, CustomerAddressMapper customerAddressMapper,
+            IIndex<TypePair, IModelToDynamicConverter> container, CustomerAddressMapper customerAddressMapper,
             CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync, CustomerPaymentMethodMapper paymentMethodMapper)
             : base(mappers, container, customerRepositoryAsync)
         {

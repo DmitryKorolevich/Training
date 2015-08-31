@@ -22,7 +22,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly CustomerAddressMapper _customerAddressMapper;
 
         public CustomerPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<Type, IModelToDynamicConverter> converters,
+            IIndex<TypePair, IModelToDynamicConverter> converters,
             IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> repo, CustomerAddressMapper customerAddressMapper)
             : base(mappers, converters, repo)
         {

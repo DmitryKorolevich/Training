@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Services.Dynamic
     {
         private readonly SkuMapper _skuMapper;
 
-        public ProductMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<Type, IModelToDynamicConverter> container,
+        public ProductMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<TypePair, IModelToDynamicConverter> container,
             SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
             : base(mappers, container, productRepositoryAsync)
         {
