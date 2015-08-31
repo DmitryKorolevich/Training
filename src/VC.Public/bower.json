@@ -1,0 +1,16 @@
+{
+  "name": "VC.Public",
+  "private": true,
+  "dependencies": {
+    "jQuery": "~1.11.3",
+    "normalize.css": "~3.0.3"
+  },
+  "exportsOverride": {
+    "jQuery": {
+      ".": "dist/jquery.js"
+    },
+    "normalize.css": {
+      ".": "normalize.css"
+    }
+  }
+}

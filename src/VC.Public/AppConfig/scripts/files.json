@@ -1,0 +1,9 @@
+﻿{
+  "minifiedFileName": "app",
+
+  "files": [
+    "lib/jquery/jquery.js",
+    "assets/scripts/plugins.js",
+    "assets/scripts/main.js"
+  ]
+}

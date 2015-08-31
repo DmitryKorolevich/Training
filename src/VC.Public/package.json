@@ -1,8 +1,8 @@
-﻿{
+{
     "version": "0.0.0",
-    "name": "VitalChoice_vNext",
+    "name": "VC.Public",
     "devDependencies": {
-        "grunt": "^0.4.5",
+    "grunt": "^0.4.5",
 		"grunt-bower-task": "^0.4.0",
 		"grunt-contrib-less": "^1.0.0",
 		"grunt-contrib-jshint": "^0.11.0",

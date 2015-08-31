@@ -22,7 +22,7 @@ using VitalChoice.Core.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Payment;
+using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Controllers

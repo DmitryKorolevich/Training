@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Domain.Entities.Options;
 
 namespace VC.Public.Components
@@ -11,8 +10,8 @@ namespace VC.Public.Components
 	[ViewComponent(Name = "Assets")]
 	public class AssetsViewComponent : ViewComponent
 	{
-		private readonly IOptions<AppOptions> _appOptionsAccessor;
-		private readonly IUrlHelper _urlHelper;
+		private readonly AppOptions appOptions;
+		private readonly IUrlHelper urlHelper;
 
 		public AssetsViewComponent(IUrlHelper urlHelper, IOptions<AppOptions> appOptionsAccessor)
 		{
@@ -25,8 +24,8 @@ namespace VC.Public.Components
 			{
 				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
-			_urlHelper = urlHelper;
-			_appOptionsAccessor = appOptionsAccessor;
+			this.urlHelper = urlHelper;
+			this.appOptions = appOptionsAccessor.Options;
 		}
 
 		public IViewComponentResult Invoke(string assetType)
@@ -34,37 +33,38 @@ namespace VC.Public.Components
 			string viewName;
 			IList<string> filePaths = new List<string>();
 
+			var versionQueryString = appOptions.Versioning.EnableStaticContentVersioning ? $"?v={appOptions.Versioning.BuildNumber}" : string.Empty;
 			if (assetType.Equals("scripts", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Scripts";
-				AssetInfo assetInfo = FrontEndAssetManager.GetScripts();
-				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
+				var assetInfo = FrontEndAssetManager.GetScripts();
+				if (appOptions.EnableBundlingAndMinification)
 				{
-					filePaths.Add(_urlHelper.Content(
-					    $"~/{assetInfo.MinifiedFileName}.min.js"));
+					filePaths.Add(urlHelper.Content(
+						$"~/{assetInfo.MinifiedFileName}.min.js{versionQueryString}"));
 				}
 				else
 				{
 					foreach (var assetFileInfo in assetInfo.Files)
 					{
-						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}"));
+						filePaths.Add(urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
 					}
 				}
 			}
 			else if (assetType.Equals("styles", StringComparison.OrdinalIgnoreCase))
 			{
 				viewName = "Styles";
-				AssetInfo assetInfo = FrontEndAssetManager.GetStyles();
-				if (_appOptionsAccessor.Options.EnableBundlingAndMinification)
+				var assetInfo = FrontEndAssetManager.GetStyles();
+				if (appOptions.EnableBundlingAndMinification)
 				{
-					filePaths.Add(_urlHelper.Content(
-					    $"~{assetInfo.MinifiedFileName}.min.css"));
+					filePaths.Add(urlHelper.Content(
+						$"~/{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
 				}
 				else
 				{
 					foreach (var assetFileInfo in assetInfo.Files)
 					{
-						filePaths.Add(_urlHelper.Content($"~/{assetFileInfo}"));
+						filePaths.Add(urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
 					}
 				}
 			}
