@@ -29,6 +29,11 @@ namespace VC.Admin.ModelConverters
 
         public void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
         {
+            if(dynamic.Customer!=null)
+            {
+                model.IdCustomer = dynamic.Customer.Id;
+            }
+
             if(dynamic.Discount!=null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
