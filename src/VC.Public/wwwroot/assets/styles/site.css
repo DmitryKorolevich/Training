@@ -109,7 +109,8 @@ a.see-reviews-link:active {
 .header-right-sidebar .header-actions-holder .actions-top-nav a {
   margin-right: 7px;
 }
-.header-right-sidebar .header-actions-holder .actions-top-nav a:last-child {
+.header-right-sidebar .header-actions-holder .actions-top-nav a:last-child,
+.header-right-sidebar .header-actions-holder .actions-top-nav a.last-child {
   margin-right: 0px;
 }
 .header-right-sidebar .header-actions-holder .cart-work-area {
@@ -238,26 +239,20 @@ header .search-area form input[type=image] {
   outline: 0;
   color: black;
   padding: 0px 5px;
-  height: 44px;
+  height: 43px;
   width: 87px;
 }
 .main-nav ul.first-level > li > a > span {
   display: table-cell;
   vertical-align: middle;
-  font-family: Paneuropa-Highway, Arial, Helvetica, sans-serif;
-  font-size: 14px;
+  font-family: 'Francois One', Arial, Helvetica, sans-serif;
+  font-size: 13px;
   font-weight: normal;
-  line-height: 0.8;
+  line-height: 1.1;
 }
 .main-nav ul.first-level > li:last-child a,
 .main-nav ul.first-level > li.last-child a {
   border-right: 0px solid black;
-}
-.lt-ie9 .main-nav ul.first-level > li > a > span {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  line-height: 1;
-  font-weight: bold;
 }
 .top-nav.main-nav ul li .dropdown_1column {
   border-radius: 0px 0px 5px 5px;
@@ -266,6 +261,9 @@ header .search-area form input[type=image] {
 }
 .top-nav.main-nav ul li:first-child .dropdown_1column {
   margin-left: -2px;
+}
+.top-nav.main-nav ul li.last-child .dropdown_1column.align_right {
+  margin-right: -2px;
 }
 .content {
   min-height: 500px;

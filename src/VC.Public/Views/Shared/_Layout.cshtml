@@ -2,9 +2,13 @@
 <!--[if lt IE 9]>
 	<html class="no-js lt-ie9" lang="en">
 <![endif]-->
-<!--[if gte IE 9]><!-->
+<!--[if gte IE 9]>
+	<html class="no-js" lang="en">
+<![endif]-->
+<!--[if !IE]><!-->
 	<html class="no-js" lang="en">
 <!--<![endif]-->
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -12,6 +16,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="apple-touch-icon" href="/assets/miscellaneous/apple-touch-icon.png">
 	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Francois One">
 	@await Component.InvokeAsync("Assets", "styles")
 	<script src="/assets/scripts/vendor/modernizr-2.8.3.min.js"></script>
 </head>
@@ -68,7 +73,7 @@
 						<div class="actions-top-nav">
 							<a href="#">Your Account</a>
 							<a href="#">Register</a>
-							<a href="#">Contact Us</a>
+							<a class="last-child" href="#">Contact Us</a>
 						</div>
 						<div class="cart-work-area">
 							<a class="view-cart" href="#">
@@ -217,7 +222,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Wild Salmon</span>
 								<ul>
 									<li><a href="#">Sockeye Salmon - Wild Alaskan</a></li>
 
@@ -230,15 +234,6 @@
 									<li><a href="#">Ikura Wild Salmon Caviar</a></li>
 									<li><a href="#">Salmon Jerky - Pacific NW</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Petite Sockeye Portions 4 oz</a></li>
-									<li><a href="#">Sockeye - Skinless 5 lb Pack</a></li>
-									<li><a href="#">Sockeye - Skin-On 5 lb Pack</a></li>
-									<li><a href="#">King Salmon - Skin-On 5 lb Pack</a></li>
-									<li><a href="#">King Salmon - Skinless 5 lb Pack</a></li>
-									<li><a href="#">Sockeye &amp; Halibut Combo</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
@@ -248,22 +243,12 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Wild Cod, Tuna,<br>Halibut &amp; More</span>
 								<ul>
 									<li><a href="#">Cod - Wild Alaskan</a></li>
 									<li><a href="#">Halibut - Wild Alaskan</a></li>
 									<li><a href="#">Tuna - Wild Pacific</a></li>
 									<li><a href="#">Sablefish - Wild Alaskan</a></li>
 									<li><a href="#">Petrale Sole - Wild Pacific NW</a></li>
-								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Cod &amp; Silver Salmon Combo</a></li>
-									<li><a href="#">Cod Pieces - Four 1 lb Bags</a></li>
-
-									<li><a href="#">Halibut Portions - 5 lb Bulk Pack</a></li>
-									<li><a href="#">Halibut Pieces - Four 1 lb Bags</a></li>
-									<li><a href="#">Sablefish &amp; King Salmon Combo</a></li>
 								</ul>
 							</div>
 						</div>
@@ -274,7 +259,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Wild Shrimp<br>and Shellfish</span>
 								<ul>
 									<li><a href="#">Sea Scallops - Wild</a></li>
 									<li><a href="#">Lobster - Wild Maine</a></li>
@@ -288,10 +272,6 @@
 									<li><a href="#">Cultured Mussels- Live &amp; Frozen</a></li>
 									<li><a href="#">Wild Oregon Pink Shrimp - Cooked</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Check back for updates</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
@@ -301,7 +281,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Canned &amp; Pouched Wild Seafood</span>
 								<ul>
 									<li><a href="#">Sockeye Salmon</a></li>
 									<li><a href="#">Pink Salmon</a></li>
@@ -318,11 +297,6 @@
 									<li><a href="#">Kosher Certified Options</a></li>
 									<li><a href="#">Canned Seafood Samplers</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Sampler Packs</a></li>
-									<li><a href="#">Salmon Patty Mix</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
@@ -332,7 +306,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Lox &amp; Smoked Wild Fish</span>
 								<ul>
 									<li><a href="#">Sockeye Salmon: Hot-Smoked, Lox &amp; Candy</a></li>
 									<li><a href="#">Smoked King Salmon</a></li>
@@ -341,32 +314,19 @@
 									<li><a href="#">Smoked Albacore Tuna</a></li>
 									<li><a href="#">Sablefish ("black cod")</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Hot-Smoked Sockeye Combo</a></li>
-									<li><a href="#">Smoked Salmon Sampler</a></li>
-									<li><a href="#">Wild Sockeye Lox Trim - 2 lbs</a></li>
-									<li><a href="#">Nova Lox Fillets, Sliced - 26 oz</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
 					<li>
 						<a href="#">
-							<span>SALMON BURGERS, BACON, & SAUSAGE</span>
+							<span>SALMON BURGERS & BACON</span>
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Wild Salmon<br>Burgers, Bacon, and Sausage</span>
 								<ul>
 									<li class="right"><a href="#">Wild Salmon Bacon</a></li>
 									<li class="right"><a href="#">Wild Sockeye Salmon Burgers</a></li>
 									<li class="right"><a href="#">Wild Sockeye Salmon Sausage: Savory, Chorizo &amp; Italian Style</a></li>
-								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Salmon Bacon &amp; Sausage Combo</a></li>
-									<li><a href="#">Weil for Vital Choice™ Sausage Sampler</a></li>
 								</ul>
 							</div>
 						</div>
@@ -377,7 +337,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Omega-3s &amp; Supplements</span>
 								<ul>
 									<li><a href="#">Omega-3 Krill Oil</a></li>
 									<li><a href="#">Omega-3 Salmon Oil</a></li>
@@ -390,10 +349,6 @@
 									<li><a href="#">Astaxanthin Marine Antioxidant</a></li>
 									<li><a href="#">Sport-Certified™ Omega-3s+D3</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Check back for updates</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
@@ -403,7 +358,6 @@
 						</a>
 						<div class="dropdown_1column">
 							<div class="col_1">
-								<span class="ddtitle">Chicken, Beef, &amp; Organic Foods</span>
 								<ul>
 									<li><a href="#">Heritage Chicken</a></li>
 									<li><a href="#">Grass-Fed Beef</a></li>
@@ -418,10 +372,6 @@
 									<li><a href="#">Seaweed Salad &amp; Kelp Cubes</a></li>
 									<li><a href="#">Cultured Organic Garlic Flower</a></li>
 								</ul>
-								<span class="ddtitle">New, Specials, and Combos</span>
-								<ul>
-									<li><a href="#">Cook's Trio</a></li>
-								</ul>
 							</div>
 						</div>
 					</li>
@@ -429,9 +379,8 @@
 						<a href="#">
 							<span>GIFT, SAMPLERS, & PET TREATS</span>
 						</a>
-						<div class="dropdown_1column">
+						<div class="dropdown_1column align_right">
 							<div class="col_1">
-								<span class="ddtitle">Gifts, Samplers &amp; Pet Treats</span>
 								<ul>
 									<li><a href="#">All Gifts</a></li>
 									<li><a href="#">Gift Packs</a></li>
@@ -448,13 +397,12 @@
 							</div>
 						</div>
 					</li>
-					<li>
-						<a href="#" class="last-child">
+					<li class="last-child">
+						<a href="#">
 							<span>COOK'S TOOLS & BOOKS</span>
 						</a>
-						<div class="dropdown_1column">
+						<div class="dropdown_1column align_right">
 							<div class="col_1">
-								<span class="ddtitle">Cook's Tools &amp; Books</span>
 								<ul>
 									<li><a href="#">Grilling Planks</a></li>
 									<li><a href="#">Snap-On Can Lids</a></li>
