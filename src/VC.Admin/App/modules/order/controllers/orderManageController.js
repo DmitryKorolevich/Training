@@ -174,7 +174,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         ];
 
         $scope.minimumPerishableThreshold = $rootScope.ReferenceData.AppSettings.GlobalPerishableThreshold;
-        $scope.ignoneMinimumPerishableThreshold = false;
+        $scope.ignoneMinimumPerishableThreshold = $scope.id ? true: false;//only for a new order
         $scope.orderSources = $rootScope.ReferenceData.OrderSources;
         $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
         $scope.orderPreferredShipMethod = $rootScope.ReferenceData.OrderPreferredShipMethod;
@@ -417,7 +417,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
-    $scope.buildOrderShippingAddressForPartial = function ()
+    $scope.buildOrderShippingAddressForPartial = function (disableValidation)
     {
         if ($scope.order === undefined || $scope.order.Shipping === undefined)
             return undefined;
@@ -425,24 +425,44 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping' };
         }
+        uiScope.shippingAddressTab.OrderShippingEditModel.disableValidation = disableValidation;
         return $scope.shippingAddressTab.OrderShippingEditModel;
+    }
+
+    $scope.buildOrderPaymentPartial = function (model, disableValidation)
+    {
+        model.disableValidation = disableValidation;
+        return model;
     }
 
     var initOrder = function ()
     {
-        $scope.order.OnHold = $scope.order.StatusCode = 3;//on hold status
+        $scope.oldOrderStatus = $scope.order.OrderStatus;
+        $scope.order.OnHold = $scope.order.OrderStatus == 7;//on hold status
         $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
         $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
             if (newValue)
             {
-                $scope.order.StatusCode = 3;
+                $scope.order.OrderStatus = 7;
+            }
+            else
+            {
+                $scope.order.OrderStatus = $scope.oldOrderStatus;
             }
         });
-
-        //TODO: set needed data to the legend row
-        $scope.legend.CustomerName = "Test";
-        $scope.legend.CustomerId = $scope.idCustomer;
+        
+        $scope.legend.CustomerName = $scope.currentCustomer.ProfileAddress.FirstName + " " + $scope.currentCustomer.ProfileAddress.LastName;
+        if ($scope.id)
+        {
+            $scope.legend.OrderId = $scope.order.Id;
+            $scope.legend.OrderDate = $scope.order.DateCreated;
+            $scope.legend.OrderStatus = $rootScope.getReferenceItem(ReferenceData.OrderStatuses, $scope.order.OrderStatus).Text;
+        }
+        else
+        {
+            $scope.legend.CustomerId = $scope.idCustomer;
+        }
     };
     
     function initCustomerFiles()
@@ -467,6 +487,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     $scope.requestRecalculate = function ()
     {
         var orderForCalculating = angular.copy($scope.order);
+        orderForCalculating.Customer = angular.copy($scope.currentCustomer);
         if (angular.equals(oldOrderForCalculating, orderForCalculating))
         {
             return;
@@ -578,6 +599,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.GCs.skussubmitted = true;
+            $scope.calculateErrors = result.Messages;
             $scope.calculateServerMessages = new ServerMessages(result.Messages);
             var formForShowing = null;
             $.each(data.Messages, function (index, value)
@@ -666,45 +688,121 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         if (valid)
         {
+            var productErrorMessages = '';
+            if ($scope.order.SkuOrdereds.length == 1 && !$scope.order.SkuOrdereds[0].Code)
+            {
+                productErrorMessages += "You must add at least 1 product. ";
+            }
+            var productErrorsExist=false;
+            if ($scope.calculateErrors != null && $scope.calculateErrors.length != 0)
+            {
+                productErrorsExist = true;
+            }
+            if($scope.productsPerishableThresholdIssue && !$scope.ignoneMinimumPerishableThreshold)
+            {
+                productErrorsExist = true;
+            }
+            angular.forEach($scope.order.SkuOrdereds, function (skuOrdered, index)
+            {
+                if (skuOrdered.Messages && skuOrdered.Messages.length != 0)
+                {
+                    productErrorsExist = true;
+                    return;
+                }
+            });
+            if(productErrorsExist)
+            {                
+                productErrorMessages += "There are some errors in the order. ";
+            }
+
+            if (productErrorMessages)
+            {
+                $scope.mainTab.active = true;
+                toaster.pop('error', 'Error!', productErrorMessages, null, 'trustedHtml');
+                return;
+            }
+
             angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
             {
                 shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
             });
 
             $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
-            if (!$scope.id)
+            var billingErrorMessages = '';
+            if ($scope.order.IdPaymentMethodType == 1)//card
             {
-                if ($scope.order.IdPaymentMethodType==1)//card
+                if ($scope.currentCustomer.CreditCards.length != 0)
                 {
-                    if ($scope.currentCustomer.CreditCards.length == 0)
+                    angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
                     {
-                        toaster.pop('error', "Credit Card is required.", messages, null, 'trustedHtml');
-                    }
-                    else
+                        cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                    });
+                }
+            }
+            if (!$scope.order.OnHold)
+            {
+                if (!$scope.id)
+                {
+                    if ($scope.order.IdPaymentMethodType == 1)//card
                     {
-                        angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
+                        if ($scope.currentCustomer.CreditCards.length == 0)
                         {
-                            cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
-                        });
+                            billingErrorMessages += "Credit Card is required. ";
+                        }
+                        else
+                        {
+                            angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
+                            {
+                                cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                            });
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
+                    {
+                        if ($scope.currentCustomer.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 3)//check
+                    {
+                        if ($scope.currentCustomer.CreditCard == null)
+                        {
+                            billingErrorMessages += "Check is required. ";
+                        }
                     }
                 }
-                if ($scope.order.IdPaymentMethodType == 2)//oac
+                else
                 {
-                    if ($scope.currentCustomer.Oac.length == 0)
+                    if ($scope.order.IdPaymentMethodType == 1)//card
                     {
-                        toaster.pop('error', "On Approved Credit is required.", messages, null, 'trustedHtml');
+                        if ($scope.order.CreditCard == null)
+                        {
+                            billingErrorMessages += "Credit Card is required. ";
+                        }
                     }
-                }
-                if ($scope.order.IdPaymentMethodType == 3)//check
-                {
-                    if ($scope.currentCustomer.CreditCards.length == 0)
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
                     {
-                        toaster.pop('error', "Check is required.", messages, null, 'trustedHtml');
+                        if ($scope.order.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 3)//check
+                    {
+                        if ($scope.order.CreditCard == null)
+                        {
+                            billingErrorMessages += "Check is required. ";
+                        }
                     }
                 }
             }
-            else
+
+            if (billingErrorMessages)
             {
+                $scope.paymentInfoTab.active = true;
+                toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                return;
             }
 
             if ($scope.currentCustomer.newEmail || $scope.currentCustomer.emailConfirm)
@@ -715,9 +813,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 $scope.currentCustomer.EmailConfirm = $scope.currentCustomer.Email;
             }
-            $scope.order.Customer = angular.copy($scope.currentCustomer);
+            var order = angular.copy($scope.order);
+            order.Customer = angular.copy($scope.currentCustomer);
 
-            orderService.updateOrder($scope.order, $scope.addEditTracker).success(function (result)
+            orderService.updateOrder(order, $scope.addEditTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).

@@ -72,6 +72,9 @@ namespace VC.Admin.Models.Order
         [Map]
         public int IdCustomer { get; set; }
 
+        [Map]
+        public DateTime DateCreated { get; set; }
+
         [DirectLocalized("Customer")]
         public AddUpdateCustomerModel Customer { get; set; }
         

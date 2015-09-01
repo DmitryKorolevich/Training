@@ -81,21 +81,28 @@ namespace VitalChoice.Business.Services.Dynamic
                         Id = entity.IdCustomer
                     };
                 }
-                dynamic.GiftCertificates.AddRange(entity.GiftCertificates.Select(g => new GiftCertificateInOrder
+
+                if (entity.GiftCertificates != null)
                 {
-                    Amount = g.Amount,
-                    GiftCertificate = g.GiftCertificate
-                }));
+                    dynamic.GiftCertificates.AddRange(entity.GiftCertificates.Select(g => new GiftCertificateInOrder
+                    {
+                        Amount = g.Amount,
+                        GiftCertificate = g.GiftCertificate
+                    }));
+                }
                 dynamic.Discount = await _discountMapper.FromEntityAsync(entity.Discount, withDefaults);
                 dynamic.PaymentMethod =
                     await _orderPaymentMethodMapper.FromEntityAsync(entity.PaymentMethod, withDefaults);
-                await dynamic.Skus.AddRangeAsync(entity.Skus.Select(async s => new SkuOrdered
+                if (entity.Skus != null)
                 {
-                    Amount = s.Amount,
-                    Quantity = s.Quantity,
-                    Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
-                    ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku.Product, withDefaults)
-                }));
+                    await dynamic.Skus.AddRangeAsync(entity.Skus.Select(async s => new SkuOrdered
+                    {
+                        Amount = s.Amount,
+                        Quantity = s.Quantity,
+                        Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
+                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku.Product, withDefaults)
+                    }));
+                }
             });
         }
 

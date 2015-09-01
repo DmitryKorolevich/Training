@@ -9,6 +9,7 @@ using VitalChoice.Validation.Helpers;
 using VitalChoice.Domain.Constants;
 using VC.Admin.Models.Order;
 using VC.Admin.Validators.Customer;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
 
 namespace VC.Admin.Validators.Order
 {
@@ -32,7 +33,7 @@ namespace VC.Admin.Validators.Order
                     int index = 0;
                     foreach (var shipping in value.Customer.Shipping)
                     {
-                        if (value.UpdateShippingAddressForCustomer || shipping.IsSelected)
+                        if (value.UpdateShippingAddressForCustomer || (shipping.IsSelected && value.OrderStatus!=OrderStatus.OnHold))
                         {
                             ParseResults(addressValidator.Validate(shipping), "Shipping", index, "shipping");
                         }
@@ -43,7 +44,7 @@ namespace VC.Admin.Validators.Order
                         index = 0;
                         foreach (var card in value.Customer.CreditCards)
                         {
-                            if (value.UpdateCardForCustomer || card.IsSelected)
+                            if (value.UpdateCardForCustomer || (card.IsSelected && value.OrderStatus != OrderStatus.OnHold))
                             {
                                 ParseResults(creditCardValidator.Validate(card), "CreditCards", index,  "card");
                                 ParseResults(addressValidator.Validate(card.Address), "CreditCards", index, "card");
@@ -51,12 +52,14 @@ namespace VC.Admin.Validators.Order
                             index++;
                         }
                     }
-                    if (value.IdPaymentMethodType.Value == 2 && value.Customer.Oac != null)//oac
+                    if (value.IdPaymentMethodType.Value == 2 && value.Customer.Oac != null &&
+                        (value.UpdateOACForCustomer || value.OrderStatus != OrderStatus.OnHold))//oac
                     {
                         ParseResults(oacPaymentModelValidator.Validate(value.Customer.Oac), "oac");
                         ParseResults(addressValidator.Validate(value.Customer.Oac.Address), "oac");
                     }
-                    if (value.IdPaymentMethodType.Value == 3 && value.Customer.Check != null)//check
+                    if (value.IdPaymentMethodType.Value == 3 && value.Customer.Check != null &&
+                        (value.UpdateCheckForCustomer || value.OrderStatus != OrderStatus.OnHold))//check
                     {
                         ParseResults(checkPaymentModelValidator.Validate(value.Customer.Check), "check");
                         ParseResults(addressValidator.Validate(value.Customer.Check.Address), "check");
@@ -104,22 +107,22 @@ namespace VC.Admin.Validators.Order
                         {
                             RuleFor(model => model.Customer.Source)
                                .Must(p => p.HasValue)
-                               .When(p => p.Customer != null)
+                               .When(p => p.Customer != null && p.OrderStatus!=OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.Source, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer)
                                .Must(p => p != null)
                                .WithMessage(model => model.Customer, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.CreditCards)
                                .Must(p => p.Where(x=>x.IsSelected).Any())
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1 && p.Customer != null)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1 && p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.CreditCards, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.Oac)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2 && p.Customer!=null)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2 && p.Customer!=null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.Oac, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.Check)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 3 && p.Customer != null)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 3 && p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.Check, ValidationMessages.FieldRequired);
 
                         });
@@ -131,15 +134,15 @@ namespace VC.Admin.Validators.Order
                                .WithMessage(model => model.Shipping, ValidationMessages.FieldRequired);
                             RuleFor(model => model.CreditCard)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1 && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.CreditCard, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Oac)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2 && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Oac, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Check)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 3)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 3 && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Check, ValidationMessages.FieldRequired);
                         });
             }
