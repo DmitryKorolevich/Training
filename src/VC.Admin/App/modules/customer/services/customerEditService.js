@@ -122,22 +122,25 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
     var initCustomerEdit = function (uiScope)
     {
-        uiScope.buildShippingAddressForPartial = function (collection, index) {
+        uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation) {
             if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
                 return undefined;
             if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined)
             {
                 uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping' };
             }
+            uiScope.shippingAddressTab.ShippingEditModels[index].disableValidation = disableValidation;
             return uiScope.shippingAddressTab.ShippingEditModels[index];
         }
 
-        uiScope.buildCreditCardAddressForPartial = function (collection, index) {
+        uiScope.buildCreditCardAddressForPartial = function (collection, index, disableValidation)
+        {
             if (collection === undefined || collection[index] === undefined || collection[index].Address === undefined || uiScope.paymentInfoTab.AddressEditModels === undefined)
                 return undefined;
             if (uiScope.paymentInfoTab.AddressEditModels[index] === undefined) {
                 uiScope.paymentInfoTab.AddressEditModels[index] = { Address: collection[index].Address, formName: 'card', index: index, collectionName: 'CreditCards' };
             }
+            uiScope.paymentInfoTab.AddressEditModels[index].disableValidation = disableValidation;
             return uiScope.paymentInfoTab.AddressEditModels[index];
         }
 

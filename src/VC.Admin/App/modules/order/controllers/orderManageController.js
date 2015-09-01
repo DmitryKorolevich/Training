@@ -417,7 +417,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
-    $scope.buildOrderShippingAddressForPartial = function ()
+    $scope.buildOrderShippingAddressForPartial = function (disableValidation)
     {
         if ($scope.order === undefined || $scope.order.Shipping === undefined)
             return undefined;
@@ -425,18 +425,30 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping' };
         }
+        uiScope.shippingAddressTab.OrderShippingEditModel.disableValidation = disableValidation;
         return $scope.shippingAddressTab.OrderShippingEditModel;
+    }
+
+    $scope.buildOrderPaymentPartial = function (model, disableValidation)
+    {
+        model.disableValidation = disableValidation;
+        return model;
     }
 
     var initOrder = function ()
     {
-        $scope.order.OnHold = $scope.order.StatusCode = 3;//on hold status
+        $scope.oldOrderStatus = $scope.order.OrderStatus;
+        $scope.order.OnHold = $scope.order.OrderStatus == 7;//on hold status
         $scope.order.AutoShip = $scope.order.AutoShipFrequency ? true : false;
         $scope.$watch('order.OnHold', function (newValue, oldValue)
         {
             if (newValue)
             {
-                $scope.order.StatusCode = 3;
+                $scope.order.OrderStatus = 7;
+            }
+            else
+            {
+                $scope.order.OrderStatus = $scope.oldOrderStatus;
             }
         });
         
@@ -475,6 +487,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     $scope.requestRecalculate = function ()
     {
         var orderForCalculating = angular.copy($scope.order);
+        orderForCalculating.Customer = angular.copy($scope.currentCustomer);
         if (angular.equals(oldOrderForCalculating, orderForCalculating))
         {
             return;
@@ -586,6 +599,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.GCs.skussubmitted = true;
+            $scope.calculateErrors = result.Messages;
             $scope.calculateServerMessages = new ServerMessages(result.Messages);
             var formForShowing = null;
             $.each(data.Messages, function (index, value)
@@ -680,7 +694,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 productErrorMessages += "You must add at least 1 product. ";
             }
             var productErrorsExist=false;
-            if ($scope.calculateServerMessages != null && $scope.calculateServerMessages.Messages.length != 0)
+            if ($scope.calculateErrors != null && $scope.calculateErrors.length != 0)
             {
                 productErrorsExist = true;
             }
@@ -715,58 +729,71 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
             $scope.order.IdPaymentMethodType = $scope.paymentInfoTab.PaymentMethodType;
             var billingErrorMessages = '';
-            if (!$scope.id)
+            if ($scope.order.IdPaymentMethodType == 1)//card
             {
-                if ($scope.order.IdPaymentMethodType==1)//card
+                if ($scope.currentCustomer.CreditCards.length != 0)
                 {
-                    if ($scope.currentCustomer.CreditCards.length == 0)
+                    angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
                     {
-                        billingErrorMessages += "Credit Card is required. ";
-                    }
-                    else
-                    {
-                        angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
-                        {
-                            cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
-                        });
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 2)//oac
-                {
-                    if ($scope.currentCustomer.Oac == null)
-                    {
-                        billingErrorMessages += "On Approved Credit is required. ";
-                    }
-                }
-                if ($scope.order.IdPaymentMethodType == 3)//check
-                {
-                    if ($scope.currentCustomer.CreditCard == null)
-                    {
-                        billingErrorMessages += "Check is required. ";
-                    }
+                        cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                    });
                 }
             }
-            else
+            if (!$scope.order.OnHold)
             {
-                if ($scope.order.IdPaymentMethodType==1)//card
+                if (!$scope.id)
                 {
-                    if ($scope.order.CreditCard == null)
+                    if ($scope.order.IdPaymentMethodType == 1)//card
                     {
-                        billingErrorMessages += "Credit Card is required. ";
+                        if ($scope.currentCustomer.CreditCards.length == 0)
+                        {
+                            billingErrorMessages += "Credit Card is required. ";
+                        }
+                        else
+                        {
+                            angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index)
+                            {
+                                cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                            });
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
+                    {
+                        if ($scope.currentCustomer.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 3)//check
+                    {
+                        if ($scope.currentCustomer.CreditCard == null)
+                        {
+                            billingErrorMessages += "Check is required. ";
+                        }
                     }
                 }
-                if ($scope.order.IdPaymentMethodType == 2)//oac
+                else
                 {
-                    if ($scope.order.Oac == null)
+                    if ($scope.order.IdPaymentMethodType == 1)//card
                     {
-                        billingErrorMessages += "On Approved Credit is required. ";
+                        if ($scope.order.CreditCard == null)
+                        {
+                            billingErrorMessages += "Credit Card is required. ";
+                        }
                     }
-                }
-                if ($scope.order.IdPaymentMethodType == 3)//check
-                {
-                    if ($scope.order.CreditCard == null)
+                    if ($scope.order.IdPaymentMethodType == 2)//oac
                     {
-                        billingErrorMessages += "Check is required. ";
+                        if ($scope.order.Oac == null)
+                        {
+                            billingErrorMessages += "On Approved Credit is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 3)//check
+                    {
+                        if ($scope.order.CreditCard == null)
+                        {
+                            billingErrorMessages += "Check is required. ";
+                        }
                     }
                 }
             }

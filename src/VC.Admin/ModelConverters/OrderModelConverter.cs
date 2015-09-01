@@ -148,7 +148,10 @@ namespace VC.Admin.ModelConverters
                     {
                         dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
                     }
-                    dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    if (dynamic.PaymentMethod != null)
+                    {
+                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    }
                 }
             }
             else
@@ -183,7 +186,10 @@ namespace VC.Admin.ModelConverters
                     {
                         dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
                     }
-                    dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    if (dynamic.PaymentMethod != null)
+                    {
+                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    }
                 }
             }
         }

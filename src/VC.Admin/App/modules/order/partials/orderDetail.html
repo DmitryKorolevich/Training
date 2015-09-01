@@ -120,7 +120,7 @@
                                                             <span>{{currentCustomer.SourceValue}}</span>
                                                         </div>
                                                         <div data-ng-if="!currentCustomer.SourceValue" class="col-md-9">
-                                                            <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" required>
+                                                            <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" data-ng-required="!order.OnHold">
                                                                 <option value="" ng-if="false"></option>
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Source.$invalid">
@@ -131,11 +131,11 @@
                                                     <div data-ng-if="!currentCustomer.SourceValue && currentCustomer.Source && (currentCustomer.Source==4 || currentCustomer.Source==10)" class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Details</label>
                                                         <div class="col-md-9">
-                                                            <input data-ng-if="currentCustomer.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="currentCustomer.SourceDetails" required>
+                                                            <input data-ng-if="currentCustomer.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="currentCustomer.SourceDetails" data-ng-required="!order.OnHold">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsText.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.SourceDetailsText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
                                                             </div>
-                                                            <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" required>
+                                                            <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" data-ng-required="!order.OnHold">
                                                                 <option value="" ng-if="false"></option>
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsCelebrity.$invalid">
@@ -146,7 +146,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">PO#</label>
                                                         <div class="col-md-9">
-                                                            <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" required>
+                                                            <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PoNumber.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.PoNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","#PO")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.PoNumber.$error.server">{{serverMessages.GetMessage('PoNumber')}}</small>
@@ -156,7 +156,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Key Code</label>
                                                         <div class="col-md-9">
-                                                            <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" required>
+                                                            <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" data-ng-required="!order.OnHold">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.KeyCode.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Key Code")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.server">{{serverMessages.GetMessage('KeyCode')}}</small>
@@ -770,7 +770,7 @@
                                                         <div class="form-group">
                                                             <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" required autocomplete="off">
+                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
@@ -781,7 +781,7 @@
                                                         <div class="form-group">
                                                             <label for="CardType" class="col-md-3 control-label">Card Type</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
+                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
@@ -791,7 +791,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -802,7 +802,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -812,7 +812,7 @@
                                                             <label class="col-md-1">
                                                             </label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
@@ -828,7 +828,7 @@
                                                                 <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                             </div>
                                                         </div>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildCreditCardAddressForPartial(currentCustomer.CreditCards, paymentInfoTab.CreditCardIndex)]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildCreditCardAddressForPartial(currentCustomer.CreditCards, paymentInfoTab.CreditCardIndex, order.OnHold && !order.UpdateCardForCustomer)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
@@ -848,7 +848,7 @@
                                                         <div class="form-group">
                                                             <label for="terms" class="col-md-3 control-label">Terms:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" required></select>
+                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold || order.updateOACForCustomer"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Terms.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Terms")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.server">{{serverMessages.GetMessage('Terms', undefined, undefined, "oac")}}</small>
@@ -858,7 +858,7 @@
                                                         <div class="form-group">
                                                             <label class="col-md-3 control-label" for="Fob">FOB:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" required></select>
+                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold || order.updateOACForCustomer"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Fob.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Fob")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "oac")}}</small>
@@ -873,7 +873,7 @@
                                                                 <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                             </div>
                                                         </div>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Oac]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Oac, order.OnHold && !order.UpdateOACForCustomer)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
@@ -893,7 +893,7 @@
                                                         <div class="form-group">
                                                             <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" required>
+                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold || order.UpdateCheckForCustomer">
                                                                 <div class="error-container" ng-show="forms.submitted['check'] && forms.check.CheckNumber.$invalid">
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Check Number")}}</small>
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Check Number", "100"])}}</small>
@@ -919,7 +919,7 @@
                                                                 <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                             </div>
                                                         </div>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Check]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Check, order.OnHold && !order.UpdateCheckForCustomer)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
@@ -1018,7 +1018,7 @@
                                                         <div class="form-group">
                                                             <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="order.CreditCard.NameOnCard" placeholder="Name on Card" required autocomplete="off">
+                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="order.CreditCard.NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
@@ -1029,7 +1029,7 @@
                                                         <div class="form-group">
                                                             <label for="CardType" class="col-md-3 control-label">Card Type</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="order.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" required autocomplete="off"></select>
+                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="order.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold" autocomplete="off"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "card")}}</small>
@@ -1039,7 +1039,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -1050,7 +1050,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -1060,7 +1060,7 @@
                                                             <label class="col-md-1">
                                                             </label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
@@ -1076,7 +1076,7 @@
                                                                 <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
                                                             </div>
                                                         </div>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [order.CreditCard]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.CreditCard, order.OnHold)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
@@ -1086,7 +1086,7 @@
                                                         <div class="form-group">
                                                             <label for="terms" class="col-md-3 control-label">Terms:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="order.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" required></select>
+                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="order.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Terms.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Terms")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.server">{{serverMessages.GetMessage('Terms', undefined, undefined, "oac")}}</small>
@@ -1096,7 +1096,7 @@
                                                         <div class="form-group">
                                                             <label class="col-md-3 control-label" for="Fob">FOB:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="order.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" required></select>
+                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="order.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Fob.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Fob")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "oac")}}</small>
@@ -1104,7 +1104,7 @@
                                                             </div>
                                                         </div>
                                                         <span class="legend">Billing Address</span>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [order.Oac]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.Oac, order.OnHold)]"></div>
                                                     </div>
 
                                                 </fieldset>
@@ -1115,7 +1115,7 @@
                                                         <div class="form-group">
                                                             <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="order.Check.CheckNumber" placeholder="Check #" required>
+                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="order.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold">
                                                                 <div class="error-container" ng-show="forms.submitted['check'] && forms.check.CheckNumber.$invalid">
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Check Number")}}</small>
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Check Number", "100"])}}</small>
@@ -1134,7 +1134,7 @@
                                                             </div>
                                                         </div>
                                                         <span class="legend">Billing Address</span>
-                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [order.Check]"></div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.Check, order.OnHold)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
