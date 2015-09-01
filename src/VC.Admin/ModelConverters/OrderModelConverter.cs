@@ -95,12 +95,15 @@ namespace VC.Admin.ModelConverters
             if(model.GCs!=null)
             {
                 dynamic.GiftCertificates = new List<GiftCertificateInOrder>();
-                foreach(var gc in model.GCs)
+                if (!(model.GCs.Count == 1 && String.IsNullOrEmpty(model.GCs[0].Code)))
                 {
-                    GiftCertificateInOrder item = new GiftCertificateInOrder();
-                    item.GiftCertificate = new GiftCertificate();
-                    item.GiftCertificate.Code = gc.Code;
-                    dynamic.GiftCertificates.Add(item);
+                    foreach (var gc in model.GCs)
+                    {
+                        GiftCertificateInOrder item = new GiftCertificateInOrder();
+                        item.GiftCertificate = new GiftCertificate();
+                        item.GiftCertificate.Code = gc.Code;
+                        dynamic.GiftCertificates.Add(item);
+                    }
                 }
             }
 

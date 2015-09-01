@@ -30,6 +30,7 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Contexts;
 using System.Threading;
 using VC.Admin.Models.Customer;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
 
 namespace VC.Admin.Controllers
 {
@@ -187,6 +188,9 @@ namespace VC.Admin.Controllers
                 model.IdCustomer = 84920494;
                 model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
                 model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.StatusCode = RecordStatusCode.Active;
+                model.OrderStatus = OrderStatus.Processed;
+                model.DateCreated = DateTime.Now;
                 model.PreferredShipMethod = 1;
                 model.ShipDelayType = 0;
                 model.UpdateShippingAddressForCustomer = true;
@@ -194,19 +198,6 @@ namespace VC.Admin.Controllers
                 model.UpdateCheckForCustomer = true;
                 model.UpdateOACForCustomer = true;
                 return model;
-                //return new OrderManageModel()
-                //{
-                //    IdObjectType=1,//normal
-                //    IdCustomer= 84920494,
-                //    GCs=new List<GCListItemModel>() { new GCListItemModel(null)},
-                //    SkuOrdereds=new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                //    PreferredShipMethod = 1,
-                //    ShipDelayType=0,
-                //    UpdateShippingAddressForCustomer = true,
-                //    UpdateCardForCustomer = true,
-                //    UpdateCheckForCustomer = true,
-                //    UpdateOACForCustomer = true,
-                //};
             }
             else
             {
@@ -214,6 +205,9 @@ namespace VC.Admin.Controllers
                 {
                     IdObjectType = 1,//normal
                     IdCustomer = 84920494,
+                    StatusCode = RecordStatusCode.Active,
+                    OrderStatus = OrderStatus.Processed,
+                    DateCreated = DateTime.Now,
                     GCs = new List<GCListItemModel>() { new GCListItemModel(null) },
                     SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
                     PreferredShipMethod = 1,
