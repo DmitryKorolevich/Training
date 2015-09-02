@@ -45,6 +45,10 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.Description)
                     .Length(0, BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.MetaDescription, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.NavLabel)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.NavLabel, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

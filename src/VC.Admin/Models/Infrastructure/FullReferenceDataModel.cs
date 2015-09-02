@@ -12,7 +12,8 @@ namespace VC.Admin.Models.Infrastructure
 	    public IList<LookupItem<byte>> UserStatuses { get; set; }
         public IList<LookupItem<int>> ContentTypes { get; set; }
         public IList<ContentProcessor> ContentProcessors { get; set; }
-        public string PublicHost { get; set; }        
+        public string PublicHost { get; set; }
+        public IList<LookupItem<int?>> VisibleOptions { get; set; }
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
         public IList<LookupItem<int>> GCTypes { get; set; }

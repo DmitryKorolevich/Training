@@ -98,7 +98,8 @@ namespace VitalChoice.Business.Services
 	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
 	            ? appOptionsAccessor.Options.PublicHost
 	            : "http://notdefined/";
-	        referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+            referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
+            referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
 	        {
 	            Key = x.Key,
 	            Text = x.Value

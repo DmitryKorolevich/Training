@@ -274,6 +274,7 @@ namespace VC.Admin.Controllers
                     Template = String.Empty,
                     StatusCode = RecordStatusCode.Active,
                     Assigned = CustomerTypeCode.All,
+                    NavIdVisible=CustomerTypeCode.All,
                 };
             }
             return new ProductCategoryManageModel((await productCategoryService.GetCategoryAsync(id)));

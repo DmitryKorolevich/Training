@@ -68,3 +68,16 @@ VALUES
 (1,@contentItemId,@masterRootId)
 
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'ProductCategories') AND Name = N'NavLabel')
+BEGIN
+	ALTER TABLE ProductCategories ADD NavLabel NVARCHAR(250) NULL
+	ALTER TABLE ProductCategories ADD NavIdVisible INT CONSTRAINT DV_NavIdVisible DEFAULT 1 WITH VALUES	
+	
+	ALTER TABLE ProductCategories DROP CONSTRAINT DV_NavIdVisible
+	ALTER TABLE ProductCategories ALTER COLUMN NavIdVisible INT NULL	
+END
+
+GO

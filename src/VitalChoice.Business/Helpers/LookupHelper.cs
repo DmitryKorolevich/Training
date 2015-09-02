@@ -205,5 +205,17 @@ namespace VitalChoice.Business.Helpers
             }
             return paymentMethods;
         }
+
+        public static IList<LookupItem<int?>> GetVisibleOptions()
+        {
+            IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
+            {
+                new LookupItem<int?>() {Key = (int?) CustomerTypeCode.All, Text="All" },
+                new LookupItem<int?>() {Key = (int?) CustomerTypeCode.Wholesale, Text="Wholesale Only" },
+                new LookupItem<int?>() {Key = (int?) CustomerTypeCode.Retail, Text="Retail Only" },
+                new LookupItem<int?>() {Key =null, Text="Hidden" },
+            };
+            return toReturn;
+        }
     }
 }

@@ -30,6 +30,10 @@ namespace VitalChoice.Domain.Entities.Content
 
         public string LongDescriptionBottom { get; set; }
 
+        public string NavLabel { get; set; }
+
+        public CustomerTypeCode? NavIdVisible { get; set; }
+
         public virtual MasterContentItem MasterContentItem { get; set; }
 
         public int MasterContentItemId { get; set; }

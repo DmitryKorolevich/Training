@@ -44,6 +44,7 @@ namespace VC.Admin.Controllers
                     ContentTypes = referenceData.ContentTypes,
                     ContentProcessors = referenceData.ContentProcessors,
                     PublicHost = referenceData.PublicHost,
+                    VisibleOptions = referenceData.VisibleOptions,
                     ContentItemStatusNames = referenceData.ContentItemStatusNames,
                     ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
                     GCTypes = referenceData.GCTypes,

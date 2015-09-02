@@ -21,6 +21,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public string PublicHost { get; set; }
 
+        public IList<LookupItem<int?>> VisibleOptions { get; set; }
+
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
 
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
