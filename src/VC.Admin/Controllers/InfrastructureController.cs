@@ -66,6 +66,8 @@ namespace VC.Admin.Controllers
                     OrderSources = referenceData.OrderSources,
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
                     OrderPreferredShipMethod = referenceData.OrderPreferredShipMethod,
+                    OrderTypes = referenceData.OrderTypes,
+                    POrderTypes = referenceData.POrderTypes,
                     AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                     AffiliateTiers = referenceData.AffiliateTiers,

@@ -57,6 +57,7 @@ namespace VC.Admin.Models.Order
             dynamic.Sku.Code = Code;
             dynamic.ProductWithoutSkus = new ProductDynamic();
             dynamic.ProductWithoutSkus.Name = ProductName;
+            dynamic.ProductWithoutSkus.IdObjectType = IdProductType;
             dynamic.Quantity = QTY;
             dynamic.Amount = Price;
             return dynamic;

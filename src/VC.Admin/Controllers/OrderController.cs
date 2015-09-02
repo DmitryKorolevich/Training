@@ -31,28 +31,33 @@ using VitalChoice.Workflow.Contexts;
 using System.Threading;
 using VC.Admin.Models.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
+using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 
 namespace VC.Admin.Controllers
 {
     [AdminAuthorize(PermissionType.Orders)]
     public class OrderController : BaseApiController
     {
-        private readonly IOrderService orderService;
+        private readonly IOrderService _orderService;
         private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
+        private readonly ICustomerService _customerService;
         private readonly ILogger logger;
 
         public OrderController(IOrderService orderService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper)
+            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService)
         {
-            this.orderService = orderService;
+            _orderService = orderService;
             _mapper = mapper;
+            _customerService = customerService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
         
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
-            var result = await orderService.GetOrdersAsync(filter);
+            var result = await _orderService.GetOrdersAsync(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
             {
@@ -184,7 +189,7 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var model = orderService.CreatePrototypeFor<OrderManageModel>(1);//normal
+                var model = _orderService.CreatePrototypeFor<OrderManageModel>(1);//normal
                 model.IdCustomer = 84920494;
                 model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
                 model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
@@ -216,7 +221,7 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await orderService.SelectAsync(id);
+            var item = await _orderService.SelectAsync(id);
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
@@ -228,7 +233,7 @@ namespace VC.Admin.Controllers
         {
             var item = _mapper.FromModel(model);
 
-            var orderContext = await orderService.CalculateOrder(item);
+            var orderContext = await _orderService.CalculateOrder(item);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
 
@@ -243,6 +248,24 @@ namespace VC.Admin.Controllers
 
             var item = _mapper.FromModel(model);
 
+            var pOrder = false;
+            var npOrder = false;
+            foreach(var skuOrdered in item.Skus)
+            {
+                pOrder = pOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.Perishable;
+                npOrder = npOrder || skuOrdered.ProductWithoutSkus.IdObjectType == (int)ProductType.NonPerishable;
+            }
+            if(pOrder && npOrder)
+            {
+                item.Data.POrderType = (int)POrderType.PNP;
+            } else if(pOrder)
+            {
+                item.Data.POrderType = (int)POrderType.P;
+            } else if(npOrder)
+            {
+                item.Data.POrderType = (int)POrderType.NP;
+            }
+
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
             if (Int32.TryParse(sUserId, out userId))
@@ -250,15 +273,95 @@ namespace VC.Admin.Controllers
                 item.IdEditedBy = userId;
             }
             if (model.Id > 0)
-                item = (await orderService.UpdateAsync(item));
+            {
+                item = (await _orderService.UpdateAsync(item));
+            }
             else
-                item = (await orderService.InsertAsync(item));
+            {
+                item.Data.OrderType = (int)SourceOrderType.Phone;
+                item = (await _orderService.InsertAsync(item));
+            }
+
+            //update customer
+            var dbCustomer = await _customerService.SelectAsync(item.Customer.Id);
+            if (dbCustomer == null)
+            {
+                item.Customer.IdEditedBy = userId;
+                foreach (var address in item.Customer.Addresses)
+                {
+                    address.IdEditedBy = userId;
+                }
+                foreach (var customerNote in item.Customer.CustomerNotes)
+                {
+                    customerNote.IdEditedBy = userId;
+                }
+                dbCustomer.CustomerNotes = item.Customer.CustomerNotes;
+                dbCustomer.Files = item.Customer.Files;
+                if(model.Id==0)
+                {
+                    dbCustomer.ApprovedPaymentMethods = item.Customer.ApprovedPaymentMethods;
+                    dbCustomer.OrderNotes = item.Customer.OrderNotes;
+
+                    var profileAddress = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Profile).FirstOrDefault();
+                    if(profileAddress!=null)
+                    {
+                        dbCustomer.Addresses.Remove(profileAddress);
+                    }
+                    profileAddress= item.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Profile).FirstOrDefault();
+                    if (profileAddress != null)
+                    {
+                        dbCustomer.Addresses.Add(profileAddress);
+                    }
+
+                    if(model.UpdateShippingAddressForCustomer)
+                    {
+                        var shippingAddress = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).FirstOrDefault();
+                        if (shippingAddress != null)
+                        {
+                            dbCustomer.Addresses.Remove(shippingAddress);
+                        }
+                        shippingAddress = item.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).FirstOrDefault();
+                        if (shippingAddress != null)
+                        {
+                            dbCustomer.Addresses.Add(profileAddress);
+                        }
+                    }
+
+                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.CreditCard, model.UpdateCardForCustomer);
+                    foreach(var card in item.Customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard))
+                    {
+                        dbCustomer.CustomerPaymentMethods.Add(card);
+                    }
+                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.Oac, model.UpdateOACForCustomer);
+                    foreach (var card in item.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Oac))
+                    {
+                        dbCustomer.CustomerPaymentMethods.Add(card);
+                    }
+                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.Check, model.UpdateCheckForCustomer);
+                    foreach (var card in item.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Check))
+                    {
+                        dbCustomer.CustomerPaymentMethods.Add(card);
+                    }
+                }
+            }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
             //TODO - add sign up for newsletter(SignUpNewsletter)
 
             return toReturn;
+        }
+
+        private void RemovePaymentMethodsFromDBCusomer(CustomerDynamic customer, int? orderPaymentMethod, PaymentMethodType method, bool update)
+        {
+            if (orderPaymentMethod == (int)method && update)
+            {
+                var customerPaymentMethods = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)method).ToList();
+                foreach (var customerPaymentMethod in customerPaymentMethods)
+                {
+                    customer.CustomerPaymentMethods.Remove(customerPaymentMethod);
+                }
+            }
         }
     }
 }
