@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
 using Microsoft.Framework.Logging;
+using VitalChoice.Data.Extensions;
 #if !DNXCORE50
 using NLog;
 #endif
@@ -98,6 +99,11 @@ namespace VitalChoice.Core.Services
                 return NestedDiagnosticsContext.Push(state.ToString());
             }
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 #endif
     public class LoggerProviderExtended : ILoggerProviderExtended
@@ -171,6 +177,11 @@ namespace VitalChoice.Core.Services
         public ILogger<T> CreateLogger<T>()
         {
             return (ILogger<T>)CreateLogger(typeof(T).FullName);
+        }
+
+        public void Dispose()
+        {
+            _factory.Dispose();
         }
     }
 }

@@ -1,4 +1,5 @@
 {
+  "compile": "..\\Shared\\**\\*.cs",
   "version": "1.0.0-*",
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",
@@ -13,7 +14,7 @@
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "Templates": "2.2.5-*",
-    "Autofac.Framework.DependencyInjection": "4.0.0-*"
+    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*"
   },
 
   "frameworks": {
@@ -21,10 +22,9 @@
     },
     "dnxcore50": {
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
-        "System.IO.FileSystem": "4.0.0-*",
-        "System.IO": "4.0.10-*",
-        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
+        "System.Runtime": "4.0.21-*",
+        "System.IO.FileSystem": "4.0.1-*",
+        "System.IO": "4.0.11-*"
       }
     }
   }

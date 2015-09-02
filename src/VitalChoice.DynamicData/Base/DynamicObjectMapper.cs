@@ -14,6 +14,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
+using Shared.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {

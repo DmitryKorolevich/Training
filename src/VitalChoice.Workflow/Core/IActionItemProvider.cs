@@ -7,6 +7,7 @@ namespace VitalChoice.Workflow.Core
 {
     public interface IActionItemProvider
     {
+        Task<Type> GetTreeType(string treeName);
         Task<HashSet<ActionItem>> GetDependencyItems(string treeName);
     }
 }

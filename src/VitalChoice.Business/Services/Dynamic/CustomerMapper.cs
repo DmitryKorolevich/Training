@@ -16,6 +16,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
+using Shared.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

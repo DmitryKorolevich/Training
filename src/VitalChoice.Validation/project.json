@@ -1,4 +1,5 @@
 ﻿{
+  "compile": "..\\Shared\\**\\*.cs",
   "version": "1.0.0-*",
   "description": "",
   "authors": [ "" ],
@@ -19,7 +20,7 @@
     "dnxcore50": {
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
-        "System.Runtime" :  "4.0.20-*",
+        "System.Runtime": "4.0.21-*",
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
         "System.Threading": "4.0.10-*",

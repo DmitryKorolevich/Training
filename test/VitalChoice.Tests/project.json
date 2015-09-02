@@ -9,7 +9,6 @@
     "test": "xunit.runner.dnx"
   },
   "dependencies": {
-    "xunit.runner.dnx": "2.1.0-*",
     "xunit": "2.1.0-*",
     "Autofac.Framework.DependencyInjection": "4.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",

@@ -14,6 +14,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
+using Microsoft.AspNet.Http;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Base;

@@ -5,6 +5,8 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.Notification;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Core.Base
 {
@@ -21,12 +23,12 @@ namespace VitalChoice.Core.Base
             IReadOnlyList<IModelBinder> modelBinders,
             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
-            IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-            ITempDataDictionary tempData, ILoggerFactory loggerFactory)
+            IActionBindingContextAccessor actionBindingContextAccessor,
+            ILogger logger, INotifier notifier)
             : base(
                 actionContext, filterProviders, controllerFactory, descriptor, inputFormatters, outputFormatters,
                 controllerActionArgumentBinder, modelBinders, modelValidatorProviders, valueProviderFactories,
-                actionBindingContextAccessor, tempData, loggerFactory, 1000)
+                actionBindingContextAccessor, logger, notifier, 1000)
         {
 
         }

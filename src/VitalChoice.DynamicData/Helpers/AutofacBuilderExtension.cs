@@ -4,6 +4,7 @@ using System.Reflection;
 using Autofac;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
+using Shared.Helpers;
 
 namespace VitalChoice.DynamicData.Helpers
 {

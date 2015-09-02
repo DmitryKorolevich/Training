@@ -5,6 +5,7 @@ using System.Reflection;
 using Autofac.Features.Indexed;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using Shared.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {

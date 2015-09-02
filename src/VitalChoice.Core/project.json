@@ -1,4 +1,5 @@
 {
+  "compile": "..\\Shared\\**\\*.cs",
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.AspNet.Mvc": "6.0.0-*",
@@ -7,7 +8,7 @@
     "Microsoft.Framework.OptionsModel": "1.0.0-*",
     "Microsoft.Framework.Configuration.Json": "1.0.0-*",
     "Templates": "2.2.5-*",
-    "Autofac.Framework.DependencyInjection": "4.0.0-*",
+    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*",
     "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
     "Microsoft.Framework.Logging": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
@@ -29,7 +30,7 @@
     "dnxcore50": {
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
+        "System.Runtime": "4.0.21-*",
         "System.Diagnostics.Process": "4.0.0-*",
         "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }

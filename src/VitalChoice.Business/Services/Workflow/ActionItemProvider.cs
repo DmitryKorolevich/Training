@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Templates.Helpers;
 using VitalChoice.Business.Queries.Workflow;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
@@ -18,6 +20,14 @@ namespace VitalChoice.Business.Services.Workflow
         public ActionItemProvider(IReadRepositoryAsync<WorkflowTree> treeRepository)
         {
             _treeRepository = treeRepository;
+        }
+
+        public async Task<Type> GetTreeType(string treeName)
+        {
+            var tree = await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName)).SelectFirstOrDefaultAsync(false);
+            if (tree == null)
+                throw new ApiException($"Tree {treeName} not found");
+            return ReflectionHelper.ResolveType(tree.ImplementationType);
         }
 
         public async Task<HashSet<ActionItem>> GetDependencyItems(string treeName)

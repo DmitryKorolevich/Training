@@ -20,12 +20,12 @@ namespace VitalChoice.Core.Infrastructure
 		private readonly IOptions<AppOptions> appOptions;
 		private readonly HttpContext httpContext;
 
-		public CustomUrlHelper(IScopedInstance<ActionContext> contextAccessor,
+		public CustomUrlHelper(IActionContextAccessor contextAccessor,
 							   IActionSelector actionSelector,
 							   IOptions<AppOptions> appOptions) : base(contextAccessor, actionSelector)
 		{
 			this.appOptions = appOptions;
-			this.httpContext = contextAccessor.Value.HttpContext;
+			this.httpContext = contextAccessor.ActionContext.HttpContext;
 		}
 
 		/// <summary>

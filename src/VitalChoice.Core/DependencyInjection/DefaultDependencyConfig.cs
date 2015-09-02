@@ -31,7 +31,6 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Orders;
@@ -45,6 +44,8 @@ using VitalChoice.Interfaces.Services.Products;
 using Autofac;
 using VitalChoice.Data.Repositories.Specifics;
 using Autofac.Framework.DependencyInjection;
+using Microsoft.Dnx.Runtime;
+using Microsoft.Framework.DependencyInjection.Extensions;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -102,46 +103,46 @@ namespace VitalChoice.Core.DependencyInjection
 
             services.Configure<AppOptions>(options =>
             {
-                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.Get("App:GenerateLowercaseUrls"));
+                options.GenerateLowercaseUrls = Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
                 options.EnableBundlingAndMinification =
-                    Convert.ToBoolean(configuration.Get("App:EnableBundlingAndMinification"));
+                    Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
                 options.Versioning = new Versioning()
                 {
                     EnableStaticContentVersioning =
-                        Convert.ToBoolean(configuration.Get("App:Versioning:EnableStaticContentVersioning")),
+                        Convert.ToBoolean(configuration.GetSection("App:Versioning:EnableStaticContentVersioning").Value),
                     BuildNumber =
-                        Convert.ToBoolean(configuration.Get("App:Versioning:AutoGenerateBuildNumber"))
+                        Convert.ToBoolean(configuration.GetSection("App:Versioning:AutoGenerateBuildNumber").Value)
                             ? Guid.NewGuid().ToString("N")
-                            : configuration.Get("App:Versioning:BuildNumber")
+                            : configuration.GetSection("App:Versioning:BuildNumber").Value
                 };
-                options.LogPath = configuration.Get("App:LogPath");
+                options.LogPath = configuration.GetSection("App:LogPath").Value;
                 options.DefaultCacheExpirationTermMinutes =
-                    Convert.ToInt32(configuration.Get("App:DefaultCacheExpirationTermMinutes"));
+                    Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
                 options.ActivationTokenExpirationTermDays =
-                    Convert.ToInt32(configuration.Get("App:ActivationTokenExpirationTermDays"));
-                options.DefaultCultureId = configuration.Get("App:DefaultCultureId");
+                    Convert.ToInt32(configuration.GetSection("App:ActivationTokenExpirationTermDays").Value);
+                options.DefaultCultureId = configuration.GetSection("App:DefaultCultureId").Value;
                 options.Connection = new Connection
                 {
-                    UserName = configuration.Get("App:Connection:UserName"),
-                    Password = configuration.Get("App:Connection:Password"),
-                    Server = configuration.Get("App:Connection:Server"),
+                    UserName = configuration.GetSection("App:Connection:UserName").Value,
+                    Password = configuration.GetSection("App:Connection:Password").Value,
+                    Server = configuration.GetSection("App:Connection:Server").Value,
                 };
-                options.PublicHost = configuration.Get("App:PublicHost");
-                options.AdminHost = configuration.Get("App:AdminHost");
-                options.FilesRelativePath = configuration.Get("App:FilesRelativePath");
+                options.PublicHost = configuration.GetSection("App:PublicHost").Value;
+                options.AdminHost = configuration.GetSection("App:AdminHost").Value;
+                options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
 	            options.EmailConfiguration = new Email
 	            {
-		            From = configuration.Get("App:Email:From"),
-		            Host = configuration.Get("App:Email:Host"),
-		            Port = Convert.ToInt32(configuration.Get("App:Email:Port")),
-		            Secured = Convert.ToBoolean(configuration.Get("App:Email:Secured")),
-		            Username = configuration.Get("App:Email:Username"),
-		            Password = configuration.Get("App:Email:Password")
+		            From = configuration.GetSection("App:Email:From").Value,
+		            Host = configuration.GetSection("App:Email:Host").Value,
+		            Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
+		            Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
+		            Username = configuration.GetSection("App:Email:Username").Value,
+		            Password = configuration.GetSection("App:Email:Password").Value
 	            };
 				options.AzureStorage = new AzureStorage()
 				{
-					StorageConnectionString = configuration.Get("App:AzureStorage:StorageConnectionString"),
-					CustomerContainerName = configuration.Get("App:AzureStorage:CustomerContainerName")
+					StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
+					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value
 				};
             });
 
@@ -270,7 +271,7 @@ namespace VitalChoice.Core.DependencyInjection
 			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
             builder.RegisterInstance(
-                LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.Get("App:LogPath")))
+                LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
 
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
@@ -281,7 +282,7 @@ namespace VitalChoice.Core.DependencyInjection
             var container = builder.Build();
 
             LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(),
-                configuration.Get("App:DefaultCultureId"));
+                configuration.GetSection("App:DefaultCultureId").Value);
             if (!String.IsNullOrEmpty(appPath))
             {
                 FileService.Init(appPath);

@@ -6,7 +6,9 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.Notification;
 using Microsoft.Framework.OptionsModel;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Core.Base
@@ -22,18 +24,17 @@ namespace VitalChoice.Core.Base
         private readonly IReadOnlyList<IModelBinder> _modelBinders;
         private readonly IReadOnlyList<IModelValidatorProvider> _modelValidatorProviders;
         private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
-        private readonly IScopedInstance<ActionBindingContext> _actionBindingContextAccessor;
-        private readonly ITempDataDictionary _tempData;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly IActionBindingContextAccessor _actionBindingContextAccessor;
+        private readonly ILoggerProviderExtended _loggerProvider;
+        private readonly INotifier _notifier;
         //private readonly int _maxModelValidationErrors;
 
         public ValidationActionInvokerProvider(
                     IControllerFactory controllerFactory,
                     IReadOnlyList<IFilterProvider> filterProviders,
                     IControllerActionArgumentBinder argumentBinder,
-                    IScopedInstance<ActionBindingContext> actionBindingContextAccessor,
-                    ITempDataDictionary tempData,
-                    ILoggerFactory loggerFactory, IOptions<MvcOptions> mvcOptions)
+                    IActionBindingContextAccessor actionBindingContextAccessor,
+                    ILoggerProviderExtended loggerProvider, IOptions<MvcOptions> mvcOptions, INotifier notifier)
         {
             _controllerFactory = controllerFactory;
             _filterProviders = new ReadOnlyCollection<IFilterProvider>(filterProviders.OrderBy(item => item.Order).ToList());
@@ -44,8 +45,8 @@ namespace VitalChoice.Core.Base
             _modelValidatorProviders = new ReadOnlyCollection<IModelValidatorProvider>(mvcOptions.Options.ModelValidatorProviders);
             _valueProviderFactories = new ReadOnlyCollection<IValueProviderFactory>(mvcOptions.Options.ValueProviderFactories);
             _actionBindingContextAccessor = actionBindingContextAccessor;
-            _tempData = tempData;
-            _loggerFactory = loggerFactory;
+            _loggerProvider = loggerProvider;
+            _notifier = notifier;
             //_maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
         }
 
@@ -70,7 +71,7 @@ namespace VitalChoice.Core.Base
                                                     _modelValidatorProviders,
                                                     _valueProviderFactories,
                                                     _actionBindingContextAccessor,
-                                                    _tempData, _loggerFactory);
+                                                    _loggerProvider.CreateLoggerDefault(), _notifier);
             }
         }
 

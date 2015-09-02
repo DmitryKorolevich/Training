@@ -15,11 +15,11 @@ namespace VitalChoice.Workflow.Core
             _actionItemProvider = actionItemProvider;
         }
 
-        public async Task<TTree> CreateTree<TTree, TContext, TResult>(string name)
+        public async Task<IWorkflowTree<TContext, TResult>> CreateTree<TContext, TResult>(string name)
             where TContext : WorkflowContext<TResult>
-            where TTree : IWorkflowTree<TContext, TResult>
         {
-            var result = (TTree) Activator.CreateInstance(typeof (TTree), _actionItemProvider, name);
+            var treeType = await _actionItemProvider.GetTreeType(name);
+            var result = (IWorkflowTree<TContext, TResult>)Activator.CreateInstance(treeType, _actionItemProvider, name);
             await result.InitializeTreeAsync();
             return result;
         }

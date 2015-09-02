@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Product;

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
 using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Queries.User;

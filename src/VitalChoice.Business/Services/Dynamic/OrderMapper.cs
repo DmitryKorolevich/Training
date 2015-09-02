@@ -19,6 +19,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Helpers;
+using Shared.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

@@ -56,7 +56,7 @@ namespace VC.Admin.Models.Order
             CanadaSurcharge = context.CanadaSurcharge;
             StandardShippingCharges = context.StandardShippingCharges;
             ShippingUpgradePOptions = context.ShippingUpgradePOptions;
-            ShippingUpgradeNPOptions = context.ShippingUpgradeNPOptions;
+            ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             ShippingTotal = context.ShippingTotal;
             ProductsSubtotal = context.ProductsSubtotal;
             DiscountTotal = context.DiscountTotal;

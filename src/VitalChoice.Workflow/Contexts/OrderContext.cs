@@ -19,7 +19,7 @@ namespace VitalChoice.Workflow.Contexts
 
         public IList<LookupItem<int>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<int>> ShippingUpgradeNPOptions { get; set; }
+        public IList<LookupItem<int>> ShippingUpgradeNpOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
 

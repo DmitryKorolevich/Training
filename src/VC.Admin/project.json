@@ -1,4 +1,5 @@
 {
+  "compile": "..\\Shared\\**\\*.cs",
   "webroot": "wwwroot",
   "version": "1.0.0-*",
   "exclude": [
@@ -40,8 +41,8 @@
     },
     "dnxcore50": {
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
-	"System.Security.Cryptography.Encoding": "4.0.0-beta-*"
+        "System.Runtime": "4.0.21-*",
+        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
       }
     }
   },
