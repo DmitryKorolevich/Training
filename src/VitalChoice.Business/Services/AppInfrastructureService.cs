@@ -71,6 +71,8 @@ namespace VitalChoice.Business.Services
             var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
             var orderSourcesCelebrityHealthAdvocateLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Select(false).Single().Id;
             var orderPreferredShipMethod = lookupRepository.Query(x => x.Name == LookupNames.OrderPreferredShipMethod).Select(false).Single().Id;
+            var orderTypes = lookupRepository.Query(x => x.Name == LookupNames.OrderTypes).Select(false).Single().Id;
+            var pOrderTypes = lookupRepository.Query(x => x.Name == LookupNames.POrderTypes).Select(false).Single().Id;
             var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
@@ -96,7 +98,8 @@ namespace VitalChoice.Business.Services
 	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
 	            ? appOptionsAccessor.Options.PublicHost
 	            : "http://notdefined/";
-	        referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
+            referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
+            referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
 	        {
 	            Key = x.Key,
 	            Text = x.Value
@@ -205,6 +208,22 @@ namespace VitalChoice.Business.Services
                 }).ToList();
             referenceData.OrderPreferredShipMethod = lookupVariantRepository.Query()
                 .Where(x => x.IdLookup == orderPreferredShipMethod)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.OrderTypes = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == orderTypes)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
+            referenceData.POrderTypes = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == pOrderTypes)
                 .Select(false)
                 .Select(x => new LookupItem<int>()
                 {

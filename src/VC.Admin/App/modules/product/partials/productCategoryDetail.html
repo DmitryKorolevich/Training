@@ -122,6 +122,26 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <span class="legend">Navigation</span>
+                                            <div class="form-group">
+                                                <label for="nav_label" class="col-md-3 control-label">Nav Label</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Nav Label" class="form-control" placeholder="Nav Label" data-ng-model="productCategory.NavLabel">
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.NavLabel.$invalid">
+                                                        <small class="error" ng-show="forms.form.NavLabel.$error.server">{{serverMessages.GetMessage('NavLabel')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Display</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="NavIdVisible" data-ng-model="productCategory.NavIdVisible" ng-options="item.Key as item.Text for item in visibleOptions"></select>
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.NavIdVisible.$invalid">
+                                                        <small class="error" ng-show="forms.form.NavIdVisible.$error.server">{{serverMessages.GetMessage('NavIdVisible')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </fieldset>
                                     </form>
                                 </spinner-overlay>

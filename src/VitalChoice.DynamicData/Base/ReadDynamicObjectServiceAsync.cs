@@ -59,7 +59,7 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task<TDynamic> CreatePrototypeAsync(int? idObjectType = null)
         {
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
-            var entity = new TEntity {OptionTypes = optionTypes};
+            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType };
             return await Mapper.FromEntityAsync(entity, true);
         }
 

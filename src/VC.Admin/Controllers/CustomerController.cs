@@ -253,6 +253,7 @@ namespace VC.Admin.Controllers
                     customerNote.IdEditedBy = userId;
                 }
             }
+            item.IdEditedBy = userId;
             if (item.Id > 0)
             {
                 item = await _customerService.UpdateAsync(item);

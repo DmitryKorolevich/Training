@@ -189,6 +189,8 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.FileImageLargeUrl = model.FileImageLargeUrl;
                 dbItem.LongDescription = model.LongDescription;
                 dbItem.LongDescriptionBottom = model.LongDescriptionBottom;
+                dbItem.NavLabel = model.NavLabel;
+                dbItem.NavIdVisible = model.NavIdVisible;
                 if (model.MasterContentItemId != 0)
                 {
                     dbItem.MasterContentItemId = model.MasterContentItemId;

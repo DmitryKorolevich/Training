@@ -198,3 +198,47 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='OrderSource')
+BEGIN
+
+	DECLARE @IdLookupOrderTypes INT, @IdLookupPOrderTypes INT
+		
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], Name)
+	VALUES
+	(N'string', N'OrderTypes')
+	
+	SET @IdLookupOrderTypes = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookupOrderTypes, 'Web'),
+	(2, @IdLookupOrderTypes, 'Phone'),
+	(3, @IdLookupOrderTypes, 'Mail Order')
+			
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], Name)
+	VALUES
+	(N'string', N'POrderTypes')
+	
+	SET @IdLookupPOrderTypes = SCOPE_IDENTITY()
+	
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookupPOrderTypes, 'P Orders'),
+	(2, @IdLookupPOrderTypes, 'NP Orders'),
+	(3, @IdLookupPOrderTypes, 'P/NP Orders'),
+	(4, @IdLookupPOrderTypes, 'Other')
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'OrderType', 3, @IdLookupOrderTypes, NULL, NULL),
+	(N'POrderType', 3, @IdLookupPOrderTypes, NULL, NULL)
+
+END
+
+GO
+

@@ -41,6 +41,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
             $scope.previewUrl = null;
 
             $scope.statuses = $rootScope.ReferenceData.ProductCategoryStatusNames;
+            $scope.visibleOptions = $rootScope.ReferenceData.VisibleOptions;
 
             $scope.toogleEditorState = function (property) {
                 $scope[property] = !$scope[property];

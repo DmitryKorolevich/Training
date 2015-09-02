@@ -19,12 +19,15 @@ namespace VC.Admin.ModelConverters
     {
         private readonly IDynamicToModelMapper<OrderPaymentMethodDynamic> _paymentMethodMapper;
         private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
+        private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
 
         public OrderModelConverter(IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
-                                   IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper)
+                                   IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper,
+                                   IDynamicToModelMapper<CustomerDynamic> customerMapper)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
+            _customerMapper = customerMapper;
         }
 
         public void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
@@ -86,6 +89,11 @@ namespace VC.Admin.ModelConverters
 
         public void ModelToDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
+            if(model.Customer!=null)
+            {
+                dynamic.Customer = _customerMapper.FromModel(model.Customer);
+            }
+
             if(!String.IsNullOrEmpty(model.DiscountCode))
             {
                 dynamic.Discount = new DiscountDynamic();

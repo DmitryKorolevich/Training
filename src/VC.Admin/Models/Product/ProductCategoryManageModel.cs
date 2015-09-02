@@ -53,6 +53,10 @@ namespace VC.Admin.Models.Product
 
         public CustomerTypeCode Assigned { get; set; }
 
+        public string NavLabel { get; set; }
+
+        public CustomerTypeCode? NavIdVisible { get; set; }
+
         public ProductCategoryManageModel()
         {
         }
@@ -70,6 +74,8 @@ namespace VC.Admin.Models.Product
             MasterContentItemId = item.MasterContentItemId;
             LongDescription = item.LongDescription;
             LongDescriptionBottom = item.LongDescriptionBottom;
+            NavLabel = item.NavLabel;
+            NavIdVisible = item.NavIdVisible;
             Description = item.ContentItem.Description;
             Template = item.ContentItem.Template;
             Title = item.ContentItem.Title;
@@ -102,6 +108,8 @@ namespace VC.Admin.Models.Product
             toReturn.ParentId = ParentId;
             toReturn.LongDescription = LongDescription;
             toReturn.LongDescriptionBottom = LongDescriptionBottom;
+            toReturn.NavLabel = NavLabel;
+            toReturn.NavIdVisible = NavIdVisible;
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Description = Description;
             if(toReturn.ContentItem.Description==null)

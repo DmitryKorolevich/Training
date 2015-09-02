@@ -21,6 +21,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public string PublicHost { get; set; }
 
+        public IList<LookupItem<int?>> VisibleOptions { get; set; }
+
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
 
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
@@ -59,6 +61,8 @@ namespace VitalChoice.Domain.Transfer.Base
         public IList<LookupItem<int>> OrderSources { get; set; }
         public IList<LookupItem<int>> OrderSourcesCelebrityHealthAdvocate { get; set; }
         public IList<LookupItem<int>> OrderPreferredShipMethod { get; set; }
+        public IList<LookupItem<int>> OrderTypes { get; set; }
+        public IList<LookupItem<int>> POrderTypes { get; set; }
 
         public IList<LookupItem<int>> AffiliateProfessionalPractices { get; set; }
         public IList<LookupItem<int>> AffiliateMonthlyEmailsSentOptions { get; set; }

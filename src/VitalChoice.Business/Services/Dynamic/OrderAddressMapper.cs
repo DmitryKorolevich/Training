@@ -11,6 +11,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Data.Repositories.Specifics;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -18,7 +19,7 @@ namespace VitalChoice.Business.Services.Dynamic
     {
         public OrderAddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<TypePair, IModelToDynamicConverter> converters,
-            IReadRepositoryAsync<AddressOptionType> optionTypeRepositoryAsync)
+            IEcommerceRepositoryAsync<AddressOptionType> optionTypeRepositoryAsync)
             : base(mappers, converters, optionTypeRepositoryAsync)
         {
         }

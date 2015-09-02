@@ -9,14 +9,14 @@ SELECT
 	o.Id,
 	o.OrderStatus,
 	oval.Value As IdOrderSource,
-	oval.Value As OrderNotes,
+	onval.Value As OrderNotes,
 	o.IdPaymentMethod,
 	o.DateCreated,
 	NULL As DateShipped,
 	o.Total,
 	o.IdEditedBy,
 	o.DateEdited,
-	NULL As  POrderType,
+	opval.Value As POrderType,
 	c.IdObjectType AS IdCustomerType,
 	NULL As IdShippingMethod,
 	c.Id AS IdCustomer,
@@ -24,10 +24,12 @@ SELECT
 	options.FirstName+' '+options.LastName As Customer,
 	st.StateCode
 	FROM Orders AS o
-	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderSource' AND oopt.IdObjectType = o.IdObjectType
+	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderType' AND oopt.IdObjectType = o.IdObjectType
 	LEFT JOIN OrderOptionValues AS oval ON oval.IdOrder = o.Id AND oval.IdOptionType = oopt.Id
 	LEFT JOIN OrderOptionTypes AS onopt ON onopt.Name = N'OrderNotes' AND onopt.IdObjectType = o.IdObjectType
 	LEFT JOIN OrderOptionValues AS onval ON onval.IdOrder = o.Id AND onval.IdOptionType = onopt.Id
+	LEFT JOIN OrderOptionTypes AS opopt ON opopt.Name = N'POrderType' AND opopt.IdObjectType = o.IdObjectType
+	LEFT JOIN OrderOptionValues AS opval ON opval.IdOrder = o.Id AND opval.IdOptionType = opopt.Id
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
 	JOIN Addresses AS ad ON ad.IdCustomer = c.Id
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName], [Company]

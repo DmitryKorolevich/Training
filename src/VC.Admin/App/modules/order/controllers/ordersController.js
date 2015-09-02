@@ -37,19 +37,12 @@
             $scope.orderStatuses = angular.copy($rootScope.ReferenceData.OrderStatuses);
             $scope.orderStatuses.splice(0, 0, { Key: null, Text: 'All Order Statuses' });
 
-            $scope.orderTypes = [ 
-                { Key: null, Text: 'All Order Types' },
-                {Key: 1, Text: 'Web'},
-                {Key: 2, Text: 'Phone'},
-                {Key: 3, Text: 'Mail Order'},      
-            ];
-            $scope.pOrderTypes = [ 
-                { Key: null, Text: 'All  P/NP Types' },
-                {Key: 1, Text: 'P Orders'},
-                {Key: 2, Text: 'NP Orders'},
-                {Key: 3, Text: 'P/NP Orders'},                
-                {Key: 4, Text: 'Other'}
-            ];
+            $scope.orderTypes = angular.copy($rootScope.ReferenceData.OrderTypes);
+            $scope.orderTypes.splice(0, 0, { Key: null, Text: 'All Order Types' });
+
+            $scope.pOrderTypes = angular.copy($rootScope.ReferenceData.POrderTypes);
+            $scope.pOrderTypes.splice(0, 0, { Key: null, Text: 'All  P/NP Types' });
+
             $scope.shippingMethods = [ 
                 { Key: null, Text: 'All Shipping Methods' },
                 {Key: 1, Text: 'Upgraded'},
