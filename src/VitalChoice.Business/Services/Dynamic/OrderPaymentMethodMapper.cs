@@ -11,6 +11,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Data.Repositories.Specifics;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -26,7 +27,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public OrderPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<TypePair, IModelToDynamicConverter> converters,
-            IReadRepositoryAsync<CustomerPaymentMethodOptionType> optionTypeRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> optionTypeRepositoryAsync,
             OrderAddressMapper orderAddressMapper) : base(mappers, converters, optionTypeRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -54,8 +55,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
 
-                entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
-                entity.BillingAddress.IdOrder = dynamic.IdOrder;
+                if (dynamic.Address != null)
+                {
+                    entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
+                    entity.BillingAddress.IdOrder = dynamic.IdOrder;
+                }
                 entity.IdOrder = dynamic.IdOrder;
             });
         }
@@ -70,11 +74,16 @@ namespace VitalChoice.Business.Services.Dynamic
                             new DynamicEntityPair<OrderAddressDynamic, OrderAddress>(i.Dynamic.Address,
                                 i.Entity.BillingAddress))
                         .ToList());
-            items.ForEach(pair =>
+            await items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
-                entity.BillingAddress.IdOrder = dynamic.IdOrder;
+                if (dynamic.Address != null)
+                {
+                    entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
+                    entity.BillingAddress.IdOrder = dynamic.IdOrder;
+                }
+                entity.IdOrder = dynamic.IdOrder;
                 foreach (var value in entity.OptionValues)
                 {
                     value.IdOrderPaymentMethod = dynamic.Id;
