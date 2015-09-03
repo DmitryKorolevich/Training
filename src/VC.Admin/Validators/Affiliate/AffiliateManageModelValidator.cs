@@ -7,6 +7,7 @@ using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Constants;
 using System;
+using VC.Admin.Models.Affiliate;
 
 namespace VC.Admin.Validators.Affiliate
 {

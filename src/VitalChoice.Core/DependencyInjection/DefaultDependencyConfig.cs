@@ -55,6 +55,8 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Payments;
+using VitalChoice.Interfaces.Services.Help;
+using VitalChoice.Business.Services.HelpService;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -267,6 +269,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CustomerService>().As<ICustomerService>();
             builder.RegisterType<OrderService>().As<IOrderService>();
             builder.RegisterType<AffiliateService>().As<IAffiliateService>();
+            builder.RegisterType<HelpService>().As<IHelpService>();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
 			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 

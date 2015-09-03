@@ -181,4 +181,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\AffiliatesData.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\HelpTickets.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VHelpTickets.sql" />
+  </ItemGroup>
 </Project>

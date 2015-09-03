@@ -17,3 +17,4 @@ Post-Deployment Script Template
 :r .\Scripts\VProductSkus.sql
 :r .\Scripts\OrdersData.sql
 :r .\Scripts\AffiliatesData.sql
+:r .\Scripts\VHelpTickets.sql

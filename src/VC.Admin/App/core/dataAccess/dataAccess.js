@@ -15,5 +15,6 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.orderNoteService',
 	'app.core.dataAccess.services.customerService',
 	'app.core.dataAccess.services.orderService',
-	'app.core.dataAccess.services.affiliateService'
+	'app.core.dataAccess.services.affiliateService',
+	'app.core.dataAccess.services.helpService'
 ]);

@@ -19,6 +19,7 @@ using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Services;
+using Microsoft.Dnx.Runtime;
 
 namespace VC.Admin
 {

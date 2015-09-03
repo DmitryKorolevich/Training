@@ -45,3 +45,5 @@
 
 :r .\Scripts\Affiliates.sql
 :r .\Scripts\VAffiliates.sql
+
+:r .\Scripts\HelpTickets.sql

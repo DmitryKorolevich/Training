@@ -31,7 +31,7 @@ SELECT
 	LEFT JOIN OrderOptionTypes AS opopt ON opopt.Name = N'POrderType' AND opopt.IdObjectType = o.IdObjectType
 	LEFT JOIN OrderOptionValues AS opval ON opval.IdOrder = o.Id AND opval.IdOptionType = opopt.Id
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
-	JOIN Addresses AS ad ON ad.IdCustomer = c.Id
+	JOIN Addresses AS ad ON ad.IdCustomer = c.Id AND ad.IdObjectType = (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Profile')
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName], [Company]
 	FROM (SELECT [IdAddress], [Name], [Value] FROM [dbo].[AddressOptionTypes] AS adt
 	INNER JOIN [dbo].[AddressOptionValues] AS adv on adt.Id = adv.IdOptionType ) AS source
