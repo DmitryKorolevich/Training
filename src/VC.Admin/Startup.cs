@@ -11,7 +11,6 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
 using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
@@ -19,6 +18,7 @@ using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Services;
+using Microsoft.Dnx.Runtime;
 
 namespace VC.Admin
 {
