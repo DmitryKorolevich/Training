@@ -11,8 +11,8 @@ namespace VitalChoice.Domain.Entities.Workflow
 
         public int IdExecutor { get; set; }
 
-        public virtual WorkflowExecutor Executor { get; set; }
+        public WorkflowExecutor Executor { get; set; }
 
-        public virtual WorkflowTree Tree { get; set; }
+        public WorkflowTree Tree { get; set; }
     }
 }

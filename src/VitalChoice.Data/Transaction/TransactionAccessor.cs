@@ -7,11 +7,11 @@ using VitalChoice.Data.DataContext;
 
 namespace VitalChoice.Data.Transaction
 {
-    public class TransactionManager
+    public class TransactionAccessor
     {
 	    private readonly DbContext _dataContext;
 
-	    public TransactionManager(IDataContextAsync dataContext)
+	    public TransactionAccessor(IDataContextAsync dataContext)
 	    {
 		    this._dataContext = (DbContext)dataContext;
 	    }

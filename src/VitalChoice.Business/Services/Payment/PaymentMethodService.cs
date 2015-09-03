@@ -86,7 +86,7 @@ namespace VitalChoice.Business.Services.Payment
 						.Include(x => x.CustomerTypes)
 						.SelectAsync(false);
 
-			using (var transaction = new TransactionManager(_context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
 			{
 				try
 				{

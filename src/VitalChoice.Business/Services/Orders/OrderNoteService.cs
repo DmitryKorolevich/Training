@@ -149,7 +149,7 @@ namespace VitalChoice.Business.Services.Orders
 			orderNote.DateCreated = orderNote.DateEdited = DateTime.Now;
 			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
 
-			using (var transaction = new TransactionManager(_context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
 			{
 				try
 				{
@@ -187,7 +187,7 @@ namespace VitalChoice.Business.Services.Orders
 			orderNote.StatusCode = RecordStatusCode.Active;
 			orderNote.DateEdited = DateTime.Now;
 			orderNote.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
-			using (var transaction = new TransactionManager(_context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(_context).BeginTransaction())
 			{
 				try
 				{
