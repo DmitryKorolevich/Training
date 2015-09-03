@@ -22,6 +22,7 @@ using VitalChoice.Domain.Entities.Workflow;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
+using VitalChoice.Domain.Entities.eCommerce.Help;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -942,6 +943,35 @@ namespace VitalChoice.Infrastructure.Context
                     .PrincipalKey(p => p.Id)
                     .Required(false);
                 entity.Ignore(p => p.IdObjectType);
+            });
+
+            #endregion
+
+            #region Help
+
+            builder.Entity<HelpTicket>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("HelpTickets");
+                entity.Reference(p => p.Order)
+                    .InverseCollection()
+                    .ForeignKey(p => p.IdOrder)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
+                entity.Collection(p => p.Comments)
+                    .InverseReference(p=>p.HelpTicket)
+                    .ForeignKey(p => p.IdHelpTicket)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
+                entity.Ignore(p => p.IdCustomer);
+                entity.Ignore(p => p.Customer);
+            });
+
+            builder.Entity<HelpTicketComment>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("HelpTicketComments");
+                entity.Ignore(p => p.EditedBy);
             });
 
             #endregion

@@ -17,7 +17,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Interfaces;
 using VC.Admin.Validators.Affiliate;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Affiliate
 {
     [ApiValidator(typeof(AffiliatetManageModelValidator))]
     public class AffiliateManageModel : BaseModel

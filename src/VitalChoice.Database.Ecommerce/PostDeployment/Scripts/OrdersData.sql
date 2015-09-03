@@ -198,7 +198,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='OrderSource')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[OrderOptionTypes] Where Name='OrderTypes')
 BEGIN
 
 	DECLARE @IdLookupOrderTypes INT, @IdLookupPOrderTypes INT
