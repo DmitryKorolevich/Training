@@ -59,6 +59,14 @@ namespace VC.Admin.Models.Help
                 Description = item.Description;
                 IdCustomer = item.IdCustomer;
                 Customer = item.Customer;
+                if(item.Comments!=null)
+                {
+                    Comments = new List<HelpTicketCommentManageModel>();
+                    foreach(var comment in item.Comments)
+                    {
+                        Comments.Add(new HelpTicketCommentManageModel(comment));
+                    }
+                }
             }
         }
 

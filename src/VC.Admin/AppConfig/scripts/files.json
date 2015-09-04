@@ -177,6 +177,9 @@
     "app/modules/customer/controllers/customerManagementController.js",
     "app/modules/customer/controllers/manageCustomerFilesController.js",
     "app/modules/customer/controllers/manageCustomerNotesController.js",
-		"app/modules/customer/customer.js"
+    "app/modules/customer/customer.js",
+    "app/modules/help/controllers/helpTicketsController.js",
+    "app/modules/help/controllers/helpTicketDetailController.js",
+		"app/modules/help/help.js"
 	]
 }

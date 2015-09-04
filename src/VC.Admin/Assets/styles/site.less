@@ -7,6 +7,7 @@
 @hover-light-gray: #EDEDED;
 @table-warning: #FFD9DC;
 @table-attention: #fffaa3;
+@table-success: #99FF99;
 
 body{
 	min-width: 1100px;
@@ -1030,3 +1031,9 @@ th.sortable-column {
 
 .orders .table > tbody > tr > td.order-source { color:grey;}
 .orders .table > tbody > tr > td.payment-methods { color:grey;}
+
+.help-tickets .table > tbody > tr.success > td{ background-color: @table-success; }
+.help-tickets .table > tbody > tr.warning > td{ background-color: @table-attention; }
+.help-tickets .table > tbody > tr > td .priority-1 { color: red; }
+.help-tickets .table > tbody > tr > td .priority-2 { color: orange; }
+.help-tickets .table > tbody > tr > td .priority-3 { color: blue; }

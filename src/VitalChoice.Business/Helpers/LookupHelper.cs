@@ -4,6 +4,7 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Base;
@@ -214,6 +215,27 @@ namespace VitalChoice.Business.Helpers
                 new LookupItem<int?>() {Key = (int?) CustomerTypeCode.Wholesale, Text="Wholesale Only" },
                 new LookupItem<int?>() {Key = (int?) CustomerTypeCode.Retail, Text="Retail Only" },
                 new LookupItem<int?>() {Key =null, Text="Hidden" },
+            };
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetTicketStatuses()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) RecordStatusCode.Active, "Open"},
+                {(int) RecordStatusCode.NotActive, "Closed"}
+            };
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetPriorities()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) HelpTicketPriority.High, "High"},
+                {(int) HelpTicketPriority.Medium, "Medium"},
+                {(int) HelpTicketPriority.Low, "Low"},
             };
             return toReturn;
         }

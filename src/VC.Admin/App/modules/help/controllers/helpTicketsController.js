@@ -1,0 +1,83 @@
+﻿angular.module('app.modules.help.controllers.helpTicketsController', [])
+.controller('helpTicketsController', ['$scope', '$rootScope', '$state', 'helpService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, helpService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+    {
+        $scope.refreshTracker = promiseTracker("refresh");
+        $scope.deleteTracker = promiseTracker("delete");
+
+        function errorHandler(result) {
+            toaster.pop('error', "Error!", "Server error occured");
+        };
+
+        function refreshItems() {
+            helpService.getHelpTickets($scope.filter, $scope.refreshTracker)
+                .success(function (result) {
+                    if (result.Success) {
+                        $scope.items = result.Data.Items;
+                        $scope.totalItems = result.Data.Count;
+                    } else {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result) {
+                    errorHandler(result);
+                });
+        };
+
+        function initialize()
+        {
+            $scope.forms = {};
+
+            var currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            $scope.filter = {
+                To: currentDate.shiftDate('+1d'),
+                From: currentDate.shiftDate('-1m'),
+                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Sorting: gridSorterUtil.resolve(refreshItems, "DateCreated", "Desc")
+            };
+
+            refreshItems();
+        }
+
+        $scope.filterItems = function ()
+        {
+            if ($scope.forms.form.$valid)
+            {
+                $scope.filter.Paging.PageIndex = 1;
+                refreshItems();
+            }
+            else
+            {
+                $scope.forms.form.submitted = true;
+            }
+        };
+
+        $scope.pageChanged = function () {
+            refreshOrders();
+        };
+
+        $scope.delete = function (id)        {
+            confirmUtil.confirm(function ()
+            {
+               helpService.deleteHelpTicket(id, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully deleted.");
+                            refreshItems();
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }, 'Are you sure you want to delete this help ticket?');
+        };
+
+        initialize();
+    }]);

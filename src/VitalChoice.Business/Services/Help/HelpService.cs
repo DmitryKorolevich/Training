@@ -150,7 +150,7 @@ namespace VitalChoice.Business.Services.HelpService
                     item.IdCustomer = vItem.IdCustomer;
                 }
 
-                var adminProfileCondition = new AdminProfileQuery().IdInRange(item.Comments.Select(x => x.IdEditedBy).ToList());
+                var adminProfileCondition = new AdminProfileQuery().IdInRange(item.Comments.Where(x=>x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
                 var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
                 foreach(var comment in item.Comments)
                 {

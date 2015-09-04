@@ -254,6 +254,16 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
+            referenceData.TicketStatuses = LookupHelper.GetTicketStatuses().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.Priorities = LookupHelper.GetPriorities().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
             return referenceData;
 	    }
 

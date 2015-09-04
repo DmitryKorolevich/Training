@@ -19,7 +19,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Help
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public int IdEditedBy { get; set; }
+        public int? IdEditedBy { get; set; }
 
         public string EditedBy { get; set; }
 
