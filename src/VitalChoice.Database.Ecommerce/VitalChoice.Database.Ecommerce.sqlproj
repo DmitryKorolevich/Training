@@ -137,16 +137,7 @@
     <None Include="PreDeployment\Scripts\VSkus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\WorkflowTrees.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\WorkflowExecutors.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\WorkflowResolverPaths.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\WorkflowTreeActions.sql" />
+    <None Include="PreDeployment\Scripts\Workflow.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PreDeployment\Scripts\RecordStatusCodes.sql" />

@@ -37,6 +37,7 @@ namespace VitalChoice.Domain.Workflow
 
         public Type ActionType { get; }
         public string ActionName { get; }
+        public WorkflowActionType WorkflowActionType { get; set; }
 
         public bool Equals(ActionItem other)
         {

@@ -13,7 +13,7 @@ namespace VitalChoice.Domain.Workflow
 
         public Type Type { get; }
         public string Name { get; set; }
-        public Dictionary<int, Type> Actions { get; set; }
+        public Dictionary<int, WorkflowActionResolverPathDefinition> Actions { get; set; }
 
         public bool Equals(WorkflowActionResolverDefinition other) => other?.Type == Type;
 

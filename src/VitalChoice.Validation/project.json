@@ -21,11 +21,10 @@
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.21-*",
-        "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.Threading": "4.0.10-*",
-        "Microsoft.CSharp": "4.0.0-*",
-        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
+        "System.Collections": "4.0.11-*",
+        "System.Linq": "4.0.1-*",
+        "System.Threading": "4.0.11-*",
+        "Microsoft.CSharp": "4.0.1-*"
       }
     }
   }

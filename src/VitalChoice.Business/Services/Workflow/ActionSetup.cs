@@ -6,7 +6,8 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Workflow
 {
-    public class ActionSetup : IActionSetup
+    public class ActionSetup<TContext, TResult> : IActionSetup<TContext, TResult> 
+        where TContext : WorkflowContext<TResult>
     {
         public ActionSetup()
         {
@@ -15,7 +16,8 @@ namespace VitalChoice.Business.Services.Workflow
 
         internal HashSet<Type> Actions { get; }
 
-        public IActionSetup Action<T>()
+        public IActionSetup<TContext, TResult> Action<T>() 
+            where T : IWorkflowAction<TContext, TResult>
         {
             if (!typeof(T).IsImplementGeneric(typeof(IWorkflowAction<,>)))
             {
@@ -25,7 +27,8 @@ namespace VitalChoice.Business.Services.Workflow
             return this;
         }
 
-        public IActionSetup ActionResolver<T>()
+        public IActionSetup<TContext, TResult> ActionResolver<T>() 
+            where T : IWorkflowActionResolver<TContext, TResult>
         {
             if (!typeof(T).IsImplementGeneric(typeof(IWorkflowActionResolver<,>)))
             {

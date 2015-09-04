@@ -14,10 +14,6 @@ namespace VitalChoice.Workflow.Core
 
         IWorkflowExecutor<TContext, TResult> GetAction<TAction>() where TAction : IWorkflowExecutor<TContext, TResult>;
 
-        void SetUpActionDependencies(Dictionary<string, HashSet<string>> flatDependencyList);
-
-        void SetUpActionResolverDependencies(Dictionary<string, Dictionary<int, string>> flatDependencyList);
-
         TResult GetActionResult(string actionName, TContext context);
 
         bool TryGetActionResult(string actionName, TContext context, out TResult result);

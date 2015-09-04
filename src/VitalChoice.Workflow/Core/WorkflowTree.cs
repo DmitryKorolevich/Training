@@ -45,21 +45,70 @@ namespace VitalChoice.Workflow.Core
             var actionMapping = await _itemProvider.GetDependencyItems(Name);
             foreach (var action in actionMapping)
             {
-                IWorkflowExecutor<TContext, TResult> instance;
-                if (action.ActionType.IsImplement<IWorkflowTree<TContext, TResult>>())
+                await AddWalkAction(action);
+            }
+        }
+
+        private async Task AddTreeWithDependencies(ActionItem action)
+        {
+            var workflowTree =
+                (IWorkflowTree<TContext, TResult>) Activator.CreateInstance(action.ActionType, _itemProvider, action.ActionName);
+            _actions.Add(action.ActionName, workflowTree);
+            _reverseAccessActions.Add(action.ActionType, action.ActionName);
+            await workflowTree.InitializeTreeAsync();
+        }
+
+        private async Task AddActionWithDependencies(ActionItem action)
+        {
+            var workflowAction =
+                (IWorkflowAction<TContext, TResult>)
+                    Activator.CreateInstance(action.ActionType, this, action.ActionName);
+            _actions.Add(action.ActionName, workflowAction);
+            _reverseAccessActions.Add(action.ActionType, action.ActionName);
+            var dependencyItems = await _itemProvider.GetActionDependencyItems(action.ActionName);
+            foreach (var dep in dependencyItems)
+            {
+                workflowAction.DependendActions.Add(dep.ActionName);
+                if (!_actions.ContainsKey(dep.ActionName))
                 {
-                    instance = (IWorkflowExecutor<TContext, TResult>)Activator.CreateInstance(action.ActionType, _itemProvider, action.ActionName);
-                    var workflowTree = instance as IWorkflowTree<TContext, TResult>;
-                    if (workflowTree == null)
-                        throw new ApiException($"Tree {Name} doesn't implement IWorkflowTree<TContext, TResult>>()");
-                    await workflowTree.InitializeTreeAsync();
+                    await AddWalkAction(dep);
                 }
-                else
+            }
+        }
+
+        private async Task AddWalkAction(ActionItem action)
+        {
+            switch (action.WorkflowActionType)
+            {
+                case WorkflowActionType.ActionTree:
+                    await AddTreeWithDependencies(action);
+                    break;
+                case WorkflowActionType.Action:
+                    await AddActionWithDependencies(action);
+                    break;
+                case WorkflowActionType.ActionResolver:
+                    await AddActionResolverWithDependencies(action);
+                    break;
+                default:
+                    throw new ApiException("Invalid action type supplied");
+            }
+        }
+
+        private async Task AddActionResolverWithDependencies(ActionItem action)
+        {
+            var workflowActionResolver =
+                (IWorkflowActionResolver<TContext, TResult>)
+                    Activator.CreateInstance(action.ActionType, this, action.ActionName);
+            _actions.Add(action.ActionName, workflowActionResolver);
+            _reverseAccessActions.Add(action.ActionType, action.ActionName);
+            var dependencyItems = await _itemProvider.GetActionResolverDependencyItems(action.ActionName);
+            foreach (var dep in dependencyItems)
+            {
+                workflowActionResolver.Actions.Add(dep.Key, dep.Value.ActionName);
+                if (!_actions.ContainsKey(dep.Value.ActionName))
                 {
-                    instance = (IWorkflowExecutor<TContext, TResult>)Activator.CreateInstance(action.ActionType, this, action.ActionName);
+                    await AddWalkAction(dep.Value);
                 }
-                _actions.Add(action.ActionName, instance);
-                _reverseAccessActions.Add(action.ActionType, action.ActionName);
             }
         }
 
@@ -92,39 +141,6 @@ namespace VitalChoice.Workflow.Core
                 throw new ApiException("ActionNotFound", actionName);
             }
             return result;
-        }
-
-        public virtual void SetUpActionDependencies(Dictionary<string, HashSet<string>> flatDependencyList)
-        {
-            if (flatDependencyList == null)
-                throw new ArgumentNullException(nameof(flatDependencyList));
-            foreach (var dependency in flatDependencyList)
-            {
-                var executor = GetAction(dependency.Key);
-                var action = executor as IWorkflowAction<TContext, TResult>;
-                if (action == null)
-                    throw new ApiException("ActionDoesNotImplement", dependency.Key,
-                        typeof (IWorkflowAction<TContext, TResult>));
-                action.DependendActions.AddRange(dependency.Value);
-            }
-        }
-
-        public void SetUpActionResolverDependencies(Dictionary<string, Dictionary<int, string>> flatDependencyList)
-        {
-            if (flatDependencyList == null)
-                throw new ArgumentNullException(nameof(flatDependencyList));
-            foreach (var dependency in flatDependencyList)
-            {
-                var executor = GetAction(dependency.Key);
-                var action = executor as IWorkflowActionResolver<TContext, TResult>;
-                if (action == null)
-                    throw new ApiException("ActionDoesNotImplement", dependency.Key,
-                        typeof (IWorkflowActionResolver<TContext, TResult>));
-                foreach (var dependendAction in dependency.Value)
-                {
-                    action.Actions.Add(dependendAction.Key, dependendAction.Value);
-                }
-            }
         }
 
         /// <summary>

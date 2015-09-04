@@ -13,5 +13,7 @@ namespace VitalChoice.Domain.Entities.Workflow
         public WorkflowActionType ActionType { get; set; }
 
         public ICollection<WorkflowResolverPath> ResolverPaths { get; set; }
+
+        public ICollection<WorkflowActionDependency> Dependencies { get; set; }
     }
 }
