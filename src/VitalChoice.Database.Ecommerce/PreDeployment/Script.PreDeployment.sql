@@ -14,10 +14,7 @@
 
 :r .\Scripts\RecordStatusCodes.sql
 
-:r .\Scripts\WorkflowExecutors.sql
-:r .\Scripts\WorkflowTrees.sql
-:r .\Scripts\WorkflowTreeActions.sql
-:r .\Scripts\WorkflowResolverPaths.sql
+:r .\Scripts\Workflow.sql
 
 :r .\Scripts\ProductCategories.sql
 :r .\Scripts\InventoryCategories.sql

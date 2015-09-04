@@ -55,8 +55,8 @@ BEGIN
 		[IdParent] INT NOT NULL, 
 		[IdDependent] INT NOT NULL, 
 		CONSTRAINT [PK_WorkflowActionDependency] PRIMARY KEY (IdParent, IdDependent),
-		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowParentAction] FOREIGN KEY (IdParent) REFERENCES [WorkflowExecutors] (Id) ON DELETE CASCADE,
-		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowDependentAction] FOREIGN KEY (IdDependent) REFERENCES [WorkflowExecutors] (Id) ON DELETE CASCADE
+		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowParentAction] FOREIGN KEY (IdParent) REFERENCES [WorkflowExecutors] (Id),
+		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowDependentAction] FOREIGN KEY (IdDependent) REFERENCES [WorkflowExecutors] (Id)
 	)
 END
 
@@ -75,8 +75,8 @@ BEGIN
 	ADD CONSTRAINT PK_WorkflowTreeAction PRIMARY KEY (IdTree, IdExecutor)
 
 	ALTER TABLE [WorkflowTreeActions] 
-	ADD CONSTRAINT [FK_WorkflowTreeActions_ToTree] FOREIGN KEY ([IdTree]) REFERENCES [WorkflowTrees]([Id]) ON DELETE CASCADE, 
-	CONSTRAINT [FK_WorkflowTreeActions_ToExecutor] FOREIGN KEY ([IdExecutor]) REFERENCES [WorkflowExecutors]([Id]) ON DELETE CASCADE
+	ADD CONSTRAINT [FK_WorkflowTreeActions_ToTree] FOREIGN KEY ([IdTree]) REFERENCES [WorkflowTrees]([Id]), 
+	CONSTRAINT [FK_WorkflowTreeActions_ToExecutor] FOREIGN KEY ([IdExecutor]) REFERENCES [WorkflowExecutors]([Id])
 
 
 	ALTER TABLE [WorkflowResolverPaths]
@@ -93,8 +93,8 @@ BEGIN
 	CONSTRAINT PK_WorkflowResolverPath PRIMARY KEY (Id)
 
 	ALTER TABLE [WorkflowResolverPaths]
-	ADD CONSTRAINT [FK_WorkflowResolverPath_ToResolver] FOREIGN KEY ([IdResolver]) REFERENCES [WorkflowExecutors]([Id]) ON DELETE CASCADE, 
-	CONSTRAINT [FK_WorkflowTreeActions_ToExecutor] FOREIGN KEY ([IdExecutor]) REFERENCES [WorkflowExecutors]([Id]) ON DELETE CASCADE
+	ADD CONSTRAINT [FK_WorkflowResolverPath_ToResolver] FOREIGN KEY ([IdResolver]) REFERENCES [WorkflowExecutors]([Id]), 
+	CONSTRAINT [FK_WorkflowTreeActions_ToExecutor] FOREIGN KEY ([IdExecutor]) REFERENCES [WorkflowExecutors]([Id])
 
 
 	ALTER TABLE WorkflowExecutors
