@@ -72,6 +72,8 @@ namespace VC.Admin.Controllers
                     AffiliateProfessionalPractices = referenceData.AffiliateProfessionalPractices,
                     AffiliateMonthlyEmailsSentOptions = referenceData.AffiliateMonthlyEmailsSentOptions,
                     AffiliateTiers = referenceData.AffiliateTiers,
+                    TicketStatuses = referenceData.TicketStatuses,
+                    Priorities = referenceData.Priorities,
                 };
 	        }
 			else

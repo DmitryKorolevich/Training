@@ -720,6 +720,11 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey<Order>(o => o.IdShippingAddress)
                     .PrincipalKey<OrderAddress>(a => a.Id)
                     .Required(false);
+                entity.Reference(p => p.EditedBy)
+                    .InverseCollection()
+                    .ForeignKey(p => p.IdEditedBy)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -972,6 +977,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Key(t => t.Id);
                 entity.ToTable("HelpTicketComments");
                 entity.Ignore(p => p.EditedBy);
+            });
+
+            builder.Entity<VHelpTicket>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("VHelpTickets");
             });
 
             #endregion

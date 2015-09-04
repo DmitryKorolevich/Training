@@ -1,7 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.core.dataAccess.services.helpService', [])
-.service('orderService', ['$http', function ($http) {
+.service('helpService', ['$http', function ($http)
+{
 	var baseUrl = '/Api/Help/';
 
 	function getConfig(tracker) {

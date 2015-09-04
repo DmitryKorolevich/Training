@@ -15,9 +15,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'orders',
 			stateLabel: 'Orders',
 			subMenu: [
-				{ name: 'viewAllOrders',stateName: 'index.oneCol.manageOrders',stateLabel: 'Manage Orders',access: 2 },
-				{ name: 'locateOrder', stateName: 'index.oneCol.locateOrder', stateLabel: 'Locate Order', access: 2 },
-				{ name: 'placeNewOrder', stateName: 'index.oneCol.placeNewOrder', stateLabel: 'Place New Order', access: 2 }
+				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageOrders', stateLabel: 'Manage Orders', access: 2 },
+				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageHelpTickets', stateLabel: 'Manage Help Tickets', access: 11 },
 			]
 		},
 		{
