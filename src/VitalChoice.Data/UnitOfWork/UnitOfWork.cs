@@ -50,7 +50,7 @@ namespace VitalChoice.Data.UnitOfWork
 
 	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 		{
-			return new TransactionManager(_dataContext).BeginTransaction(isolation);
+			return new TransactionAccessor(_dataContext).BeginTransaction(isolation);
 		}
 
 		#endregion Constuctor/Dispose

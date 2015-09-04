@@ -234,7 +234,7 @@ namespace VitalChoice.Business.Services.Content
 			    }
 			    dbItem.RecipesToProducts = null;
 
-			    using (var transaction = new TransactionManager(_context).BeginTransaction())
+			    using (var transaction = new TransactionAccessor(_context).BeginTransaction())
 			    {
 				    try
 				    {

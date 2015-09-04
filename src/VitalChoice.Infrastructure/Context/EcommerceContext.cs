@@ -79,6 +79,11 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<WorkflowExecutor>().Key(w => w.Id);
             builder.Entity<WorkflowExecutor>().ToTable("WorkflowExecutors");
+		    builder.Entity<WorkflowExecutor>()
+		        .Collection(e => e.ResolverPaths)
+		        .InverseReference()
+		        .ForeignKey(r => r.IdResolver)
+		        .PrincipalKey(e => e.Id);
 
             builder.Entity<WorkflowResolverPath>().Key(w => w.Id);
             builder.Entity<WorkflowResolverPath>().ToTable("WorkflowResolverPaths");

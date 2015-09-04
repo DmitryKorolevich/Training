@@ -178,7 +178,7 @@ namespace VitalChoice.Business.Services
 				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
 			}
 
-			using (var transaction = new TransactionManager(context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(context).BeginTransaction())
 			{
 				try
 				{
@@ -238,7 +238,7 @@ namespace VitalChoice.Business.Services
 		{
 			await ValidateUserInternalAsync(user);
 
-			using (var transaction = new TransactionManager(context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(context).BeginTransaction())
 			{
 				try
 				{
@@ -378,7 +378,7 @@ namespace VitalChoice.Business.Services
 		{
 			await ValidateUserInternalAsync(user);
 
-			using (var transaction = new TransactionManager(context).BeginTransaction())
+			using (var transaction = new TransactionAccessor(context).BeginTransaction())
 			{
 				try
 				{
