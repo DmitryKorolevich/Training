@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
@@ -26,7 +27,7 @@ namespace VC.Public.Components.Menu
 			return entities.Select(x => new MainMenuIItemModel()
 			{
 				Label = x.Label,
-				Link = x.Link,
+				Link = !string.IsNullOrWhiteSpace(x.Link) ? $"/products/{x.Link}" : string.Empty,
 				SubItems = ConvertToModel(x.SubItems)
 			}).ToList();
 		}
@@ -40,8 +41,6 @@ namespace VC.Public.Components.Menu
 			
 			return View("MainMenu", new MainMenuIItemModel()
 			{
-				Label = rootCategory.Label,
-				Link = rootCategory.Link,
 				SubItems = ConvertToModel(rootCategory.SubItems)
 			});
 		}
