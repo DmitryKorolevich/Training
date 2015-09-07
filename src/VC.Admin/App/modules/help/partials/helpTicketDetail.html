@@ -5,10 +5,10 @@
                 <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
             </div>
             <div class="margin-top-10px">
-                <button cancel-button-default-state="index.oneCol.manageGCs" cancel-button class="btn btn-default width-160px">Cancel</button>
+                <button cancel-button-default-state="index.oneCol.manageHelpTickets" cancel-button class="btn btn-default width-160px">Cancel</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageGCs">Manage All</button>
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageHelpTickets">Manage All</button>
             </div>
         </div>
     </div>
@@ -21,7 +21,104 @@
                             <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
                                 <fieldset>
                                     <span class="legend">Help Ticket Details</span>
-                                  
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Order ID</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{helpTicket.IdOrder}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Customer</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{helpTicket.Customer}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Priority" class="col-md-3 control-label">Priority</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" id="Priority" data-ng-model="helpTicket.Priority" data-ng-options="item.Key as item.Text for item in ReferenceData.Priorities"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Summary</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{helpTicket.Summary}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Description</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{helpTicket.Description}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status" class="col-md-3 control-label">Status</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" id="status" data-ng-model="helpTicket.StatusCode" data-ng-options="item.Key as item.Text for item in ReferenceData.TicketStatuses"></select>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+
+                            <form class="form-horizontal" name="forms.existComment" data-ng-class="{submitted: forms.existComment.submitted}" novalidate>
+                                <fieldset>
+                                    <span class="legend">Comments</span>
+                                    <div data-ng-repeat="comment in helpTicket.Comments">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <span>
+                                                    <span data-ng-if="comment.DateCreated==comment.DateEdited">Submitted</span><span data-ng-if="comment.DateCreated!=comment.DateEdited">Modified</span> on
+                                                    <strong>{{::comment.DateEdited | date:"MM/dd/yy"}} {{::comment.DateEdited | date:"h:mm a"}}</strong> by
+                                                </span>
+                                                <strong data-ng-if="comment.EditedBy">Store Manager({{::comment.EditedBy}})</strong>
+                                                <strong data-ng-if="!comment.EditedBy">{{::comment.Customer}}</strong>
+                                            </div>
+                                            <div data-ng-if="!comment.IsEdit" class="col-md-2">
+                                                <button class="btn btn-xs btn-default btn-success" data-ng-click="startUpdateComment(comment);">Edit</button>
+                                                <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteComment(comment);">Delete</button>
+                                            </div>
+                                            <div data-ng-if="comment.IsEdit" class="col-md-2">
+                                                <button class="btn btn-xs btn-default btn-success" data-ng-click="updateComment(comment);">Save</button>
+                                                <button class="btn btn-xs btn-default btn-danger" data-ng-click="cancelUpdateComment(comment);">Cancel</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="col-md-3 control-label">Comment</label>
+                                            <div data-ng-if="!comment.IsEdit" class="col-md-9 form-control-static">
+                                                <span>{{comment.Comment}}</span>
+                                            </div>
+                                            <div data-ng-if="comment.IsEdit" class="col-md-9 form-control-static">
+                                                <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="comment.EditComment" required></textarea>
+                                                <div class="error-container" ng-show="forms.existComment.submitted && forms.existComment.Comment.$invalid">
+                                                    <small class="error" ng-show="forms.existComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>
+                                                    <small class="error" ng-show="forms.existComment.Comment.$error.server">{{serverMessages.GetMessage('Comment')}}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+
+                            <form class="form-horizontal" name="forms.newComment" data-ng-class="{submitted: forms.newComment.submitted}" novalidate>
+                                <fieldset>
+                                    <span class="legend">Add New Comment</span>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Comment</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="newHelpTicketComment.Comment" required></textarea>
+                                            <div class="error-container" ng-show="forms.newComment.submitted && forms.newComment.Comment.$invalid">
+                                                <small class="error" ng-show="forms.newComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>
+                                                <small class="error" ng-show="forms.newComment.Comment.$error.server">{{serverMessages.GetMessage('Comment')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                        </div>
+                                        <div class="col-md-9">
+                                            <button class="btn btn-success width-160px" data-ng-click="addComment()">Add New Comment</button>
+                                        </div>
+                                    </div>
                                 </fieldset>
                             </form>
                         </spinner-overlay>
@@ -31,4 +128,3 @@
         </div>
     </div>
 </div>
-
