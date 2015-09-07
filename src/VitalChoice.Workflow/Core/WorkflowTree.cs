@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Templates.Helpers;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Workflow;
 
@@ -36,7 +35,14 @@ namespace VitalChoice.Workflow.Core
         {
             object value;
             var getResult = context.DictionaryData.TryGetValue(actionName, out value);
-            result = (TResult)value;
+            if (value != null)
+            {
+                result = (TResult) value;
+            }
+            else
+            {
+                result = default(TResult);
+            }
             return getResult;
         }
 

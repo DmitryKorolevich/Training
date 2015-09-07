@@ -1,5 +1,5 @@
 ﻿using System;
-using Templates.Helpers;
+using Shared.Helpers;
 
 namespace VitalChoice.Domain.Workflow
 {
@@ -7,7 +7,7 @@ namespace VitalChoice.Domain.Workflow
     {
         public ActionItem(string typeName, string actionName)
         {
-            ReflectionHelper.ResolveType(typeName);
+            ActionType = ReflectionHelper.ResolveType(typeName);
             ActionName = actionName;
         }
 

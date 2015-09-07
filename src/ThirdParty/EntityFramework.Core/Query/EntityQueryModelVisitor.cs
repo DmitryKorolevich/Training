@@ -320,7 +320,7 @@ namespace Microsoft.Data.Entity.Query
                                          .FindNavigation(propertyInfo.Name);
                     if (navigation == null)
                     {
-                        throw new Exception($"Cannot find navigation {navigationPropertyPath}.");
+                        throw new Exception($"Cannot find navigation {propertyInfo}.");
                     }
 
                     boundChainedNavigations.Add(navigation);

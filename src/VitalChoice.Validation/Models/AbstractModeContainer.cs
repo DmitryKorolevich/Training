@@ -1,5 +1,4 @@
 ﻿using System;
-using Antlr4.Runtime.Atn;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VitalChoice.Validation.Models

@@ -6,6 +6,12 @@ namespace VitalChoice.Domain.Entities.Workflow
 {
     public class WorkflowExecutor: Entity
     {
+        public WorkflowExecutor()
+        {
+            ResolverPaths = new List<WorkflowResolverPath>();
+            Dependencies = new List<WorkflowActionDependency>();
+        }
+
         public string Name { get; set; }
 
         public string ImplementationType { get; set; }

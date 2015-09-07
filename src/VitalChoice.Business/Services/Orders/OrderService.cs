@@ -32,6 +32,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -42,6 +43,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
+        private readonly IWorkflowFactory _treeFactory;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -51,7 +53,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService)
+            ICustomerService customerService, IWorkflowFactory treeFactory)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
@@ -61,6 +63,7 @@ namespace VitalChoice.Business.Services.Orders
             _productOptionTypesRepository = productOptionTypesRepository;
             _productMapper = productMapper;
             _customerService = customerService;
+            _treeFactory = treeFactory;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -109,13 +112,17 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
-        public Task<OrderContext> CalculateOrder(OrderDynamic order)
+        public async Task<OrderContext> CalculateOrder(OrderDynamic order)
         {
-            return Task.FromResult(new OrderContext
+
+            var context = new OrderContext
             {
-                SkuOrdereds=order.Skus.ToList(),//temp - should be returned from the calculation engine
+                SkuOrdereds = order.Skus.ToList(), //temp - should be returned from the calculation engine
                 Order = order
-            });
+            };
+            var tree = await _treeFactory.CreateTreeAsync<OrderContext, decimal>("Order");
+            var total = tree.Execute(context);
+            return context;
         }
 
         protected override async Task BeforeEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)

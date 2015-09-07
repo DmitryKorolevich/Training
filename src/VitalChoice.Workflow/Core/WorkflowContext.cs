@@ -38,13 +38,11 @@ namespace VitalChoice.Workflow.Core
 
         internal void ActionSetResult(string actionName, T data)
         {
-            var resultData = (_data as IDictionary<string, object>);
-            if (resultData.ContainsKey(actionName))
+            if (DictionaryData.ContainsKey(actionName))
             {
                 throw new ApiException("ActionAlreadySetData", actionName);
             }
             DictionaryData.Add(actionName, data);
-            resultData.Add(actionName, data);
         }
     }
 }

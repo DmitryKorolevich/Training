@@ -9,6 +9,7 @@ namespace VitalChoice.Domain.Workflow
         {
             Type = type;
             Name = name;
+            Actions = new Dictionary<int, WorkflowActionResolverPathDefinition>();
         }
 
         public Type Type { get; }

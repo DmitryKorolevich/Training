@@ -4,7 +4,7 @@
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Templates": "2.2.5-*"
+    "Microsoft.Dnx.Runtime": "1.0.0-*"
   },
 
   "frameworks": {
@@ -17,7 +17,12 @@
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.21-*",
-        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
+        "System.Reflection": "4.1.0-*",
+        "System.Reflection.Extensions": "4.0.1-*",
+        "System.Reflection.TypeExtensions": "4.0.1-*",
+        "System.Reflection.Emit": "4.0.1-*",
+        "System.Reflection.Emit.Lightweight": "4.0.1-*",
+        "System.Reflection.Emit.ILGeneration": "4.0.1-*"
       }
     }
   }

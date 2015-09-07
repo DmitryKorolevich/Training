@@ -92,24 +92,47 @@ namespace VitalChoice.Business.Services.Workflow
 
         public async Task UpdateAsync()
         {
-            ICollection<string> names = Trees.Select(t => t.Value.Name).ToList();
+            ICollection<string> treeNames = Trees.Select(t => t.Value.Name).ToList();
+            ICollection<string> executorNames =
+                Trees.Select(t => t.Value.Name)
+                    .Union(Actions.Select(a => a.Value.Name))
+                    .Union(ActionResolvers.Select(r => r.Value.Name))
+                    .ToList();
+            List<WorkflowTree> trees = null;
+            List<WorkflowExecutor> executors = null;
+            if (treeNames.Any())
+            {
+                trees = await _treeRepository.Query(t => treeNames.Contains(t.Name)).SelectAsync();
+            }
+            if (executorNames.Any())
+            {
+                executors =
+                    await
+                        _executorsRepository.Query(e => executorNames.Contains(e.Name))
+                            .Include(e => e.ResolverPaths)
+                            .ThenInclude(e => e.Executor)
+                            .Include(e => e.Dependencies)
+                            .ThenInclude(d => d.Dependent).SelectAsync();
+            }
+
             using (var transaction = new TransactionAccessor(_context).BeginTransaction())
             {
                 try
                 {
                     //Wipe out related trees
-                    var trees =
+                    if (trees != null)
+                    {
+                        await _treeRepository.DeleteAllAsync(trees);
+                    }
+                    if (executors != null)
+                    {
+                        await _actionDependenciesRepository.DeleteAllAsync(executors.SelectMany(e => e.Dependencies));
+                        await _resolverPathsRepository.DeleteAllAsync(executors.SelectMany(e => e.ResolverPaths));
                         await
-                            _treeRepository.Query(t => names.Contains(t.Name))
-                                .Include(t => t.Actions)
-                                .ThenInclude(a => a.Executor)
-                                .ThenInclude(a => a.ResolverPaths)
-                                .Include(t => t.Actions)
-                                .ThenInclude(a => a.Executor)
-                                .ThenInclude(a => a.Dependencies)
-                                .ThenInclude(a => a.Dependent)
-                                .SelectAsync();
-                    await _treeRepository.DeleteAllAsync(trees);
+                            _executorsRepository.DeleteAllAsync(
+                                executors.Union(executors.SelectMany(e => e.Dependencies.Select(d => d.Dependent)))
+                                    .Union(executors.SelectMany(e => e.ResolverPaths.Select(r => r.Executor))));
+                    }
 
                     //Insert executors
                     var dbExecutors = Actions.Select(a => new WorkflowExecutor
@@ -171,10 +194,10 @@ namespace VitalChoice.Business.Services.Workflow
 
                     transaction.Commit();
                 }
-                catch
+                catch(Exception e)
                 {
                     transaction.Rollback();
-                    throw;
+                    Console.WriteLine(e);
                 }
             }
         }

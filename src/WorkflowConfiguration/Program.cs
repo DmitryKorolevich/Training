@@ -4,6 +4,7 @@ using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Infrastructure;
 using Microsoft.Framework.Configuration;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.DependencyInjection;
 using VitalChoice.Core.Base;
@@ -15,13 +16,16 @@ using VitalChoice.Workflow.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Infrastructure.Context;
 using Autofac.Framework.DependencyInjection;
+using Microsoft.AspNet.Identity.EntityFramework;
+using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity;
 
 namespace Workflow.Configuration
 {
     public class Program
     {
 
-        public async void Main(string[] args)
+        public async Task Main(string[] args)
         {
             var applicationEnvironment =
                 (IApplicationEnvironment)
@@ -35,6 +39,24 @@ namespace Workflow.Configuration
             services.AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<VitalChoiceContext>();
+
+            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+                .AddEntityFrameworkStores<VitalChoiceContext, int>()
+                .AddUserStore<ExtendedUserStore>()
+                .AddUserValidator<ExtendedUserValidator>()
+                .AddUserManager<ExtendedUserManager>()
+                .AddTokenProvider<UserTokenProvider>();
+
+            services.ConfigureIdentity(x =>
+            {
+                x.User.RequireUniqueEmail = true;
+                x.Lockout.MaxFailedAccessAttempts = 5;
+                x.Lockout.AllowedForNewUsers = true;
+                x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
+                x.Password.RequiredLength = 8;
+                x.Password.RequireDigit = true;
+                x.Password.RequireNonLetterOrDigit = true;
+            });
 
             services.Configure<AppOptions>(options =>
             {
@@ -96,6 +118,7 @@ namespace Workflow.Configuration
                 var setup = scope.Resolve<ITreeSetup<OrderContext, decimal>>();
                 DefaultConfiguration.Configure(setup);
                 await setup.UpdateAsync();
+                Console.WriteLine("Update Success!");
             }
         }
     }

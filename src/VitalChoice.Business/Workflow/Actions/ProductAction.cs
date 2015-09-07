@@ -12,7 +12,8 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            return context.Order.Skus.Sum(s => s.Amount * s.Quantity);
+            context.ProductsSubtotal = context.Order.Skus.Sum(s => s.Amount * s.Quantity);
+            return context.ProductsSubtotal;
         }
     }
 }

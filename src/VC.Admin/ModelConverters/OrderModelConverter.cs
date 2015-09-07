@@ -164,7 +164,7 @@ namespace VC.Admin.ModelConverters
             }
             else
             {
-                var shippingAddress = model.Customer.Shipping.Where(p => p.IsSelected).FirstOrDefault();
+                var shippingAddress = model.Customer?.Shipping.FirstOrDefault(p => p.IsSelected);
                 if(shippingAddress!=null)
                 {
                     var addressDynamic = _addressMapper.FromModel(shippingAddress);
@@ -176,7 +176,7 @@ namespace VC.Admin.ModelConverters
                 {
                     if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.CreditCard)
                     {
-                        var card = model.Customer.CreditCards.Where(p => p.IsSelected).FirstOrDefault();
+                        var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
                         if (card != null)
                         {
                             dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card);
@@ -184,11 +184,13 @@ namespace VC.Admin.ModelConverters
                     }
                     else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Oac)
                     {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
+                        if (model.Customer != null)
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
                     }
                     else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Check)
                     {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
+                        if (model.Customer != null)
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
                     }
                     else
                     {

@@ -24,6 +24,8 @@ namespace VitalChoice.Data.DataContext
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
+            if (cancellationToken == default(CancellationToken))
+                cancellationToken = CancellationToken.None;
 			var changesAsync = await base.SaveChangesAsync(cancellationToken);
 			return changesAsync;
 		}

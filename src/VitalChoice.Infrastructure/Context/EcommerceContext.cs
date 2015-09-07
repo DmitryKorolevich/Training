@@ -81,12 +81,12 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WorkflowExecutor>().ToTable("WorkflowExecutors");
 		    builder.Entity<WorkflowExecutor>()
 		        .Collection(e => e.ResolverPaths)
-		        .InverseReference()
+		        .InverseReference(r => r.Resolver)
 		        .ForeignKey(r => r.IdResolver)
 		        .PrincipalKey(e => e.Id);
 		    builder.Entity<WorkflowExecutor>()
 		        .Collection(e => e.Dependencies)
-		        .InverseReference()
+		        .InverseReference(d => d.Parent)
 		        .ForeignKey(d => d.IdParent)
 		        .PrincipalKey(e => e.Id);
 
@@ -99,7 +99,7 @@ namespace VitalChoice.Infrastructure.Context
                 .PrincipalKey(executor => executor.Id);
 		    builder.Entity<WorkflowResolverPath>()
 		        .Reference(w => w.Resolver)
-		        .InverseCollection()
+		        .InverseCollection(r => r.ResolverPaths)
 		        .ForeignKey(w => w.IdResolver)
 		        .PrincipalKey(w => w.Id);
 
@@ -107,7 +107,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WorkflowTree>().ToTable("WorkflowTrees");
 		    builder.Entity<WorkflowTree>()
 		        .Collection(tree => tree.Actions)
-		        .InverseReference()
+		        .InverseReference(action => action.Tree)
 		        .ForeignKey(action => action.IdTree)
 		        .PrincipalKey(tree => tree.Id);
 
@@ -121,16 +121,17 @@ namespace VitalChoice.Infrastructure.Context
 		        .PrincipalKey<WorkflowExecutor>(executor => executor.Id);
 		    builder.Entity<WorkflowTreeAction>()
 		        .Reference(action => action.Tree)
-		        .InverseCollection()
+		        .InverseCollection(tree => tree.Actions)
 		        .ForeignKey(action => action.IdTree)
 		        .PrincipalKey(tree => tree.Id);
 
             builder.Entity<WorkflowActionDependency>(entity =>
-		    {
+            {
+                entity.ToTable("WorkflowActionDependencies");
 		        entity.Key(d => new {d.IdParent, d.IdDependent});
 		        entity.Ignore(d => d.Id);
 		        entity.Reference(d => d.Parent)
-                    .InverseCollection()
+                    .InverseCollection(e => e.Dependencies)
                     .ForeignKey(d => d.IdParent)
                     .PrincipalKey(e => e.Id);
 		        entity.Reference(d => d.Dependent)

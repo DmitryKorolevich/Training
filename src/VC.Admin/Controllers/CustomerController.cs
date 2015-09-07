@@ -34,6 +34,8 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
+using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VC.Admin.Controllers
 {
@@ -45,7 +47,7 @@ namespace VC.Admin.Controllers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
         private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
-        private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper; 
+        private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
 
         private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
@@ -55,12 +57,15 @@ namespace VC.Admin.Controllers
 
 		private readonly ILogger logger;
 
-		public CustomerController(ICustomerService customerService,
+        public CustomerController(ICustomerService customerService,
             IDynamicToModelMapper<CustomerDynamic> customerMapper,
             IDynamicToModelMapper<CustomerAddressDynamic> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
             IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
-                addressService, IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService, IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider)
+                addressService,
+            IEcommerceDynamicObjectService
+                <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
+            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -71,8 +76,8 @@ namespace VC.Admin.Controllers
             _addressService = addressService;
             _notesService = notesService;
             _noteMapper = noteMapper;
-			this.logger = loggerProvider.CreateLoggerDefault();
-		}
+            this.logger = loggerProvider.CreateLoggerDefault();
+        }
 
         [HttpGet]
         public async Task<Result<IList<OrderNoteModel>>> GetOrderNotes(CustomerType customerType)

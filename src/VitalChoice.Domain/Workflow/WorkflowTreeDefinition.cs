@@ -9,6 +9,7 @@ namespace VitalChoice.Domain.Workflow
         {
             Type = type;
             Name = name;
+            Actions = new HashSet<Type>();
         }
 
         public Type Type { get; }
