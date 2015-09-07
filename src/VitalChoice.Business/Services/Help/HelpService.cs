@@ -267,6 +267,7 @@ namespace VitalChoice.Business.Services.HelpService
                         var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
                         item.Order = dbItem.Order;
                         item.IdHelpTicket = dbItem.IdHelpTicket;
+                        item.DateCreated = dbItem.DateCreated;
                         item.DateEdited = now;
                         await _helpTicketCommentRepository.UpdateAsync(item);
                     }
