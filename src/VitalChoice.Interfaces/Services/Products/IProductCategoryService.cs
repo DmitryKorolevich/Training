@@ -18,5 +18,6 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<ProductCategoryContent> GetCategoryAsync(int id);
         Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent category);
         Task<bool> DeleteCategoryAsync(int id);
+		Task<ProductCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter);
     }
 }

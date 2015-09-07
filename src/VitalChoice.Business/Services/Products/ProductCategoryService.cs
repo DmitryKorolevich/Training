@@ -251,9 +251,32 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        #region Private
+	    public async Task<ProductCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter)
+	    {
+		    var productRootCategory = await GetCategoriesTreeAsync(new ProductCategoryTreeFilter() {Status = RecordStatusCode.Active});
 
-        private ProductCategory FindUICategory(ProductCategory uiRoot, int id)
+			var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
+			var contentCategories = await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(false);
+
+		    return new ProductCategoryLite()
+		    {
+				SubItems = ConvertToTransferCategory(productRootCategory.SubCategories, contentCategories)
+			};
+		}
+
+	    #region Private
+
+	    private IList<ProductCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IList<ProductCategoryContent> contentCategories)
+	    {
+		    return subCategories.Where(x => contentCategories.Select(y=>y.Id).Contains(x.Id)).Select(x => new ProductCategoryLite()
+		    {
+				Label = contentCategories.First(y => y.Id == x.Id).NavLabel,
+				Link = x.Url,
+				SubItems = ConvertToTransferCategory(x.SubCategories, contentCategories)
+			}).ToList();
+	    }
+
+	    private ProductCategory FindUICategory(ProductCategory uiRoot, int id)
         {
             if (uiRoot.Id == id)
             {
