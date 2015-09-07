@@ -1,0 +1,29 @@
+﻿@model VC.Public.Models.Menu.MainMenuIItemModel
+
+<nav class="top-nav main-nav">
+	<ul class="first-level">
+		@for (var i = 0; i <  Model.SubItems.Count; i++)
+		{
+			<li @(i == Model.SubItems.Count - 1 ? "class=last-child" : "")>
+				<a href="@Model.SubItems[i].Link">
+					<span>@Model.SubItems[i].Label</span>
+				</a>
+				@if (Model.SubItems[i].SubItems.Any())
+				{
+					<div class="dropdown_1column @( i >= Model.SubItems.Count - 2 ? "align_right" : "" )">
+						<div class="col_1">
+							<ul>
+								@foreach (var secondLevel in Model.SubItems[i].SubItems)
+								{
+									<li>
+										<a href="@secondLevel.Link">@secondLevel.Label</a>
+									</li>
+								}
+							</ul>
+						</div>
+					</div>
+				}
+			</li>
+		}
+	</ul>
+</nav>

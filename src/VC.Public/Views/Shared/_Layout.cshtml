@@ -214,7 +214,7 @@
 					<input type="image" src="/Assets/images/mag.jpg" />
 				</form>
 			</div>
-			<nav class="top-nav main-nav">
+		@*<nav class="top-nav main-nav">
 				<ul class="first-level">
 					<li>
 						<a href="#">
@@ -416,7 +416,8 @@
 						</div>
 					</li>
 				</ul>
-			</nav>
+			</nav>*@
+			@await Component.InvokeAsync("Menu")
 			<div class="nav-shadow"></div>
 		</header>
 		<div class="content">
