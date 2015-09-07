@@ -11,6 +11,6 @@ namespace VitalChoice.Domain.Entities.Workflow
 
         public string ImplementationType { get; set; }
 
-        public virtual ICollection<WorkflowTreeAction> Actions { get; set; }
+        public ICollection<WorkflowTreeAction> Actions { get; set; }
     }
 }

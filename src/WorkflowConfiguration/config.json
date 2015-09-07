@@ -1,0 +1,36 @@
+{
+  "App": {
+    "GenerateLowercaseUrls": true,
+    "EnableBundlingAndMinification": true,
+    "Versioning": {
+      "EnableStaticContentVersioning": true,
+      "AutoGenerateBuildNumber": true,
+      "BuildNumber": 1
+    },
+    "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
+    "FilesRelativePath": "/files",
+    "DefaultCacheExpirationTermMinutes": 1440,
+    "ActivationTokenExpirationTermDays": 3,
+    "DefaultCultureId": "en-US",
+   "Connection": {
+           "UserName": "dev_vcdb_login",
+            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+            "Server": "vw4v86cs0h.database.windows.net"
+        },
+		"PublicHost": "http://staging.g2-dg.com/",
+		"AdminHost": "http://admin.staging.g2-dg.com/",
+    "Email": {
+      "From": "admin.staging@g2designgroup.com",
+      "Host": "smtp.1and1.com",
+      "Port": 587,
+      "Secured": true,
+      "Username": "admin.staging@g2designgroup.com",
+      "Password": "vcstaging123"
+    },
+    "AzureStorage": {
+      "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",
+      "CustomerContainerName": "customer-files"
+    }
+  }
+}

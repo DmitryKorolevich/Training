@@ -97,10 +97,11 @@ namespace VitalChoice.Infrastructure.Context
 		        .InverseCollection()
 		        .ForeignKey(resolverPath => resolverPath.IdExecutor)
                 .PrincipalKey(executor => executor.Id);
-            builder.Entity<WorkflowResolverPath>()
-                .Reference(w => w.Resolver)
-                .InverseCollection()
-                .ForeignKey(w => w.IdResolver);
+		    builder.Entity<WorkflowResolverPath>()
+		        .Reference(w => w.Resolver)
+		        .InverseCollection()
+		        .ForeignKey(w => w.IdResolver)
+		        .PrincipalKey(w => w.Id);
 
             builder.Entity<WorkflowTree>().Key(w => w.Id);
             builder.Entity<WorkflowTree>().ToTable("WorkflowTrees");
@@ -115,16 +116,16 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WorkflowTreeAction>().ToTable("WorkflowTreeActions");
 		    builder.Entity<WorkflowTreeAction>()
 		        .Reference(treeAction => treeAction.Executor)
-		        .InverseCollection()
-		        .ForeignKey(treeAction => treeAction.IdExecutor)
-		        .PrincipalKey(executor => executor.Id);
+		        .InverseReference()
+		        .ForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
+		        .PrincipalKey<WorkflowExecutor>(executor => executor.Id);
 		    builder.Entity<WorkflowTreeAction>()
 		        .Reference(action => action.Tree)
 		        .InverseCollection()
 		        .ForeignKey(action => action.IdTree)
 		        .PrincipalKey(tree => tree.Id);
 
-		    builder.Entity<WorkflowActionDependency>(entity =>
+            builder.Entity<WorkflowActionDependency>(entity =>
 		    {
 		        entity.Key(d => new {d.IdParent, d.IdDependent});
 		        entity.Ignore(d => d.Id);

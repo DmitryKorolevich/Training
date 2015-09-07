@@ -208,7 +208,30 @@ namespace VitalChoice.Core.DependencyInjection
             var builder = new ContainerBuilder();
 
             builder.Populate(services);
+            builder.RegisterInstance(configuration).As<IConfiguration>();
+            var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
+            builder.RegisterInstance(
+                LoggerService.Build(applicationEnvironment.ApplicationBasePath,
+                    configuration.GetSection("App:LogPath").Value))
+                .As<ILoggerProviderExtended>().SingleInstance();
+            var container = BuildContainer(projectAssembly, builder);
 
+            LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(),
+                configuration.GetSection("App:DefaultCultureId").Value);
+            if (!String.IsNullOrEmpty(appPath))
+            {
+                FileService.Init(appPath);
+            }
+
+            UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
+
+            return container.Resolve<IServiceProvider>();
+            //}
+            //return null;
+        }
+
+        public static IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
+        {
             builder.Register<IDataContextAsync>(x => x.Resolve<VitalChoiceContext>());
             builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
@@ -222,8 +245,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (LogsRepositoryAsync<>))
                 .As(typeof (ILogsRepositoryAsync<>))
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
-	        builder.RegisterGeneric(typeof (GenericService<>))
-		        .As(typeof (IGenericService<>));
+            builder.RegisterGeneric(typeof (GenericService<>))
+                .As(typeof (IGenericService<>));
             builder.RegisterType<ContentViewService>().As<IContentViewService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<MasterContentService>().As<IMasterContentService>();
@@ -235,7 +258,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ContentPageService>().As<IContentPageService>();
             builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
-            builder.RegisterInstance(configuration).As<IConfiguration>();
             builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
             builder.RegisterType<MemoryCache>().As<IMemoryCache>();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
@@ -271,31 +293,15 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AffiliateService>().As<IAffiliateService>();
             builder.RegisterType<HelpService>().As<IHelpService>();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
-			var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-
-            builder.RegisterInstance(
-                LoggerService.Build(applicationEnvironment.ApplicationBasePath, configuration.GetSection("App:LogPath").Value))
-                .As<ILoggerProviderExtended>().SingleInstance();
 
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))
                 .As(typeof (IEcommerceDynamicObjectService<,,,>));
+            builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
 
             var container = builder.Build();
-
-            LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(),
-                configuration.GetSection("App:DefaultCultureId").Value);
-            if (!String.IsNullOrEmpty(appPath))
-            {
-                FileService.Init(appPath);
-            }
-
-            UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
-
-            return container.Resolve<IServiceProvider>();
-            //}
-            //return null;
+            return container;
         }
     }
 }

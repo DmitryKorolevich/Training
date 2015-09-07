@@ -17,8 +17,8 @@ namespace VitalChoice.Business.Services.Workflow
             Actions = new Dictionary<int, WorkflowActionResolverPathDefinition>();
         }
 
-        public IActionResolverSetup<TContext, TResult> Action<T>(int key, string pathName)
-            where T : IWorkflowAction<TContext, TResult>
+        public IActionResolverSetup<TContext, TResult> ResolvePath<T>(int key, string pathName)
+            where T : IWorkflowExecutor<TContext, TResult>
         {
             Actions.Add(key, new WorkflowActionResolverPathDefinition
             {
