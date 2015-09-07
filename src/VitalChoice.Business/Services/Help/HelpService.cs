@@ -142,6 +142,8 @@ namespace VitalChoice.Business.Services.HelpService
 
             if (item != null)
             {
+                item.Comments = item.Comments.Where(p => p.StatusCode != RecordStatusCode.Deleted).ToList();
+
                 var vCondition = new VHelpTicketQuery().WithId(id);
                 var vItem = (await _vHelpTicketRepository.Query(vCondition).SelectAsync(false)).FirstOrDefault();
                 if(vItem!=null)
@@ -151,7 +153,7 @@ namespace VitalChoice.Business.Services.HelpService
                 }
 
                 var adminProfileCondition = new AdminProfileQuery().IdInRange(item.Comments.Where(x=>x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
-                var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
+                var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).Include(p=>p.User).SelectAsync(false);
                 foreach(var comment in item.Comments)
                 {
                     comment.HelpTicket = item;
@@ -159,7 +161,7 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         if(comment.IdEditedBy==adminProfile.Id)
                         {
-                            comment.EditedBy = adminProfile.AgentId;
+                            comment.EditedBy = adminProfile.User.FirstName+ " "+ adminProfile.User.LastName;
                         }
                     }
                 }
@@ -185,6 +187,7 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         var dbItem = (await _helpTicketRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
                         item.IdOrder = dbItem.IdOrder;
+                        item.DateCreated = dbItem.DateCreated;
                         item.DateEdited = DateTime.Now;
                         await _helpTicketRepository.UpdateAsync(item);
                     }
@@ -264,6 +267,7 @@ namespace VitalChoice.Business.Services.HelpService
                         var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
                         item.Order = dbItem.Order;
                         item.IdHelpTicket = dbItem.IdHelpTicket;
+                        item.DateCreated = dbItem.DateCreated;
                         item.DateEdited = now;
                         await _helpTicketCommentRepository.UpdateAsync(item);
                     }
@@ -272,6 +276,13 @@ namespace VitalChoice.Business.Services.HelpService
                     var helpTicket= (await _helpTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
                     helpTicket.DateEdited = now;
                     await _helpTicketRepository.UpdateAsync(helpTicket);
+
+                    var adminProfileCondition = new AdminProfileQuery().WithId(item.IdEditedBy.Value);
+                    var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
+                    if(adminProfile!=null)
+                    {
+                        item.EditedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
+                    }
 
                     transaction.Commit();
                 }
