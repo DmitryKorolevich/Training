@@ -998,6 +998,7 @@ namespace VitalChoice.Infrastructure.Context
                     .Required();
                 entity.Ignore(p => p.IdCustomer);
                 entity.Ignore(p => p.Customer);
+                entity.Ignore(p => p.CustomerEmail);
             });
 
             builder.Entity<HelpTicketComment>(entity =>

@@ -29,7 +29,7 @@ angular.module('app.core.dataAccess.services.helpService', [])
 	    },
 	    deleteHelpTicket: function (id, tracker)
 	    {
-	        return $http.post(baseUrl + 'DeleteHelpTicket/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteHelpTicket/' + id, null, getConfig(tracker));
 	    },
 
 	    //comments
@@ -43,7 +43,7 @@ angular.module('app.core.dataAccess.services.helpService', [])
 	    },
 	    deleteHelpTicketComment: function (id, tracker)
 	    {
-	        return $http.post(baseUrl + 'DeleteHelpTicketComment/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteHelpTicketComment/' + id, null, getConfig(tracker));
 	    },
 	};
 }]);

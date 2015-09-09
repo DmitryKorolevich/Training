@@ -162,6 +162,7 @@ function ($scope, $rootScope, $state, $stateParams, helpService, toaster, modalU
             helpService.updateHelpTicketComment($scope.newHelpTicketComment, $scope.refreshTracker).success(function (result)
             {
                 successSaveNewCommentHandler(result);
+                $scope.newHelpTicketComment.Comment = '';
             }).error(function (result)
             {
                 errorHandler(result);
@@ -216,7 +217,7 @@ function ($scope, $rootScope, $state, $stateParams, helpService, toaster, modalU
     {
         confirmUtil.confirm(function ()
         {
-            helpService.deleteHelpTicketComment(item.Id, $scope.editTracker).success(function (result)
+            helpService.deleteHelpTicketComment(item.Id, $scope.refreshTracker).success(function (result)
             {
                 var commentIndex = null;
                 $.each($scope.helpTicket.Comments, function (index, commetn)

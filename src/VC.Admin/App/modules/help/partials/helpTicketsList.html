@@ -21,6 +21,14 @@
                         </p>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Priority" data-ng-model="filter.Priority" data-ng-options="item.Key as item.Text for item in priorities"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Status" data-ng-model="filter.StatusCode" data-ng-options="item.Key as item.Text for item in statuses"></select>
+                    </div>
+                </div>
             </fieldset>
         </form>
         <div class="row form-group">
@@ -101,7 +109,9 @@
                             <a ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{::item.IdOrder}}</a>
                         </td>
                         <td>
-                            <span data-ng-class="{'priority-1': item.Priority==1, 'priority-2': item.Priority==2, 'priority-3': item.Priority==3}">{{getReferenceItem(ReferenceData.Priorities, item.Priority).Text}}</span>
+                            <span data-ng-if="item.Priority == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.Priorities, item.Priority).Text}}</span>
+                            <span data-ng-if="item.Priority == 2" class="label label-warning font-default">{{getReferenceItem(ReferenceData.Priorities, item.Priority).Text}}</span>
+                            <span data-ng-if="item.Priority == 3" class="label label-info font-default">{{getReferenceItem(ReferenceData.Priorities, item.Priority).Text}}</span>
                         </td>
                         <td>{{::item.Summary}}</td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>

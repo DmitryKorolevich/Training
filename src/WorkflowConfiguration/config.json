@@ -13,10 +13,10 @@
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
-   "Connection": {
-           "UserName": "dev_vcdb_login",
-            "Password": "1230123",
-            "Server": "multiarc-pc"
+        "Connection": {
+            "UserName": "sa",
+            "Password": "007007",
+            "Server": "localhost"
         },
 		"PublicHost": "http://staging.g2-dg.com/",
 		"AdminHost": "http://admin.staging.g2-dg.com/",

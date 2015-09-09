@@ -36,7 +36,16 @@ namespace VitalChoice.Business.Queries.Help
         {
             if (status.HasValue)
             {
-                Add(x => x.StatusCode <= status.Value);
+                Add(x => x.StatusCode == status.Value);
+            }
+            return this;
+        }
+
+        public VHelpTicketQuery WithPriority(HelpTicketPriority? priority)
+        {
+            if (priority.HasValue)
+            {
+                Add(x => x.Priority == priority.Value);
             }
             return this;
         }
