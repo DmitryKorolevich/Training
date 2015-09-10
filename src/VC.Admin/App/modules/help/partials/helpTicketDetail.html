@@ -80,7 +80,7 @@
                                                 <strong data-ng-if="!comment.EditedBy">{{::comment.Customer}}</strong>
                                             </div>
                                             <div data-ng-if="comment.EditedBy && !comment.IsEdit" class="col-md-2">
-                                                <div class="btn-group pull-right">
+                                                <div class="pull-right">
                                                     <button title="Edit" class="btn btn-xs btn-success" data-ng-click="startUpdateComment(comment);">
                                                         <i class="glyphicon glyphicon-edit"></i>
                                                     </button>
@@ -90,7 +90,7 @@
                                                 </div>
                                             </div>
                                             <div data-ng-if="comment.EditedBy && comment.IsEdit" class="col-md-2">
-                                                <div class="btn-group pull-right">
+                                                <div class="pull-right">
                                                     <button title="Save" class="btn btn-xs btn-success" data-ng-click="updateComment(comment);">
                                                         <i class="glyphicon glyphicon-check"></i>
                                                     </button>
