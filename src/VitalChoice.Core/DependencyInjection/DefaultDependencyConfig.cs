@@ -293,6 +293,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AffiliateService>().As<IAffiliateService>();
             builder.RegisterType<HelpService>().As<IHelpService>();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
+            builder.RegisterType<PromotionService>().As<IPromotionService>();
 
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);

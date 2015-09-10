@@ -3,17 +3,16 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Product
 {
-    public class DiscountListItemModel : BaseModel
+    public class PromotionListItemModel : BaseModel
     {
         public int Id { get; set; }
-
-        public string Code { get; set; }
 
         public string Description { get; set; }
 
@@ -21,9 +20,9 @@ namespace VC.Admin.Models.Product
 
         public CustomerType? Assigned { get; set; }
 
-        public DiscountType DiscountType { get; set; }
+        public PromotionType PromotionType { get; set; }
 
-        public string DiscountTypeName { get; set; }
+        public string PromotionTypeName { get; set; }
 
         public DateTime? StartDate { get; set; }
 
@@ -33,17 +32,16 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
-        public DiscountListItemModel(DiscountDynamic item)
+        public PromotionListItemModel(PromotionDynamic item)
         {
             if(item!=null)
             {
                 Id = item.Id;
-                Code = item.Code;
                 Description = item.Description;
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
-                DiscountType = (DiscountType)(item.IdObjectType ?? 0);
-                DiscountTypeName = LookupHelper.GetDiscountTypeName((DiscountType)(item.IdObjectType ?? 0));
+                PromotionType = (PromotionType)(item.IdObjectType ?? 0);
+                PromotionTypeName = LookupHelper.GetPromotionTypeName((PromotionType)(item.IdObjectType ?? 0));
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;

@@ -15,6 +15,7 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VC.Admin.Models.Product
 {
@@ -36,7 +37,7 @@ namespace VC.Admin.Models.Product
         public DiscountType DiscountType { get; set; }
 
         [Map]
-        public CustomerTypeCode Assigned { get; set; }
+        public CustomerType? Assigned { get; set; }
         
         [Map]
         public DateTime? StartDate { get; set; }

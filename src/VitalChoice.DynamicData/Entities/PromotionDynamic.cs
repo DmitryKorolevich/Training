@@ -6,14 +6,13 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class DiscountDynamic : MappedObject
+    public sealed class PromotionDynamic : MappedObject
     {
         public int? IdAddedBy { get; set; }
-
-        public string Code { get; set; }
 
         public string Description { get; set; }
 
@@ -23,16 +22,8 @@ namespace VitalChoice.DynamicData.Entities
 
         public DateTime? ExpirationDate { get; set; }
 
-        public bool ExcludeSkus { get; set; }
+        public ICollection<PromotionToBuySku> PromotionsToBuySkus { get; set; }
 
-        public bool ExcludeCategories { get; set; }
-
-        public ICollection<int> CategoryIds { get; set; }
-
-        public ICollection<DiscountToSku> DiscountsToSkus { get; set; }
-
-        public ICollection<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
-
-        public ICollection<DiscountTier> DiscountTiers { get; set; }
+        public ICollection<PromotionToGetSku> PromotionsToGetSkus { get; set; }
     }
 }

@@ -1,0 +1,221 @@
+﻿<div class="container-fluid promotion-edit">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div>
+                <button data-ng-click="save()" class="btn btn-success width-160px">Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button cancel-button-default-state="index.oneCol.managePromotions" cancel-button class="btn btn-default width-160px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.managePromotions">Manage All</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <tabset>
+                    <tab heading="Promotion Details" active="detailsTab.active">
+                        <div class="container container-left">
+                            <div class="well row">
+                                <spinner-overlay data-loading="refreshTracker.active()">
+                                    <form class="form-horizontal" name="forms.mainForm" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                        <fieldset>
+                                            <span class="legend">General Information</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Customer Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="Assigned" data-ng-model="promotion.Assigned" ng-options="assignedCustomerType.Key as assignedCustomerType.Text for assignedCustomerType in assignedCustomerTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="url" class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Description" class="form-control" placeholder="Description" data-ng-model="promotion.Description" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Description.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Description.$error.server">{{serverMessages.GetMessage('Description')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Status and Expiration</span>
+                                            <div class="form-group">
+                                                <label for="active" class="col-md-3 control-label">Active</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="StatusCode" data-ng-model="promotion.StatusCode" data-ng-true-value="2" data-ng-false-value="1" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Valid From</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="StartDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="promotion.StartDate" is-open="startDateOpened" required />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); startDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.StartDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid From")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.StartDate.$error.server">{{serverMessages.GetMessage('StartDate')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="date" class="col-md-3 control-label">Valid To</label>
+                                                <div class="col-md-9">
+                                                    <p class="input-group">
+                                                        <input type="text" name="ExpirationDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="promotion.ExpirationDate" is-open="expirationDateOpened" required />
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); expirationDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                        </span>
+                                                    </p>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ExpirationDate.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Valid To")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.ExpirationDate.$error.server">{{serverMessages.GetMessage('ExpirationDate')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <span class="legend">Promotion Type</span>
+                                            <div class="form-group">
+                                                <label for="type" class="col-md-3 control-label">Promotion Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="PromotionType" data-ng-model="promotion.IdObjectType" ng-options="promotionType.Key as promotionType.Text for promotionType in promotionTypes"></select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="active" class="col-md-3 control-label">Allow Healthwise</label>
+                                                <div class="col-md-9">
+                                                    <div class="checkbox">
+                                                        <label><input type="checkbox" name="AllowHealthwise" data-ng-model="promotion.AllowHealthwise" /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+
+                                    <div data-ng-show="promotion.IdObjectType==1">
+                                        <div class="products">
+                                            <span class="legend">Buy X</span>
+                                            <form class="form-horizontal" name="forms.PromotionsToBuySkus" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                <table class="table table-striped table-hover ">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="qty">Quantity</th>
+                                                            <th class="sku">SKU</thclass="sku">
+                                                            <th>Name</th>
+                                                            <th class="actions"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr data-ng-repeat="item in promotion.PromotionsToBuySkus" class="form-horizontal" ng-form="i{{$index}}" novalidate>
+                                                            <td>
+                                                                <input name="Quantity" class="form-control" placeholder="QTY" numbers-only min="1" max="100" data-ng-model="item.Quantity" required>
+                                                                <div class="error-container small-block" ng-show="forms.submitted && forms.PromotionsToBuySkus.i{{$index}}.Quantity.$invalid">
+                                                                    <small class="error" ng-show="forms.PromotionsToBuySkus.i{{$index}}.Quantity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Quantity")}}</small>
+                                                                    <small class="error" ng-show="forms.PromotionsToBuySkus.i{{$index}}.Quantity.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Quantity")}}</small>
+                                                                    <small class="error" ng-show="forms.PromotionsToBuySkus.i{{$index}}.Quantity.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Quantity",100)}}</small>
+                                                                    <small class="error" ng-show="forms.PromotionsToBuySkus.i{{$index}}.Quantity.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","GeneralFieldNames.Quantity", 0)}}</small>
+                                                                    <small class="error" ng-show="forms.PromotionsToBuySkus.i{{$index}}.Quantity.$error.server">{{serverMessages.GetMessage('Quantity','PromotionsToBuySkus',$index)}}</small>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="as-label">
+                                                                    {{item.ShortSkuInfo.Code}}
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="as-label">
+                                                                    {{item.ShortSkuInfo.ProductName}}
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="as-label">
+                                                                    <button class="btn btn-xs btn-default btn-danger" data-ng-click="deletePromotionToBuySku($index);">Delete</button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                            <div ng-controller="skusSearchController" onload="name = 'PromotionsToBuySkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                        </div>
+
+
+                                        <div>
+                                            <div class="products">
+                                                <span class="legend">Get Y</span>
+                                                <form class="form-horizontal" name="forms.PromotionsToGetSkus" data-ng-class="{submitted: forms.submitted}" novalidate>
+                                                    <table class="table table-striped table-hover ">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="qty">Quantity</th>
+                                                                <th class="sku">SKU</thclass="sku">
+                                                                <th>Name</th>
+                                                                <th class="percent">Percent</thclass="percent">
+                                                                <th class="actions"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr data-ng-repeat="item in promotion.PromotionsToGetSkus" class="form-horizontal" ng-form="i{{$index}}" novalidate>
+                                                                <td>
+                                                                    <input name="Quantity" class="form-control" placeholder="QTY" numbers-only min="1" max="100" data-ng-model="item.Quantity" required>
+                                                                    <div class="error-container small-block" ng-show="forms.submitted && forms.PromotionsToGetSkus.i{{$index}}.Quantity.$invalid">
+                                                                        <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Quantity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Quantity")}}</small>
+                                                                        <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Quantity.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Quantity")}}</small>
+                                                                        <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Quantity.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Quantity",100)}}</small>
+                                                                        <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Quantity.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","GeneralFieldNames.Quantity", 0)}}</small>
+                                                                        <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Quantity.$error.server">{{serverMessages.GetMessage('Quantity','PromotionsToBuySkus',$index)}}</small>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="as-label">
+                                                                        {{item.ShortSkuInfo.Code}}
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="as-label">
+                                                                        {{item.ShortSkuInfo.ProductName}}
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">%</span>
+                                                                            <input type="text" name="Percent" class="form-control" placeholder="Percent" money max="100" min="0.01" data-ng-model="item.Percent" required>
+                                                                        </div>
+                                                                        <div class="error-container small-block" ng-show="forms.submitted && forms.PromotionsToGetSkus.i{{$index}}.Percent.$invalid">
+                                                                            <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Percent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Percent")}}</small>
+                                                                            <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Percent.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Percent")}}</small>
+                                                                            <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Percent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Percent",100)}}</small>
+                                                                            <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Percent.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.Percent")}}</small>
+                                                                            <small class="error" ng-show="forms.PromotionsToGetSkus.i{{$index}}.Percent.$error.server">{{serverMessages.GetMessage('Percent','PromotionsToGetSkus',$index)}}</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="as-label">
+                                                                        <button class="btn btn-xs btn-default btn-danger" data-ng-click="deletePromotionToGetSku($index);">Delete</button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                                <div ng-controller="skusSearchController" onload="name = 'PromotionsToGetSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

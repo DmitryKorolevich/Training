@@ -1,6 +1,7 @@
-﻿angular.module('app.modules.product.controllers.discountsController', [])
-.controller('discountsController', ['$scope', '$rootScope', '$state', 'discountService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, discountService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil) {
+﻿angular.module('app.modules.product.controllers.promotionsController', [])
+.controller('promotionsController', ['$scope', '$rootScope', '$state', 'promotionService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, promotionService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+    {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
 
@@ -14,11 +15,11 @@
             toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         };
 
-        function refreshDiscounts() {
-            discountService.getDiscounts($scope.filter, $scope.refreshTracker)
+        function refreshPromotions() {
+            promotionService.getPromotions($scope.filter, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
-                        $scope.discounts = result.Data.Items;
+                        $scope.promotions = result.Data.Items;
                         $scope.totalItems = result.Data.Count;
                     } else {
                         errorHandler(result);
@@ -39,37 +40,37 @@
                 SearchText: '',
                 Status: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
-                Sorting: gridSorterUtil.resolve(refreshDiscounts, "DateCreated", "Desc")
+                Sorting: gridSorterUtil.resolve(refreshPromotions, "DateCreated", "Desc")
             };
 
-            refreshDiscounts();
+            refreshPromotions();
         }
 
-        $scope.filterDiscounts = function () {
+        $scope.filterPromotions = function () {
             $scope.filter.Paging.PageIndex = 1;
-            refreshDiscounts();
+            refreshPromotions();
         };
 
         $scope.pageChanged = function () {
-            refreshDiscounts();
+            refreshPromotions();
         };
 
         $scope.open = function (id) {
             if (id) {
-                $state.go('index.oneCol.discountDetail', { id: id });
+                $state.go('index.oneCol.promotionDetail', { id: id });
             }
             else {
-                $state.go('index.oneCol.addNewDiscount');
+                $state.go('index.oneCol.addNewPromotion');
             }
         };
 
         $scope.delete = function (id) {
             confirmUtil.confirm(function () {
-                discountService.deleteDiscount(id, $scope.deleteTracker)
+                promotionService.deletePromotion(id, $scope.deleteTracker)
                     .success(function (result) {
                         if (result.Success) {
                             toaster.pop('success', "Success!", "Successfully deleted.");
-                            refreshDiscounts();
+                            refreshPromotions();
                         } else {
                             errorHandler(result);
                         }
@@ -77,7 +78,7 @@
                     .error(function (result) {
                         errorHandler(result);
                     });
-            }, 'Are you sure you want to delete this discount?');
+            }, 'Are you sure you want to delete this promotion?');
         };
 
         initialize();

@@ -64,7 +64,7 @@ namespace VC.Admin.Controllers
                 return new DiscountManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Assigned = CustomerTypeCode.All,
+                    Assigned = null,//All
                     DiscountType=DiscountType.PercentDiscount,
                     StartDate = now,
                     ExpirationDate= now.AddDays(30),

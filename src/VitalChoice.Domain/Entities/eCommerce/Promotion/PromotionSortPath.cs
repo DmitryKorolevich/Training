@@ -1,8 +1,7 @@
-﻿namespace VitalChoice.Domain.Entities.eCommerce.Discounts
+﻿namespace VitalChoice.Domain.Entities.eCommerce.Promotions
 {
-    public static class DiscountSortPath
+    public static class PromotionSortPath
     {
-		public const string Code = "Code";
 	    public const string Description = "Description";
         public const string IdObjectType = "IdObjectType";
         public const string Assigned = "Assigned";
