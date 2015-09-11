@@ -97,6 +97,13 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
     {
         if ($scope.loadedId != $scope.order.Id)
         {
+            $.each($scope.forms.form, function (index, element)
+            {
+                if (element && element.$name == index)
+                {
+                    element.$setValidity("server", true);
+                }
+            });
             $scope.order.CurrentIdStatus = null;
             $scope.loadedId = null;
         }

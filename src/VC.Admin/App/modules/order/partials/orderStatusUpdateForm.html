@@ -27,9 +27,9 @@
                                                     <i ng-show="loadingOrders" class="glyphicon glyphicon-refresh"></i>
                                                 </span>
                                             </div>
-                                            <div class="error-container" ng-show="forms.submitted && forms.mainForm.Id.$invalid">
-                                                <small class="error" ng-show="forms.mainForm.Id.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Id")}}</small>
-                                                <small class="error" ng-show="forms.mainForm.Id.$error.server">{{serverMessages.GetMessage('Id')}}</small>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Id.$invalid">
+                                                <small class="error" ng-show="forms.form.Id.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order #")}}</small>
+                                                <small class="error" ng-show="forms.form.Id.$error.server">{{serverMessages.GetMessage('Id')}}</small>
                                             </div>
                                         </div>
                                     </div>
