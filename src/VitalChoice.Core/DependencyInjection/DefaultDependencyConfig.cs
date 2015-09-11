@@ -294,7 +294,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<HelpService>().As<IHelpService>();
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
             builder.RegisterType<PromotionService>().As<IPromotionService>();
-
+            builder.RegisterType<ContentAreaService>().As<IContentAreaService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))

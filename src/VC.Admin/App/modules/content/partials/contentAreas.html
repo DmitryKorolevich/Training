@@ -1,0 +1,27 @@
+﻿<div class="container-fluid">
+	<div class="well">
+		<span class="legend">Manage Content Areas</span>
+		<spinner-overlay data-loading="refreshTracker.active()">
+			<table class="table table-striped table-hover">
+			    <thead>
+                   <tr>
+                    <th>Name</th>
+	                <th>Updated</th>
+				   	<th>Actions</th>
+                 </tr>
+			    </thead>
+				<tbody>
+				<tr data-ng-repeat="contentArea in contentAreas">
+					<td>{{contentArea.Name}}</td>
+					<td>{{contentArea.Updated | date:"MM/dd/yy"}}<br />{{contentArea.Updated | date:"h:mm a"}}<br />{{contentArea.AgentId}}</td>
+					<td>
+						<button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(contentArea.Id)">
+							<i class="glyphicon glyphicon-edit"></i>
+						</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</spinner-overlay>
+	</div>
+</div>

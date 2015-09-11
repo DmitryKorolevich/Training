@@ -33,3 +33,4 @@ Post-Deployment Script Template
 :r .\Scripts\ArticlesToProducts.sql
 
 :r .\Scripts\RecipeUpdate.sql
+:r .\Scripts\ContentAreas.sql

@@ -648,3 +648,9 @@ header .search-area form input[type=image] {
   color: #F34D20;
   font-style: italic;
 }
+.slider-wrapper {
+  margin-top: -14px;
+}
+.home-content {
+  padding-top: 18px;
+}

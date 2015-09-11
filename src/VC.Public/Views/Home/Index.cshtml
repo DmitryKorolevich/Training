@@ -3,3 +3,12 @@
 	@*<meta name="keywords" content="@Html.Raw(Model.MetaKeywords)">
 	<meta name="description" content="@Html.Raw(Model.MetaDescription)">*@
 }
+
+<div class="slider-wrapper theme-default">
+	<div id="slider" class="nivoSlider">
+		@await Component.InvokeAsync("Area", "Home Carousel")
+	</div>
+	<div class="home-content">
+		@await Component.InvokeAsync("Area", "Home Banners")
+	</div>
+</div>

@@ -36,7 +36,7 @@ namespace VC.Public.Components.Menu
 		{
 			var rootCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
 			{
-				Visibility = User.Identity.IsAuthenticated ? (User.IsInRole("Retail") ? CustomerTypeCode.Retail : CustomerTypeCode.Wholesale ) : CustomerTypeCode.All //refactor when authentication mechanism gets ready
+				Visibility = User.Identity.IsAuthenticated ? (new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All}) : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All, CustomerTypeCode.Wholesale } //refactor when authentication mechanism gets ready
 			});
 			
 			return View("MainMenu", new MainMenuIItemModel()
