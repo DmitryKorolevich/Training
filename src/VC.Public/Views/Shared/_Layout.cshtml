@@ -110,51 +110,7 @@
 		<footer>
 			<div class="footer-main">
 				<nav class="footer-nav">
-					<div class="footer-links-column">
-						<span>Need Help?</span>
-						<ul>
-							<li><a href="#">Customer Service</a></li>
-							<li><a href="#">Request a Catalog</a></li>
-							<li><a href="#">Customer Rewards</a></li>
-							<li><a href="#">Returns & Exchanges</a></li>
-							<li><a href="#">Shipping Information</a></li>
-						</ul>
-					</div>
-					<div class="footer-links-column">
-						<span>Our Company</span>
-						<ul>
-							<li><a href="#">About Us</a></li>
-							<li><a href="#">Guarantee</a></li>
-							<li><a href="#">Testimonials</a></li>
-							<li><a href="#">Purity Standards</a></li>
-							<li><a href="#">Sustainability Policy</a></li>
-							<li><a href="#">Vital Green™</a></li>
-							<li><a href="#">News Room</a></li>
-							<li><a href="#">Giving Back</a></li>
-							<li><a href="#">Privacy Policy</a></li>
-							<li><a href="#">Careers</a></li>
-						</ul>
-					</div>
-					<div class="footer-links-column">
-						<span>Programs</span>
-						<ul>
-							<li><a href="#">Affiliate Accounts</a></li>
-							<li><a href="#">Customer Rewards</a></li>
-							<li><a href="#">Wholesale Accounts</a></li>
-						</ul>
-					</div>
-					<div class="footer-links-column">
-						<span>Learn</span>
-						<ul>
-							<li><a href="#">FAQs</a></li>
-							<li><a href="#">Recipes</a></li>
-							<li><a href="#">Seafood Cooking Tips</a></li>
-							<li><a href="#">Newsletter Archive</a></li>
-							<li><a href="#">Healthy Mom & Baby</a></li>
-							<li><a href="#">Seafood Health Benefits</a></li>
-							<li><a href="#">Omega-3 Facts & Sources</a></li>
-						</ul>
-					</div>
+					@await Component.InvokeAsync("Area", "Footer Nav")
 				</nav>
 				<div class="footer-market">
 					<div class="market-left">
