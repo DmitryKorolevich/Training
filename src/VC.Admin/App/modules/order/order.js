@@ -3,6 +3,7 @@
 angular.module('app.modules.order',[
 	'app.modules.order.controllers.ordersController',
 	'app.modules.order.controllers.orderManageController',
+	'app.modules.order.controllers.orderStatusUpdateController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -23,6 +24,11 @@ angular.module('app.modules.order',[
 		            url: '/orders/add?{idcustomer:int}',
 		            templateUrl: 'app/modules/order/partials/orderDetail.html',
 		            controller: 'orderManageController'
-		        }); 
+		        })
+		        .state('index.oneCol.changeOrderStatus', {
+		            url: '/tools/change-order-status',
+		            templateUrl: 'app/modules/order/partials/orderStatusUpdateForm.html',
+		            controller: 'orderStatusUpdateController'
+		        });
 		}
 ]);

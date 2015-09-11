@@ -151,6 +151,13 @@ namespace VitalChoice.Business.Services.Orders
             return base.ValidateDelete(id);
         }
 
+        public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
+        {
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderBy(y => y.Id);
+            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode!=RecordStatusCode.Deleted).OrderBy(sortable);
+            return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+        }
+
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)
         {
             var conditions = new VOrderQuery();
