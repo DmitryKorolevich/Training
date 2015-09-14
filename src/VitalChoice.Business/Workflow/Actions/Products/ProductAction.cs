@@ -1,8 +1,8 @@
-﻿using VitalChoice.Workflow.Base;
-using System.Linq;
+﻿using System.Linq;
+using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
 
-namespace VitalChoice.Business.Workflow.Actions
+namespace VitalChoice.Business.Workflow.Actions.Products
 {
     public class ProductAction: ComputableAction<OrderContext>
     {

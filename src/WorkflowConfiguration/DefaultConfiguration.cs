@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
+using VitalChoice.Business.Workflow.Actions.Products;
 using VitalChoice.Business.Workflow.Trees;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Workflow.Contexts;
@@ -18,23 +19,19 @@ namespace Workflow.Configuration
             treeSetup.Action<TotalAction>("Total", action =>
             {
                 action.Dependency<ProductAction>();
-                action.Dependency<DiscountTypeResolver>();
+                action.Dependency<DiscountTypeActionResolver>();
             });
             treeSetup.Action<ProductAction>("Products");
-            treeSetup.Action<DiscountPercent>("PercentDiscount", action =>
+            treeSetup.Action<DiscountPercentAction>("PercentDiscount");
+            treeSetup.Action<DiscountPriceAction>("PriceDiscount");
+            treeSetup.Action<DiscountableProductsAction>("DiscountableSubtotal");
+            treeSetup.ActionResolver<DiscountTypeActionResolver>("DiscountType", action =>
             {
-                action.Dependency<ProductAction>();
+                action.ResolvePath<DiscountPercentAction>((int) DiscountType.PercentDiscount, "PercentDiscount");
+                action.ResolvePath<DiscountPriceAction>((int) DiscountType.PriceDiscount, "PriceDiscount");
+                action.Dependency<DiscountableProductsAction>();
             });
-            treeSetup.Action<DiscountPrice>("PriceDiscount", action =>
-            {
-                action.Dependency<ProductAction>();
-            });
-            treeSetup.ActionResolver<DiscountTypeResolver>("DiscountType", action =>
-            {
-                action.ResolvePath<DiscountPercent>((int) DiscountType.PercentDiscount, "PercentDiscount");
-                action.ResolvePath<DiscountPrice>((int) DiscountType.PriceDiscount, "PriceDiscount");
-            });
-            treeSetup.Tree<OrdersTree>("Order", tree =>
+            treeSetup.Tree<OrderTree>("Order", tree =>
             {
                 tree.Dependency<TotalAction>();
             });

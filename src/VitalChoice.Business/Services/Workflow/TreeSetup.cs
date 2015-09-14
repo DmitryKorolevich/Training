@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Framework.Logging;
 using Shared.Helpers;
 using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
@@ -15,30 +16,34 @@ using VitalChoice.Domain.Entities.Workflow;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Workflow;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Workflow
 {
     public class TreeSetup<TContext, TResult> : ITreeSetup<TContext, TResult>
-        where TContext: WorkflowContext<TResult>
+        where TContext : WorkflowContext<TResult>
     {
         private readonly IEcommerceRepositoryAsync<WorkflowTree> _treeRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowExecutor> _executorsRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowResolverPath> _resolverPathsRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowActionDependency> _actionDependenciesRepository;
         private readonly EcommerceContext _context;
+        private readonly ILogger _logger;
 
         public TreeSetup(
             IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
             IEcommerceRepositoryAsync<WorkflowExecutor> executorsRepository,
-            IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository, 
-            IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository, EcommerceContext context)
+            IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository,
+            IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository, EcommerceContext context,
+            ILoggerProviderExtended loggerProvider)
         {
             _treeRepository = treeRepository;
             _executorsRepository = executorsRepository;
             _resolverPathsRepository = resolverPathsRepository;
             _actionDependenciesRepository = actionDependenciesRepository;
             _context = context;
+            _logger = loggerProvider.CreateLoggerDefault();
             Trees = new Dictionary<Type, WorkflowTreeDefinition>();
             Actions = new Dictionary<Type, WorkflowActionDefinition>();
             ActionResolvers = new Dictionary<Type, WorkflowActionResolverDefinition>();
@@ -48,7 +53,7 @@ namespace VitalChoice.Business.Services.Workflow
         internal Dictionary<Type, WorkflowActionDefinition> Actions { get; }
         internal Dictionary<Type, WorkflowActionResolverDefinition> ActionResolvers { get; }
 
-        public ITreeSetup<TContext, TResult> Tree<T>(string treeName, Action<IActionSetup<TContext, TResult>> actions) 
+        public ITreeSetup<TContext, TResult> Tree<T>(string treeName, Action<IActionSetup<TContext, TResult>> actions)
             where T : IWorkflowTree<TContext, TResult>
         {
             if (actions == null)
@@ -57,12 +62,13 @@ namespace VitalChoice.Business.Services.Workflow
             var tree = new WorkflowTreeDefinition(typeof (T), treeName);
             var actionSetup = new ActionSetup<TContext, TResult>();
             actions(actionSetup);
-            tree.Actions = actionSetup.Actions;
-            Trees.Add(typeof(T), tree);
+            tree.Actions = actionSetup.Dependencies;
+            Trees.Add(typeof (T), tree);
             return this;
         }
 
-        public ITreeSetup<TContext, TResult> Action<T>(string actionName, Action<IActionSetup<TContext, TResult>> actions = null) 
+        public ITreeSetup<TContext, TResult> Action<T>(string actionName,
+            Action<IActionSetup<TContext, TResult>> actions = null)
             where T : IWorkflowAction<TContext, TResult>
         {
             var action = new WorkflowActionDefinition(typeof (T), actionName);
@@ -70,68 +76,47 @@ namespace VitalChoice.Business.Services.Workflow
             {
                 var actionSetup = new ActionSetup<TContext, TResult>();
                 actions(actionSetup);
-                action.Actions = actionSetup.Actions;
+                action.Dependencies = actionSetup.Dependencies;
             }
             Actions.Add(typeof (T), action);
             return this;
         }
 
-        public ITreeSetup<TContext, TResult> ActionResolver<T>(string actionName, Action<IActionResolverSetup<TContext, TResult>> actions) 
+        public ITreeSetup<TContext, TResult> ActionResolver<T>(string actionName,
+            Action<IActionResolverSetup<TContext, TResult>> actions)
             where T : IWorkflowActionResolver<TContext, TResult>
         {
             if (actions == null)
                 throw new ArgumentNullException(nameof(actions));
 
-            var action = new WorkflowActionResolverDefinition(typeof(T), actionName);
+            var action = new WorkflowActionResolverDefinition(typeof (T), actionName);
             var actionSetup = new ActionResolverSetup<TContext, TResult>();
             actions(actionSetup);
             action.Actions = actionSetup.Actions;
-            ActionResolvers.Add(typeof(T), action);
+            ActionResolvers.Add(typeof (T), action);
             return this;
         }
 
-        public async Task UpdateAsync()
+        public async Task<bool> UpdateAsync()
         {
-            ICollection<string> treeNames = Trees.Select(t => t.Value.Name).ToList();
-            ICollection<string> executorNames =
-                Trees.Select(t => t.Value.Name)
-                    .Union(Actions.Select(a => a.Value.Name))
-                    .Union(ActionResolvers.Select(r => r.Value.Name))
-                    .ToList();
-            List<WorkflowTree> trees = null;
-            List<WorkflowExecutor> executors = null;
-            if (treeNames.Any())
-            {
-                trees = await _treeRepository.Query(t => treeNames.Contains(t.Name)).SelectAsync();
-            }
-            if (executorNames.Any())
-            {
-                executors =
-                    await
-                        _executorsRepository.Query(e => executorNames.Contains(e.Name))
-                            .Include(e => e.ResolverPaths)
-                            .ThenInclude(e => e.Executor)
-                            .Include(e => e.Dependencies)
-                            .ThenInclude(d => d.Dependent).SelectAsync();
-            }
-
+            var trees = await _treeRepository.Query().SelectAsync();
+            var dependencies = await _actionDependenciesRepository.Query().SelectAsync();
+            var resolverPaths = await _resolverPathsRepository.Query().SelectAsync();
+            var executors = await _executorsRepository.Query().SelectAsync();
             using (var transaction = new TransactionAccessor(_context).BeginTransaction())
             {
                 try
                 {
-                    //Wipe out related trees
-                    if (trees != null)
+                    //Wipe out everything
+                    if (trees.Any())
                     {
                         await _treeRepository.DeleteAllAsync(trees);
                     }
-                    if (executors != null)
+                    if (dependencies.Any())
                     {
-                        await _actionDependenciesRepository.DeleteAllAsync(executors.SelectMany(e => e.Dependencies));
-                        await _resolverPathsRepository.DeleteAllAsync(executors.SelectMany(e => e.ResolverPaths));
-                        await
-                            _executorsRepository.DeleteAllAsync(
-                                executors.Union(executors.SelectMany(e => e.Dependencies.Select(d => d.Dependent)))
-                                    .Union(executors.SelectMany(e => e.ResolverPaths.Select(r => r.Executor))));
+                        await _actionDependenciesRepository.DeleteAllAsync(dependencies);
+                        await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
+                        await _executorsRepository.DeleteAllAsync(executors);
                     }
 
                     //Insert executors
@@ -145,11 +130,6 @@ namespace VitalChoice.Business.Services.Workflow
                         Name = a.Value.Name,
                         ImplementationType = a.Key.FullName,
                         ActionType = WorkflowActionType.ActionResolver
-                    })).Union(Trees.Select(a => new WorkflowExecutor
-                    {
-                        Name = a.Value.Name,
-                        ImplementationType = a.Key.FullName,
-                        ActionType = WorkflowActionType.ActionTree
                     })).ToList();
                     await _executorsRepository.InsertRangeAsync(dbExecutors);
 
@@ -159,9 +139,18 @@ namespace VitalChoice.Business.Services.Workflow
                     var dbActions = new List<WorkflowActionDependency>();
                     foreach (var action in Actions)
                     {
-                        dbActions.AddRange(action.Value.Actions.Select(dependency => new WorkflowActionDependency
+                        dbActions.AddRange(action.Value.Dependencies.Select(dependency => new WorkflowActionDependency
                         {
-                            IdParent = actions[action.Key.FullName], IdDependent = actions[dependency.FullName]
+                            IdParent = actions[action.Key.FullName],
+                            IdDependent = actions[dependency.FullName]
+                        }));
+                    }
+                    foreach (var action in ActionResolvers)
+                    {
+                        dbActions.AddRange(action.Value.Dependencies.Select(dependency => new WorkflowActionDependency
+                        {
+                            IdParent = actions[action.Key.FullName],
+                            IdDependent = actions[dependency.FullName]
                         }));
                     }
                     await _actionDependenciesRepository.InsertRangeAsync(dbActions);
@@ -193,11 +182,13 @@ namespace VitalChoice.Business.Services.Workflow
                     await _resolverPathsRepository.InsertRangeAsync(dbActionResolvers);
 
                     transaction.Commit();
+                    return true;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
+                    _logger.LogCritical(0, "Cannot update workflow manager DB", e);
                     transaction.Rollback();
-                    Console.WriteLine(e);
+                    return false;
                 }
             }
         }

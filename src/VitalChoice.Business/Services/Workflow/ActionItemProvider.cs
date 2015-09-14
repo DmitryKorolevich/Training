@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Workflow
             return ReflectionHelper.ResolveType(tree.ImplementationType);
         }
 
-        public async Task<HashSet<ActionItem>> GetDependencyItems(string treeName)
+        public async Task<HashSet<ActionItem>> GetTreeActions(string treeName)
         {
             var result =
                 await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName))
@@ -54,7 +54,7 @@ namespace VitalChoice.Business.Services.Workflow
                     }));
         }
 
-        public async Task<Dictionary<int, ActionItem>> GetActionResolverDependencyItems(string actionName)
+        public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName)
         {
             var actions =
                 await
@@ -71,10 +71,10 @@ namespace VitalChoice.Business.Services.Workflow
             });
         }
 
-        public async Task<HashSet<ActionItem>> GetActionDependencyItems(string actionName)
+        public async Task<HashSet<ActionItem>> GetDependencies(string actionName)
         {
             var result =
-                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName).WithType(WorkflowActionType.Action))
+                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName))
                     .Include(t => t.Dependencies)
                     .ThenInclude(ta => ta.Dependent)
                     .SelectAsync(false);

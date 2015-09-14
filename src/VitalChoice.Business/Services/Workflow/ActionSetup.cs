@@ -9,15 +9,15 @@ namespace VitalChoice.Business.Services.Workflow
     {
         public ActionSetup()
         {
-            Actions = new HashSet<Type>();
+            Dependencies = new HashSet<Type>();
         }
 
-        internal HashSet<Type> Actions { get; }
+        internal HashSet<Type> Dependencies { get; }
 
         public IActionSetup<TContext, TResult> Dependency<T>() 
             where T : IWorkflowExecutor<TContext, TResult>
         {
-            Actions.Add(typeof(T));
+            Dependencies.Add(typeof(T));
             return this;
         }
     }

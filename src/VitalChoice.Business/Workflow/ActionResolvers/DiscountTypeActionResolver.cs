@@ -8,9 +8,9 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.ActionResolvers
 {
-    public class DiscountTypeResolver : ComputableActionResolver<OrderContext>
+    public class DiscountTypeActionResolver : ComputableActionResolver<OrderContext>
     {
-        public DiscountTypeResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
+        public DiscountTypeActionResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
         {
         }
 

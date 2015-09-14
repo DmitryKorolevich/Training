@@ -48,7 +48,7 @@ namespace VitalChoice.Workflow.Core
 
         public async Task InitializeTreeAsync()
         {
-            var actionMapping = await _itemProvider.GetDependencyItems(Name);
+            var actionMapping = await _itemProvider.GetTreeActions(Name);
             foreach (var action in actionMapping)
             {
                 await AddWalkAction(action);
@@ -71,7 +71,7 @@ namespace VitalChoice.Workflow.Core
                     Activator.CreateInstance(action.ActionType, this, action.ActionName);
             _actions.Add(action.ActionName, workflowAction);
             _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetActionDependencyItems(action.ActionName);
+            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName);
             foreach (var dep in dependencyItems)
             {
                 workflowAction.DependendActions.Add(dep.ActionName);
@@ -107,13 +107,22 @@ namespace VitalChoice.Workflow.Core
                     Activator.CreateInstance(action.ActionType, this, action.ActionName);
             _actions.Add(action.ActionName, workflowActionResolver);
             _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetActionResolverDependencyItems(action.ActionName);
+            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName);
             foreach (var dep in dependencyItems)
             {
-                workflowActionResolver.Actions.Add(dep.Key, dep.Value.ActionName);
-                if (!_actions.ContainsKey(dep.Value.ActionName))
+                workflowActionResolver.DependendActions.Add(dep.ActionName);
+                if (!_actions.ContainsKey(dep.ActionName))
                 {
-                    await AddWalkAction(dep.Value);
+                    await AddWalkAction(dep);
+                }
+            }
+            var paths = await _itemProvider.GetActionResolverPaths(action.ActionName);
+            foreach (var path in paths)
+            {
+                workflowActionResolver.Actions.Add(path.Key, path.Value.ActionName);
+                if (!_actions.ContainsKey(path.Value.ActionName))
+                {
+                    await AddWalkAction(path.Value);
                 }
             }
         }

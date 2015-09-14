@@ -7,15 +7,15 @@ using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Workflow.Actions
 {
-    public class DiscountPrice : ComputableAction<OrderContext>
+    public class DiscountPriceAction : ComputableAction<OrderContext>
     {
-        public DiscountPrice(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public DiscountPriceAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            return -Math.Min(Tree.GetActionResult("Products", context), context.Order.Discount.Data.Amount);
+            return -Math.Min(context.Data.DiscountableSubtotal, context.Order.Discount.Data.Amount - context.Data.DiscountableSubtotal);
         }
     }
 }

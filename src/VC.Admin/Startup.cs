@@ -20,6 +20,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Services;
 
+
 namespace VC.Admin
 {
 	public class Startup

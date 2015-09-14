@@ -7,14 +7,14 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Trees
 {
-    public class OrdersTree: ComputableTree<OrderContext>
+    public class OrderTree: ComputableTree<OrderContext>
     {
         public override decimal Execute(OrderContext context)
         {
             return Execute<TotalAction>(context);
         }
 
-        public OrdersTree(IActionItemProvider actionProvider, string treeName) : base(actionProvider, treeName)
+        public OrderTree(IActionItemProvider actionProvider, string treeName) : base(actionProvider, treeName)
         {
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
 using Autofac;
 using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Infrastructure;
@@ -19,6 +21,7 @@ using Autofac.Framework.DependencyInjection;
 using Microsoft.AspNet.Identity.EntityFramework;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
+using VitalChoice.Core.Infrastructure;
 
 namespace Workflow.Configuration
 {
@@ -27,11 +30,42 @@ namespace Workflow.Configuration
 
         public async Task Main(string[] args)
         {
+            Console.WriteLine($"[{DateTime.Now:O}] Configuring IoC");
+
+            var container = BuildContainer();
+            using (var scope = container.BeginLifetimeScope())
+            {
+                Console.WriteLine($"[{DateTime.Now:O}] Configuring DB");
+                var setup = scope.Resolve<ITreeSetup<OrderContext, decimal>>();
+                DefaultConfiguration.Configure(setup);
+                if (await setup.UpdateAsync())
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine($"[{DateTime.Now:O}] Update Success!");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine($"[{DateTime.Now:O}] Update Failed! See logs for details.");
+                    Console.ResetColor();
+                }
+            }
+        }
+
+        private static IContainer BuildContainer()
+        {
             var applicationEnvironment =
                 (IApplicationEnvironment)
                     CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
             var configurationBuilder = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json");
+
+            var path = PathResolver.ResolveAppRelativePath("config.local.json");
+            if (File.Exists(path))
+            {
+                configurationBuilder.AddJsonFile("config.local.json");
+            }
             var configuration = configurationBuilder.Build();
 
             var services = new ServiceCollection();
@@ -39,24 +73,6 @@ namespace Workflow.Configuration
             services.AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<VitalChoiceContext>();
-
-            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
-                .AddEntityFrameworkStores<VitalChoiceContext, int>()
-                .AddUserStore<ExtendedUserStore>()
-                .AddUserValidator<ExtendedUserValidator>()
-                .AddUserManager<ExtendedUserManager>()
-                .AddTokenProvider<UserTokenProvider>();
-
-            services.ConfigureIdentity(x =>
-            {
-                x.User.RequireUniqueEmail = true;
-                x.Lockout.MaxFailedAccessAttempts = 5;
-                x.Lockout.AllowedForNewUsers = true;
-                x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
-                x.Password.RequiredLength = 8;
-                x.Password.RequireDigit = true;
-                x.Password.RequireNonLetterOrDigit = true;
-            });
 
             services.Configure<AppOptions>(options =>
             {
@@ -113,13 +129,7 @@ namespace Workflow.Configuration
                 .As<ILoggerProviderExtended>().SingleInstance();
 
             var container = DefaultDependencyConfig.BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
-            using (var scope = container.BeginLifetimeScope())
-            {
-                var setup = scope.Resolve<ITreeSetup<OrderContext, decimal>>();
-                DefaultConfiguration.Configure(setup);
-                await setup.UpdateAsync();
-                Console.WriteLine("Update Success!");
-            }
+            return container;
         }
     }
 }

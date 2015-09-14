@@ -1,13 +1,13 @@
 {
   "App": {
     "GenerateLowercaseUrls": true,
-    "EnableBundlingAndMinification": false,
+    "EnableBundlingAndMinification": true,
     "Versioning": {
       "EnableStaticContentVersioning": true,
-      "AutoGenerateBuildNumber": false,
-      "BuildNumber": 2
+      "AutoGenerateBuildNumber": true,
+      "BuildNumber": 1
     },
-    "LogPath": "d:\\Work\\VitalChoice\\src",
+    "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
     "FilesRelativePath": "/files",
     "DefaultCacheExpirationTermMinutes": 1440,
@@ -15,8 +15,8 @@
     "DefaultCultureId": "en-US",
    "Connection": {
            "UserName": "dev_vcdb_login",
-            "Password": "1230123",
-            "Server": "multiarc-pc"
+            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+            "Server": "vw4v86cs0h.database.windows.net"
         },
 		"PublicHost": "http://staging.g2-dg.com/",
 		"AdminHost": "http://admin.staging.g2-dg.com/",
