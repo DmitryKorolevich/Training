@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Order;
 using VC.Admin.Models.Product;
+using VitalChoice.Business.Queries.Product;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Transfer.Orders;
@@ -12,6 +13,13 @@ using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.ModelConverters
 {
@@ -19,15 +27,25 @@ namespace VC.Admin.ModelConverters
     {
         private readonly IDynamicToModelMapper<OrderPaymentMethodDynamic> _paymentMethodMapper;
         private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
-        private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
+        private readonly ICustomerService _customerService;
+        private readonly IDiscountService _discountService;
+        private readonly IGcService _gcService;
+        private readonly IProductService _skuService;
+        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> _productService;
 
         public OrderModelConverter(IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
-                                   IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper,
-                                   IDynamicToModelMapper<CustomerDynamic> customerMapper)
+            IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper, ICustomerService customerService,
+            IDiscountService discountService, IGcService gcService,
+            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
+                productService, IProductService skuService)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
-            _customerMapper = customerMapper;
+            _customerService = customerService;
+            _discountService = discountService;
+            _gcService = gcService;
+            _productService = productService;
+            _skuService = skuService;
         }
 
         public void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
@@ -91,37 +109,56 @@ namespace VC.Admin.ModelConverters
         {
             if(model.Customer!=null)
             {
-                dynamic.Customer = _customerMapper.FromModel(model.Customer);
+                dynamic.Customer = _customerService.Select(model.Customer.Id, true);
             }
 
-            if(!String.IsNullOrEmpty(model.DiscountCode))
+            if (!string.IsNullOrEmpty(model.DiscountCode))
             {
-                dynamic.Discount = new DiscountDynamic();
-                dynamic.Discount.Code = model.DiscountCode;
+                dynamic.Discount =
+                    _discountService.Select(new DiscountQuery().WithCode(model.DiscountCode).NotDeleted(), true)
+                        .FirstOrDefault();
             }
 
             if(model.GCs!=null)
             {
-                dynamic.GiftCertificates = new List<GiftCertificateInOrder>();
-                if (!(model.GCs.Count == 1 && String.IsNullOrEmpty(model.GCs[0].Code)))
+                if (model.GCs?.Any() ?? false)
                 {
-                    foreach (var gc in model.GCs)
+                    ICollection<string> codes =
+                        model.GCs.Select(g => g.Code).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
+                    var task = _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
+                    task.Wait();
+                    dynamic.GiftCertificates = task.Result.Select(g => new GiftCertificateInOrder
                     {
-                        GiftCertificateInOrder item = new GiftCertificateInOrder();
-                        item.GiftCertificate = new GiftCertificate();
-                        item.GiftCertificate.Code = gc.Code;
-                        dynamic.GiftCertificates.Add(item);
-                    }
+                        GiftCertificate = g,
+                        Amount = 0
+                    }).ToList();
                 }
             }
 
             if (model.SkuOrdereds != null)
             {
-                dynamic.Skus = new List<SkuOrdered>();
-                foreach (var item in model.SkuOrdereds)
-                {
-                    dynamic.Skus.Add(item.Convert());
-                }
+                var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).ToList();
+                Dictionary<int, SkuOrderedManageModel> keyedCollection =
+                    // ReSharper disable once PossibleInvalidOperationException
+                    validList.ToDictionary(s => s.Id.Value, s => s);
+                dynamic.Skus =
+                    _skuService.GetSkus(validList.Select(s => new SkuInfo
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        Id = s.Id.Value,
+                        // ReSharper disable once PossibleInvalidOperationException
+                        IdProductType = (ProductType) s.IdProductType
+                    }).ToList(), true).Select(s =>
+                    {
+                        var orderedItem = keyedCollection[s.Id];
+                        return new SkuOrdered
+                        {
+                            Sku = s,
+                            Amount = orderedItem.Price,
+                            Quantity = orderedItem.QTY,
+                            ProductWithoutSkus = _productService.Select(s.IdProduct)
+                        };
+                    }).ToList();
             }
 
             if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)

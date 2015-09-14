@@ -98,7 +98,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Autofac.Framework.Dependenc
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Core", "src\ThirdParty\EntityFramework.Core\EntityFramework.Core.xproj", "{CE8F7D9C-FAC7-4BA9-868F-47A8BA3C381B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Workflow.Configuration", "src\WorkflowConfiguration\Workflow.Configuration.xproj", "{7023482F-79DB-4C0D-AD3D-7591C6B16550}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Workflow.Configuration", "src\VitalChoice.Workflow.Configuration\VitalChoice.Workflow.Configuration.xproj", "{7023482F-79DB-4C0D-AD3D-7591C6B16550}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

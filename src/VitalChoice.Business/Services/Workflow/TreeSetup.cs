@@ -93,6 +93,7 @@ namespace VitalChoice.Business.Services.Workflow
             var actionSetup = new ActionResolverSetup<TContext, TResult>();
             actions(actionSetup);
             action.Actions = actionSetup.Actions;
+            action.Dependencies = actionSetup.Dependencies;
             ActionResolvers.Add(typeof (T), action);
             return this;
         }

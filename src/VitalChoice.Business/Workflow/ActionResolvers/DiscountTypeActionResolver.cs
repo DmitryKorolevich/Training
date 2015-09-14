@@ -18,6 +18,12 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (context.Order.Discount == null)
                 return 0;
+            if (context.Order.Discount.Data.RequireMinimumPerishable &&
+                context.Data.PerishableSubtotal < context.Order.Discount.Data.RequireMinimumPerishableAmount)
+            {
+                context.DiscountMessage = "Minimum perishable not reached";
+                return 0;
+            }
             return context.Order.Discount.IdObjectType ?? 0;
         }
     }

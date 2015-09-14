@@ -36,6 +36,7 @@ namespace VitalChoice.Workflow.Core
                 context.ActionSetResult(Name, result);
                 return result;
             }
+            context.ActionSetResult(Name, default(TResult));
             return default(TResult);
         }
 

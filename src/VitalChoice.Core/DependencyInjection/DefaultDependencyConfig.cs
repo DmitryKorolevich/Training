@@ -275,7 +275,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>())
                 .InstancePerLifetimeScope();
             builder.RegisterType<NotificationService>().As<INotificationService>();
-            builder.RegisterType<GCService>().As<IGCService>();
+            builder.RegisterType<GCService>().As<IGcService>();
             builder.RegisterType<ProductService>().As<IProductService>();
             builder.RegisterType<DiscountService>().As<IDiscountService>();
             builder.RegisterType<CountryService>().As<ICountryService>();

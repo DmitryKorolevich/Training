@@ -1,7 +1,7 @@
 ﻿using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
 
-namespace VitalChoice.Business.Workflow.Actions
+namespace VitalChoice.Business.Workflow.Actions.Discounts
 {
     public class DiscountPercentAction: ComputableAction<OrderContext>
     {
@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            return -context.Order.Discount.Data.Percent*context.Data.DiscountableSubtotal;
+            return -context.Order.Discount.Data.Percent / (decimal)100.0*context.Data.DiscountableSubtotal;
         }
     }
 }

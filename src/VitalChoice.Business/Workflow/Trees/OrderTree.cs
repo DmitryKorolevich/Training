@@ -11,7 +11,9 @@ namespace VitalChoice.Business.Workflow.Trees
     {
         public override decimal Execute(OrderContext context)
         {
-            return Execute<TotalAction>(context);
+            var result = Execute<TotalAction>(context);
+            context.Total = result;
+            return result;
         }
 
         public OrderTree(IActionItemProvider actionProvider, string treeName) : base(actionProvider, treeName)

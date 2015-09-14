@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Product;
@@ -20,6 +21,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -36,6 +38,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
+        private readonly SkuMapper _skuMapper;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly OrderSkusRepository _orderSkusRepositoryRepository;
 
@@ -170,7 +173,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            OrderSkusRepository orderSkusRepositoryRepository)
+            OrderSkusRepository orderSkusRepositoryRepository, SkuMapper skuMapper)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
                 bigStringValueRepository)
@@ -184,6 +187,7 @@ namespace VitalChoice.Business.Services.Products
             _productToCategoriesRepository = productToCategoriesRepository;
             _adminProfileRepository = adminProfileRepository;
             _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
+            _skuMapper = skuMapper;
         }
 
         #region ProductOptions
@@ -285,14 +289,31 @@ namespace VitalChoice.Business.Services.Products
             return pagedList.Items;
         }
 
-        public async Task<Sku> GetSku(string code)
+        public List<SkuDynamic> GetSkus(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
+        {
+            var optionTypes = _productOptionTypeRepository.Query().Select(false);
+            var skus =
+                _skuRepository.Query(new SkuQuery().ByIds(skuInfos.Select(i => i.Id).ToList()))
+                    .Include(s => s.OptionValues)
+                    .Select(false);
+            var skusKeyed = skus.ToDictionary(s => s.Id, s => s);
+            foreach (var info in skuInfos)
+            {
+                var sku = skusKeyed[info.Id];
+                sku.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery((int?) info.IdProductType).Query().Compile()).ToList();
+            }
+            return _skuMapper.FromEntityRange(skus, true);
+        }
+
+        public async Task<Sku> GetSkuAsync(string code)
         {
             var query = _skuRepository.Query(p => p.Code == code && p.StatusCode != RecordStatusCode.Deleted);
 
             return (await query.SelectAsync(false)).FirstOrDefault();
         }
 
-        public async Task<Sku> GetSku(int id)
+        public async Task<Sku> GetSkuAsync(int id)
         {
             var query = _skuRepository.Query(p=>p.Id==id && p.StatusCode!=RecordStatusCode.Deleted);
 

@@ -80,7 +80,7 @@ namespace VC.Admin.Controllers
             int skuId = 0;
             if(item.DictionaryData.ContainsKey("ProductSKU") && item.DictionaryData["ProductSKU"] is string && Int32.TryParse((string)item.DictionaryData["ProductSKU"],out skuId))
             {
-                var sku = await _productService.GetSku(skuId);
+                var sku = await _productService.GetSkuAsync(skuId);
                 if(sku!=null)
                 {
                     toReturn.ProductSKU = sku.Code;
@@ -97,7 +97,7 @@ namespace VC.Admin.Controllers
             var item = _mapper.FromModel(model);
             if ((DiscountType)(item.IdObjectType ?? 0) == DiscountType.Threshold)
             {
-                var sku = await _productService.GetSku(model.ProductSKU);
+                var sku = await _productService.GetSkuAsync(model.ProductSKU);
                 if (sku == null)
                 {
                     throw new AppValidationException("ProductSKU", "The give SKU doesn't exist.");

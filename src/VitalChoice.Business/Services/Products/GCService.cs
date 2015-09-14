@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Framework.Logging;
@@ -20,7 +21,7 @@ using Microsoft.Data.Entity;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class GCService : IGCService
+    public class GCService : IGcService
     {
         private const int GC_SYMBOLS_COUNT = 12;
 
@@ -167,6 +168,11 @@ namespace VitalChoice.Business.Services.Products
                 toReturn = true;
             }
             return toReturn;
+        }
+
+        public async Task<List<GiftCertificate>> GetGiftCertificatesAsync(Expression<Func<GiftCertificate, bool>> expression)
+        {
+            return await giftCertificateRepository.Query(expression).SelectAsync(false);
         }
 
         #region Private

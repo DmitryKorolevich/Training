@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
+using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.Products;
 using VitalChoice.Business.Workflow.Trees;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
-namespace Workflow.Configuration
+namespace VitalChoice.Workflow.Configuration
 {
     public static class DefaultConfiguration
     {
@@ -25,11 +26,16 @@ namespace Workflow.Configuration
             treeSetup.Action<DiscountPercentAction>("PercentDiscount");
             treeSetup.Action<DiscountPriceAction>("PriceDiscount");
             treeSetup.Action<DiscountableProductsAction>("DiscountableSubtotal");
-            treeSetup.ActionResolver<DiscountTypeActionResolver>("DiscountType", action =>
+            treeSetup.Action<DiscountTieredAction>("TieredDiscount");
+            treeSetup.Action<PerishableProductsAction>("PerishableSubtotal");
+            treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
             {
+                action.Dependency<DiscountableProductsAction>();
+                action.Dependency<PerishableProductsAction>();
+
                 action.ResolvePath<DiscountPercentAction>((int) DiscountType.PercentDiscount, "PercentDiscount");
                 action.ResolvePath<DiscountPriceAction>((int) DiscountType.PriceDiscount, "PriceDiscount");
-                action.Dependency<DiscountableProductsAction>();
+                action.ResolvePath<DiscountTieredAction>((int)DiscountType.Tiered, "TieredDiscount");
             });
             treeSetup.Tree<OrderTree>("Order", tree =>
             {

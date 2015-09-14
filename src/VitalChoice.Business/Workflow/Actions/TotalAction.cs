@@ -11,6 +11,8 @@ namespace VitalChoice.Business.Workflow.Actions
 
         public override decimal ExecuteAction(OrderContext context)
         {
+            context.DiscountTotal = -context.Data.Discount;
+            context.DiscountedSubtotal = context.Data.Products + context.Data.Discount;
             return 0;
         }
     }

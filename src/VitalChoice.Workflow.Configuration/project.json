@@ -1,6 +1,6 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "WorkflowConfiguration Console Application",
+  "description": "VitalChoice.Workflow.Configuration Console Application",
   "authors": [ "multi_000" ],
   "tags": [ "" ],
   "projectUrl": "",
@@ -18,7 +18,7 @@
   },
 
   "commands": {
-    "WorkflowConfiguration": "WorkflowConfiguration"
+    "VitalChoice.Workflow.Configuration": "VitalChoice.Workflow.Configuration"
   },
 
   "frameworks": {
