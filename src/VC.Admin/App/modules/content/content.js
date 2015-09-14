@@ -19,6 +19,8 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.contentPageManageController',
 	'app.modules.content.controllers.contentPageCategoriesController',
 	'app.modules.content.controllers.contentPageCategoryManageController',
+	'app.modules.content.controllers.contentAreasController',
+	'app.modules.content.controllers.contentAreaDetailController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -168,6 +170,17 @@ angular.module('app.modules.content', [
 		            url: '/content/contentpages/categories/{id:int}',
 		            templateUrl: 'app/modules/content/partials/contentPageCategoryDetail.html',
 		            controller: 'contentPageCategoryManageController'
-		        });
+		        })
+				/*manage areas*/
+				.state('index.oneCol.manageContentAreas', {
+					url: '/content/contentareas',
+					templateUrl: 'app/modules/content/partials/contentAreas.html',
+					controller: 'contentAreasController'
+				})
+				.state('index.oneCol.manageContentAreaDetail', {
+					url: '/content/contentareas/{id:int}',
+					templateUrl: 'app/modules/content/partials/contentAreaDetail.html',
+					controller: 'contentAreaDetailController'
+				});
 		}
 ]);

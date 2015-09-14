@@ -14,6 +14,10 @@ angular.module('app.core.dataAccess.services.orderService', [])
 
 	return {
 	    //orders
+	    getShortOrders: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShortOrders', filter, getConfig(tracker));
+	    },
 	    getOrders: function (filter, tracker)
 	    {
 	        return $http.post(baseUrl + 'GetOrders', filter, getConfig(tracker));
@@ -29,6 +33,10 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    updateOrder: function (model, tracker)
 	    {
 	        return $http.post(baseUrl + 'UpdateOrder', model, getConfig(tracker));
+	    },
+	    updateOrderStatus: function (id, status, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateOrderStatus/' + id + '?status=' + status, {}, getConfig(tracker));
 	    },
 	};
 }]);

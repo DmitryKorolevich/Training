@@ -168,12 +168,16 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ContentPage>().Reference(p => p.MasterContentItem).InverseCollection().ForeignKey(p => p.MasterContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.ContentItem).InverseCollection().ForeignKey(p => p.ContentItemId).PrincipalKey(p => p.Id);
             builder.Entity<ContentPage>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
-            
-            #endregion
 
-            #region Products
+			builder.Entity<ContentArea>().Key(p => p.Id);
+			builder.Entity<ContentArea>().ToTable("ContentAreas");
+			builder.Entity<ContentArea>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id);
 
-            builder.Entity<ProductCategoryContent>().Key(p => p.Id);
+			#endregion
+
+			#region Products
+
+			builder.Entity<ProductCategoryContent>().Key(p => p.Id);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Name);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.Url);
             builder.Entity<ProductCategoryContent>().Ignore(x => x.ParentId);

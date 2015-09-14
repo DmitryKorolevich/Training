@@ -3,7 +3,8 @@
   "private": true,
   "dependencies": {
     "jQuery": "~1.11.3",
-    "normalize.css": "~3.0.3"
+    "normalize.css": "~3.0.3",
+    "nivoslider": "*"
   },
   "exportsOverride": {
     "jQuery": {

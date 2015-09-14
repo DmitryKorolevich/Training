@@ -178,4 +178,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VHelpTickets.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Promotions.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\PromotionData.sql" />
+  </ItemGroup>
 </Project>

@@ -74,6 +74,7 @@ namespace VC.Admin.Controllers
                     AffiliateTiers = referenceData.AffiliateTiers,
                     TicketStatuses = referenceData.TicketStatuses,
                     Priorities = referenceData.Priorities,
+                    PromotionTypes = referenceData.PromotionTypes,
                 };
 	        }
 			else

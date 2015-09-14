@@ -23,6 +23,7 @@ using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -223,6 +224,72 @@ namespace VitalChoice.Infrastructure.Context
                 .PrincipalKey(p => p.Id)
                 .Required();
             builder.Entity<Discount>()
+                .Reference(p => p.EditedBy)
+                .InverseCollection()
+                .ForeignKey(o => o.IdEditedBy)
+                .PrincipalKey(p => p.Id)
+                .Required(false);
+
+            #endregion
+
+
+            #region Promotions
+
+            builder.Entity<PromotionTypeEntity>().Key(p => p.Id);
+            builder.Entity<PromotionTypeEntity>().ToTable("PromotionTypes");
+
+            builder.Entity<PromotionOptionType>().Key(p => p.Id);
+            builder.Entity<PromotionOptionType>().ToTable("PromotionOptionTypes");
+            builder.Entity<PromotionOptionType>()
+                .Reference(p => p.Lookup)
+                .InverseCollection()
+                .ForeignKey(p => p.IdLookup)
+                .PrincipalKey(p => p.Id)
+                .Required(false);
+
+            builder.Entity<PromotionOptionValue>().Key(o => o.Id);
+            builder.Entity<PromotionOptionValue>().ToTable("PromotionOptionValues");
+            builder.Entity<PromotionOptionValue>()
+                .Reference(v => v.OptionType)
+                .InverseCollection()
+                .ForeignKey(t => t.IdOptionType)
+                .PrincipalKey(v => v.Id);
+
+            builder.Entity<PromotionOptionValue>().Ignore(d => d.BigValue);
+            builder.Entity<PromotionOptionValue>().Ignore(d => d.IdBigString);
+
+            builder.Entity<PromotionToBuySku>().Key(p => p.Id);
+            builder.Entity<PromotionToBuySku>().ToTable("PromotionsToBuySkus");
+            builder.Entity<PromotionToBuySku>().Ignore(p => p.ShortSkuInfo);
+
+            builder.Entity<PromotionToGetSku>().Key(p => p.Id);
+            builder.Entity<PromotionToGetSku>().ToTable("PromotionsToGetSkus");
+            builder.Entity<PromotionToGetSku>().Ignore(p => p.ShortSkuInfo);
+
+            builder.Entity<Promotion>().Key(p => p.Id);
+            builder.Entity<Promotion>().ToTable("Promotions");
+            builder.Entity<Promotion>()
+                .Collection(p => p.OptionValues)
+                .InverseReference()
+                .ForeignKey(o => o.IdPromotion)
+                .PrincipalKey(p => p.Id)
+                .Required(false);
+
+            builder.Entity<Promotion>().Ignore(p => p.OptionTypes);
+
+            builder.Entity<Promotion>()
+                .Collection(p => p.PromotionsToBuySkus)
+                .InverseReference()
+                .ForeignKey(t => t.IdPromotion)
+                .PrincipalKey(p => p.Id)
+                .Required();
+            builder.Entity<Promotion>()
+                .Collection(p => p.PromotionsToGetSkus)
+                .InverseReference()
+                .ForeignKey(t => t.IdPromotion)
+                .PrincipalKey(p => p.Id)
+                .Required();
+            builder.Entity<Promotion>()
                 .Reference(p => p.EditedBy)
                 .InverseCollection()
                 .ForeignKey(o => o.IdEditedBy)
@@ -998,6 +1065,7 @@ namespace VitalChoice.Infrastructure.Context
                     .Required();
                 entity.Ignore(p => p.IdCustomer);
                 entity.Ignore(p => p.Customer);
+                entity.Ignore(p => p.CustomerEmail);
             });
 
             builder.Entity<HelpTicketComment>(entity =>

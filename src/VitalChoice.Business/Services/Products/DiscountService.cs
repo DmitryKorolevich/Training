@@ -164,7 +164,7 @@ namespace VitalChoice.Business.Services.Products
                                 ? x.OrderBy(y => y.Description)
                                 : x.OrderByDescending(y => y.Description);
                     break;
-                case DiscountSortPath.IdDiscountType:
+                case DiscountSortPath.IdObjectType:
                     sortable =
                         (x) =>
                             sortOrder == SortOrder.Asc

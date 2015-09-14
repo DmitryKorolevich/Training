@@ -17,6 +17,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Help
 
         public string Customer { get; set; }
 
+        public string CustomerEmail { get; set; }
+
         public DateTime DateCreated { get; set; }
 
         public DateTime DateEdited { get; set; }

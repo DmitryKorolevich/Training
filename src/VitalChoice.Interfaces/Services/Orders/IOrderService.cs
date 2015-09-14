@@ -10,9 +10,9 @@ namespace VitalChoice.Interfaces.Services.Orders
 {
 	public interface IOrderService: IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
 	{
+        Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
 	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
 	    Task<OrderContext> CalculateOrder(OrderDynamic order);
-
 	}
 }

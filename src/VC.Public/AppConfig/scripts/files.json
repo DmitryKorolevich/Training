@@ -3,6 +3,7 @@
 
   "files": [
     "lib/jquery/jquery.js",
+    "lib/nivoslider/jquery.nivo.slider.js",
     "assets/scripts/plugins.js"
   ]
 }

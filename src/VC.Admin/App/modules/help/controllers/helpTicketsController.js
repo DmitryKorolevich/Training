@@ -26,6 +26,16 @@
 
         function initialize()
         {
+            $scope.priorities = angular.copy($rootScope.ReferenceData.Priorities);
+            $scope.priorities.splice(0, 0, { Key: null, Text: 'All' });
+
+            $scope.statuses = angular.copy($rootScope.ReferenceData.TicketStatuses);
+            $.each($scope.statuses, function (index, item)
+            {
+                item.Text="Show " + item.Text;
+            });
+            $scope.statuses.splice(0, 0, { Key: null, Text: 'Show All' });
+
             $scope.forms = {};
 
             var currentDate = new Date();
@@ -33,6 +43,8 @@
             $scope.filter = {
                 To: currentDate.shiftDate('+1d'),
                 From: currentDate.shiftDate('-1m'),
+                Priority: null,
+                StatusCode: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshItems, "DateCreated", "Desc")
             };

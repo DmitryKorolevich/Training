@@ -22,50 +22,54 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using System.Collections.Generic;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
 namespace VitalChoice.Business.Services
 {
     public class AppInfrastructureService : IAppInfrastructureService
     {
-	    private readonly ICacheProvider cache;
-	    private readonly int expirationTerm;
-	    private readonly RoleManager<IdentityRole<int>> roleManager;
+        private readonly ICacheProvider cache;
+        private readonly int expirationTerm;
+        private readonly RoleManager<IdentityRole<int>> roleManager;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
-	    private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
+        private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
         private readonly IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
+        private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository;
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
-	    private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
+        private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly ISettingService settingService;
 
         public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
-            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository, 
+            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
+            IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository,
             IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService)
         {
-		    this.cache = cache;
-		    this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
-		    this.roleManager = roleManager;
+            this.cache = cache;
+            this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
+            this.roleManager = roleManager;
             this.contentProcessorRepository = contentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
             this.appOptionsAccessor = appOptionsAccessor;
-		    this.customerTypeRepository = customerTypeRepository;
+            this.customerTypeRepository = customerTypeRepository;
             this.orderStatusRepository = orderStatusRepository;
             this.paymentMethodRepository = paymentMethodRepository;
+            this.promotionTypeEntityRepository = promotionTypeEntityRepository;
             this.lookupVariantRepository = lookupVariantRepository;
-		    this.lookupRepository = lookupRepository;
+            this.lookupRepository = lookupRepository;
             this.settingService = settingService;
         }
 
-	    private ReferenceData Populate()
-	    {
-		    var tradeLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTradeClass).Select(false).Single().Id;
-		    var taxExemptLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTaxExempt).Select(false).Single().Id;
-		    var priorityLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
-		    var tierLookup = lookupRepository.Query(x=>x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
+        private ReferenceData Populate()
+        {
+            var tradeLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTradeClass).Select(false).Single().Id;
+            var taxExemptLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTaxExempt).Select(false).Single().Id;
+            var priorityLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerNotePriorities).Select(false).Single().Id;
+            var tierLookup = lookupRepository.Query(x => x.Name == LookupNames.CustomerTier).Select(false).Single().Id;
             var termsLookup = lookupRepository.Query(x => x.Name == LookupNames.Terms).Select(false).Single().Id;
             var fobLookup = lookupRepository.Query(x => x.Name == LookupNames.Fob).Select(false).Single().Id;
             var orderSourcesLookup = lookupRepository.Query(x => x.Name == LookupNames.OrderSources).Select(false).Single().Id;
@@ -78,110 +82,110 @@ namespace VitalChoice.Business.Services
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
-	        referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
-	        {
-	            Key = x.Id,
-	            Text = x.Name
-	        }).ToList();
-	        referenceData.UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof (UserStatus)).Select(x => new LookupItem<byte>()
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Id,
-	            Text = x.Name
-	        }).ToList();
-	        referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
-	        referenceData.Labels = LocalizationService.GetStrings();
-	        referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
-	            ? appOptionsAccessor.Options.PublicHost
-	            : "http://notdefined/";
+            referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
+            {
+                Key = x.Id,
+                Text = x.Name
+            }).ToList();
+            referenceData.UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
+            {
+                Key = x.Id,
+                Text = x.Name
+            }).ToList();
+            referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
+            referenceData.Labels = LocalizationService.GetStrings();
+            referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
+                ? appOptionsAccessor.Options.PublicHost
+                : "http://notdefined/";
             referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
             referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.ProductCategoryStatusNames = LookupHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.GCTypes = LookupHelper.GetGCTypeNames().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.RecordStatuses = LookupHelper.GetRecordStatuses().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.ProductTypes = LookupHelper.GetProductTypes().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.DiscountTypes = LookupHelper.GetDiscountTypes().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.AssignedCustomerTypes = LookupHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.ActiveFilterOptions = LookupHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
-	        {
-	            Key = x.Key==-1 ? null : (int?)x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
-	            .Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
-	            .ToList();
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.ProductCategoryStatusNames = LookupHelper.GetProductCategoryStatusNames().Select(x => new LookupItem<string>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.GCTypes = LookupHelper.GetGCTypeNames().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.RecordStatuses = LookupHelper.GetRecordStatuses().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.ProductTypes = LookupHelper.GetProductTypes().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.DiscountTypes = LookupHelper.GetDiscountTypes().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.AssignedCustomerTypes = LookupHelper.GetAssignedCustomerTypes().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.ActiveFilterOptions = LookupHelper.GetActiveFilterOptions().Select(x => new LookupItem<int?>
+            {
+                Key = x.Key == -1 ? null : (int?)x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
+                .Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
+                .ToList();
             referenceData.OrderStatuses = orderStatusRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
                 .ToList();
             referenceData.PaymentMethods = paymentMethodRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
                 .ToList();
             var shortPaymentMethods = (new List<LookupItem<int>>(referenceData.PaymentMethods));
             referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
-            referenceData.TaxExempts = lookupVariantRepository.Query().Where(x=>x.IdLookup == taxExemptLookup).Select(false).Select(x=> new LookupItem<int>()
-	        {
-	            Key = x.Id,
-	            Text = x.ValueVariant
-	        }).ToList();
-	        referenceData.Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
-	        {
-	            Key = x.Id,
-	            Text = x.ValueVariant
-	        }).ToList();
-	        referenceData.TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
-	        {
-	            Key = x.Id,
-	            Text = x.ValueVariant
-	        }).ToList();
-	        referenceData.CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
-	        {
-	            Key = x.Id,
-	            Text = x.ValueVariant
-	        }).ToList();
-	        referenceData.CreditCardTypes = LookupHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
-	        {
-	            Key = x.Key,
-	            Text = x.Value
-	        }).ToList();
-	        referenceData.OacTerms =
-	            lookupVariantRepository.Query()
-	                .Where(x => x.IdLookup == termsLookup)
-	                .Select(false)
-	                .Select(x => new LookupItem<int>()
-	                {
-	                    Key = x.Id,
-	                    Text = x.ValueVariant
-	                }).ToList();
+            referenceData.TaxExempts = lookupVariantRepository.Query().Where(x => x.IdLookup == taxExemptLookup).Select(false).Select(x => new LookupItem<int>()
+            {
+                Key = x.Id,
+                Text = x.ValueVariant
+            }).ToList();
+            referenceData.Tiers = lookupVariantRepository.Query().Where(x => x.IdLookup == tierLookup).Select(false).Select(x => new LookupItem<int>()
+            {
+                Key = x.Id,
+                Text = x.ValueVariant
+            }).ToList();
+            referenceData.TradeClasses = lookupVariantRepository.Query().Where(x => x.IdLookup == tradeLookup).Select(false).Select(x => new LookupItem<int>()
+            {
+                Key = x.Id,
+                Text = x.ValueVariant
+            }).ToList();
+            referenceData.CustomerNotePriorities = lookupVariantRepository.Query().Where(x => x.IdLookup == priorityLookup).Select(false).Select(x => new LookupItem<int>()
+            {
+                Key = x.Id,
+                Text = x.ValueVariant
+            }).ToList();
+            referenceData.CreditCardTypes = LookupHelper.GetCreditCardTypes().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
+            referenceData.OacTerms =
+                lookupVariantRepository.Query()
+                    .Where(x => x.IdLookup == termsLookup)
+                    .Select(false)
+                    .Select(x => new LookupItem<int>()
+                    {
+                        Key = x.Id,
+                        Text = x.ValueVariant
+                    }).ToList();
             referenceData.OacFob = lookupVariantRepository.Query()
                     .Where(x => x.IdLookup == fobLookup)
                     .Select(false)
@@ -264,8 +268,14 @@ namespace VitalChoice.Business.Services
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
+            referenceData.PromotionTypes = promotionTypeEntityRepository.Query()
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.Name
+                }).ToList();
             return referenceData;
-	    }
+        }
 
         private ReferenceData SetAppSettings(ReferenceData referenceData)
         {
@@ -274,17 +284,17 @@ namespace VitalChoice.Business.Services
         }
 
         public ReferenceData Get()
-		{
-			var referenceData = cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
+        {
+            var referenceData = cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 
-			if (referenceData == null)
-			{
-				referenceData = Populate();
-				cache.SetItem(CacheKeys.AppInfrastructure, referenceData, expirationTerm);
-			}
+            if (referenceData == null)
+            {
+                referenceData = Populate();
+                cache.SetItem(CacheKeys.AppInfrastructure, referenceData, expirationTerm);
+            }
             referenceData = SetAppSettings(referenceData);
 
             return referenceData;
-	    }
+        }
     }
 }

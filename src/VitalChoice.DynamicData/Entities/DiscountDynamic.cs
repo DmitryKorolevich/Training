@@ -5,6 +5,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using System;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.DynamicData.Entities
 {
@@ -16,7 +17,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public string Description { get; set; }
 
-        public CustomerTypeCode Assigned { get; set; }
+        public CustomerType? Assigned { get; set; }
 
         public DateTime? StartDate { get; set; }
 

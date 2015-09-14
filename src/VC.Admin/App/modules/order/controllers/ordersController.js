@@ -16,7 +16,7 @@
                         $scope.items = result.Data.Items;
                         $.each($scope.items, function(index, item)
                         {
-                            item.AllowExport = item.OrderStatus == 1 || item.OrderStatus == 2 || item.OrderStatus == 6 || item.OrderStatus == 7;
+                            item.AllowExport = item.OrderStatus == 2;
                             item.IsSelected = item.OrderStatus == 3;//Shipped
                         });
                         $scope.totalItems = result.Data.Count;

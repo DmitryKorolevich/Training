@@ -4,7 +4,7 @@
     {
 		public const string Code = "Code";
 	    public const string Description = "Description";
-        public const string IdDiscountType = "IdDiscountType";
+        public const string IdObjectType = "IdObjectType";
         public const string Assigned = "Assigned";
 	    public const string StartDate = "StartDate";
         public const string ExpirationDate = "ExpirationDate";

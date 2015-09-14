@@ -34,6 +34,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
+using VitalChoice.Domain.Exceptions;
 
 namespace VC.Admin.Controllers
 {
@@ -41,19 +42,49 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
+        private readonly IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> _simpleOrderService;
         private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
         private readonly ICustomerService _customerService;
         private readonly ILogger logger;
 
-        public OrderController(IOrderService orderService,
+        public OrderController(IOrderService orderService, IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> simpleOrderService,
             ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService)
         {
             _orderService = orderService;
+            _simpleOrderService = simpleOrderService;
             _mapper = mapper;
             _customerService = customerService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
-        
+
+        [HttpPost]
+        public async Task<Result<PagedList<ShortOrderListItemModel>>> GetShortOrders([FromBody]ShortOrderFilter filter)
+        {
+            var result = await _orderService.GetShortOrdersAsync(filter);
+
+            var toReturn = new PagedList<ShortOrderListItemModel>
+            {
+                Items = result.Items.Select(p => new ShortOrderListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status)
+        {
+            var order = await _simpleOrderService.SelectAsync(id,false);
+
+            if(order==null)
+            {
+                throw new AppValidationException("Id", "The given order doesn't exist.");
+            }
+            order.OrderStatus = (OrderStatus)status;
+            order = await _simpleOrderService.UpdateAsync(order);
+
+            return order!=null;
+        }
+
         [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {

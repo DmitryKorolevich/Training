@@ -9,6 +9,6 @@ namespace VitalChoice.Domain.Transfer.Products
 {
     public class ProductCategoryLiteFilter:FilterBase
     {
-	    public CustomerTypeCode? Visibility { get; set; }
+	    public IList<CustomerTypeCode> Visibility { get; set; }
     }
 }

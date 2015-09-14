@@ -19,7 +19,7 @@ namespace VitalChoice.Interfaces.Services.Help
 
         Task<HelpTicket> GetHelpTicketAsync(int id);
 
-        Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket model);
+        Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket model, int? adminId);
 
         Task<bool> DeleteHelpTicketAsync(int id);
 
@@ -27,6 +27,6 @@ namespace VitalChoice.Interfaces.Services.Help
 
         Task<HelpTicketComment> UpdateHelpTicketCommentAsync(HelpTicketComment model);
 
-        Task<bool> DeleteHelpTicketCommentAsync(int id);
+        Task<bool> DeleteHelpTicketCommentAsync(int id, int? adminId);
     }
 }

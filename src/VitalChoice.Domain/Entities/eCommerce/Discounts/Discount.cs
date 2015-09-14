@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 {
@@ -12,7 +13,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 
         public string Description { get; set; }
 
-        public CustomerTypeCode Assigned { get; set; }
+        public CustomerType? Assigned { get; set; }
 
         public DateTime? StartDate { get; set; }
 

@@ -2,10 +2,10 @@
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div>
-                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()">Save</button>
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()" unsaved-warning-clear>Save</button>
             </div>
             <div class="margin-top-10px">
-                <button cancel-button-default-state="index.oneCol.manageHelpTickets" cancel-button class="btn btn-default width-160px">Cancel</button>
+                <button cancel-button-default-state="index.oneCol.manageHelpTickets" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
             </div>
             <div class="margin-top-10px">
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageHelpTickets">Manage All</button>
@@ -76,16 +76,28 @@
                                                     <span data-ng-if="comment.DateCreated==comment.DateEdited">Submitted</span><span data-ng-if="comment.DateCreated!=comment.DateEdited">Modified</span> on
                                                     <strong>{{::comment.DateEdited | date:"MM/dd/yy"}} {{::comment.DateEdited | date:"h:mm a"}}</strong> by
                                                 </span>
-                                                <strong data-ng-if="comment.EditedBy">Store Manager({{::comment.EditedBy}})</strong>
+                                                <strong data-ng-if="comment.EditedBy">Vital Choice({{::comment.EditedBy}})</strong>
                                                 <strong data-ng-if="!comment.EditedBy">{{::comment.Customer}}</strong>
                                             </div>
-                                            <div data-ng-if="!comment.IsEdit" class="col-md-2">
-                                                <button class="btn btn-xs btn-default btn-success" data-ng-click="startUpdateComment(comment);">Edit</button>
-                                                <button class="btn btn-xs btn-default btn-danger" data-ng-click="deleteComment(comment);">Delete</button>
+                                            <div data-ng-if="comment.EditedBy && !comment.IsEdit" class="col-md-2">
+                                                <div class="pull-right">
+                                                    <button title="Edit" class="btn btn-xs btn-success" data-ng-click="startUpdateComment(comment);">
+                                                        <i class="glyphicon glyphicon-edit"></i>
+                                                    </button>
+                                                    <button title="Delete" class="btn btn-xs btn-danger" data-ng-click="deleteComment(comment);">
+                                                        <i class="glyphicon glyphicon-remove"></i>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div data-ng-if="comment.IsEdit" class="col-md-2">
-                                                <button class="btn btn-xs btn-default btn-success" data-ng-click="updateComment(comment);">Save</button>
-                                                <button class="btn btn-xs btn-default btn-danger" data-ng-click="cancelUpdateComment(comment);">Cancel</button>
+                                            <div data-ng-if="comment.EditedBy && comment.IsEdit" class="col-md-2">
+                                                <div class="pull-right">
+                                                    <button title="Save" class="btn btn-xs btn-success" data-ng-click="updateComment(comment);">
+                                                        <i class="glyphicon glyphicon-check"></i>
+                                                    </button>
+                                                    <button title="Cancel" class="btn btn-xs btn-danger" data-ng-click="cancelUpdateComment(comment);">
+                                                        <i class="glyphicon glyphicon-remove"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">

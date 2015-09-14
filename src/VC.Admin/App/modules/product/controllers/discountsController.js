@@ -32,6 +32,9 @@
         function initialize() {
             $scope.activeFilterOptions = $rootScope.ReferenceData.ActiveFilterOptions;
 
+            $scope.customerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
+            $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All' });
+
             $scope.filter = {
                 SearchText: '',
                 Status: null,

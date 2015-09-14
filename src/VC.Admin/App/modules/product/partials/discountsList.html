@@ -1,4 +1,4 @@
-﻿<div class="container-fluid">
+﻿<div class="container-fluid discount-list">
     <div class="well">
         <span class="legend">Manage Discounts</span>
         <div class="row form-group">
@@ -80,7 +80,7 @@
                         <td>{{item.Code}}</td>
                         <td>{{item.Description}}</td>
                         <td>{{item.DiscountTypeName}}</td>
-                        <td>{{item.AssignedName}}</td>
+                        <td>{{getReferenceItem(customerTypes, item.Assigned).Text}}</td>
                         <td>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>

@@ -363,7 +363,7 @@
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.RetailPrice",1000000)}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.RetailPrice")}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.server">{{serverMessages.GetMessage('RetailPrice','SKUs',$index)}}</small>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -379,7 +379,7 @@
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.WholesalePrice",1000000)}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.WholesalePrice")}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice')}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.server">{{serverMessages.GetMessage('RetailPrice','SKUs',$index)}}</small>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -391,7 +391,7 @@
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Stock",1)}}</small>
-                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Stock")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","Stock",'SKUs',$index)}}</small>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

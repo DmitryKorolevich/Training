@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -106,7 +107,14 @@ namespace VitalChoice.Data.Services
             return Repository.Query(query).Select();
         }
 
-		public virtual async Task<bool> DeleteAsync(int id)
+	    public async Task<TEntity> Query(int id)
+	    {
+		    var res = await Repository.Query(x=>x.Id == id).SelectAsync();
+
+		    return res.SingleOrDefault();
+	    }
+
+	    public virtual async Task<bool> DeleteAsync(int id)
         {
             return await DeleteAsync(CancellationToken.None, id);
         }

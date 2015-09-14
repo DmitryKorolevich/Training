@@ -34,6 +34,7 @@ using VitalChoice.Domain.Transfer.Help;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Business.Queries.Help;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Business.Mail;
 
 namespace VitalChoice.Business.Services.HelpService
 {
@@ -46,12 +47,13 @@ namespace VitalChoice.Business.Services.HelpService
 		private readonly EcommerceContext _context;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly ICustomerService _customerService;
-		private readonly ILogger _logger;
+        private readonly INotificationService _notificationService;
+        private readonly ILogger _logger;
 
 		public HelpService(IEcommerceRepositoryAsync<HelpTicket> helpTicketRepository, IEcommerceRepositoryAsync<HelpTicketComment> helpTicketCommentRepository,
             IEcommerceRepositoryAsync<VHelpTicket> vHelpTicketRepository,
             IHttpContextAccessor contextAccessor, EcommerceContext context, IRepositoryAsync<AdminProfile> adminProfileRepository,
-             ICustomerService customerService, ILoggerProviderExtended loggerProvider)
+             ICustomerService customerService, INotificationService notificationService, ILoggerProviderExtended loggerProvider)
         {
             _helpTicketRepository = helpTicketRepository;
             _helpTicketCommentRepository = helpTicketCommentRepository;
@@ -60,12 +62,14 @@ namespace VitalChoice.Business.Services.HelpService
 			_context = context;
 			_adminProfileRepository = adminProfileRepository;
             _customerService = customerService;
+            _notificationService = notificationService;
             _logger = loggerProvider.CreateLoggerDefault();
 		}
 
         public async Task<PagedList<VHelpTicket>> GetHelpTicketsAsync(VHelpTicketFilter filter)
         {
-            var conditions = new VHelpTicketQuery().WithDateCreatedFrom(filter.From).WithDateCreatedTo(filter.To).WithStatus(filter.StatusCode);
+            var conditions = new VHelpTicketQuery().WithDateCreatedFrom(filter.From).WithDateCreatedTo(filter.To)
+                .WithStatus(filter.StatusCode).WithPriority(filter.Priority);
 
             var query = _vHelpTicketRepository.Query(conditions);
 
@@ -150,6 +154,7 @@ namespace VitalChoice.Business.Services.HelpService
                 {
                     item.Customer = vItem.Customer;
                     item.IdCustomer = vItem.IdCustomer;
+                    item.CustomerEmail = vItem.CustomerEmail;
                 }
 
                 var adminProfileCondition = new AdminProfileQuery().IdInRange(item.Comments.Where(x=>x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
@@ -161,7 +166,7 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         if(comment.IdEditedBy==adminProfile.Id)
                         {
-                            comment.EditedBy = adminProfile.User.FirstName+ " "+ adminProfile.User.LastName;
+                            comment.EditedBy = adminProfile.AgentId;
                         }
                     }
                 }
@@ -171,7 +176,7 @@ namespace VitalChoice.Business.Services.HelpService
             return item;
         }
 
-        public async Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket item)
+        public async Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket item, int? adminId)
         {
             using (var transaction = new TransactionAccessor(_context).BeginTransaction())
             {
@@ -199,6 +204,11 @@ namespace VitalChoice.Business.Services.HelpService
                     transaction.Rollback();
                     throw;
                 }
+            }
+
+            if(adminId.HasValue)
+            {
+                await NotifyCustomer(item.Id);
             }
             
             return item;
@@ -240,7 +250,6 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<HelpTicketComment> UpdateHelpTicketCommentAsync(HelpTicketComment item)
         {
             item.StatusCode = RecordStatusCode.Active;
-            item.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
 
             using (var transaction = new TransactionAccessor(_context).BeginTransaction())
             {
@@ -277,13 +286,6 @@ namespace VitalChoice.Business.Services.HelpService
                     helpTicket.DateEdited = now;
                     await _helpTicketRepository.UpdateAsync(helpTicket);
 
-                    var adminProfileCondition = new AdminProfileQuery().WithId(item.IdEditedBy.Value);
-                    var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
-                    if(adminProfile!=null)
-                    {
-                        item.EditedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
-                    }
-
                     transaction.Commit();
                 }
                 catch (Exception)
@@ -293,17 +295,29 @@ namespace VitalChoice.Business.Services.HelpService
                 }
             }
 
+            if (item.IdEditedBy.HasValue)
+            {
+                var adminProfileCondition = new AdminProfileQuery().WithId(item.IdEditedBy.Value);
+                var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
+                if (adminProfile != null)
+                {
+                    item.EditedBy = adminProfile.AgentId;
+                }
+
+                await NotifyCustomer(item.IdHelpTicket);
+            }
+
             return item;
         }
 
-        public async Task<bool> DeleteHelpTicketCommentAsync(int id)
+        public async Task<bool> DeleteHelpTicketCommentAsync(int id, int? adminId)
         {
             var item = (await _helpTicketCommentRepository.Query(new HelpTicketCommentQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
 
             if (item != null)
             {
                 item.StatusCode = RecordStatusCode.Deleted;
-                item.IdEditedBy = Convert.ToInt32(_contextAccessor.HttpContext.User.GetUserId());
+                item.IdEditedBy = adminId;
                 item.DateEdited = DateTime.Now;
 
                 await _helpTicketCommentRepository.UpdateAsync(item);
@@ -313,9 +327,26 @@ namespace VitalChoice.Business.Services.HelpService
                 helpTicket.DateEdited = DateTime.Now;
                 await _helpTicketRepository.UpdateAsync(helpTicket);
 
+                if(adminId.HasValue)
+                {
+                    await NotifyCustomer(item.IdHelpTicket);
+                }
+
                 return true;
             }
 
+            return false;
+        }
+
+        private async Task<bool> NotifyCustomer(int idHelpTicket)
+        {
+            var helpTicket = await GetHelpTicketAsync(idHelpTicket);
+            if(helpTicket!=null)
+            {
+                await _notificationService.SendHelpTicketUpdatingEmailForCustomerAsync(helpTicket.CustomerEmail, helpTicket);
+
+                return true;
+            }
             return false;
         }
     }

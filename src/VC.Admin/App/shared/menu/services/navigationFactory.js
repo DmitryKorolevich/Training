@@ -44,6 +44,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
         	stateLabel: 'Marketing',
         	subMenu: [
                 { name: 'manageDCs', stateName: 'index.oneCol.manageDiscounts', stateLabel: 'Manage Discount Codes', access: 14 },
+                { name: 'managePromotions', stateName: 'index.oneCol.managePromotions', stateLabel: 'Manage Promotions', access: 14 },
                 { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
         	]
         },
@@ -75,6 +76,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageRecipes', stateName: 'index.oneCol.manageRecipes', stateLabel: 'Manage Recipes', access: 6 },
 				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs', access: 6 },
                 { name: 'manageMasters', stateName: 'index.oneCol.manageMasters', stateLabel: 'Manage Master Templates', access: 7 },
+                { name: 'manageContentAreas', stateName: 'index.oneCol.manageContentAreas', stateLabel: 'Manage Content Areas', access: 6 },
 				{ name: 'filesManagement', stateName: 'index.oneCol.filesManagement', stateLabel: 'Manage Media', access: 12 },
 			]
 		},

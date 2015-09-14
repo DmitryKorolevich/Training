@@ -18,3 +18,4 @@ Post-Deployment Script Template
 :r .\Scripts\OrdersData.sql
 :r .\Scripts\AffiliatesData.sql
 :r .\Scripts\VHelpTickets.sql
+:r .\Scripts\PromotionData.sql

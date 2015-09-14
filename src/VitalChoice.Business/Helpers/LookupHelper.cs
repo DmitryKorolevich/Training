@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Helpers
@@ -237,6 +238,19 @@ namespace VitalChoice.Business.Helpers
                 {(int) HelpTicketPriority.Medium, "Medium"},
                 {(int) HelpTicketPriority.Low, "Low"},
             };
+            return toReturn;
+        }
+
+
+        public static string GetPromotionTypeName(PromotionType type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case PromotionType.BuyXGetY:
+                    toReturn = "Buy X Get Y";
+                    break;
+            }
             return toReturn;
         }
     }

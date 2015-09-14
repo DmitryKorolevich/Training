@@ -24,7 +24,7 @@ angular.module('app.core.dataAccess.services.discountService', [])
 	        return $http.post(baseUrl + 'UpdateDiscount', model, getConfig(tracker));
 	    },
 	    deleteDiscount: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteDiscount/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteDiscount/' + id, null, getConfig(tracker));
 	    },
 	};
 }]);

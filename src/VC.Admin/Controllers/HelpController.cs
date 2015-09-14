@@ -87,7 +87,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
             
-            item = await _helpService.UpdateHelpTicketAsync(item);
+            item = await _helpService.UpdateHelpTicketAsync(item, Int32.Parse(Request.HttpContext.User.GetUserId()));
 
             return new HelpTicketManageModel(item);
         }        
@@ -121,6 +121,10 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
+            if(item!=null)
+            {
+                item.IdEditedBy= Int32.Parse(Request.HttpContext.User.GetUserId());
+            }
 
             item = await _helpService.UpdateHelpTicketCommentAsync(item);
 
@@ -130,7 +134,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteHelpTicketComment(int id)
         {
-            return await _helpService.DeleteHelpTicketCommentAsync(id);
+            return await _helpService.DeleteHelpTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
     }
 }

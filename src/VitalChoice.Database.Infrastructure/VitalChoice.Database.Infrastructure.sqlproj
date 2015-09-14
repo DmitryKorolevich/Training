@@ -80,6 +80,7 @@
     <None Include="PostDeployment\Scripts\StartInit.sql" />
     <None Include="PostDeployment\Scripts\UpdateIdentity.sql" />
     <None Include="Azure.publish.xml" />
+    <None Include="PostDeployment\Scripts\ContentAreas.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

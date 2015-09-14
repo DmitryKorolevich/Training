@@ -50,7 +50,8 @@ angular.module('app.modules.product.controllers.discountManageController', [])
         function initialize() {
             $scope.id = $stateParams.id ? $stateParams.id : 0;
 
-            $scope.assignedCustomerTypes = $rootScope.ReferenceData.AssignedCustomerTypes;
+            $scope.assignedCustomerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
+            $scope.assignedCustomerTypes.splice(0, 0, { Key: null, Text: 'All' });
             $scope.discountTypes = $rootScope.ReferenceData.DiscountTypes;
             $scope.tierDiscountTypes = [
                 { Key: 1, Text: "$" },

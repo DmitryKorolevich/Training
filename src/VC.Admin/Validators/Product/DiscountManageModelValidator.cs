@@ -122,7 +122,7 @@ namespace VC.Admin.Validators.Product
                     .When(p => p.IdDiscountType == DiscountType.PriceDiscount)
                     .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Amount, 100000);
 
-                RuleFor(model => model.Amount)
+                RuleFor(model => model.Percent)
                     .Cascade(CascadeMode.StopOnFirstFailure)
                     .GreaterThan(0)
                     .When(p => p.IdDiscountType == DiscountType.PercentDiscount)

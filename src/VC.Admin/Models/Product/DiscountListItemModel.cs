@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Validation.Models;
@@ -18,9 +19,7 @@ namespace VC.Admin.Models.Product
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public CustomerTypeCode Assigned { get; set; }
-
-        public string AssignedName { get; set; }
+        public CustomerType? Assigned { get; set; }
 
         public DiscountType DiscountType { get; set; }
 
@@ -43,7 +42,6 @@ namespace VC.Admin.Models.Product
                 Description = item.Description;
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
-                AssignedName = LookupHelper.GetAssignedCustomerTypeName(item.Assigned);
                 DiscountType = (DiscountType)(item.IdObjectType ?? 0);
                 DiscountTypeName = LookupHelper.GetDiscountTypeName((DiscountType)(item.IdObjectType ?? 0));
                 StartDate = item.StartDate;

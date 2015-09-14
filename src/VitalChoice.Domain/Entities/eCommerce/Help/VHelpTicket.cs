@@ -30,5 +30,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Help
         public int IdCustomer { get; set; }
 
         public string Customer { get; set; }
+
+        public string CustomerEmail { get; set; }
     }
 }
