@@ -654,3 +654,8 @@ header .search-area form input[type=image] {
 .home-content {
   padding-top: 18px;
 }
+.theme-default .nivoSlider {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
