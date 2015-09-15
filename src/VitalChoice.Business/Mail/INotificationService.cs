@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.Help;
 using VitalChoice.Domain.Mail;
 
 namespace VitalChoice.Business.Mail
@@ -15,5 +16,9 @@ namespace VitalChoice.Business.Mail
         Task SendBasicEmailAsync(BasicEmail email);
 
         Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicket helpTicket);
+
+        Task SendNewBugTicketAddingForSuperAdminAsync(BugTicket bugTicket);
+
+        Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicket bugTicket);
     }
 }

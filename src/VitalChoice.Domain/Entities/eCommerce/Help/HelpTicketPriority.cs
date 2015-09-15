@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Help
 {
-    public enum HelpTicketPriority
+    public enum TicketPriority
     {
         High=1,
         Medium=2,

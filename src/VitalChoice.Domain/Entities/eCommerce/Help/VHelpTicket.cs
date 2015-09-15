@@ -23,7 +23,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Help
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public HelpTicketPriority Priority { get; set; }
+        public TicketPriority Priority { get; set; }
 
         public string Summary { get; set; }
 

@@ -159,10 +159,6 @@ angular.module('app.modules.demo',
 					template: '<h2>Perishable Cart Threshold</h2>'
 				})
 				/*help*/
-				.state('index.oneCol.submitBug', {
-					url: '/help/submitBug',
-					template: '<h2>Submit Bug</h2>'
-				})
 				.state('index.oneCol.upload', {
 					url: '/help/upload',
 					templateUrl: 'app/modules/demo/partials/upload.html',

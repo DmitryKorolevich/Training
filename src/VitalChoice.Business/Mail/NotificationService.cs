@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Framework.OptionsModel;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.Help;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Mail;
 
 namespace VitalChoice.Business.Mail
@@ -9,11 +12,15 @@ namespace VitalChoice.Business.Mail
     public class NotificationService : INotificationService
     {
 	    private readonly IEmailSender emailSender;
+        private static string _mainSuperAdminEmail;
+        private static string _adminHost;
 
-	    public NotificationService(IEmailSender emailSender)
+        public NotificationService(IEmailSender emailSender, IOptions<AppOptions> appOptions)
 	    {
 		    this.emailSender = emailSender;
-	    }
+            _mainSuperAdminEmail = appOptions.Options.MainSuperAdminEmail;
+            _adminHost = appOptions.Options.AdminHost;
+        }
 
 	    public async Task SendUserActivationAsync(string email, UserActivation activation)
 	    {
@@ -56,6 +63,29 @@ namespace VitalChoice.Business.Mail
                 $"<p>Vital Choice</p>";
 
             var subject = $"Your Vital Choice Help Desk #{helpTicket.Id} Has Been Updated";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicket bugTicket)
+        {
+            var body =
+                $"<p>New bug ticket was added - {_adminHost}help/bugs/{bugTicket.Id}</p>";
+
+            var subject = $"Vital Choice - new bug ticket was added #{bugTicket.Id}";
+
+            await emailSender.SendEmailAsync(_mainSuperAdminEmail, subject, body);
+        }
+
+        public async Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicket bugTicket)
+        {
+            var body =
+                $"<p>Dear {bugTicket.AddedBy},</p><p>Details regarding your help desk ticket that you submitted has been updated. Please click here to review or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
+                $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
+                $"<p>Sincerely,</p>" +
+                $"<p>Vital Choice</p>";
+
+            var subject = $"Your Vital Choice Help Desk #{bugTicket.Id} Has Been Updated";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }

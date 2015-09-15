@@ -20,6 +20,7 @@
         },
 		"PublicHost": "http://staging.g2-dg.com/",
 		"AdminHost": "http://admin.staging.g2-dg.com/",
+		"MainSuperAdminEmail": "gary@g2designgroup.com",
     "Email": {
       "From": "admin.staging@g2designgroup.com",
       "Host": "smtp.1and1.com",
@@ -30,7 +31,9 @@
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=vcdatabases;AccountKey=ERNr+5Hrxekm8nRWhgs8zXhPNyzBoU8KAJ1JyUe6nX4zSvUoSVFLhYa/Fk1jVxkUCXvG8riZdMVGbGutVugdrg==",
-      "CustomerContainerName": "customer-files"
+      "CustomerContainerName": "customer-files",
+      "BugTicketFilesContainerName": "bug-ticket-files",
+      "BugTicketCommentFilesContainerName": "bug-ticket-comment-files"
     }
   }
 }

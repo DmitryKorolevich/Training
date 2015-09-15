@@ -187,6 +187,8 @@
     "app/modules/customer/customer.js",
     "app/modules/help/controllers/helpTicketsController.js",
     "app/modules/help/controllers/helpTicketDetailController.js",
+    "app/modules/help/controllers/bugTicketsController.js",
+    "app/modules/help/controllers/bugTicketDetailController.js",
 		"app/modules/help/help.js"
 	]
 }

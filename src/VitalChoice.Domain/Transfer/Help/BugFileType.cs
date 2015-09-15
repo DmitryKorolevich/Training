@@ -6,14 +6,9 @@ using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Domain.Transfer.Help
 {
-    public class VHelpTicketFilter : FilterBase
+    public enum BugFileType
     {
-        public DateTime? From { get; set; }
-
-        public DateTime? To { get; set; }
-
-        public RecordStatusCode? StatusCode { get; set; }
-
-        public TicketPriority? Priority { get; set; }
+        Ticket=1,
+        Comment=2,
     }
 }

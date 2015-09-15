@@ -139,4 +139,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\RecipeUpdate.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\BugTickets.sql" />
+  </ItemGroup>
 </Project>

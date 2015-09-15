@@ -12,10 +12,11 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.Help;
 
 namespace VC.Admin.Models.Help
 {
-    public class HelpTicketListItemModel : BaseModel
+    public class BugTicketListItemModel : BaseModel
     {
         public int Id { get; set; }
 
@@ -31,23 +32,25 @@ namespace VC.Admin.Models.Help
 
         public string Summary { get; set; }
 
-        public int IdCustomer { get; set; }
+        public int IdAddedBy { get; set; }
 
-        public string Customer { get; set; }
+        public string AddedBy { get; set; }
 
-        public HelpTicketListItemModel(VHelpTicket item)
+        public string AddedByAgent { get; set; }
+
+        public BugTicketListItemModel(BugTicket item)
         {
             if(item!=null)
             {
                 Id = item.Id;
-                IdOrder = item.IdOrder;
                 DateCreated = item.DateCreated;
                 DateEdited = item.DateEdited;
                 StatusCode = item.StatusCode;
                 Priority = item.Priority;
                 Summary = item.Summary;
-                IdCustomer = item.IdCustomer;
-                Customer = item.Customer;
+                IdAddedBy = item.IdAddedBy;
+                AddedBy = item.AddedBy;
+                AddedByAgent = item.AddedByAgent;
             }
         }
     }
