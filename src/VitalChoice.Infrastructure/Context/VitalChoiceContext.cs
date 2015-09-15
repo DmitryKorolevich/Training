@@ -13,6 +13,7 @@ using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Domain.Entities.Help;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -216,6 +217,48 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<AppSettingItem>().Key(p => p.Id);
             builder.Entity<AppSettingItem>().ToTable("AppSettings");
+
+            #endregion
+
+            #region Help
+
+            builder.Entity<BugTicket>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("BugTickets");
+                entity.Collection(p => p.Comments)
+                    .InverseReference(p => p.BugTicket)
+                    .ForeignKey(p => p.IdBugTicket)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
+                entity.Collection(p => p.Files)
+                    .InverseReference()
+                    .ForeignKey(p => p.IdBugTicket)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
+                entity.Ignore(p => p.AddedBy);
+                entity.Ignore(p => p.AddedByEmail);
+                entity.Ignore(p => p.AddedByAgent);
+            });
+
+            builder.Entity<BugTicketComment>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("BugTicketComments");
+                entity.Collection(p => p.Files)
+                    .InverseReference()
+                    .ForeignKey(p => p.IdBugTicketComment)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
+                entity.Ignore(p => p.EditedBy);
+                entity.Ignore(p => p.EditedByAgent);
+            });
+
+            builder.Entity<BugFile>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("BugFiles");
+            });
 
             #endregion
 

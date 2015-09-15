@@ -105,7 +105,7 @@
                                             <div data-ng-if="!comment.IsEdit" class="col-md-9 form-control-static">
                                                 <span>{{comment.Comment}}</span>
                                             </div>
-                                            <div data-ng-if="comment.IsEdit" class="col-md-9 form-control-static">
+                                            <div data-ng-if="comment.IsEdit" class="col-md-9">
                                                 <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="comment.EditComment" required></textarea>
                                                 <div class="error-container" ng-show="forms.existComment.submitted && forms.existComment.Comment.$invalid">
                                                     <small class="error" ng-show="forms.existComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>
@@ -122,7 +122,7 @@
                                     <span class="legend">Add New Comment</span>
                                     <div class="form-group">
                                         <label for="" class="col-md-3 control-label">Comment</label>
-                                        <div class="col-md-9 form-control-static">
+                                        <div class="col-md-9">
                                             <textarea type="text" name="Comment" class="form-control" placeholder="Comment" rows="10" data-ng-model="newHelpTicketComment.Comment" required></textarea>
                                             <div class="error-container" ng-show="forms.newComment.submitted && forms.newComment.Comment.$invalid">
                                                 <small class="error" ng-show="forms.newComment.Comment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Comment")}}</small>

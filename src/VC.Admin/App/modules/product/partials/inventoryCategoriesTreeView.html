@@ -16,8 +16,8 @@
                             <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="add(null)">
                                 <i class="glyphicon glyphicon-plus"></i>
                             </a>
-                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary expand-button">Expand All</button>
-                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary expand-button">Collapse All</button>
+                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
                             <div ui-tree="treeOptions" class="ya-treeview">
                                 <ol ui-tree-nodes data-ng-model="rootCategories" data-type="0">
                                     <li ng-repeat="item in rootCategories" ui-tree-node data-ng-include="'app/modules/product/partials/inventoryCategories.html'">

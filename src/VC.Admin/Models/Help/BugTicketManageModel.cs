@@ -17,19 +17,20 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Interfaces;
 using VC.Admin.Validators.Affiliate;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.Help;
 
 namespace VC.Admin.Models.Help
 {
-    [ApiValidator(typeof(HelpTicketManageModelValidator))]
-    public class HelpTicketManageModel : BaseModel
+    [ApiValidator(typeof(BugTicketManageModelValidator))]
+    public class BugTicketManageModel : BaseModel
     {
         public int Id { get; set; }
 
-        public int IdOrder { get; set; }
+        public int IdAddedBy { get; set; }
 
-        public int IdCustomer { get; set; }
+        public string AddedBy { get; set; }
 
-        public string Customer { get; set; }
+        public string AddedByAgent { get; set; }
 
         public DateTime DateCreated { get; set; }
 
@@ -43,42 +44,70 @@ namespace VC.Admin.Models.Help
 
         public string Description { get; set; }
 
-        public ICollection<HelpTicketCommentManageModel> Comments { get; set; }
+        public Guid PublicId { get; set; }
 
-        public HelpTicketManageModel(HelpTicket item)
+        public bool IsAllowEdit { get; set; }
+
+        public ICollection<BugTicketCommentManageModel> Comments { get; set; }
+
+        public ICollection<FileModel> Files { get; set; }
+
+        public BugTicketManageModel(BugTicket item)
         {
             if (item != null)
             {
                 Id = item.Id;
-                IdOrder = item.IdOrder;
                 DateCreated = item.DateCreated;
                 DateEdited = item.DateEdited;
                 StatusCode = item.StatusCode;
                 Priority = item.Priority;
                 Summary = item.Summary;
                 Description = item.Description;
-                IdCustomer = item.IdCustomer;
-                Customer = item.Customer;
-                if(item.Comments!=null)
+                IdAddedBy = item.IdAddedBy;
+                AddedBy = item.AddedBy;
+                AddedByAgent = item.AddedByAgent;
+                PublicId = item.PublicId;
+                if (item.Comments!=null)
                 {
-                    Comments = new List<HelpTicketCommentManageModel>();
+                    Comments = new List<BugTicketCommentManageModel>();
                     foreach(var comment in item.Comments)
                     {
-                        Comments.Add(new HelpTicketCommentManageModel(comment));
+                        Comments.Add(new BugTicketCommentManageModel(comment));
                     }
+                }
+                if (item.Files != null)
+                {
+                    Files = item.Files.Select(p => new FileModel()
+                    {
+                        Id = p.Id,
+                        FileName = p.FileName,
+                        Description = p.Description,
+                        UploadDate = p.UploadDate,
+                    }).ToList();
                 }
             }
         }
 
-        public HelpTicket Convert()
+        public BugTicket Convert()
         {
-            HelpTicket toReturn = new HelpTicket();
+            BugTicket toReturn = new BugTicket();
             toReturn.Id = Id;
-            toReturn.IdOrder = IdOrder;
             toReturn.StatusCode = StatusCode;
             toReturn.Priority = Priority;
             toReturn.Summary = Summary;
             toReturn.Description = Description;
+            toReturn.PublicId = PublicId;
+            if (Files != null)
+            {
+                toReturn.Files = Files.Select(p => new BugFile()
+                {
+                    Id = p.Id,
+                    FileName = p.FileName,
+                    Description = p.Description ?? String.Empty,
+                    UploadDate = DateTime.Now,
+                    IdBugTicket = toReturn.Id,
+                }).ToList();
+            }
 
             return toReturn;
         }

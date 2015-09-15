@@ -83,10 +83,11 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.tabs = tabs;
 
             $scope.forms = {};
-            $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
-            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
-            $scope.previewUrl = null;
+            //Not used data
+            //$scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
+            //$scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
+            //$scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+            //$scope.previewUrl = null;
 
             var clearServerValidation = function () {
             	$.each($scope.forms, function (index, form) {

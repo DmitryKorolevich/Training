@@ -8,13 +8,14 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.Help;
 using VitalChoice.Domain.Entities.Logs;
 
 namespace VitalChoice.Business.Queries.Help
 {
-    public class VHelpTicketQuery : QueryObject<VHelpTicket>
+    public class BugTicketQuery : QueryObject<BugTicket>
     {
-        public VHelpTicketQuery WithDateCreatedFrom(DateTime? from)
+        public BugTicketQuery WithDateCreatedFrom(DateTime? from)
         {
             if (from.HasValue)
             {
@@ -23,7 +24,7 @@ namespace VitalChoice.Business.Queries.Help
             return this;
         }
 
-        public VHelpTicketQuery WithDateCreatedTo(DateTime? to)
+        public BugTicketQuery WithDateCreatedTo(DateTime? to)
         {
             if (to.HasValue)
             {
@@ -32,7 +33,7 @@ namespace VitalChoice.Business.Queries.Help
             return this;
         }
 
-        public VHelpTicketQuery WithStatus(RecordStatusCode? status)
+        public BugTicketQuery WithStatus(RecordStatusCode? status)
         {
             if (status.HasValue)
             {
@@ -41,7 +42,7 @@ namespace VitalChoice.Business.Queries.Help
             return this;
         }
 
-        public VHelpTicketQuery WithPriority(TicketPriority? priority)
+        public BugTicketQuery WithPriority(TicketPriority? priority)
         {
             if (priority.HasValue)
             {
@@ -50,9 +51,15 @@ namespace VitalChoice.Business.Queries.Help
             return this;
         }
 
-        public VHelpTicketQuery WithId(int id)
+        public BugTicketQuery WithId(int id)
         {
             Add(x => x.Id == id);
+            return this;
+        }
+
+        public BugTicketQuery NotDeleted()
+        {
+            Add(x => x.StatusCode != RecordStatusCode.Deleted);
             return this;
         }
     }

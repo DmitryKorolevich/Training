@@ -234,9 +234,9 @@ namespace VitalChoice.Business.Helpers
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>
             {
-                {(int) HelpTicketPriority.High, "High"},
-                {(int) HelpTicketPriority.Medium, "Medium"},
-                {(int) HelpTicketPriority.Low, "Low"},
+                {(int) TicketPriority.High, "High"},
+                {(int) TicketPriority.Medium, "Medium"},
+                {(int) TicketPriority.Low, "Low"},
             };
             return toReturn;
         }

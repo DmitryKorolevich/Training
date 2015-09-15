@@ -134,6 +134,7 @@ namespace VitalChoice.Core.DependencyInjection
                 };
                 options.PublicHost = configuration.GetSection("App:PublicHost").Value;
                 options.AdminHost = configuration.GetSection("App:AdminHost").Value;
+                options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
                 options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
 	            options.EmailConfiguration = new Email
 	            {
@@ -147,8 +148,10 @@ namespace VitalChoice.Core.DependencyInjection
 				options.AzureStorage = new AzureStorage()
 				{
 					StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
-					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value
-				};
+					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
+                    BugTicketFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
+                    BugTicketCommentFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+                };
             });
 
             services.Configure<MvcOptions>(o =>

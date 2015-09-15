@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Users;
 
-namespace VitalChoice.Domain.Entities.eCommerce.Help
+namespace VitalChoice.Domain.Entities.Help
 {
-    public class HelpTicket : Entity
+    public class BugTicket : Entity
     {
-        public int IdOrder { get; set; }
+        public int IdAddedBy { get; set; }
 
-        public Order Order { get; set; }
+        public string AddedBy { get; set; }
 
-        public int IdCustomer { get; set; }
+        public string AddedByAgent { get; set; }
 
-        public string Customer { get; set; }
+        public string AddedByEmail { get; set; }
 
-        public string CustomerEmail { get; set; }
+        public int IdEditedBy { get; set; }
 
         public DateTime DateCreated { get; set; }
 
@@ -31,6 +32,10 @@ namespace VitalChoice.Domain.Entities.eCommerce.Help
 
         public string Description { get; set; }
 
-        public ICollection<HelpTicketComment> Comments { get; set; }
+        public Guid PublicId { get; set; }
+
+        public ICollection<BugTicketComment> Comments { get; set; }
+
+        public ICollection<BugFile> Files { get; set; }
     }
 }
