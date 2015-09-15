@@ -25,10 +25,10 @@ namespace VC.Admin.Controllers
     [AdminAuthorize(PermissionType.Marketing)]
     public class GCController : BaseApiController
     {
-        private readonly IGCService GCService;
+        private readonly IGcService GCService;
         private readonly ILogger logger;
 
-        public GCController(IGCService GCService, ILoggerProviderExtended loggerProvider)
+        public GCController(IGcService GCService, ILoggerProviderExtended loggerProvider)
         {
             this.GCService = GCService;
             this.logger = loggerProvider.CreateLoggerDefault();

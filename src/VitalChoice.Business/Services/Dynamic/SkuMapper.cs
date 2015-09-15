@@ -48,6 +48,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.Price = entity.Price;
                 dynamic.WholesalePrice = entity.WholesalePrice;
                 dynamic.Order = entity.Order;
+                dynamic.IdProduct = entity.IdProduct;
             });
             return Task.Delay(0);
         }
@@ -64,6 +65,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
+                entity.IdProduct = dynamic.IdProduct;
             });
             return Task.Delay(0);
         }
@@ -80,12 +82,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
-
-                //Set key on options
-                foreach (var value in entity.OptionValues)
-                {
-                    value.IdSku = dynamic.Id;
-                }
+                entity.IdProduct = dynamic.IdProduct;
             });
             return Task.Delay(0);
         }

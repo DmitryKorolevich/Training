@@ -9,12 +9,12 @@ namespace VitalChoice.Domain.Workflow
         {
             Type = type;
             Name = name;
-            Actions = new HashSet<Type>();
+            Dependencies = new HashSet<Type>();
         }
 
         public Type Type { get; }
         public string Name { get; set; }
-        public HashSet<Type> Actions { get; set; }
+        public HashSet<Type> Dependencies { get; set; }
         public bool Equals(WorkflowActionDefinition other) => other?.Type == Type;
 
         public override int GetHashCode()

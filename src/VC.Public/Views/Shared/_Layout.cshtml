@@ -92,7 +92,14 @@
 			</div>
 			<nav class="top-nav secondary-nav">
 				<ul>
-					@await Component.InvokeAsync("Area","Secondary Menu")
+					@if (User.Identity.IsAuthenticated && User.IsInRole("Wholesale"))//todo: refactor when authentication mechanism gets ready
+					{
+						<text>@await Component.InvokeAsync("Area", "Secondary Menu for Wholesale")</text>
+					}
+					else
+					{
+						<text>@await Component.InvokeAsync("Area", "Secondary Menu")</text>
+					}
 				</ul>
 			</nav>
 			<div class="search-area">

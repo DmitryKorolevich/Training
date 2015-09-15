@@ -235,3 +235,128 @@ BEGIN
 	ALTER TABLE [dbo].[ContentAreas]
 	ADD CONSTRAINT UQ_ContentArea UNIQUE(Name)
 END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Menu for Wholesale')
+BEGIN
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Secondary Menu for Wholesale', N'
+					<li>
+						<a href="#">New</a>
+					</li>
+					<li>
+						<a href="#">Special Offers</a>
+					</li>
+					<li>
+						<a href="#">Recipes</a>
+						<div class="dropdown_1column">
+							<div class="col_1">
+								<ul>
+									<li>
+										<a href="#">All Recipes</a>
+									</li>
+									<li>
+										<a href="#">Recipe Videos</a>
+									</li>
+									<li>
+										<a href="#">Seafood Cooking Tips</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li>
+						<a href="#">Why Vital Choice?</a>
+						<div class="dropdown_1column">
+							<div class="col_1">
+								<ul>
+									<li>
+										<a href="#">About Us</a>
+									</li>
+									<li>
+										<a href="#">Our Mission</a>
+									</li>
+									<li>
+										<a href="#">Testimonials</a>
+									</li>
+									<li>
+										<a href="#">Giving Back</a>
+									</li>
+									<li>
+										<a href="#">News Room</a>
+									</li>
+									<li>
+										<a href="#">Vital Green™</a>
+									</li>
+									<li>
+										<a href="#">Sustainability</a>
+									</li>
+									<li>
+										<a href="#">Product Purity</a>
+									</li>
+									<li>
+										<a href="#">Randy''s Podcasts</a>
+									</li>
+									<li>
+										<a href="#">Customer Rewards</a>
+									</li>
+									<li>
+										<a href="#">Frequent Questions (FAQs)</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li>
+						<a href="#">Health & Nutrition</a>
+						<div class="dropdown_1column">
+							<div class="col_1">
+								<ul>
+									<li>
+										<a href="#">Omega-3 Basics</a>
+									</li>
+									<li>
+										<a href="#">Seafood Benefits</a>
+									</li>
+									<li>
+										<a href="#">Omega-3/6 Balance</a>
+									</li>
+									<li>
+										<a href="#">Healthy Mom & Baby</a>
+									</li>
+									<li>
+										<a href="#">Seafood Purity & Safety</a>
+									</li>
+									<li>
+										<a href="#">Recommended Reading</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li>
+						<a href="#">Wholesale</a>
+					</li>
+					<li>
+						<a href="#">Catalog</a>
+					</li>
+					<li class="last-child">
+						<a href="#">Newsletter</a>
+						<div class="dropdown_1column">
+							<div class="col_1">
+								<ul>
+									<li>
+										<a href="#">Sign Up</a>
+									</li>
+									<li>
+										<a href="#">Archives</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+				', 2, GETDATE(), GETDATE())
+END

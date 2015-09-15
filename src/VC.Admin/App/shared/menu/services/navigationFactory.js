@@ -76,7 +76,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageRecipes', stateName: 'index.oneCol.manageRecipes', stateLabel: 'Manage Recipes', access: 6 },
 				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs', access: 6 },
                 { name: 'manageMasters', stateName: 'index.oneCol.manageMasters', stateLabel: 'Manage Master Templates', access: 7 },
-                { name: 'manageContentAreas', stateName: 'index.oneCol.manageContentAreas', stateLabel: 'Manage Content Areas', access: 6 },
+                { name: 'manageContentAreas', stateName: 'index.oneCol.manageContentAreas', stateLabel: 'Manage Design Elements', access: 6 },
 				{ name: 'filesManagement', stateName: 'index.oneCol.filesManagement', stateLabel: 'Manage Media', access: 12 },
 			]
 		},
