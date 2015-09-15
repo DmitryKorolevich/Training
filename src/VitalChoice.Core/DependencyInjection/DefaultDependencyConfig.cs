@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
@@ -42,6 +43,8 @@ using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Products;
 using Autofac;
+using Autofac.Core;
+using Autofac.Core.Lifetime;
 using VitalChoice.Data.Repositories.Specifics;
 using Autofac.Framework.DependencyInjection;
 using Microsoft.Dnx.Runtime;
@@ -214,11 +217,21 @@ namespace VitalChoice.Core.DependencyInjection
                 LoggerService.Build(applicationEnvironment.ApplicationBasePath,
                     configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
+
+            builder.RegisterType<LocalizationService>()
+                .As<ILocalizationService>()
+                .WithParameters(new List<Parameter>
+                {
+                    new ResolvedParameter((p, c) => p.Name == "repository",
+                        (p, c) =>
+                            c.Resolve<IRepositoryAsync<LocalizationItemData>>()),
+                    new NamedParameter("defaultCultureId", configuration.GetSection("App:DefaultCultureId").Value)
+                })
+                .SingleInstance();
+
             var container = BuildContainer(projectAssembly, builder);
 
-            LocalizationService.Init(container.Resolve<IRepositoryAsync<LocalizationItemData>>(),
-                configuration.GetSection("App:DefaultCultureId").Value);
-            if (!String.IsNullOrEmpty(appPath))
+            if (!string.IsNullOrEmpty(appPath))
             {
                 FileService.Init(appPath);
             }
@@ -280,8 +293,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<DiscountService>().As<IDiscountService>();
             builder.RegisterType<CountryService>().As<ICountryService>();
             builder.RegisterType(typeof (ExtendedUserValidator)).As(typeof (IUserValidator<ApplicationUser>));
-            builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().SingleInstance();
-            builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
+            builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>();
+            builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>();
             builder.RegisterType<VProductSkuRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<OrderSkusRepository>()
@@ -300,7 +313,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))
                 .As(typeof (IEcommerceDynamicObjectService<,,,>));
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
-
             var container = builder.Build();
             return container;
         }

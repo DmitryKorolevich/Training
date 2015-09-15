@@ -56,7 +56,7 @@ namespace VC.Admin
             {
                 app.UseErrorPage(new ErrorPageOptions
                 {
-                    SourceCodeLineCount = 25
+                    SourceCodeLineCount = 150
                 });
 				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
 			}

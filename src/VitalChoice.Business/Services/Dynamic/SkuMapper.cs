@@ -65,7 +65,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
-                entity.IdProduct = dynamic.IdProduct;
             });
             return Task.Delay(0);
         }
@@ -82,7 +81,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Price = dynamic.Price;
                 entity.WholesalePrice = dynamic.WholesalePrice;
                 entity.Order = dynamic.Order;
-                entity.IdProduct = dynamic.IdProduct;
             });
             return Task.Delay(0);
         }

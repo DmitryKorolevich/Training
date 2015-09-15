@@ -6,7 +6,6 @@ namespace VC.Admin.Controllers
     {
 	    public HomeController()
 	    {
-
 	    }
 
 	    public IActionResult Index()

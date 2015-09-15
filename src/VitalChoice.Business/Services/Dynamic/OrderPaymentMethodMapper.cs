@@ -43,7 +43,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = item.Dynamic;
 
                 dynamic.Address = await _orderAddressMapper.FromEntityAsync(entity.BillingAddress);
-                dynamic.IdOrder = entity.IdOrder;
             });
         }
 
@@ -58,9 +57,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (dynamic.Address != null)
                 {
                     entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
-                    entity.BillingAddress.IdOrder = dynamic.IdOrder;
                 }
-                entity.IdOrder = dynamic.IdOrder;
             });
         }
 
@@ -81,9 +78,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (dynamic.Address != null)
                 {
                     entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
-                    entity.BillingAddress.IdOrder = dynamic.IdOrder;
                 }
-                entity.IdOrder = dynamic.IdOrder;
                 foreach (var value in entity.OptionValues)
                 {
                     value.IdOrderPaymentMethod = dynamic.Id;

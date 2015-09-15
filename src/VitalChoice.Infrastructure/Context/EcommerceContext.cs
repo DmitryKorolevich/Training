@@ -786,12 +786,12 @@ namespace VitalChoice.Infrastructure.Context
                     .PrincipalKey(c => c.Id)
                     .Required();
                 entity.Collection(o => o.Skus)
-                    .InverseReference()
+                    .InverseReference(a => a.Order)
                     .ForeignKey(s => s.IdOrder)
                     .PrincipalKey(o => o.Id)
                     .Required();
                 entity.Collection(o => o.GiftCertificates)
-                    .InverseReference()
+                    .InverseReference(a => a.Order)
                     .ForeignKey(g => g.IdOrder)
                     .PrincipalKey(o => o.Id)
                     .Required();

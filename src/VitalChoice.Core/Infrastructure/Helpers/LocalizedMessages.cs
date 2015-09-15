@@ -8,6 +8,7 @@ using VitalChoice.Business.Services;
 using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Core.Infrastructure.Helpers
 {
@@ -15,18 +16,23 @@ namespace VitalChoice.Core.Infrastructure.Helpers
     {
         public static string GetMessage<TEnum>(TEnum key, IEnumerable<object> args) where TEnum : IComparable
         {
-            return LocalizationService.GetString(key, args.ToArray());
+            if (LocalizationService.Current == null)
+                throw new ApiException("Initialize or instantiate ILocalizationService once.");
+            return LocalizationService.Current.GetString(key, args.ToArray());
         }
 
         private static string GetFieldName<TEnum>(TEnum key) where TEnum : IComparable
         {
-            return LocalizationService.GetString(key);
+            if (LocalizationService.Current == null)
+                throw new ApiException("Initialize or instantiate ILocalizationService once.");
+            return LocalizationService.Current.GetString(key);
         }
 
         public static string Do()
         {
-            var data = LocalizationService.GetString(ValidationMessages.FieldLength);
-            return data;
+            if (LocalizationService.Current == null)
+                throw new ApiException("Initialize or instantiate ILocalizationService once.");
+            return LocalizationService.Current.GetString(ValidationMessages.FieldLength);
         }
 
         /// <summary>

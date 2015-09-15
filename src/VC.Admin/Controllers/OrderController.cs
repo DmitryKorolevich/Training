@@ -310,6 +310,8 @@ namespace VC.Admin.Controllers
             else
             {
                 item.Data.OrderType = (int)SourceOrderType.Phone;
+                item.ShippingAddress.Id = 0;
+                item.PaymentMethod.Address.Id = 0;
                 item = (await _orderService.InsertAsync(item));
             }
 

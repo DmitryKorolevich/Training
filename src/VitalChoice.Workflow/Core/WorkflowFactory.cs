@@ -9,11 +9,10 @@ namespace VitalChoice.Workflow.Core
     public class WorkflowFactory : IWorkflowFactory
     {
         private readonly IActionItemProvider _actionItemProvider;
-        private readonly Dictionary<string, object> _cache;
+        private static readonly Dictionary<string, object> Cache = new Dictionary<string, object>();
 
         public WorkflowFactory(IActionItemProvider actionItemProvider)
         {
-            _cache = new Dictionary<string, object>();
             _actionItemProvider = actionItemProvider;
         }
 
@@ -21,14 +20,14 @@ namespace VitalChoice.Workflow.Core
             where TContext : WorkflowContext<TResult>
         {
             object cachedResult;
-            if (_cache.TryGetValue(name, out cachedResult))
+            if (Cache.TryGetValue(name, out cachedResult))
             {
                 return (IWorkflowTree<TContext, TResult>) cachedResult;
             }
             var treeType = await _actionItemProvider.GetTreeType(name);
             var result = (IWorkflowTree<TContext, TResult>)Activator.CreateInstance(treeType, _actionItemProvider, name);
             await result.InitializeTreeAsync();
-            _cache.Add(name, result);
+            Cache.Add(name, result);
             return result;
         }
     }

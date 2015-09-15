@@ -41,13 +41,14 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly ISettingService settingService;
+        private readonly ILocalizationService _localizationService;
 
         public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
             IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository,
-            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService)
+            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService, ILocalizationService localizationService)
         {
             this.cache = cache;
             this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
@@ -62,6 +63,7 @@ namespace VitalChoice.Business.Services
             this.lookupVariantRepository = lookupVariantRepository;
             this.lookupRepository = lookupRepository;
             this.settingService = settingService;
+            _localizationService = localizationService;
         }
 
         private ReferenceData Populate()
@@ -98,7 +100,7 @@ namespace VitalChoice.Business.Services
                 Text = x.Name
             }).ToList();
             referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
-            referenceData.Labels = LocalizationService.GetStrings();
+            referenceData.Labels = _localizationService.GetStrings();
             referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
                 ? appOptionsAccessor.Options.PublicHost
                 : "http://notdefined/";

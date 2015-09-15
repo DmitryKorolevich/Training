@@ -219,3 +219,13 @@ BEGIN
 	ALTER TABLE OrderToSkus
 	ALTER COLUMN Quantity INT NOT NULL
 END
+
+IF EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'OrderAddresses') AND Name = N'County' AND is_nullable = 0)
+BEGIN
+	ALTER TABLE OrderAddresses
+	ALTER COLUMN County NVARCHAR(250) NULL
+
+	ALTER TABLE OrderAddresses
+	DROP CONSTRAINT FK_OrderAddressToOrder,
+		COLUMN IdOrder
+END
