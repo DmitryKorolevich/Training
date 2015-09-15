@@ -13,6 +13,6 @@ namespace VitalChoice.Workflow.Core
             where T : IWorkflowAction<TContext, TResult>;
         ITreeSetup<TContext, TResult> ActionResolver<T>(string actionName, Action<IActionResolverSetup<TContext, TResult>> actions)
             where T : IWorkflowActionResolver<TContext, TResult>;
-        Task UpdateAsync();
+        Task<bool> UpdateAsync();
     }
 }

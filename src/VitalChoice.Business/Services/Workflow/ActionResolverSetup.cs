@@ -11,10 +11,12 @@ namespace VitalChoice.Business.Services.Workflow
         where TContext : WorkflowContext<TResult>
     {
         internal Dictionary<int, WorkflowActionResolverPathDefinition> Actions { get; }
+        internal HashSet<Type> Dependencies { get; }
 
         public ActionResolverSetup()
         {
             Actions = new Dictionary<int, WorkflowActionResolverPathDefinition>();
+            Dependencies = new HashSet<Type>();
         }
 
         public IActionResolverSetup<TContext, TResult> ResolvePath<T>(int key, string pathName)
@@ -26,6 +28,13 @@ namespace VitalChoice.Business.Services.Workflow
                 Name = pathName,
                 Path = key
             });
+            return this;
+        }
+
+        public IActionResolverSetup<TContext, TResult> Dependency<T>() 
+            where T : IWorkflowExecutor<TContext, TResult>
+        {
+            Dependencies.Add(typeof(T));
             return this;
         }
     }

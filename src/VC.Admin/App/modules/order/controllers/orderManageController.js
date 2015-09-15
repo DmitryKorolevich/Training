@@ -925,6 +925,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         product.QTY = 1;
                         product.Code = newProduct.Code;
                         product.IdProductType = newProduct.ProductType;
+                        product.Id = newProduct.Id;
                         product.ProductName = newProduct.DescriptionName;
                         if ($scope.currentCustomer.CustomerType == 1)
                         {
@@ -1003,6 +1004,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 product.QTY = 1;
                                 product.IdProductType = result.Data.ProductType;
                                 product.ProductName = result.Data.DescriptionName;
+                                product.Id = result.Data.Id;
                                 if ($scope.currentCustomer.CustomerType == 1)
                                 {
                                     product.Price = result.Data.Price;
@@ -1064,6 +1066,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             product.IdProductType = result.Data.ProductType;
                             product.Code = result.Data.Code;
                             product.RequestedCode = product.Code;
+                            product.Id = result.Data.Id;
                             if ($scope.currentCustomer.CustomerType == 1)
                             {
                                 product.Price = result.Data.Price;

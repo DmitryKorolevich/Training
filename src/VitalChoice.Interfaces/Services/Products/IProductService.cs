@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
@@ -26,12 +29,14 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter);
 
-        Task<Sku> GetSku(string code);
+        Task<Sku> GetSkuAsync(string code);
 
-        Task<Sku> GetSku(int id);
+        Task<Sku> GetSkuAsync(int id);
 
         Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter);
 
-        #endregion
-    }
+	    List<SkuDynamic> GetSkus(ICollection<SkuInfo> skuInfos, bool withDefaults = false);
+
+	    #endregion
+	}
 }

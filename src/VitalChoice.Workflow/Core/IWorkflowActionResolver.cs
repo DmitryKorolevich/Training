@@ -6,6 +6,8 @@ namespace VitalChoice.Workflow.Core
         IWorkflowExecutor<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
+        List<string> DependendActions { get; }
+
         Dictionary<int, string> Actions { get; }
 
         int GetActionKey(TContext context);

@@ -10,11 +10,13 @@ namespace VitalChoice.Domain.Workflow
             Type = type;
             Name = name;
             Actions = new Dictionary<int, WorkflowActionResolverPathDefinition>();
+            Dependencies = new HashSet<Type>();
         }
 
         public Type Type { get; }
         public string Name { get; set; }
         public Dictionary<int, WorkflowActionResolverPathDefinition> Actions { get; set; }
+        public HashSet<Type> Dependencies { get; set; }
 
         public bool Equals(WorkflowActionResolverDefinition other) => other?.Type == Type;
 

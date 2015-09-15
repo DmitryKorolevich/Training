@@ -23,6 +23,8 @@ namespace VC.Admin.Models.Order
 {
     public class SkuOrderedManageModel : BaseModel
     {
+        public int? Id { get; set; }
+
         public string Code { get; set; }
 
         public int? IdProductType { get; set; }
@@ -46,21 +48,8 @@ namespace VC.Admin.Models.Order
                 IdProductType = dynamic.ProductWithoutSkus.IdObjectType;
                 QTY = dynamic.Quantity;
                 Price = dynamic.Amount;
-                Amount = Price* QTY;
+                Amount = Price * QTY;
             }
-        }
-
-        public SkuOrdered Convert()
-        {
-            SkuOrdered dynamic = new SkuOrdered();
-            dynamic.Sku = new SkuDynamic();
-            dynamic.Sku.Code = Code;
-            dynamic.ProductWithoutSkus = new ProductDynamic();
-            dynamic.ProductWithoutSkus.Name = ProductName;
-            dynamic.ProductWithoutSkus.IdObjectType = IdProductType;
-            dynamic.Quantity = QTY;
-            dynamic.Amount = Price;
-            return dynamic;
         }
     }
 

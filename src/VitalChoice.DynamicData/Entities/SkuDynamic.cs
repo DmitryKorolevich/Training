@@ -15,5 +15,7 @@ namespace VitalChoice.DynamicData.Entities
         public decimal WholesalePrice { get; set; }
 
         public int Order { get; set; }
+
+        public int IdProduct { get; set; }
     }
 }
