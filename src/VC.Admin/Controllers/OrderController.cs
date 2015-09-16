@@ -96,121 +96,121 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
-            toReturn.Items = new List<OrderListItemModel>() {
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name",
-                    StateCode="WA",
-                    Customer="Test, Customer",
-                    IdCustomer=7888921,
-                    Id=12345,
-                    Total= (decimal)55.12,
-                    EditedByAgentId="KK",
-                    DateEdited=DateTime.Now,
-                    OrderNotes="Some notes",
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Incomplete,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=1,
-                    IdPaymentMethod=1,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name2",
-                    StateCode="WA",
-                    Customer="Test2, Customer2",
-                    IdCustomer=7888921,
-                    Id=34567,
-                    Total= (decimal)55.12,
-                    EditedByAgentId="KA",
-                    DateEdited=DateTime.Now,
-                    OrderNotes=null,
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Processed,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=2,
-                    IdPaymentMethod=2,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name4",
-                    StateCode="WA",
-                    Customer="Test4, Customer4",
-                    IdCustomer=7888921,
-                    Id=12345,
-                    Total= (decimal)155.12,
-                    EditedByAgentId="KK",
-                    DateEdited=DateTime.Now,
-                    OrderNotes="Some notes",
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Shipped,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=3,
-                    IdPaymentMethod=3,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name5",
-                    StateCode="WA",
-                    Customer="Test5, Customer5",
-                    IdCustomer=7888921,
-                    Id=34567,
-                    Total= (decimal)155.12,
-                    EditedByAgentId="KA",
-                    DateEdited=DateTime.Now,
-                    OrderNotes=null,
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Cancelled,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=3,
-                    IdPaymentMethod=4,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name5",
-                    StateCode="WA",
-                    Customer="Test5, Customer5",
-                    IdCustomer=7888921,
-                    Id=34567,
-                    Total= (decimal)155.12,
-                    EditedByAgentId="KA",
-                    DateEdited=DateTime.Now,
-                    OrderNotes=null,
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Exported,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=3,
-                    IdPaymentMethod=5,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name5",
-                    StateCode="WA",
-                    Customer="Test5, Customer5",
-                    IdCustomer=7888921,
-                    Id=34567,
-                    Total= (decimal)155.12,
-                    EditedByAgentId="KA",
-                    DateEdited=DateTime.Now,
-                    OrderNotes=null,
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.ShipDelayed,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=3,
-                    IdPaymentMethod=6,
-                },
-                new OrderListItemModel(null)
-                {
-                    Company="Test company name5",
-                    StateCode="WA",
-                    Customer="Test5, Customer5",
-                    IdCustomer=7888921,
-                    Id=34567,
-                    Total= (decimal)155.12,
-                    EditedByAgentId="KA",
-                    DateEdited=DateTime.Now,
-                    OrderNotes=null,
-                    OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.OnHold,
-                    DateCreated=DateTime.Now,
-                    IdOrderSource=3,
-                    IdPaymentMethod=5,
-                },
-            };
-            toReturn.Count = 4;
+            //toReturn.Items = new List<OrderListItemModel>() {
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name",
+            //        StateCode="WA",
+            //        Customer="Test, Customer",
+            //        IdCustomer=7888921,
+            //        Id=12345,
+            //        Total= (decimal)55.12,
+            //        EditedByAgentId="KK",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes="Some notes",
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Incomplete,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=1,
+            //        IdPaymentMethod=1,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name2",
+            //        StateCode="WA",
+            //        Customer="Test2, Customer2",
+            //        IdCustomer=7888921,
+            //        Id=34567,
+            //        Total= (decimal)55.12,
+            //        EditedByAgentId="KA",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes=null,
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Processed,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=2,
+            //        IdPaymentMethod=2,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name4",
+            //        StateCode="WA",
+            //        Customer="Test4, Customer4",
+            //        IdCustomer=7888921,
+            //        Id=12345,
+            //        Total= (decimal)155.12,
+            //        EditedByAgentId="KK",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes="Some notes",
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Shipped,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=3,
+            //        IdPaymentMethod=3,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name5",
+            //        StateCode="WA",
+            //        Customer="Test5, Customer5",
+            //        IdCustomer=7888921,
+            //        Id=34567,
+            //        Total= (decimal)155.12,
+            //        EditedByAgentId="KA",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes=null,
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Cancelled,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=3,
+            //        IdPaymentMethod=4,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name5",
+            //        StateCode="WA",
+            //        Customer="Test5, Customer5",
+            //        IdCustomer=7888921,
+            //        Id=34567,
+            //        Total= (decimal)155.12,
+            //        EditedByAgentId="KA",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes=null,
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.Exported,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=3,
+            //        IdPaymentMethod=5,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name5",
+            //        StateCode="WA",
+            //        Customer="Test5, Customer5",
+            //        IdCustomer=7888921,
+            //        Id=34567,
+            //        Total= (decimal)155.12,
+            //        EditedByAgentId="KA",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes=null,
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.ShipDelayed,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=3,
+            //        IdPaymentMethod=6,
+            //    },
+            //    new OrderListItemModel(null)
+            //    {
+            //        Company="Test company name5",
+            //        StateCode="WA",
+            //        Customer="Test5, Customer5",
+            //        IdCustomer=7888921,
+            //        Id=34567,
+            //        Total= (decimal)155.12,
+            //        EditedByAgentId="KA",
+            //        DateEdited=DateTime.Now,
+            //        OrderNotes=null,
+            //        OrderStatus=VitalChoice.Domain.Entities.eCommerce.Orders.OrderStatus.OnHold,
+            //        DateCreated=DateTime.Now,
+            //        IdOrderSource=3,
+            //        IdPaymentMethod=5,
+            //    },
+            //};
+            //toReturn.Count = 4;
 
             return toReturn;
         }
@@ -292,7 +292,7 @@ namespace VC.Admin.Controllers
             }
             else
             {
-                item.Data.OrderType = (int)SourceOrderType.Phone;
+                item.Data.OrderType = (int)SourceOrderType.Web;
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
                 item.PaymentMethod.Id = 0;

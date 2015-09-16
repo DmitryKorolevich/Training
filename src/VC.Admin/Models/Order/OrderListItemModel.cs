@@ -57,7 +57,7 @@ namespace VC.Admin.Models.Order
             {
                 Id = item.Id;
                 OrderStatus = item.OrderStatus;
-                IdOrderSource = item.IdOrderSource;
+                IdOrderSource = item.IdOrderSource ?? 1;
                 OrderNotes = item.OrderNotes;
                 IdPaymentMethod = item.IdPaymentMethod;
                 DateCreated = item.DateCreated;

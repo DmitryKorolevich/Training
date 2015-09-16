@@ -16,7 +16,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
     {
         public OrderStatus OrderStatus { get; set; }
 
-        public int IdOrderSource { get; set; }
+        public int? IdOrderSource { get; set; }
 
         public string OrderNotes { get; set; }
 
