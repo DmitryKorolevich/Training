@@ -557,12 +557,17 @@ namespace VitalChoice.Business.Services.HelpService
             return item;
         }
 
-        public async Task<bool> DeleteBugTicketAsync(int id)
+        public async Task<bool> DeleteBugTicketAsync(int id, int? userId = null)
         {
             var item = (await _bugTicketRepository.Query(new BugTicketQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
 
             if (item != null)
             {
+                if(userId.HasValue && userId.Value!=item.IdAddedBy)
+                {
+                    return false;
+                }
+
                 item.StatusCode = RecordStatusCode.Deleted;
                 item.DateEdited = DateTime.Now;
 

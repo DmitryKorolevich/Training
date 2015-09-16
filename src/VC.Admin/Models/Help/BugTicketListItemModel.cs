@@ -38,6 +38,8 @@ namespace VC.Admin.Models.Help
 
         public string AddedByAgent { get; set; }
 
+        public bool AllowDelete { get; set; }
+
         public BugTicketListItemModel(BugTicket item)
         {
             if(item!=null)

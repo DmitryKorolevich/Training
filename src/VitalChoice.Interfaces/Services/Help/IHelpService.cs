@@ -43,7 +43,7 @@ namespace VitalChoice.Interfaces.Services.Help
 
         Task<BugTicket> UpdateBugTicketAsync(BugTicket item, int adminId, bool? isSuperAdmin = null);
 
-        Task<bool> DeleteBugTicketAsync(int id);
+        Task<bool> DeleteBugTicketAsync(int id, int? userId=null);
 
         Task<BugTicketComment> GetBugTicketCommentAsync(int id);
 

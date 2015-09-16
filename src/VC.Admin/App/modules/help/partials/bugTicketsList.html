@@ -118,7 +118,7 @@
                             <button title="Edit" class="btn btn-default btn-success btn-xs" ui-sref="index.oneCol.bugTicketDetail({id:item.Id})">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </button>
-                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                            <button data-ng-if="item.AllowDelete" title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </button>
                         </td>

@@ -163,6 +163,17 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
+            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
+            int userId = Int32.Parse(Request.HttpContext.User.GetUserId());
+            foreach (var item in toReturn.Items)
+            {
+                if(isSuperAdmin || item.IdAddedBy == userId)
+                {
+                    item.AllowDelete = true;
+                }
+            }
+
             return toReturn;
         }
 
@@ -211,7 +222,10 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteBugTicket(int id)
         {
-            return await _helpService.DeleteBugTicketAsync(id);
+            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
+
+            return await _helpService.DeleteBugTicketAsync(id, isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
 
 
