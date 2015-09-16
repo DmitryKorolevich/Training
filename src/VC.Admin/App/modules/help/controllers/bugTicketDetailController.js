@@ -349,36 +349,39 @@ function ($scope, $rootScope, $state, $stateParams, helpService, toaster, modalU
 
     $scope.deleteFile = function (index, file, comment)
     {
-        var promise;
-        if (comment)
+        confirmUtil.confirm(function ()
         {
-            promise = helpService.deleteBugTicketCommentFile(comment.PublicId, file.FileName, file.Id, $scope.refreshTracker)
-        }
-        else
-        {
-            promise = helpService.deleteBugTicketFile($scope.bugTicket.PublicId, file.FileName, file.Id, $scope.refreshTracker);
-        }
-        promise.success(function (result)
-        {
-            if (result.Success)
+            var promise;
+            if (comment)
             {
-                if (comment)
-                {
-                    comment.Files.splice(index, 1);
-                }
-                else
-                {
-                    $scope.bugTicket.Files.splice(index, 1);
-                }
-            } else
-            {
-                errorHandler(result);
+                promise = helpService.deleteBugTicketCommentFile(comment.PublicId, file.FileName, file.Id, $scope.refreshTracker)
             }
-        }).
-            error(function (result)
+            else
             {
-                errorHandler(result);
-            });
+                promise = helpService.deleteBugTicketFile($scope.bugTicket.PublicId, file.FileName, file.Id, $scope.refreshTracker);
+            }
+            promise.success(function (result)
+            {
+                if (result.Success)
+                {
+                    if (comment)
+                    {
+                        comment.Files.splice(index, 1);
+                    }
+                    else
+                    {
+                        $scope.bugTicket.Files.splice(index, 1);
+                    }
+                } else
+                {
+                    errorHandler(result);
+                }
+            }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
+        }, 'Are you sure you want to delete this file?');
     };
 
 

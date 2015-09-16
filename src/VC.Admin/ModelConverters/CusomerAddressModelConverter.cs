@@ -4,7 +4,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class AddressModelConverter : IModelToDynamicConverter<AddressModel, CustomerAddressDynamic>
+    public class CusomerAddressModelConverter : IModelToDynamicConverter<AddressModel, CustomerAddressDynamic>
     {
 	    public void DynamicToModel(AddressModel model, CustomerAddressDynamic dynamic)
 	    {

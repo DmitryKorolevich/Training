@@ -878,7 +878,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             return;
         }
-        var product = { Code: '', Id: null, QTY: '', ProductName: '', Price: null, Amount: '', IdProductType: null, Messages: [] };
+        var product = { Code: '', Id: null, QTY: null, ProductName: '', Price: null, Amount: null, IdProductType: null, Messages: [] };
         $scope.order.SkuOrdereds.push(product);
     };
 
@@ -989,9 +989,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 return;
             }
-            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.ExactDescriptionName != ''))
+            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.Index!= index || $scope.skuFilter.ExactDescriptionName != ''))
             {
                 $scope.skuFilter.ExactCode = product.Code;
+                $scope.skuFilter.Index = index;
                 $scope.skuFilter.ExactDescriptionName = '';
                 productService.getSku($scope.skuFilter)
                     .success(function (result)
@@ -1014,6 +1015,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                     product.Price = result.Data.WholesalePrice;
                                 }
                                 product.Amount = product.Price;
+
+                                if ($scope.order.SkuOrdereds.length == index + 1)
+                                {
+                                    $scope.productAdd();
+                                }
 
                                 $scope.requestRecalculate();
                             }
@@ -1076,6 +1082,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 product.Price = result.Data.WholesalePrice;
                             }
                             product.Amount = product.Price;
+
+                            if ($scope.order.SkuOrdereds.length == index + 1)
+                            {
+                                $scope.productAdd();
+                            }
 
                             $scope.requestRecalculate();
                         }

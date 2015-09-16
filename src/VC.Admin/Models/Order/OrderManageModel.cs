@@ -31,11 +31,11 @@ namespace VC.Admin.Models.Order
 
         public string ProductName { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
-        public int QTY { get; set; }
+        public int? QTY { get; set; }
 
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
 
         public IList<string> Messages { get; set; }
 

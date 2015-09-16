@@ -154,8 +154,8 @@ namespace VC.Admin.ModelConverters
                         return new SkuOrdered
                         {
                             Sku = s,
-                            Amount = orderedItem.Price,
-                            Quantity = orderedItem.QTY,
+                            Amount = orderedItem.Price ?? 0,
+                            Quantity = orderedItem.QTY ?? 0,
                             ProductWithoutSkus = _productService.Select(s.IdProduct)
                         };
                     }).ToList();

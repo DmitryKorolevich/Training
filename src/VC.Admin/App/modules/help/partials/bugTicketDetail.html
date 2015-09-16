@@ -30,7 +30,7 @@
                                     <div data-ng-if="bugTicket.AddedBy" class="form-group">
                                         <label for="" class="col-md-3 control-label">Posted by</label>
                                         <div class="col-md-9 form-control-static">
-                                            <span>{{::bugTicket.AddedBy}}({{::bugTicket.AddedByAgent}})</span>
+                                            <span>{{::bugTicket.AddedBy}} ({{::bugTicket.AddedByAgent}})</span>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -111,7 +111,7 @@
                                                     <span data-ng-if="comment.DateCreated==comment.DateEdited">Submitted</span><span data-ng-if="comment.DateCreated!=comment.DateEdited">Modified</span> on
                                                     <strong>{{::comment.DateEdited | date:"MM/dd/yy"}} {{::comment.DateEdited | date:"h:mm a"}}</strong> by
                                                 </span>
-                                                <strong>{{::comment.EditedBy}}({{::comment.EditedByAgent}})</strong>
+                                                <strong>{{::comment.EditedBy}} ({{::comment.EditedByAgent}})</strong>
                                             </div>
                                             <div data-ng-if="bugTicket.IsAllowEdit && comment.EditedBy && !comment.IsEdit" class="col-md-2">
                                                 <div class="pull-right">

@@ -76,7 +76,7 @@
                                                     <span data-ng-if="comment.DateCreated==comment.DateEdited">Submitted</span><span data-ng-if="comment.DateCreated!=comment.DateEdited">Modified</span> on
                                                     <strong>{{::comment.DateEdited | date:"MM/dd/yy"}} {{::comment.DateEdited | date:"h:mm a"}}</strong> by
                                                 </span>
-                                                <strong data-ng-if="comment.EditedBy">Vital Choice({{::comment.EditedBy}})</strong>
+                                                <strong data-ng-if="comment.EditedBy">Vital Choice ({{::comment.EditedBy}})</strong>
                                                 <strong data-ng-if="!comment.EditedBy">{{::comment.Customer}}</strong>
                                             </div>
                                             <div data-ng-if="comment.EditedBy && !comment.IsEdit" class="col-md-2">

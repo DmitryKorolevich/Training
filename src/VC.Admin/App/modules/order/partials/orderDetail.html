@@ -143,7 +143,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="currentCustomer.CustomerType == 2" class="form-group">
                                                         <label for="type" class="col-md-3 control-label">PO#</label>
                                                         <div class="col-md-9">
                                                             <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold">
@@ -255,13 +255,13 @@
                                         <div class="col-md-6 right-section">
                                             <form class="form-horizontal" name="forms.mainForm2" data-ng-submit="save()" data-ng-class="{submitted: forms.mainForm2.submitted}" novalidate unsaved-warning-form>
                                                 <fieldset>
-                                                    <div class="form-group margin-bottom-0px">
+                                                    <div data-ng-if="order.AlaskaHawaiiSurcharge!=0" class="form-group margin-bottom-0px">
                                                         <label for="type" class="col-md-7 control-label">Alaska/Hawaii Surcharge</label>
                                                         <div class="col-md-5 form-control-static">
                                                             <span>{{order.AlaskaHawaiiSurcharge | currency}}</span>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group margin-bottom-0px">
+                                                    <div data-ng-if="order.CanadaSurcharge!=0" class="form-group margin-bottom-0px">
                                                         <label for="type" class="col-md-7 control-label">Canada Surcharge</label>
                                                         <div class="col-md-5 form-control-static">
                                                             <span>{{order.CanadaSurcharge | currency}}</span>
@@ -290,7 +290,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="form-group">
+                                                    <div data-ng-if="order.AlaskaHawaiiSurcharge!=0 || order.CanadaSurcharge!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Surcharge Override (-)</label>
                                                         <div class="col-md-5">
                                                             <div class="input-group">
@@ -649,11 +649,12 @@
                                     <div data-ng-if="!id">
                                         <div class="form-horizontal">
                                             <div class="form-group">
-                                                <label for="updateShippingAddressForCustomer" class="col-md-3 control-label">Permanently update this address</label>
+                                                <label for="updateShippingAddressForCustomer" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
                                                             <input type="checkbox" id="updateShippingAddressForCustomer" data-ng-model="order.UpdateShippingAddressForCustomer">
+                                                            <strong>Permanently update this address</strong>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -758,11 +759,12 @@
                                                 <fieldset>
                                                     <div data-ng-if="paymentInfoTab.PaymentMethodType == 1 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex]">
                                                         <div class="form-group">
-                                                            <label for="updateCardForCustomer" class="col-md-3 control-label">Permanently update credit card information</label>
+                                                            <label for="updateCardForCustomer" class="col-md-3 control-label"></label>
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
                                                                         <input type="checkbox" id="updateCardForCustomer" data-ng-model="order.UpdateCardForCustomer">
+                                                                        <strong>Permanently update credit card information</strong>
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -836,11 +838,12 @@
                                                 <fieldset>
                                                     <div data-ng-if="paymentInfoTab.PaymentMethodType == 2 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Oac">
                                                         <div class="form-group">
-                                                            <label for="updateOACForCustomer" class="col-md-3 control-label">Permanently update oac information</label>
+                                                            <label for="updateOACForCustomer" class="col-md-3 control-label"></label>
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
                                                                         <input type="checkbox" id="updateOACForCustomer" data-ng-model="order.UpdateOACForCustomer">
+                                                                        <strong>Permanently update oac information</strong>
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -881,11 +884,12 @@
                                                 <fieldset>
                                                     <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
                                                         <div class="form-group">
-                                                            <label for="updateCheckForCustomer" class="col-md-3 control-label">Permanently update check information</label>
+                                                            <label for="updateCheckForCustomer" class="col-md-3 control-label"></label>
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
                                                                         <input type="checkbox" id="updateCheckForCustomer" data-ng-model="order.UpdateCheckForCustomer">
+                                                                        <strong>Permanently update check information</strong>
                                                                     </label>
                                                                 </div>
                                                             </div>

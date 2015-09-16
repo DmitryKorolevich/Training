@@ -73,7 +73,7 @@
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
-                            <span>Last Edited</span>
+                            <span> Last Updated</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
@@ -109,7 +109,7 @@
                         <td>{{::item.Summary}}</td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}</td>
-                        <td>{{::item.AddedBy}}</td>
+                        <td>{{::item.AddedBy}} ({{::item.AddedByAgent}})</td>
                         <td>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.TicketStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.TicketStatuses, item.StatusCode).Text}}</span>

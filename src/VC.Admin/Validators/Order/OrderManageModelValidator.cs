@@ -10,6 +10,7 @@ using VitalChoice.Domain.Constants;
 using VC.Admin.Models.Order;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VC.Admin.Validators.Order
 {
@@ -101,6 +102,13 @@ namespace VC.Admin.Validators.Order
                              RuleFor(model => model.IdPaymentMethodType)
                                 .Must(p => p.HasValue)
                                 .WithMessage(model => model.IdPaymentMethodType, ValidationMessages.FieldRequired);
+                             RuleFor(model => model.KeyCode)
+                               .NotEmpty()
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldRequired);
+                             RuleFor(model => model.PoNumber)
+                               .NotEmpty()
+                               .When(p => p.Customer != null && p.Customer.CustomerType == CustomerType.Wholesale)
+                               .WithMessage(model => model.PoNumber, ValidationMessages.FieldRequired);
                          });
                 RuleSet("NewOrder",
                         () =>
