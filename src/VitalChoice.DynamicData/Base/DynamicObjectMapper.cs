@@ -374,7 +374,6 @@ namespace VitalChoice.DynamicData.Base
             entity.OptionValues = new List<TOptionValue>();
 
             FillEntityOptions(dynamic, optionTypesCache, entity);
-            entity.Id = dynamic.Id;
             entity.DateCreated = entity.DateCreated;
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
