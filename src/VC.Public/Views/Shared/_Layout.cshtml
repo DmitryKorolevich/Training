@@ -116,7 +116,30 @@
 			<div class="nav-shadow"></div>
 		</header>
 		<div class="content">
-			@RenderBody()
+			<div class="content-dynamic">
+				@RenderBody()
+			</div>
+			<div class="content-bottom">
+				<div class="newsletter-container">
+					<form id="cse-search-box" method="post" name="search" action="https://app.bronto.com/public/webform/process/">
+						<input type="hidden" value="92galxckiog3fu5rrpft43l7m738f" name="fid"/>
+						<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+						<input type="hidden" value="" name="delid"/>
+						<input type="hidden" value="" name="subid"/>
+						<input type="hidden" value="true" name="24793[291714]"/>
+						<input name="24791" type="text" id="email" value="Enter Email Here" class="newsletter-input" onfocus="this.value = (this.value == this.defaultValue) ? '' : this.value;return true;" data-emailcapturepoint="Newsletter Sign Up Footer, Check Out Sign In, Guest Check Out"/>
+						<input type="image" border="0" align="absmiddle" alt="Submit" src="/Assets/images/arrow-submit.jpg"/>
+					</form>
+				</div>
+				<div class="finding-fish-container">
+					<a href="#">
+						<img alt="Finding good fish" src="/Assets/images/findinggoodfish.jpg"/>
+					</a>
+				</div>
+				<div class="fish-advertising-container">
+					<img alt="Randy Hartnell" src="/Assets/images/randyfooter-102413.jpg"/>
+				</div>
+			</div>
 		</div>
 		<footer>
 			<div class="footer-main">

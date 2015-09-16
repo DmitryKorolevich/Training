@@ -267,8 +267,15 @@ header .search-area form input[type=image] {
 .content {
   min-height: 500px;
   clear: left;
-  margin-bottom: 18px;
+  float: left;
+  width: 100%;
   background-color: #fff;
+  margin-bottom: 31px;
+}
+.content .content-dynamic {
+  float: left;
+  clear: both;
+  width: 100%;
 }
 .nav-shadow {
   background-color: #fff;
@@ -276,6 +283,9 @@ header .search-area form input[type=image] {
   background-repeat: no-repeat;
   height: 14px;
   clear: left;
+}
+footer {
+  clear: both;
 }
 .footer-main {
   color: #999999;
@@ -658,4 +668,40 @@ header .search-area form input[type=image] {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
+  margin-bottom: 0px;
+}
+.content-bottom {
+  width: 100%;
+  clear: left;
+  float: left;
+  margin-top: 3px;
+}
+.newsletter-container {
+  float: left;
+  background-image: url(/assets/images/newsletterbg-102513.jpg);
+  background-repeat: no-repeat;
+  width: 370px;
+  height: 64px;
+  margin-right: 41px;
+  margin-top: 19px;
+}
+.newsletter-container .newsletter-input {
+  margin-top: 15px;
+  margin-left: 197px;
+  width: 128px;
+  font-size: 11px;
+  color: #666;
+  line-height: 16px;
+  height: 16px\9;
+}
+.newsletter-container input[type=image] {
+  vertical-align: middle;
+  margin: -2px 0 0 -2px;
+}
+.finding-fish-container {
+  margin-top: 22px;
+  float: left;
+}
+.fish-advertising-container {
+  float: right;
 }
