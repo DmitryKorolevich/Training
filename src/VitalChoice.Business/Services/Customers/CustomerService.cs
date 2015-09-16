@@ -39,13 +39,8 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
-        private readonly IEcommerceRepositoryAsync<Address> _addressesRepositoryAsync;
-        private readonly IEcommerceRepositoryAsync<CustomerNote> _customerNotesRepositoryAsync;
-        private readonly IEcommerceRepositoryAsync<CustomerToOrderNote> _customerToOrderNoteRepositoryAsync;
-        private readonly IEcommerceRepositoryAsync<CustomerToPaymentMethod> _customerToPaymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        private readonly IEcommerceRepositoryAsync<CustomerPaymentMethod> _customerPaymentMethodRepositoryAsync;
 	    private readonly IBlobStorageClient _storageClient;
 	    private static string _customerContainerName;
 
@@ -54,14 +49,9 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
-            IEcommerceRepositoryAsync<Address> addressesRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerNote> customerNotesRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerToOrderNote> customerToOrderNoteRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerToPaymentMethod> customerToPaymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync,
 			IBlobStorageClient storageClient,
 			IOptions<AppOptions> appOptions)
             : base(
@@ -71,13 +61,8 @@ namespace VitalChoice.Business.Services.Customers
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
-            _addressesRepositoryAsync = addressesRepositoryAsync;
-            _customerNotesRepositoryAsync = customerNotesRepositoryAsync;
-            _customerToOrderNoteRepositoryAsync = customerToOrderNoteRepositoryAsync;
-            _customerToPaymentMethodRepositoryAsync = customerToPaymentMethodRepositoryAsync;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _adminProfileRepository = adminProfileRepository;
-            _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
 		    _storageClient = storageClient;
 		    _customerContainerName = appOptions.Options.AzureStorage.CustomerContainerName;
         }
