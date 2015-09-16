@@ -274,7 +274,6 @@ header .search-area form input[type=image] {
   margin-right: -2px;
 }
 .content {
-  min-height: 500px;
   clear: left;
   float: left;
   width: 100%;
@@ -285,6 +284,7 @@ header .search-area form input[type=image] {
   float: left;
   clear: both;
   width: 100%;
+  min-height: 400px;
 }
 .nav-shadow {
   background-color: #fff;
