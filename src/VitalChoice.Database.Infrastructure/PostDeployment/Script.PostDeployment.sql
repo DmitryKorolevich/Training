@@ -35,3 +35,4 @@ Post-Deployment Script Template
 :r .\Scripts\RecipeUpdate.sql
 :r .\Scripts\ContentAreas.sql
 :r .\Scripts\BugTickets.sql
+:r .\Scripts\CustomPublicStyles.sql

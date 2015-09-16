@@ -9,8 +9,6 @@
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
-    "CustomStylesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new",
-    "CustomStylesName": "customStyles.css",
     "FilesRelativePath": "/files",
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,

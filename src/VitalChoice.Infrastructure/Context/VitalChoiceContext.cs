@@ -174,6 +174,10 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<ContentArea>().ToTable("ContentAreas");
 			builder.Entity<ContentArea>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id);
 
+			builder.Entity<CustomPublicStyle>().Key(p => p.Id);
+			builder.Entity<CustomPublicStyle>().ToTable("CustomPublicStyles");
+			builder.Entity<CustomPublicStyle>().Reference(p => p.User).InverseCollection().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id);
+
 			#endregion
 
 			#region Products

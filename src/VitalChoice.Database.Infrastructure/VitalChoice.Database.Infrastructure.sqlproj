@@ -142,4 +142,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\BugTickets.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\CustomPublicStyles.sql" />
+  </ItemGroup>
 </Project>

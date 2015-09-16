@@ -8,8 +8,8 @@ namespace VitalChoice.Interfaces.Services.Content
 {
     public interface IStylesService
 	{
-	    string GetStyles();
+	    Task<CustomPublicStyle> GetStyles();
 
-	    Task<string> UpdateStylesAsync(string css);
+	    Task<CustomPublicStyle> UpdateStylesAsync(CustomPublicStyle customPublicStyle);
     }
 }

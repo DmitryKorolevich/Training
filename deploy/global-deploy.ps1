@@ -18,7 +18,6 @@ if ($RootBuild.Equals("")) {
 }
 $filesLinkSource = "$RootDeploy" + "\files"
 $designLinkSource = "$RootDeploy" + "\design"
-$customStylesSource = "$RootDeploy" + "\customStyles.css"
 ni -itemtype directory -path "empty" -Force
 echo "Clean temp..."
 robocopy "empty\" "${RootBuild}\" /mir /nfl /ndl /njh > clean.log
@@ -61,8 +60,6 @@ foreach{
 						cmd /c mklink /D $destinationPath $filesLinkSource
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\design"
 						cmd /c mklink /D $destinationPath $designLinkSource
-						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\customStyles.css"
-						cmd /c mklink $destinationPath $customStylesSource
 					}
 				}
 			}

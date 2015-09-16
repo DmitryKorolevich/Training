@@ -17,37 +17,21 @@ using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content
 {
-	public class StylesService : IStylesService
+	public class StylesService : GenericService<CustomPublicStyle>, IStylesService
 	{
-		private readonly IOptions<AppOptions> _options;
-		private string _customStylesFullPath;
-
-		public StylesService(IOptions<AppOptions> options)
+		public StylesService(IRepositoryAsync<CustomPublicStyle> repository) : base(repository)
 		{
-			_options = options;
-
-			_customStylesFullPath = $"{_options.Options.CustomStylesPath}\\{_options.Options.CustomStylesName}";
 		}
 
-		public string GetStyles()
+		public async Task<CustomPublicStyle> GetStyles()
 		{
-			return File.Exists(_customStylesFullPath) ? File.ReadAllText(_customStylesFullPath) : string.Empty;
+			var obj = await Repository.Query().SelectFirstOrDefaultAsync(false);
+			return obj;
 		}
 
-		public async Task<string> UpdateStylesAsync(string css)
+		public async Task<CustomPublicStyle> UpdateStylesAsync(CustomPublicStyle customPublicStyle)
 		{
-			using (var stream = File.Open(_customStylesFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-			{
-				using (var writer = new StreamWriter(stream, Encoding.UTF8))
-				{
-					await writer.WriteAsync(css);
-					stream.SetLength(stream.Position);
-				}
-			}
-
-			_options.Options.Versioning.CustomCssVersion = _options.Options.Versioning.CustomCssVersion + 1;
-
-			return GetStyles();
+			return await UpdateAsync(customPublicStyle);
 		}
 	}
 }

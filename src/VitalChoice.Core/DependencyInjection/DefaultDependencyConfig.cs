@@ -121,8 +121,6 @@ namespace VitalChoice.Core.DependencyInjection
                             : configuration.GetSection("App:Versioning:BuildNumber").Value
                 };
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
-                options.CustomStylesPath = configuration.GetSection("App:CustomStylesPath").Value;
-                options.CustomStylesName = configuration.GetSection("App:CustomStylesName").Value;
                 options.DefaultCacheExpirationTermMinutes =
                     Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
                 options.ActivationTokenExpirationTermDays =

@@ -7,8 +7,6 @@ namespace VitalChoice.Domain.Entities.Options
         public bool GenerateLowercaseUrls { get; set; }
         public bool EnableBundlingAndMinification { get; set; }
         public string LogPath { get; set; }
-        public string CustomStylesPath { get; set; }
-        public string CustomStylesName { get; set; }
         public int DefaultCacheExpirationTermMinutes { get; set; }
         public int ActivationTokenExpirationTermDays { get; set; }
         public string DefaultCultureId { get; set; }

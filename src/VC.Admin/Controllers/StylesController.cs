@@ -23,28 +23,42 @@ namespace VC.Admin.Controllers
 	public class StylesController : BaseApiController
     {
 		private readonly IStylesService _stylesService;
+		private readonly IHttpContextAccessor _contextAccessor;
 
-		public StylesController(IStylesService contentAreaService)
+		public StylesController(IStylesService contentAreaService, IHttpContextAccessor contextAccessor)
 		{
 			_stylesService = contentAreaService;
+			_contextAccessor = contextAccessor;
 		}
 
 		[HttpGet]
-		public Result<StylesModel> GetStyles()
+		public async Task<Result<StylesModel>> GetStyles()
 		{
-			var res = _stylesService.GetStyles();
+			var res = await _stylesService.GetStyles();
 			if (res == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			return new StylesModel() { CSS = res};
+			return new StylesModel() { CSS = res.Styles};
 		}
 
 		[HttpPost]
 		public async Task<Result<StylesModel>> UpdateStyles([FromBody]StylesModel model)
 		{
-			model.CSS = await _stylesService.UpdateStylesAsync(model.CSS);
+			var res = await _stylesService.GetStyles();
+			if (res == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+			}
+
+			var context = _contextAccessor.HttpContext;
+			res.IdEditedBy = Convert.ToInt32(context.User.GetUserId());
+			res.Updated = DateTime.Now;
+			res.Styles = model.CSS;
+
+			res = await _stylesService.UpdateStylesAsync(res);
+			model.CSS = res.Styles;
 
 			return model;
 		}

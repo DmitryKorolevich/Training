@@ -5,7 +5,5 @@
         public bool EnableStaticContentVersioning { get; set; }
 
         public string BuildNumber { get; set; }
-
-	    public int CustomCssVersion { get; set; }
 	}
 }
