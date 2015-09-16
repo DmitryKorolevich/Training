@@ -121,6 +121,8 @@ namespace VitalChoice.Core.DependencyInjection
                             : configuration.GetSection("App:Versioning:BuildNumber").Value
                 };
                 options.LogPath = configuration.GetSection("App:LogPath").Value;
+                options.CustomStylesPath = configuration.GetSection("App:CustomStylesPath").Value;
+                options.CustomStylesName = configuration.GetSection("App:CustomStylesName").Value;
                 options.DefaultCacheExpirationTermMinutes =
                     Convert.ToInt32(configuration.GetSection("App:DefaultCacheExpirationTermMinutes").Value);
                 options.ActivationTokenExpirationTermDays =
@@ -311,6 +313,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
             builder.RegisterType<PromotionService>().As<IPromotionService>();
             builder.RegisterType<ContentAreaService>().As<IContentAreaService>();
+            builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))

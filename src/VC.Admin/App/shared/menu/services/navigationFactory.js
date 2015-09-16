@@ -77,6 +77,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageFaqs', stateName: 'index.oneCol.manageFaqs', stateLabel: 'Manage FAQs', access: 6 },
                 { name: 'manageMasters', stateName: 'index.oneCol.manageMasters', stateLabel: 'Manage Master Templates', access: 7 },
                 { name: 'manageContentAreas', stateName: 'index.oneCol.manageContentAreas', stateLabel: 'Manage Design Elements', access: 6 },
+                { name: 'manageStyles', stateName: 'index.oneCol.manageStyles', stateLabel: 'Manage CSS', access: 6 },
 				{ name: 'filesManagement', stateName: 'index.oneCol.filesManagement', stateLabel: 'Manage Media', access: 12 },
 			]
 		},

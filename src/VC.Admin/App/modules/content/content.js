@@ -20,7 +20,8 @@ angular.module('app.modules.content', [
 	'app.modules.content.controllers.contentPageCategoriesController',
 	'app.modules.content.controllers.contentPageCategoryManageController',
 	'app.modules.content.controllers.contentAreasController',
-	'app.modules.content.controllers.contentAreaDetailController'
+	'app.modules.content.controllers.contentAreaDetailController',
+	'app.modules.content.controllers.manageStylesController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -181,6 +182,12 @@ angular.module('app.modules.content', [
 					url: '/content/contentareas/{id:int}',
 					templateUrl: 'app/modules/content/partials/contentAreaDetail.html',
 					controller: 'contentAreaDetailController'
+				})
+				/*manage css*/
+				.state('index.oneCol.manageStyles', {
+		    		url: '/content/css',
+		    		templateUrl: 'app/modules/content/partials/stylesDetail.html',
+		    		controller: 'manageStylesController'
 				});
 		}
 ]);

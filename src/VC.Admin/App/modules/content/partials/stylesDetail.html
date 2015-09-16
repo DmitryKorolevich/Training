@@ -6,10 +6,7 @@
 			</div>
 			<div class="btn-group margin-top-10px">
 				<a target="_blank" href="{{previewUrl}}" class="btn btn-info width-80px">Preview</a>
-				<button cancel-button-default-state="index.oneCol.manageContentAreas" cancel-button class="btn btn-default width-80px">Cancel</button>
-			</div>
-			<div class="margin-top-10px">
-				<button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageContentAreas">Manage All</button>
+				<button cancel-button class="btn btn-default width-80px">Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -21,10 +18,10 @@
 						<spinner-overlay data-loading="refreshTracker.active()">
 							<form class="form-horizontal">
 								<fieldset>
-									<span class="legend ng-scope">Manage Template</span>
+									<span class="legend ng-scope">Manage CSS</span>
 									<div class="form-group">
 										<div class="col-md-12">
-											<div data-ng-model="contentArea.Template" ui-ace="{
+											<div data-ng-model="model.css" ui-ace="{
 				                                require: ['ace/ext/language_tools'],
 				                                advanced: {
 					                                enableSnippets: true,
@@ -32,7 +29,7 @@
 					                                enableLiveAutocompletion: true
 				                                },
 				                                theme:'cobalt',
-				                                mode: 'html',
+				                                mode: 'css',
 				                                onLoad: aceLoaded,
 				                                onChange: aceChanged
 		                                }">

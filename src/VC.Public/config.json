@@ -8,6 +8,7 @@
       "BuildNumber": 1
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "CustomStylesName": "customStyles.css",
     "DefaultCultureId": "en-US",
    "Connection": {
             "UserName": "dev_vcdb_login",

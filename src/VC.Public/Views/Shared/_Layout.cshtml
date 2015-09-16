@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using VitalChoice.Domain.Entities.Options;
+@inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
+
+<!DOCTYPE html>
 <!--[if lt IE 9]>
 	<html class="no-js lt-ie9" lang="en">
 <![endif]-->
@@ -18,6 +21,7 @@
 	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
 	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Francois One">
 	@await Component.InvokeAsync("Assets", "styles")
+	<link rel="stylesheet" href=@($"{appOptions.Options.CustomStylesName}?v={appOptions.Options.Versioning.CustomCssVersion}") />
 	<script src="/assets/scripts/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 <body>
