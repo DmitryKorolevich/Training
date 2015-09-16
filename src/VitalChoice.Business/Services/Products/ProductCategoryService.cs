@@ -164,6 +164,12 @@ namespace VitalChoice.Business.Services.Products
                 {
                     throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
                 }
+                var nameDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Name == model.Name && p.Id != idDbItem
+                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+                if (nameDublicatesExist)
+                {
+                    throw new AppValidationException("Name", "Category with the same Name already exists, please use a unique Name.");
+                }
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
