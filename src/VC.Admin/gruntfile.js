@@ -99,8 +99,8 @@ module.exports = function (grunt) {
 					{ expand: true, cwd: 'assets/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
 					{ expand: true, cwd: 'assets/miscellaneous/', src: ['**'], dest: 'wwwroot/assets/miscellaneous/' },
 					{ expand: true, cwd: 'wwwroot/lib/bootstrap/fonts/', src: ['**'], dest: 'wwwroot/fonts/' },
-					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['theme-cobalt.js', 'mode-ttl.js', 'worker-ttl.js'], dest: 'wwwroot/' },
-					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/snippets/', src: ['text.js', 'ttl.js'], dest: 'wwwroot/snippets/' }
+					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/', src: ['theme-cobalt.js', 'mode-ttl.js', 'worker-ttl.js', 'mode-html.js', 'worker-html.js', 'mode-css.js', 'worker-css.js'], dest: 'wwwroot/' },
+					{ expand: true, cwd: 'wwwroot/lib/ace-builds/src-min-noconflict/snippets/', src: ['text.js', 'ttl.js', 'html.js', 'css.js'], dest: 'wwwroot/snippets/' }
 		        ]
 	        }
         },
