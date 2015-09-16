@@ -130,7 +130,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrder = dynamic.Id,
                     IdGiftCertificate = g.GiftCertificate.Id
                 }));
-                entity.IdDiscount = dynamic.Discount.Id;
+                entity.IdDiscount = dynamic.Discount?.Id;
                 entity.PaymentMethod =
                     await _orderPaymentMethodMapper.ToEntityAsync(dynamic.PaymentMethod);
                 entity.Skus = new List<OrderToSku>(dynamic.Skus.Select(s => new OrderToSku

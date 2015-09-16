@@ -229,3 +229,10 @@ BEGIN
 	DROP CONSTRAINT FK_OrderAddressToOrder,
 		COLUMN IdOrder
 END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'OrderPaymentMethods') AND Name = N'IdAddress')
+BEGIN
+	ALTER TABLE OrderPaymentMethods
+	ADD IdAddress INT NULL
+	CONSTRAINT FK_PaymentMethodToAddress FOREIGN KEY (IdAddress) REFERENCES OrderAddresses (Id)
+END

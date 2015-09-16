@@ -857,9 +857,9 @@ namespace VitalChoice.Infrastructure.Context
 		            .ForeignKey<OrderToGiftCertificate>(g => g.IdGiftCertificate)
 		            .PrincipalKey<GiftCertificate>(g => g.Id);
 		        entity.Reference(g => g.Order)
-		            .InverseReference()
-		            .ForeignKey<OrderToGiftCertificate>(g => g.IdOrder)
-		            .PrincipalKey<Order>(o => o.Id);
+		            .InverseCollection(o => o.GiftCertificates)
+		            .ForeignKey(g => g.IdOrder)
+		            .PrincipalKey(o => o.Id);
 		    });
 
 		    builder.Entity<OrderToSku>(entity =>
@@ -868,9 +868,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Key(s => new {s.IdOrder, s.IdSku});
 		        entity.ToTable("OrderToSkus");
 		        entity.Reference(s => s.Order)
-		            .InverseReference()
-		            .ForeignKey<OrderToSku>(s => s.IdOrder)
-		            .PrincipalKey<Order>(o => o.Id);
+		            .InverseCollection(o => o.Skus)
+		            .ForeignKey(s => s.IdOrder)
+		            .PrincipalKey(o => o.Id);
 		        entity.Reference(s => s.Sku)
 		            .InverseReference()
 		            .ForeignKey<OrderToSku>(s => s.IdSku)
@@ -902,7 +902,12 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey(g => g.IdOrderPaymentMethod)
                     .PrincipalKey(o => o.Id)
                     .Required();
-		        entity.Ignore(o => o.OptionTypes);
+                entity.Reference(p => p.EditedBy)
+                    .InverseCollection()
+                    .ForeignKey(p => p.IdEditedBy)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
+                entity.Ignore(o => o.OptionTypes);
 		    });
 
             builder.Entity<OrderPaymentMethodOptionValue>(entity =>
@@ -954,7 +959,9 @@ namespace VitalChoice.Infrastructure.Context
 		            .ForeignKey(t => t.IdOptionType)
 		            .PrincipalKey(v => v.Id)
 		            .Required();
-		    });
+                entity.Ignore(v => v.BigValue);
+                entity.Ignore(v => v.IdBigString);
+            });
 
 		    builder.Entity<RefundSku>(entity =>
 		    {
