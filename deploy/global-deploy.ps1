@@ -62,7 +62,7 @@ foreach{
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\design"
 						cmd /c mklink /D $destinationPath $designLinkSource
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\customStyles.css"
-						cmd /c mklink $destinationPath $designLinkSource
+						cmd /c mklink $destinationPath $customStylesSource
 					}
 				}
 			}
