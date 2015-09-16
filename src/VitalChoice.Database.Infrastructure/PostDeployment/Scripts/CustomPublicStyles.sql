@@ -32,4 +32,4 @@ BEGIN
 	ADD CONSTRAINT UQ_CustomPublicStyles UNIQUE(Name)
 END
 
-GO
+GO	
