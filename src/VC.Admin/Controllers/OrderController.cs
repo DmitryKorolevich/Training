@@ -220,10 +220,9 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var model = _orderService.CreatePrototypeFor<OrderManageModel>(1);//normal
-                model.IdCustomer = 84920494;
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                var model = await _orderService.CreatePrototypeForAsync<OrderManageModel>((int) OrderType.RetailOrder);
+                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
+                model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
                 model.StatusCode = RecordStatusCode.Active;
                 model.OrderStatus = OrderStatus.Processed;
                 model.DateCreated = DateTime.Now;
@@ -234,22 +233,6 @@ namespace VC.Admin.Controllers
                 model.UpdateCheckForCustomer = true;
                 model.UpdateOACForCustomer = true;
                 return model;
-            }
-            else
-            {
-                return new OrderManageModel()
-                {
-                    IdObjectType = 1,//normal
-                    IdCustomer = 84920494,
-                    StatusCode = RecordStatusCode.Active,
-                    OrderStatus = OrderStatus.Processed,
-                    DateCreated = DateTime.Now,
-                    GCs = new List<GCListItemModel>() { new GCListItemModel(null) },
-                    SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                    PreferredShipMethod = 1,
-                    ShipDelayType = 0,
-                    Shipping=new AddressModel(),
-                };
             }
 
             var item = await _orderService.SelectAsync(id);
@@ -312,12 +295,13 @@ namespace VC.Admin.Controllers
                 item.Data.OrderType = (int)SourceOrderType.Phone;
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
+                item.PaymentMethod.Id = 0;
                 item = (await _orderService.InsertAsync(item));
             }
 
             //update customer
             var dbCustomer = await _customerService.SelectAsync(item.Customer.Id);
-            if (dbCustomer == null)
+            if (dbCustomer != null)
             {
                 item.Customer.IdEditedBy = userId;
                 foreach (var address in item.Customer.Addresses)
@@ -335,12 +319,12 @@ namespace VC.Admin.Controllers
                     dbCustomer.ApprovedPaymentMethods = item.Customer.ApprovedPaymentMethods;
                     dbCustomer.OrderNotes = item.Customer.OrderNotes;
 
-                    var profileAddress = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Profile).FirstOrDefault();
+                    var profileAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
                     if(profileAddress!=null)
                     {
                         dbCustomer.Addresses.Remove(profileAddress);
                     }
-                    profileAddress= item.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Profile).FirstOrDefault();
+                    profileAddress= item.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
                     if (profileAddress != null)
                     {
                         dbCustomer.Addresses.Add(profileAddress);
@@ -348,12 +332,12 @@ namespace VC.Admin.Controllers
 
                     if(model.UpdateShippingAddressForCustomer)
                     {
-                        var shippingAddress = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).FirstOrDefault();
+                        var shippingAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Shipping);
                         if (shippingAddress != null)
                         {
                             dbCustomer.Addresses.Remove(shippingAddress);
                         }
-                        shippingAddress = item.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).FirstOrDefault();
+                        shippingAddress = item.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Shipping);
                         if (shippingAddress != null)
                         {
                             dbCustomer.Addresses.Add(profileAddress);
