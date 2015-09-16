@@ -49,21 +49,6 @@ namespace VitalChoice.Business.Services.Dynamic
         protected override async Task UpdateEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items)
         {
-            await items.ForEachAsync(async pair =>
-            {
-                var entity = pair.Entity;
-                var dynamic = pair.Dynamic;
-
-                if (dynamic.Address != null)
-                {
-                    entity.BillingAddress = await _orderAddressMapper.ToEntityAsync(dynamic.Address);
-                }
-            });
-        }
-
-        protected override async Task ToEntityRangeInternalAsync(
-            ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items)
-        {
             await
                 _orderAddressMapper.UpdateEntityRangeAsync(
                     items.Select(
@@ -71,6 +56,11 @@ namespace VitalChoice.Business.Services.Dynamic
                             new DynamicEntityPair<OrderAddressDynamic, OrderAddress>(i.Dynamic.Address,
                                 i.Entity.BillingAddress))
                         .ToList());
+        }
+
+        protected override async Task ToEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items)
+        {
             await items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;

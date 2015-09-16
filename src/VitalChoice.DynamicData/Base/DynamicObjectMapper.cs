@@ -14,7 +14,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
-using Shared.Helpers;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -479,8 +479,17 @@ namespace VitalChoice.DynamicData.Base
 
             if (entity.OptionTypes == null)
             {
-                entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
+                try
+                {
+                    entity.OptionTypes =
+                        await
+                            _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType))
+                                .SelectAsync(false);
+                }
+                catch
+                {
+                    return null;
+                }
             }
 
             var result = FromEntityItem(entity, withDefaults);

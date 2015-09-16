@@ -122,9 +122,12 @@
             }
         };
 
-        $scope.exportOrders = function()
-        {
+        $scope.exportOrders = function () {
 
+        };
+
+        $scope.openOrder = function (id) {
+            $state.go('index.oneCol.orderDetail', { id: id });
         };
 
         initialize();

@@ -20,14 +20,24 @@ namespace VitalChoice.Workflow.Core
             where TContext : WorkflowContext<TResult>
         {
             object cachedResult;
-            if (Cache.TryGetValue(name, out cachedResult))
+            lock (Cache)
             {
-                return (IWorkflowTree<TContext, TResult>) cachedResult;
+                if (Cache.TryGetValue(name, out cachedResult))
+                {
+                    return (IWorkflowTree<TContext, TResult>) cachedResult;
+                }
             }
             var treeType = await _actionItemProvider.GetTreeType(name);
             var result = (IWorkflowTree<TContext, TResult>)Activator.CreateInstance(treeType, _actionItemProvider, name);
             await result.InitializeTreeAsync();
-            Cache.Add(name, result);
+            lock (Cache)
+            {
+                if (Cache.TryGetValue(name, out cachedResult))
+                {
+                    return (IWorkflowTree<TContext, TResult>)cachedResult;
+                }
+                Cache.Add(name, result);
+            }
             return result;
         }
     }

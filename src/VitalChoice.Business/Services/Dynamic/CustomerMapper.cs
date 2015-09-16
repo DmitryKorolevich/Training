@@ -16,7 +16,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
-using Shared.Helpers;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -76,17 +76,19 @@ namespace VitalChoice.Business.Services.Dynamic
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
                 entity.IdAffiliate = dynamic.IdAffiliate;
 
-                entity.PaymentMethods = dynamic.ApprovedPaymentMethods?.Select(c => new CustomerToPaymentMethod()
-                {
-                    IdCustomer = dynamic.Id,
-                    IdPaymentMethod = c
-                }).ToList();
+                entity.PaymentMethods.Merge(dynamic.ApprovedPaymentMethods, (method, i) => method.IdPaymentMethod != i,
+                    c => new CustomerToPaymentMethod
+                    {
+                        IdCustomer = dynamic.Id,
+                        IdPaymentMethod = c
+                    });
 
-                entity.OrderNotes = dynamic.OrderNotes?.Select(c => new CustomerToOrderNote()
-                {
-                    IdCustomer = dynamic.Id,
-                    IdOrderNote = c
-                }).ToList();
+                entity.OrderNotes.Merge(dynamic.OrderNotes, (note, i) => note.IdOrderNote != i,
+                    c => new CustomerToOrderNote
+                    {
+                        IdCustomer = dynamic.Id,
+                        IdOrderNote = c
+                    });
 
                 foreach (var address in dynamic.Addresses)
                 {

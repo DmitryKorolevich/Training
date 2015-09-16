@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Shared.Helpers
+namespace VitalChoice.Domain.Helpers
 {
-    internal static class CollectionExtensions
+    public static class CollectionExtensions
     {
         public static void AddCast(this IList results, IEnumerable items, Type srcType, Type destType)
         {
@@ -50,6 +51,39 @@ namespace Shared.Helpers
             {
                 collection.Add(await item);
             }
+        }
+
+        public static void RemoveAll<T>(this ICollection<T> collection, Func<T, bool> where = null)
+        {
+            if (where == null)
+            {
+                collection.Clear();
+                return;
+            }
+
+            var filtered = collection.Where(where).ToList();
+
+            foreach (var item in filtered)
+            {
+                collection.Remove(item);
+            }
+        }
+
+        public static void Merge<T1, T2>(this ICollection<T1> main, IEnumerable<T2> toAdd,
+            Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
+        {
+            if (addCondition == null)
+                throw new ArgumentNullException(nameof(addCondition));
+            if (projection == null)
+                throw new ArgumentNullException(nameof(projection));
+
+            main?.AddRange(toAdd?.WhereAll(main, (m, c) => addCondition(c, m)).Select(projection));
+        }
+
+        public static IEnumerable<T1> WhereAll<T1, T2>(this IEnumerable<T1> main, IEnumerable<T2> compareTo,
+            Func<T1, T2, bool> allCondition)
+        {
+            return main.Where(m => compareTo.All(c => allCondition(m, c)));
         }
     }
 }

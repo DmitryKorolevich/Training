@@ -81,17 +81,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VC.Public", "src\VC.Public\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FluentValidation", "src\ThirdParty\FluentValidation\FluentValidation.xproj", "{33895E3B-410F-4465-A1C4-8FABB6C0AA2A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9B10EC91-2503-4AE4-AA84-6F5A1AA1E327}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{32C14376-E245-414C-B460-A6443944510D}"
-	ProjectSection(SolutionItems) = preProject
-		src\Shared\Helpers\CollectionExtensions.cs = src\Shared\Helpers\CollectionExtensions.cs
-		src\Shared\Helpers\MethodInfoHelper.cs = src\Shared\Helpers\MethodInfoHelper.cs
-		src\Shared\Helpers\NativeHelper.cs = src\Shared\Helpers\NativeHelper.cs
-		src\Shared\Helpers\ReflectionHelper.cs = src\Shared\Helpers\ReflectionHelper.cs
-		src\Shared\Helpers\TypeExtension.cs = src\Shared\Helpers\TypeExtension.cs
-	EndProjectSection
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Core", "src\ThirdParty\EntityFramework.Core\EntityFramework.Core.xproj", "{CE8F7D9C-FAC7-4BA9-868F-47A8BA3C381B}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Workflow.Configuration", "src\VitalChoice.Workflow.Configuration\VitalChoice.Workflow.Configuration.xproj", "{7023482F-79DB-4C0D-AD3D-7591C6B16550}"
@@ -262,8 +251,6 @@ Global
 		{8B12D22B-A763-4BB5-8B63-D58155779846} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{08B600B7-5F90-4B9F-ABED-654EE8DC6167} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{33895E3B-410F-4465-A1C4-8FABB6C0AA2A} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
-		{9B10EC91-2503-4AE4-AA84-6F5A1AA1E327} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
-		{32C14376-E245-414C-B460-A6443944510D} = {9B10EC91-2503-4AE4-AA84-6F5A1AA1E327}
 		{CE8F7D9C-FAC7-4BA9-868F-47A8BA3C381B} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
 		{7023482F-79DB-4C0D-AD3D-7591C6B16550} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 	EndGlobalSection

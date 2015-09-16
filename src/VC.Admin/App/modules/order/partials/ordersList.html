@@ -189,7 +189,7 @@
                         <td>{{::item.Total | currency}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
-                            <button title="View" class="btn btn-default btn-success btn-xs">
+                            <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
                                 <i class="fa fa-search"></i>
                             </button>
                             <button title="Delete" data-ng-if="item.OrderStatus==1 || item.OrderStatus==2 || item.OrderStatus==6 || item.OrderStatus==7" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">

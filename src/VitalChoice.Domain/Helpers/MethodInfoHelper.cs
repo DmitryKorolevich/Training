@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading.Tasks;
 
-namespace Shared.Helpers
+namespace VitalChoice.Domain.Helpers
 {
-    internal static class MethodInfoHelper
+    public static class MethodInfoHelper
     {
         public static Delegate CompileStaticDelegateAccessor<TDelegate>(this MethodInfo method)
         {

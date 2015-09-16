@@ -291,6 +291,12 @@ namespace VitalChoice.Business.Services.Products
 
         public List<SkuDynamic> GetSkus(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
         {
+            if (skuInfos == null)
+                throw new ArgumentNullException(nameof(skuInfos));
+
+            if (!skuInfos.Any())
+                return new List<SkuDynamic>();
+
             var optionTypes = _productOptionTypeRepository.Query().Select(false);
             var skus =
                 _skuRepository.Query(new SkuQuery().ByIds(skuInfos.Select(i => i.Id).ToList()))
@@ -302,6 +308,28 @@ namespace VitalChoice.Business.Services.Products
                 var sku = skusKeyed[info.Id];
                 sku.OptionTypes =
                     optionTypes.Where(GetOptionTypeQuery((int?) info.IdProductType).Query().Compile()).ToList();
+            }
+            return _skuMapper.FromEntityRange(skus, true);
+        }
+
+        public List<SkuDynamic> GetSkus(ICollection<string> codes, bool withDefaults = false)
+        {
+            if (codes == null)
+                throw new ArgumentNullException(nameof(codes));
+
+            if (!codes.Any())
+                return new List<SkuDynamic>();
+
+            var optionTypes = _productOptionTypeRepository.Query().Select(false);
+            var skus =
+                _skuRepository.Query(new SkuQuery().Including(codes).NotDeleted())
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .Select(false);
+            foreach (var sku in skus)
+            {
+                sku.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
             }
             return _skuMapper.FromEntityRange(skus, true);
         }

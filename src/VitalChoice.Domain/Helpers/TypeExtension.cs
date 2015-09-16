@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace Shared.Helpers
+namespace VitalChoice.Domain.Helpers
 {
-    internal static class TypeExtension
+    public static class TypeExtension
     {
         public static bool IsType(this Type typeToCheck, Type type)
         {

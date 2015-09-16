@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 #if DNX451 || DNXCORE50
-using Microsoft.CodeAnalysis;
 using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Infrastructure;
 #endif
 
-namespace Shared.Helpers
+namespace VitalChoice.Domain.Helpers
 {
-    internal static class NativeHelper {
-#if DNX451 || DNXCORE50
-
-#endif
+    public static class NativeHelper {
 #if DNXCORE50
         private static readonly IAssemblyLoadContextAccessor LoadContextAccessor =
             (IAssemblyLoadContextAccessor)

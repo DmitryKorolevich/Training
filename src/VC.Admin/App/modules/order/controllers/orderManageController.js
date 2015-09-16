@@ -425,7 +425,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping' };
         }
-        uiScope.shippingAddressTab.OrderShippingEditModel.disableValidation = disableValidation;
+        $scope.shippingAddressTab.OrderShippingEditModel.disableValidation = disableValidation;
         return $scope.shippingAddressTab.OrderShippingEditModel;
     }
 
@@ -457,7 +457,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.legend.OrderId = $scope.order.Id;
             $scope.legend.OrderDate = $scope.order.DateCreated;
-            $scope.legend.OrderStatus = $rootScope.getReferenceItem(ReferenceData.OrderStatuses, $scope.order.OrderStatus).Text;
+            $scope.legend.OrderStatus = $rootScope.getReferenceItem($rootScope.ReferenceData.OrderStatuses, $scope.order.OrderStatus).Text;
         }
         else
         {

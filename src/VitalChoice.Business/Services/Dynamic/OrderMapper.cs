@@ -19,7 +19,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Helpers;
-using Shared.Helpers;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -101,7 +101,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         Amount = s.Amount,
                         Quantity = s.Quantity,
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
-                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku.Product, withDefaults)
+                        ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults)
                     }));
                 }
             });
@@ -143,7 +143,8 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override async Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
+        protected override async Task UpdateEntityRangeInternalAsync(
+            ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
             await items.ForEachAsync(async item =>
             {
@@ -160,21 +161,25 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                entity.GiftCertificates = new List<OrderToGiftCertificate>(dynamic.GiftCertificates.Select(g => new OrderToGiftCertificate
-                {
-                    Amount = g.Amount,
-                    IdOrder = dynamic.Id,
-                    IdGiftCertificate = g.GiftCertificate.Id
-                }));
+                entity.GiftCertificates.Merge(dynamic.GiftCertificates,
+                    (g, gio) =>
+                        g.IdGiftCertificate != gio.GiftCertificate?.Id,
+                    g => new OrderToGiftCertificate
+                    {
+                        Amount = g.Amount,
+                        IdOrder = dynamic.Id,
+                        IdGiftCertificate = g.GiftCertificate.Id
+                    });
                 entity.IdDiscount = dynamic.Discount?.Id;
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
-                entity.Skus = new List<OrderToSku>(dynamic.Skus.Select(s => new OrderToSku
-                {
-                    Amount = s.Amount,
-                    Quantity = s.Quantity,
-                    IdOrder = dynamic.Id,
-                    IdSku = s.Sku.Id
-                }));
+                entity.Skus.Merge(dynamic.Skus, (s, ds) => s.IdSku != ds.Sku?.Id,
+                    s => new OrderToSku
+                    {
+                        Amount = s.Amount,
+                        Quantity = s.Quantity,
+                        IdOrder = dynamic.Id,
+                        IdSku = s.Sku.Id
+                    });
             });
         }
     }

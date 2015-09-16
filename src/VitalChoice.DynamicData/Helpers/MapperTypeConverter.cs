@@ -1,9 +1,9 @@
-using Shared.Helpers;
 using System;
 using System.Globalization;
 using System.Reflection;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Delegates;
 
 namespace VitalChoice.DynamicData.Helpers

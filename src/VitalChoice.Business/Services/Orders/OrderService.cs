@@ -14,12 +14,15 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
+using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Domain.Transfer.Products;
@@ -94,7 +97,21 @@ namespace VitalChoice.Business.Services.Orders
         protected override async Task AfterSelect(Order entity)
         {
             var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
-            foreach (var orderToSku in entity.Skus)
+            foreach (var orderToSku in entity.Skus.Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
+            {
+                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
+                    .WithObjectType(orderToSku.Sku.Product.IdObjectType)
+                    .Query()
+                    .Compile()).ToList();
+                orderToSku.Sku.OptionTypes = optionTypes;
+                orderToSku.Sku.Product.OptionTypes = optionTypes;
+            }
+        }
+
+        protected override async Task AfterSelect(List<Order> entity)
+        {
+            var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
+            foreach (var orderToSku in entity.SelectMany(e => e.Skus))
             {
                 var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
                     .WithObjectType(orderToSku.Sku.Product.IdObjectType)
@@ -114,31 +131,34 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderContext> CalculateOrder(OrderDynamic order)
         {
-
             var context = new OrderContext
             {
-                SkuOrdereds = order.Skus.ToList(), //temp - should be returned from the calculation engine
                 Order = order
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderContext, decimal>("Order");
-            var total = tree.Execute(context);
+            tree.Execute(context);
             return context;
         }
 
         protected override async Task BeforeEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
         {
+            var orderAddressOptionValuesRepository = uow.RepositoryAsync<OrderAddressOptionValue>();
+            var orderPaymentMethodOptionValuesRepository = uow.RepositoryAsync<OrderPaymentMethodOptionValue>();
+            await orderAddressOptionValuesRepository.DeleteAllAsync(entity.ShippingAddress.OptionValues);
+            await orderPaymentMethodOptionValuesRepository.DeleteAllAsync(entity.PaymentMethod.OptionValues);
+            await orderAddressOptionValuesRepository.DeleteAllAsync(entity.PaymentMethod.BillingAddress.OptionValues);
             var orderToGcRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
             var orderToSkuRepository = uow.RepositoryAsync<OrderToSku>();
-            await orderToGcRepository.DeleteAllAsync(entity.GiftCertificates);
-            await orderToSkuRepository.DeleteAllAsync(entity.Skus);
+            await
+                orderToGcRepository.DeleteAllAsync(entity.GiftCertificates.WhereAll(model.GiftCertificates,
+                    (g, dg) => g.IdGiftCertificate != dg.GiftCertificate?.Id));
+            await
+                orderToSkuRepository.DeleteAllAsync(entity.Skus.WhereAll(model.Skus, (s, ds) => s.IdSku != ds.Sku?.Id));
         }
 
         protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
         {
-            var orderToGcRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
-            var orderToSkuRepository = uow.RepositoryAsync<OrderToSku>();
-            await orderToGcRepository.InsertRangeAsync(entity.GiftCertificates);
-            await orderToSkuRepository.InsertRangeAsync(entity.Skus);
+            //await AfterSelect(entity);
         }
 
         protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)

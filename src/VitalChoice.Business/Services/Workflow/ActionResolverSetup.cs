@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shared.Helpers;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Core;

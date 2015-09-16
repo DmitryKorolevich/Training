@@ -1,5 +1,5 @@
 ﻿{
-  "compile": "..\\Shared\\**\\*.cs",
+  
   "version": "1.0.0-*",
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",

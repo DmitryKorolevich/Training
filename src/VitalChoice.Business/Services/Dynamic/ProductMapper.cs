@@ -14,7 +14,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
-using Shared.Helpers;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

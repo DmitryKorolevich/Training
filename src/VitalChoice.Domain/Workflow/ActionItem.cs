@@ -1,5 +1,5 @@
 ﻿using System;
-using Shared.Helpers;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Domain.Workflow
 {

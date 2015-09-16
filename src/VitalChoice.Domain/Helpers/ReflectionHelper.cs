@@ -2,21 +2,19 @@
 #endif
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using VitalChoice.Domain.Exceptions;
 #if DNXCORE50
 using System.Runtime.Loader;
 #endif
-using System.Text.RegularExpressions;
-using System.Threading;
-using VitalChoice.Domain.Exceptions;
 
-namespace Shared.Helpers {
+namespace VitalChoice.Domain.Helpers {
     /// <summary>
     /// Extends AttributeSet to perform more helper methods for Type reflection
     /// </summary>
-    internal class ReflectionHelper {
+    public class ReflectionHelper {
         private static readonly Regex GenericExpression = new Regex
             (@"^(?<main_type>[_a-zA-Z@][a-zA-Z0-9\.]*)<(?<generic_parameters>[_a-zA-Z@][a-zA-Z0-9\.\+]*)>$",
              RegexOptions.Compiled | RegexOptions.Singleline);

@@ -1,7 +1,7 @@
-﻿using Shared.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Attributes;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;

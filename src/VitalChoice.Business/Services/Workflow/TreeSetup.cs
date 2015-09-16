@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
-using Shared.Helpers;
 using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Trees;

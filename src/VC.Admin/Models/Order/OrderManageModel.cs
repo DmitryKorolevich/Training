@@ -49,6 +49,7 @@ namespace VC.Admin.Models.Order
                 QTY = dynamic.Quantity;
                 Price = dynamic.Amount;
                 Amount = Price * QTY;
+                Id = dynamic.Sku.Id;
             }
         }
     }

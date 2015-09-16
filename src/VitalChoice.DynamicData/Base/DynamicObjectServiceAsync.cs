@@ -267,6 +267,7 @@ namespace VitalChoice.DynamicData.Base
             await UpdateItems(uow, items, bigValueRepository, valueRepository);
             await mainRepository.UpdateRangeAsync(entities);
             await uow.SaveChangesAsync(CancellationToken.None);
+            await AfterSelect(entities);
             return entities;
         }
 
@@ -294,6 +295,7 @@ namespace VitalChoice.DynamicData.Base
                     }, bigValueRepository, valueRepository);
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
+            await AfterSelect(entity);
             return entity;
         }
 

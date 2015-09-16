@@ -137,7 +137,8 @@ namespace VC.Admin.ModelConverters
 
             if (model.SkuOrdereds != null)
             {
-                var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).ToList();
+                var validList = model.SkuOrdereds.Where(s => s.Id.HasValue && s.IdProductType.HasValue).ToList();
+                var notValidList = model.SkuOrdereds.Where(s => !s.Id.HasValue || !s.IdProductType.HasValue).ToList();
                 Dictionary<int, SkuOrderedManageModel> keyedCollection =
                     // ReSharper disable once PossibleInvalidOperationException
                     validList.ToDictionary(s => s.Id.Value, s => s);
@@ -158,7 +159,17 @@ namespace VC.Admin.ModelConverters
                             Quantity = orderedItem.QTY ?? 0,
                             ProductWithoutSkus = _productService.Select(s.IdProduct)
                         };
-                    }).ToList();
+                    }).Union(_skuService.GetSkus(notValidList.Select(s => s.Code).ToList(), true).Select(s =>
+                    {
+                        var orderedItem = keyedCollection[s.Id];
+                        return new SkuOrdered
+                        {
+                            Sku = s,
+                            Amount = orderedItem.Price ?? 0,
+                            Quantity = orderedItem.QTY ?? 0,
+                            ProductWithoutSkus = _productService.Select(s.IdProduct)
+                        };
+                    })).ToList();
             }
 
             if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)
