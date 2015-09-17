@@ -184,6 +184,12 @@ namespace VC.Admin.Controllers
 
             if (model.Id > 0)
             {
+                var dbItem = (await _orderService.SelectAsync(item.Id));
+                if(dbItem!=null && dbItem.DictionaryData.ContainsKey("OrderType"))
+                {
+                    item.Data.OrderType = dbItem.Data.OrderType;
+                }
+
                 item = (await _orderService.UpdateAsync(item));
             }
             else

@@ -10,7 +10,7 @@ SELECT
 	o.OrderStatus,
 	CAST(oval.Value as int) As IdOrderSource,
 	onval.Value As OrderNotes,
-	o.IdPaymentMethod,
+	opm.IdObjectType As IdPaymentMethod,
 	o.DateCreated,
 	NULL As DateShipped,
 	o.Total,
@@ -24,6 +24,7 @@ SELECT
 	options.FirstName+' '+options.LastName As Customer,
 	st.StateCode
 	FROM Orders AS o
+	LEFT JOIN OrderPaymentMethods AS opm ON opm.Id = o.IdPaymentMethod
 	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderType' AND (oopt.IdObjectType = o.IdObjectType OR oopt.IdObjectType IS NULL)
 	LEFT JOIN OrderOptionValues AS oval ON oval.IdOrder = o.Id AND oval.IdOptionType = oopt.Id
 	LEFT JOIN OrderOptionTypes AS onopt ON onopt.Name = N'OrderNotes' AND (onopt.IdObjectType = o.IdObjectType OR onopt.IdObjectType IS NULL)
