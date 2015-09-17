@@ -39,6 +39,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         List<SkuDynamic> GetSkus(ICollection<string> codes, bool withDefaults = false);
 
-        #endregion
-    }
+	    ProductDynamic GetProductWithoutSkus(int id, bool withDefaults = false);
+
+	    #endregion
+	}
 }

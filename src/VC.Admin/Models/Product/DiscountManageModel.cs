@@ -90,10 +90,10 @@ namespace VC.Admin.Models.Product
         [Map]
         public IList<int> CategoryIds { get; set; }
 
-        [Map]
+        [Map("SkusFilter")]
         public IList<DiscountToSku> DiscountsToSkus { get; set; }
 
-        [Map]
+        [Map("SkusAppliedOnlyTo")]
         public IList<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
 
         [Map]

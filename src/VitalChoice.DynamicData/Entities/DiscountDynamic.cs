@@ -29,9 +29,9 @@ namespace VitalChoice.DynamicData.Entities
 
         public ICollection<int> CategoryIds { get; set; }
 
-        public ICollection<DiscountToSku> DiscountsToSkus { get; set; }
+        public ICollection<DiscountToSku> SkusFilter { get; set; }
 
-        public ICollection<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
+        public ICollection<DiscountToSelectedSku> SkusAppliedOnlyTo { get; set; }
 
         public ICollection<DiscountTier> DiscountTiers { get; set; }
     }

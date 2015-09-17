@@ -324,7 +324,7 @@ namespace VitalChoice.DynamicData.Base
             IRepositoryAsync<BigStringValue> bigValueRepository,
             IRepositoryAsync<TOptionValue> valueRepository)
         {
-            await SetBigValuesAsync(items.Select(i => i.Entity), bigValueRepository, true);
+            await SetBigValuesAsync(items.Select(i => i.Entity), true);
             foreach (var pair in items)
             {
                 await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);

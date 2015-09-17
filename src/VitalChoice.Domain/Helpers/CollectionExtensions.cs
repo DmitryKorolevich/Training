@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Internal;
 
 namespace VitalChoice.Domain.Helpers
 {
@@ -84,6 +85,20 @@ namespace VitalChoice.Domain.Helpers
             Func<T1, T2, bool> allCondition)
         {
             return main.Where(m => compareTo.All(c => allCondition(m, c)));
+        }
+
+        public static IEnumerable<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
+            IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
+        {
+            HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
+            return main.Where(m => !searchIn.Contains(mainKeySelector(m)));
+        }
+
+        public static IEnumerable<T1> IntersectKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
+            IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
+        {
+            HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
+            return main.Where(m => searchIn.Contains(mainKeySelector(m)));
         }
     }
 }

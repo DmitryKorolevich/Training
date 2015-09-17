@@ -30,14 +30,11 @@ namespace VC.Admin.ModelConverters
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
         private readonly IGcService _gcService;
-        private readonly IProductService _skuService;
-        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> _productService;
+        private readonly IProductService _productService;
 
         public OrderModelConverter(IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
             IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper, ICustomerService customerService,
-            IDiscountService discountService, IGcService gcService,
-            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
-                productService, IProductService skuService)
+            IDiscountService discountService, IGcService gcService, IProductService productService)
         {
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
@@ -45,7 +42,6 @@ namespace VC.Admin.ModelConverters
             _discountService = discountService;
             _gcService = gcService;
             _productService = productService;
-            _skuService = skuService;
         }
 
         public void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
@@ -143,7 +139,7 @@ namespace VC.Admin.ModelConverters
                     // ReSharper disable once PossibleInvalidOperationException
                     validList.ToDictionary(s => s.Id.Value, s => s);
                 dynamic.Skus =
-                    _skuService.GetSkus(validList.Select(s => new SkuInfo
+                    _productService.GetSkus(validList.Select(s => new SkuInfo
                     {
                         // ReSharper disable once PossibleInvalidOperationException
                         Id = s.Id.Value,
@@ -159,7 +155,7 @@ namespace VC.Admin.ModelConverters
                             Quantity = orderedItem.QTY ?? 0,
                             ProductWithoutSkus = _productService.Select(s.IdProduct)
                         };
-                    }).Union(_skuService.GetSkus(notValidList.Select(s => s.Code).ToList(), true).Select(s =>
+                    }).Union(_productService.GetSkus(notValidList.Select(s => s.Code).ToList(), true).Select(s =>
                     {
                         var orderedItem = keyedCollection[s.Id];
                         return new SkuOrdered
@@ -167,7 +163,7 @@ namespace VC.Admin.ModelConverters
                             Sku = s,
                             Amount = orderedItem.Price ?? 0,
                             Quantity = orderedItem.QTY ?? 0,
-                            ProductWithoutSkus = _productService.Select(s.IdProduct)
+                            ProductWithoutSkus = _productService.GetProductWithoutSkus(s.IdProduct, true)
                         };
                     })).ToList();
             }

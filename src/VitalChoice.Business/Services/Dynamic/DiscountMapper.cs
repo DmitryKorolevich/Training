@@ -52,8 +52,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdAddedBy = entity.IdAddedBy;
 
                 dynamic.CategoryIds = entity.DiscountsToCategories?.Select(p => p.IdCategory).ToList();
-                dynamic.DiscountsToSkus = entity.DiscountsToSkus?.ToList();
-                dynamic.DiscountsToSelectedSkus = entity.DiscountsToSelectedSkus?.ToList();
+                dynamic.SkusFilter = entity.DiscountsToSkus?.ToList();
+                dynamic.SkusAppliedOnlyTo = entity.DiscountsToSelectedSkus?.ToList();
                 dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
             });
             return Task.Delay(0);
@@ -81,23 +81,23 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdCategory = c,
                     IdDiscount = dynamic.Id
                 }).ToList();
-                if (dynamic.DiscountsToSkus != null)
+                if (dynamic.SkusFilter != null)
                 {
-                    foreach (var item in dynamic.DiscountsToSkus)
+                    foreach (var item in dynamic.SkusFilter)
                     {
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
+                    entity.DiscountsToSkus = dynamic.SkusFilter.ToList();
                 }
-                if (dynamic.DiscountsToSelectedSkus != null)
+                if (dynamic.SkusAppliedOnlyTo != null)
                 {
-                    foreach (var item in dynamic.DiscountsToSelectedSkus)
+                    foreach (var item in dynamic.SkusAppliedOnlyTo)
                     {
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
+                    entity.DiscountsToSelectedSkus = dynamic.SkusAppliedOnlyTo.ToList();
                 }
                 if (dynamic.DiscountTiers != null)
                 {
@@ -134,23 +134,23 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdCategory = c,
                     IdDiscount = dynamic.Id
                 }).ToList();
-                if (dynamic.DiscountsToSkus != null)
+                if (dynamic.SkusFilter != null)
                 {
-                    foreach (var item in dynamic.DiscountsToSkus)
+                    foreach (var item in dynamic.SkusFilter)
                     {
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSkus = dynamic.DiscountsToSkus.ToList();
+                    entity.DiscountsToSkus = dynamic.SkusFilter.ToList();
                 }
-                if (dynamic.DiscountsToSelectedSkus != null)
+                if (dynamic.SkusAppliedOnlyTo != null)
                 {
-                    foreach (var item in dynamic.DiscountsToSelectedSkus)
+                    foreach (var item in dynamic.SkusAppliedOnlyTo)
                     {
                         item.Id = 0;
                         item.IdDiscount = dynamic.Id;
                     }
-                    entity.DiscountsToSelectedSkus = dynamic.DiscountsToSelectedSkus.ToList();
+                    entity.DiscountsToSelectedSkus = dynamic.SkusAppliedOnlyTo.ToList();
                 }
                 if (dynamic.DiscountTiers != null)
                 {

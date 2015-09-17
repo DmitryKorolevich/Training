@@ -334,6 +334,14 @@ namespace VitalChoice.Business.Services.Products
             return _skuMapper.FromEntityRange(skus, true);
         }
 
+        public ProductDynamic GetProductWithoutSkus(int id, bool withDefaults = false)
+        {
+            var task = SelectItemAsync(query => query.Include(p => p.ProductsToCategories),
+                p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted, withDefaults);
+            task.Wait();
+            return task.Result;
+        }
+
         public async Task<Sku> GetSkuAsync(string code)
         {
             var query = _skuRepository.Query(p => p.Code == code && p.StatusCode != RecordStatusCode.Deleted);
