@@ -17,23 +17,27 @@
             $scope.options.currentFileDescription = null;
         });
 
-        $scope.upload = function (files)
+        $scope.setFile = function(files)
+        {
+            $scope.uploadFile = files && files.length > 0 ? files[0] : null;
+        };
+
+        $scope.upload = function ()
         {
             var logRequest = $scope.logFileRequest;
             logRequest.type = "upload";
             logRequest.progress = 0;
             logRequest.state = "progress";
 
-            if (files && files.length > 0)
+            if ($scope.uploadFile)
             {
-
-                logRequest.name = files[0].FileName;
+                logRequest.name = $scope.uploadFile.FileName;
 
                 $scope.uploading = true;
                 Upload.upload({
                     url: '/api/customer/UploadCustomerFile',
                     data: $scope.publicId,
-                    file: files[0]
+                    file: $scope.uploadFile
                 }).progress(function (evt)
                 {
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
@@ -61,12 +65,15 @@
                     }
 
                     files = [];
+                    $scope.uploadFile = null;
                     $scope.options.currentFileDescription = "";
+                    logRequest.state = '';
 
                     $scope.uploading = false;
                 }).error(function (data, status, headers, config)
                 {
                     $scope.uploading = false;
+                    $scope.uploadFile = null;
 
                     logRequest.progress = 100;
                     logRequest.state = 'error';

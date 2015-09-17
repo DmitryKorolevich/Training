@@ -1,7 +1,7 @@
 ﻿<spinner-overlay data-loading="addEditTracker.active()">
     <div class="well row">
         <div class="col-md-6">
-            <form class="form-horizontal" unsaved-warning-form>
+            <form class="form-horizontal">
                 <fieldset>
                     <span class="legend">Upload New File</span>
                     <div class="form-group">
@@ -13,9 +13,10 @@
                     <div class="form-group">
                         <label class="col-md-3 control-label"></label>
                         <div class="col-md-3">
-                            <button class="btn btn-primary" ngf-select ngf-change="upload($files)" ladda="uploading">Upload</button>
+                            <button class="btn btn-primary" ngf-select ngf-change="setFile($files)">Locate file</button>
+                            <button data-ng-if="uploadFile" class="btn btn-primary" data-ng-click="upload()" ladda="uploading">Upload</button>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 form-control-static">
                             <div ng-if="logFileRequest.state=='progress'">
                                 <progressbar animate="true" value="logFileRequest.progress" type="success"><b>{{logFileRequest.progress}}%</b></progressbar>
                             </div>
@@ -48,10 +49,12 @@
                         <td>{{file.UploadDate | date:"MM/dd/yy"}}</td>
                         <td>{{file.Description}}</td>
                         <td>
-                            <a class="btn btn-default btn-info" target="_self" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&publicId={{publicId}}&viewMode=false&buildNumber={{buildNumber}}">
-                                Download
+                            <a title="Download" class="btn btn-xs btn-success" target="_self" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&publicId={{publicId}}&viewMode=false&buildNumber={{buildNumber}}">
+                                <i class="glyphicon glyphicon-download"></i>
                             </a>
-                            <button class="btn btn-danger" data-ng-click="deleteFile(fileIndex, file.FileName)" ladda="deleteFileTracker.active()">Delete</button>
+                            <button title="Delete" class="btn btn-xs btn-danger" data-ng-click="deleteFile(fileIndex, file.FileName)">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>

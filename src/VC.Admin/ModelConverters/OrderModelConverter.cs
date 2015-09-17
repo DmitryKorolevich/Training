@@ -103,11 +103,6 @@ namespace VC.Admin.ModelConverters
 
         public void ModelToDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
-            if(model.Customer!=null)
-            {
-                dynamic.Customer = _customerService.Select(model.Customer.Id, true);
-            }
-
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {
                 dynamic.Discount =
@@ -244,6 +239,94 @@ namespace VC.Admin.ModelConverters
                     {
                         dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
                     }
+                }
+            }
+
+            if (model.Customer != null)
+            {
+                //update customer
+                var dbCustomer = _customerService.Select(model.Customer.Id, true);
+                if (dbCustomer != null)
+                {
+                    dbCustomer.CustomerNotes = dynamic.Customer.CustomerNotes;
+                    dbCustomer.Files = dynamic.Customer.Files;
+                    if (model.Id == 0)
+                    {
+                        if (dynamic.Customer.DictionaryData.ContainsKey("Source"))
+                        {
+                            dbCustomer.Data.Source = dynamic.Customer.Data.Source;
+                        }
+                        if (dynamic.Customer.DictionaryData.ContainsKey("SourceDetails"))
+                        {
+                            dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
+                        }
+                        dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
+                        dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
+
+                        var profileAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
+                        if (profileAddress != null)
+                        {
+                            dbCustomer.Addresses.Remove(profileAddress);
+                        }
+                        profileAddress = dynamic.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
+                        if (profileAddress != null)
+                        {
+                            dbCustomer.Addresses.Add(profileAddress);
+                        }
+
+                        if (model.UpdateShippingAddressForCustomer)
+                        {
+                            var shippingAddresses = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).ToList();
+                            foreach(var address in shippingAddresses)
+                            { 
+                                dbCustomer.Addresses.Remove(address);
+                            }
+                            shippingAddresses = dynamic.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).ToList();
+                            foreach (var address in shippingAddresses)
+                            {
+                                dbCustomer.Addresses.Add(address);
+                            }
+                        }
+
+                        if (model.UpdateCardForCustomer && dynamic.PaymentMethod!=null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.CreditCard);
+                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                        if (model.UpdateOACForCustomer && dynamic.PaymentMethod != null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.Oac);
+                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Oac))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.Check);
+                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Check))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                    }
+
+                    dynamic.Customer = dbCustomer;
+                }
+            }
+        }
+
+        private void RemovePaymentMethodsFromDBCustomer(CustomerDynamic customer, int? orderPaymentMethod, PaymentMethodType method)
+        {
+            if (orderPaymentMethod == (int)method)
+            {
+                var customerPaymentMethods = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)method).ToList();
+                foreach (var customerPaymentMethod in customerPaymentMethods)
+                {
+                    customer.CustomerPaymentMethods.Remove(customerPaymentMethod);
                 }
             }
         }

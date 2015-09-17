@@ -170,8 +170,26 @@ namespace VC.Admin.Controllers
             {
                 item.IdEditedBy = userId;
             }
+            item.Customer.IdEditedBy = userId;
+            foreach (var address in item.Customer.Addresses)
+            {
+                address.IdEditedBy = userId;
+            }
+            foreach (var customerNote in item.Customer.CustomerNotes)
+            {
+                customerNote.IdEditedBy = userId;
+            }
+
+            await _customerService.UpdateAsync(item.Customer);
+
             if (model.Id > 0)
             {
+                var dbItem = (await _orderService.SelectAsync(item.Id));
+                if(dbItem!=null && dbItem.DictionaryData.ContainsKey("OrderType"))
+                {
+                    item.Data.OrderType = dbItem.Data.OrderType;
+                }
+
                 item = (await _orderService.UpdateAsync(item));
             }
             else
@@ -183,69 +201,6 @@ namespace VC.Admin.Controllers
                 item = (await _orderService.InsertAsync(item));
             }
 
-            //update customer
-            var dbCustomer = await _customerService.SelectAsync(item.Customer.Id);
-            if (dbCustomer != null)
-            {
-                item.Customer.IdEditedBy = userId;
-                foreach (var address in item.Customer.Addresses)
-                {
-                    address.IdEditedBy = userId;
-                }
-                foreach (var customerNote in item.Customer.CustomerNotes)
-                {
-                    customerNote.IdEditedBy = userId;
-                }
-                dbCustomer.CustomerNotes = item.Customer.CustomerNotes;
-                dbCustomer.Files = item.Customer.Files;
-                if(model.Id==0)
-                {
-                    dbCustomer.ApprovedPaymentMethods = item.Customer.ApprovedPaymentMethods;
-                    dbCustomer.OrderNotes = item.Customer.OrderNotes;
-
-                    var profileAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
-                    if(profileAddress!=null)
-                    {
-                        dbCustomer.Addresses.Remove(profileAddress);
-                    }
-                    profileAddress= item.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
-                    if (profileAddress != null)
-                    {
-                        dbCustomer.Addresses.Add(profileAddress);
-                    }
-
-                    if(model.UpdateShippingAddressForCustomer)
-                    {
-                        var shippingAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Shipping);
-                        if (shippingAddress != null)
-                        {
-                            dbCustomer.Addresses.Remove(shippingAddress);
-                        }
-                        shippingAddress = item.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Shipping);
-                        if (shippingAddress != null)
-                        {
-                            dbCustomer.Addresses.Add(profileAddress);
-                        }
-                    }
-
-                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.CreditCard, model.UpdateCardForCustomer);
-                    foreach(var card in item.Customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard))
-                    {
-                        dbCustomer.CustomerPaymentMethods.Add(card);
-                    }
-                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.Oac, model.UpdateOACForCustomer);
-                    foreach (var card in item.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Oac))
-                    {
-                        dbCustomer.CustomerPaymentMethods.Add(card);
-                    }
-                    RemovePaymentMethodsFromDBCusomer(dbCustomer, item.PaymentMethod.IdObjectType, PaymentMethodType.Check, model.UpdateCheckForCustomer);
-                    foreach (var card in item.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Check))
-                    {
-                        dbCustomer.CustomerPaymentMethods.Add(card);
-                    }
-                }
-            }
-
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
             //TODO - add sign up for newsletter(SignUpNewsletter)
@@ -253,16 +208,5 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-        private void RemovePaymentMethodsFromDBCusomer(CustomerDynamic customer, int? orderPaymentMethod, PaymentMethodType method, bool update)
-        {
-            if (orderPaymentMethod == (int)method && update)
-            {
-                var customerPaymentMethods = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)method).ToList();
-                foreach (var customerPaymentMethod in customerPaymentMethods)
-                {
-                    customer.CustomerPaymentMethods.Remove(customerPaymentMethod);
-                }
-            }
-        }
     }
 }

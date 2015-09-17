@@ -5,7 +5,7 @@
                 <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <button cancel-button-default-state="index.oneCol.manageOrders" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
+                <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
             </div>
         </div>
     </div>
@@ -16,7 +16,7 @@
                     <span data-ng-if="legend.CustomerName" class="item">Customer: {{legend.CustomerName}}</span>
                     <span data-ng-if="legend.CustomerId" class="item">Customer ID: {{legend.CustomerId}}</span>
                     <span data-ng-if="legend.OrderId" class="item">Order ID: {{legend.OrderId}}</span>
-                    <span data-ng-if="legend.OrderDate" class="item">Order Date: {{legend.OrderDate}}</span>
+                    <span data-ng-if="legend.OrderDate" class="item">Order Date: {{::legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</span>
                     <span data-ng-if="legend.OrderStatus" class="item">Status: {{legend.OrderStatus}}</span>
                 </span>
             </div>
