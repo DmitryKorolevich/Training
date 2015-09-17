@@ -547,17 +547,58 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
 
+        var toDeleteIdxs = [];
         $.each($scope.order.SkuOrdereds, function (index, uiSku)
         {
+            var found = false;
             $.each(data.SkuOrdereds, function (index, sku)
             {
                 if (uiSku.Code == sku.Code)
                 {
+                    uiSku.Price = sku.Price;
                     uiSku.Amount = sku.Amount;
+                    uiSku.Quantity = sku.Quantity;
                     uiSku.Messages = sku.Messages;
+                    found = true;
                     return false;
                 }
             });
+            if (!found && uiSku.Id != null)
+            {
+                toDeleteIdxs.push(index);
+            }
+        });
+
+        $.each(toDeleteIdxs, function (index, item) {
+            $scope.order.SkuOrdereds.splice(item, 1);
+        });
+
+        $.each(data.PromoSkus, function (index, sku) {
+            var found = false;
+            $.each($scope.order.SkuOrdereds, function (index, uiSku) {
+                if (uiSku.Code == sku.Code) {
+                    uiSku.Price = sku.Price;
+                    uiSku.Amount = sku.Amount;
+                    uiSku.Quantity = sku.Quantity;
+                    uiSku.Messages = sku.Messages;
+                    uiSku.Promo = sku.Promo;
+                    found = true;
+                    return false;
+                }
+            });
+            if (!found)
+            {
+                var lastIndex = $scope.order.SkuOrdereds.length - 1;
+                if ($scope.order.SkuOrdereds[lastIndex].Id == null)
+                {
+                    $scope.order.SkuOrdereds[lastIndex] = sku;
+                    $scope.productAdd();
+                }
+                else
+                {
+                    $scope.order.SkuOrdereds.push(sku);
+                }
+            }
         });
 
         //clear the main tab left part validation

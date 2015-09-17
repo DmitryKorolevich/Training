@@ -16,6 +16,7 @@ using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
@@ -128,39 +129,34 @@ namespace VC.Admin.ModelConverters
 
             if (model.SkuOrdereds != null)
             {
-                var validList = model.SkuOrdereds.Where(s => s.Id.HasValue && s.IdProductType.HasValue).ToList();
-                var notValidList = model.SkuOrdereds.Where(s => !s.Id.HasValue || !s.IdProductType.HasValue).ToList();
-                Dictionary<int, SkuOrderedManageModel> keyedCollection =
+                model.SkuOrdereds = model.SkuOrdereds.Where(s => !(s.Promo ?? false)).ToList();
+
+                var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).Select(s => s.Id.Value).ToList();
+                var notValidList = model.SkuOrdereds.Where(s => !s.Id.HasValue).Select(s => s.Code).ToList();
+                var task = _productService.GetSkusOrderedAsync(validList);
+                task.Wait();
+                var validSkus = task.Result;
+                task = _productService.GetSkusOrderedAsync(notValidList);
+                task.Wait();
+                var notValidSkus = task.Result;
+                Dictionary<int, SkuOrderedManageModel> valid =
                     // ReSharper disable once PossibleInvalidOperationException
-                    validList.ToDictionary(s => s.Id.Value, s => s);
-                dynamic.Skus =
-                    _productService.GetSkus(validList.Select(s => new SkuInfo
-                    {
-                        // ReSharper disable once PossibleInvalidOperationException
-                        Id = s.Id.Value,
-                        // ReSharper disable once PossibleInvalidOperationException
-                        IdProductType = (ProductType) s.IdProductType
-                    }).ToList(), true).Select(s =>
-                    {
-                        var orderedItem = keyedCollection[s.Id];
-                        return new SkuOrdered
-                        {
-                            Sku = s,
-                            Amount = orderedItem.Price ?? 0,
-                            Quantity = orderedItem.QTY ?? 0,
-                            ProductWithoutSkus = _productService.Select(s.IdProduct)
-                        };
-                    }).Union(_productService.GetSkus(notValidList.Select(s => s.Code).ToList(), true).Select(s =>
-                    {
-                        var orderedItem = keyedCollection[s.Id];
-                        return new SkuOrdered
-                        {
-                            Sku = s,
-                            Amount = orderedItem.Price ?? 0,
-                            Quantity = orderedItem.QTY ?? 0,
-                            ProductWithoutSkus = _productService.GetProductWithoutSkus(s.IdProduct, true)
-                        };
-                    })).ToList();
+                    model.SkuOrdereds.Where(s => s.Id.HasValue).ToDictionary(s => s.Id.Value, s => s);
+                Dictionary<string, SkuOrderedManageModel> notValid =
+                    model.SkuOrdereds.Where(s => !s.Id.HasValue).ToDictionary(s => s.Code, s => s);
+                foreach (var sku in validSkus)
+                {
+                    var item = valid[sku.Sku.Id];
+                    sku.Amount = item.Price ?? 0;
+                    sku.Quantity = item.QTY ?? 0;
+                }
+                foreach (var sku in notValidSkus)
+                {
+                    var item = notValid[sku.Sku.Code];
+                    sku.Amount = item.Price ?? 0;
+                    sku.Quantity = item.QTY ?? 0;
+                }
+                dynamic.Skus = new List<SkuOrdered>(validSkus.Union(notValidSkus));
             }
 
             if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)

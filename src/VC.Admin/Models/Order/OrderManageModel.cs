@@ -35,6 +35,8 @@ namespace VC.Admin.Models.Order
 
         public int? QTY { get; set; }
 
+        public bool? Promo { get; set; }
+
         public decimal? Amount { get; set; }
 
         public IList<string> Messages { get; set; }

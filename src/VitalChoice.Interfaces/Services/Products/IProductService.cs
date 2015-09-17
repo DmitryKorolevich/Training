@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
@@ -29,17 +30,23 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<Dictionary<int, int>> GetTopPurchasedSkuIdsAsync(FilterBase filter);
 
-        Task<Sku> GetSkuAsync(string code);
+        Task<SkuOrdered> GetSkuOrderedAsync(string code);
 
-        Task<Sku> GetSkuAsync(int id);
+        Task<SkuOrdered> GetSkuOrderedAsync(int id);
+
+        Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<string> codes);
+
+        Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids);
+
+        Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false);
+
+        Task<SkuDynamic> GetSkuAsync(int id, bool withDefaults = false);
 
         Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter);
 
-	    List<SkuDynamic> GetSkus(ICollection<SkuInfo> skuInfos, bool withDefaults = false);
+	    Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false);
 
-        List<SkuDynamic> GetSkus(ICollection<string> codes, bool withDefaults = false);
-
-	    ProductDynamic GetProductWithoutSkus(int id, bool withDefaults = false);
+        Task<List<SkuDynamic>> GetSkusAsync(ICollection<string> codes, bool withDefaults = false);
 
 	    #endregion
 	}

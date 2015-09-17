@@ -17,6 +17,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
 
         public override decimal ExecuteAction(OrderContext context)
         {
+            context.FreeShipping = context.Order.Discount.Data.FreeShipping;
             var discountableSubtotal = context.Data.DiscountableSubtotal;
             foreach (var tier in context.Order.Discount.DiscountTiers)
             {
@@ -29,7 +30,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
                             return -Math.Min(discountableSubtotal, tier.Amount ?? 0);
                         case DiscountType.PercentDiscount:
                             context.DiscountMessage = $"Tiered Discount, Tier from {tier.From:C} to {tier.To:C} ({(tier.Percent ?? 0) / 100:P0})";
-                            return -tier.Percent ?? 0 / 100.0 * discountableSubtotal;
+                            return -tier.Percent ?? 0 / (decimal)100.0 * discountableSubtotal;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }

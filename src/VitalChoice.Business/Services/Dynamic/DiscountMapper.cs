@@ -13,16 +13,20 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
+        private readonly IProductService _productService;
+
         public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<TypePair, IModelToDynamicConverter> container,
-            IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync)
+            IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync, IProductService productService)
             : base(mappers, container, discountRepositoryAsync)
         {
+            _productService = productService;
         }
 
         public override Expression<Func<DiscountOptionValue, int?>> ObjectIdSelector
@@ -55,6 +59,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.SkusFilter = entity.DiscountsToSkus?.ToList();
                 dynamic.SkusAppliedOnlyTo = entity.DiscountsToSelectedSkus?.ToList();
                 dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
+                if (dynamic.IdObjectType == (int)DiscountType.Threshold && withDefaults)
+                {
+                    var task = _productService.GetSkuOrderedAsync((string)dynamic.Data.ProductSKU);
+                    task.Wait();
+                    dynamic.Data.ThresholdSku = task.Result;
+                }
             });
             return Task.Delay(0);
         }

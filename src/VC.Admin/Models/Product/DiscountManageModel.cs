@@ -85,6 +85,7 @@ namespace VC.Admin.Models.Product
         //4
         //A SKU code for the frontend UI
         [Localized(GeneralFieldNames.Code)]
+        [Map]
         public string ProductSKU { get; set; }
 
         [Map]

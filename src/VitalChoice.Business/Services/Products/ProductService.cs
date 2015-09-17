@@ -273,6 +273,149 @@ namespace VitalChoice.Business.Services.Products
             return await _orderSkusRepositoryRepository.GetTopPurchasedSkuIdsAsync(filter);
         }
 
+        public async Task<SkuOrdered> GetSkuOrderedAsync(string code)
+        {
+            if (code == null)
+                throw new ArgumentNullException(nameof(code));
+
+            if (string.IsNullOrWhiteSpace(code))
+                return null;
+
+            var sku =
+                await _skuRepository.Query(s => s.Code == code && s.StatusCode != RecordStatusCode.Deleted)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectFirstOrDefaultAsync(false);
+            sku.OptionTypes =
+                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+            sku.Product.OptionTypes = sku.OptionTypes;
+            return new SkuOrdered
+            {
+                Sku = await _skuMapper.FromEntityAsync(sku, true),
+                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true)
+            };
+        }
+
+        public async Task<SkuOrdered> GetSkuOrderedAsync(int id)
+        {
+            var sku =
+                await _skuRepository.Query(s => s.Id == id)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectFirstOrDefaultAsync(false);
+            sku.OptionTypes =
+                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+            sku.Product.OptionTypes = sku.OptionTypes;
+            return new SkuOrdered
+            {
+                Sku = await _skuMapper.FromEntityAsync(sku, true),
+                ProductWithoutSkus = await Mapper.FromEntityAsync(sku.Product, true)
+            };
+        }
+
+        public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<string> codes)
+        {
+            if (codes == null)
+                throw new ArgumentNullException(nameof(codes));
+
+            if (!codes.Any())
+                return new List<SkuOrdered>();
+
+            var skus =
+                await _skuRepository.Query(s => codes.Contains(s.Code) && s.StatusCode != RecordStatusCode.Deleted)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectAsync(false);
+
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
+
+            foreach (var sku in skus)
+            {
+                sku.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
+                sku.Product.OptionTypes = sku.OptionTypes;
+            }
+
+            return skus.Select(sku => new SkuOrdered
+            {
+                Sku = _skuMapper.FromEntity(sku, true),
+                ProductWithoutSkus = Mapper.FromEntity(sku.Product, true)
+            }).ToList();
+        }
+
+        public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids)
+        {
+            if (ids == null)
+                throw new ArgumentNullException(nameof(ids));
+
+            if (!ids.Any())
+                return new List<SkuOrdered>();
+
+            var skus =
+                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != RecordStatusCode.Deleted)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.OptionValues)
+                    .Include(s => s.Product)
+                    .ThenInclude(p => p.ProductsToCategories)
+                    .SelectAsync(false);
+
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
+
+            foreach (var sku in skus)
+            {
+                sku.OptionTypes =
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
+                sku.Product.OptionTypes = sku.OptionTypes;
+            }
+
+            return skus.Select(sku => new SkuOrdered
+            {
+                Sku = _skuMapper.FromEntity(sku, true),
+                ProductWithoutSkus = Mapper.FromEntity(sku.Product, true)
+            }).ToList();
+        }
+
+        public async Task<SkuDynamic> GetSkuAsync(string code, bool withDefaults = false)
+        {
+            if (code == null)
+                throw new ArgumentNullException(nameof(code));
+
+            if (string.IsNullOrWhiteSpace(code))
+                return null;
+
+            var sku =
+                await _skuRepository.Query(s => s.Code == code && s.StatusCode != RecordStatusCode.Deleted)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .SelectFirstOrDefaultAsync(false);
+            sku.OptionTypes =
+                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+            return await _skuMapper.FromEntityAsync(sku, withDefaults);
+        }
+
+        public async Task<SkuDynamic> GetSkuAsync(int id, bool withDefaults = false)
+        {
+            var sku =
+                await _skuRepository.Query(s => s.Id == id)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .SelectFirstOrDefaultAsync(false);
+            sku.OptionTypes =
+                await
+                    _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+            return await _skuMapper.FromEntityAsync(sku, withDefaults);
+        }
+
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
             var conditions = new VSkuQuery().NotDeleted().WithText(filter.SearchText).WithCode(filter.Code).WithDescriptionName(filter.DescriptionName)
@@ -289,7 +432,7 @@ namespace VitalChoice.Business.Services.Products
             return pagedList.Items;
         }
 
-        public List<SkuDynamic> GetSkus(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
+        public async Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
         {
             if (skuInfos == null)
                 throw new ArgumentNullException(nameof(skuInfos));
@@ -297,11 +440,11 @@ namespace VitalChoice.Business.Services.Products
             if (!skuInfos.Any())
                 return new List<SkuDynamic>();
 
-            var optionTypes = _productOptionTypeRepository.Query().Select(false);
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
             var skus =
-                _skuRepository.Query(new SkuQuery().ByIds(skuInfos.Select(i => i.Id).ToList()))
+                await _skuRepository.Query(new SkuQuery().ByIds(skuInfos.Select(i => i.Id).ToList()))
                     .Include(s => s.OptionValues)
-                    .Select(false);
+                    .SelectAsync(false);
             var skusKeyed = skus.ToDictionary(s => s.Id, s => s);
             foreach (var info in skuInfos)
             {
@@ -309,10 +452,10 @@ namespace VitalChoice.Business.Services.Products
                 sku.OptionTypes =
                     optionTypes.Where(GetOptionTypeQuery((int?) info.IdProductType).Query().Compile()).ToList();
             }
-            return _skuMapper.FromEntityRange(skus, true);
+            return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
 
-        public List<SkuDynamic> GetSkus(ICollection<string> codes, bool withDefaults = false)
+        public async Task<List<SkuDynamic>> GetSkusAsync(ICollection<string> codes, bool withDefaults = false)
         {
             if (codes == null)
                 throw new ArgumentNullException(nameof(codes));
@@ -320,40 +463,18 @@ namespace VitalChoice.Business.Services.Products
             if (!codes.Any())
                 return new List<SkuDynamic>();
 
-            var optionTypes = _productOptionTypeRepository.Query().Select(false);
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
             var skus =
-                _skuRepository.Query(new SkuQuery().Including(codes).NotDeleted())
+                await _skuRepository.Query(new SkuQuery().Including(codes).NotDeleted())
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
-                    .Select(false);
+                    .SelectAsync(false);
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
                     optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
             }
-            return _skuMapper.FromEntityRange(skus, true);
-        }
-
-        public ProductDynamic GetProductWithoutSkus(int id, bool withDefaults = false)
-        {
-            var task = SelectItemAsync(query => query.Include(p => p.ProductsToCategories),
-                p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted, withDefaults);
-            task.Wait();
-            return task.Result;
-        }
-
-        public async Task<Sku> GetSkuAsync(string code)
-        {
-            var query = _skuRepository.Query(p => p.Code == code && p.StatusCode != RecordStatusCode.Deleted);
-
-            return (await query.SelectAsync(false)).FirstOrDefault();
-        }
-
-        public async Task<Sku> GetSkuAsync(int id)
-        {
-            var query = _skuRepository.Query(p=>p.Id==id && p.StatusCode!=RecordStatusCode.Deleted);
-
-            return (await query.SelectAsync(false)).FirstOrDefault();
+            return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
 
         #endregion

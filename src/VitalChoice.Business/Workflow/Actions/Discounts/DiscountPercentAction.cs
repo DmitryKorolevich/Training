@@ -12,6 +12,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
         public override decimal ExecuteAction(OrderContext context)
         {
             context.DiscountMessage = $"Percent Discount ({context.Order.Discount.Data.Percent / 100:P0})";
+            context.FreeShipping = context.Order.Discount.Data.FreeShipping;
             return -context.Order.Discount.Data.Percent / (decimal)100.0*context.Data.DiscountableSubtotal;
         }
     }

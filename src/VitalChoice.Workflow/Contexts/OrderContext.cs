@@ -12,6 +12,7 @@ namespace VitalChoice.Workflow.Contexts
         public OrderContext()
         {
             Messages = new List<MessageInfo>();
+            PromoSkus = new List<SkuOrdered>();
         }
 
         public OrderDynamic Order { get; set; }
@@ -40,9 +41,13 @@ namespace VitalChoice.Workflow.Contexts
 
         public decimal Total { get; set; }
 
+        public bool FreeShipping { get; set; }
+
         public bool ProductsPerishableThresholdIssue { get; set; }
 
         public IList<SkuOrdered> SkuOrdereds { get; set; }
+
+        public IList<SkuOrdered> PromoSkus { get; set; }
 
         public IList<MessageInfo> Messages { get; set; }
     }

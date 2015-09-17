@@ -48,6 +48,8 @@ namespace VC.Admin.Models.Order
 
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
+        public IList<SkuOrderedManageModel> PromoSkus { get; set; }
+
         public IList<MessageInfo> Messages { get; set; }
 
         public OrderCalculateModel(OrderContext context)
@@ -65,14 +67,12 @@ namespace VC.Admin.Models.Order
             TaxTotal = context.TaxTotal;
             Total = context.Total;
 
-            if (context.SkuOrdereds != null)
+            SkuOrdereds = context.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
+
+            PromoSkus = context.PromoSkus?.Select(item => new SkuOrderedManageModel(item)
             {
-                SkuOrdereds = new List<SkuOrderedManageModel>();
-                foreach (var item in context.SkuOrdereds)
-                {
-                    SkuOrdereds.Add(new SkuOrderedManageModel(item));
-                }
-            }
+                Promo = true
+            }).ToList() ?? new List<SkuOrderedManageModel>();
 
             Messages = context.Messages;
         }

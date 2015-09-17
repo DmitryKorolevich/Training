@@ -77,9 +77,10 @@ namespace VitalChoice.DynamicData.Base
             return _valueSetter;
         }
 
-        public virtual async void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
+        public virtual void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
         {
-            await SyncCollectionsAsync(dynamics, entities, optionTypes);
+            var task = SyncCollectionsAsync(dynamics, entities, optionTypes);
+            task.Wait();
         }
 
         public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null)
@@ -312,7 +313,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public async void UpdateEntity(TDynamic dynamic, TEntity entity)
+        public void UpdateEntity(TDynamic dynamic, TEntity entity)
         {
             if (entity == null)
                 return;
@@ -320,11 +321,11 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
+                    _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).Select(false);
             }
 
             UpdateEntityItem(dynamic, entity);
-            await UpdateEntityInternalAsync(dynamic, entity);
+            UpdateEntityInternalAsync(dynamic, entity).Wait();
             var valueObjectIdSetter = GetValueObjectIdSetter();
             foreach (var value in entity.OptionValues)
             {
@@ -332,7 +333,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public async void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
+        public void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items)
         {
             if (items == null)
                 return;
@@ -343,7 +344,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 if (optionTypes == null)
                 {
-                    optionTypes = await _optionTypeRepositoryAsync.Query().SelectAsync(false);
+                    optionTypes = _optionTypeRepositoryAsync.Query().Select(false);
                 }
                 pair.Entity.OptionTypes = FilterByType(optionTypes, pair.Dynamic.IdObjectType).ToList();
             }
@@ -352,7 +353,7 @@ namespace VitalChoice.DynamicData.Base
                 UpdateEntityItem(pair);
             }
             
-            await UpdateEntityRangeInternalAsync(items);
+            UpdateEntityRangeInternalAsync(items).Wait();
             var valueObjectIdSetter = GetValueObjectIdSetter();
             items.ForEach(item =>
             {

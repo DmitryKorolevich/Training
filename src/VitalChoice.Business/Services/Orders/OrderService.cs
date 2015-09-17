@@ -156,11 +156,6 @@ namespace VitalChoice.Business.Services.Orders
                 orderToSkuRepository.DeleteAllAsync(entity.Skus.WhereAll(model.Skus, (s, ds) => s.IdSku != ds.Sku?.Id));
         }
 
-        protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
-        {
-            //await AfterSelect(entity);
-        }
-
         protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
         {
             return base.Validate(dynamic);

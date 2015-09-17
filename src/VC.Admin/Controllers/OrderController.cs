@@ -104,7 +104,7 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var model = await _orderService.CreatePrototypeForAsync<OrderManageModel>((int) OrderType.RetailOrder);
+                var model = await _orderService.CreatePrototypeForAsync<OrderManageModel>((int) OrderType.Normal);
                 model.GCs = new List<GCListItemModel>() {new GCListItemModel(null)};
                 model.SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)};
                 model.StatusCode = RecordStatusCode.Active;

@@ -23,30 +23,72 @@ namespace VitalChoice.Business.Workflow.Actions.Products
             {
                 if (context.Order.Discount.ExcludeCategories)
                 {
-                    HashSet<int> categories = new HashSet<int>(context.Order.Discount.CategoryIds);
-                    var excludedSkus =
-                        skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => categories.Contains(c))).ToArray();
-                    foreach (var sku in excludedSkus)
+                    if (context.Order.Discount.CategoryIds.Any())
                     {
-                        sku.Messages.Add("The discount for this product has been excluded by category");
+                        HashSet<int> categories = new HashSet<int>(context.Order.Discount.CategoryIds);
+                        var excludedSkus =
+                            skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => categories.Contains(c))).ToArray();
+                        foreach (var sku in excludedSkus)
+                        {
+                            sku.Messages.Add("The discount for this product has been excluded by category");
+                        }
+                        if (excludedSkus.Any())
+                        {
+                            return 0;
+                        }
                     }
-                    if (excludedSkus.Any())
+                }
+                else
+                {
+                    if (context.Order.Discount.CategoryIds.Any())
                     {
-                        return 0;
+                        HashSet<int> categories = new HashSet<int>(context.Order.Discount.CategoryIds);
+                        var excludedSkus =
+                            skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
+                        foreach (var sku in excludedSkus)
+                        {
+                            sku.Messages.Add("The discount for this product has been excluded by category");
+                        }
+                        if (excludedSkus.Any())
+                        {
+                            return 0;
+                        }
                     }
                 }
                 if (context.Order.Discount.ExcludeSkus)
                 {
-                    HashSet<int> filteredSkus = new HashSet<int>(context.Order.Discount.SkusFilter.Select(s => s.IdSku));
-                    var excludedSkus =
-                        skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
-                    foreach (var sku in excludedSkus)
+                    if (context.Order.Discount.SkusFilter.Any())
                     {
-                        sku.Messages.Add("The discount for this product has been excluded by SKU");
+                        HashSet<int> filteredSkus =
+                            new HashSet<int>(context.Order.Discount.SkusFilter.Select(s => s.IdSku));
+                        var excludedSkus =
+                            skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
+                        foreach (var sku in excludedSkus)
+                        {
+                            sku.Messages.Add("The discount for this product has been excluded by SKU");
+                        }
+                        if (excludedSkus.Any())
+                        {
+                            return 0;
+                        }
                     }
-                    if (excludedSkus.Any())
+                }
+                else
+                {
+                    if (context.Order.Discount.SkusFilter.Any())
                     {
-                        return 0;
+                        HashSet<int> filteredSkus =
+                            new HashSet<int>(context.Order.Discount.SkusFilter.Select(s => s.IdSku));
+                        var excludedSkus =
+                            skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
+                        foreach (var sku in excludedSkus)
+                        {
+                            sku.Messages.Add("The discount for this product has been excluded by SKU");
+                        }
+                        if (excludedSkus.Any())
+                        {
+                            return 0;
+                        }
                     }
                 }
                 if (context.Order.Discount.SkusAppliedOnlyTo.Any())
