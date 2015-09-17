@@ -198,8 +198,16 @@ namespace VC.Admin.Controllers
                 }
                 dbCustomer.CustomerNotes = item.Customer.CustomerNotes;
                 dbCustomer.Files = item.Customer.Files;
-                if(model.Id==0)
+                if (model.Id==0)
                 {
+                    if (item.Customer.DictionaryData.ContainsKey("Source"))
+                    {
+                        dbCustomer.Data.Source = item.Customer.Data.Source;
+                    }
+                    if(item.Customer.DictionaryData.ContainsKey("SourceDetails"))
+                    {
+                        dbCustomer.Data.SourceDetails = item.Customer.Data.SourceDetails;
+                    }
                     dbCustomer.ApprovedPaymentMethods = item.Customer.ApprovedPaymentMethods;
                     dbCustomer.OrderNotes = item.Customer.OrderNotes;
 
@@ -244,6 +252,8 @@ namespace VC.Admin.Controllers
                         dbCustomer.CustomerPaymentMethods.Add(card);
                     }
                 }
+
+                await _customerService.UpdateAsync(dbCustomer);
             }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
