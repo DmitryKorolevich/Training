@@ -42,7 +42,7 @@
             currentDate.setHours(0, 0, 0, 0);
             $scope.filter = {
                 To: currentDate.shiftDate('+1d'),
-                From: currentDate.shiftDate('-1m'),
+                From: currentDate.shiftDate('-3m'),
                 Priority: null,
                 StatusCode: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },

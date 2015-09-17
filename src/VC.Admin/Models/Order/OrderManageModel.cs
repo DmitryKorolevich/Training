@@ -67,6 +67,7 @@ namespace VC.Admin.Models.Order
         public DateTime DateCreated { get; set; }
 
         [DirectLocalized("Customer")]
+        [Map]
         public AddUpdateCustomerModel Customer { get; set; }
         
         //Only for adding a new one 
