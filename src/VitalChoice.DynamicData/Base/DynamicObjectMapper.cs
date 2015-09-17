@@ -229,7 +229,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity.OptionTypes == null)
             {
                 entity.OptionTypes =
-                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType)).SelectAsync(false);
+                    await _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(dynamic.IdObjectType)).SelectAsync(false);
             }
 
             UpdateEntityItem(dynamic, entity);

@@ -4,7 +4,8 @@
     {
         $scope.deleteFileTracker = promiseTracker("deleteFile");
 
-        function initialize() {
+        function initialize()
+        {
             $scope.logFileRequest = {};
         }
 
@@ -17,7 +18,7 @@
             $scope.options.currentFileDescription = null;
         });
 
-        $scope.setFile = function(files)
+        $scope.setFile = function (files)
         {
             $scope.uploadFile = files && files.length > 0 ? files[0] : null;
         };
@@ -87,20 +88,23 @@
 
         $scope.deleteFile = function (index, fileName)
         {
-            customerService.deleteCustomerFile($scope.publicId, fileName, $scope.deleteFileTracker).success(function (result)
+            confirmUtil.confirm(function ()
             {
-                if (result.Success)
+                customerService.deleteCustomerFile($scope.publicId, fileName, $scope.deleteFileTracker).success(function (result)
                 {
-                    $scope.files.splice(index, 1);
-                } else
-                {
-                    toaster.pop('error', 'Error!', "Can't delete customer file");
-                }
-            }).
-                error(function (result)
-                {
-                    toaster.pop('error', "Error!", "Server error ocurred");
-                });
+                    if (result.Success)
+                    {
+                        $scope.files.splice(index, 1);
+                    } else
+                    {
+                        toaster.pop('error', 'Error!', "Can't delete customer file");
+                    }
+                }).
+                    error(function (result)
+                    {
+                        toaster.pop('error', "Error!", "Server error ocurred");
+                    });
+            }, 'Are you sure you want to delete this file?');
         };
 
         initialize();
