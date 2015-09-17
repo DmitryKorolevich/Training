@@ -12,6 +12,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
 
         public override decimal ExecuteAction(OrderContext context)
         {
+            context.DiscountMessage = $"Price Discount ({context.Order.Discount.Data.Amount:C})";
             return -Math.Min(context.Data.DiscountableSubtotal, context.Order.Discount.Data.Amount);
         }
     }

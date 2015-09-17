@@ -9,6 +9,11 @@ namespace VitalChoice.Workflow.Contexts
 {
     public class OrderContext: ComputableContext {
 
+        public OrderContext()
+        {
+            Messages = new List<MessageInfo>();
+        }
+
         public OrderDynamic Order { get; set; }
 
         public decimal AlaskaHawaiiSurcharge { get; set; }

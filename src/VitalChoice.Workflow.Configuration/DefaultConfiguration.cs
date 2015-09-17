@@ -30,7 +30,6 @@ namespace VitalChoice.Workflow.Configuration
             treeSetup.Action<PerishableProductsAction>("PerishableSubtotal");
             treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
             {
-                action.Dependency<ProductAction>();
                 action.Dependency<DiscountableProductsAction>();
                 action.Dependency<PerishableProductsAction>();
 

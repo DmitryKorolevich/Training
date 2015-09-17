@@ -87,18 +87,18 @@ namespace VitalChoice.Domain.Helpers
             return main.Where(m => compareTo.All(c => allCondition(m, c)));
         }
 
-        public static IEnumerable<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
+        public static ICollection<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
             IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
         {
             HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
-            return main.Where(m => !searchIn.Contains(mainKeySelector(m)));
+            return main.Where(m => !searchIn.Contains(mainKeySelector(m))).ToList();
         }
 
-        public static IEnumerable<T1> IntersectKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
+        public static ICollection<T1> IntersectKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
             IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
         {
             HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
-            return main.Where(m => searchIn.Contains(mainKeySelector(m)));
+            return main.Where(m => searchIn.Contains(mainKeySelector(m))).ToList();
         }
     }
 }

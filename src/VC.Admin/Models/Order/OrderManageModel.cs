@@ -50,6 +50,7 @@ namespace VC.Admin.Models.Order
                 Price = dynamic.Amount;
                 Amount = Price * QTY;
                 Id = dynamic.Sku.Id;
+                Messages = dynamic.Messages;
             }
         }
     }

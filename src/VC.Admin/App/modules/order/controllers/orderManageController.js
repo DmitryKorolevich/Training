@@ -599,8 +599,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.GCs.skussubmitted = true;
-            $scope.calculateErrors = result.Messages;
-            $scope.calculateServerMessages = new ServerMessages(result.Messages);
+            $scope.calculateErrors = data.Messages;
+            $scope.calculateServerMessages = new ServerMessages(data.Messages);
             var formForShowing = null;
             $.each(data.Messages, function (index, value)
             {
