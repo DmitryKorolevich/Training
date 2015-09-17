@@ -47,11 +47,6 @@ namespace VitalChoice.Business.Services.Dynamic
             _productMapper = productMapper;
         }
 
-        public override IQueryOptionType<OrderOptionType> GetOptionTypeQuery()
-        {
-            return new OrderOptionTypeQuery();
-        }
-
         public override Expression<Func<OrderOptionValue, int?>> ObjectIdSelector
         {
             get { return v => v.IdOrder; }
