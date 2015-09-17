@@ -175,6 +175,15 @@ a.see-reviews-link:active {
 .secondary-nav ul li a:active {
   color: #F34D20;
 }
+.secondary-nav ul li a.highlighted-sec-menu,
+.secondary-nav ul li a.highlighted-sec-menu:hover,
+.secondary-nav ul li a.highlighted-sec-menu:active {
+  background-color: #F34D20;
+  border-radius: 4px 4px 0 0;
+  color: #FFFFFF;
+  margin: -2px 0 0;
+  padding: 2px 4px 0;
+}
 .secondary-nav ul li.last-child {
   border-right: none;
 }
@@ -265,7 +274,6 @@ header .search-area form input[type=image] {
   margin-right: -2px;
 }
 .content {
-  min-height: 500px;
   clear: left;
   float: left;
   width: 100%;
@@ -276,6 +284,7 @@ header .search-area form input[type=image] {
   float: left;
   clear: both;
   width: 100%;
+  min-height: 400px;
 }
 .nav-shadow {
   background-color: #fff;
@@ -704,4 +713,9 @@ footer {
 }
 .fish-advertising-container {
   float: right;
+}
+.sub-sec-menu-separator {
+  margin: 10px 0 9px 0;
+  border-bottom: 1px solid #CCC;
+  width: 150px;
 }
