@@ -13,6 +13,15 @@ namespace VitalChoice.Business.Queries.Order
 {
     public class VOrderQuery : QueryObject<VOrder>
     {
+        public VOrderQuery WithCustomerId(int? idCustomer)
+        {
+            if (idCustomer.HasValue)
+            {
+                Add(x => x.IdCustomer == idCustomer.Value);
+            }
+            return this;
+        }
+
         public VOrderQuery WithCreatedDate(DateTime? from, DateTime? to)
         {
             if (from.HasValue && to.HasValue)

@@ -176,6 +176,7 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)
         {
             var conditions = new VOrderQuery();
+            conditions = conditions.WithCustomerId(filter.IdCustomer);
 
             if (!filter.ShipDate)
             {

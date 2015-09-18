@@ -6,6 +6,8 @@ namespace VitalChoice.Domain.Transfer.Orders
 {
     public class VOrderFilter : FilterBase
     {
+        public int? IdCustomer { get; set; }
+
         public DateTime? From { get; set; }
 
         public DateTime? To { get; set; }
