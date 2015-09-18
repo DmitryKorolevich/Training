@@ -48,7 +48,7 @@ namespace VC.Admin.Models.Order
 
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
-        public IList<SkuOrderedManageModel> PromoSkus { get; set; }
+        public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
 
         public IList<MessageInfo> Messages { get; set; }
 
@@ -69,10 +69,7 @@ namespace VC.Admin.Models.Order
 
             SkuOrdereds = context.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
-            PromoSkus = context.PromoSkus?.Select(item => new SkuOrderedManageModel(item)
-            {
-                Promo = true
-            }).ToList() ?? new List<SkuOrderedManageModel>();
+            PromoSkus = context.PromoSkus?.Select(item => new PromoSkuOrderedManageModel(item)).ToList() ?? new List<PromoSkuOrderedManageModel>();
 
             Messages = context.Messages;
         }

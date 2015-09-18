@@ -48,9 +48,6 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		createCheckPrototype: function (tracker) {
 		    return $http.post(baseUrl + 'CreateCheckPrototype', getConfig(tracker));
-		},
-		deleteCustomerFile: function(publicId, fileName, tracker) {
-			return $http.post(baseUrl + 'DeleteFile', { PublicId: publicId, FileName: fileName }, getConfig(tracker));
 		}
 	};
 }]);

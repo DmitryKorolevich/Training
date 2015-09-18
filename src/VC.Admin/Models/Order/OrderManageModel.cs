@@ -57,6 +57,22 @@ namespace VC.Admin.Models.Order
         }
     }
 
+    public class PromoSkuOrderedManageModel : SkuOrderedManageModel
+    {
+        public bool IsEnabled { get; set; }
+
+        public bool IsAllowDisable { get; set; }
+
+        public PromoSkuOrderedManageModel(SkuOrdered dynamic) : base(dynamic)
+        {
+            if (dynamic != null)
+            {
+                IsEnabled = true;
+                IsAllowDisable = true;
+            }
+        }
+    }
+
     [ApiValidator(typeof(OrderManageModelValidator))]
     public class OrderManageModel : BaseModel
     {
@@ -199,12 +215,16 @@ namespace VC.Admin.Models.Order
         [Map]
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
+        [Map]
+        public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
+
         public bool SignUpNewsletter { get; set; }
 
         public OrderManageModel()
         {
             GCs = new List<GCListItemModel>();
             SkuOrdereds = new List<SkuOrderedManageModel>();
+            PromoSkus = new List<PromoSkuOrderedManageModel>();
         }
 
     }

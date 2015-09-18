@@ -40,7 +40,8 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
-		private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+        private readonly IEcommerceRepositoryAsync<CustomerFile> _customerFileRepositoryAsync;
+        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
 	    private static string _customerContainerName;
 
@@ -50,6 +51,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
+            IEcommerceRepositoryAsync<CustomerFile> customerFileRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
 			IBlobStorageClient storageClient,
@@ -62,6 +64,7 @@ namespace VitalChoice.Business.Services.Customers
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+            _customerFileRepositoryAsync = customerFileRepositoryAsync;
             _adminProfileRepository = adminProfileRepository;
 		    _storageClient = storageClient;
 		    _customerContainerName = appOptions.Options.AzureStorage.CustomerContainerName;
@@ -186,6 +189,36 @@ namespace VitalChoice.Business.Services.Customers
                 entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
             await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
             await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
+
+            List<string> fileNamesForDelete = new List<string>();
+            foreach(var dbFile in entity.Files)
+            {
+                bool delete = true;
+                foreach(var file in model.Files)
+                {
+                    if(dbFile.Id==file.Id)
+                    {
+                        delete = false;
+                    }
+                }
+                if(delete)
+                {
+                    fileNamesForDelete.Add(dbFile.FileName);
+                }
+            }
+
+            if(fileNamesForDelete.Count!=0)
+            {
+                var publicId = entity.PublicId;
+                Task deleteFilesTask = new Task(() =>
+                {
+                    foreach(var fileName in fileNamesForDelete)
+                    {
+                        var result = DeleteFileAsync(fileName, publicId.ToString()).Result;
+                    }
+                });
+                deleteFilesTask.Start();
+            }
         }
 
         protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
@@ -361,17 +394,32 @@ namespace VitalChoice.Business.Services.Customers
 	    public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null)
 	    {
 		    var i = 0;
-		    string blobname;
-		    string generatedFileName;
-		    do
-		    {
-				generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
+            Guid publicId = Guid.Parse(customerPublicId);
+            var customer = (await _customerRepositoryAsync.Query(p => p.PublicId == publicId).SelectAsync(false)).FirstOrDefault();
 
-			    blobname = $"{customerPublicId}/{generatedFileName}";
-			    i++;
-		    } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
+            string blobname;
+            string generatedFileName;
+            if (customer != null)
+            {
+                var files = await _customerFileRepositoryAsync.Query(p => p.IdCustomer == customer.Id).SelectAsync(false);
+                do
+                {
+                    generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
+                    blobname = $"{customerPublicId}/{generatedFileName}";
+                    i++;
+                } while (files.Select(p=>p.FileName.ToLower()).Contains(generatedFileName));
+            }
+            else
+            {
+                do
+                {
+                    generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
+                    blobname = $"{customerPublicId}/{generatedFileName}";
+                    i++;
+                } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
+            }            
 
-		    await _storageClient.UploadBlobAsync(_customerContainerName, blobname, file, contentType);
+            await _storageClient.UploadBlobAsync(_customerContainerName, blobname, file, contentType);
 
 		    return generatedFileName;
 	    }
@@ -381,7 +429,7 @@ namespace VitalChoice.Business.Services.Customers
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
 
-	    public async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
+	    private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
 	    {
 		    return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }

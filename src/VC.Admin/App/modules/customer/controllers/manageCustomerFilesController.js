@@ -86,25 +86,23 @@
             }
         };
 
-        $scope.deleteFile = function (index, fileName)
+        $scope.deleteFile = function (file)
         {
-            confirmUtil.confirm(function ()
+            var indexForDelete = null;
+            $.each($scope.files, function (index, item)
             {
-                customerService.deleteCustomerFile($scope.publicId, fileName, $scope.deleteFileTracker).success(function (result)
+                if (file == item)
                 {
-                    if (result.Success)
-                    {
-                        $scope.files.splice(index, 1);
-                    } else
-                    {
-                        toaster.pop('error', 'Error!', "Can't delete customer file");
-                    }
-                }).
-                    error(function (result)
-                    {
-                        toaster.pop('error', "Error!", "Server error ocurred");
-                    });
-            }, 'Are you sure you want to delete this file?');
+                    indexForDelete = index;
+                }
+            });
+            if (indexForDelete)
+            {
+                confirmUtil.confirm(function ()
+                {
+                    $scope.files.splice(indexForDelete, 1);
+                }, 'Are you sure you want to delete this file?');
+            }
         };
 
         initialize();

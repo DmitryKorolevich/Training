@@ -367,13 +367,5 @@ namespace VC.Admin.Controllers
 			return File(blob.File, blob.ContentType);
 		}
 #endif
-
-		[HttpPost]
-	    public async Task<Result<bool>> DeleteFile(DeleteCustomerFileModel customerFileModel)
-	    {
-		    await _customerService.DeleteFileAsync(customerFileModel.FileName, customerFileModel.PublicId);
-
-		    return true;
-	    }
     }
 }

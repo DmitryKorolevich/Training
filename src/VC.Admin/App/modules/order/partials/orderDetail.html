@@ -13,11 +13,11 @@
         <div class="container-fluid">
             <div class="row">
                 <span class="legend">
-                    <span data-ng-if="legend.CustomerName" class="item">Customer: {{legend.CustomerName}}</span>
-                    <span data-ng-if="legend.CustomerId" class="item">Customer ID: {{legend.CustomerId}}</span>
-                    <span data-ng-if="legend.OrderId" class="item">Order ID: {{legend.OrderId}}</span>
-                    <span data-ng-if="legend.OrderDate" class="item">Order Date: {{::legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</span>
-                    <span data-ng-if="legend.OrderStatus" class="item">Status: {{legend.OrderStatus}}</span>
+                    <span data-ng-if="legend.CustomerName" class="item">Customer: <strong>{{legend.CustomerName}}</strong></span>
+                    <span data-ng-if="legend.CustomerId" class="item">Customer ID: <strong>{{legend.CustomerId}}</strong></span>
+                    <span data-ng-if="legend.OrderId" class="item">Order ID: <strong>{{legend.OrderId}}</strong></span>
+                    <span data-ng-if="legend.OrderDate" class="item">Order Date: <strong>{{::legend.OrderDate | date:"MM/dd/yy"}} {{::legend.OrderDate | date:"h:mm a"}}</strong></span>
+                    <span data-ng-if="legend.OrderStatus" class="item">Status: <strong>{{legend.OrderStatus}}</strong></span>
                 </span>
             </div>
             <div class="row">
@@ -106,6 +106,52 @@
                                                                 <span>{{minimumPerishableThreshold | currency}} minimum perishable threshold not met. Override</span>
                                                                 <input type="checkbox" data-ng-model="ignoneMinimumPerishableThreshold">
                                                             </label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div data-ng-if="order.PromoSkus && order.PromoSkus.length>0" class="col-md-12 form-horizontal products promo">
+                                            <span class="legend">Promo Products</span>
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr data-ng-class="{warning: item.Messages.length>0}" data-ng-repeat-start="item in order.PromoSkus">
+                                                        <td class="sku">
+                                                            <div class="input-group autocomplete">
+                                                                <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code" readonly>
+                                                            </div>
+                                                        </td>
+                                                        <td class="type">
+                                                            <span data-ng-if="item.IdProductType==2" class="perishable">P</span>
+                                                            <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
+                                                        </td>
+                                                        <td class="qty">
+                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only data-ng-model="item.QTY" readonly>
+                                                        </td>
+                                                        <td class="product-name">
+                                                            <div class="input-group autocomplete">
+                                                                <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName" readonly />
+                                                            </div>
+                                                        </td>
+                                                        <td class="price">
+                                                            <div class="col-md-12 padding-0px">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">$</span>
+                                                                    <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money data-ng-model="item.Price" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="amount">
+                                                            <div class="amount">{{item.Amount | currency}}</div>
+                                                        </td>
+                                                        <td class="enabled">
+                                                            <input type="checkbox" data-ng-model="item.IsEnabled" data-ng-disabled="!item.IsAllowDisable">
+                                                        </td>
+                                                    </tr>
+                                                    <tr data-ng-repeat-end class="warning" data-ng-if="item.Messages.length>0">
+                                                        <td colspan="7">
+                                                            <span class="message" data-ng-repeat="message in item.Messages">{{message}}</span>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -931,11 +977,12 @@
                                         <div data-ng-if="id">
                                             <div data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
                                                 <div class="form-group">
-                                                    <label for="creditCardCustomerSaved" class="col-md-3 control-label">Customer Saved Credit Card</label>
+                                                    <label for="creditCardCustomerSaved" class="col-md-3 control-label"></label>
                                                     <div class="col-md-9">
                                                         <div class="checkbox">
                                                             <label>
                                                                 <input type="checkbox" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" id="creditCardCustomerSaved" data-ng-model="creditCardCustomerSaved">
+                                                                Customer Saved Credit Card
                                                             </label>
                                                         </div>
                                                     </div>
