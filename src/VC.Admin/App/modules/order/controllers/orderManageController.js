@@ -2,9 +2,9 @@
 
 angular.module('app.modules.order.controllers.orderManageController', [])
 .controller('orderManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
-    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService',
+    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService', 'gridSorterUtil',
 function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
-    toaster, confirmUtil, promiseTracker, customerEditService)
+    toaster, confirmUtil, promiseTracker, customerEditService, gridSorterUtil)
 {
     $scope.addEditTracker = promiseTracker("addEdit");
 
@@ -174,7 +174,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         ];
 
         $scope.minimumPerishableThreshold = $rootScope.ReferenceData.AppSettings.GlobalPerishableThreshold;
-        $scope.ignoneMinimumPerishableThreshold = $scope.id ? true: false;//only for a new order
+        $scope.ignoneMinimumPerishableThreshold = $scope.id ? true : false;//only for a new order
         $scope.orderSources = $rootScope.ReferenceData.OrderSources;
         $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
         $scope.orderPreferredShipMethod = $rootScope.ReferenceData.OrderPreferredShipMethod;
@@ -250,7 +250,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 if (result.Success)
                 {
-                    $scope.order=result.Data;
+                    $scope.order = result.Data;
 
                     customerEditService.initBase($scope);
                     if ($scope.id)
@@ -407,6 +407,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 initCustomerFiles();
                 initCustomerNotes();
 
+                $scope.ordersFilter = {
+                    idCustomer: $scope.idCustomer,
+                    Paging: { PageIndex: 1, PageItemCount: 20 },
+                    Sorting: gridSorterUtil.resolve(refreshOrdersHistory, "DateCreated", "Desc")
+                };
+                refreshOrdersHistory();
+
                 if ($scope.id)
                 {
                     $scope.requestRecalculate();
@@ -456,7 +463,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.order.OrderStatus = $scope.oldOrderStatus;
             }
         });
-        
+
         $scope.legend.CustomerName = $scope.currentCustomer.ProfileAddress.FirstName + " " + $scope.currentCustomer.ProfileAddress.LastName;
         if ($scope.id)
         {
@@ -469,7 +476,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.legend.CustomerId = $scope.idCustomer;
         }
     };
-    
+
     function initCustomerFiles()
     {
         var data = {};
@@ -551,7 +558,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
 
         $scope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
-        
+
         var toDeleteIdxs = [];
         $.each($scope.order.SkuOrdereds, function (index, uiSku)
         {
@@ -574,7 +581,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
         });
 
-        $.each(toDeleteIdxs, function (index, item) {
+        $.each(toDeleteIdxs, function (index, item)
+        {
             $scope.order.SkuOrdereds.splice(item, 1);
         });
 
@@ -601,7 +609,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         }
                     });
                 }
-                else if(index=="mainForm2")
+                else if (index == "mainForm2")
                 {
                     $.each(form, function (index, element)
                     {
@@ -713,12 +721,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 productErrorMessages += "You must add at least 1 product. ";
             }
-            var productErrorsExist=false;
+            var productErrorsExist = false;
             if ($scope.calculateErrors != null && $scope.calculateErrors.length != 0)
             {
                 productErrorsExist = true;
             }
-            if($scope.productsPerishableThresholdIssue && !$scope.ignoneMinimumPerishableThreshold)
+            if ($scope.productsPerishableThresholdIssue && !$scope.ignoneMinimumPerishableThreshold)
             {
                 productErrorsExist = true;
             }
@@ -730,8 +738,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     return;
                 }
             });
-            if(productErrorsExist)
-            {                
+            if (productErrorsExist)
+            {
                 productErrorMessages += "There are some errors in the order. ";
             }
 
@@ -1009,7 +1017,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 return;
             }
-            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.Index!= index || $scope.skuFilter.ExactDescriptionName != ''))
+            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.Index != index || $scope.skuFilter.ExactDescriptionName != ''))
             {
                 $scope.skuFilter.ExactCode = product.Code;
                 $scope.skuFilter.Index = index;
@@ -1120,6 +1128,31 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
+    };
+
+    $scope.ordersPageChanged = function ()
+    {
+        refreshOrdersHistory();
+    };
+
+    function refreshOrdersHistory()
+    {
+        orderService.getOrders($scope.ordersFilter, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.ordersHistory = result.Data.Items;
+                    $scope.ordersTotalItems = result.Data.Count;
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
     };
 
     initialize();
