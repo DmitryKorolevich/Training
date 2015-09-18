@@ -167,6 +167,18 @@ namespace VitalChoice.Business.Services.Dynamic
                     });
                 entity.IdDiscount = dynamic.Discount?.Id;
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
+                var keyedSkus = dynamic.Skus.Where(s => s.Sku?.Id > 0).ToDictionary(s => s.Sku.Id);
+                //Update
+                foreach (var sku in entity.Skus)
+                {
+                    SkuOrdered skuOrdered;
+                    if (keyedSkus.TryGetValue(sku.IdSku, out skuOrdered))
+                    {
+                        sku.Amount = skuOrdered.Amount;
+                        sku.Quantity = skuOrdered.Quantity;
+                    }
+                }
+                //Add
                 entity.Skus.Merge(dynamic.Skus, (s, ds) => s.IdSku != ds.Sku?.Id,
                     s => new OrderToSku
                     {
