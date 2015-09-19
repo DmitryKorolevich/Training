@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Interfaces.Services.Content.ContentProcessors
+﻿namespace VitalChoice.Interfaces.Services
 {
 	public interface IContentProcessorsService
 	{

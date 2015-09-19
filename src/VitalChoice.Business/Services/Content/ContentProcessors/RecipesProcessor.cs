@@ -6,7 +6,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services.Content.ContentProcessors;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {

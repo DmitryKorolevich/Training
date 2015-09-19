@@ -27,7 +27,6 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
@@ -273,7 +272,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ArticleService>().As<IArticleService>();
             builder.RegisterType<ContentPageService>().As<IContentPageService>();
             builder.RegisterType<TtlGlobalCache>().As<ITtlGlobalCache>().SingleInstance();
-            builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>().SingleInstance();
             builder.RegisterType<CustomUrlHelper>().As<IUrlHelper>();
             builder.RegisterType<MemoryCache>().As<IMemoryCache>();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
@@ -317,6 +315,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))
                 .As(typeof (IEcommerceDynamicObjectService<,,,>));
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
+            builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>();
+            builder.RegisterProcessors(typeof (ContentProcessorsService).GetTypeInfo().Assembly);
             var container = builder.Build();
             return container;
         }

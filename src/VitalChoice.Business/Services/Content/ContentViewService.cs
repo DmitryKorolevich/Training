@@ -14,7 +14,6 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 
 namespace VitalChoice.Business.Services.Content
 {

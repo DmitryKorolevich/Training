@@ -12,7 +12,6 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Interfaces.Services.Content.ContentProcessors;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
