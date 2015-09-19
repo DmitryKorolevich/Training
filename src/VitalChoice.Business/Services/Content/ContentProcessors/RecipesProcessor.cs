@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
@@ -12,26 +13,30 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
     public class RecipesProcessor : IContentProcessor
     {
+        private readonly IReadRepositoryAsync<RecipeToContentCategory> _recipeToContentCategoryRepositoryAsync;
+
+        public RecipesProcessor(IReadRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepositoryAsync)
+        {
+            _recipeToContentCategoryRepositoryAsync = recipeToContentCategoryRepositoryAsync;
+        }
+
+
         public async Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string, object> queryData)
         {
             int? categoryId = null;
             if (queryData.ContainsKey(ContentConstants.CATEGORY_ID) && queryData[ContentConstants.CATEGORY_ID] is int?)
             {
-                categoryId = (int?)queryData[ContentConstants.CATEGORY_ID];
+                categoryId = (int?) queryData[ContentConstants.CATEGORY_ID];
             }
             if (!categoryId.HasValue)
             {
                 throw new Exception("No query data for RecipesProcessor");
             }
-            using (var uof = new VitalChoiceUnitOfWork())
-            {
-                //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
-                var repository = uof.RepositoryAsync<RecipeToContentCategory>();
-                var recipeToContentCategories = (await repository.Query(p => p.ContentCategoryId== categoryId).
-                    Include(p=>p.Recipe).SelectAsync(false)).Where(p=>p.Recipe.StatusCode == RecordStatusCode.Active).ToArray();
-                var recipes = recipeToContentCategories.Select(item => item.Recipe).ToList();
-                model.Recipes = recipes;
-            }
+            var recipes = await _recipeToContentCategoryRepositoryAsync.Query(p => p.ContentCategoryId == categoryId).
+                Include(p => p.Recipe)
+                .Where(p => p.Recipe.StatusCode == RecordStatusCode.Active)
+                .SelectAsync(item => item.Recipe, false);
+            model.Recipes = recipes;
             return model;
         }
     }
