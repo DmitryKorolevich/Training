@@ -780,9 +780,13 @@ footer {
 .category-main .category-breadcrumb a:hover {
   color: #f34d20;
 }
+.category-main .categories-selection-container {
+  margin-bottom: 12px;
+}
 .category-main .categories-selection-container .categories-selection-row {
   margin-top: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
+  display: inline-block;
 }
 .category-main .categories-selection-container .categories-selection-row a {
   color: #666;
