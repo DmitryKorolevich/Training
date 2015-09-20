@@ -4,6 +4,7 @@
   "files": [
     "lib/jquery/jquery.js",
     "lib/nivoslider/jquery.nivo.slider.js",
+    "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
     "assets/scripts/plugins.js"
   ]
 }

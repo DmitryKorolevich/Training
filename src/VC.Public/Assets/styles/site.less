@@ -26,6 +26,7 @@ body {
 
 .header-top{
 	height: 38px;
+	position:relative;
 }
 
 .separator-top {
@@ -819,4 +820,158 @@ footer{
 	margin: 10px 0 9px 0;
 	border-bottom: 1px solid #CCC;
 	width:150px;
+}
+
+/*Category*/
+.category-aside{
+	padding-top: 5px;
+	width: 200px;	
+	position:absolute;
+
+	ul{
+		list-style: none;
+	}
+
+	.category-sidebar{
+		font-size: 11px;
+		margin: 0;
+		padding: 0;
+		vertical-align: top;
+		line-height: 14px;
+
+		a{
+			cursor: pointer;
+			display: block;
+			margin-left: 0;
+			padding: 6px 2px 6px 7px;
+			text-decoration: none;
+			outline: none;
+			color: #000;
+		}
+
+		a:hover{
+			text-decoration: underline;
+			color:#F34D20;
+		}
+
+		a.expanded{
+			color:#F34D20;
+		}
+
+		> li > a{
+			padding-left:20px;
+			font-size: 12px;
+		}
+
+		ul {
+			padding: 0 0 10px 0;
+			display: none;
+
+			li a{
+				margin-bottom: -6px;
+				margin-top: -6px;
+				padding-left: 25px;
+				padding-right: 6px;
+			}
+
+		}
+	}
+}
+
+.category-main{
+	margin: 0 0 48px 200px;
+
+	.category-breadcrumb {
+		padding: 1px 14px 2px 14px;
+		font-size: 12px;
+
+		a{
+			color: #4c4c4c;
+			text-decoration: none;
+		}
+
+		a:hover{
+			color: #f34d20;
+		}
+	}
+	.category-video{
+
+	}
+
+	.categories-selection-container{
+		
+		.categories-selection-row{
+			margin-top: 10px;
+			margin-bottom:14px;
+
+			a{
+				color: #666;
+				text-decoration: none;
+				font-size: 12px;
+				display: inline-block;
+				width:234px;
+				text-align:center;
+				margin: 0 12px;
+
+				img{
+					border: 0px solid #E1E1E1;
+					padding: 5px 0 8px 0;
+				}
+			}
+
+			a:hover{
+				color: #f34d20;
+			}
+		}
+	}
+
+	.category-article{
+		border: 1px solid #e3e3e3;
+		padding: 10px;
+		margin: 0px 0px 0px 21px;
+		width: 741px;
+		color:rgb(51, 51, 51);
+		line-height: 14px;
+		text-align: left;
+		font-family: Arial;
+
+		.article-left{
+			width: 526px;
+			border-right: 1px solid #e3e3e3;
+			padding-right:14px;
+			display: table-cell;
+			vertical-align: top;
+		}
+
+		.article-right{
+			display: table-cell;
+			vertical-align: top;
+			padding-left: 14px;
+		}
+
+		h3{
+			font-size:18px;
+			color: #2A6C82;
+			font-weight: bold;
+			margin:0px;
+		}
+
+		a{
+			color: #666;
+			text-decoration: none;
+			font-size:12px;
+		}
+
+		p{
+			margin:14px 0;
+		}
+
+		img{
+			border: 1px solid #e3e3e3;
+		}
+
+		a:hover{
+			color: #f34d20;
+		}
+	}
 }

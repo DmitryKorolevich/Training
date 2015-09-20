@@ -59,4 +59,8 @@ $(function () {
 		captionOpacity: 0.8, // Universal caption opacity
 		randomStart: false, // Start on a random slide
 	});
+
+	$("#menuSidebar").accordion({
+		accordion: true
+	});
 });
