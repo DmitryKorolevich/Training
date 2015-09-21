@@ -4,6 +4,7 @@ angular.module('app.modules.order',[
 	'app.modules.order.controllers.ordersController',
 	'app.modules.order.controllers.orderManageController',
 	'app.modules.order.controllers.orderStatusUpdateController',
+	'app.modules.order.controllers.moveOrderController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -21,7 +22,7 @@ angular.module('app.modules.order',[
 		            controller: 'orderManageController'
 		        })
 		        .state('index.oneCol.orderAdd',{
-		            url: '/orders/add?{idcustomer:int}',
+		            url: '/orders/add?{idcustomer:int}{idsource:int}',
 		            templateUrl: 'app/modules/order/partials/orderDetail.html',
 		            controller: 'orderManageController'
 		        })
@@ -29,6 +30,11 @@ angular.module('app.modules.order',[
 		            url: '/tools/change-order-status',
 		            templateUrl: 'app/modules/order/partials/orderStatusUpdateForm.html',
 		            controller: 'orderStatusUpdateController'
+		        })
+		        .state('index.oneCol.moveOrder', {
+		            url: '/tools/move-order',
+		            templateUrl: 'app/modules/order/partials/moveOrderForm.html',
+		            controller: 'moveOrderController'
 		        });
 		}
 ]);

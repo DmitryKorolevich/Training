@@ -86,6 +86,26 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        public async Task<Result<bool>> MoveOrder(int id, int idcustomer)
+        {
+            var order = await _simpleOrderService.SelectAsync(id, false);
+            var customer = await _customerService.SelectAsync(idcustomer, false);
+
+            if (order == null)
+            {
+                throw new AppValidationException("Id", "The given order doesn't exist.");
+            }
+            if (customer == null)
+            {
+                throw new AppValidationException("IdCustomer", "The given customer doesn't exist.");
+            }
+            order.Customer.Id = idcustomer;
+            order = await _simpleOrderService.UpdateAsync(order);
+
+            return order != null;
+        }
+
+        [HttpPost]
         public async Task<Result<PagedList<OrderListItemModel>>> GetOrders([FromBody]VOrderFilter filter)
         {
             var result = await _orderService.GetOrdersAsync(filter);

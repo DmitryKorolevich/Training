@@ -4,7 +4,9 @@ namespace VitalChoice.Domain.Transfer.Customers
 {
     public class CustomerFilter : FilterBase
     {
-		public string Company { get; set; }
+        public string IdContains { get; set; }
+
+        public string Company { get; set; }
 
 		public string FirstName { get; set; }
 
