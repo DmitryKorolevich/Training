@@ -156,37 +156,47 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                entity.GiftCertificates.Merge(dynamic.GiftCertificates,
-                    (g, gio) =>
-                        g.IdGiftCertificate != gio.GiftCertificate?.Id,
-                    g => new OrderToGiftCertificate
-                    {
-                        Amount = g.Amount,
-                        IdOrder = dynamic.Id,
-                        IdGiftCertificate = g.GiftCertificate.Id
-                    });
+                if (entity.GiftCertificates != null)
+                {
+                    entity.GiftCertificates.Merge(dynamic.GiftCertificates,
+                        (g, gio) =>
+                            g.IdGiftCertificate != gio.GiftCertificate?.Id,
+                        g => new OrderToGiftCertificate
+                        {
+                            Amount = g.Amount,
+                            IdOrder = dynamic.Id,
+                            IdGiftCertificate = g.GiftCertificate.Id
+                        });
+                }
                 entity.IdDiscount = dynamic.Discount?.Id;
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
-                var keyedSkus = dynamic.Skus.Where(s => s.Sku?.Id > 0).ToDictionary(s => s.Sku.Id);
-                //Update
-                foreach (var sku in entity.Skus)
+                Dictionary<int, SkuOrdered> keyedSkus = new Dictionary<int, SkuOrdered>();
+                if (dynamic.Skus != null)
                 {
-                    SkuOrdered skuOrdered;
-                    if (keyedSkus.TryGetValue(sku.IdSku, out skuOrdered))
-                    {
-                        sku.Amount = skuOrdered.Amount;
-                        sku.Quantity = skuOrdered.Quantity;
-                    }
+                    keyedSkus = dynamic.Skus.Where(s => s.Sku?.Id > 0).ToDictionary(s => s.Sku.Id);
                 }
-                //Add
-                entity.Skus.Merge(dynamic.Skus, (s, ds) => s.IdSku != ds.Sku?.Id,
-                    s => new OrderToSku
+                if (entity.Skus != null)
+                {
+                    //Update
+                    foreach (var sku in entity.Skus)
                     {
-                        Amount = s.Amount,
-                        Quantity = s.Quantity,
-                        IdOrder = dynamic.Id,
-                        IdSku = s.Sku.Id
-                    });
+                        SkuOrdered skuOrdered;
+                        if (keyedSkus.TryGetValue(sku.IdSku, out skuOrdered))
+                        {
+                            sku.Amount = skuOrdered.Amount;
+                            sku.Quantity = skuOrdered.Quantity;
+                        }
+                    }
+                    //Add
+                    entity.Skus.Merge(dynamic.Skus, (s, ds) => s.IdSku != ds.Sku?.Id,
+                        s => new OrderToSku
+                        {
+                            Amount = s.Amount,
+                            Quantity = s.Quantity,
+                            IdOrder = dynamic.Id,
+                            IdSku = s.Sku.Id
+                        });
+                }
             });
         }
     }

@@ -286,11 +286,12 @@ namespace VitalChoice.Business.Services.Customers
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
 		}
 
-		public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
+        public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
 		{
 			var condition =
 				new VCustomerQuery().NotDeleted()
-					.WithId(filter.SearchText)
+                    .WithIdContains(filter.IdContains)
+                    .WithId(filter.SearchText)
 					.WithEmail(filter.Email)
 					.WithAddress1(filter.Address1)
 					.WithAddress2(filter.Address2)

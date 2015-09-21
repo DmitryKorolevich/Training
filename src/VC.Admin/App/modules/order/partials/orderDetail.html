@@ -567,8 +567,8 @@
                                                 </td>
                                                 <td>{{::item.Total | currency}}</td>
                                                 <td>
-                                                    <button title="Repeat" class="btn btn-default btn-success btn-xs">
-                                                        Repeat
+                                                    <button title="Repeat" class="btn btn-default btn-success btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
+                                                        <i class="glyphicon glyphicon-repeat"></i>
                                                     </button>
                                                     <button title="Reship" class="btn btn-default btn-success btn-xs">
                                                         Reship

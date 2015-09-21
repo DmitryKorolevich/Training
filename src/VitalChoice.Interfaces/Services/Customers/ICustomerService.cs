@@ -18,7 +18,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 		Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType);
 
-		Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
+        Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
 
 		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
 
