@@ -36,7 +36,11 @@
                                         <label for="id" class="col-md-3 control-label">New Customer #:</label>
                                         <div class="col-md-9">
                                             <div class="input-group autocomplete">
+<<<<<<< HEAD
                                                 <input type="text" name="IdCustomer" class="form-control" placeholder="New Customer #" data-ng-model="order.IdCustomer" required numbers-only
+=======
+                                                <input type="text" name="IdCustomer" class="form-control" placeholder="Order #" data-ng-model="order.IdCustomer" required numbers-only
+>>>>>>> e71299e0d4f7f58d797c96821e0fc682e1e0f4cd
                                                        typeahead-min-length="3" typeahead="item.Id as item.Id+' - '+item.Name for item in getCustomers($viewValue)" typeahead-loading="loadingCustomers">
                                                 <span class="input-group-addon">
                                                     <i ng-show="loadingCustomers" class="glyphicon glyphicon-refresh"></i>
