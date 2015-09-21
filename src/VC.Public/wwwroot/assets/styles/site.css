@@ -773,12 +773,18 @@ footer {
   padding: 1px 14px 2px 14px;
   font-size: 12px;
 }
+.category-main .category-breadcrumb img {
+  padding: 0 2px 2px 4px;
+}
 .category-main .category-breadcrumb a {
   color: #4c4c4c;
   text-decoration: none;
 }
 .category-main .category-breadcrumb a:hover {
   color: #f34d20;
+}
+.category-main .category-top img {
+  margin-bottom: 3px;
 }
 .category-main .categories-selection-container {
   margin-bottom: 12px;

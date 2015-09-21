@@ -13,5 +13,10 @@ namespace VC.Public.Controllers
 		{
 			return View();
 		}
+
+		public IActionResult Category1()
+		{
+			return View();
+		}
 	}
 }
