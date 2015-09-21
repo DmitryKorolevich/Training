@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
@@ -17,6 +18,7 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
@@ -26,6 +28,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -41,6 +44,9 @@ namespace VitalChoice.Business.Services.Products
         private readonly SkuMapper _skuMapper;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly OrderSkusRepository _orderSkusRepositoryRepository;
+        private readonly IEcommerceRepositoryAsync<ProductOutOfStockRequest> _productOutOfStockRequestRepository;
+        private readonly ISettingService _settingService;
+        private readonly INotificationService _notificationService;
 
         protected override async Task AfterSelect(Product entity)
         {
@@ -173,7 +179,11 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            OrderSkusRepository orderSkusRepositoryRepository, SkuMapper skuMapper)
+            OrderSkusRepository orderSkusRepositoryRepository,
+            SkuMapper skuMapper,
+            IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
+            ISettingService settingService,
+            INotificationService notificationService)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
                 bigStringValueRepository)
@@ -188,6 +198,9 @@ namespace VitalChoice.Business.Services.Products
             _adminProfileRepository = adminProfileRepository;
             _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
             _skuMapper = skuMapper;
+            _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
+            _settingService = settingService;
+            _notificationService = notificationService;
         }
 
         #region ProductOptions
@@ -428,7 +441,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 return await query.OrderBy(sortable).SelectAsync(false);
             }
-            var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex,filter.Paging.PageItemCount);
+            var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             return pagedList.Items;
         }
 
@@ -450,7 +463,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var sku = skusKeyed[info.Id];
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery((int?) info.IdProductType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery((int?)info.IdProductType).Query().Compile()).ToList();
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -502,6 +515,76 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        #endregion
+
+        #region ProductOutOfStockRequests
+
+        public async Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainers()
+        {
+            var items = await _productOutOfStockRequestRepository.Query().SelectAsync(false);
+            var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
+            var products = await _productRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
+
+            var containers = new List<ProductOutOfStockContainer>();
+            foreach (var item in items)
+            {
+                ProductOutOfStockContainer container = containers.FirstOrDefault(p => p.IdProduct == item.IdProduct);
+                if (container == null)
+                {
+                    container = new ProductOutOfStockContainer();
+                    container.Requests = new List<ProductOutOfStockRequest>();
+                }
+
+                container.Requests.Add(item);
+            }
+            return containers;
+        }
+
+        public async Task<ProductOutOfStockRequest> AddProductOutOfStockRequest(ProductOutOfStockRequest model)
+        {
+            model.DateCreated = DateTime.Now;
+            await _productOutOfStockRequestRepository.InsertAsync(model);
+            return model;
+        }
+
+        public async Task<bool> SendProductOutOfStockRequests(ICollection<int> ids)
+        {
+            if(ids.Count>0)
+            {
+                var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
+                if(setting==null)
+                {
+                    throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
+                }
+
+                var items = await _productOutOfStockRequestRepository.Query(p=>ids.Contains(p.Id)).SelectAsync(false);
+                var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
+                var products = await _productRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
+
+                foreach(var item in items)
+                {
+                    var product = products.FirstOrDefault(p => p.Id == item.IdProduct);
+                    if(product!=null)
+                    {
+                        var text = setting.Value.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
+                            Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER, product.Name);
+                        //TODO - add setting for a product url
+
+                        BasicEmail email = new BasicEmail();
+                        email.IsHTML = true;
+                        email.Subject = "Vital Choice - Out of Stock Notification";
+                        email.Body = text;
+                        email.ToEmail = item.Email;
+                        email.ToName = item.Name;
+                        await _notificationService.SendBasicEmailAsync(email);
+                    }
+                }
+
+                await _productOutOfStockRequestRepository.DeleteAllAsync(ids);
+            }
+            return true;
         }
 
         #endregion

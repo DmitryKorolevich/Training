@@ -93,5 +93,15 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    deleteProductReview: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteProductReview/' + id, getConfig(tracker));
 	    },
+
+	    //product out of stock requests
+	    getProductOutOfStockContainers: function (tracker)
+	    {
+	        return $http.post(baseUrl + 'GetProductOutOfStockContainers', null, getConfig(tracker));
+	    },
+	    sendProductOutOfStockRequests: function (ids, tracker)
+	    {
+	        return $http.post(baseUrl + 'SendProductOutOfStockRequests', ids, getConfig(tracker));
+	    },
 	};
 }]);
