@@ -37,6 +37,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageCategories', stateName: 'index.oneCol.manageProductCategories', stateLabel: 'Manage Categories', access: 4 },
 				{ name: 'manageInventoryCategories', stateName: 'index.oneCol.manageInventoryCategories', stateLabel: 'Manage Sales Categories', access: 4 },
 				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews', access: 4 },
+				{ name: 'outOfStocks', stateName: 'index.oneCol.outOfStocks', stateLabel: 'Out of Stock Requests', access: 4 },
 			]
 		},
         {

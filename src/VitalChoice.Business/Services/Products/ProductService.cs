@@ -535,6 +535,13 @@ namespace VitalChoice.Business.Services.Products
                 {
                     container = new ProductOutOfStockContainer();
                     container.Requests = new List<ProductOutOfStockRequest>();
+                    container.IdProduct = item.IdProduct;
+                    var product = products.FirstOrDefault(p => p.Id == item.IdProduct);
+                    if (product != null)
+                    {
+                        container.Name = product.Name;
+                    }
+                    containers.Add(container);
                 }
 
                 container.Requests.Add(item);
@@ -551,22 +558,22 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<bool> SendProductOutOfStockRequests(ICollection<int> ids)
         {
-            if(ids.Count>0)
+            if (ids.Count > 0)
             {
                 var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
-                if(setting==null)
+                if (setting == null)
                 {
                     throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
                 }
 
-                var items = await _productOutOfStockRequestRepository.Query(p=>ids.Contains(p.Id)).SelectAsync(false);
+                var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 var productIds = items.Select(p => p.IdProduct).Distinct().ToArray();
                 var products = await _productRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
 
-                foreach(var item in items)
+                foreach (var item in items)
                 {
                     var product = products.FirstOrDefault(p => p.Id == item.IdProduct);
-                    if(product!=null)
+                    if (product != null)
                     {
                         var text = setting.Value.Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_CUSTOMER_NAME_HOLDER, item.Name).
                             Replace(SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_NAME_HOLDER, product.Name);

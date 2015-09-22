@@ -46,10 +46,11 @@ namespace VitalChoice.Business.Mail
 			await emailSender.SendEmailAsync(email, subject, body);
 		}
 
-        public async Task SendBasicEmailAsync(BasicEmail email)
+        public async Task<bool> SendBasicEmailAsync(BasicEmail email)
         {
             //todo:refactor this to user nustache or something
             await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.FromEmail, email.ToName, email.IsHTML);
+            return true;
         }
 
         public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicket helpTicket)

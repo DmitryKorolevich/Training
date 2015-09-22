@@ -421,7 +421,7 @@ namespace VC.Admin.Controllers
         #region ProductOutOfStockRequests
 
         [HttpPost]
-        public async Task<ICollection<ProductOutOfStockContainerListItemModel>> GetProductOutOfStockContainers()
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
         {
             var toReturn = await productService.GetProductOutOfStockContainers();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();

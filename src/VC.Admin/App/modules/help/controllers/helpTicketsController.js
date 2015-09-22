@@ -66,7 +66,7 @@
         };
 
         $scope.pageChanged = function () {
-            refreshOrders();
+            refreshItems();
         };
 
         $scope.delete = function (id)        {
