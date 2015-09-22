@@ -899,17 +899,19 @@ footer{
 		}
 	}
 	.category-top{
-		img{
-			margin-bottom:3px;
+
+		img, object{
+			vertical-align:top;
 		}
 	}
 
 	.categories-selection-container{
-		margin-bottom:12px;
+		margin-bottom:10px;
+		margin-top:5px;
 
 		.categories-selection-row{
-			margin-top: 10px;
-			margin-bottom:6px;
+			margin-top: 7px;
+			margin-bottom:8px;
 			display:inline-block;
 
 			a{
@@ -917,13 +919,14 @@ footer{
 				text-decoration: none;
 				font-size: 12px;
 				display: inline-block;
-				width:234px;
+				width:218px;
 				text-align:center;
-				margin: 0 12px;
+				margin: 0 20px;
+				vertical-align:top;
 
 				img{
 					border: 0px solid #E1E1E1;
-					padding: 5px 0 8px 0;
+					padding: 6px 0 8px 0;
 				}
 			}
 
@@ -934,52 +937,56 @@ footer{
 	}
 
 	.category-article{
-		border: 1px solid #e3e3e3;
-		padding: 10px;
 		margin: 0px 0px 0px 21px;
-		width: 741px;
 		color:rgb(51, 51, 51);
 		line-height: 14px;
 		text-align: left;
 		font-family: Arial;
 
-		.article-left{
-			width: 526px;
-			border-right: 1px solid #e3e3e3;
-			padding-right:14px;
-			display: table-cell;
-			vertical-align: top;
-		}
-
-		.article-right{
-			display: table-cell;
-			vertical-align: top;
-			padding-left: 14px;
-		}
-
-		h3{
-			font-size:18px;
-			color: #2A6C82;
-			font-weight: bold;
-			margin:0px;
-		}
-
-		a{
-			color: #666;
-			text-decoration: none;
-			font-size:12px;
-		}
-
-		p{
-			margin:14px 0;
-		}
-
-		img{
+		.bordered-container{
 			border: 1px solid #e3e3e3;
+			padding: 10px;
+			width: 741px;
+
+			.article-left{
+				width: 526px;
+				border-right: 1px solid #e3e3e3;
+				padding-right:14px;
+				display: table-cell;
+				vertical-align: top;
+			}
+
+			.article-right{
+				display: table-cell;
+				vertical-align: top;
+				padding-left: 14px;
+			}
+
+			h3{
+				font-size:18px;
+				color: #2A6C82;
+				font-weight: bold;
+				margin:0px;
+			}
+
+			a{
+				color: #666;
+				text-decoration: none;
+				font-size:12px;
+			}
+
+			p{
+				margin:14px 0;
+			}
+
+			img{
+				border: 1px solid #e3e3e3;
+			}
+
+			a:hover{
+				color: #f34d20;
+			}
 		}
 
-		a:hover{
-			color: #f34d20;
-		}
 	}
 }
