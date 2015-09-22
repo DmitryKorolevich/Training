@@ -59,7 +59,8 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (validFrom.HasValue)
             {
-                Add(x => !x.StartDate.HasValue || x.StartDate.Value>= validFrom.Value);
+                var from = new DateTime(validFrom.Value.Year, validFrom.Value.Month, validFrom.Value.Day, 0, 0, 0);
+                Add(x => !x.StartDate.HasValue || x.StartDate.Value>= from);
             }
             return this;
         }
@@ -68,7 +69,8 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (validTo.HasValue)
             {
-                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= validTo.Value);
+                var to = (new DateTime(validTo.Value.Year, validTo.Value.Month, validTo.Value.Day, 0, 0, 0)).AddDays(1);
+                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
             }
             return this;
         }
