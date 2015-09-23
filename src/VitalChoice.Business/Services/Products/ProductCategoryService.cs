@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Services.Products
                     }
                     else
                     {
-                        throw new Exception("The default master template isn't confugurated. Please contact support.");
+                        throw new Exception("The default master template isn't confugured. Please contact support.");
                     }
                 }
             }
