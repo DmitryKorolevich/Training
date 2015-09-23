@@ -68,7 +68,7 @@ namespace VitalChoice.Business.Services.Workflow
             if (!actions.Any())
                 throw new ApiException($"Action {actionName} not found");
 
-            return actions.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Name)
+            return actions.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
             {
                 WorkflowActionType = a.Executor.ActionType
             });

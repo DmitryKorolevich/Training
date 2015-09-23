@@ -18,6 +18,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
+using VitalChoice.Infrastructure.Cache;
 
 namespace VitalChoice.Business.Services.Content
 {

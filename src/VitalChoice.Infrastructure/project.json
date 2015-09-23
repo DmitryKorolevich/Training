@@ -8,7 +8,8 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
-    "WindowsAzure.Storage": "5.0.1-preview-*"
+    "WindowsAzure.Storage": "5.0.1-preview-*",
+    "Templates": "2.2.6-*"
   },
 
   "frameworks": {

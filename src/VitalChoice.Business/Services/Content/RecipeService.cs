@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Transaction;
+using VitalChoice.Infrastructure.Cache;
 
 namespace VitalChoice.Business.Services.Content
 {

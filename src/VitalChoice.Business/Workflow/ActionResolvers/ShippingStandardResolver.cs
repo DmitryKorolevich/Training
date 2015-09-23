@@ -17,6 +17,8 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (context.FreeShipping)
                 return 0;
+            if (context.Order.ShippingAddress == null)
+                return 0;
             if (context.Order.Customer.IdObjectType == (int)CustomerType.Wholesale)
             {
                 if (context.Order.ShippingAddress.IdCountry ==

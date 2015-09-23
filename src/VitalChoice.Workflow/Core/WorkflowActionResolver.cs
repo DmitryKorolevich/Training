@@ -18,6 +18,9 @@ namespace VitalChoice.Workflow.Core
 
         public override TResult Execute(TContext context)
         {
+            TResult result;
+            if (Tree.TryGetActionResult(Name, context, out result))
+                return result;
             //pre-execute dependent actions, do not aggregate
             foreach (var dependentActionName in DependendActions)
             {
@@ -31,7 +34,7 @@ namespace VitalChoice.Workflow.Core
             {
                 var actionName = Actions[key];
                 context.ActionLock(actionName);
-                var result = Tree.GetAction(actionName).Execute(context);
+                result = Tree.GetAction(actionName).Execute(context);
                 context.ActionUnlock(actionName);
                 context.ActionSetResult(Name, result);
                 return result;

@@ -23,6 +23,7 @@ namespace VitalChoice.Workflow.Configuration
             {
                 action.Aggregate<ProductsWithPromoAction>();
                 action.Aggregate<DiscountTypeActionResolver>();
+                action.Aggregate<ShippingStandardResolver>();
             });
 
             treeSetup.Action<ProductAction>("Products");
@@ -96,8 +97,8 @@ namespace VitalChoice.Workflow.Configuration
 
             treeSetup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
-                action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardUsShipping");
-                action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardUsCaShipping");
+                action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
+                action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
             });
 
             treeSetup.Tree<OrderTree>("Order", tree =>

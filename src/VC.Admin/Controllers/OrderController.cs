@@ -43,16 +43,18 @@ namespace VC.Admin.Controllers
         private readonly IOrderService _orderService;
         private readonly IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> _simpleOrderService;
         private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
+        private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly ILogger logger;
 
         public OrderController(IOrderService orderService, IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> simpleOrderService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService)
+            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService, IDynamicToModelMapper<OrderAddressDynamic> addressMapper)
         {
             _orderService = orderService;
             _simpleOrderService = simpleOrderService;
             _mapper = mapper;
             _customerService = customerService;
+            _addressMapper = addressMapper;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -149,6 +151,9 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
             var item = _mapper.FromModel(model);
+            item.ShippingAddress =
+                _addressMapper.FromModel(model.Customer?.Shipping?.FirstOrDefault(s => s.IsSelected) ??
+                                         model.Customer?.Shipping?.FirstOrDefault());
 
             var orderContext = await _orderService.CalculateOrder(item);
 

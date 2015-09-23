@@ -539,7 +539,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             return;
         }
-
         oldOrderForCalculating = orderForCalculating;
         if ($scope.currectCalculateCanceller)
         {
