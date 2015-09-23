@@ -9,13 +9,21 @@ namespace VitalChoice.Business.Services.Workflow
     {
         public ActionSetup()
         {
+            Aggregations = new HashSet<Type>();
             Dependencies = new HashSet<Type>();
         }
 
+        internal HashSet<Type> Aggregations { get; }
         internal HashSet<Type> Dependencies { get; }
 
-        public IActionSetup<TContext, TResult> Dependency<T>() 
+        public IActionSetup<TContext, TResult> Aggregate<T>() 
             where T : IWorkflowExecutor<TContext, TResult>
+        {
+            Aggregations.Add(typeof(T));
+            return this;
+        }
+
+        public IActionSetup<TContext, TResult> Dependency<T>() where T : IWorkflowExecutor<TContext, TResult>
         {
             Dependencies.Add(typeof(T));
             return this;

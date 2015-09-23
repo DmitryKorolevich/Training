@@ -20,7 +20,9 @@ namespace VitalChoice.Business.Services.Workflow
         private readonly IEcommerceRepositoryAsync<WorkflowExecutor> _executors;
         private readonly IEcommerceRepositoryAsync<WorkflowResolverPath> _resolverPaths;
 
-        public ActionItemProvider(IEcommerceRepositoryAsync<WorkflowTree> treeRepository, IEcommerceRepositoryAsync<WorkflowExecutor> executors, IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPaths)
+        public ActionItemProvider(IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
+            IEcommerceRepositoryAsync<WorkflowExecutor> executors,
+            IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPaths)
         {
             _treeRepository = treeRepository;
             _executors = executors;
@@ -29,7 +31,8 @@ namespace VitalChoice.Business.Services.Workflow
 
         public async Task<Type> GetTreeType(string treeName)
         {
-            var tree = await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName)).SelectFirstOrDefaultAsync(false);
+            var tree =
+                await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName)).SelectFirstOrDefaultAsync(false);
             if (tree == null)
                 throw new ApiException($"Tree {treeName} not found");
             return ReflectionHelper.ResolveType(tree.ImplementationType);
@@ -88,6 +91,26 @@ namespace VitalChoice.Business.Services.Workflow
                     {
                         WorkflowActionType = a.Dependent.ActionType
                     }));
+        }
+
+        public async Task<HashSet<ActionItem>> GetAggregations(string actionName)
+        {
+            var result =
+                await _executors.Query(new WorkflowExecutorQuery().WithName(actionName))
+                    .Include(t => t.Aggreagations)
+                    .ThenInclude(ta => ta.ToAggregate)
+                    .SelectAsync(false);
+            var action = result.SingleOrDefault();
+            if (action == null)
+                throw new ApiException($"Action {actionName} not found");
+
+            return
+                new HashSet<ActionItem>(
+                    action.Aggreagations.Select(
+                        a => new ActionItem(a.ToAggregate.ImplementationType, a.ToAggregate.Name)
+                        {
+                            WorkflowActionType = a.ToAggregate.ActionType
+                        }));
         }
     }
 }

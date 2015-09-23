@@ -13,7 +13,6 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Infrastructure.Context;
@@ -22,6 +21,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Workflow.Configuration
 {

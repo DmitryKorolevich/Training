@@ -11,5 +11,6 @@ namespace VitalChoice.Workflow.Core
         Task<HashSet<ActionItem>> GetTreeActions(string treeName);
         Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName);
         Task<HashSet<ActionItem>> GetDependencies(string actionName);
+        Task<HashSet<ActionItem>> GetAggregations(string actionName);
     }
 }

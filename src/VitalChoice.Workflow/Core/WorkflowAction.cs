@@ -10,6 +10,7 @@ namespace VitalChoice.Workflow.Core
         protected WorkflowAction(IWorkflowTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
             DependendActions = new List<string>();
+            AggreagatedActions = new List<string>();
         }
 
         public abstract TResult AggregateResult(TResult result, TResult currentValue, string actionName);
@@ -23,6 +24,12 @@ namespace VitalChoice.Workflow.Core
             foreach (var actionName in DependendActions)
             {
                 context.ActionLock(actionName);
+                Tree.GetAction(actionName).Execute(context);
+                context.ActionUnlock(actionName);
+            }
+            foreach (var actionName in AggreagatedActions)
+            {
+                context.ActionLock(actionName);
                 result = AggregateResult(Tree.GetAction(actionName).Execute(context), result, actionName);
                 context.ActionUnlock(actionName);
             }
@@ -32,5 +39,6 @@ namespace VitalChoice.Workflow.Core
         }
 
         public List<string> DependendActions { get; }
+        public List<string> AggreagatedActions { get; }
     }
 }

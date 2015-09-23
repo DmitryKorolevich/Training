@@ -141,6 +141,20 @@ namespace VitalChoice.Infrastructure.Context
 		            .PrincipalKey(e => e.Id);
 		    });
 
+            builder.Entity<WorkflowActionAggregation>(entity =>
+            {
+                entity.ToTable("WorkflowActionAggregations");
+                entity.Key(d => new { d.IdParent, d.IdAggregate });
+                entity.Ignore(d => d.Id);
+                entity.Reference(d => d.Parent)
+                    .InverseCollection(e => e.Aggreagations)
+                    .ForeignKey(d => d.IdParent)
+                    .PrincipalKey(e => e.Id);
+                entity.Reference(d => d.ToAggregate)
+                    .InverseCollection()
+                    .ForeignKey(d => d.IdAggregate)
+                    .PrincipalKey(e => e.Id);
+            });
 
             #endregion
 

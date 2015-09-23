@@ -10,11 +10,13 @@ namespace VitalChoice.Domain.Workflow
             Type = type;
             Name = name;
             Dependencies = new HashSet<Type>();
+            Aggregations = new HashSet<Type>();
         }
 
         public Type Type { get; }
         public string Name { get; set; }
         public HashSet<Type> Dependencies { get; set; }
+        public HashSet<Type> Aggregations { get; set; }
         public bool Equals(WorkflowActionDefinition other) => other?.Type == Type;
 
         public override int GetHashCode()

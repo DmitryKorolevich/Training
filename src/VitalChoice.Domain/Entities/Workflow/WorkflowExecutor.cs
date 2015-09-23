@@ -21,5 +21,7 @@ namespace VitalChoice.Domain.Entities.Workflow
         public ICollection<WorkflowResolverPath> ResolverPaths { get; set; }
 
         public ICollection<WorkflowActionDependency> Dependencies { get; set; }
+
+        public ICollection<WorkflowActionAggregation> Aggreagations { get; set; }
     }
 }

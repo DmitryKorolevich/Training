@@ -6,7 +6,9 @@ using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.Products;
+using VitalChoice.Business.Workflow.Actions.Shipping;
 using VitalChoice.Business.Workflow.Trees;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
@@ -19,25 +21,70 @@ namespace VitalChoice.Workflow.Configuration
         {
             treeSetup.Action<TotalAction>("Total", action =>
             {
-                action.Dependency<ProductsWithPromoAction>();
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Aggregate<ProductsWithPromoAction>();
+                action.Aggregate<DiscountTypeActionResolver>();
             });
+
             treeSetup.Action<ProductAction>("Products");
+
             treeSetup.Action<ProductsWithPromoAction>("PromoProducts", action =>
             {
-                action.Dependency<ProductAction>();
+                action.Dependency<DiscountTypeActionResolver>();
+
+                action.Aggregate<ProductAction>();
             });
-            treeSetup.Action<DiscountPercentAction>("PercentDiscount");
-            treeSetup.Action<DiscountPriceAction>("PriceDiscount");
-            treeSetup.Action<DiscountableProductsAction>("DiscountableSubtotal");
-            treeSetup.Action<DiscountTieredAction>("TieredDiscount");
-            treeSetup.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
-            treeSetup.Action<DiscountThresholdAction>("ThresholdDiscount");
-            treeSetup.Action<PerishableProductsAction>("PerishableSubtotal");
-            treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+
+            treeSetup.Action<DiscountPercentAction>("PercentDiscount", action =>
+            {
+                action.Dependency<DiscountableProductsAction>();
+            });
+
+            treeSetup.Action<DiscountPriceAction>("PriceDiscount", action =>
+            {
+                action.Dependency<DiscountableProductsAction>();
+            });
+
+            treeSetup.Action<DiscountableProductsAction>("DiscountableSubtotal", action =>
             {
                 action.Dependency<ProductAction>();
+            });
+
+            treeSetup.Action<DiscountTieredAction>("TieredDiscount", action =>
+            {
                 action.Dependency<DiscountableProductsAction>();
+            });
+
+            treeSetup.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
+
+            treeSetup.Action<DiscountThresholdAction>("ThresholdDiscount", action =>
+            {
+                action.Dependency<DiscountableProductsAction>();
+            });
+
+            treeSetup.Action<PerishableProductsAction>("PerishableSubtotal", action =>
+            {
+                action.Dependency<ProductAction>();
+            });
+
+            treeSetup.Action<DeliveredProductsAction>("DeliveredAmount", action =>
+            {
+                action.Dependency<ProductsWithPromoAction>();
+            });
+
+            treeSetup.Action<StandardShippingUsWholesaleAction>("StandardWholesaleShipping", action =>
+            {
+                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.Action<StandardShippingUsCaRetailAction>("StandardRetailShipping", action =>
+            {
+                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+            {
                 action.Dependency<PerishableProductsAction>();
 
                 action.ResolvePath<DiscountPercentAction>((int) DiscountType.PercentDiscount, "PercentDiscount");
@@ -46,6 +93,13 @@ namespace VitalChoice.Workflow.Configuration
                 action.ResolvePath<DiscountFreeShippingAction>((int) DiscountType.FreeShipping, "FreeShippingDiscount");
                 action.ResolvePath<DiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
             });
+
+            treeSetup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
+            {
+                action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardUsShipping");
+                action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardUsCaShipping");
+            });
+
             treeSetup.Tree<OrderTree>("Order", tree =>
             {
                 tree.Dependency<TotalAction>();

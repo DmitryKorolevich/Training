@@ -19,11 +19,11 @@ namespace VitalChoice.Workflow.Core
         public override TResult Execute(TContext context)
         {
             //pre-execute dependent actions, do not aggregate
-            foreach (var actionName in DependendActions)
+            foreach (var dependentActionName in DependendActions)
             {
-                context.ActionLock(actionName);
-                Tree.GetAction(actionName).Execute(context);
-                context.ActionUnlock(actionName);
+                context.ActionLock(dependentActionName);
+                Tree.GetAction(dependentActionName).Execute(context);
+                context.ActionUnlock(dependentActionName);
             }
 
             var key = GetActionKey(context);

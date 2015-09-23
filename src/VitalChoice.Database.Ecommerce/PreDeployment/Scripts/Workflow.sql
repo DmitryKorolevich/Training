@@ -119,3 +119,15 @@ BEGIN
 	ADD CONSTRAINT [FK_WorkflowActionDependencyToWorkflowParentAction] FOREIGN KEY (IdParent) REFERENCES [WorkflowExecutors] (Id) ON DELETE CASCADE,
 		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowDependentAction] FOREIGN KEY (IdDependent) REFERENCES [WorkflowExecutors] (Id)
 END
+
+IF OBJECT_ID(N'dbo.WorkflowActionAggregations', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[WorkflowActionAggregations]
+	(
+		[IdParent] INT NOT NULL, 
+		[IdAggregate] INT NOT NULL, 
+		CONSTRAINT [PK_WorkflowActionAggregation] PRIMARY KEY (IdParent, IdAggregate),
+		CONSTRAINT [FK_WorkflowActionAggregationToWorkflowParentAction] FOREIGN KEY (IdParent) REFERENCES [WorkflowExecutors] (Id) ON DELETE CASCADE,
+		CONSTRAINT [FK_WorkflowActionAggregationToWorkflowAggregateAction] FOREIGN KEY (IdAggregate) REFERENCES [WorkflowExecutors] (Id)
+	)
+END

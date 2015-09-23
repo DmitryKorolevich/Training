@@ -31,9 +31,11 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
@@ -47,6 +49,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
+        private readonly ICountryService _countryService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -56,7 +59,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService, IWorkflowFactory treeFactory)
+            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
@@ -67,6 +70,7 @@ namespace VitalChoice.Business.Services.Orders
             _productMapper = productMapper;
             _customerService = customerService;
             _treeFactory = treeFactory;
+            _countryService = countryService;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -131,7 +135,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<OrderContext> CalculateOrder(OrderDynamic order)
         {
-            var context = new OrderContext
+            var context = new OrderContext(await _countryService.GetCountriesAsync())
             {
                 Order = order
             };

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.DynamicData.Entities;
@@ -7,10 +8,13 @@ using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Workflow.Contexts
 {
-    public class OrderContext: ComputableContext {
+    public class OrderContext : ComputableContext
+    {
+        public ICollection<Country> Coutries { get; }
 
-        public OrderContext()
+        public OrderContext(ICollection<Country> coutries)
         {
+            Coutries = coutries;
             Messages = new List<MessageInfo>();
             PromoSkus = new List<SkuOrdered>();
         }

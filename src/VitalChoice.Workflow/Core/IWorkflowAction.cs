@@ -9,6 +9,8 @@ namespace VitalChoice.Workflow.Core
     {
         List<string> DependendActions { get; }
 
+        List<string> AggreagatedActions { get; }
+
         TResult AggregateResult(TResult result, TResult currentValue, string actionName);
 
         TResult ExecuteAction(TContext context);

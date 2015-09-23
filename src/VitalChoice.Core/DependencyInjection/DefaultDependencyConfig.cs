@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
@@ -31,6 +32,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Newtonsoft.Json;
 using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Orders;
@@ -59,6 +61,7 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.Business.Services.HelpService;
+using VitalChoice.Core.GlobalFilters;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -166,15 +169,21 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                     inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
+                    inputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
                 }
                 else
                 {
-                    // ReSharper disable once UseObjectOrCollectionInitializer
-                    var newFormatter = new JsonInputFormatter();
-                    newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                    newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    var newFormatter = new JsonInputFormatter
+                    {
+                        SerializerSettings =
+                        {
+                            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                            DateParseHandling = DateParseHandling.DateTime,
+                            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+                        }
+                    };
+                    newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
                     o.InputFormatters.Add(newFormatter);
                 }
 
@@ -182,15 +191,21 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                     outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
+                    outputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
                 }
                 else
                 {
-                    // ReSharper disable once UseObjectOrCollectionInitializer
-                    var newFormatter = new JsonOutputFormatter();
-                    newFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                    newFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                    newFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                    var newFormatter = new JsonOutputFormatter
+                    {
+                        SerializerSettings =
+                        {
+                            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                            DateParseHandling = DateParseHandling.DateTime,
+                            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+                        }
+                    };
+                    newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
                     o.OutputFormatters.Add(newFormatter);
                 }
             });

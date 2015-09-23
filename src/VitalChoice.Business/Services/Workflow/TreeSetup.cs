@@ -27,6 +27,7 @@ namespace VitalChoice.Business.Services.Workflow
         private readonly IEcommerceRepositoryAsync<WorkflowExecutor> _executorsRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowResolverPath> _resolverPathsRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowActionDependency> _actionDependenciesRepository;
+        private readonly IEcommerceRepositoryAsync<WorkflowActionAggregation> _actionAggregationsRepository;
         private readonly EcommerceContext _context;
         private readonly ILogger _logger;
 
@@ -34,13 +35,15 @@ namespace VitalChoice.Business.Services.Workflow
             IEcommerceRepositoryAsync<WorkflowTree> treeRepository,
             IEcommerceRepositoryAsync<WorkflowExecutor> executorsRepository,
             IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository,
-            IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository, EcommerceContext context,
+            IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository,
+            IEcommerceRepositoryAsync<WorkflowActionAggregation> actionAggregationsRepository, EcommerceContext context,
             ILoggerProviderExtended loggerProvider)
         {
             _treeRepository = treeRepository;
             _executorsRepository = executorsRepository;
             _resolverPathsRepository = resolverPathsRepository;
             _actionDependenciesRepository = actionDependenciesRepository;
+            _actionAggregationsRepository = actionAggregationsRepository;
             _context = context;
             _logger = loggerProvider.CreateLoggerDefault();
             Trees = new Dictionary<Type, WorkflowTreeDefinition>();
@@ -76,6 +79,7 @@ namespace VitalChoice.Business.Services.Workflow
                 var actionSetup = new ActionSetup<TContext, TResult>();
                 actions(actionSetup);
                 action.Dependencies = actionSetup.Dependencies;
+                action.Aggregations = actionSetup.Aggregations;
             }
             Actions.Add(typeof (T), action);
             return this;
@@ -101,6 +105,7 @@ namespace VitalChoice.Business.Services.Workflow
         {
             var trees = await _treeRepository.Query().SelectAsync();
             var dependencies = await _actionDependenciesRepository.Query().SelectAsync();
+            var aggregations = await _actionAggregationsRepository.Query().SelectAsync();
             var resolverPaths = await _resolverPathsRepository.Query().SelectAsync();
             var executors = await _executorsRepository.Query().SelectAsync();
             using (var transaction = new TransactionAccessor(_context).BeginTransaction())
@@ -108,17 +113,12 @@ namespace VitalChoice.Business.Services.Workflow
                 try
                 {
                     //Wipe out everything
-                    if (trees.Any())
-                    {
-                        await _treeRepository.DeleteAllAsync(trees);
-                    }
-                    if (dependencies.Any())
-                    {
-                        await _actionDependenciesRepository.DeleteAllAsync(dependencies);
-                        await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
-                        await _executorsRepository.DeleteAllAsync(executors);
-                    }
-
+                    await _treeRepository.DeleteAllAsync(trees);
+                    await _actionAggregationsRepository.DeleteAllAsync(aggregations);
+                    await _actionDependenciesRepository.DeleteAllAsync(dependencies);
+                    await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
+                    await _executorsRepository.DeleteAllAsync(executors);
+                    
                     //Insert executors
                     var dbExecutors = Actions.Select(a => new WorkflowExecutor
                     {
@@ -154,6 +154,19 @@ namespace VitalChoice.Business.Services.Workflow
                         }));
                     }
                     await _actionDependenciesRepository.InsertRangeAsync(dbActions);
+
+                    //Insert action aggregations
+                    var dbAggregations = new List<WorkflowActionAggregation>();
+                    foreach (var action in Actions)
+                    {
+                        dbAggregations.AddRange(
+                            action.Value.Aggregations.Select(dependency => new WorkflowActionAggregation
+                            {
+                                IdParent = actions[action.Key.FullName],
+                                IdAggregate = actions[dependency.FullName]
+                            }));
+                    }
+                    await _actionAggregationsRepository.InsertRangeAsync(dbAggregations);
 
                     //Insert trees
                     var dbTrees = Trees.Select(t => new WorkflowTree

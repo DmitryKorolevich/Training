@@ -80,6 +80,15 @@ namespace VitalChoice.Workflow.Core
                     await AddWalkAction(dep);
                 }
             }
+            var aggregatedItems = await _itemProvider.GetAggregations(action.ActionName);
+            foreach (var aggr in aggregatedItems)
+            {
+                workflowAction.AggreagatedActions.Add(aggr.ActionName);
+                if (!_actions.ContainsKey(aggr.ActionName))
+                {
+                    await AddWalkAction(aggr);
+                }
+            }
         }
 
         private async Task AddWalkAction(ActionItem action)

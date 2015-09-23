@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
 
         public override decimal ExecuteAction(OrderContext context)
         {
-            IEnumerable<SkuOrdered> skus = context.SkuOrdereds ?? context.Order.Skus;
+            IEnumerable<SkuOrdered> skus = context.SkuOrdereds;
             if (context.Order.Discount != null)
             {
                 if (context.Order.Discount.ExcludeCategories)
