@@ -14,7 +14,17 @@ namespace VitalChoice.Business.Queries.Customer
 		    return this;
 	    }
 
-		public VCustomerQuery WithId(string text)
+        public VCustomerQuery WithIdContains(string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                Add(x => x.Id.ToString().Contains(id));
+            }
+
+            return this;
+        }
+
+        public VCustomerQuery WithId(string text)
 		{
 			if (string.IsNullOrWhiteSpace(text))
 			{

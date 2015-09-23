@@ -66,6 +66,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 										initCustomerFiles();
 										initCustomerNotes();
+										initOrdersList();
 									} else {
 										toaster.pop('error', 'Error!', "Can't load customer prototype");
 									}
@@ -112,6 +113,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 										initCustomerFiles();
 										initCustomerNotes();
+										initOrdersList();
 									} else {
 										toaster.pop('error', 'Error!', "Can't load customer");
 									}
@@ -142,7 +144,14 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    var data = {};
 			    data.customerNotes = $scope.currentCustomer.CustomerNotes;
 			    data.addEditTracker = $scope.addEditTracker;
-			    $scope.$broadcast('customerNotess#in#init', data);
+			    $scope.$broadcast('customerNotes#in#init', data);
+			};
+
+			function initOrdersList()
+			{
+			    var data = {};
+			    data.idCustomer = $scope.currentCustomer.Id;
+			    $scope.$broadcast('customerOrders#in#init', data);
 			};
 
 			function clearServerValidation() {
@@ -185,7 +194,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			};
 
 			function successHandler(result) {
-				if (result.Success) {
+			    if (result.Success)
+			    {
+			        $scope.currentCustomer.Id = result.Data.Id;
 					toaster.pop('success', "Success!", "Successfully saved");
 				} else {
 					var messages = "";

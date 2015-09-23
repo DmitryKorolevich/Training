@@ -48,6 +48,16 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<List<SkuDynamic>> GetSkusAsync(ICollection<string> codes, bool withDefaults = false);
 
-	    #endregion
-	}
+        #endregion
+
+        #region ProductOutOfStockRequests
+
+        Task<ICollection<ProductOutOfStockContainer>> GetProductOutOfStockContainers();
+
+        Task<ProductOutOfStockRequest> AddProductOutOfStockRequest(ProductOutOfStockRequest model);
+
+        Task<bool> SendProductOutOfStockRequests(ICollection<int> ids);
+        
+        #endregion
+    }
 }

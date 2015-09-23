@@ -286,11 +286,12 @@ namespace VitalChoice.Business.Services.Customers
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
 		}
 
-		public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
+        public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
 		{
 			var condition =
 				new VCustomerQuery().NotDeleted()
-					.WithId(filter.SearchText)
+                    .WithIdContains(filter.IdContains)
+                    .WithId(filter.SearchText)
 					.WithEmail(filter.Email)
 					.WithAddress1(filter.Address1)
 					.WithAddress2(filter.Address2)
@@ -395,29 +396,16 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    var i = 0;
             Guid publicId = Guid.Parse(customerPublicId);
-            var customer = (await _customerRepositoryAsync.Query(p => p.PublicId == publicId).SelectAsync(false)).FirstOrDefault();
 
             string blobname;
             string generatedFileName;
-            if (customer != null)
+
+            do
             {
-                var files = await _customerFileRepositoryAsync.Query(p => p.IdCustomer == customer.Id).SelectAsync(false);
-                do
-                {
-                    generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
-                    blobname = $"{customerPublicId}/{generatedFileName}";
-                    i++;
-                } while (files.Select(p=>p.FileName.ToLower()).Contains(generatedFileName));
-            }
-            else
-            {
-                do
-                {
-                    generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
-                    blobname = $"{customerPublicId}/{generatedFileName}";
-                    i++;
-                } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
-            }            
+                generatedFileName = (i != 0 ? (i + "_") : string.Empty) + fileName;
+                blobname = $"{customerPublicId}/{generatedFileName}";
+                i++;
+            } while (await _storageClient.BlobExistsAsync(_customerContainerName, blobname));
 
             await _storageClient.UploadBlobAsync(_customerContainerName, blobname, file, contentType);
 

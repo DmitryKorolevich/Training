@@ -145,10 +145,6 @@ angular.module('app.modules.demo',
 					url: '/tools/emailAddressProfiles',
 					template: '<h2>Multiple Email Address Profiles</h2>'
 				})
-				.state('index.oneCol.reassignTransaction', {
-					url: '/tools/reassignTransaction',
-					template: '<h2>Reassign Transaction</h2>'
-				})
 				.state('index.oneCol.healthWise', {
 					url: '/tools/healthWise',
 					template: '<h2>HealthWise</h2>'

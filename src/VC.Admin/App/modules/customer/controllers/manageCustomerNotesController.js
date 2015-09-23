@@ -9,7 +9,7 @@
             $scope.childForms.submitted = [];
         }
 
-        $scope.$on('customerNotess#in#init', function (event, args)
+        $scope.$on('customerNotes#in#init', function (event, args)
         {
             $scope.customerNotes = args.customerNotes;
             $scope.addEditTracker = args.addEditTracker;

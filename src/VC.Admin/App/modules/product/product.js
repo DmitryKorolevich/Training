@@ -20,6 +20,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.productTaxCodesController',
 	'app.modules.product.controllers.promotionsController',
 	'app.modules.product.controllers.promotionManageController',
+	'app.modules.product.controllers.outOfStocksController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -121,6 +122,12 @@ angular.module('app.modules.product', [
 				    url: '/promotions/{id:int}',
 				    templateUrl: 'app/modules/product/partials/promotionDetail.html',
 				    controller: 'promotionManageController'
+				})
+                /*product out of stock requests*/
+				.state('index.oneCol.outOfStocks', {
+				    url: '/products/out-of-stock-request',
+				    templateUrl: 'app/modules/product/partials/outOfStocksList.html',
+				    controller: 'outOfStocksController'
 				});
 		}
 ]);

@@ -423,6 +423,9 @@ namespace VitalChoice.Infrastructure.Context
                 .PrincipalKey(p => p.Id)
                 .Required();
 
+            builder.Entity<ProductOutOfStockRequest>().Key(p => p.Id);
+            builder.Entity<ProductOutOfStockRequest>().ToTable("ProductOutOfStockRequests");
+
             #endregion
 
 

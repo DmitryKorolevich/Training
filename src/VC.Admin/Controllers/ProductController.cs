@@ -417,5 +417,22 @@ namespace VC.Admin.Controllers
         }
 
         #endregion
+
+        #region ProductOutOfStockRequests
+
+        [HttpPost]
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
+        {
+            var toReturn = await productService.GetProductOutOfStockContainers();
+            return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> SendProductOutOfStockRequests([FromBody]ICollection<int> ids)
+        {
+            return await productService.SendProductOutOfStockRequests(ids);
+        }
+
+        #endregion
     }
 }

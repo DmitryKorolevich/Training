@@ -15,3 +15,15 @@ INSERT INTO ContentProcessors
 SELECT 3, 'RecipesProcessor', 'Recipes processor', NULL
 
 END
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ProductCategoryProcessor')
+BEGIN
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(4, N'ProductCategoryProcessor', N'Product category processor', N'Processor to manage product categories')
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 4 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Product sub categories'
+END

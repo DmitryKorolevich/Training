@@ -96,7 +96,7 @@
                     indexForDelete = index;
                 }
             });
-            if (indexForDelete)
+            if (indexForDelete!=null)
             {
                 confirmUtil.confirm(function ()
                 {

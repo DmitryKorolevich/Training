@@ -37,6 +37,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageCategories', stateName: 'index.oneCol.manageProductCategories', stateLabel: 'Manage Categories', access: 4 },
 				{ name: 'manageInventoryCategories', stateName: 'index.oneCol.manageInventoryCategories', stateLabel: 'Manage Sales Categories', access: 4 },
 				{ name: 'manageProductReviews', stateName: 'index.oneCol.manageProductReviews', stateLabel: 'Manage Product Reviews', access: 4 },
+				{ name: 'outOfStocks', stateName: 'index.oneCol.outOfStocks', stateLabel: 'Out of Stock Requests', access: 4 },
 			]
 		},
         {
@@ -87,7 +88,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 8 },
 				{ name: 'emailAddressProfiles', stateName: 'index.oneCol.emailAddressProfiles', stateLabel: 'Multiple Email Address Profiles', access: 8 },
-				{ name: 'reassignTransaction', stateName: 'index.oneCol.reassignTransaction', stateLabel: 'Reassign Transaction', access: 8 },
+				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
 				{ name: 'healthWise', stateName: 'index.oneCol.healthWise', stateLabel: 'HealthWise', access: 8 },
 			]

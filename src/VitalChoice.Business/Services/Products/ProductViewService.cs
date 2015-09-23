@@ -116,9 +116,7 @@ namespace VitalChoice.Business.Services.Products
                 };
             }
             dynamic model = new ExpandoObject();
-            model.BodyHtml = category.ContentItem.Description;
-            model.LongDescriptionHTML = category.LongDescription;
-            model.LongDescriptionBottomHTML = category.LongDescriptionBottom;
+            model = category;
             parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
             foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)
             {

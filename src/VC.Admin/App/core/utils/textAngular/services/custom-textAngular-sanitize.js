@@ -191,7 +191,7 @@ var optionalEndTagBlockElements = makeMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th
 // Safe Block Elements - HTML5
 var blockElements = angular.extend({}, optionalEndTagBlockElements, makeMap("address,article," +
         "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
-        "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,script,section,table,ul"));
+        "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,script,section,table,ul,object"));
 
 // Inline Elements - HTML5
 var inlineElements = angular.extend({}, optionalEndTagInlineElements, makeMap("a,abbr,acronym,b," +
@@ -543,14 +543,14 @@ function validStyles(styleAttr){
 // this function is used to manually allow specific attributes on specific tags with certain prerequisites
 function validCustomTag(tag, attrs, lkey, value){
 	// catch the div placeholder for the iframe replacement
-	if (lkey == 'data-restore') {
-		return true;
-	}
+	//if (lkey == 'data-restore') {
+	//	return true;
+	//}
 
-	if (tag === 'img' && attrs['ta-insert-video']){
-        if(lkey === 'ta-insert-video' || lkey === 'allowfullscreen' || lkey === 'frameborder' || (lkey === 'contenteditable' && value === 'false')) return true;
-    }
-    return false;
+	//if (tag === 'img' && attrs['ta-insert-video']){
+    //    if(lkey === 'ta-insert-video' || lkey === 'allowfullscreen' || lkey === 'frameborder' || (lkey === 'contenteditable' && value === 'false')) return true;
+    //}
+    return true;
 }
 
 /**

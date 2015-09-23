@@ -145,4 +145,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\CustomPublicStyles.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductsOutOfStockData.sql" />
+  </ItemGroup>
 </Project>

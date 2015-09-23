@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Mail
 #endif
 		}
 
-		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= "Vital Choice", string fromEmail=null, string toDisplayName = "",
+		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= null, string fromEmail=null, string toDisplayName = "",
             bool isBodyHtml=true)
 		{
 #if DNX451
@@ -40,6 +40,10 @@ namespace VitalChoice.Business.Mail
             if(String.IsNullOrEmpty(fromEmailAdddress))
             {
                 fromEmailAdddress = _configuration.From;
+            }
+            if (String.IsNullOrEmpty(fromDisplayName))
+            {
+                fromDisplayName = "Vital Choice";
             }
             var fromAddr = new MailAddress(fromEmailAdddress, fromDisplayName, Encoding.UTF8);
 			var toAddr = new MailAddress(email, toDisplayName, Encoding.UTF8);

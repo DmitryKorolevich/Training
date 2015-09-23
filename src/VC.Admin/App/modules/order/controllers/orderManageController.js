@@ -163,6 +163,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     {
         $scope.id = $stateParams.id ? $stateParams.id : 0;
         $scope.idCustomer = $stateParams.idcustomer ? $stateParams.idcustomer : 0;
+        $scope.idOrderSource = $stateParams.idsource ? $stateParams.idsource : 0;
 
         $scope.forms = { submitted: [] };
 
@@ -263,6 +264,38 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         $scope.order.UpdateShippingAddressForCustomer = true;
                         customerEditService.initCustomerEdit($scope);
                     }
+
+                    if ($scope.idOrderSource)
+                    {
+                        loadOrderSource();
+                    }
+                    else
+                    {
+                        loadReferencedData();
+                    }
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
+    var loadOrderSource = function ()
+    {
+        orderService.getOrder($scope.idOrderSource, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    if (result.Data.SkuOrdereds && result.Data.SkuOrdereds.length > 0)
+                    {
+                        $scope.order.SkuOrdereds = result.Data.SkuOrdereds;
+                    }
+                    $scope.order.PromoSkus = result.Data.PromoSkus;
                     loadReferencedData();
                 } else
                 {
@@ -407,14 +440,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 initCustomerFiles();
                 initCustomerNotes();
 
-                $scope.ordersFilter = {
-                    idCustomer: $scope.idCustomer,
-                    Paging: { PageIndex: 1, PageItemCount: 20 },
-                    Sorting: gridSorterUtil.resolve(refreshOrdersHistory, "DateCreated", "Desc")
-                };
-                refreshOrdersHistory();
+                initOrdersList();
 
-                if ($scope.id)
+                if ($scope.id || $scope.idOrderSource)
                 {
                     $scope.requestRecalculate();
                 }
@@ -491,7 +519,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         var data = {};
         data.customerNotes = $scope.currentCustomer.CustomerNotes;
         data.addEditTracker = $scope.addEditTracker;
-        $scope.$broadcast('customerNotess#in#init', data);
+        $scope.$broadcast('customerNotes#in#init', data);
+    };
+
+    function initOrdersList()
+    {
+        var data = {};
+        data.idCustomer = $scope.idCustomer;
+        $scope.$broadcast('customerOrders#in#init', data);
     };
 
     var oldOrderForCalculating = null;
@@ -1128,31 +1163,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
-    };
-
-    $scope.ordersPageChanged = function ()
-    {
-        refreshOrdersHistory();
-    };
-
-    function refreshOrdersHistory()
-    {
-        orderService.getOrders($scope.ordersFilter, $scope.addEditTracker)
-            .success(function (result)
-            {
-                if (result.Success)
-                {
-                    $scope.ordersHistory = result.Data.Items;
-                    $scope.ordersTotalItems = result.Data.Count;
-                } else
-                {
-                    errorHandler(result);
-                }
-            })
-            .error(function (result)
-            {
-                errorHandler(result);
-            });
     };
 
     initialize();

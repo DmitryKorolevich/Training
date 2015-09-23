@@ -36,3 +36,5 @@ Post-Deployment Script Template
 :r .\Scripts\ContentAreas.sql
 :r .\Scripts\BugTickets.sql
 :r .\Scripts\CustomPublicStyles.sql
+
+:r .\Scripts\ProductsOutOfStockData.sql

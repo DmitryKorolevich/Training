@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Mail
 
 	    Task SendPasswordResetAsync(string email, PasswordReset passwordReset);
 
-        Task SendBasicEmailAsync(BasicEmail email);
+        Task<bool> SendBasicEmailAsync(BasicEmail email);
 
         Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicket helpTicket);
 

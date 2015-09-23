@@ -54,5 +54,25 @@ namespace VitalChoice.Business.Queries.Product
 
             return this;
         }
+
+        public DiscountQuery WithValidFrom(DateTime? validFrom)
+        {
+            if (validFrom.HasValue)
+            {
+                var from = new DateTime(validFrom.Value.Year, validFrom.Value.Month, validFrom.Value.Day, 0, 0, 0);
+                Add(x => !x.StartDate.HasValue || x.StartDate.Value>= from);
+            }
+            return this;
+        }
+
+        public DiscountQuery WithValidTo(DateTime? validTo)
+        {
+            if (validTo.HasValue)
+            {
+                var to = (new DateTime(validTo.Value.Year, validTo.Value.Month, validTo.Value.Day, 0, 0, 0)).AddDays(1);
+                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
+            }
+            return this;
+        }
     }
 }
