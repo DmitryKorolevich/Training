@@ -5,6 +5,7 @@ angular.module('app.modules.order',[
 	'app.modules.order.controllers.orderManageController',
 	'app.modules.order.controllers.orderStatusUpdateController',
 	'app.modules.order.controllers.moveOrderController',
+	'app.modules.order.controllers.customerOrdersController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

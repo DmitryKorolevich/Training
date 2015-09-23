@@ -440,12 +440,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 initCustomerFiles();
                 initCustomerNotes();
 
-                $scope.ordersFilter = {
-                    idCustomer: $scope.idCustomer,
-                    Paging: { PageIndex: 1, PageItemCount: 20 },
-                    Sorting: gridSorterUtil.resolve(refreshOrdersHistory, "DateCreated", "Desc")
-                };
-                refreshOrdersHistory();
+                initOrdersList();
 
                 if ($scope.id || $scope.idOrderSource)
                 {
@@ -524,7 +519,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         var data = {};
         data.customerNotes = $scope.currentCustomer.CustomerNotes;
         data.addEditTracker = $scope.addEditTracker;
-        $scope.$broadcast('customerNotess#in#init', data);
+        $scope.$broadcast('customerNotes#in#init', data);
+    };
+
+    function initOrdersList()
+    {
+        var data = {};
+        data.idCustomer = $scope.idCustomer;
+        $scope.$broadcast('customerOrders#in#init', data);
     };
 
     var oldOrderForCalculating = null;
@@ -1161,31 +1163,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
-    };
-
-    $scope.ordersPageChanged = function ()
-    {
-        refreshOrdersHistory();
-    };
-
-    function refreshOrdersHistory()
-    {
-        orderService.getOrders($scope.ordersFilter, $scope.addEditTracker)
-            .success(function (result)
-            {
-                if (result.Success)
-                {
-                    $scope.ordersHistory = result.Data.Items;
-                    $scope.ordersTotalItems = result.Data.Count;
-                } else
-                {
-                    errorHandler(result);
-                }
-            })
-            .error(function (result)
-            {
-                errorHandler(result);
-            });
     };
 
     initialize();

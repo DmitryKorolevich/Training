@@ -127,6 +127,15 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                     data.DiscountTiers = [];
                 };
 
+                //if (data.ExpirationDate)
+                //{
+                //    data.ExpirationDate = data.ExpirationDate.toServerDateTime();
+                //}
+                //if (data.StartDate)
+                //{
+                //    data.StartDate = data.StartDate.toServerDateTime();
+                //}
+
                 discountService.updateDiscount(data, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);
                 }).error(function (result) {

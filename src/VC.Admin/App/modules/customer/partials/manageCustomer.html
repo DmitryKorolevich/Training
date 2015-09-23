@@ -426,6 +426,11 @@
                             </div>
                         </div>
                     </tab>
+                    <tab data-ng-show="currentCustomer.Id" heading="Order History">
+                        <div class="container-fluid">
+                            <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
+                        </div>
+                    </tab>
                     <tab heading="Notes" active="customerNotesTab.active">
                         <div class="container-fluid">
                             <div ng-controller="manageCustomerNotesController" onload="name = 'CustomerNotes'" data-ng-include="'app/modules/customer/partials/manageCustomerNotes.html'"></div>
