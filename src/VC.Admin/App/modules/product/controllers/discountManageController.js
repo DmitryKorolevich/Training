@@ -95,6 +95,15 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			                $scope.discount.SelectedProductsOnly = true;
 			            }
 
+			            if ($scope.discount.ExpirationDate)
+			            {
+			                $scope.discount.ExpirationDate = Date.parseDateTime($scope.discount.ExpirationDate);
+			            }
+			            if ($scope.discount.StartDate)
+			            {
+			                $scope.discount.StartDate = Date.parseDateTime($scope.discount.StartDate);
+			            }
+
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
 			            addProductsListWatchers();
 			            if ($scope.discount.DiscountTiers.length == 0) {
@@ -127,14 +136,14 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                     data.DiscountTiers = [];
                 };
 
-                //if (data.ExpirationDate)
-                //{
-                //    data.ExpirationDate = data.ExpirationDate.toServerDateTime();
-                //}
-                //if (data.StartDate)
-                //{
-                //    data.StartDate = data.StartDate.toServerDateTime();
-                //}
+                if (data.ExpirationDate)
+                {
+                    data.ExpirationDate = data.ExpirationDate.toServerDateTime();
+                }
+                if (data.StartDate)
+                {
+                    data.StartDate = data.StartDate.toServerDateTime();
+                }
 
                 discountService.updateDiscount(data, $scope.refreshTracker).success(function (result) {
                     successSaveHandler(result);

@@ -14,8 +14,20 @@
             toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         };
 
-        function refreshDiscounts() {
-            discountService.getDiscounts($scope.filter, $scope.refreshTracker)
+        function refreshDiscounts()
+        {
+            var data = {};
+            angular.copy($scope.filter, data);
+            if (data.ValidFrom)
+            {
+                data.ValidFrom = data.ValidFrom.toServerDateTime();
+            }
+            if (data.ValidTo)
+            {
+                data.ValidTo = data.ValidTo.toServerDateTime();
+            }
+
+            discountService.getDiscounts(data, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.discounts = result.Data.Items;

@@ -29,6 +29,7 @@ namespace VC.Admin.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicToModelMapper<DiscountDynamic> _mapper;
         private readonly ILogger _logger;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public DiscountController(IDiscountService discountService, IProductService productService, ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<DiscountDynamic> mapper)
         {
@@ -36,6 +37,7 @@ namespace VC.Admin.Controllers
             this._productService = productService;
             _mapper = mapper;
             this._logger = loggerProvider.CreateLoggerDefault();
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         #region Products
@@ -66,8 +68,8 @@ namespace VC.Admin.Controllers
                     StatusCode = RecordStatusCode.Active,
                     Assigned = null,//All
                     DiscountType=DiscountType.PercentDiscount,
-                    StartDate = now,
-                    ExpirationDate= now.AddDays(30),
+                    StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
+                    ExpirationDate= TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
                     DiscountsToSelectedSkus = new List<DiscountToSelectedSku>(),
                     DiscountsToSkus = new List<DiscountToSku>(),
                     DiscountTiers = new List<DiscountTier>(),

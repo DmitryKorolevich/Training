@@ -13,8 +13,6 @@ namespace VC.Admin.ModelConverters
     {
         public void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
         {
-            model.ExpirationDate = model.ExpirationDate?.AddDays(-1);
-
             if(dynamic.PromotionsToBuySkus!=null)
             {
                 model.PromotionsToBuySkus = new List<PromotionToBuySkuModel>();
@@ -50,15 +48,6 @@ namespace VC.Admin.ModelConverters
 
         public void ModelToDynamic(PromotionManageModel model, PromotionDynamic dynamic)
         {
-            if (dynamic.StartDate.HasValue)
-            {
-                dynamic.StartDate = new DateTime(dynamic.StartDate.Value.Year, dynamic.StartDate.Value.Month, dynamic.StartDate.Value.Day);
-            }
-            if (dynamic.ExpirationDate != null)
-            {
-                dynamic.ExpirationDate = (new DateTime(dynamic.ExpirationDate.Value.Year, dynamic.ExpirationDate.Value.Month, dynamic.ExpirationDate.Value.Day)).AddDays(1);
-            }
-
             if (model.PromotionsToBuySkus != null)
             {
                 dynamic.PromotionsToBuySkus = new List<PromotionToBuySku>();

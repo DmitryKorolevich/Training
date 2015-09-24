@@ -49,7 +49,7 @@ namespace VC.Admin.Models.Product
                 {
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
-                ExpirationDate = ExpirationDate?.AddDays(-1);
+                ExpirationDate = ExpirationDate;
             }
         }
     }

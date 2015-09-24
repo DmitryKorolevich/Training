@@ -62,7 +62,15 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.article.CategoryIds = categoryIds;
 
-                contentService.updateArticle($scope.article, $scope.editTracker).success(function (result) {
+                var data = {};
+                angular.copy($scope.article, data);
+                if (data.PublishedDate)
+                {
+                    data.PublishedDate = data.PublishedDate.toServerDateTime();
+                }
+
+                contentService.updateArticle(data, $scope.editTracker).success(function (result)
+                {
                     successSaveHandler(result);
                 }).
                     error(function (result) {
@@ -97,6 +105,10 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         .success(function (result) {
                             if (result.Success) {
                                 $scope.article = result.Data;
+                                if ($scope.article.PublishedDate)
+                                {
+                                    $scope.article.PublishedDate = Date.parseDateTime($scope.article.PublishedDate);
+                                }
                                 if ($scope.article.Url) {
                                     $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
                                 }

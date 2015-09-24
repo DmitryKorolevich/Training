@@ -29,6 +29,7 @@ namespace VC.Admin.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicToModelMapper<PromotionDynamic> _mapper;
         private readonly ILogger _logger;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public PromotionController(IPromotionService promotionService, IProductService productService, ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<PromotionDynamic> mapper)
         {
@@ -36,6 +37,7 @@ namespace VC.Admin.Controllers
             this._productService = productService;
             _mapper = mapper;
             this._logger = loggerProvider.CreateLoggerDefault();
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         #region Products
@@ -66,8 +68,8 @@ namespace VC.Admin.Controllers
                     StatusCode = RecordStatusCode.Active,
                     Assigned = null,//All
                     IdObjectType = PromotionType.BuyXGetY,
-                    StartDate = now,
-                    ExpirationDate= now.AddDays(30),
+                    StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
+                    ExpirationDate = TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
                     PromotionsToBuySkus = new List<PromotionToBuySkuModel>(),
                     PromotionsToGetSkus = new List<PromotionToGetSkuModel>(),
                 };
