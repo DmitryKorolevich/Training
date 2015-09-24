@@ -9,6 +9,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public string Name { get; set; }
 
+        public bool InStock { get; set; }
+
         public ICollection<ProductOutOfStockRequest> Requests { get; set; }
     }
 }

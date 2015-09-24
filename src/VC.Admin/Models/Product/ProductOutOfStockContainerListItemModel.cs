@@ -17,6 +17,8 @@ namespace VC.Admin.Models.Product
 
         public string Name { get; set; }
 
+        public bool InStock { get; set; }
+
         public ICollection<ProductOutOfStockRequest> Requests { get; set; }
 
         public ProductOutOfStockContainerListItemModel(ProductOutOfStockContainer item)
@@ -25,6 +27,7 @@ namespace VC.Admin.Models.Product
             {
                 IdProduct = item.IdProduct;
                 Name = item.Name;
+                InStock = item.InStock;
                 Requests = item.Requests;
             }
         }

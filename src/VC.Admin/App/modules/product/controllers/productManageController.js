@@ -552,7 +552,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 Active: true,
                 RetailPrice: 0.00,
                 WholesalePrice: 0.00,
-                Stock: null,
+                Stock: 0,
                 DisregardStock: Boolean.parse($scope.productTypeDefaults[disregardStockFieldName]),
                 NonDiscountable: Boolean.parse($scope.productTypeDefaults[nonDiscountableFieldName]),
                 HideFromDataFeed: Boolean.parse($scope.productTypeDefaults[hideFromDataFeedFieldName]),

@@ -17,7 +17,9 @@
                 </thead>
                 <tbody>
                     <tr class="container-row" data-ng-repeat-start="item in items" data-ng-click="item.RequestsVisible=!item.RequestsVisible">
-                        <td>                            
+                        <td>
+                            <span data-ng-if="item.InStock">YES</span>    
+                            <span data-ng-if="!item.InStock">NO</span>                           
                         </td>
                         <td colspan="3">{{::item.Name}}</td>
                         <td>

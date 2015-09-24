@@ -38,6 +38,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public SkuQuery ByProductIds(ICollection<int> ids)
+        {
+            if (ids != null && ids.Any())
+            {
+                Add(s => ids.Contains(s.IdProduct));
+            }
+            return this;
+        }
+
         public SkuQuery WithProductId(int id)
         {
             Add(s => s.IdProduct == id);

@@ -365,17 +365,17 @@
                                             </table>
                                             <div ng-controller="skusSearchController" onload="name = 'DiscountsToSelectedSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
                                         </div>
-                                        <div data-ng-show="discount.DiscountType!=3 && discount.SelectedMode==3">
-                                            <span class="legend">Selected Categories</span>
-                                            <div class="applied-categories categories">
-                                                <button data-ng-if="!appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
-                                                <button data-ng-if="appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
-                                                <div ui-tree data-drag-enabled="false" class="ya-treeview">
-                                                    <ol ui-tree-nodes="" data-ng-model="rootAppliedCategory.SubItems">
-                                                        <li ng-repeat="item in rootAppliedCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
-                                                        </li>
-                                                    </ol>
-                                                </div>
+                                    </div>
+                                    <div data-ng-show="discount.DiscountType!=3 && discount.SelectedMode==3">
+                                        <span class="legend">Selected Categories</span>
+                                        <div class="applied-categories categories">
+                                            <button data-ng-if="!appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                            <button data-ng-if="appliedCategoriesExpanded" data-ng-click="updateAppliedCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                            <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                                <ol ui-tree-nodes="" data-ng-model="rootAppliedCategory.SubItems">
+                                                    <li ng-repeat="item in rootAppliedCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                                    </li>
+                                                </ol>
                                             </div>
                                         </div>
                                     </div>

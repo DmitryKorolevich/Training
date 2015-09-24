@@ -546,6 +546,43 @@ namespace VitalChoice.Business.Services.Products
 
                 container.Requests.Add(item);
             }
+
+            //Set InStock field
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
+            var skus =
+                await _skuRepository.Query(new SkuQuery().ByProductIds(products.Select(i => i.Id).ToList()).NotDeleted())
+                    .Include(s => s.OptionValues)
+                    .SelectAsync(false);
+            foreach (var sku in skus)
+            {
+                var product = products.FirstOrDefault(p => p.Id == sku.IdProduct);
+                if (product != null)
+                {
+                    sku.OptionTypes =
+                        optionTypes.Where(GetOptionTypeQuery((int?)product.IdObjectType).Query().Compile()).ToList();
+                }
+            }
+            var skuDynamics = await _skuMapper.FromEntityRangeAsync(skus, true);
+
+            foreach (var skuDynamic in skuDynamics)
+            {
+                var container = containers.FirstOrDefault(p => p.IdProduct == skuDynamic.IdProduct);
+                if (container != null)
+                {
+                    bool disregardStock = true;
+                    if (skuDynamic.DictionaryData.ContainsKey("DisregardStock") && skuDynamic.DictionaryData["DisregardStock"] is bool)
+                    {
+                        disregardStock = (bool)skuDynamic.DictionaryData["DisregardStock"];
+                    }
+                    int stock = 0;
+                    if (skuDynamic.DictionaryData.ContainsKey("Stock") && skuDynamic.DictionaryData["Stock"] is int)
+                    {
+                        stock = (int)skuDynamic.DictionaryData["Stock"];
+                    }
+                    container.InStock = container.InStock || disregardStock || stock > 0;
+                }
+            }
+
             return containers;
         }
 
