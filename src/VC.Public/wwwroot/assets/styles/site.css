@@ -791,26 +791,21 @@ footer {
   margin-bottom: 10px;
   margin-top: 5px;
 }
-.category-main .categories-selection-container .categories-selection-row {
-  margin-top: 7px;
-  margin-bottom: 8px;
-  display: inline-block;
-}
-.category-main .categories-selection-container .categories-selection-row a {
+.category-main .categories-selection-container a {
   color: #666;
   text-decoration: none;
   font-size: 12px;
   display: inline-block;
   width: 218px;
   text-align: center;
-  margin: 0 20px;
+  margin: 7px 20px 8px 20px;
   vertical-align: top;
 }
-.category-main .categories-selection-container .categories-selection-row a img {
+.category-main .categories-selection-container a img {
   border: 0px solid #E1E1E1;
   padding: 6px 0 8px 0;
 }
-.category-main .categories-selection-container .categories-selection-row a:hover {
+.category-main .categories-selection-container a:hover {
   color: #f34d20;
 }
 .category-main .category-article {
