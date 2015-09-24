@@ -35,7 +35,7 @@ namespace VitalChoice.Infrastructure.Azure
 				});
 			}
 
-		    return container.GetBlockBlobReference(blobName); ;
+		    return container.GetBlockBlobReference(blobName);
 	    }
 
 	    public async Task UploadBlobAsync(string containerName, string blobName, byte[] data, string contentType = null)
