@@ -88,7 +88,9 @@ namespace VitalChoice.Infrastructure.Cache
                 {
                     if (result.DateCreated != dateUpdated || result.MasterDateCreated != masterDateUpdated)
                     {
-                        if (!result.Recompile(masterTemplate + template).Success)
+                        if (
+                            !result.Recompile(masterTemplate + template,
+                                new CompileContext(new TemplateOptions {AllowCSharp = true})).Success)
                         {
                             //Update dates so old template using in runtime next request ok
                             result.MasterDateCreated = masterDateUpdated;
