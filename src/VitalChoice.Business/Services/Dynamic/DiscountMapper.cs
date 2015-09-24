@@ -56,6 +56,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdAddedBy = entity.IdAddedBy;
 
                 dynamic.CategoryIds = entity.DiscountsToCategories?.Select(p => p.IdCategory).ToList();
+                dynamic.CategoryIdsAppliedOnlyTo = entity.DiscountsToSelectedCategories?.Select(p => p.IdCategory).ToList();
                 dynamic.SkusFilter = entity.DiscountsToSkus?.ToList();
                 dynamic.SkusAppliedOnlyTo = entity.DiscountsToSelectedSkus?.ToList();
                 dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
@@ -87,6 +88,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdAddedBy;
 
                 entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
+                {
+                    IdCategory = c,
+                    IdDiscount = dynamic.Id
+                }).ToList();
+                entity.DiscountsToSelectedCategories = dynamic.CategoryIdsAppliedOnlyTo?.Select(c => new DiscountToSelectedCategory
                 {
                     IdCategory = c,
                     IdDiscount = dynamic.Id
@@ -140,6 +146,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdAddedBy = entity.IdEditedBy;
 
                 entity.DiscountsToCategories = dynamic.CategoryIds?.Select(c => new DiscountToCategory
+                {
+                    IdCategory = c,
+                    IdDiscount = dynamic.Id
+                }).ToList();
+                entity.DiscountsToSelectedCategories = dynamic.CategoryIdsAppliedOnlyTo?.Select(c => new DiscountToSelectedCategory
                 {
                     IdCategory = c,
                     IdDiscount = dynamic.Id

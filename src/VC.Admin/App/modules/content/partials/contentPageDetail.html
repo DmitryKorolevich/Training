@@ -119,7 +119,7 @@
                                                     <select class="form-control" name="MasterTemplate" data-ng-model="contentPage.MasterContentItemId" ng-options="master.Id as master.Name for master in masters"></select>
                                                 </div>
                                             </div>
-                                            <button class="btn btn-info width-200px margin-bottom-10px" ng-if="validatePermission(7) && contentPage.MasterContentItemId!=0" data-ng-click="goToMaster(contentPage.MasterContentItemId);">Manage Master Template</button>
+                                            <button class="btn btn-info width-200px margin-bottom-10px" data-ng-if="validatePermission(7) && contentPage.MasterContentItemId!=0" data-ng-click="goToMaster(contentPage.MasterContentItemId);">Manage Master Template</button>
                                             <span class="legend">Manage Template</span>
 
                                             <div class="form-group">

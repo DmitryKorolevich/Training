@@ -199,6 +199,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<DiscountToSelectedSku>().ToTable("DiscountsToSelectedSkus");
             builder.Entity<DiscountToSelectedSku>().Ignore(p => p.ShortSkuInfo);
 
+            builder.Entity<DiscountToSelectedCategory>().Key(p => p.Id);
+            builder.Entity<DiscountToSelectedCategory>().ToTable("DiscountToSelectedCategories");
+
             builder.Entity<DiscountTier>().Key(p => p.Id);
             builder.Entity<DiscountTier>().ToTable("DiscountTiers");
 
@@ -215,6 +218,12 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<Discount>()
                 .Collection(p => p.DiscountsToCategories)
+                .InverseReference()
+                .ForeignKey(t => t.IdDiscount)
+                .PrincipalKey(p => p.Id)
+                .Required();
+            builder.Entity<Discount>()
+                .Collection(p => p.DiscountsToSelectedCategories)
                 .InverseReference()
                 .ForeignKey(t => t.IdDiscount)
                 .PrincipalKey(p => p.Id)

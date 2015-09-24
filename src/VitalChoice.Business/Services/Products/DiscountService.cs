@@ -67,7 +67,8 @@ namespace VitalChoice.Business.Services.Products
             return query.Include(p => p.DiscountTiers)
                 .Include(p => p.DiscountsToSelectedSkus)
                 .Include(p => p.DiscountsToSkus)
-                .Include(p => p.DiscountsToCategories);
+                .Include(p => p.DiscountsToCategories)
+                .Include(p => p.DiscountsToSelectedCategories);
         }
 
         protected override async Task AfterSelect(Discount entity)
@@ -116,10 +117,12 @@ namespace VitalChoice.Business.Services.Products
             var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
             var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
             var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
+            var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
 
             await discountToSelectedSkuRepository.DeleteAllAsync(entity.DiscountsToSelectedSkus);
             await discountToSkuRepository.DeleteAllAsync(entity.DiscountsToSkus);
             await discountToCategoryRepository.DeleteAllAsync(entity.DiscountsToCategories);
+            await discountToSelectedCategoryRepository.DeleteAllAsync(entity.DiscountsToSelectedCategories);
             await discountTierRepository.DeleteAllAsync(entity.DiscountTiers);
         }
 
@@ -129,10 +132,12 @@ namespace VitalChoice.Business.Services.Products
             var discountToSelectedSkuRepository = uow.RepositoryAsync<DiscountToSelectedSku>();
             var discountToSkuRepository = uow.RepositoryAsync<DiscountToSku>();
             var discountToCategoryRepository = uow.RepositoryAsync<DiscountToCategory>();
+            var discountToSelectedCategoryRepository = uow.RepositoryAsync<DiscountToSelectedCategory>();
 
             await discountToSelectedSkuRepository.InsertRangeAsync(entity.DiscountsToSelectedSkus);
             await discountToSkuRepository.InsertRangeAsync(entity.DiscountsToSkus);
             await discountToCategoryRepository.InsertRangeAsync(entity.DiscountsToCategories);
+            await discountToSelectedCategoryRepository.InsertRangeAsync(entity.DiscountsToSelectedCategories);
             if (entity.IdObjectType == (int)DiscountType.Tiered && entity.DiscountTiers != null && entity.DiscountTiers.Count > 0)
             {
                 await discountTierRepository.InsertRangeAsync(entity.DiscountTiers);

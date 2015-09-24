@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.productCategoryManageController', [])
-.controller('productCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, productService, toaster, confirmUtil, promiseTracker) {
+.controller('productCategoryManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'productService', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, productService, contentService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
 
@@ -54,26 +54,68 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
             $scope.loaded = false;
             $scope.forms = {};
 
+            refreshMasters();
+        }
+
+        function refreshCategory()
+        {
             productService.getCategory($scope.id, $scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
                         $scope.productCategory = result.Data;
-                        if ($scope.productCategory.Url) {
+                        if ($scope.productCategory.Url)
+                        {
                             $scope.previewUrl = $scope.baseUrl.format($scope.productCategory.Url);
                         };
-                        if ($stateParams.categoryid) {
+                        if (!$scope.productCategory.MasterContentItemId)
+                        {
+                            $scope.productCategory.MasterContentItemId = $scope.MasterContentItemId;
+                        };
+                        if ($stateParams.categoryid)
+                        {
                             $scope.productCategory.ParentId = $stateParams.categoryid;
                         };
                         setUIstatus($scope.productCategory);
                         $scope.loaded = true;
-                    } else {
+                    } else
+                    {
                         errorHandler(result);
                     }
                 }).
-                error(function (result) {
+                error(function (result)
+                {
                     errorHandler(result);
                 });
         }
+
+        function refreshMasters()
+        {
+            contentService.getMasterContentItems({ Type: 9 })//productCategory
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.masters = result.Data;
+                        $.each($scope.masters, function (index, master)
+                        {
+                            if (master.IsDefault)
+                            {
+                                $scope.MasterContentItemId = master.Id;
+                            };
+                        });
+                        refreshCategory();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
 
         $scope.save = function () {
             $.each($scope.forms.form, function (index, element) {

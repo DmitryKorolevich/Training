@@ -90,6 +90,9 @@ namespace VC.Admin.Models.Product
 
         [Map]
         public IList<int> CategoryIds { get; set; }
+        
+        [Map]
+        public IList<int> CategoryIdsAppliedOnlyTo { get; set; }
 
         [Map("SkusFilter")]
         public IList<DiscountToSku> DiscountsToSkus { get; set; }
@@ -104,6 +107,7 @@ namespace VC.Admin.Models.Product
         {
             CategoryIds = new List<int>();
             DiscountsToSkus = new List<DiscountToSku>();
+            CategoryIdsAppliedOnlyTo = new List<int>();
             DiscountsToSelectedSkus = new List<DiscountToSelectedSku>();
             DiscountTiers = new List<DiscountTier>();
         }

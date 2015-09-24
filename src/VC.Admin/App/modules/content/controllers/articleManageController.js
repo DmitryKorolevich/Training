@@ -101,26 +101,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.rootCategory = result.Data;
-			        contentService.getArticle($scope.id, $scope.refreshTracker)
-                        .success(function (result) {
-                            if (result.Success) {
-                                $scope.article = result.Data;
-                                if ($scope.article.PublishedDate)
-                                {
-                                    $scope.article.PublishedDate = Date.parseDateTime($scope.article.PublishedDate);
-                                }
-                                if ($scope.article.Url) {
-                                    $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
-                                }
-                                setSelected($scope.rootCategory, $scope.article.CategoryIds);
-                                //addProductsListWatchers();
-                            } else {
-                                errorHandler(result);
-                            }
-                        }).
-                        error(function (result) {
-                            errorHandler(result);
-                        });
+			        refreshMasters();
 			    } else {
 			        errorHandler(result);
 			    }
@@ -128,6 +109,67 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
 			error(function (result) {
 			    errorHandler(result);
 			});
+    };
+
+    function refreshArticle()
+    {
+        contentService.getArticle($scope.id, $scope.refreshTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.article = result.Data;
+                    if ($scope.article.PublishedDate)
+                    {
+                        $scope.article.PublishedDate = Date.parseDateTime($scope.article.PublishedDate);
+                    }
+                    if ($scope.article.Url)
+                    {
+                        $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
+                    }
+                    if (!$scope.article.MasterContentItemId)
+                    {
+                        $scope.article.MasterContentItemId = $scope.MasterContentItemId;
+                    };
+                    setSelected($scope.rootCategory, $scope.article.CategoryIds);
+                    //addProductsListWatchers();
+                } else
+                {
+                    errorHandler(result);
+                }
+            }).
+            error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
+    function refreshMasters()
+    {
+        contentService.getMasterContentItems({ Type: 4 })//article
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.masters = result.Data;
+                    $.each($scope.masters, function (index, master)
+                    {
+                        if (master.IsDefault)
+                        {
+                            $scope.MasterContentItemId = master.Id;
+                        };
+                    });
+                    $scope.MastersLoaded = true;
+                    refreshArticle();
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
     };
 
     function setSelected(category, ids) {

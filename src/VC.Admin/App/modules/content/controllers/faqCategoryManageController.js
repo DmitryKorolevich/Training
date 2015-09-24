@@ -34,7 +34,8 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
         toaster.pop('error', "Error!", "Server error occured");
     };
 
-    function initialize() {
+    function initialize()
+    {
         $scope.id = $stateParams.id ? $stateParams.id : 0;
 
         $scope.baseUrl = $rootScope.ReferenceData.PublicHost + 'faqs/{0}?preview=true';
@@ -47,26 +48,69 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
         $scope.loaded = false;
         $scope.forms = {};
 
+        refreshMasters();
+    };
+
+    function refreshFAQCategory()
+    {
         contentService.getCategory($scope.id, $scope.refreshTracker)
-            .success(function (result) {
-                if (result.Success) {
+            .success(function (result)
+            {
+                if (result.Success)
+                {
                     $scope.faqCategory = result.Data;
                     $scope.faqCategory.Type = 5;//faq category
-                    if ($scope.faqCategory.Url) {
+                    if ($scope.faqCategory.Url)
+                    {
                         $scope.previewUrl = $scope.baseUrl.format($scope.faqCategory.Url);
                     }
-                    if ($stateParams.categoryid) {
+                    if (!$scope.faqCategory.MasterContentItemId)
+                    {
+                        $scope.faqCategory.MasterContentItemId = $scope.MasterContentItemId;
+                    };
+                    if ($stateParams.categoryid)
+                    {
                         $scope.faqCategory.ParentId = $stateParams.categoryid;
                     }
                     $scope.loaded = true;
-                } else {
+                } else
+                {
                     errorHandler(result);
                 }
             }).
-            error(function (result) {
+            error(function (result)
+            {
                 errorHandler(result);
             });
-    }
+    };
+
+    function refreshMasters()
+    {
+        contentService.getMasterContentItems({ Type: 5 })//faq category
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.masters = result.Data;
+                    $.each($scope.masters, function (index, master)
+                    {
+                        if (master.IsDefault)
+                        {
+                            $scope.MasterContentItemId = master.Id;
+                        };
+                    });
+                    $scope.MastersLoaded = true;
+                    refreshFAQCategory();
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
 
     $scope.save = function () {
         $.each($scope.forms.form, function (index, element) {

@@ -47,26 +47,69 @@ angular.module('app.modules.content.controllers.contentPageCategoryManageControl
             $scope.loaded = false;
             $scope.forms = {};
 
+            refreshMasters();
+        }
+
+        function refreshCategory()
+        {
             contentService.getCategory($scope.id, $scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
                         $scope.contentPageCategory = result.Data;
                         $scope.contentPageCategory.Type = 7;//contentPage category
-                        if ($scope.contentPageCategory.Url) {
+                        if ($scope.contentPageCategory.Url)
+                        {
                             $scope.previewUrl = $scope.baseUrl.format($scope.contentPageCategory.Url);
                         }
-                        if ($stateParams.categoryid) {
+                        if (!$scope.contentPageCategory.MasterContentItemId)
+                        {
+                            $scope.contentPageCategory.MasterContentItemId = $scope.MasterContentItemId;
+                        };
+                        if ($stateParams.categoryid)
+                        {
                             $scope.contentPageCategory.ParentId = $stateParams.categoryid;
                         }
                         $scope.loaded = true;
-                    } else {
+                    } else
+                    {
                         errorHandler(result);
                     }
                 }).
-                error(function (result) {
+                error(function (result)
+                {
                     errorHandler(result);
                 });
-        }
+        };
+
+        function refreshMasters()
+        {
+            contentService.getMasterContentItems({ Type: 7 })//contentCategory
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.masters = result.Data;
+                        $.each($scope.masters, function (index, master)
+                        {
+                            if (master.IsDefault)
+                            {
+                                $scope.MasterContentItemId = master.Id;
+                            };
+                        });
+                        $scope.MastersLoaded = true;
+                        refreshCategory();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
 
         $scope.save = function () {
             $.each($scope.forms.form, function (index, element) {

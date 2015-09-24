@@ -29,6 +29,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Discounts
 
         public ICollection<DiscountToSelectedSku> DiscountsToSelectedSkus { get; set; }
 
+        public ICollection<DiscountToSelectedCategory> DiscountsToSelectedCategories { get; set; }
+
         public ICollection<DiscountTier> DiscountTiers { get; set; }
     }
 }

@@ -74,6 +74,7 @@ namespace VC.Admin.Controllers
                     DiscountsToSkus = new List<DiscountToSku>(),
                     DiscountTiers = new List<DiscountTier>(),
                     CategoryIds = new List<int>(),
+                    CategoryIdsAppliedOnlyTo = new List<int>(),
                 };
             }
 

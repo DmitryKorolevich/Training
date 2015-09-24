@@ -47,27 +47,69 @@ angular.module('app.modules.content.controllers.recipeCategoryManageController',
             $scope.loaded = false;
             $scope.forms = {};
 
+            refreshMasters();
+        }
 
+        function refreshRecipeCategory()
+        {
             contentService.getCategory($scope.id, $scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
                         $scope.recipeCategory = result.Data;
                         $scope.recipeCategory.Type = 1;//recipe category
-                        if ($scope.recipeCategory.Url) {
+                        if ($scope.recipeCategory.Url)
+                        {
                             $scope.previewUrl = $scope.baseUrl.format($scope.recipeCategory.Url);
                         }
-                        if ($stateParams.categoryid) {
+                        if (!$scope.recipeCategory.MasterContentItemId)
+                        {
+                            $scope.recipeCategory.MasterContentItemId = $scope.MasterContentItemId;
+                        };
+                        if ($stateParams.categoryid)
+                        {
                             $scope.recipeCategory.ParentId = $stateParams.categoryid;
                         }
                         $scope.loaded = true;
-                    } else {
+                    } else
+                    {
                         errorHandler(result);
                     }
                 }).
-                error(function (result) {
+                error(function (result)
+                {
                     errorHandler(result);
                 });
-        }
+        };
+
+        function refreshMasters()
+        {
+            contentService.getMasterContentItems({ Type: 1 })//recipe category
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.masters = result.Data;
+                        $.each($scope.masters, function (index, master)
+                        {
+                            if (master.IsDefault)
+                            {
+                                $scope.MasterContentItemId = master.Id;
+                            };
+                        });
+                        $scope.MastersLoaded = true;
+                        refreshRecipeCategory();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
 
         $scope.save = function () {
             $.each($scope.forms.form, function (index, element) {

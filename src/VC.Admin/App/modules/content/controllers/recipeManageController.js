@@ -157,23 +157,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 		                    .success(function(result) {
 		                    	if (result.Success) {
 				                    $scope.recipeDefaults = result.Data;
-
-				                    contentService.getRecipe($scope.id, $scope.refreshTracker)
-					                    .success(function(result) {
-						                    if (result.Success) {
-							                    $scope.recipe = result.Data;
-							                    if ($scope.recipe.Url) {
-								                    $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
-							                    };
-							                    setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
-							                    addProductsListWatchers();
-						                    } else {
-							                    errorHandler(result);
-						                    }
-					                    }).
-					                    error(function(result) {
-						                    errorHandler(result);
-					                    });
+				                    refreshMasters();
 			                    } else {
 				                    errorHandler(result);
 			                    }
@@ -186,6 +170,63 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                     }
                 }).
                 error(function (result) {
+                    errorHandler(result);
+                });
+        };
+
+        function refreshRecipe()
+        {
+            contentService.getRecipe($scope.id, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.recipe = result.Data;
+                        if ($scope.recipe.Url)
+                        {
+                            $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
+                        };
+                        if (!$scope.recipe.MasterContentItemId)
+                        {
+                            $scope.recipe.MasterContentItemId = $scope.MasterContentItemId;
+                        };
+                        setSelected($scope.rootCategory, $scope.recipe.CategoryIds);
+                        addProductsListWatchers();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
+
+        function refreshMasters()
+        {
+            contentService.getMasterContentItems({ Type: 2 })//recipe
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.masters = result.Data;
+                        $.each($scope.masters, function (index, master)
+                        {
+                            if (master.IsDefault)
+                            {
+                                $scope.MasterContentItemId = master.Id;
+                            };
+                        });
+                        $scope.MastersLoaded = true;
+                        refreshRecipe();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
                     errorHandler(result);
                 });
         };

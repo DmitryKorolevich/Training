@@ -218,3 +218,17 @@ ALTER TABLE dbo.Discounts ADD CONSTRAINT
 END
 
 GO
+
+IF OBJECT_ID(N'[dbo].[DiscountToSelectedCategories]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[DiscountToSelectedCategories]
+	(
+		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+		[IdCategory] INT NOT NULL, 
+		[IdDiscount] INT NOT NULL, 		
+		CONSTRAINT [FK_DiscountToSelectedCategories_ToDiscount] FOREIGN KEY ([IdDiscount]) REFERENCES [Discounts]([Id]), 
+		CONSTRAINT [FK_DDiscountToSelectedCategories_ToProductCategory] FOREIGN KEY ([IdCategory]) REFERENCES [ProductCategories]([Id])
+	)
+END
+
+GO

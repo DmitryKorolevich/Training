@@ -76,6 +76,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 .success(function (result) {
                     if (result.Success) {
                         $scope.rootCategory = result.Data;
+                        $scope.rootAppliedCategory = angular.copy($scope.rootCategory);
                         loadDiscount();
                     } else {
                         errorHandler(result);
@@ -92,7 +93,13 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			        if (result.Success) {
 			            $scope.discount = result.Data;
 			            if ($scope.discount.DiscountsToSelectedSkus.length > 0) {
-			                $scope.discount.SelectedProductsOnly = true;
+			                $scope.discount.SelectedMode = 2;
+			            } else if ($scope.discount.CategoryIdsAppliedOnlyTo.length > 0)
+			            {
+			                $scope.discount.SelectedMode = 3;
+			            } else
+			            {
+			                $scope.discount.SelectedMode = 1;
 			            }
 
 			            if ($scope.discount.ExpirationDate)
@@ -105,6 +112,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			            }
 
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
+			            setSelected($scope.rootAppliedCategory, $scope.discount.CategoryIdsAppliedOnlyTo);
 			            addProductsListWatchers();
 			            if ($scope.discount.DiscountTiers.length == 0) {
 			                $scope.addTier();
@@ -126,11 +134,27 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 getSelected($scope.rootCategory, categoryIds);
                 $scope.discount.CategoryIds = categoryIds;
 
+                var categoryIdsAppliedOnlyTo = [];
+                getSelected($scope.rootAppliedCategory, categoryIdsAppliedOnlyTo);
+                $scope.discount.CategoryIdsAppliedOnlyTo = categoryIdsAppliedOnlyTo;
+
                 var data = {};
                 angular.copy($scope.discount, data);
                 //Remove all selected skus if this option doesn't have sense
-                if (data.DiscountType == 3 || !data.SelectedProductsOnly) {
+                if (data.DiscountType == 3 || data.SelectedMode==1)
+                {
                     data.DiscountsToSelectedSkus = [];
+                    data.CategoryIdsAppliedOnlyTo = [];
+                } else
+                {
+                    if (data.SelectedMode == 2)
+                    {
+                        data.CategoryIdsAppliedOnlyTo = [];
+                    }
+                    if (data.SelectedMode == 3)
+                    {
+                        data.DiscountsToSelectedSkus = [];
+                    }
                 }
                 if (data.DiscountType != 5) {
                     data.DiscountTiers = [];
@@ -264,7 +288,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
         };
 
         var getCategoriesTreeViewScope = function () {
-            return angular.element($('.categories .ya-treeview').get(0)).scope();
+            return angular.element($('.filter-categories .ya-treeview').get(0)).scope();
         };
 
         $scope.updateCategoriesCollapsed = function (expand) {
@@ -276,6 +300,25 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 scope.collapseAll();
             }
             $scope.categoriesExpanded = expand;
+        };
+
+        var getAppliedCategoriesTreeViewScope = function ()
+        {
+            return angular.element($('.applied-categories .ya-treeview').get(0)).scope();
+        };
+
+        $scope.updateAppliedCategoriesCollapsed = function (expand)
+        {
+            var scope = getAppliedCategoriesTreeViewScope();
+            if (expand)
+            {
+                scope.expandAll();
+            }
+            else
+            {
+                scope.collapseAll();
+            }
+            $scope.appliedCategoriesExpanded = expand;
         };
 
         $scope.toogleEditorState = function (property) {

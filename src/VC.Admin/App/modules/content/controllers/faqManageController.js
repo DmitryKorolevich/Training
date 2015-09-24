@@ -79,22 +79,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
 			.success(function (result) {
 			    if (result.Success) {
 			        $scope.rootCategory = result.Data;
-			        contentService.getFAQ($scope.id, $scope.refreshTracker)
-                        .success(function (result) {
-                            if (result.Success) {
-                                $scope.faq = result.Data;
-                                if ($scope.faq.Url) {
-                                    $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
-                                };
-                                setSelected($scope.rootCategory, $scope.faq.CategoryIds);
-                                $scope.loaded = true;
-                            } else {
-                                errorHandler(result);
-                            }
-                        }).
-                        error(function (result) {
-                            errorHandler(result);
-                        });
+			        refreshMasters();
 			    } else {
 			        errorHandler(result);
 			    }
@@ -102,6 +87,63 @@ function ($scope, $rootScope, $state, $stateParams, contentService, toaster, con
 			error(function (result) {
 			    errorHandler(result);
 			});
+    };
+
+    function refreshFAQ()
+    {
+        contentService.getFAQ($scope.id, $scope.refreshTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.faq = result.Data;
+                    if ($scope.faq.Url)
+                    {
+                        $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
+                    };
+                    if (!$scope.faq.MasterContentItemId)
+                    {
+                        $scope.faq.MasterContentItemId = $scope.MasterContentItemId;
+                    };
+                    setSelected($scope.rootCategory, $scope.faq.CategoryIds);
+                    $scope.loaded = true;
+                } else
+                {
+                    errorHandler(result);
+                }
+            }).
+            error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
+    function refreshMasters()
+    {
+        contentService.getMasterContentItems({ Type: 6 })//faq
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.masters = result.Data;
+                    $.each($scope.masters, function (index, master)
+                    {
+                        if (master.IsDefault)
+                        {
+                            $scope.MasterContentItemId = master.Id;
+                        };
+                    });
+                    $scope.MastersLoaded = true;
+                    refreshFAQ();
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
     };
 
     var getCategoriesTreeViewScope = function () {
