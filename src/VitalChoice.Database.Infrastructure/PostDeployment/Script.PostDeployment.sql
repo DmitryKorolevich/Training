@@ -38,3 +38,4 @@ Post-Deployment Script Template
 :r .\Scripts\CustomPublicStyles.sql
 
 :r .\Scripts\ProductsOutOfStockData.sql
+:r .\Scripts\MastersData.sql
