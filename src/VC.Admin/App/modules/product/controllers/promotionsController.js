@@ -15,7 +15,8 @@
             toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         };
 
-        function refreshPromotions() {
+        function refreshPromotions()
+        {
             promotionService.getPromotions($scope.filter, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {

@@ -95,6 +95,14 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
 			        if (result.Success)
 			        {
 			            $scope.promotion = result.Data;
+			            if ($scope.promotion.ExpirationDate)
+			            {
+			                $scope.promotion.ExpirationDate = Date.parseDateTime($scope.promotion.ExpirationDate);
+			            }
+			            if ($scope.promotion.StartDate)
+			            {
+			                $scope.promotion.StartDate = Date.parseDateTime($scope.promotion.StartDate);
+			            }
 
 			            addProductsListWatchers();
 			        } else
@@ -116,6 +124,14 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
             {
                 var data = {};
                 angular.copy($scope.promotion, data);
+                if (data.ExpirationDate)
+                {
+                    data.ExpirationDate = data.ExpirationDate.toServerDateTime();
+                }
+                if (data.StartDate)
+                {
+                    data.StartDate = data.StartDate.toServerDateTime();
+                }
 
                 promotionService.updatePromotion(data, $scope.refreshTracker).success(function (result)
                 {
