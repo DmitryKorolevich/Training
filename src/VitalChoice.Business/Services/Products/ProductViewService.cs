@@ -8,12 +8,15 @@ using Templates;
 using Templates.Exceptions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Domain.Transfer.TemplateModels;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -27,13 +30,15 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IContentProcessorsService contentProcessorsService;
 	    private readonly ITtlGlobalCache _templatesCache;
-	    private readonly ILogger _logger;
+		private readonly VProductSkuRepository _productRepository;
+		private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
+		private readonly ILogger _logger;
 
 	    public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
 	        IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
 	        IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
 	        IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService,
-	        ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider)
+	        ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider, VProductSkuRepository productRepository, IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository)
 	    {
 	        this.masterContentItemRepository = masterContentItemRepository;
 	        this.productCategoryRepository = productCategoryRepository;
@@ -41,10 +46,33 @@ namespace VitalChoice.Business.Services.Products
 	        this.contentItemRepository = contentItemRepository;
 	        this.contentProcessorsService = contentProcessorsService;
 	        _templatesCache = templatesCache;
-	        _logger = loggerProvider.CreateLoggerDefault();
+			_productRepository = productRepository;
+		    _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
+		    _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
-	    #region Public
+		private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null)
+		{
+			return new TtlCategoryModel()
+			{
+				Name = productCategoryContent.Name,
+				Url = productCategoryContent.Url,
+				Order = productCategoryContent.Order,
+				FileImageSmallUrl = productCategoryContent.FileImageSmallUrl,
+				FileImageLargeUrl = productCategoryContent.FileImageLargeUrl,
+				LongDescription = productCategoryContent.LongDescription,
+				LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
+				SubCategories = subProductCategoryContent?.Select(x=> PopulateCategoryTemplateModel(x)).ToList(),
+				Products = products?.Select(x=> new TtlCategoryProductModel()
+				{
+					Name = x.Name,
+					Thumbnail = x.Thumbnail,
+					Url = x.Url
+				}).ToList()
+			};
+		}
+
+		#region Public
 
         public async Task<ExecutedContentItem> GetProductCategoryContentAsync(Dictionary<string, object> parameters, string categoryUrl = null)
         {
@@ -116,9 +144,38 @@ namespace VitalChoice.Business.Services.Products
                     HTML = (e as TemplateCompileException)?.ToString()
                 };
             }
-            dynamic model = new ExpandoObject();
-            model = category;
-            parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
+
+			/*model population todo: should be placed in processor*/
+
+			var subCategories = (await productCategoryEcommerceRepository.Query(p => p.ParentId == category.Id &&
+	                                                                                 p.StatusCode !=
+	                                                                                 RecordStatusCode.Deleted)
+		        .SelectAsync(false));
+
+			var subCategoriesContent = new List<ProductCategoryContent>();
+			foreach (var subCategory in subCategories)
+	        {
+				var subCategoryContent = (await productCategoryRepository.Query(p => p.Id == subCategory.Id && p.StatusCode != RecordStatusCode.Deleted).OrderBy(x=>x.OrderBy(y=>y.Order)).SelectAsync(false)).Single();
+				subCategoryContent.Set(subCategory);
+
+				subCategoriesContent.Add(subCategoryContent);
+            }
+
+	        var productIds =
+		        (await _productToCategoryEcommerceRepository.Query(x => x.IdCategory == category.Id).SelectAsync(false))
+			        .Select(x => x.IdProduct).ToList();
+
+	        IList<VProductSku> products = null;
+	        if (productIds.Any())
+	        {
+		        products = (await _productRepository.GetProductsAsync(new VProductSkuFilter() {IdProducts = productIds})).Items;
+	        }
+
+			var model = PopulateCategoryTemplateModel(category, subCategoriesContent, products);
+
+			/*-------*/
+
+			parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
             foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)
             {
                 var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);

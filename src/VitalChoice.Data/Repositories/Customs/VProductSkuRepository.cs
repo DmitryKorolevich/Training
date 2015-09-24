@@ -25,8 +25,12 @@ namespace VitalChoice.Data.Repositories.Customs
             {
                 query = query.Where(x => x.Code.Contains(filter.SearchText) || x.Name.Contains(filter.SearchText));
             }
+	        if (filter.IdProducts != null && filter.IdProducts.Any())
+	        {
+				query = query.Where(x => filter.IdProducts.Contains(x.IdProduct));
+	        }
 
-            Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable = x => x.OrderByDescending(y => y.Name);
+	        Func<IQueryable<VProductSku>, IOrderedQueryable<VProductSku>> sortable = x => x.OrderByDescending(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
             {
@@ -64,6 +68,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 DateEdited= g.Min(p => p.DateEdited),
                 IdEditedBy = g.Min(p => p.IdEditedBy),
                 IdProductType = g.Min(p => p.IdProductType),
+				Url = g.Min(p => p.Url)
             });
             var count = await query.CountAsync();
             query = sortable(query);
