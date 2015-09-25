@@ -156,18 +156,15 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                if (entity.GiftCertificates != null)
-                {
-                    entity.GiftCertificates.Merge(dynamic.GiftCertificates,
-                        (g, gio) =>
-                            g.IdGiftCertificate != gio.GiftCertificate?.Id,
-                        g => new OrderToGiftCertificate
-                        {
-                            Amount = g.Amount,
-                            IdOrder = dynamic.Id,
-                            IdGiftCertificate = g.GiftCertificate.Id
-                        });
-                }
+                entity.GiftCertificates?.Merge(dynamic.GiftCertificates,
+                    (g, gio) =>
+                        g.IdGiftCertificate != gio.GiftCertificate?.Id,
+                    g => new OrderToGiftCertificate
+                    {
+                        Amount = g.Amount,
+                        IdOrder = dynamic.Id,
+                        IdGiftCertificate = g.GiftCertificate.Id
+                    });
                 entity.IdDiscount = dynamic.Discount?.Id;
                 await _orderPaymentMethodMapper.UpdateEntityAsync(dynamic.PaymentMethod, entity.PaymentMethod);
                 Dictionary<int, SkuOrdered> keyedSkus = new Dictionary<int, SkuOrdered>();

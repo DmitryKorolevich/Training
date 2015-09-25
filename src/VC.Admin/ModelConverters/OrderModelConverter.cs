@@ -244,6 +244,7 @@ namespace VC.Admin.ModelConverters
                 var dbCustomer = _customerService.Select(model.Customer.Id, true);
                 if (dbCustomer != null)
                 {
+                    dbCustomer.IdObjectType = (int?) model.Customer.CustomerType;
                     dbCustomer.CustomerNotes = dynamic.Customer.CustomerNotes;
                     dbCustomer.Files = dynamic.Customer.Files;
                     if (model.Id == 0)

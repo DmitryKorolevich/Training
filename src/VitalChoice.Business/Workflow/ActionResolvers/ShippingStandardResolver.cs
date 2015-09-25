@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
@@ -19,22 +20,21 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                 return 0;
             if (context.Order.ShippingAddress == null)
                 return 0;
-            if (context.Order.Customer.IdObjectType == (int)CustomerType.Wholesale)
+            if (context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
             {
-                if (context.Order.ShippingAddress.IdCountry ==
-                context.Coutries.SingleOrDefault(c => c.CountryCode.ToLowerInvariant() == "us")?.Id)
+                if (context.Order.ShippingAddress.IdCountry == context.Coutries.GetCountryId("us"))
                 {
-                    return (int)CustomerType.Wholesale;
+                    return (int) CustomerType.Wholesale;
                 }
             }
             if (context.Order.Customer.IdObjectType == (int) CustomerType.Retail)
             {
                 if (context.Order.ShippingAddress.IdCountry ==
-                    context.Coutries.SingleOrDefault(c => c.CountryCode.ToLowerInvariant() == "ca")?.Id ||
+                    context.Coutries.GetCountryId("ca") ||
                     context.Order.ShippingAddress.IdCountry ==
-                    context.Coutries.SingleOrDefault(c => c.CountryCode.ToLowerInvariant() == "us")?.Id)
+                    context.Coutries.GetCountryId("us"))
                 {
-                    return (int)CustomerType.Retail;
+                    return (int) CustomerType.Retail;
                 }
             }
 

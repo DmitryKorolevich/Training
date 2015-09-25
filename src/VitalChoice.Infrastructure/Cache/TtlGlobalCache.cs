@@ -111,6 +111,12 @@ namespace VitalChoice.Infrastructure.Cache
             result.DateCreated = dateUpdated;
             lock (_lockObject)
             {
+                ITtlTemplate cachedResult;
+                if (_cache.TryGetValue(searchValue, out cachedResult))
+                {
+                    result.Dispose();
+                    return cachedResult;
+                }
                 _cache.Add(searchValue, result);
             }
             return result;

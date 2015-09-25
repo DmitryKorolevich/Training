@@ -463,7 +463,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             return undefined;
         if ($scope.shippingAddressTab.OrderShippingEditModel === undefined)
         {
-            $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping' };
+            $scope.shippingAddressTab.OrderShippingEditModel = { Address: $scope.order.Shipping, formName: 'shipping', recalculate: true };
         }
         $scope.shippingAddressTab.OrderShippingEditModel.disableValidation = disableValidation;
         return $scope.shippingAddressTab.OrderShippingEditModel;

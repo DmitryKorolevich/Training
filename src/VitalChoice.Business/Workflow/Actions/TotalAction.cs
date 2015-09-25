@@ -13,6 +13,8 @@ namespace VitalChoice.Business.Workflow.Actions
         {
             context.DiscountTotal = -context.Data.Discount;
             context.DiscountedSubtotal = context.Data.Products + context.Data.Discount;
+            context.ShippingTotal = context.StandardShippingCharges + context.CanadaSurcharge +
+                                    context.AlaskaHawaiiSurcharge;
             return 0;
         }
     }

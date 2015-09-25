@@ -65,7 +65,7 @@
 <div class="form-group">
 	<label for="{{::model.formName}}_model_country" class="col-md-3 control-label">Country</label>
 	<div class="col-md-9">
-	    <select id="{{::model.formName}}_model_country" name="Country" class="form-control" data-ng-model="model.Address.Country" data-ng-options="country as country.CountryName for country in countries track by country.Id" data-ng-required="!model.disableValidation">
+	    <select id="{{::model.formName}}_model_country" name="Country" class="form-control" data-ng-model="model.Address.Country" data-ng-options="country as country.CountryName for country in countries track by country.Id" data-ng-required="!model.disableValidation" data-ng-change="model.recalculate && requestRecalculate()">
             <option value="">Select Country</option>
         </select>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Country.$invalid">
@@ -77,7 +77,7 @@
 <div class="form-group" data-ng-if="model.Address.Country.CountryCode">
 	<label class="col-md-3 control-label">State/Province</label>
     <div class="col-md-9" data-ng-if="model.Address.Country.States && model.Address.Country.States.length > 0">
-        <select name="State" class="form-control" id="{{::model.formName}}_model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" data-ng-required="!model.disableValidation">
+        <select name="State" class="form-control" id="{{::model.formName}}_model_state" data-ng-model="model.Address.State" data-ng-options="state.Id as state.StateName for state in model.Address.Country.States" data-ng-required="!model.disableValidation" data-ng-change="model.recalculate && requestRecalculate()">
             <option value="">Select State</option>
         </select>
         <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].State.$invalid">

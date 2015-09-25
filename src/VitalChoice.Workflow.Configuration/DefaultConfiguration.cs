@@ -24,6 +24,7 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ProductsWithPromoAction>();
                 action.Aggregate<DiscountTypeActionResolver>();
                 action.Aggregate<ShippingStandardResolver>();
+                action.Aggregate<ShippingSurchargeResolver>();
             });
 
             treeSetup.Action<ProductAction>("Products");
@@ -82,6 +83,24 @@ namespace VitalChoice.Workflow.Configuration
             {
                 action.Dependency<DiscountTypeActionResolver>();
                 action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.Action<ShippingSurchargeUsAkHiAction>("ShippingSurchargeUs", action =>
+            {
+                action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.Action<ShippingSurchargeCaAction>("ShippingSurchargeCa", action =>
+            {
+                action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>
+            {
+                action.ResolvePath<ShippingSurchargeUsAkHiAction>((int) SurchargeType.AlaskaHawaii,
+                    "ShippingSurchargeUs");
+                action.ResolvePath<ShippingSurchargeCaAction>((int) SurchargeType.Canada,
+                    "ShippingSurchargeCa");
             });
 
             treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>

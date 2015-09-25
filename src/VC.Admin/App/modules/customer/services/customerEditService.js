@@ -122,12 +122,12 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
     var initCustomerEdit = function (uiScope)
     {
-        uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation) {
+        uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation, forOrder) {
             if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
                 return undefined;
             if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined)
             {
-                uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping' };
+                uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping', recalculate: forOrder };
             }
             uiScope.shippingAddressTab.ShippingEditModels[index].disableValidation = disableValidation;
             return uiScope.shippingAddressTab.ShippingEditModels[index];
