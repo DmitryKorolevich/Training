@@ -544,6 +544,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             $scope.currectCalculateCanceller.resolve("canceled");
         }
+        angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index) {
+            shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
+        });
         $scope.currectCalculateCanceller = $q.defer();
         orderService.calculateOrder(orderForCalculating, $scope.currectCalculateCanceller)
             .success(function (result)

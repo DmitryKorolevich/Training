@@ -151,10 +151,6 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
             var item = _mapper.FromModel(model);
-            item.ShippingAddress =
-                _addressMapper.FromModel(model.Customer?.Shipping?.FirstOrDefault(s => s.IsSelected) ??
-                                         model.Customer?.Shipping?.FirstOrDefault());
-
             var orderContext = await _orderService.CalculateOrder(item);
 
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
