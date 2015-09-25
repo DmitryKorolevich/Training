@@ -20,5 +20,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Promotions
         public ICollection<PromotionToGetSku> PromotionsToGetSkus { get; set; }
 
         public ICollection<PromotionToBuySku> PromotionsToBuySkus { get; set; }
+
+        public ICollection<PromotionToSelectedCategory> PromotionsToSelectedCategories { get; set; }
     }
 }

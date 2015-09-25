@@ -51,6 +51,15 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.ExpirationDate)
                     .Must(model => model.HasValue)
                     .WithMessage(model => model.StartDate, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Percent)
+                    .Cascade(CascadeMode.StopOnFirstFailure)
+                    .GreaterThan(0)
+                    .When(p => p.IdObjectType == PromotionType.CategoryDiscount)
+                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Percent, 0)
+                    .LessThanOrEqualTo(100)
+                    .When(p => p.IdObjectType == PromotionType.CategoryDiscount)
+                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Percent, 100);
             }
         }
 

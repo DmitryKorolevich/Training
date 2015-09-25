@@ -114,3 +114,17 @@ BEGIN
 END
 
 GO
+
+IF OBJECT_ID(N'[dbo].[PromotionsToSelectedCategories]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[PromotionsToSelectedCategories]
+	(
+		[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+		[IdCategory] INT NOT NULL, 
+		[IdPromotion] INT NOT NULL, 		
+		CONSTRAINT [FK_PromotionToSelectedCategories_ToDiscount] FOREIGN KEY ([IdPromotion]) REFERENCES [Promotions]([Id]), 
+		CONSTRAINT [FK_PromotionsToSelectedCategories_ToProductCategory] FOREIGN KEY ([IdCategory]) REFERENCES [ProductCategories]([Id])
+	)
+END
+
+GO

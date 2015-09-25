@@ -25,5 +25,7 @@ namespace VitalChoice.DynamicData.Entities
         public ICollection<PromotionToBuySku> PromotionsToBuySkus { get; set; }
 
         public ICollection<PromotionToGetSku> PromotionsToGetSkus { get; set; }
+
+        public ICollection<int> SelectedCategoryIds { get; set; }
     }
 }

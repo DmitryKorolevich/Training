@@ -45,6 +45,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 
                 dynamic.PromotionsToBuySkus = entity.PromotionsToBuySkus?.ToList();
                 dynamic.PromotionsToGetSkus = entity.PromotionsToGetSkus?.ToList();
+                dynamic.SelectedCategoryIds = entity.PromotionsToSelectedCategories?.Select(p => p.IdCategory).ToList();
             });
             return Task.Delay(0);
         }
@@ -80,6 +81,11 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                     entity.PromotionsToGetSkus = dynamic.PromotionsToGetSkus.ToList();
                 }
+                entity.PromotionsToSelectedCategories = dynamic.SelectedCategoryIds?.Select(c => new PromotionToSelectedCategory
+                {
+                    IdCategory = c,
+                    IdPromotion = dynamic.Id
+                }).ToList();
             });
             return Task.Delay(0);
         }
@@ -96,8 +102,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.StartDate = dynamic.StartDate;
                 entity.ExpirationDate = dynamic.ExpirationDate;
                 entity.IdAddedBy = entity.IdEditedBy;
-
-
+                
                 if (dynamic.PromotionsToBuySkus != null)
                 {
                     foreach (var item in dynamic.PromotionsToBuySkus)
@@ -116,6 +121,11 @@ namespace VitalChoice.Business.Services.Dynamic
                     }
                     entity.PromotionsToGetSkus = dynamic.PromotionsToGetSkus.ToList();
                 }
+                entity.PromotionsToSelectedCategories = dynamic.SelectedCategoryIds?.Select(c => new PromotionToSelectedCategory
+                {
+                    IdCategory = c,
+                    IdPromotion = dynamic.Id
+                }).ToList();
             });
             return Task.Delay(0);
         }

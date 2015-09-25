@@ -289,6 +289,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<PromotionToGetSku>().ToTable("PromotionsToGetSkus");
             builder.Entity<PromotionToGetSku>().Ignore(p => p.ShortSkuInfo);
 
+            builder.Entity<PromotionToSelectedCategory>().Key(p => p.Id);
+            builder.Entity<PromotionToSelectedCategory>().ToTable("PromotionsToSelectedCategories");
+
             builder.Entity<Promotion>().Key(p => p.Id);
             builder.Entity<Promotion>().ToTable("Promotions");
             builder.Entity<Promotion>()
@@ -308,6 +311,12 @@ namespace VitalChoice.Infrastructure.Context
                 .Required();
             builder.Entity<Promotion>()
                 .Collection(p => p.PromotionsToGetSkus)
+                .InverseReference()
+                .ForeignKey(t => t.IdPromotion)
+                .PrincipalKey(p => p.Id)
+                .Required();
+            builder.Entity<Promotion>()
+                .Collection(p => p.PromotionsToSelectedCategories)
                 .InverseReference()
                 .ForeignKey(t => t.IdPromotion)
                 .PrincipalKey(p => p.Id)
