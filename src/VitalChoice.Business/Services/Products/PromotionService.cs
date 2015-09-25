@@ -65,7 +65,8 @@ namespace VitalChoice.Business.Services.Products
         protected override IQueryFluent<Promotion> BuildQuery(IQueryFluent<Promotion> query)
         {
             return query.Include(p => p.PromotionsToBuySkus)
-                .Include(p => p.PromotionsToGetSkus);
+                        .Include(p => p.PromotionsToGetSkus)
+                        .Include(p => p.PromotionsToSelectedCategories);
         }
 
         protected override async Task AfterSelect(Promotion entity)
@@ -111,18 +112,22 @@ namespace VitalChoice.Business.Services.Products
         {
             var promotionToSelectedSkuRepository = uow.RepositoryAsync<PromotionToBuySku>();
             var promotionToSkuRepository = uow.RepositoryAsync<PromotionToGetSku>();
+            var promotionToSelectedCategoryRepository = uow.RepositoryAsync<PromotionToSelectedCategory>();
 
             await promotionToSelectedSkuRepository.DeleteAllAsync(entity.PromotionsToBuySkus);
             await promotionToSkuRepository.DeleteAllAsync(entity.PromotionsToGetSkus);
+            await promotionToSelectedCategoryRepository.DeleteAllAsync(entity.PromotionsToSelectedCategories);
         }
 
         protected override async Task AfterEntityChangesAsync(PromotionDynamic model, Promotion entity, IUnitOfWorkAsync uow)
         {
             var promotionToSelectedSkuRepository = uow.RepositoryAsync<PromotionToBuySku>();
             var promotionToSkuRepository = uow.RepositoryAsync<PromotionToGetSku>();
+            var promotionToSelectedCategoryRepository = uow.RepositoryAsync<PromotionToSelectedCategory>();
 
             await promotionToSelectedSkuRepository.InsertRangeAsync(entity.PromotionsToBuySkus);
             await promotionToSkuRepository.InsertRangeAsync(entity.PromotionsToGetSkus);
+            await promotionToSelectedCategoryRepository.InsertRangeAsync(entity.PromotionsToSelectedCategories);
         }
 
         #region Promotions

@@ -73,6 +73,11 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
             $scope.assignedCustomerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
             $scope.assignedCustomerTypes.splice(0, 0, { Key: null, Text: 'All' });
             $scope.promotionTypes = $rootScope.ReferenceData.PromotionTypes;
+            $scope.maxTimesUseModes = [
+                { Key: 1, Text: 'One Time Only' },
+                { Key: 2, Text: 'Unlimited' },
+                { Key: 3, Text: '# of Uses' },
+            ];
 
             $scope.skuFilter = {
                 Code: '',
@@ -83,8 +88,29 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
             $scope.detailsTab = {
                 active: true
             };
+            $scope.options = {};
 
-            loadPromotion();
+            loadCategories();
+        };
+
+        function loadCategories()
+        {
+            productService.getCategoriesTree({}, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        $scope.rootCategory = result.Data;
+                        loadPromotion();
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                }).
+                error(function (result)
+                {
+                    errorHandler(result);
+                });
         };
 
         function loadPromotion()
@@ -104,6 +130,24 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
 			                $scope.promotion.StartDate = Date.parseDateTime($scope.promotion.StartDate);
 			            }
 
+			            if ($scope.promotion.MaxTimesUse)
+			            {
+			                if ($scope.promotion.MaxTimesUse == 1)
+			                {
+			                    $scope.options.maxTimesUseMode = 1;
+			                }
+			                else
+			                {
+			                    $scope.options.maxTimesUseMode = 3;
+			                    $scope.options.maxTimesUse = $scope.promotion.MaxTimesUse;
+			                }
+			            }
+			            else
+			            {
+			                $scope.options.maxTimesUseMode = 2;
+			            }
+
+			            setSelected($scope.rootCategory, $scope.promotion.SelectedCategoryIds);
 			            addProductsListWatchers();
 			        } else
 			        {
@@ -132,6 +176,21 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
                 {
                     data.StartDate = data.StartDate.toServerDateTime();
                 }
+
+                if ($scope.options.maxTimesUseMode == 1)
+                {
+                    data.MaxTimesUse = 1;
+                } else if ($scope.options.maxTimesUseMode == 2)
+                {
+                    data.MaxTimesUse = null;
+                } else
+                {
+                    data.MaxTimesUse = $scope.options.maxTimesUse;
+                }
+
+                var categoryIds = [];
+                getSelected($scope.rootCategory, categoryIds);
+                data.SelectedCategoryIds = categoryIds;
 
                 promotionService.updatePromotion(data, $scope.refreshTracker).success(function (result)
                 {
@@ -285,6 +344,53 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
         $scope.deletePromotionToGetSku = function (index)
         {
             $scope.promotion.PromotionsToGetSkus.splice(index, 1);
+        };
+
+        var getCategoriesTreeViewScope = function ()
+        {
+            return angular.element($('.categories .ya-treeview').get(0)).scope();
+        };
+
+        $scope.updateCategoriesCollapsed = function (expand)
+        {
+            var scope = getCategoriesTreeViewScope();
+            if (expand)
+            {
+                scope.expandAll();
+            }
+            else
+            {
+                scope.collapseAll();
+            }
+            $scope.categoriesExpanded = expand;
+        };
+
+        function setSelected(category, ids)
+        {
+            category.IsSelected = false;
+            $.each(ids, function (index, id)
+            {
+                if (category.Id == id)
+                {
+                    category.IsSelected = true;
+                }
+            });
+            $.each(category.SubItems, function (index, value)
+            {
+                setSelected(value, ids);
+            });
+        };
+
+        function getSelected(category, ids)
+        {
+            if (category.IsSelected)
+            {
+                ids.push(category.Id);
+            }
+            $.each(category.SubItems, function (index, value)
+            {
+                getSelected(value, ids);
+            });
         };
 
         initialize();

@@ -49,17 +49,29 @@ namespace VC.Admin.Models.Product
         [Map]
         public bool AllowHealthwise { get; set; }
 
+        //1
+        [Map]
+        public int? MaxTimesUse { get; set; }
+
+        //2
+        [Map]
+        public decimal Percent { get; set; }
+
 
         [Map]
         public IList<PromotionToBuySkuModel> PromotionsToBuySkus { get; set; }
 
         [Map]
         public IList<PromotionToGetSkuModel> PromotionsToGetSkus { get; set; }
-        
+
+        [Map]
+        public IList<int> SelectedCategoryIds { get; set; }
+
         public PromotionManageModel()
         {
             PromotionsToBuySkus = new List<PromotionToBuySkuModel>();
             PromotionsToGetSkus = new List<PromotionToGetSkuModel>();
+            SelectedCategoryIds = new List<int>();
         }
     }
 

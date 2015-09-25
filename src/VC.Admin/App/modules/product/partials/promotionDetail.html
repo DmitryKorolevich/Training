@@ -95,6 +95,39 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div data-ng-if="promotion.IdObjectType==1" class="form-group">
+                                                <label for="MaxTimesUseMode" class="col-md-3 control-label">Max Time Uses Per Customer</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="MaxTimesUseMode" data-ng-model="options.maxTimesUseMode" ng-options="item.Key as item.Text for item in maxTimesUseModes"></select>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="promotion.IdObjectType==1 && options.maxTimesUseMode==3" class="form-group">
+                                                <label for="MaxTimesUse" class="col-md-3 control-label">Count</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="MaxTimesUse" class="form-control" placeholder="Count" data-ng-model="options.maxTimesUse" min="1" max="100000" numbers-only required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.MaxTimesUse.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Count")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Count",100000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Count",1)}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="promotion.IdObjectType==2" class="form-group">
+                                                <label for="Percent" class="col-md-3 control-label">Percent Discount</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">%</span>
+                                                        <input type="text" name="Percent" class="form-control" placeholder="Percent Discount" money min="0.01" max="100" data-ng-model="promotion.Percent" required>
+                                                    </div>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Percent.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Percent Discount",100)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.min">{{getValidationMessage("{0} must be over %0.00","Percent Discount")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Percent.$error.server">{{serverMessages.GetMessage('Percent')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </fieldset>
                                     </form>
 
@@ -207,6 +240,20 @@
                                                     </table>
                                                 </form>
                                                 <div ng-controller="skusSearchController" onload="name = 'PromotionsToGetSkus'" data-ng-include="'app/modules/product/partials/skusSearchList.html'"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div data-ng-show="promotion.IdObjectType==2">
+                                        <span class="legend">Selected Categories</span>
+                                        <div class="categories">
+                                            <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
+                                            <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>
+                                            <div ui-tree data-drag-enabled="false" class="ya-treeview">
+                                                <ol ui-tree-nodes="" data-ng-model="rootCategory.SubItems">
+                                                    <li ng-repeat="item in rootCategory.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/content/partials/contentCategories.html'">
+                                                    </li>
+                                                </ol>
                                             </div>
                                         </div>
                                     </div>
