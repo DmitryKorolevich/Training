@@ -6,7 +6,7 @@
 		{
 			<li @(i == Model.SubItems.Count - 1 ? "class=last-child" : "")>
 				<a href="@Model.SubItems[i].Link">
-					<span>@Model.SubItems[i].Label</span>
+					<span>@(Model.SubItems[i].Label?.ToUpper())</span>
 				</a>
 				@if (Model.SubItems[i].SubItems.Any())
 				{

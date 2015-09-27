@@ -77,7 +77,7 @@ namespace VitalChoice.Business.Services.Products
 					Url = subItem.Url
 				});
 
-				if (!subItem.Name.Equals(url, StringComparison.OrdinalIgnoreCase))
+				if (!subItem.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
 				{
 					var found = BuildBreadcrumb(subItem, url, breadcrumbItems);
 					if (found)
