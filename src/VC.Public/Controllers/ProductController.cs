@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -13,10 +15,20 @@ namespace VC.Public.Controllers
         {
         }
 
-        [HttpGet]
+	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
+	    {
+		    return User.Identity.IsAuthenticated
+			    ? (User.IsInRole("Wholesale")
+				    ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
+				    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
+			    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All};
+			    //todo: refactor when authentication mechanism gets ready
+	    }
+
+	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetParameters());
+            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -27,7 +39,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetParameters(), url);
+            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

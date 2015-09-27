@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using Templates;
@@ -32,13 +33,14 @@ namespace VitalChoice.Business.Services.Products
 	    private readonly ITtlGlobalCache _templatesCache;
 		private readonly VProductSkuRepository _productRepository;
 		private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
+		private readonly IProductCategoryService _productCategoryService;
 		private readonly ILogger _logger;
 
 	    public ProductViewService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
 	        IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
 	        IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
 	        IRepositoryAsync<ContentItem> contentItemRepository, IContentProcessorsService contentProcessorsService,
-	        ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider, VProductSkuRepository productRepository, IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository)
+	        ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider, VProductSkuRepository productRepository, IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository, IProductCategoryService productCategoryService)
 	    {
 	        this.masterContentItemRepository = masterContentItemRepository;
 	        this.productCategoryRepository = productCategoryRepository;
@@ -48,11 +50,95 @@ namespace VitalChoice.Business.Services.Products
 	        _templatesCache = templatesCache;
 			_productRepository = productRepository;
 		    _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
+		    _productCategoryService = productCategoryService;
 		    _logger = loggerProvider.CreateLoggerDefault();
 	    }
 
-		private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null)
+		private bool BuildBreadcrumb(ProductCategory rootCategory, string url, IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems)
 		{
+			if (!rootCategory.SubCategories.Any())
+			{
+				if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
+				{
+					breadcrumbItems.Clear();
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+
+			foreach (var subItem in rootCategory.SubCategories)
+			{
+				breadcrumbItems.Add(new TtlCategoryBreadcrumbItemModel()
+				{
+					Label = subItem.Name,
+					Url = subItem.Url
+				});
+
+				if (!subItem.Name.Equals(url, StringComparison.OrdinalIgnoreCase))
+				{
+					var found = BuildBreadcrumb(subItem, url, breadcrumbItems);
+					if (found)
+					{
+						return true;
+					}
+				}
+				else
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private ProductCategory FindTargetCategory(ProductCategory root, int idToFind)
+		{
+			if (root.Id == idToFind)
+			{
+				return root;
+			}
+
+			foreach (var subCategory in root.SubCategories)
+			{
+				if (subCategory.Id == idToFind)
+				{
+					return subCategory;
+				}
+				else
+				{
+					var target = FindTargetCategory(subCategory, idToFind);
+					if (target != null)
+					{
+						return target;
+					}
+				}
+			}
+
+			return null;
+		}
+
+		private IList<TtlSidebarMenuItemModel> ConvertToSideMenuModelLevel(IList<ProductNavCategoryLite> productCategoryLites)
+		{
+			return productCategoryLites?.Select(x => new TtlSidebarMenuItemModel()
+			{
+				Label = x.Label,
+				Url = x.Link,
+				SubItems = ConvertToSideMenuModelLevel(x.SubItems)
+			}).ToList();
+		}
+
+		private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, ProductCategory rootCategory = null, ProductNavCategoryLite rootNavCategory = null)
+		{
+			IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = null;
+			if (rootCategory != null)
+			{
+				breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
+				BuildBreadcrumb(rootCategory, productCategoryContent.Url, breadcrumbItems);
+			}
+
 			return new TtlCategoryModel()
 			{
 				Name = productCategoryContent.Name,
@@ -68,17 +154,19 @@ namespace VitalChoice.Business.Services.Products
 					Name = x.Name,
 					Thumbnail = x.Thumbnail,
 					Url = x.Url
-				}).ToList()
+				}).ToList(),
+				SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
+				BreadcrumbOrderedItems = breadcrumbItems
 			};
 		}
 
 		#region Public
 
-        public async Task<ExecutedContentItem> GetProductCategoryContentAsync(Dictionary<string, object> parameters, string categoryUrl = null)
+        public async Task<ExecutedContentItem> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes, Dictionary<string, object> parameters, string categoryUrl = null)
         {
             ProductCategoryContent category=null;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
-            if (!String.IsNullOrEmpty(categoryUrl))
+            if (!string.IsNullOrEmpty(categoryUrl))
             {
                 var categoryEcommerce = (await productCategoryEcommerceRepository.Query(p => p.Url == categoryUrl &&
                     p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
@@ -99,10 +187,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     category = (await productCategoryRepository.Query(p => p.Id == categoryEcommerce.Id).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-                    if (category != null)
-                    {
-                        category.Set(categoryEcommerce);
-                    }
+	                category?.Set(categoryEcommerce);
                 }
             }
 
@@ -113,11 +198,16 @@ namespace VitalChoice.Business.Services.Products
                 return null;
             }
 
+			var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
             if (category.StatusCode == RecordStatusCode.NotActive)
             {
                 if (!parameters.ContainsKey(ContentConstants.PREVIEW_PARAM))
                 {
                     return null;
+                }
+                else
+                {
+	                targetStatuses.Add(RecordStatusCode.NotActive);
                 }
             }
 
@@ -145,17 +235,16 @@ namespace VitalChoice.Business.Services.Products
                 };
             }
 
-			/*model population todo: should be placed in processor*/
+			/*model population todo: should be placed in processor and this service must be generic for every content manageable page*/
 
-			var subCategories = (await productCategoryEcommerceRepository.Query(p => p.ParentId == category.Id &&
-	                                                                                 p.StatusCode !=
-	                                                                                 RecordStatusCode.Deleted)
-		        .SelectAsync(false));
+			var rootCategory = await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryTreeFilter() { Statuses = targetStatuses });
+
+			var subCategories = FindTargetCategory(rootCategory, category.Id).SubCategories;
 
 			var subCategoriesContent = new List<ProductCategoryContent>();
 			foreach (var subCategory in subCategories)
 	        {
-				var subCategoryContent = (await productCategoryRepository.Query(p => p.Id == subCategory.Id && p.StatusCode != RecordStatusCode.Deleted).OrderBy(x=>x.OrderBy(y=>y.Order)).SelectAsync(false)).Single();
+				var subCategoryContent = (await productCategoryRepository.Query(p => p.Id == subCategory.Id).OrderBy(x=>x.OrderBy(y=>y.Order)).SelectAsync(false)).Single();
 				subCategoryContent.Set(subCategory);
 
 				subCategoriesContent.Add(subCategoryContent);
@@ -169,11 +258,18 @@ namespace VitalChoice.Business.Services.Products
 	        if (productIds.Any())
 	        {
 		        products = (await _productRepository.GetProductsAsync(new VProductSkuFilter() {IdProducts = productIds})).Items;
+				products = products.Where(x => targetStatuses.Contains(x.StatusCode)).ToList();
 	        }
 
-			var model = PopulateCategoryTemplateModel(category, subCategoriesContent, products);
+			var rootNavCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(rootCategory, new ProductCategoryLiteFilter()
+			{
+				Visibility = customerTypeCodes,
+				Statuses = targetStatuses
+			});
 
-			/*-------*/
+			var model = PopulateCategoryTemplateModel(category, subCategoriesContent, products, rootCategory, rootNavCategory);
+
+			/*end of model population-------*/
 
 			parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
             foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)

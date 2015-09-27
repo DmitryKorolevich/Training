@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
@@ -32,11 +34,11 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
-        public ProductCategoryQuery WithStatus(RecordStatusCode? status)
+        public ProductCategoryQuery WithStatus(IList<RecordStatusCode> statuses)
         {
-            if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
+            if (statuses != null && statuses.Any())
             {
-                Add(x => x.StatusCode == status);
+                Add(x => statuses.Contains(x.StatusCode));
             }
 
             return this;

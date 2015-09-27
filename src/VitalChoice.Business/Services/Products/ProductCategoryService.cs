@@ -46,7 +46,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter)
         {
             ProductCategory toReturn = null;
-            var query = new ProductCategoryQuery().NotDeleted().WithStatus(filter.Status);
+            var query = new ProductCategoryQuery().NotDeleted().WithStatus(filter.Statuses);
             List<ProductCategory> categories = await productCategoryEcommerceRepository.Query(query).SelectAsync(false);
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);
             if (toReturn == null)
@@ -258,24 +258,29 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-	    public async Task<ProductCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter)
+	    public async Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter)
 	    {
-		    var productRootCategory = await GetCategoriesTreeAsync(new ProductCategoryTreeFilter() {Status = RecordStatusCode.Active});
+		    var productRootCategory = await GetCategoriesTreeAsync(new ProductCategoryTreeFilter() {Statuses = liteFilter.Statuses});
 
+			return await GetLiteCategoriesTreeAsync(productRootCategory, liteFilter);
+        }
+
+		public async Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory, ProductCategoryLiteFilter liteFilter)
+		{
 			var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
 			var contentCategories = await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(false);
 
-		    return new ProductCategoryLite()
-		    {
+			return new ProductNavCategoryLite()
+			{
 				SubItems = ConvertToTransferCategory(productRootCategory.SubCategories, contentCategories)
 			};
 		}
 
-	    #region Private
+		#region Private
 
-	    private IList<ProductCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IList<ProductCategoryContent> contentCategories)
+	    private IList<ProductNavCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IList<ProductCategoryContent> contentCategories)
 	    {
-		    return subCategories.Where(x => contentCategories.Select(y=>y.Id).Contains(x.Id)).Select(x => new ProductCategoryLite()
+		    return subCategories.Where(x => contentCategories.Select(y=>y.Id).Contains(x.Id)).Select(x => new ProductNavCategoryLite()
 		    {
 				Label = contentCategories.First(y => y.Id == x.Id).NavLabel,
 				Link = x.Url,

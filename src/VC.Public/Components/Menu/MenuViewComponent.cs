@@ -22,7 +22,7 @@ namespace VC.Public.Components.Menu
 			_productCategoryService = productCategoryService;
 		}
 
-		private IList<MainMenuIItemModel> ConvertToModel(IList<ProductCategoryLite> entities)
+		private IList<MainMenuIItemModel> ConvertToModel(IList<ProductNavCategoryLite> entities)
 		{
 			return entities.Select(x => new MainMenuIItemModel()
 			{

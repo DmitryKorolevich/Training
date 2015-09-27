@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Domain.Transfer.Products
 {
-    public class ProductCategoryLite
+    public class ProductNavCategoryLite
     {
 	    public string Label { get; set; }
 
 	    public string Link { get; set; }
 
-	    public IList<ProductCategoryLite> SubItems { get; set; }
+	    public IList<ProductNavCategoryLite> SubItems { get; set; }
 
-	    public ProductCategoryLite()
+	    public ProductNavCategoryLite()
 	    {
-			SubItems = new List<ProductCategoryLite>();
+			SubItems = new List<ProductNavCategoryLite>();
 	    }
     }
 }
