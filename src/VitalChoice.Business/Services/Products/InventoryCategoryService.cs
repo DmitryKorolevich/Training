@@ -52,7 +52,6 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<bool> UpdateCategoriesTreeAsync(IList<InventoryCategory> categories)
         {
-            bool toReturn = false;
             if (categories == null)
             {
                 throw new ArgumentException();
@@ -79,14 +78,11 @@ namespace VitalChoice.Business.Services.Products
                 }
             }
 
-            toReturn = true;
-
-            return toReturn;
+            return true;
         }
 
         public async Task<InventoryCategory> GetCategoryAsync(int id)
         {
-            InventoryCategory toReturn = null;
             InventoryCategoryQuery query = new InventoryCategoryQuery().WithId(id).NotDeleted();
             return (await inventoryCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
         }

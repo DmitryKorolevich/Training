@@ -45,7 +45,7 @@ namespace VitalChoice.Business.Services.Products
             _mapper = mapper;
         }
 
-        protected override async Task<List<MessageInfo>> Validate(PromotionDynamic dynamic)
+        protected override Task<List<MessageInfo>> Validate(PromotionDynamic dynamic)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
             if (dynamic.IdObjectType == (int)PromotionType.BuyXGetY)
@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Products
                     errors.AddRange(CreateError().Error("At least one skus should be specified for get area.").Build());
                 }
             }
-            return errors;
+            return Task.FromResult(errors);
         }
 
         protected override IQueryFluent<Promotion> BuildQuery(IQueryFluent<Promotion> query)

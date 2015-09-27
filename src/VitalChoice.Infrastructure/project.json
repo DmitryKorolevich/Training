@@ -9,7 +9,7 @@
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
     "WindowsAzure.Storage": "5.0.1-preview-*",
-    "Templates": "2.2.10-beta7"
+    "Templates": "2.3.0-beta7"
   },
 
   "frameworks": {
