@@ -46,5 +46,25 @@ namespace VitalChoice.Business.Queries.Product
 
             return this;
         }
+
+        public PromotionQuery WithValidFrom(DateTime? validFrom)
+        {
+            if (validFrom.HasValue)
+            {
+                var from = validFrom;
+                Add(x => !x.StartDate.HasValue || x.StartDate.Value >= from);
+            }
+            return this;
+        }
+
+        public PromotionQuery WithValidTo(DateTime? validTo)
+        {
+            if (validTo.HasValue)
+            {
+                var to = validTo;
+                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
+            }
+            return this;
+        }
     }
 }

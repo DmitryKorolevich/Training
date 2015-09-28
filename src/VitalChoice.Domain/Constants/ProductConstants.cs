@@ -14,8 +14,10 @@ namespace VitalChoice.Domain.Constants
         public const int FIELD_COUNT_YOUTUBE = 3;
 
         public const string FIELD_NAME_DISREGARD_STOCK = "DisregardStock";
+        public const string FIELD_NAME_STOCK = "Stock";
         public const string FIELD_NAME_NON_DISCOUNTABLE = "NonDiscountable";
         public const string FIELD_NAME_HIDE_FROM_DATA_FEED = "HideFromDataFeed";
+        public const string FIELD_NAME_QTY_THRESHOLD = "QTYThreshold";
 
         public const string FIELD_NAME_INVENTORY_CATEGORY_ID = "InventoryCategoryId";
     }

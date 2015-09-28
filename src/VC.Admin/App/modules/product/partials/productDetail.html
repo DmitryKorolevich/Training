@@ -386,7 +386,7 @@
                                                                                 <div class="fixed-accordion-row" data-ng-hide="product.Type==3 || product.Type==4">
                                                                                     <label class="control-label">Stock</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/" required>
+                                                                                        <input type="text" name="Stock" class="form-control number" placeholder="Stock" numbers-only data-ng-model="subSku.Stock" min="0" max="100000" ng-pattern="/^\d{0,9}?$/" required>
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.Stock.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Stock")}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.Stock.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Stock",100000)}}</small>
@@ -429,6 +429,18 @@
                                                                                         <label>
                                                                                             <input id="lbOrphanType{{subSku.Id}}" type="checkbox" data-ng-model="subSku.OrphanType">
                                                                                         </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="fixed-accordion-row" data-ng-if="product.Type==1 && subSku.OrphanType">
+                                                                                    <label class="control-label">QTY Threshold</label>
+                                                                                    <div class="col-md-1">
+                                                                                        <input type="text" name="QTYThreshold" class="form-control number" placeholder="QTY" numbers-only data-ng-model="subSku.QTYThreshold" min="0" max="100000" ng-pattern="/^\d{0,9}?$/" required>
+                                                                                        <div class="error-container x-small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.QTYThreshold.$invalid">
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.QTYThreshold.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","QTY Threshold")}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.QTYThreshold.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","QTY Threshold",100000)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.QTYThreshold.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","QTY Threshold",1)}}</small>
+                                                                                            <small class="error" ng-show="forms.SKUs.i{{$index}}.QTYThreshold.$error.pattern">{{getValidationMessage("ValidationMessages.FieldNumber","QTYThreshold",'SKUs',$index)}}</small>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

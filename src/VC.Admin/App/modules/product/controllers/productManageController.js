@@ -10,8 +10,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
         var specialIconFieldName = 'SpecialIcon';
         
         var disregardStockFieldName = 'DisregardStock';
+        var stockFieldName = 'Stock';
         var nonDiscountableFieldName = 'NonDiscountable';
         var hideFromDataFeedFieldName = 'HideFromDataFeed';
+        var qTYThresholdFieldName = 'QTYThreshold';
 
         function successSaveHandler(result) {
             if (result.Success) {
@@ -552,10 +554,11 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 Active: true,
                 RetailPrice: 0.00,
                 WholesalePrice: 0.00,
-                Stock: 0,
+                Stock: parseInt($scope.productTypeDefaults[stockFieldName]),
                 DisregardStock: Boolean.parse($scope.productTypeDefaults[disregardStockFieldName]),
                 NonDiscountable: Boolean.parse($scope.productTypeDefaults[nonDiscountableFieldName]),
                 HideFromDataFeed: Boolean.parse($scope.productTypeDefaults[hideFromDataFeedFieldName]),
+                QTYThreshold: $scope.productTypeDefaults[qTYThresholdFieldName] ? parseInt($scope.productTypeDefaults[qTYThresholdFieldName]) : null,
                 Seller: $scope.defaultSeller,
                 IsOpen: true,
             };

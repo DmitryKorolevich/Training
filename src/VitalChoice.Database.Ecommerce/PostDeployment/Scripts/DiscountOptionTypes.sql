@@ -68,3 +68,14 @@ WHERE IdObjectType=4 AND Name='Amount'
 END
 
 GO
+
+IF NOT EXISTS (SELECT * FROM DiscountOptionTypes WHERE Name='MaxTimesUse')
+BEGIN
+
+INSERT INTO DiscountOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT NULL, 3, NULL, N'MaxTimesUse'
+
+END
+
+GO

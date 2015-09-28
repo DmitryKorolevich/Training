@@ -70,6 +70,9 @@ namespace VC.Admin.Models.Product
         [Map]
         public bool FreeShipping { get; set; }
 
+        [Map]
+        public int? MaxTimesUse { get; set; }
+
         //1
         [Map]
         public decimal Amount { get; set; }

@@ -10,6 +10,24 @@
             </div>
         </div>
         <div class="row form-group">
+            <div class="col-md-3">
+                <p class="input-group">
+                    <input type="text" name="test" class="form-control" placeholder="Valid From" datepicker-popup="dd-MMM-yyyy" ng-model="filter.ValidFrom" is-open="fromOpened" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="input-group">
+                    <input type="text" name="test" class="form-control" placeholder="Valid To" datepicker-popup="dd-MMM-yyyy" ng-model="filter.ValidTo" is-open="toOpened" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="row form-group">
             <div class="col-md-4">
                 <button class="btn btn-info" data-ng-click="filterPromotions();" type="button">Filter</button>
             </div>

@@ -17,7 +17,18 @@
 
         function refreshPromotions()
         {
-            promotionService.getPromotions($scope.filter, $scope.refreshTracker)
+            var data = {};
+            angular.copy($scope.filter, data);
+            if (data.ValidFrom)
+            {
+                data.ValidFrom = data.ValidFrom.toServerDateTime();
+            }
+            if (data.ValidTo)
+            {
+                data.ValidTo = data.ValidTo.toServerDateTime();
+            }
+
+            promotionService.getPromotions(data, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.promotions = result.Data.Items;
@@ -40,6 +51,8 @@
             $scope.filter = {
                 SearchText: '',
                 Status: null,
+                ValidFrom: null,
+                ValidTo: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refreshPromotions, "DateCreated", "Desc")
             };

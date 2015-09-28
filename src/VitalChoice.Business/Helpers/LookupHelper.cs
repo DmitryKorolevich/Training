@@ -250,6 +250,9 @@ namespace VitalChoice.Business.Helpers
                 case PromotionType.BuyXGetY:
                     toReturn = "Buy X Get Y";
                     break;
+                case PromotionType.CategoryDiscount:
+                    toReturn = "Category Discount";
+                    break;
             }
             return toReturn;
         }

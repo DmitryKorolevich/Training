@@ -48,8 +48,13 @@ namespace VC.Admin.Models.Product
         [Map]
         public bool NonDiscountable { get; set; }
 
+        //1
         [Map]
         public bool OrphanType { get; set; }
+
+        //1
+        [Map]
+        public int? QTYThreshold { get; set; }
 
         [Map]
         public bool AutoShipProduct { get; set; }

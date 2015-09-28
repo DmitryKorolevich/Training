@@ -34,11 +34,6 @@ namespace VitalChoice.Business.Services.Dynamic
             get { return c => c.IdDiscount; }
         }
 
-        public override IQueryOptionType<DiscountOptionType> GetOptionTypeQuery()
-        {
-            return new DiscountOptionTypeQuery();
-        }
-
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
         {
             items.ForEach(pair =>

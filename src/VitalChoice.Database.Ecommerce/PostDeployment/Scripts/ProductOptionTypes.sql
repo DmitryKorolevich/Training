@@ -667,3 +667,14 @@ SELECT NULL, 4, 4, N'QTY'
 END
 
 GO
+
+IF NOT EXISTS (SELECT * FROM ProductOptionTypes WHERE Name='QTYThreshold')
+BEGIN
+
+INSERT INTO ProductOptionTypes
+(DefaultValue, IdFieldType, IdObjectType, Name)
+SELECT 4, 3, 1, N'QTYThreshold'
+
+END
+
+GO

@@ -57,6 +57,11 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 { Key: 1, Text: "$" },
                 { Key: 2, Text: "%" }
             ];//price or percent
+            $scope.maxTimesUseModes = [
+                { Key: 1, Text: 'One Time Only' },
+                { Key: 2, Text: 'Unlimited' },
+                { Key: 3, Text: '# of Uses' },
+            ];
 
             $scope.skuFilter = {
                 Code: '',
@@ -67,6 +72,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             $scope.detailsTab = {
                 active: true
             };
+            $scope.options = {};
 
             loadCategories();
         };
@@ -109,6 +115,23 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			            if ($scope.discount.StartDate)
 			            {
 			                $scope.discount.StartDate = Date.parseDateTime($scope.discount.StartDate);
+			            }
+
+			            if ($scope.discount.MaxTimesUse)
+			            {
+			                if ($scope.discount.MaxTimesUse == 1)
+			                {
+			                    $scope.options.maxTimesUseMode = 1;
+			                }
+			                else
+			                {
+			                    $scope.options.maxTimesUseMode = 3;
+			                    $scope.options.maxTimesUse = $scope.discount.MaxTimesUse;
+			                }
+			            }
+			            else
+			            {
+			                $scope.options.maxTimesUseMode = 2;
 			            }
 
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
@@ -167,6 +190,17 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 if (data.StartDate)
                 {
                     data.StartDate = data.StartDate.toServerDateTime();
+                }
+
+                if ($scope.options.maxTimesUseMode == 1)
+                {
+                    data.MaxTimesUse = 1;
+                } else if ($scope.options.maxTimesUseMode == 2)
+                {
+                    data.MaxTimesUse = null;
+                } else
+                {
+                    data.MaxTimesUse = $scope.options.maxTimesUse;
                 }
 
                 discountService.updateDiscount(data, $scope.refreshTracker).success(function (result) {

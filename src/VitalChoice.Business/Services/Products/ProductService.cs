@@ -226,8 +226,10 @@ namespace VitalChoice.Business.Services.Products
                 names.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i);
             }
             names.Add(ProductConstants.FIELD_NAME_DISREGARD_STOCK);
+            names.Add(ProductConstants.FIELD_NAME_STOCK);
             names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
             names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
+            names.Add(ProductConstants.FIELD_NAME_QTY_THRESHOLD);
             var items = await GetProductOptionTypesAsync(names);
             foreach (var item in items.Where(p => p.IdObjectType.HasValue))
             {

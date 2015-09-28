@@ -145,6 +145,23 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="form-group">
+                                                <label for="MaxTimesUseMode" class="col-md-3 control-label">Max Time Uses Per Customer</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="MaxTimesUseMode" data-ng-model="options.maxTimesUseMode" ng-options="item.Key as item.Text for item in maxTimesUseModes"></select>
+                                                </div>
+                                            </div>
+                                            <div data-ng-if="options.maxTimesUseMode==3" class="form-group">
+                                                <label for="MaxTimesUse" class="col-md-3 control-label">Count</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="MaxTimesUse" class="form-control" placeholder="Count" data-ng-model="options.maxTimesUse" min="1" max="100000" numbers-only required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.MaxTimesUse.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Count")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Count",100000)}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.MaxTimesUse.$error.min">{{getValidationMessage("ValidationMessages.FieldMin","Count",1)}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="form-group" data-ng-if="discount.DiscountType==1">
                                                 <label for="type" class="col-md-3 control-label">Price Discount</label>
