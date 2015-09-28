@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Shipping;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.Workflow.Base;
@@ -14,17 +16,25 @@ namespace VitalChoice.Workflow.Contexts
     {
         public int PerishableCount { get; set; }
 
+        public decimal PerishableAmount { get; set; }
+
         public int NonPerishableCount { get; set; }
+
+        public decimal NonPerishableAmount { get; set; }
 
         public int NonPerishableOrphanCount { get; set; }
 
         public int NonPerishableNonOrphanCount => NonPerishableCount - NonPerishableOrphanCount;
+
+        public decimal PNpAmount => PerishableAmount + NonPerishableAmount;
 
         public bool SpecialSkuAdded { get; set; }
 
         public bool ThresholdReached { get; set; }
 
         public bool ShouldSplit { get; set; }
+
+        public POrderType ProductTypes { get; set; }
     }
 
     public class OrderContext : ComputableContext
@@ -52,9 +62,9 @@ namespace VitalChoice.Workflow.Contexts
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<int>> ShippingUpgradePOptions { get; set; }
+        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<int>> ShippingUpgradeNpOptions { get; set; }
+        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradeNpOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
 
