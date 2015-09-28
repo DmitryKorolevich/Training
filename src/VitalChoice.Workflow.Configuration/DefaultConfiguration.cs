@@ -25,6 +25,7 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<DiscountTypeActionResolver>();
                 action.Aggregate<ShippingStandardResolver>();
                 action.Aggregate<ShippingSurchargeResolver>();
+                action.Aggregate<ShippingUpgradesActionResolver>();
             });
 
             treeSetup.Action<ProductAction>("Products");
@@ -93,6 +94,21 @@ namespace VitalChoice.Workflow.Configuration
             treeSetup.Action<ShippingSurchargeCaAction>("ShippingSurchargeCa", action =>
             {
                 action.Dependency<DeliveredProductsAction>();
+            });
+
+            treeSetup.Action<ProductsSplitAction>("SplitAction", action =>
+            {
+                action.Dependency<ProductsWithPromoAction>();
+            });
+
+            treeSetup.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
+            {
+                action.Dependency<ProductsSplitAction>();
+            });
+
+            treeSetup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
+            {
+                action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
             });
 
             treeSetup.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>

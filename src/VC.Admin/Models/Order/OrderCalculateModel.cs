@@ -14,6 +14,7 @@ using VitalChoice.Domain.Entities.Localization.Groups;
 using VC.Admin.Models.Product;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Shipping;
 using VitalChoice.Workflow.Contexts;
 
 namespace VC.Admin.Models.Order
@@ -26,9 +27,9 @@ namespace VC.Admin.Models.Order
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<int>> ShippingUpgradePOptions { get; set; }
+        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<int>> ShippingUpgradeNPOptions { get; set; }
+        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradeNPOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
 
