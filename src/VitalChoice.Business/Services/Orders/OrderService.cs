@@ -255,6 +255,13 @@ namespace VitalChoice.Business.Services.Orders
                                 ? x.OrderBy(y => y.Customer)
                                 : x.OrderByDescending(y => y.Customer);
                     break;
+                case VOrderSortPath.ShipTo:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.ShipTo)
+                                : x.OrderByDescending(y => y.ShipTo);
+                    break;
                 case VOrderSortPath.Id:
                     sortable =
                         (x) =>

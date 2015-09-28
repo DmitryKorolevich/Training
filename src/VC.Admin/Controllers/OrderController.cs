@@ -202,19 +202,39 @@ namespace VC.Admin.Controllers
 
             await _customerService.UpdateAsync(item.Customer);
 
+            var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
             if (model.Id > 0)
             {
                 var dbItem = (await _orderService.SelectAsync(item.Id));
                 if(dbItem!=null && dbItem.DictionaryData.ContainsKey("OrderType"))
                 {
-                    item.Data.OrderType = dbItem.Data.OrderType;
+                    if (dbItem.Data.OrderType == (int?)SourceOrderType.MailOrder)
+                    {
+                        if (!orderType.HasValue)
+                        {
+                            orderType = (int)SourceOrderType.Phone;
+                        }
+                        item.Data.OrderType = orderType.Value;
+                    }
+                    else
+                    {
+                        item.Data.OrderType = orderType.HasValue ? orderType.Value : dbItem.Data.OrderType;
+                    }
+                }
+                else
+                {
+                    item.Data.OrderType = orderType.HasValue ? orderType.Value : (int)SourceOrderType.Phone;
                 }
 
                 item = (await _orderService.UpdateAsync(item));
             }
             else
             {
-                item.Data.OrderType = (int)SourceOrderType.Web;
+                if (!orderType.HasValue)
+                {
+                    orderType = (int)SourceOrderType.Phone;
+                }
+                item.Data.OrderType = orderType.Value;
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
                 item.PaymentMethod.Id = 0;

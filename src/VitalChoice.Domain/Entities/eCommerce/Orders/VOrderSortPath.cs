@@ -10,6 +10,7 @@
         public const string Company = "Company";
         public const string StateCode = "StateCode";
         public const string Customer = "Customer";
+        public const string ShipTo = "ShipTo";
         public const string Id = "Id";
         public const string Total = "Total";
         public const string DateEdited = "DateEdited";

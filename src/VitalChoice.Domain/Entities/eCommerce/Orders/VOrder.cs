@@ -47,5 +47,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
         public string Customer { get; set; }
 
         public string StateCode { get; set; }
+
+        public string ShipTo { get; set; }
     }
 }
