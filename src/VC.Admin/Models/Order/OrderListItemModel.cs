@@ -51,6 +51,8 @@ namespace VC.Admin.Models.Order
 
         public string StateCode { get; set; }
 
+        public string ShipTo { get; set; }
+
         public OrderListItemModel(VOrder item)
         {
             if(item!=null)
@@ -73,6 +75,7 @@ namespace VC.Admin.Models.Order
                 Company = item.Company;
                 Customer = item.Customer;
                 StateCode = item.StateCode;
+                ShipTo = item.ShipTo;
             }
         }
     }

@@ -45,9 +45,9 @@
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
                     </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Customer')">
-                        <span>Customer</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Customer'">
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('ShipTo')">
+                        <span>Ship To</span>
+                        <span data-ng-if="filter.Sorting.Path == 'ShipTo'">
                             <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
@@ -78,10 +78,10 @@
                     <td>
                         <a ui-sref="index.oneCol.orderDetail({id:item.Id})">{{::item.Id}}</a>
                     </td>
-                    <td>
-                        <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.Customer}}</a>
-                    </td>
                     <td>{{::item.Total | currency}}</td>
+                    <td>
+                        {{::item.ShipTo}}
+                    </td>
                     <td>
                         <button title="Repeat" class="btn btn-default btn-success btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:item.IdCustomer, idsource:item.Id })">
                             Repeat
@@ -89,7 +89,7 @@
                         <button title="Reship" class="btn btn-default btn-info btn-xs">
                             Reship
                         </button>
-                        <button title="Refund" class="btn btn-default btn-primary btn-xs">
+                        <button data-ng-if="item.OrderStatus==3" title="Refund" class="btn btn-default btn-primary btn-xs">
                             Refund
                         </button>
                     </td>
