@@ -7,7 +7,7 @@ angular.module('app.core.utils.textAngular', [
 	'app.core.utils.textAngular.services.imageCustomizationService'
 ])
 .config(['$provide', function ($provide) {
-	$provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'imageCustomizationService', function (taRegisterTool, taOptions, imageCustomizationService) {
+	$provide.decorator('taOptions', ['taRegisterTool', '$delegate', 'imageCustomizationService', '$timeout', function (taRegisterTool, taOptions, imageCustomizationService, $timeout) {
 		taRegisterTool('image', {
 			iconclass: 'fa fa-picture-o',
 			action: function (promise, restoreSelection) {
@@ -63,9 +63,27 @@ angular.module('app.core.utils.textAngular', [
 			}
 		});
 
+		taRegisterTool("toggleHtml", {
+			iconclass: 'fa fa-code',
+			tooltiptext: 'Toggle html / Rich Text',
+			action: function () {
+				var editor = this.$editor();
+
+				editor.switchView();
+
+				if (editor.showHtml && !editor.displayElements.html[0].innerHTML && !editor.displayElements.html[0].innerText && editor.displayElements.text[0].innerHTML) {
+					//$timeout(function () { $(editor.displayElements.html[0]).val(editor.displayElements.text[0].innerHTML) }, 500); // stupid hack
+					$(editor.displayElements.html[0]).val(editor.displayElements.text[0].innerHTML);
+				}
+			},
+			activeState: function () {
+				return this.$editor().showHtml;
+			}
+		});
+
 		taOptions.toolbar = [
 			['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'justifyLeft', 'justifyCenter', 'justifyRight', 'indent', 'outdent'],
-			['quote', 'bold', 'italics', 'underline', 'strikeThrough', 'ul', 'ol', 'redo', 'undo', 'clear', 'html', 'insertLink', 'insertVideo', 'image']
+			['quote', 'bold', 'italics', 'underline', 'strikeThrough', 'ul', 'ol', 'redo', 'undo', 'clear', 'html' /*'toggleHtml'*/, 'insertLink', 'insertVideo', 'image']
 		];
 		taOptions.keyMappings = []; 
 
