@@ -321,7 +321,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
                                                         <div class="col-md-5">
-                                                            <select class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-chnage="requestRecalculate()">
+                                                            <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
                                                                 <option value="" ng-if="false"></option>
                                                             </select>
                                                         </div>
@@ -329,7 +329,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
                                                         <div class="col-md-5">
-                                                            <select class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-chnage="requestRecalculate()">
+                                                            <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
                                                                 <option value="" ng-if="false"></option>
                                                             </select>
                                                         </div>

@@ -62,9 +62,9 @@ namespace VitalChoice.Workflow.Contexts
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradePOptions { get; set; }
+        public IList<LookupItem<int?>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<ShippingUpgrade>> ShippingUpgradeNpOptions { get; set; }
+        public IList<LookupItem<int?>> ShippingUpgradeNpOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
 

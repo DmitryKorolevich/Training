@@ -39,25 +39,25 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
                         upgradeNonPerishableO = context.SplitInfo.NonPerishableAmount * (decimal)0.15;
                     else
                         upgradeNonPerishableO = 25;
-                    context.ShippingUpgradePOptions = new List<LookupItem<ShippingUpgrade>>
+                    context.ShippingUpgradePOptions = new List<LookupItem<int?>>
                     {
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.OvernightP,
+                            Key = (int?)ShippingUpgradeOption.Overnight,
                             Text = $"Overnight + {upgradePerishableO:C}"
                         }
                     };
-                    context.ShippingUpgradeNpOptions = new List<LookupItem<ShippingUpgrade>>
+                    context.ShippingUpgradeNpOptions = new List<LookupItem<int?>>
                     {
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.OvernightNp,
+                            Key = (int?)ShippingUpgradeOption.Overnight,
                             Text = $"Overnight + {upgradeNonPerishableO:C}"
                         },
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.SecondDayNp,
-                            Text = $"Overnight + {upgradeNonPerishable2D:C}"
+                            Key = (int?)ShippingUpgradeOption.SecondDay,
+                            Text = $"2nd Day + {upgradeNonPerishable2D:C}"
                         }
                     };
                     return 0;
@@ -70,11 +70,11 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
                     else
                         upgradePerishableO = 25;
 
-                    context.ShippingUpgradePOptions = new List<LookupItem<ShippingUpgrade>>
+                    context.ShippingUpgradePOptions = new List<LookupItem<int?>>
                     {
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.OvernightP,
+                            Key = (int?)ShippingUpgradeOption.Overnight,
                             Text = $"Overnight + {upgradePerishableO:C}"
                         }
                     };
@@ -93,17 +93,17 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
                         upgradeNonPerishableO = context.SplitInfo.NonPerishableAmount * (decimal)0.15;
                     else
                         upgradeNonPerishableO = 25;
-                    context.ShippingUpgradeNpOptions = new List<LookupItem<ShippingUpgrade>>
+                    context.ShippingUpgradeNpOptions = new List<LookupItem<int?>>
                     {
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.OvernightNp,
+                            Key = (int?)ShippingUpgradeOption.Overnight,
                             Text = $"Overnight + {upgradeNonPerishableO:C}"
                         },
-                        new LookupItem<ShippingUpgrade>
+                        new LookupItem<int?>
                         {
-                            Key = ShippingUpgrade.SecondDayNp,
-                            Text = $"Overnight + {upgradeNonPerishable2D:C}"
+                            Key = (int?)ShippingUpgradeOption.SecondDay,
+                            Text = $"2nd Day + {upgradeNonPerishable2D:C}"
                         }
                     };
                     return 0;

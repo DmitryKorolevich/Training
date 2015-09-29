@@ -93,6 +93,14 @@
                                                     <div data-ng-show="DescriptionExpanded" text-angular data-ng-model="product.Description"></div>
                                                 </div>
                                             </div>
+
+<!--<div class="form-group"><label for="url" class="col-md-3 control-label"></label><div class="col-md-4"><input name="Url" class="form-control ng-pristine ng-untouched ng-valid-pattern ng-valid ng-valid-required" placeholder="URL" data-ng-model="product.Url" ng-pattern="/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/" required=""><div class="error-container ng-hide" ng-show="forms.submitted &amp;&amp; forms.parentDetails.Url.$invalid"><small class="error ng-binding ng-hide" ng-show="forms.parentDetails.Url.$error.required">URL is required.</small> <small class="error ng-binding ng-hide" ng-show="forms.parentDetails.Url.$error.pattern">URL has invalid format(e.g. some-page-name).</small> <small class="error ng-binding ng-hide" ng-show="forms.parentDetails.Url.$error.server"></small></div></div>
+<label for="url" class="col-md-2 padding-0px form-control-static" style="
+    padding-left: 0px;
+    padding-right: 0px;
+">Override Tab Title</label>
+<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" name="StatusCode" data-ng-model="product.StatusCode" data-ng-true-value="2" data-ng-false-value="1" class="ng-pristine ng-untouched ng-valid"><strong>Hide</strong></label></div></div></div>-->
+
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Serving" class="col-md-3 control-label">Serving/Storage</label>
                                                 <div class="col-md-9">
