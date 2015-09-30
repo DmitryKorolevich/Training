@@ -119,6 +119,21 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.TaxCode)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.TaxCode, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.DescriptionTitleOverride)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.DescriptionTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.ServingTitleOverride)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.ServingTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.RecipesTitleOverride)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.RecipesTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.IngredientsTitleOverride)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.IngredientsTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                RuleFor(model => model.ShippingTitleOverride)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.ShippingTitleOverride, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.SubProductGroupName)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)

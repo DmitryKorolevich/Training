@@ -18,5 +18,6 @@ namespace VitalChoice.Domain.Entities.Options
         public Email EmailConfiguration { get; set; }
 		public Versioning Versioning { get; set; }
 		public AzureStorage AzureStorage { get; set; }
+        public FedExOptions FedExOptions { get; set; }
     }
 }

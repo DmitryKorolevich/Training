@@ -21,6 +21,8 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Business.FedEx;
+using System.ServiceModel;
 
 namespace VitalChoice.Business.Services.Products
 {

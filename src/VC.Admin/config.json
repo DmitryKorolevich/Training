@@ -13,14 +13,14 @@
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
-   "Connection": {
-           "UserName": "dev_vcdb_login",
-            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
-            "Server": "vw4v86cs0h.database.windows.net"
-        },
-		"PublicHost": "http://staging.g2-dg.com/",
-		"AdminHost": "http://admin.staging.g2-dg.com/",
-		"MainSuperAdminEmail": "gary@g2designgroup.com",
+    "Connection": {
+      "UserName": "dev_vcdb_login",
+      "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+      "Server": "vw4v86cs0h.database.windows.net"
+    },
+    "PublicHost": "http://staging.g2-dg.com/",
+    "AdminHost": "http://admin.staging.g2-dg.com/",
+    "MainSuperAdminEmail": "gary@g2designgroup.com",
     "Email": {
       "From": "admin.staging@g2designgroup.com",
       "Host": "smtp.1and1.com",
@@ -34,6 +34,14 @@
       "CustomerContainerName": "customer-files",
       "BugTicketFilesContainerName": "bug-ticket-files",
       "BugTicketCommentFilesContainerName": "bug-ticket-comment-files"
+    },
+    "FedExOptions": {
+      "AccountNumber": "304955066",
+      "MeterNumber": "104067734",
+      "MerchantPhoneNumber": "8664825887",
+      "Key": "7Ux69IBvsRj0Ep7X",
+      "Password": "m0Zybyteel4RMp5j904aa1HpB",
+      "PayAccountNumber": "304955066"
     }
   }
 }

@@ -13,11 +13,11 @@
                     <div class="form-group">
                         <label class="col-md-3 control-label"></label>
                         <div class="col-md-9">
-                            <div class="col-md-4 padding-0px">
+                            <div class="col-md-5 padding-0px">
                                 <button class="btn btn-primary margin-right-8px" ngf-select ngf-change="setFile($files)">Locate file</button>
                                 <button data-ng-if="uploadFile" class="btn btn-success" data-ng-click="upload()" ladda="uploading">Upload</button>
                             </div>
-                            <div class="col-md-8 form-control-static">
+                            <div class="col-md-7 form-control-static">
                                 <div ng-if="logFileRequest.state=='progress'">
                                     <progressbar animate="true" value="logFileRequest.progress" type="success"><b>{{logFileRequest.progress}}%</b></progressbar>
                                 </div>

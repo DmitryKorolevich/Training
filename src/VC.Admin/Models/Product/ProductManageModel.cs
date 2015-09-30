@@ -69,13 +69,46 @@ namespace VC.Admin.Models.Product
         public string Description { get; set; }
 
         [Map]
+        public string DescriptionTitleOverride { get; set; }
+
+        [Map]
+        public bool DescriptionHide { get; set; }
+
+        [Map]
         public string Serving { get; set; }
+
+        [Map]
+        public string ServingTitleOverride { get; set; }
+
+        [Map]
+        public bool ServingHide { get; set; }
 
         [Map]
         public string Recipes { get; set; }
 
         [Map]
+        public string RecipesTitleOverride { get; set; }
+
+        [Map]
+        public bool RecipesHide { get; set; }
+
+        [Map]
         public string Ingredients { get; set; }
+
+        [Map]
+        public string IngredientsTitleOverride { get; set; }
+
+        [Map]
+        public bool IngredientsHide { get; set; }
+
+        [Map]
+        public string Shipping { get; set; }
+
+        [Map]
+        public string ShippingTitleOverride { get; set; }
+
+        [Map]
+        public bool ShippingHide { get; set; }
 
         [Map]
         public string ShortDescription { get; set; }

@@ -14,6 +14,7 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Entities.Help;
+using VitalChoice.Domain.Entities.VitalGreen;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -262,6 +263,27 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.Key(t => t.Id);
                 entity.ToTable("BugFiles");
+            });
+
+            #endregion
+
+            #region VitalGreen
+
+            builder.Entity<FedExZone>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("FedExZones");
+            });
+
+            builder.Entity<VitalGreenRequest>(entity =>
+            {
+                entity.Key(t => t.Id);
+                entity.ToTable("VitalGreenRequests");
+                entity.Reference(p => p.Zone)
+                    .InverseCollection()
+                    .ForeignKey(p => p.ZoneId)
+                    .PrincipalKey(p => p.Id)
+                    .Required(false);
             });
 
             #endregion

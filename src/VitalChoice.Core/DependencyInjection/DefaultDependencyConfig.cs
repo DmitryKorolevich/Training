@@ -62,6 +62,7 @@ using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.Business.Services.HelpService;
 using VitalChoice.Core.GlobalFilters;
+using VitalChoice.Business.Services.FedEx;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -153,6 +154,15 @@ namespace VitalChoice.Core.DependencyInjection
 					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
                     BugTicketFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketFilesContainerName").Value,
                     BugTicketCommentFilesContainerName = configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
+                };
+                options.FedExOptions = new FedExOptions()
+                {
+                    AccountNumber = configuration.GetSection("App:FedExOptions:AccountNumber").Value,
+                    MeterNumber = configuration.GetSection("App:FedExOptions:MeterNumber").Value,
+                    MerchantPhoneNumber = configuration.GetSection("App:FedExOptions:MerchantPhoneNumber").Value,
+                    Key = configuration.GetSection("App:FedExOptions:Key").Value,
+                    Password = configuration.GetSection("App:FedExOptions:Password").Value,
+                    PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
                 };
             });
 
@@ -324,6 +334,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>();
             builder.RegisterType<PromotionService>().As<IPromotionService>();
             builder.RegisterType<ContentAreaService>().As<IContentAreaService>();
+            builder.RegisterType<FedExService>().As<IFedExService>();
+            builder.RegisterType<VitalGreenService>().As<IVitalGreenService>();
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);

@@ -39,3 +39,5 @@ Post-Deployment Script Template
 
 :r .\Scripts\ProductsOutOfStockData.sql
 :r .\Scripts\MastersData.sql
+
+:r .\Scripts\FedEx.sql

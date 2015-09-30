@@ -14,17 +14,23 @@
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "Templates": "2.3.0-beta7",
-    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*"
+    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*",
   },
 
   "frameworks": {
     "dnx451": {
+        "frameworkAssemblies": {
+            "System.ServiceModel": "4.0.0.0"
+        }
     },
     "dnxcore50": {
       "dependencies": {
         "System.Runtime": "4.0.21-*",
         "System.IO.FileSystem": "4.0.1-*",
-        "System.IO": "4.0.11-*"
+        "System.IO": "4.0.11-*",
+        "System.ServiceModel.Http": "4.0.10-*",
+        "System.Private.ServiceModel": "4.0.0-*",
+        "System.ServiceModel.Primitives": "4.0.0-*"
       }
     }
   }

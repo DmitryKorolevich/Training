@@ -60,7 +60,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             $scope.maxTimesUseModes = [
                 { Key: 1, Text: 'One Time Only' },
                 { Key: 2, Text: 'Unlimited' },
-                { Key: 3, Text: '# of Uses' },
+                { Key: 3, Text: 'Number of Uses' },
             ];
 
             $scope.skuFilter = {

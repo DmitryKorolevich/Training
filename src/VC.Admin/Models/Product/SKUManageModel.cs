@@ -79,5 +79,8 @@ namespace VC.Admin.Models.Product
 
         [Map]
         public bool AutoShipFrequency6 { get; set; }
+
+        [Map]
+        public string SalesText { get; set; }
     }
 }

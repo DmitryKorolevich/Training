@@ -18,8 +18,8 @@
                 <tbody>
                     <tr class="container-row" data-ng-repeat-start="item in items" data-ng-click="item.RequestsVisible=!item.RequestsVisible">
                         <td>
-                            <span data-ng-if="item.InStock">YES</span>    
-                            <span data-ng-if="!item.InStock">NO</span>                           
+                            <span data-ng-if="item.InStock" class="label label-success font-default">Yes</span>    
+                            <span data-ng-if="!item.InStock" class="label label-danger font-default">No</span>                           
                         </td>
                         <td colspan="3">
                             <a target="_self" data-ng-click="$event.stopPropagation()" ui-sref="index.oneCol.productDetail({id: item.IdProduct})">{{::item.Name}}

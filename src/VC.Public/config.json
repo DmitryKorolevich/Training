@@ -9,10 +9,18 @@
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "DefaultCultureId": "en-US",
-   "Connection": {
-            "UserName": "dev_vcdb_login",
-            "Password": "CCQLaskw3pMFU9XqE6CHp28m",
-            "Server": "vw4v86cs0h.database.windows.net"
+    "Connection": {
+      "UserName": "dev_vcdb_login",
+      "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+      "Server": "vw4v86cs0h.database.windows.net"
+    },
+    "FedExOptions": {
+      "AccountNumber": "304955066",
+      "MeterNumber": "104067734",
+      "MerchantPhoneNumber": "8664825887",
+      "Key": "7Ux69IBvsRj0Ep7X",
+      "Password": "m0Zybyteel4RMp5j904aa1HpB",
+      "PayAccountNumber": "304955066"
     }
   }
 }
