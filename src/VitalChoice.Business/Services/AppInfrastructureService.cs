@@ -23,6 +23,8 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using System.Collections.Generic;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using System.Threading;
+using System.Globalization;
 
 namespace VitalChoice.Business.Services
 {
@@ -101,6 +103,16 @@ namespace VitalChoice.Business.Services
             }).ToList();
             referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
             referenceData.Labels = _localizationService.GetStrings();
+            var months = CultureInfo.InvariantCulture.DateTimeFormat.MonthNames.Where(p => !String.IsNullOrEmpty(p)).ToList();
+            referenceData.Months = new List<LookupItem<int>>();
+            for (int i = 0; i < months.Count; i++)
+            {
+                referenceData.Months.Add(new LookupItem<int>()
+                {
+                    Key = i + 1,
+                    Text = months[i],
+                });
+            }
             referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
                 ? appOptionsAccessor.Options.PublicHost
                 : "http://notdefined/";
@@ -276,7 +288,9 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.Name
                 }).ToList();
+
             return referenceData;
+            
         }
 
         private ReferenceData SetAppSettings(ReferenceData referenceData)

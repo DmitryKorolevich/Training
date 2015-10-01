@@ -1,0 +1,57 @@
+﻿<div class="container-fluid vital-green-report">
+    <div class="well">
+        <span class="legend">VitalGreen Report</span>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <select class="form-control" name="Month" data-ng-change="filterChanged();" data-ng-model="filter.Month" ng-options="item.Key as item.Text for item in ReferenceData.Months"></select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="Year" data-ng-change="filterChanged();" data-ng-model="filter.Year" ng-options="item.Key as item.Text for item in years"></select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-12">
+                <button class="btn btn-info" data-ng-click="filterReport();" type="button">Filter</button>
+                <a target="_self" class="btn btn-primary pull-right" data-ng-href={{report.exportUrl}}>Export</a>
+            </div>
+        </div>
+        <span class="legend">{{getReferenceItem(ReferenceData.Months, report.Month).Text}} - {{report.Year}}</span>
+        <div class="form-group">
+            Completed Page Views: <strong>{{report.CompletedCount}}</strong>
+        </div>
+        <div>
+            <div data-ng-repeat="item in report.Zones">
+                {{::item.Zone.Company}} - {{::item.Zone.City}}, {{::item.Zone.State}} - <strong>{{::item.CompletedCount}}</strong>
+            </div>
+        </div>
+        <hr />
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Region</th>
+                        <th class="completions">Completions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="container-row" data-ng-repeat-start="item in report.Dates" data-ng-click="item.RequestsVisible=!item.RequestsVisible">
+                        <td colspan="3">
+                            <strong>{{::item.Date | date:"EEEE MM/dd/yy"}}</strong>
+                        </td>
+                        <td>
+                            <strong>{{::item.CompletedCount}}</strong>
+                        </td>
+                    </tr>
+                    <tr data-ng-class="{'hidden': !item.RequestsVisible}" class="request-row" data-ng-repeat="request in item.Requests">
+                        <td>{{::request.FirstName}} {{::request.LastName}}</td>
+                        <td>{{::request.Address}} {{::request.City}}, {{::request.State}} {{::request.Zip}}</td>
+                        <td colspan="2" data-ng-if="request.Zone">{{::request.Zone.Company}} - {{::request.Zone.City}}, {{::request.Zone.State}}</td>
+                    </tr>
+                    <tr class="hidden" data-ng-repeat-end></tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+    </div>
+</div>

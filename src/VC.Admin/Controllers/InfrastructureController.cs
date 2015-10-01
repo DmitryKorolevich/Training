@@ -43,6 +43,7 @@ namespace VC.Admin.Controllers
                     UserStatuses = referenceData.UserStatuses,
                     ContentTypes = referenceData.ContentTypes,
                     ContentProcessors = referenceData.ContentProcessors,
+                    Months = referenceData.Months,
                     PublicHost = referenceData.PublicHost,
                     VisibleOptions = referenceData.VisibleOptions,
                     ContentItemStatusNames = referenceData.ContentItemStatusNames,

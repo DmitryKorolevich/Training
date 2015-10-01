@@ -19,5 +19,6 @@ angular.module('app.dataAccess', [
 	'app.core.dataAccess.services.helpService',
 	'app.core.dataAccess.services.promotionService',
 	'app.core.dataAccess.services.contentAreaService',
-	'app.core.dataAccess.services.manageStylesService'
+	'app.core.dataAccess.services.manageStylesService',
+	'app.core.dataAccess.services.vitalGreenService'
 ]);

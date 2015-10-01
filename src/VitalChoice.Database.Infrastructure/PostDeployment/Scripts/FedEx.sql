@@ -43,6 +43,7 @@ CREATE TABLE [dbo].[VitalGreenRequests](
 	[FirstName] [nvarchar](250) NULL,
 	[LastName] [nvarchar](250) NULL,
 	[Email] [nvarchar](250) NULL,
+	[Phone] [nvarchar](250) NULL,
 	[ZoneId] [int] NULL,
 	[DateView] DATETIME2 NULL,
 	[DateCompleted] DATETIME2 NULL,

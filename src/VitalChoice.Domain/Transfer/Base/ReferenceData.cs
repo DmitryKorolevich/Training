@@ -19,6 +19,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<string>> Labels { get; set; }
 
+        public IList<LookupItem<int>> Months { get; set; }
+
         public string PublicHost { get; set; }
 
         public IList<LookupItem<int?>> VisibleOptions { get; set; }

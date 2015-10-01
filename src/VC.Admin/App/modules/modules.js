@@ -13,5 +13,6 @@ angular.module('app.modules', [
 	'app.modules.customer',
 	'app.modules.order',
 	'app.modules.affiliate',
-	'app.modules.help'
+	'app.modules.help',
+	'app.modules.misc'
 ]);

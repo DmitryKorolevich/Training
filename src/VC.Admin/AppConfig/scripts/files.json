@@ -56,6 +56,7 @@
 		"app/core/dataAccess/services/affiliateService.js",
 		"app/core/dataAccess/services/helpService.js",
 		"app/core/dataAccess/services/promotionService.js",
+		"app/core/dataAccess/services/vitalGreenService.js",
 		"app/core/dataAccess/dataAccess.js",
 		"app/core/utils/httpInterceptor.js",
 		"app/core/utils/modalUtil.js",
@@ -194,6 +195,8 @@
     "app/modules/help/controllers/helpTicketDetailController.js",
     "app/modules/help/controllers/bugTicketsController.js",
     "app/modules/help/controllers/bugTicketDetailController.js",
-		"app/modules/help/help.js"
+    "app/modules/help/help.js",
+    "app/modules/misc/controllers/vitalGreenController.js",
+		"app/modules/misc/misc.js"
 	]
 }
