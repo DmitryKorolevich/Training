@@ -26,6 +26,7 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ShippingStandardResolver>();
                 action.Aggregate<ShippingSurchargeResolver>();
                 action.Aggregate<ShippingUpgradesActionResolver>();
+                action.Aggregate<ShippingOverrideAction>();
             });
 
             treeSetup.Action<ProductAction>("Products");
@@ -134,6 +135,12 @@ namespace VitalChoice.Workflow.Configuration
             {
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
+            });
+
+            treeSetup.Action<ShippingOverrideAction>("ShippingOverride", action =>
+            {
+                action.Dependency<ShippingStandardResolver>();
+                action.Dependency<ShippingUpgradesActionResolver>();
             });
 
             treeSetup.Tree<OrderTree>("Order", tree =>

@@ -18,6 +18,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Entities;
 using VC.Admin.Models.Customer;
+using VitalChoice.Domain.Transfer.Shipping;
 
 namespace VC.Admin.Models.Order
 {
@@ -175,10 +176,10 @@ namespace VC.Admin.Models.Order
         public decimal StandardShippingCharges { get; set; }
 
         [Map]
-        public int? ShippingUpgradeP { get; set; }
+        public ShippingUpgradeOption? ShippingUpgradeP { get; set; }
 
         [Map]
-        public int? ShippingUpgradeNP { get; set; }
+        public ShippingUpgradeOption? ShippingUpgradeNP { get; set; }
 
         [Map]
         public decimal SurchargeOverride { get; set; }

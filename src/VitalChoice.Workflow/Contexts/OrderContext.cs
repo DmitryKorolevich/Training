@@ -62,11 +62,13 @@ namespace VitalChoice.Workflow.Contexts
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<int?>> ShippingUpgradePOptions { get; set; }
+        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<int?>> ShippingUpgradeNpOptions { get; set; }
+        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNpOptions { get; set; }
 
         public decimal ShippingTotal { get; set; }
+
+        public decimal TotalShipping { get; set; }
 
         public decimal ProductsSubtotal { get; set; }
 
@@ -79,6 +81,10 @@ namespace VitalChoice.Workflow.Contexts
         public decimal TaxTotal { get; set; }
 
         public decimal Total { get; set; }
+
+        public decimal ShippingOverride { get; set; }
+        
+        public decimal SurchargeOverride { get; set; }
 
         public bool FreeShipping { get; set; }
 

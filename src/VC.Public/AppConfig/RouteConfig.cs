@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Builder;
+﻿using System.Linq;
+using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Routing;
 
 namespace VC.Public.AppConfig
