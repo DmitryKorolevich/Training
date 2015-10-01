@@ -39,9 +39,19 @@
 						<span class="caret"></span>
 					</a>
 					<ul data-ng-if="module.subMenu != null" class="dropdown-menu" role="menu">
-						<li data-ng-repeat="subModule in module.subMenu" ui-sref-active="active" data-ng-if="validatePermission(subModule.access)">
+						<li data-ng-class="{'sub-dropdown': subModule.subMenu != null}" data-ng-repeat="subModule in module.subMenu" ui-sref-active="active" data-ng-if="validatePermission(subModule.access)">
 							<a ng-if="subModule.stateName" ui-sref="{{subModule.stateName}}({name:subModule.name})">{{subModule.stateLabel}}</a>
                             <a ng-if="subModule.handler" ng-click="subModule.handler();">{{subModule.stateLabel}}</a>
+                            <a data-ng-if="subModule.subMenu != null">
+                                {{subModule.stateLabel}}
+                                <span class="caret"></span>
+                            </a>
+                            <ul data-ng-if="subModule.subMenu != null" class="dropdown-menu" role="menu">
+                                <li data-ng-repeat="subModule2 in subModule.subMenu" ui-sref-active="active" data-ng-if="validatePermission(subModule2.access)">
+                                    <a ng-if="subModule2.stateName" ui-sref="{{subModule2.stateName}}({name:subModule2.name})">{{subModule2.stateLabel}}</a>
+                                    <a ng-if="subModule2.handler" ng-click="subModule2.handler();">{{subModule2.stateLabel}}</a>
+                                </li>
+                            </ul>
 						</li>
 					</ul>
 				</li>

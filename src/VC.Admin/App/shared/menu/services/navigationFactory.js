@@ -56,7 +56,16 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'salesOrders', stateName: 'index.twoCols.salesOrders.healthWise', stateLabel: 'Sales, Orders', access: 3 },
 				{ name: 'wholesale', stateName: 'index.twoCols.wholesale.wholesaleSummary', stateLabel: 'Wholesale', access: 3 },
 				{ name: 'affiliates', stateName: 'index.oneCol.affiliates', stateLabel: 'Affiliates', access: 3 },
-				{ name: 'operations', stateName: 'index.twoCols.operations.vitalGreen', stateLabel: 'Operations', access: 3 },
+				{
+				    name: 'operations',
+				    stateLabel: 'Operations',
+				    subMenu: [
+                        { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
+				        { name: 'salesOrders', stateName: 'index.twoCols.salesOrders.healthWise', stateLabel: 'Sales, Orders', access: 3 },
+				        { name: 'wholesale', stateName: 'index.twoCols.wholesale.wholesaleSummary', stateLabel: 'Wholesale', access: 3 },
+				        { name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis', access: 3 }
+				    ]
+				},
 				{ name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis', access: 3 }
 			]
 		},
@@ -91,7 +100,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
 				{ name: 'healthWise', stateName: 'index.oneCol.healthWise', stateLabel: 'HealthWise', access: 8 },
-				{ name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 8 },
 			]
 		},
 		{

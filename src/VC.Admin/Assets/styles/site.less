@@ -44,6 +44,29 @@ a.block{ display:block;}
   width: 900px;
 }
 
+.sub-dropdown{
+    position:relative;
+} 
+.sub-dropdown > .dropdown-menu
+{
+    top:0;
+    left:100%;
+    margin-top:-6px;
+    margin-left:-1px;    
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+} 
+.sub-dropdown:hover > .dropdown-menu{
+    display:block;
+}
+
+.navbar-inverse .navbar-nav > .sub-dropdown.open > a,
+.navbar-inverse .navbar-nav > .sub-dropdown.open > a:hover,
+.navbar-inverse .navbar-nav > .sub-dropdown.open > a:focus {
+  background-color: #646464;
+  color: #ffffff;
+}
+
 .form-horizontal .control-label.left {
     text-align:left;
 }

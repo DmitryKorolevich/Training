@@ -28,7 +28,7 @@ using System.Net.Mime;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Tools)]
+    [AdminAuthorize(PermissionType.Reports)]
     public class VitalGreenController : BaseApiController
     {
         private readonly IVitalGreenService _vitalGreenService;
