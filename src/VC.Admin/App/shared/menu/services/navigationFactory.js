@@ -91,7 +91,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 8 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 8 },
 				{ name: 'healthWise', stateName: 'index.oneCol.healthWise', stateLabel: 'HealthWise', access: 8 },
-				{ name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Vital Green', access: 8 },
+				{ name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 8 },
 			]
 		},
 		{
