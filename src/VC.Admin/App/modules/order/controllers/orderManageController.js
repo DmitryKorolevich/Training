@@ -585,6 +585,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.order.CanadaSurcharge = data.CanadaSurcharge;
         $scope.order.StandardShippingCharges = data.StandardShippingCharges;
         $scope.order.ShippingTotal = data.ShippingTotal;
+        $scope.order.TotalShipping = data.TotalShipping;
         $scope.order.ProductsSubtotal = data.ProductsSubtotal;
         $scope.order.DiscountTotal = data.DiscountTotal;
         $scope.order.DiscountedSubtotal = data.DiscountedSubtotal;
@@ -594,6 +595,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.shippingUpgradePOptions = data.ShippingUpgradePOptions;
         $scope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
+
+        $scope.order.ShippingOverride = data.ShippingOverride;
+        $scope.order.SurchargeOverride = data.SurchargeOverride;
 
         $scope.productsPerishableThresholdIssue = data.ProductsPerishableThresholdIssue;
 

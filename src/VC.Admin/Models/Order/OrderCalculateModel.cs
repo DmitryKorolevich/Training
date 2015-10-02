@@ -27,17 +27,23 @@ namespace VC.Admin.Models.Order
 
         public decimal StandardShippingCharges { get; set; }
 
-        public IList<LookupItem<int?>> ShippingUpgradePOptions { get; set; }
+        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
-        public IList<LookupItem<int?>> ShippingUpgradeNPOptions { get; set; }
+        public IList<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNPOptions { get; set; }
 
-        public int? ShippingUpgradeP { get; set; }
+        public ShippingUpgradeOption? ShippingUpgradeP { get; set; }
 
-        public int? ShippingUpgradeNP { get; set; }
+        public ShippingUpgradeOption? ShippingUpgradeNP { get; set; }
 
         public decimal ShippingTotal { get; set; }
 
+        public decimal TotalShipping { get; set; }
+
         public decimal ProductsSubtotal { get; set; }
+
+        public decimal SurchargeOverride { get; set; }
+
+        public decimal ShippingOverride { get; set; }
 
         public decimal DiscountTotal { get; set; }
 
@@ -71,6 +77,9 @@ namespace VC.Admin.Models.Order
             DiscountMessage = context.DiscountMessage;
             TaxTotal = context.TaxTotal;
             Total = context.Total;
+            ShippingOverride = context.ShippingOverride;
+            SurchargeOverride = context.SurchargeOverride;
+            TotalShipping = context.TotalShipping;
 
             SkuOrdereds = context.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
