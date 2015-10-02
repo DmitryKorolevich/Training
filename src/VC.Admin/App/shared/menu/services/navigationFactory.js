@@ -53,20 +53,65 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			name: 'reports',
 			stateLabel: 'Reports',
 			subMenu: [
-				{ name: 'salesOrders', stateName: 'index.twoCols.salesOrders.healthWise', stateLabel: 'Sales, Orders', access: 3 },
-				{ name: 'wholesale', stateName: 'index.twoCols.wholesale.wholesaleSummary', stateLabel: 'Wholesale', access: 3 },
-				{ name: 'affiliates', stateName: 'index.oneCol.affiliates', stateLabel: 'Affiliates', access: 3 },
+				{
+				    name: 'salesOrders',
+				    stateLabel: 'Sales, Orders',
+				    subMenu: [
+                        { name: 'healthWiseCustomerReport', stateName: 'index.oneCol.healthWiseCustomerReport', stateLabel: 'HealthWise Customer Report', access: 3 },
+                        { name: 'summarySalesReport', stateName: 'index.oneCol.summarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
+                        { name: 'breakdownReport', stateName: 'index.oneCol.breakdownReport', stateLabel: 'Breakdown Report', access: 3 },
+                        { name: 'sKUBreakdownReport', stateName: 'index.oneCol.sKUBreakdownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
+                        { name: 'futuresBreakdownReport', stateName: 'index.oneCol.futuresBreakdownReport', stateLabel: 'Futures Breakdown Report', access: 3 },
+                        { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
+                        { name: 'regionalSalesSummary', stateName: 'index.oneCol.regionalSalesSummary', stateLabel: 'Regional Sales Summary', access: 3 },
+                        { name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
+                        { name: 'orderSKUCounts', stateName: 'index.oneCol.orderSKUCounts', stateLabel: 'Order SKU Counts', access: 3 },
+                        { name: 'shippedViaReport', stateName: 'index.oneCol.shippedViaReport', stateLabel: 'Shipped Via Report', access: 3 },
+                        { name: 'categorySalesReport', stateName: 'index.oneCol.categorySalesReport', stateLabel: 'Category Sales Report', access: 3 },
+                        { name: 'transactionRefundReport', stateName: 'index.oneCol.transactionRefundReport', stateLabel: 'Transaction & Refund Report', access: 3 },
+				    ]
+				},
+				{
+				    name: 'wholesale',
+				    stateLabel: 'Wholesale',
+				    subMenu: [
+                        { name: 'wholesaleSummaryReport', stateName: 'index.oneCol.wholesaleSummaryReport', stateLabel: 'Wholesale Summary Report', access: 3 },
+                        { name: 'wholesaleDropShipOrdersReport', stateName: 'index.oneCol.wholesaleDropShipOrdersReport', stateLabel: 'Wholesale Drop Ship Orders Report', access: 3 },
+				    ]
+				},
+				{
+				    name: 'affiliates',
+				    stateLabel: 'Affiliates',
+				    subMenu: [
+                        { name: 'affiliateCustomersReport', stateName: 'index.oneCol.affiliateCustomersReport', stateLabel: 'Affiliate Customers Report', access: 3 },
+                        { name: 'affiliatePayComissions', stateName: 'index.oneCol.affiliatePayComissions', stateLabel: 'Affiliate Pay Comissions', access: 3 },
+                        { name: 'affiliateSummaryInformation', stateName: 'index.oneCol.affiliateSummaryInformation', stateLabel: 'Affiliate Summary Information', access: 3 },
+				    ]
+				},
 				{
 				    name: 'operations',
 				    stateLabel: 'Operations',
 				    subMenu: [
+                        { name: 'weeklyAgentReport', stateName: 'index.oneCol.weeklyAgentReport', stateLabel: 'Weekly Agent Report', access: 3 },
+                        { name: 'serviceCodeReport', stateName: 'index.oneCol.serviceCodeReport', stateLabel: 'Service Code Report', access: 3 },
+                        { name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
+                        { name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
-				        { name: 'salesOrders', stateName: 'index.twoCols.salesOrders.healthWise', stateLabel: 'Sales, Orders', access: 3 },
-				        { name: 'wholesale', stateName: 'index.twoCols.wholesale.wholesaleSummary', stateLabel: 'Wholesale', access: 3 },
-				        { name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis', access: 3 }
 				    ]
 				},
-				{ name: 'listProcessingAnalysis', stateName: 'index.oneCol.listProcessingAnalysis', stateLabel: 'List Processing, Analysis', access: 3 }
+				{
+				    name: 'listProcessingAnalysis',
+				    stateLabel: 'List Processing, Analysis',
+				    subMenu: [
+                        { name: 'matchbackPostSeasonAnalysisReport', stateName: 'index.oneCol.matchbackPostSeasonAnalysisReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
+                        { name: 'giftCertificateReport', stateName: 'index.oneCol.giftCertificateReport', stateLabel: 'Gift Certificate Report', access: 3 },
+                        { name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
+                        { name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
+                        { name: 'mailingListReport', stateName: 'index.oneCol.mailingListReport', stateLabel: 'Mailing List Report', access: 3 },
+                        { name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },
+                        { name: 'newCustomersReport', stateName: 'index.oneCol.newCustomersReport', stateLabel: 'New Customers Report', access: 3 },
+				    ]
+				}
 			]
 		},
 		{
