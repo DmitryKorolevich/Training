@@ -22,7 +22,7 @@ namespace VitalChoice.Business.Mail
             _adminHost = appOptions.Options.AdminHost;
         }
 
-	    public async Task SendUserActivationAsync(string email, UserActivation activation)
+	    public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
 	    {
 			//todo:refactor this to user nustache or something
 
@@ -34,7 +34,7 @@ namespace VitalChoice.Business.Mail
 		    await emailSender.SendEmailAsync(email, subject, body);
 	    }
 
-	    public async Task SendPasswordResetAsync(string email, PasswordReset passwordReset)
+	    public async Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset)
 	    {
 			//todo:refactor this to user nustache or something
 

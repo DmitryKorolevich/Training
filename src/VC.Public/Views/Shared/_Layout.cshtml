@@ -15,7 +15,14 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	@RenderSection("Meta", false)
+	@if (IsSectionDefined("Meta"))
+	{
+		@RenderSection("Meta", false)
+	}
+	else
+	{
+		<title>Wild Salmon | Omega-3 | Wild Seafood | Organic Foods | Vital Choice</title>
+	}
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="apple-touch-icon" href="/assets/miscellaneous/apple-touch-icon.png">
 	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">

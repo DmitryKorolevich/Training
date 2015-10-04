@@ -154,4 +154,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\FedEx.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\UpdateIdentityWithStorefront.sql" />
+  </ItemGroup>
 </Project>

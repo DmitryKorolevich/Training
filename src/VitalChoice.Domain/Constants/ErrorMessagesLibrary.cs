@@ -27,13 +27,15 @@ namespace VitalChoice.Domain.Constants
 		    public const string LabelTakenAlready = "LabelTakenAlready";
 		    public const string HasAssignments = "HasAssignments";
 		    public const string AtLeastOneDefaultShipping = "AtLeastOneDefaultShipping";
+		    public const string AttemptToUpdateUsingWrongService = "AttemptToUpdateUsingWrongService";
+		    public const string AttemptToAssignWrongRole = "AttemptToAssignWrongRole";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
 		    {Keys.UpdateUserGeneral, "Error occurred while updating user"},
 		    {Keys.CantFindUserByActivationToken, "Unable to find user by activation token"},
-		    {Keys.UserAlreadyConfirmed, "User already activated"},
+		    {Keys.UserAlreadyConfirmed, "User already activated or deleted"},
 		    {Keys.ActivationTokenExpired, "Activation token has expired"},
 		    {Keys.UserLockedOut, "User is locked out"},
 		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
@@ -50,7 +52,9 @@ namespace VitalChoice.Domain.Constants
 			{Keys.TitleTakenAlready, "Title is already in use"},
 			{Keys.LabelTakenAlready, "Label is already in use"},
 			{Keys.HasAssignments, "Record cannot be removed because there are references to it"},
-			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"}
+			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"},
+			{Keys.AttemptToUpdateUsingWrongService, "Attempt to update user using forbidden operation"},
+			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"}
 		};
     }
 }

@@ -10,6 +10,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers
@@ -17,10 +18,10 @@ namespace VC.Admin.Controllers
 	[AllowAnonymous]
     public class AccountController : BaseApiController
     {
-	    private readonly IUserService userService;
+	    private readonly IAdminUserService userService;
 		private readonly IHttpContextAccessor contextAccessor;
 
-		public AccountController(IUserService userService, IHttpContextAccessor contextAccessor)
+		public AccountController(IAdminUserService userService, IHttpContextAccessor contextAccessor)
 		{
 			this.userService = userService;
 			this.contextAccessor = contextAccessor;
@@ -72,7 +73,7 @@ namespace VC.Admin.Controllers
 			user.FirstName = model.FirstName;
 			user.LastName = model.LastName;
 			user.Email = model.Email;
-			user.Profile.IsConfirmed = true;
+			user.IsConfirmed = true;
 			user.Status = UserStatus.Active;
 
 			await userService.UpdateAsync(user, null, model.Password);

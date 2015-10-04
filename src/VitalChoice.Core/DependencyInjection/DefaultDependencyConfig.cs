@@ -63,6 +63,12 @@ using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.Business.Services.HelpService;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Business.Services.FedEx;
+using VitalChoice.Business.Services.Users;
+using VitalChoice.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Identity.UserStores;
+using VitalChoice.Infrastructure.Identity.Validators;
+using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -92,12 +98,13 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddDbContext<VitalChoiceContext>();
 
             // Add Identity services to the services container.
-            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
-                .AddEntityFrameworkStores<VitalChoiceContext, int>()
-                .AddUserStore<ExtendedUserStore>()
-                .AddUserValidator<ExtendedUserValidator>()
-                .AddUserManager<ExtendedUserManager>()
-                .AddTokenProvider<UserTokenProvider>();
+	        services.AddIdentity<ApplicationUser, ApplicationRole>()
+		        .AddEntityFrameworkStores<VitalChoiceContext, int>()
+		        .AddErrorDescriber<ExtendedIdentityErrorDescriber>()
+		        .AddUserStore<AdminUserStore>()
+		        .AddUserValidator<AdminUserValidator>()
+		        .AddUserManager<ExtendedUserManager>()
+		        .AddTokenProvider<UserTokenProvider>();
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
             services.TryAdd(
@@ -303,8 +310,10 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<MemoryCache>().As<IMemoryCache>();
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
-            builder.RegisterType<UserService>().As<IUserService>();
-            builder.RegisterType<ProductViewService>().As<IProductViewService>();
+	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
+	        builder.RegisterType<ExtendedUserManager>().Named<ExtendedUserManager>("storefrontUserManager").WithParameter((pi, cc) => pi.Name == "store", (pi, cc) => cc.Resolve<StorefrontUserStore>());
+			builder.RegisterType<StorefrontUserService>().As<IStorefrontUserService>().WithParameter((pi, cc) => pi.Name == "userManager", (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager")).WithParameter((pi, cc) => pi.Name == "userValidator", (pi, cc) => cc.Resolve<UserValidator<ApplicationUser>>());
+			builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
             builder.RegisterType<ProductReviewService>().As<IProductReviewService>();
@@ -320,7 +329,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ProductService>().As<IProductService>();
             builder.RegisterType<DiscountService>().As<IDiscountService>();
             builder.RegisterType<CountryService>().As<ICountryService>();
-            builder.RegisterType(typeof (ExtendedUserValidator)).As(typeof (IUserValidator<ApplicationUser>));
+            builder.RegisterType(typeof (AdminUserValidator)).As(typeof (IUserValidator<ApplicationUser>));
             builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>();
             builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>();
             builder.RegisterType<VProductSkuRepository>()

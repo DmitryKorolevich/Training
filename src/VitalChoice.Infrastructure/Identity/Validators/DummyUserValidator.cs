@@ -2,7 +2,7 @@
 using Microsoft.AspNet.Identity;
 using VitalChoice.Domain.Entities.Users;
 
-namespace VitalChoice.Infrastructure.Identity
+namespace VitalChoice.Infrastructure.Identity.Validators
 {
     public class DummyUserValidator : UserValidator<ApplicationUser>
 	{

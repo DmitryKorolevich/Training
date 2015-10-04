@@ -6,6 +6,8 @@ namespace VitalChoice.Infrastructure.Identity
     {
 	    public const string PermissionRoleClaimType = "Permission";
 
+	    public const string CustomerRoleType = "CustomerRole";
+
 	    public const string IdentityBasicProfile = "Basic";
     }
 }

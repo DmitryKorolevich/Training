@@ -9,7 +9,7 @@ namespace VitalChoice.Domain.Transfer.Base
     {
         public AppSettings AppSettings { get; set; }
 
-        public IList<LookupItem<int>> Roles { get; set; }
+        public IList<LookupItem<int>> AdminRoles { get; set; }
 
         public IList<LookupItem<byte>> UserStatuses { get; set; }
 

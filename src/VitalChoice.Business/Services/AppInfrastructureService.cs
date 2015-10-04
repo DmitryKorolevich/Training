@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using System.Threading;
 using System.Globalization;
+using VitalChoice.Domain.Entities.Roles;
 
 namespace VitalChoice.Business.Services
 {
@@ -32,7 +33,7 @@ namespace VitalChoice.Business.Services
     {
         private readonly ICacheProvider cache;
         private readonly int expirationTerm;
-        private readonly RoleManager<IdentityRole<int>> roleManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
         private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
@@ -45,7 +46,7 @@ namespace VitalChoice.Business.Services
         private readonly ISettingService settingService;
         private readonly ILocalizationService _localizationService;
 
-        public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<IdentityRole<int>> roleManager,
+        public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<ApplicationRole> roleManager,
             IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
@@ -86,12 +87,12 @@ namespace VitalChoice.Business.Services
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
-            referenceData.Roles = roleManager.Roles.Select(x => new LookupItem<int>
-            {
-                Key = x.Id,
-                Text = x.Name
-            }).ToList();
-            referenceData.UserStatuses = Infrastructure.Utils.EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
+	        referenceData.AdminRoles = roleManager.Roles.Where(x => !x.IsStorefrontRole).Select(x => new LookupItem<int>
+	        {
+		        Key = x.Id,
+		        Text = x.Name
+	        }).ToList();
+            referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
             {
                 Key = x.Key,
                 Text = x.Value

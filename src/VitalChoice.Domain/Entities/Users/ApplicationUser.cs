@@ -27,5 +27,13 @@ namespace VitalChoice.Domain.Entities.Users
 		public DateTime? DeletedDate { get; set; }
 
 		public AdminProfile Profile { get; set; }
+
+		public Guid ConfirmationToken { get; set; }
+
+		public DateTime TokenExpirationDate { get; set; }
+
+		public bool IsConfirmed { get; set; }
+
+		public bool IsAdminUser { get; set; }
 	}
 }

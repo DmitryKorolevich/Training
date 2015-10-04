@@ -163,7 +163,7 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
-            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
             int userId = Int32.Parse(Request.HttpContext.User.GetUserId());
             foreach (var item in toReturn.Items)
@@ -196,7 +196,7 @@ namespace VC.Admin.Controllers
             var result = await _helpService.GetBugTicketAsync(id);
             var toReturn= new BugTicketManageModel(result);
 
-            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             if(Context.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(Request.HttpContext.User.GetUserId()))
             {
                 toReturn.IsAllowEdit = true;
@@ -212,7 +212,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
 
-            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
             item = await _helpService.UpdateBugTicketAsync(item, Int32.Parse(Request.HttpContext.User.GetUserId()), isSuperAdmin);
 
@@ -222,7 +222,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteBugTicket(int id)
         {
-            var superAdmin = _appInfrastructureService.Get().Roles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
 
             return await _helpService.DeleteBugTicketAsync(id, isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));

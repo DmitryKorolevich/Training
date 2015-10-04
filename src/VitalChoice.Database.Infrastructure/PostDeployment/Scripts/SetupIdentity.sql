@@ -13,3 +13,12 @@ BEGIN
 
 	SET IDENTITY_INSERT [dbo].[AspNetRoles] OFF
 END
+
+/*stupid hack to avoid errors*/
+IF COL_LENGTH('[dbo].[AdminProfiles]','ConfirmationToken') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[AdminProfiles]
+		ADD [ConfirmationToken]   UNIQUEIDENTIFIER NULL,
+			[TokenExpirationDate] DATETIME2 (7)    NULL,
+			[IsConfirmed]         BIT              NULL
+END

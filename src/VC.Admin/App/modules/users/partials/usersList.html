@@ -62,7 +62,7 @@
 					<td>{{user.AgentId}}</td>
 					<td>{{user.FullName}}</td>
 					<td>{{user.Email}}</td>
-					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceItem(ReferenceData.Roles, role).Text + ', ' : getReferenceItem(ReferenceData.Roles, role).Text">
+					<td><span data-ng-repeat="role in user.RoleIds" data-ng-bind="$index < user.RoleIds.length - 1 ? getReferenceItem(ReferenceData.AdminRoles, role).Text + ', ' : getReferenceItem(ReferenceData.AdminRoles, role).Text">
 					</span>
 					</td>
 					<td>

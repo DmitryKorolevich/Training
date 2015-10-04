@@ -39,7 +39,7 @@ namespace VC.Admin.Controllers
                 {
                     AppSettings=referenceData.AppSettings,
                     Labels = referenceData.Labels,
-                    Roles = referenceData.Roles,
+                    AdminRoles = referenceData.AdminRoles,
                     UserStatuses = referenceData.UserStatuses,
                     ContentTypes = referenceData.ContentTypes,
                     ContentProcessors = referenceData.ContentProcessors,

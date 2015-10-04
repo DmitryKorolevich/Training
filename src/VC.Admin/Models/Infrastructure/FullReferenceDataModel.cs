@@ -8,7 +8,7 @@ namespace VC.Admin.Models.Infrastructure
     public class FullReferenceDataModel : RestrictedReferenceData
     {
         public AppSettings AppSettings { get; set; }
-        public IList<LookupItem<int>> Roles { get; set; }
+        public IList<LookupItem<int>> AdminRoles { get; set; }
 	    public IList<LookupItem<byte>> UserStatuses { get; set; }
         public IList<LookupItem<int>> ContentTypes { get; set; }
         public IList<ContentProcessor> ContentProcessors { get; set; }

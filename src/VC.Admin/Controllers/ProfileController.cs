@@ -19,6 +19,7 @@ using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Controllers
@@ -26,10 +27,10 @@ namespace VC.Admin.Controllers
 	[AdminAuthorize]
     public class ProfileController : BaseApiController
     {
-	    private readonly IUserService userService;
+	    private readonly IAdminUserService userService;
 	    private readonly IHttpContextAccessor contextAccessor;
 
-		public ProfileController(IUserService userService, IHttpContextAccessor contextAccessor)
+		public ProfileController(IAdminUserService userService, IHttpContextAccessor contextAccessor)
 	    {
 		    this.userService = userService;
 			this.contextAccessor = contextAccessor;

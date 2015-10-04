@@ -9,7 +9,7 @@ using VitalChoice.Domain.Entities.Users;
 
 namespace VitalChoice.Data.DataContext
 {
-	public class IdentityDataContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>, IDataContext, IDataContextAsync
+	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
 	{
 	    public IdentityDataContext()
 		{

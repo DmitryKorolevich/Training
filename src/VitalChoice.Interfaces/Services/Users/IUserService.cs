@@ -6,7 +6,7 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Transfer.Base;
 
-namespace VitalChoice.Interfaces.Services
+namespace VitalChoice.Interfaces.Services.Users
 {
     public interface IUserService
     {
@@ -29,8 +29,6 @@ namespace VitalChoice.Interfaces.Services
 		Task<ApplicationUser> SignInAsync(string login, string password);
 
 	    Task<IList<PermissionType>> GetUserPermissions(ApplicationUser user);
-
-		Task<bool> IsSuperAdmin(ApplicationUser user);
 
 		Task SignOutAsync(ApplicationUser user);
 

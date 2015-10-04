@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Identity.Validators;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Infrastructure.Identity
+namespace VitalChoice.Infrastructure.Identity.UserManagers
 {
 	//needed to remove default user validator
-    public class ExtendedUserManager : UserManager<ApplicationUser>
+    public class StorefrontUserManager : UserManager<ApplicationUser>
     {
-        public ExtendedUserManager(IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
+        public StorefrontUserManager(IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
             IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors, IEnumerable<IUserTokenProvider<ApplicationUser>> tokenProviders,

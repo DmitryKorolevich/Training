@@ -23,9 +23,9 @@ namespace VitalChoice.Infrastructure.Identity
 
 	    public async Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    user.Profile.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays);
-		    user.Profile.IsConfirmed = false;
-		    user.Profile.ConfirmationToken = Guid.NewGuid();
+		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays);
+		    user.IsConfirmed = false;
+		    user.ConfirmationToken = Guid.NewGuid();
 
 		    var result = await manager.UpdateAsync(user);
 		    if (!result.Succeeded)
@@ -33,12 +33,12 @@ namespace VitalChoice.Infrastructure.Identity
 			    throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.GenerateSecurityStampError]);
 		    }
 
-			return user.Profile.ConfirmationToken.ToString();
+			return user.ConfirmationToken.ToString();
 		}
 
 	    public Task<bool> ValidateAsync(string purpose, string token, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    return Task.FromResult(user.Profile.ConfirmationToken.Equals(Guid.Parse(token)) && !user.Profile.IsConfirmed && user.Profile.TokenExpirationDate.Subtract(DateTime.Now).Days > 0);
+		    return Task.FromResult(user.ConfirmationToken.Equals(Guid.Parse(token)) && !user.IsConfirmed && user.TokenExpirationDate.Subtract(DateTime.Now).Days > 0);
 		}
 
 	    public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<ApplicationUser> manager, ApplicationUser user)

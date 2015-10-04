@@ -19,6 +19,7 @@ using VC.Admin.Models.UserManagement;
 using VC.Admin.Validators.UserManagement;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Controllers
@@ -26,11 +27,11 @@ namespace VC.Admin.Controllers
 	[AdminAuthorize(PermissionType.Users)]
     public class UserManagementController : BaseApiController
     {
-	    private readonly IUserService userService;
+	    private readonly IAdminUserService userService;
 	    private readonly IOptions<AppOptions> appOptions;
 		private readonly IHttpContextAccessor contextAccessor;
 
-		public UserManagementController(IUserService userService, IOptions<AppOptions> appOptions, IHttpContextAccessor contextAccessor)
+		public UserManagementController(IAdminUserService userService, IOptions<AppOptions> appOptions, IHttpContextAccessor contextAccessor)
 	    {
 		    this.userService = userService;
 		    this.appOptions = appOptions;
@@ -75,13 +76,14 @@ namespace VC.Admin.Controllers
 				FirstName = userModel.FirstName,
 				LastName = userModel.LastName,
 				Email = userModel.Email,
-				Profile = new AdminProfile()
+				TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
+				IsConfirmed = false,
+				ConfirmationToken = Guid.NewGuid(),
+                Profile = new AdminProfile()
 				{
 					AgentId = userModel.AgentId,
-					TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
-					IsConfirmed = false,
-					ConfirmationToken = Guid.NewGuid()
-				}
+				},
+				IsAdminUser = true
 			};
 
 			await userService.CreateAsync(appUser, userModel.RoleIds);
@@ -116,6 +118,7 @@ namespace VC.Admin.Controllers
 			user.Status = userModel.Status;
 			user.Email = userModel.Email;
 			user.UserName = userModel.Email;
+			user.IsAdminUser = true;
 
 			await userService.UpdateAsync(user, userModel.RoleIds);
 
