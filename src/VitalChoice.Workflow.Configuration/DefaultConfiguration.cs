@@ -17,9 +17,9 @@ namespace VitalChoice.Workflow.Configuration
 {
     public static class DefaultConfiguration
     {
-        public static void Configure(ITreeSetup<OrderContext, decimal> treeSetup)
+        public static void Configure(ITreeSetup<OrderContext, decimal> setup)
         {
-            treeSetup.Action<TotalAction>("Total", action =>
+            setup.Action<TotalAction>("Total", action =>
             {
                 action.Aggregate<ProductsWithPromoAction>();
                 action.Aggregate<DiscountTypeActionResolver>();
@@ -30,90 +30,90 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ShippingSurchargeOverrideAction>();
             });
 
-            treeSetup.Action<ProductAction>("Products");
+            setup.Action<ProductAction>("Products");
 
-            treeSetup.Action<ProductsWithPromoAction>("PromoProducts", action =>
+            setup.Action<ProductsWithPromoAction>("PromoProducts", action =>
             {
                 action.Dependency<DiscountTypeActionResolver>();
 
                 action.Aggregate<ProductAction>();
             });
 
-            treeSetup.Action<DiscountPercentAction>("PercentDiscount", action =>
+            setup.Action<DiscountPercentAction>("PercentDiscount", action =>
             {
                 action.Dependency<DiscountableProductsAction>();
             });
 
-            treeSetup.Action<DiscountPriceAction>("PriceDiscount", action =>
+            setup.Action<DiscountPriceAction>("PriceDiscount", action =>
             {
                 action.Dependency<DiscountableProductsAction>();
             });
 
-            treeSetup.Action<DiscountableProductsAction>("DiscountableSubtotal", action =>
+            setup.Action<DiscountableProductsAction>("DiscountableSubtotal", action =>
             {
                 action.Dependency<ProductAction>();
             });
 
-            treeSetup.Action<DiscountTieredAction>("TieredDiscount", action =>
+            setup.Action<DiscountTieredAction>("TieredDiscount", action =>
             {
                 action.Dependency<DiscountableProductsAction>();
             });
 
-            treeSetup.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
+            setup.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
 
-            treeSetup.Action<DiscountThresholdAction>("ThresholdDiscount", action =>
+            setup.Action<DiscountThresholdAction>("ThresholdDiscount", action =>
             {
                 action.Dependency<DiscountableProductsAction>();
             });
 
-            treeSetup.Action<PerishableProductsAction>("PerishableSubtotal", action =>
+            setup.Action<PerishableProductsAction>("PerishableSubtotal", action =>
             {
                 action.Dependency<ProductAction>();
             });
 
-            treeSetup.Action<DeliveredProductsAction>("DeliveredAmount", action =>
+            setup.Action<DeliveredProductsAction>("DeliveredAmount", action =>
             {
                 action.Dependency<ProductsWithPromoAction>();
             });
 
-            treeSetup.Action<StandardShippingUsWholesaleAction>("StandardWholesaleShipping", action =>
+            setup.Action<StandardShippingUsWholesaleAction>("StandardWholesaleShipping", action =>
             {
                 action.Dependency<DiscountTypeActionResolver>();
                 action.Dependency<DeliveredProductsAction>();
             });
 
-            treeSetup.Action<StandardShippingUsCaRetailAction>("StandardRetailShipping", action =>
+            setup.Action<StandardShippingUsCaRetailAction>("StandardRetailShipping", action =>
             {
                 action.Dependency<DiscountTypeActionResolver>();
                 action.Dependency<DeliveredProductsAction>();
             });
 
-            treeSetup.Action<ShippingSurchargeUsAkHiAction>("ShippingSurchargeUs", action =>
+            setup.Action<ShippingSurchargeUsAkHiAction>("ShippingSurchargeUs", action =>
             {
                 action.Dependency<DeliveredProductsAction>();
             });
 
-            treeSetup.Action<ShippingSurchargeCaAction>("ShippingSurchargeCa", action =>
+            setup.Action<ShippingSurchargeCaAction>("ShippingSurchargeCa", action =>
             {
                 action.Dependency<DeliveredProductsAction>();
             });
 
-            treeSetup.Action<ProductsSplitAction>("SplitAction", action =>
+            setup.Action<ProductsSplitAction>("SplitAction", action =>
             {
                 action.Dependency<ProductsWithPromoAction>();
             });
 
-            treeSetup.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
+            setup.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
             {
                 action.Dependency<ProductsSplitAction>();
             });
 
-            treeSetup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
+            setup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
             {
                 action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
             });
 
-            treeSetup.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>
+            setup.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>
             {
                 action.ResolvePath<ShippingSurchargeUsAkHiAction>((int) SurchargeType.AlaskaHawaii,
                     "ShippingSurchargeUs");
@@ -121,7 +121,7 @@ namespace VitalChoice.Workflow.Configuration
                     "ShippingSurchargeCa");
             });
 
-            treeSetup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
+            setup.ActionResolver<DiscountTypeActionResolver>("Discount", action =>
             {
                 action.Dependency<PerishableProductsAction>();
 
@@ -132,26 +132,26 @@ namespace VitalChoice.Workflow.Configuration
                 action.ResolvePath<DiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
             });
 
-            treeSetup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
+            setup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
             });
 
-            treeSetup.Action<ShippingOverrideAction>("ShippingOverride", action =>
+            setup.Action<ShippingOverrideAction>("ShippingOverride", action =>
             {
                 action.Dependency<ShippingStandardResolver>();
                 action.Dependency<ShippingUpgradesActionResolver>();
             });
 
-            treeSetup.Action<ShippingSurchargeOverrideAction>("SurchargeOverride", action =>
+            setup.Action<ShippingSurchargeOverrideAction>("SurchargeOverride", action =>
             {
                 action.Dependency<ShippingSurchargeResolver>();
             });
 
-            treeSetup.Tree<OrderTree>("Order", tree =>
+            setup.Tree<OrderTree>("Order", tree =>
             {
-                tree.Dependency<TotalAction>();
+                tree.Action<TotalAction>();
             });
         }
     }

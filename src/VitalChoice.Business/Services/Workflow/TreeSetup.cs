@@ -55,16 +55,16 @@ namespace VitalChoice.Business.Services.Workflow
         internal Dictionary<Type, WorkflowActionDefinition> Actions { get; }
         internal Dictionary<Type, WorkflowActionResolverDefinition> ActionResolvers { get; }
 
-        public ITreeSetup<TContext, TResult> Tree<T>(string treeName, Action<IActionSetup<TContext, TResult>> actions)
+        public ITreeSetup<TContext, TResult> Tree<T>(string treeName, Action<ITreeActionSetup<TContext, TResult>> actions)
             where T : IWorkflowTree<TContext, TResult>
         {
             if (actions == null)
                 throw new ArgumentNullException(nameof(actions));
 
             var tree = new WorkflowTreeDefinition(typeof (T), treeName);
-            var actionSetup = new ActionSetup<TContext, TResult>();
+            var actionSetup = new TreeActionSetup<TContext, TResult>();
             actions(actionSetup);
-            tree.Actions = actionSetup.Dependencies;
+            tree.Actions = actionSetup.Actions;
             Trees.Add(typeof (T), tree);
             return this;
         }

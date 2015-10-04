@@ -6,7 +6,7 @@ using VitalChoice.Domain.Workflow;
 
 namespace VitalChoice.Workflow.Core
 {
-    public abstract class WorkflowTree<TContext, TResult> : WorkflowExecutor<TContext, TResult>,
+    public abstract class WorkflowTree<TContext, TResult>:
         IWorkflowTree<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
@@ -15,12 +15,15 @@ namespace VitalChoice.Workflow.Core
 
         private readonly Dictionary<Type, string> _reverseAccessActions;
 
-        protected WorkflowTree(IActionItemProvider itemProvider, string treeName) : base(null, treeName)
+        protected WorkflowTree(IActionItemProvider itemProvider, string treeName)
         {
+            Name = treeName;
             _itemProvider = itemProvider;
             _actions = new Dictionary<string, IWorkflowExecutor<TContext, TResult>>();
             _reverseAccessActions = new Dictionary<Type, string>();
         }
+
+        public string Name { get; }
 
         public TResult GetActionResult(string actionName, TContext context)
         {
@@ -55,15 +58,6 @@ namespace VitalChoice.Workflow.Core
             }
         }
 
-        private async Task AddTreeWithDependencies(ActionItem action)
-        {
-            var workflowTree =
-                (IWorkflowTree<TContext, TResult>) Activator.CreateInstance(action.ActionType, _itemProvider, action.ActionName);
-            _actions.Add(action.ActionName, workflowTree);
-            _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            await workflowTree.InitializeTreeAsync();
-        }
-
         private async Task AddActionWithDependencies(ActionItem action)
         {
             var workflowAction =
@@ -95,9 +89,6 @@ namespace VitalChoice.Workflow.Core
         {
             switch (action.WorkflowActionType)
             {
-                case WorkflowActionType.ActionTree:
-                    await AddTreeWithDependencies(action);
-                    break;
                 case WorkflowActionType.Action:
                     await AddActionWithDependencies(action);
                     break;
@@ -172,6 +163,6 @@ namespace VitalChoice.Workflow.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public abstract override TResult Execute(TContext context);
+        public abstract TResult Execute(TContext context);
     }
 }

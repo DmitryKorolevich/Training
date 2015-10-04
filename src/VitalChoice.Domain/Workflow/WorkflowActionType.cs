@@ -3,7 +3,6 @@
     public enum WorkflowActionType
     {
         Action,
-        ActionResolver,
-        ActionTree
+        ActionResolver
     }
 }

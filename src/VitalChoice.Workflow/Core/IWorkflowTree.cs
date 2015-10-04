@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Workflow.Core
 {
-    public interface IWorkflowTree<TContext, TResult> : IWorkflowExecutor<TContext, TResult>
+    public interface IWorkflowTree<TContext, TResult>
         where TContext : WorkflowContext<TResult>
     {
+        TResult Execute(TContext context);
+
         TResult Execute(string actionName, TContext result);
 
         TResult Execute<TAction>(TContext context) where TAction : IWorkflowExecutor<TContext, TResult>;
