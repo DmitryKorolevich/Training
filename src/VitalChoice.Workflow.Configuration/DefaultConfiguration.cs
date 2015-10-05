@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Actions.Discounts;
+using VitalChoice.Business.Workflow.Actions.GiftCertificates;
 using VitalChoice.Business.Workflow.Actions.Products;
 using VitalChoice.Business.Workflow.Actions.Shipping;
 using VitalChoice.Business.Workflow.Trees;
@@ -21,6 +22,12 @@ namespace VitalChoice.Workflow.Configuration
         {
             setup.Action<TotalAction>("Total", action =>
             {
+                action.Aggregate<OrderSubTotalAction>();
+                action.Aggregate<GiftCertificatesPaymentAction>();
+            });
+
+            setup.Action<OrderSubTotalAction>("SubTotal", action =>
+            {
                 action.Aggregate<ProductsWithPromoAction>();
                 action.Aggregate<DiscountTypeActionResolver>();
                 action.Aggregate<ShippingStandardResolver>();
@@ -28,6 +35,11 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ShippingUpgradesActionResolver>();
                 action.Aggregate<ShippingOverrideAction>();
                 action.Aggregate<ShippingSurchargeOverrideAction>();
+            });
+
+            setup.Action<GiftCertificatesPaymentAction>("GiftCertificates", action =>
+            {
+                action.Dependency<OrderSubTotalAction>();
             });
 
             setup.Action<ProductAction>("Products");

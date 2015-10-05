@@ -113,7 +113,7 @@ namespace VC.Admin.ModelConverters
 
             if(model.GCs!=null)
             {
-                if (model.GCs?.Any() ?? false)
+                if (model.GCs.Any())
                 {
                     ICollection<string> codes =
                         model.GCs.Select(g => g.Code).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
