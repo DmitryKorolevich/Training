@@ -6,36 +6,38 @@
 	<title>Vital Choice | Login</title>
 }
 
-<div class="input-area-holder">
-	@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+<div class="working-area-holder">
+	@using (Html.BeginForm("Login", "Auth", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
 	{
 		@Html.AntiForgeryToken()
 		<h4>Account Login</h4>
-		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+		@Html.ValidationSummary(true, "", new { @class = "form-validation-summary" })
 		<div class="form-group">
-			@Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
+			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
+			<div class="input-group">
 				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+				@Html.ValidationMessageFor(m => m.Email, "")
 			</div>
 		</div>
 		<div class="form-group">
-			@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-			<div class="col-md-10">
+			@Html.LabelFor(m => m.Password, new { @class = "control-label" })
+			<div class="input-group">
 				@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+				@Html.ValidationMessageFor(m => m.Password, "")
 			</div>
+		</div>
+		<div class="form-buttons-group">
+			<input type="submit" value="Login" class="btn btn-default" />
 		</div>
 		<div class="form-group">
-			<div class="col-md-offset-2 col-md-10">
-				<input type="submit" value="Login" class="btn btn-default" />
-			</div>
+			Forgot your password? @Html.ActionLink("Click here to have it e-mailed to you.", "ForgotPassword")
 		</div>
-		<p>
-			@Html.ActionLink("Forgot your password?", "ForgotPassword")
-		</p>
 	}
-	<p>
+	<div class="form-group">
+		<hr />
+	</div>
+	<div class="form-group">
 		@Html.ActionLink("Would you like to Register a New Account? Click Here", "Register")
-	</p>
+	</div>
+
 </div>

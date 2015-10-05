@@ -166,7 +166,7 @@ namespace VitalChoice.Business.Services.Users
 
 			//stupid ef
 			var temp = await UserManager.Users.ToListAsync();
-			var notConfirmed = temp.Any(x => !x.IsConfirmed && x.Email.Equals(login) && !x.DeletedDate.HasValue);
+			var notConfirmed = temp.Any(x => !x.IsConfirmed && x.Email.Equals(login));
 
 			if (notConfirmed)
 			{

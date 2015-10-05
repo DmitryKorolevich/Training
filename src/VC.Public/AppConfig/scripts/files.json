@@ -3,6 +3,9 @@
 
   "files": [
     "lib/jquery/jquery.js",
+    "assets/scripts/vendor/jquery.validate.js",
+    "assets/scripts/vendor/additional-methods.js",
+    "assets/scripts/vendor/jquery.validate.unobtrusive.js",
     "lib/nivoslider/jquery.nivo.slider.js",
     "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
     "assets/scripts/plugins.js"

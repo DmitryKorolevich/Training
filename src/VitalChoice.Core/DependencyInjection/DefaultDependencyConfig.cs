@@ -311,8 +311,23 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
-	        builder.RegisterType<ExtendedUserManager>().Named<ExtendedUserManager>("storefrontUserManager").WithParameter((pi, cc) => pi.Name == "store", (pi, cc) => cc.Resolve<StorefrontUserStore>());
-			builder.RegisterType<StorefrontUserService>().As<IStorefrontUserService>().WithParameter((pi, cc) => pi.Name == "userManager", (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager")).WithParameter((pi, cc) => pi.Name == "userValidator", (pi, cc) => cc.Resolve<UserValidator<ApplicationUser>>());
+	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
+	        builder.RegisterType<ExtendedUserManager>()
+		        .Named<ExtendedUserManager>("storefrontUserManager")
+		        .WithParameter((pi, cc) => pi.Name == "store",
+			        (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("storefronUserStore"));
+	        builder.RegisterType<SignInManager<ApplicationUser>>()
+		        .Named<SignInManager<ApplicationUser>>("storefrontSignInManager")
+		        .WithParameter((pi, cc) => pi.Name == "userManager",
+			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"));
+	        builder.RegisterType<StorefrontUserService>()
+		        .As<IStorefrontUserService>()
+		        .WithParameter((pi, cc) => pi.Name == "userManager",
+			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"))
+		        .WithParameter((pi, cc) => pi.Name == "userValidator",
+			        (pi, cc) => cc.Resolve<IUserValidator<ApplicationUser>>())
+		        .WithParameter((pi, cc) => pi.Name == "signInManager",
+			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager"));
 			builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
