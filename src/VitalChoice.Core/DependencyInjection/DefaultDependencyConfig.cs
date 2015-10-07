@@ -312,6 +312,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
 	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
+	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
 	        builder.RegisterType<ExtendedUserManager>()
 		        .Named<ExtendedUserManager>("storefrontUserManager")
 		        .WithParameter((pi, cc) => pi.Name == "store",
@@ -325,7 +326,7 @@ namespace VitalChoice.Core.DependencyInjection
 		        .WithParameter((pi, cc) => pi.Name == "userManager",
 			        (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("storefrontUserManager"))
 		        .WithParameter((pi, cc) => pi.Name == "userValidator",
-			        (pi, cc) => cc.Resolve<IUserValidator<ApplicationUser>>())
+			        (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("storefrontUserValidator"))
 		        .WithParameter((pi, cc) => pi.Name == "signInManager",
 			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager"));
 			builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
@@ -344,7 +345,6 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ProductService>().As<IProductService>();
             builder.RegisterType<DiscountService>().As<IDiscountService>();
             builder.RegisterType<CountryService>().As<ICountryService>();
-            builder.RegisterType(typeof (AdminUserValidator)).As(typeof (IUserValidator<ApplicationUser>));
             builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>();
             builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>();
             builder.RegisterType<VProductSkuRepository>()

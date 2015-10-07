@@ -5,6 +5,7 @@ using VC.Public.Controllers.Content;
 using VC.Public.Models;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Public.Controllers
@@ -18,7 +19,7 @@ namespace VC.Public.Controllers
 	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
 	    {
 		    return User.Identity.IsAuthenticated
-			    ? (User.IsInRole("Wholesale")
+			    ? (User.IsInRole(IdentityConstants.WholesaleCustomer)
 				    ? new List<CustomerTypeCode>() {CustomerTypeCode.Wholesale, CustomerTypeCode.All}
 				    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All})
 			    : new List<CustomerTypeCode>() {CustomerTypeCode.Retail, CustomerTypeCode.All};

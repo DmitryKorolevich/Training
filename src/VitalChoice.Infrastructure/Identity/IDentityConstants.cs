@@ -9,5 +9,9 @@ namespace VitalChoice.Infrastructure.Identity
 	    public const string CustomerRoleType = "CustomerRole";
 
 	    public const string IdentityBasicProfile = "Basic";
+
+	    public const string RetailCustomer = "Retail";
+
+	    public const string WholesaleCustomer = "Wholesale";
     }
 }

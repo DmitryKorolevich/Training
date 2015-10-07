@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
@@ -10,7 +11,7 @@ namespace VitalChoice.Interfaces.Services.Users
 {
     public interface IUserService
     {
-	    Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true);
+	    Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true);
 
 	    Task DeleteAsync(ApplicationUser user);
 
@@ -32,7 +33,7 @@ namespace VitalChoice.Interfaces.Services.Users
 
 		Task SignOutAsync(ApplicationUser user);
 
-	    Task SendActivationAsync(Guid id);
+	    Task ResendActivationAsync(Guid id);
 
 	    Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword);
 
@@ -44,5 +45,7 @@ namespace VitalChoice.Interfaces.Services.Users
 	    Task SendResetPasswordAsync(Guid publicId);
 
 	    Task ResetPasswordAsync(string email, string token, string newPassword);
+
+	    Task SendActivationAsync(string email);
     }
 }

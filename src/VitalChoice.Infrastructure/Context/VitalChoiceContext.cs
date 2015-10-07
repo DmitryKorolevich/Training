@@ -2,6 +2,7 @@
 using Microsoft.Data.Entity.Metadata;
 using System.Data.SqlClient;
 using System.IO;
+using Microsoft.Data.Entity.SqlServer;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
@@ -42,8 +43,8 @@ namespace VitalChoice.Infrastructure.Context
 	    }       
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
-		{
-            var connectionString = (new SqlConnectionStringBuilder
+        {
+			var connectionString = (new SqlConnectionStringBuilder
             {
                 DataSource = _options.Options.Connection.Server,
                 // TODO: Currently nested queries are run while processing the results of outer queries
@@ -202,12 +203,11 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<AdminProfile>().Key(x => x.Id);
 			builder.Entity<AdminProfile>().ToTable("AdminProfiles");
-		    builder.Entity<AdminProfile>()
-		        .Reference(x => x.User)
-		        .InverseReference(x => x.Profile)
-                .ForeignKey<AdminProfile>(a => a.Id)
-		        .PrincipalKey<ApplicationUser>(x => x.Id)
-		        .Required();
+			builder.Entity<AdminProfile>()
+				.Reference(x => x.User)
+				.InverseReference(x => x.Profile)
+				.ForeignKey<AdminProfile>(a => a.Id)
+				.PrincipalKey<ApplicationUser>(x => x.Id);
 
             #endregion
 

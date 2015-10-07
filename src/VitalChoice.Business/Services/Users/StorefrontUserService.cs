@@ -32,9 +32,14 @@ namespace VitalChoice.Business.Services.Users
 		{
 		}
 
-		protected override Task SendActivationInternalAsync(ApplicationUser dbUser)
+		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{
-			throw new NotImplementedException();
+			await NotificationService.SendStorefrontUserActivationAsync(dbUser.Email, new UserActivation()
+			{
+				FirstName = dbUser.FirstName,
+				LastName = dbUser.LastName,
+				Link = $"{Options.PublicHost}auth/activate/{dbUser.ConfirmationToken}"
+			});
 		}
 
 		protected override Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)

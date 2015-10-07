@@ -29,6 +29,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string AtLeastOneDefaultShipping = "AtLeastOneDefaultShipping";
 		    public const string AttemptToUpdateUsingWrongService = "AttemptToUpdateUsingWrongService";
 		    public const string AttemptToAssignWrongRole = "AttemptToAssignWrongRole";
+		    public const string IncorrectCustomerRole = "IncorrectCustomerRole";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -54,7 +55,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.HasAssignments, "Record cannot be removed because there are references to it"},
 			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"},
 			{Keys.AttemptToUpdateUsingWrongService, "Attempt to update user using forbidden operation"},
-			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"}
+			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"},
+			{Keys.IncorrectCustomerRole, "Incorrect customer type"}
 		};
     }
 }

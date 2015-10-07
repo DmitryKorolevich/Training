@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+#if DNX451
+using System.Transactions;
+#endif
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
@@ -21,6 +24,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
@@ -31,19 +35,23 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Business.Services.Customers
 {
     public class CustomerService: EcommerceDynamicObjectService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
+	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
-        private readonly IEcommerceRepositoryAsync<CustomerFile> _customerFileRepositoryAsync;
-        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
+	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
-	    private static string _customerContainerName;
+	    private readonly IStorefrontUserService _storefrontUserService;
+	    private readonly IOptions<AppOptions> _appOptions;
+
+		private static string _customerContainerName;
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
@@ -51,11 +59,12 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerFile> customerFileRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
 			IBlobStorageClient storageClient,
-			IOptions<AppOptions> appOptions)
+			IOptions<AppOptions> appOptions,
+			IStorefrontUserService storefrontUserService,
+			IEcommerceRepositoryAsync<User> userRepositoryAsync)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
@@ -64,10 +73,12 @@ namespace VitalChoice.Business.Services.Customers
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
             _customerRepositoryAsync = customerRepositoryAsync;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
-            _customerFileRepositoryAsync = customerFileRepositoryAsync;
-            _adminProfileRepository = adminProfileRepository;
+		    _adminProfileRepository = adminProfileRepository;
 		    _storageClient = storageClient;
+		    _storefrontUserService = storefrontUserService;
 		    _customerContainerName = appOptions.Options.AzureStorage.CustomerContainerName;
+		    _appOptions = appOptions;
+		    _userRepositoryAsync = userRepositoryAsync;
         }
 
         protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
@@ -241,32 +252,59 @@ namespace VitalChoice.Business.Services.Customers
                 .ThenInclude(p => p.OptionValues);
         }
 
-        protected async override Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+	    protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
 	    {
-			var rand = new Random();
+		    var roles = new List<RoleType>();
+		    switch (model.IdObjectType)
+		    {
+			    case (int) CustomerType.Retail:
+				    roles.Add(RoleType.Retail);
+				    break;
+			    case (int) CustomerType.Wholesale:
+				    roles.Add(RoleType.Wholesale);
+				    break;
+			    default:
+				    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
+		    }
 
-			var userRepository = uow.RepositoryAsync<User>();
-			var user = new User()
-			{
-				Id = rand.Next(1, 100000000) //temp solution
-			};
+		    var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int) AddressType.Profile);
+		    var appUser = new ApplicationUser()
+		    {
+			    FirstName = profileAddress.Data.FirstName,
+			    LastName = profileAddress.Data.LastName,
+			    Email = model.Email,
+			    TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Options.ActivationTokenExpirationTermDays),
+			    IsConfirmed = false,
+			    ConfirmationToken = Guid.NewGuid(),
+			    IsAdminUser = false,
+			    Profile = null
+		    };
 
-			using (var transaction = uow.BeginTransaction())
+		    using (var transaction = uow.BeginTransaction())
 		    {
 			    try
 			    {
-					await userRepository.InsertAsync(user);
-					await uow.SaveChangesAsync();
+				    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false);
 
-					model.Id = user.Id;
-					model.User.Id = user.Id;
-					var customer = await base.InsertAsync(model, uow);
-					transaction.Commit();
+				    model.Id = appUser.Id;
+				    model.User.Id = appUser.Id;
+
+				    var customer = await base.InsertAsync(model, uow);
+
+				    transaction.Commit();
+
+				    await _storefrontUserService.SendActivationAsync(model.Email);
+
 				    return customer;
 			    }
-			    catch (Exception)
+			    catch (Exception ex)
 			    {
-					transaction.Rollback();
+				    if (appUser.Id > 0)
+				    {
+					    await _storefrontUserService.DeleteAsync(appUser);
+				    }
+
+				    transaction.Rollback();
 				    throw;
 			    }
 		    }

@@ -1,10 +1,13 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
@@ -42,7 +45,12 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
 			}
 
-			return Redirect(returnUrl);
+		    if (string.IsNullOrWhiteSpace(returnUrl))
+		    {
+			    returnUrl = ""; //todo: refactor
+		    }
+
+			return RedirectToAction("Index", "Home");
 	    }
 
 		[HttpPost]
@@ -62,6 +70,44 @@ namespace VC.Public.Controllers
 			}
 
 			return true;
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Activate(Guid id)
+		{
+			var result = await _userService.GetByTokenAsync(id);
+			if (result == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+			}
+
+			return View(new CreateCustomerAccountModel()
+			{
+				Email = result.Email,
+				PublicId = result.PublicId
+			});
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Activate(CreateCustomerAccountModel model)
+		{
+			if (!ModelState.IsValid)
+				return View(model);
+
+			var user = await _userService.GetAsync(model.PublicId);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			user.Email = model.Email;
+			user.IsConfirmed = true;
+			user.Status = UserStatus.Active;
+
+			await _userService.UpdateAsync(user, null, model.Password);
+
+			return await Login(new LoginModel() {Email = model.Email, Password = model.Password}, string.Empty);
 		}
 	}
 }

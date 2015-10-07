@@ -8,6 +8,7 @@ using VC.Public.Models.Menu;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Public.Components.Menu
@@ -36,8 +37,8 @@ namespace VC.Public.Components.Menu
 		{
 			var rootCategory = await _productCategoryService.GetLiteCategoriesTreeAsync(new ProductCategoryLiteFilter()
 			{
-				Visibility = User.Identity.IsAuthenticated ? (User.IsInRole("Wholesale") ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All } : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
-				: new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All }, //todo: refactor when authentication mechanism gets ready
+				Visibility = User.Identity.IsAuthenticated ? (User.IsInRole(IdentityConstants.WholesaleCustomer) ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All } : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
+				: new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All },
 				Statuses = new List<RecordStatusCode>() { RecordStatusCode.Active }
 			});
 			

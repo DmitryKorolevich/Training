@@ -43,8 +43,7 @@ namespace VC.Admin.Controllers
     {
         private readonly ICountryService _countryService;
         private readonly IGenericService<AdminProfile> _adminProfileService;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
+	    private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
         private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
         private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
@@ -69,8 +68,7 @@ namespace VC.Admin.Controllers
             _customerService = customerService;
             _countryService = countryService;
             _adminProfileService = adminProfileService;
-            _contextAccessor = contextAccessor;
-            _customerMapper = customerMapper;
+	        _customerMapper = customerMapper;
             _addressMapper = addressMapper;
             _addressService = addressService;
             _notesService = notesService;

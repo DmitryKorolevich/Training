@@ -891,6 +891,15 @@ footer {
 .form-regular.small .control-label {
   width: 70px;
 }
+.form-regular.small .form-buttons-group :first-child {
+  margin-left: 85px;
+}
+.form-regular.medium-small .control-label {
+  width: 120px;
+}
+.form-regular.medium-small .form-buttons-group :first-child {
+  margin-left: 135px;
+}
 .form-regular {
   font-family: Arial;
   font-size: 13px;
@@ -931,7 +940,7 @@ footer {
   clear: left;
 }
 .form-regular .form-buttons-group :first-child {
-  margin-left: 85px;
+  margin-left: 215px;
 }
 .validation-summary-errors {
   color: red;

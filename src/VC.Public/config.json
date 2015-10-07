@@ -8,6 +8,9 @@
       "BuildNumber": 1
     },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
+    "ActivationTokenExpirationTermDays": 3,
+    "PublicHost": "http://staging.g2-dg.com/",
+    "AdminHost": "http://admin.staging.g2-dg.com/",
     "DefaultCultureId": "en-US",
     "Connection": {
       "UserName": "dev_vcdb_login",

@@ -36,7 +36,7 @@ namespace VitalChoice.Core.GlobalFilters
 				else
 				{
 					result.ViewName = "Error";
-					result.ViewData["Message"] = ApiException.GetDefaultErrorMessage;
+					//result.ViewData["Message"] = ApiException.GetDefaultErrorMessage; //todo
                     result.StatusCode = (int) HttpStatusCode.InternalServerError;
 
 					LoggerService.GetDefault().LogError(context.Exception.ToString());

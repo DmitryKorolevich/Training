@@ -73,6 +73,26 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
+		protected virtual async Task PrepareForAdd(ApplicationUser user, IList<RoleType> roles)
+		{
+			user.CreateDate = DateTime.Now;
+			user.UpdatedDate = DateTime.Now;
+			user.Status = UserStatus.NotActive;
+			user.LastLoginDate = null;
+			user.PublicId = Guid.NewGuid();
+			user.UserName = user.Email;
+
+			await ValidateUserInternalAsync(user);
+
+			ValidateRoleAssignments(user, roles);
+
+			var validateResult = await userValidator.ValidateAsync(UserManager, user);
+			if (!validateResult.Succeeded)
+			{
+				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
+			}
+		}
+
 		private async Task SendActivationAsync(ApplicationUser dbUser)
 		{
 			if (dbUser.Status != UserStatus.NotActive)
@@ -174,24 +194,9 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true)
+		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true)
 		{
-			user.CreateDate = DateTime.Now;
-			user.UpdatedDate = DateTime.Now;
-			user.Status = UserStatus.NotActive;
-			user.LastLoginDate = null;
-			user.PublicId = Guid.NewGuid();
-			user.UserName = user.Email;
-
-			await ValidateUserInternalAsync(user);
-
-			ValidateRoleAssignments(user, roles);
-
-			var validateResult = await userValidator.ValidateAsync(UserManager, user);
-			if (!validateResult.Succeeded)
-			{
-				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
-			}
+			await PrepareForAdd(user, roles);
 
 			using (var transaction = new TransactionAccessor(Context).BeginTransaction())
 			{
@@ -210,15 +215,18 @@ namespace VitalChoice.Business.Services.Users
 							}
 						}
 
-						await ecommerceRepositoryAsync.InsertAsync(new User() {Id = user.Id});
-
-						if (sendActivation)
+						if (createEcommerceUser)
 						{
-							var dbUser = await FindAsync(user.Email);
-							await SendActivationAsync(dbUser);
+							await ecommerceRepositoryAsync.InsertAsync(new User() { Id = user.Id });
+
 						}
 
 						transaction.Commit();
+
+						if (sendActivation)
+						{
+							await SendActivationAsync(user.Email);
+						}
 
 						return user;
 					}
@@ -233,6 +241,12 @@ namespace VitalChoice.Business.Services.Users
 					throw;
 				}
 			}
+		}
+
+		public async Task SendActivationAsync(string email)
+		{
+			var dbUser = await FindAsync(email);
+			await SendActivationAsync(dbUser);
 		}
 
 		public async Task DeleteAsync(ApplicationUser user)
@@ -360,7 +374,7 @@ namespace VitalChoice.Business.Services.Users
 			await signInManager.SignOutAsync();
 		}
 
-		public async Task SendActivationAsync(Guid id)
+		public async Task ResendActivationAsync(Guid id)
 		{
 			var dbUser = await GetAsync(id);
 			dbUser.ConfirmationToken = Guid.NewGuid();

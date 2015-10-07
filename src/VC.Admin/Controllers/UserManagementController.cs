@@ -174,7 +174,7 @@ namespace VC.Admin.Controllers
 		[HttpPost]
 		public async Task<Result<bool>> ResendActivation(Guid id)
 		{
-			await userService.SendActivationAsync(id);
+			await userService.ResendActivationAsync(id);
 
 			return true;
 		}
