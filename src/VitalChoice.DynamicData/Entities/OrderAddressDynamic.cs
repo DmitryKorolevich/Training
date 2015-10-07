@@ -6,14 +6,8 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Entities
 {
-    public sealed class OrderAddressDynamic: MappedObject
+    public sealed class OrderAddressDynamic: AddressDynamic
     {
         public int IdOrder { get; set; }
-
-        public int IdCountry { get; set; }
-
-        public string County { get; set; }
-
-        public int? IdState { get; set; }
     }
 }

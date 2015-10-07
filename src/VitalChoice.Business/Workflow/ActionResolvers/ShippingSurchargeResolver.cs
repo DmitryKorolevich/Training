@@ -27,12 +27,12 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (context.Order.ShippingAddress == null)
                 return (int) SurchargeType.None;
-            if (context.Order.ShippingAddress.IdState == context.States.GetStateId("us", "hi") ||
-                context.Order.ShippingAddress.IdState == context.States.GetStateId("us", "ak"))
+            if (context.IsState(context.Order.ShippingAddress, "us", "hi") ||
+                context.IsState(context.Order.ShippingAddress, "us", "ak"))
             {
                 return (int) SurchargeType.AlaskaHawaii;
             }
-            if (context.Order.ShippingAddress.IdCountry == context.Coutries.GetCountryId("ca"))
+            if (context.IsCountry(context.Order.ShippingAddress, "ca"))
             {
                 return (int) SurchargeType.Canada;
             }

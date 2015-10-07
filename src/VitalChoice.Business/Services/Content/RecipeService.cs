@@ -289,7 +289,7 @@ namespace VitalChoice.Business.Services.Content
 
 					    transaction.Commit();
 				    }
-				    catch (Exception e)
+				    catch (Exception)
 				    {
 					    transaction.Rollback();
 					    throw;

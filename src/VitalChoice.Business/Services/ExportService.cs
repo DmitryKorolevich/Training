@@ -23,8 +23,6 @@ namespace VitalChoice.Business.Services
 
         public byte[] ExportToCSV(ICollection<T> items)
         {
-            byte[] toReturn = null;
-
             var type = typeof(T).GetTypeInfo();
             var properties = typeof(T).GetProperties().Where(p => p.GetCustomAttributes(true).Any(a => a is ExportHeaderAttribute)).ToList();
             StringBuilder builder = new StringBuilder();

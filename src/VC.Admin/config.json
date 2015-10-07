@@ -42,6 +42,15 @@
       "Key": "7Ux69IBvsRj0Ep7X",
       "Password": "m0Zybyteel4RMp5j904aa1HpB",
       "PayAccountNumber": "304955066"
+    },
+    "Avatax": {
+      "AccountNumber": "1100019190",
+      "LicenseKey": "B50461EFC03F20AB",
+      "ServiceUrl": "https://avatax.avalara.net/",
+      "AccountName": "Vital Choice Seafood Inc",
+      "ProfileName": "Vital Choice",
+      "CompanyCode": "VC001",
+      "TurnOffCommit": true
     }
   }
 }

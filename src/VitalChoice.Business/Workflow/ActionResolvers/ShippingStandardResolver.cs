@@ -22,17 +22,15 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                 return 0;
             if (context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
             {
-                if (context.Order.ShippingAddress.IdCountry == context.Coutries.GetCountryId("us"))
+                if (context.IsCountry(context.Order.ShippingAddress, "us"))
                 {
                     return (int) CustomerType.Wholesale;
                 }
             }
             if (context.Order.Customer.IdObjectType == (int) CustomerType.Retail)
             {
-                if (context.Order.ShippingAddress.IdCountry ==
-                    context.Coutries.GetCountryId("ca") ||
-                    context.Order.ShippingAddress.IdCountry ==
-                    context.Coutries.GetCountryId("us"))
+                if (context.IsCountry(context.Order.ShippingAddress, "us") ||
+                    context.IsCountry(context.Order.ShippingAddress, "ca"))
                 {
                     return (int) CustomerType.Retail;
                 }

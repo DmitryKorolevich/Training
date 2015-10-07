@@ -25,5 +25,25 @@ namespace VitalChoice.Domain.Helpers
             collection.TryGetValue(countryCode, out result);
             return result;
         }
+
+        public static Country GetCountry(this Dictionary<int, Country> countries, int id)
+        {
+            Country result;
+            countries.TryGetValue(id, out result);
+            return result;
+        }
+
+        public static State GetState(this Dictionary<int, Dictionary<int, State>> states, int idCountry, int idState)
+        {
+            Dictionary<int, State> country;
+            if (states.TryGetValue(idCountry, out country))
+            {
+                State result;
+                country.TryGetValue(idState, out result);
+                return result;
+            }
+            return null;
+        }
+
     }
 }

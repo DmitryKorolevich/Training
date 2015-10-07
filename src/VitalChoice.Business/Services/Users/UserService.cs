@@ -235,7 +235,7 @@ namespace VitalChoice.Business.Services.Users
 						throw new AppValidationException(AggregateIdentityErrors(createResult.Errors));
 					}
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
                     transaction.Rollback();
 					throw;

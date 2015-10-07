@@ -48,6 +48,7 @@ using Autofac.Core;
 using Autofac.Core.Lifetime;
 using VitalChoice.Data.Repositories.Specifics;
 using Autofac.Framework.DependencyInjection;
+using Avalara.Avatax.Rest.Services;
 using Microsoft.Dnx.Runtime;
 using Microsoft.Framework.DependencyInjection.Extensions;
 using VitalChoice.Data.Services;
@@ -170,6 +171,16 @@ namespace VitalChoice.Core.DependencyInjection
                     Key = configuration.GetSection("App:FedExOptions:Key").Value,
                     Password = configuration.GetSection("App:FedExOptions:Password").Value,
                     PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
+                };
+                options.Avatax = new AvataxOptions
+                {
+                    AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
+                    CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
+                    AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
+                    LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
+                    ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
+                    ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
+                    TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
                 };
             });
 
@@ -370,6 +381,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>();
             builder.RegisterProcessors(typeof (ContentProcessorsService).GetTypeInfo().Assembly);
+            builder.RegisterType<TaxService>().As<ITaxService>();
+            builder.RegisterType<AddressService>().As<IAddressService>();
             var container = builder.Build();
             return container;
         }

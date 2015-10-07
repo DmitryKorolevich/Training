@@ -19,5 +19,6 @@ namespace VitalChoice.Domain.Entities.Options
 		public Versioning Versioning { get; set; }
 		public AzureStorage AzureStorage { get; set; }
         public FedExOptions FedExOptions { get; set; }
+        public AvataxOptions Avatax { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Shipping;
 using VitalChoice.DynamicData.Entities;
@@ -39,16 +40,22 @@ namespace VitalChoice.Workflow.Contexts
 
     public class OrderContext : ComputableContext
     {
-        public Dictionary<string, int> Coutries { get; }
+        private readonly Dictionary<string, int> _coutries;
 
-        public Dictionary<string, Dictionary<string, int>> States { get; }
+        private readonly Dictionary<string, Dictionary<string, int>> _states;
+
+        private readonly Dictionary<int, Country> _coutryCodes;
+
+        private readonly Dictionary<int, Dictionary<int, State>> _stateCodes;
 
         public OrderContext(ICollection<Country> coutries)
         {
-            Coutries = coutries.ToDictionary(c => c.CountryCode, c => c.Id, StringComparer.OrdinalIgnoreCase);
-            States = coutries.ToDictionary(c => c.CountryCode,
+            _coutries = coutries.ToDictionary(c => c.CountryCode, c => c.Id, StringComparer.OrdinalIgnoreCase);
+            _states = coutries.ToDictionary(c => c.CountryCode,
                 c => c.States.ToDictionary(s => s.StateCode, s => s.Id, StringComparer.OrdinalIgnoreCase),
                 StringComparer.OrdinalIgnoreCase);
+            _coutryCodes = coutries.ToDictionary(c => c.Id);
+            _stateCodes = coutries.ToDictionary(c => c.Id, c => c.States.ToDictionary(s => s.Id));
             Messages = new List<MessageInfo>();
             PromoSkus = new List<SkuOrdered>();
             SplitInfo = new SplitInfo();
@@ -97,5 +104,45 @@ namespace VitalChoice.Workflow.Contexts
         public IList<MessageInfo> Messages { get; set; }
 
         public SplitInfo SplitInfo { get; set; }
+
+        //public int GetCountryId(string countryCode)
+        //{
+        //    return _coutries.GetCountryId(countryCode);
+        //}
+
+        //public int GetStateId(string countryCode, string stateCode)
+        //{
+        //    return _states.GetStateId(countryCode, stateCode);
+        //}
+
+        public bool IsState(AddressDynamic address, string countryCode, string stateCode)
+        {
+            return _states.GetStateId(countryCode, stateCode) == address.IdState;
+        }
+
+        public bool IsCountry(AddressDynamic address, string countryCode)
+        {
+            return _coutries.GetCountryId(countryCode) == address.IdCountry;
+        }
+
+        public string GetCountryCode(int idCountry)
+        {
+            return _coutryCodes.GetCountry(idCountry)?.CountryCode;
+        }
+
+        public string GetStateCode(int idCountry, int idState)
+        {
+            return _stateCodes.GetState(idCountry, idState)?.StateCode;
+        }
+
+        public string GetCountryCode(AddressDynamic address)
+        {
+            return _coutryCodes.GetCountry(address.IdCountry)?.CountryCode;
+        }
+
+        public string GetRegionOrStateCode(AddressDynamic address)
+        {
+            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode ?? address.County;
+        }
     }
 }

@@ -25,8 +25,8 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
             if (context.Order.ShippingAddress == null)
                 return (int) ShippingUpgradeGroup.None;
-            if (context.Order.ShippingAddress.IdCountry == context.Coutries.GetCountryId("us") ||
-                context.Order.ShippingAddress.IdCountry == context.Coutries.GetCountryId("ca"))
+            if (context.IsCountry(context.Order.ShippingAddress, "us") ||
+                context.IsCountry(context.Order.ShippingAddress, "ca"))
             {
                 return (int)ShippingUpgradeGroup.UsCa;
             }

@@ -15,6 +15,7 @@
     "VitalChoice.DynamicData": "1.0.0-*",
     "Templates": "2.3.0-beta7",
     "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*",
+    "Avalara.Avatax.Rest": "1.0.0-*"
   },
 
   "frameworks": {

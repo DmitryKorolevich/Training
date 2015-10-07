@@ -17,7 +17,8 @@
     "VitalChoice.Validation": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
-    "VitalChoice.DynamicData": "1.0.0-*"
+    "VitalChoice.DynamicData": "1.0.0-*",
+    "Avalara.Avatax.Rest": "1.0.0-*"
   },
 
   "frameworks": {

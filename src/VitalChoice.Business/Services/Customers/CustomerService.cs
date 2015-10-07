@@ -297,7 +297,7 @@ namespace VitalChoice.Business.Services.Customers
 
 				    return customer;
 			    }
-			    catch (Exception ex)
+			    catch (Exception)
 			    {
 				    if (appUser.Id > 0)
 				    {
