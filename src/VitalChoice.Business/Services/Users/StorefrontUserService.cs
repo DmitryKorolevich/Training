@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}auth/activate/{dbUser.ConfirmationToken}"
+				Link = $"{Options.PublicHost}account/activate/{dbUser.ConfirmationToken}"
 			});
 		}
 
