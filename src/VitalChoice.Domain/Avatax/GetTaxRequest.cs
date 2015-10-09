@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace VitalChoice.Domain.Avatax
 {
@@ -58,12 +60,14 @@ namespace VitalChoice.Domain.Avatax
 
         public string DocCode { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public DocType DocType { get; set; }
 
         public string CompanyCode { get; set; }
 
         public bool Commit { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public DetailLevel DetailLevel { get; set; }
 
         // Use where appropriate to the situation

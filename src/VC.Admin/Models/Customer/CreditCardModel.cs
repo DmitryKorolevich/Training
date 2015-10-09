@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.DynamicData.Attributes;
-using VitalChoice.Validation.Logic.Interfaces;
 using VitalChoice.Validation.Models;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.Customer

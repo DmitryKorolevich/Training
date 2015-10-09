@@ -58,6 +58,7 @@ using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Services.Affiliates;
+using VitalChoice.Business.Services.Avatax;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Help;
@@ -69,6 +70,7 @@ using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Identity.UserStores;
 using VitalChoice.Infrastructure.Identity.Validators;
+using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Core.DependencyInjection
@@ -383,6 +385,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterProcessors(typeof (ContentProcessorsService).GetTypeInfo().Assembly);
             builder.RegisterType<TaxService>().As<ITaxService>();
             builder.RegisterType<AddressService>().As<IAddressService>();
+            builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();
             var container = builder.Build();
             return container;
         }

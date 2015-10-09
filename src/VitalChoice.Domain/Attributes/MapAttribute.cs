@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VitalChoice.DynamicData.Attributes
+namespace VitalChoice.Domain.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class MapAttribute : Attribute

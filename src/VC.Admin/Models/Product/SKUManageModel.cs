@@ -5,10 +5,8 @@ using VC.Admin.Validators.Product;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Models.Interfaces; 
-using VitalChoice.DynamicData.Attributes;
-using VitalChoice.DynamicData;
-using VitalChoice.Domain.Constants;
+using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Models.Product

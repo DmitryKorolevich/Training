@@ -15,24 +15,17 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Business.Services.Avatax
 {
-    [Flags]
-    public enum TaxGetType
-    {
-        Commit = 1,
-        PerishableOnly = 2,
-        NonPerishableOnly = 4,
-        UseBoth = PerishableOnly | NonPerishableOnly,
-        SavePermanent = 8
-    }
-
-    public class AvalaraTax
+    public class AvalaraTax : IAvalaraTax
     {
         private readonly ITaxService _taxService;
+        private readonly IDynamicToModelMapper<OrderAddressDynamic> _mapper;
         private readonly ILogger _logger;
         private readonly string _accountName;
         private readonly string _profileName;
@@ -41,9 +34,11 @@ namespace VitalChoice.Business.Services.Avatax
         //TODO move out tax code to global settings
         internal const string ShippingTaxCode = "FR020100";
 
-        public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider)
+        public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider,
+            IDynamicToModelMapper<OrderAddressDynamic> mapper)
         {
             _taxService = taxService;
+            _mapper = mapper;
             _accountName = options.Options.Avatax.AccountName;
             _profileName = options.Options.Avatax.ProfileName;
             _companyCode = options.Options.Avatax.CompanyCode;
@@ -119,7 +114,7 @@ namespace VitalChoice.Business.Services.Avatax
                 return result.TotalTax;
             }
             _logger.LogWarning(string.Join("\n",
-                    result.Messages.Select(m => $"[{m.Source}] {m.Summary} ({m.Details})")));
+                result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
             return 0;
         }
 
@@ -137,7 +132,7 @@ namespace VitalChoice.Business.Services.Avatax
                     order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
                     order.Order.Customer.Data.TaxExempt
                         ? "G"
-                        : "<null>",
+                        : null,
                 DocCode =
                     "TAX" +
                     (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{order.Order.Id}-P" : $"{order.Order.Id}-NP"),
@@ -154,7 +149,7 @@ namespace VitalChoice.Business.Services.Avatax
             return getTaxRequest;
         }
 
-        private static void FillAddresses(OrderContext orderContext, out Address originAddress,
+        private void FillAddresses(OrderContext orderContext, out Address originAddress,
             out Address destinationAddress)
         {
             originAddress = new Address
@@ -167,18 +162,10 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-
-            destinationAddress = new Address
-            {
-                AddressCode = "02",
-                City = orderContext.Order.ShippingAddress.Data.City,
-                Country = orderContext.GetCountryCode(orderContext.Order.ShippingAddress),
-                Line1 = orderContext.Order.ShippingAddress.Data.Address,
-                Line2 = orderContext.Order.ShippingAddress.Data.Address2,
-                PostalCode = orderContext.Order.ShippingAddress.Data.Zip,
-                Region =
-                    orderContext.GetRegionOrStateCode(orderContext.Order.ShippingAddress)
-            };
+            destinationAddress = _mapper.ToModel<Address>(orderContext.Order.ShippingAddress);
+            destinationAddress.AddressCode = "02";
+            destinationAddress.Country = orderContext.GetCountryCode(orderContext.Order.ShippingAddress);
+            destinationAddress.Region = orderContext.GetRegionOrStateCode(orderContext.Order.ShippingAddress);
         }
 
         private TaxGetType CommitProtect(TaxGetType taxGetType)
@@ -215,7 +202,7 @@ namespace VitalChoice.Business.Services.Avatax
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
                         order.Order.Customer.Data.TaxExempt
                             ? "G"
-                            : "<null>"
+                            : null
                 }
             });
         }
@@ -240,24 +227,24 @@ namespace VitalChoice.Business.Services.Avatax
                 items = order.SkuOrdereds.Union(order.PromoSkus);
             }
             return items.Select(
-                        p => new Line
-                        {
-                            Amount = p.Amount * p.Quantity,
-                            Description = p.ProductWithoutSkus.Name,
-                            DestinationCode = "02",
-                            OriginCode = "01",
-                            Discounted = order.DiscountTotal > 0,
-                            TaxCode = p.Sku.Data.TaxCode,
-                            Qty = p.Quantity,
-                            ItemCode = p.Sku.Code,
-                            LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),
-                            Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
-                            CustomerUsageType =
-                                order.Order.Customer.IdObjectType == (int)CustomerType.Wholesale &&
-                                order.Order.Customer.Data.TaxExempt
-                                    ? "G"
-                                    : "<null>"
-                        });
+                p => new Line
+                {
+                    Amount = p.Amount*p.Quantity,
+                    Description = p.ProductWithoutSkus.Name,
+                    DestinationCode = "02",
+                    OriginCode = "01",
+                    Discounted = order.DiscountTotal > 0,
+                    TaxCode = p.ProductWithoutSkus.Data.TaxCode,
+                    Qty = p.Quantity,
+                    ItemCode = p.Sku.Code,
+                    LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),
+                    Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
+                    CustomerUsageType =
+                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+                        order.Order.Customer.Data.TaxExempt
+                            ? "G"
+                            : null
+                });
         }
     }
 }

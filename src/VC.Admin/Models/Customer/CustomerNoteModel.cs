@@ -1,8 +1,8 @@
 ﻿using System;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.DynamicData.Attributes;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 

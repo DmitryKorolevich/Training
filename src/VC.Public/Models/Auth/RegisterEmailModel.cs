@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.DynamicData.Attributes;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Auth

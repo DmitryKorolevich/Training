@@ -12,6 +12,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain.Avatax;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
@@ -32,6 +33,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
@@ -50,6 +52,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
         private readonly ICountryService _countryService;
+        private readonly IAvalaraTax _avataxService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -59,7 +62,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderMapper mapper,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService)
+            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IAvalaraTax avataxService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository)
@@ -71,6 +74,7 @@ namespace VitalChoice.Business.Services.Orders
             _customerService = customerService;
             _treeFactory = treeFactory;
             _countryService = countryService;
+            _avataxService = avataxService;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -141,7 +145,18 @@ namespace VitalChoice.Business.Services.Orders
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderContext, decimal>("Order");
             tree.Execute(context);
+            context.TaxTotal = await _avataxService.GetTax(context, TaxGetType.PerishableOnly) +
+                               await _avataxService.GetTax(context, TaxGetType.NonPerishableOnly);
             return context;
+        }
+
+        public void UpdateOrderFromCalculationContext(OrderDynamic order, OrderContext context)
+        {
+            order.TaxTotal = context.TaxTotal;
+            order.Total = context.Total;
+            order.DiscountTotal = context.DiscountTotal;
+            order.ShippingTotal = context.ShippingTotal;
+            //TODO: Add promo skus and skus to order
         }
 
         protected override async Task BeforeEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)

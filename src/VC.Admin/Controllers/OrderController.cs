@@ -225,8 +225,9 @@ namespace VC.Admin.Controllers
                 {
                     item.Data.OrderType = orderType.HasValue ? orderType.Value : (int)SourceOrderType.Phone;
                 }
-
-                item = (await _orderService.UpdateAsync(item));
+                var context = await _orderService.CalculateOrder(item);
+                _orderService.UpdateOrderFromCalculationContext(item, context);
+                item = await _orderService.UpdateAsync(item);
             }
             else
             {
@@ -238,12 +239,14 @@ namespace VC.Admin.Controllers
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
                 item.PaymentMethod.Id = 0;
-                item = (await _orderService.InsertAsync(item));
+                var context = await _orderService.CalculateOrder(item);
+                _orderService.UpdateOrderFromCalculationContext(item, context);
+                item = await _orderService.InsertAsync(item);
             }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
-            //TODO - add sign up for newsletter(SignUpNewsletter)
+            //TODO: - add sign up for newsletter(SignUpNewsletter)
 
             return toReturn;
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.DynamicData.Attributes;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.DynamicData.Helpers;
 
 namespace VitalChoice.DynamicData.Delegates

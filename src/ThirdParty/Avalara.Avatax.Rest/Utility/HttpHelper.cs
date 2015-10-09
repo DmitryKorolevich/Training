@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
+using VitalChoice.Domain.Avatax;
 
 namespace Avalara.Avatax.Rest.Utility
 {
@@ -38,6 +39,18 @@ namespace Avalara.Avatax.Rest.Utility
                 if (responseStream != null)
                     return serializer.Deserialize<T>(new JsonTextReader(new StreamReader(responseStream)));
                 return default(T);
+            }
+        }
+
+        internal static void WriteTo(this JsonSerializer serializer, object obj, Stream newStream)
+        {
+            using (var streamWriter = new StreamWriter(newStream))
+            {
+                using (var jsonWriter = new JsonTextWriter(streamWriter))
+                {
+                    serializer.Serialize(jsonWriter, obj);
+                    jsonWriter.Flush();
+                }
             }
         }
     }

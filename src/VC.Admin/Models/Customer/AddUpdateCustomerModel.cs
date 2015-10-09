@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using VC.Admin.Validators.Customer;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.DynamicData.Attributes;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
