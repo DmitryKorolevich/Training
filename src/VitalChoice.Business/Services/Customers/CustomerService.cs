@@ -252,16 +252,16 @@ namespace VitalChoice.Business.Services.Customers
                 .ThenInclude(p => p.OptionValues);
         }
 
-        public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, bool sendActivation)
+        public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, bool sendActivation, string password)
         {
             using (var uow = CreateUnitOfWork())
             {
-                var entity = await InsertAsync(model, uow, sendActivation);
+                var entity = await InsertAsync(model, uow, sendActivation, password);
                 return await SelectAsync(entity.Id);
             }
         }
 
-        private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, bool sendActivation)
+        private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, bool sendActivation, string password)
         {
             var roles = new List<RoleType>();
             switch (model.IdObjectType)
@@ -306,7 +306,6 @@ namespace VitalChoice.Business.Services.Customers
                         appUser.IsConfirmed = true;
                         appUser.Status = UserStatus.Active;
 
-                        string password = model.Data.Password.ToString();
                         await _storefrontUserService.UpdateAsync(appUser, null, password);
 
                         transaction.Commit();
@@ -335,7 +334,7 @@ namespace VitalChoice.Business.Services.Customers
 
         protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
         {
-            return await InsertAsync(model, uow, true);
+            return await InsertAsync(model, uow, true, null);
 	    }
 
 	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)

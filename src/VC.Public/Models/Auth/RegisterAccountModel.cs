@@ -13,7 +13,6 @@ namespace VC.Public.Models.Auth
     public class RegisterAccountModel : RegisterEmailModel
 	{
 		[Required]
-		[Map]
 		public string Password { get; set; }
 
 		[Required]

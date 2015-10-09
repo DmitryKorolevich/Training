@@ -23,5 +23,7 @@ namespace VitalChoice.Interfaces.Services.Customers
 		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
 
 		Task<Blob> DownloadFileAsync(string fileName, string customerPublicId);
+
+	    Task<CustomerDynamic> InsertAsync(CustomerDynamic model, bool sendActivation, string password);
 	}
 }

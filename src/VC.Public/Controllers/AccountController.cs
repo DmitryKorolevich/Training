@@ -148,7 +148,7 @@ namespace VC.Public.Controllers
 			item.PublicId = Guid.NewGuid();
 			item.IdDefaultPaymentMethod = 1; //todo
 
-			item = await _customerService.InsertAsync(item);
+			item = await _customerService.InsertAsync(item, false, model.Password);
 			if (item == null || item.Id == 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
