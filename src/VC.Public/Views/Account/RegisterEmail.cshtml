@@ -1,0 +1,29 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Models.Auth
+@model RegisterEmailModel
+
+@section Meta {
+	<title>Vital Choice | Register Email</title>
+}
+
+<div class="working-area-holder">
+	@using (Html.BeginForm("RegisterEmail", "Account", null, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
+	{
+		@Html.AntiForgeryToken()
+		<h4>Register a New Account</h4>
+		@Html.ValidationSummary(true, "", new { @class = "form-validation-summary" })
+		<div class="form-group">
+			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Email, "")
+			</div>
+		</div>
+		<div class="form-buttons-group">
+			<input type="submit" value="Register" />
+		</div>
+	}
+	<div class="form-group">
+		<hr />
+	</div>
+</div>

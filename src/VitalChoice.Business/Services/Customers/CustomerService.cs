@@ -277,7 +277,7 @@ namespace VitalChoice.Business.Services.Customers
 			    IsConfirmed = false,
 			    ConfirmationToken = Guid.NewGuid(),
 			    IsAdminUser = false,
-			    Profile = null
+			    Profile = null,
 		    };
 
 		    using (var transaction = uow.BeginTransaction())
@@ -291,13 +291,27 @@ namespace VitalChoice.Business.Services.Customers
 
 				    var customer = await base.InsertAsync(model, uow);
 
-				    transaction.Commit();
+				    if (model.DictionaryData.Keys.Contains("Password")) //todo: 'wonderfull' archtecture forced me to do such comparison
+				    {
+						appUser.Email = model.Email;
+						appUser.IsConfirmed = true;
+						appUser.Status = UserStatus.Active;
 
-				    await _storefrontUserService.SendActivationAsync(model.Email);
+					    string password = model.Data.Password.ToString();
+                        await _storefrontUserService.UpdateAsync(appUser, null, password);
+
+						transaction.Commit();
+					}
+				    else
+				    {
+						transaction.Commit();
+
+						await _storefrontUserService.SendActivationAsync(model.Email);
+					}
 
 				    return customer;
 			    }
-			    catch (Exception)
+			    catch (Exception ex)
 			    {
 				    if (appUser.Id > 0)
 				    {

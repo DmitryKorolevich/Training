@@ -7,7 +7,7 @@
 }
 
 <div class="working-area-holder">
-	@using (Html.BeginForm("Login", "Auth", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
+	@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
 	{
 		@Html.AntiForgeryToken()
 		<h4>Account Login</h4>
@@ -27,7 +27,7 @@
 			</div>
 		</div>
 		<div class="form-buttons-group">
-			<input type="submit" value="Login" class="btn btn-default" />
+			<input type="submit" value="Login"/>
 		</div>
 		<div class="form-group">
 			Forgot your password? @Html.ActionLink("Click here to have it e-mailed to you.", "ForgotPassword")

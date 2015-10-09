@@ -1,4 +1,5 @@
 ﻿@using VitalChoice.Domain.Entities.Options;
+@using VitalChoice.Infrastructure.Identity
 @inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
 
 <!DOCTYPE html>
@@ -84,8 +85,8 @@
 					</div>
 					<div class="header-actions-holder">
 						<div class="actions-top-nav">
-							<a href="#">Your Account</a>
-							<a href="#">Register</a>
+							<a href="@Url.Action("Index", "Profile")">Your Account</a>
+							<a href="@Url.Action("RegisterEmail", "Account")">Register</a>
 							<a class="last-child" href="#">Contact Us</a>
 						</div>
 						<div class="cart-work-area">
@@ -105,7 +106,7 @@
 			</div>
 			<nav class="top-nav secondary-nav">
 				<ul>
-					@if (User.Identity.IsAuthenticated && User.IsInRole("Wholesale"))//todo: refactor when authentication mechanism gets ready
+					@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
 					{
 						<text>@await Component.InvokeAsync("Area", "Secondary Menu for Wholesale")</text>
 					}

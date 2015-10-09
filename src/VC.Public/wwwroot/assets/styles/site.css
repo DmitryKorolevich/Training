@@ -856,6 +856,21 @@ footer {
   padding-left: 15px;
   padding-right: 15px;
 }
+.working-area-holder hr {
+  margin: 20px 0 10px 0;
+}
+.working-area-holder a:visited {
+  color: #2b6c82;
+  text-decoration: none;
+}
+.working-area-holder a:link {
+  color: #2b6c82;
+  text-decoration: none;
+  outline: none;
+}
+.working-area-holder a:hover {
+  text-decoration: underline;
+}
 .working-area-holder h4 {
   font-size: 18px;
   font-weight: bold;
@@ -904,6 +919,35 @@ footer {
   font-family: Arial;
   font-size: 13px;
 }
+.form-regular *,
+.form-regular :after,
+.form-regular :before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.form-regular .form-two-column {
+  float: left;
+  width: 50%;
+}
+.form-regular .sub-title {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  float: left;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 5px 0;
+}
+.form-regular .sub-title span {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.form-regular .form-control-hint {
+  float: left;
+  width: 100%;
+  color: #737373;
+  margin-bottom: 15px;
+}
 .form-regular .form-group .control-label {
   text-align: left;
   margin-bottom: 0;
@@ -949,19 +993,4 @@ footer {
   list-style: none;
   padding-left: 0;
   margin: 15px 0;
-}
-hr {
-  margin: 20px 0 10px 0;
-}
-a:visited {
-  color: #2b6c82;
-  text-decoration: none;
-}
-a:link {
-  color: #2b6c82;
-  text-decoration: none;
-  outline: none;
-}
-a:hover {
-  text-decoration: underline;
 }

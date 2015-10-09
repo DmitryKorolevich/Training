@@ -75,6 +75,7 @@ module.exports = function (grunt) {
         copy: {
         	development: {
         		files: [
+					{ expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 				  { expand: true, cwd: 'assets/scripts/', src: ['**'], dest: 'wwwroot/assets/scripts/' },
 				  { expand: true, cwd: 'temp/css/', src: ['**'], dest: 'wwwroot/assets/styles/' },
 				  { expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
@@ -83,7 +84,8 @@ module.exports = function (grunt) {
         		]
         	},
         	release: {
-		        files: [
+        		files: [
+					{ expand: true, cwd: 'app/', src: ['**'], dest: 'wwwroot/app/' },
 					{ expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/' },
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/' },
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },

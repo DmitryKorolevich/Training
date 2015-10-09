@@ -64,7 +64,9 @@ namespace VC.Public
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
 
-            app.UseMvc(RouteConfig.RegisterRoutes);
+			//app.UseCookieAuthentication();
+
+			app.UseMvc(RouteConfig.RegisterRoutes);
         }
     }
 }

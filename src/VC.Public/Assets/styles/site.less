@@ -988,6 +988,25 @@ footer{
 	padding-left: 15px;
     padding-right: 15px;
 
+	hr{
+		margin:20px 0 10px 0;
+	}
+
+	a:visited {
+		color: #2b6c82;
+	    text-decoration: none;
+	}
+
+	a:link {
+		color: #2b6c82;
+		text-decoration: none;
+	    outline: none;
+	}
+
+	a:hover{
+		text-decoration: underline;
+	}
+
 	h4{
 		font-size: 18px;
 		font-weight: bold;
@@ -1055,6 +1074,38 @@ footer{
 	font-family: Arial;
 	font-size: 13px;
 
+	*, :after, :before {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	.form-two-column{
+		float:left;
+		width: 50%;
+	}
+
+	.sub-title{
+		background-color: rgb(245, 245, 245);
+		font-weight:bold;
+		float:left;
+		width:100%;
+		margin-bottom: 15px;
+		padding: 5px 0;
+
+		span{
+			margin-left:3px;
+			margin-right:3px;
+		}
+	}
+
+	.form-control-hint{
+		float:left;
+		width:100%;
+		color: #737373;
+		margin-bottom: 15px;
+	}
+
 	.form-validation-summary{
 
 	}
@@ -1117,23 +1168,4 @@ footer{
 		padding-left:0;
 		margin: 15px 0;
 	}
-}
-
-hr{
-	margin:20px 0 10px 0;
-}
-
-a:visited {
-    color: #2b6c82;
-    text-decoration: none;
-}
-
-a:link {
-    color: #2b6c82;
-    text-decoration: none;
-    outline: none;
-}
-
-a:hover{
-	text-decoration: underline;
 }

@@ -8,7 +8,7 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Auth
 {
-    public class CreateCustomerAccountModel: BaseModel
+    public class CreateAccountModel: BaseModel
     {
 	    public Guid PublicId { get; set; }
 
@@ -22,7 +22,7 @@ namespace VC.Public.Models.Auth
 
 		[Required]
 		[Compare("Password")]
-		[Display(Name = "Confirm Password")]
+		[Display(Name = "Password Confirm")]
 	    public string ConfirmPassword { get; set; }
     }
 }
