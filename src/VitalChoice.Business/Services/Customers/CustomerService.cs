@@ -252,76 +252,90 @@ namespace VitalChoice.Business.Services.Customers
                 .ThenInclude(p => p.OptionValues);
         }
 
-	    protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
-	    {
-		    var roles = new List<RoleType>();
-		    switch (model.IdObjectType)
-		    {
-			    case (int) CustomerType.Retail:
-				    roles.Add(RoleType.Retail);
-				    break;
-			    case (int) CustomerType.Wholesale:
-				    roles.Add(RoleType.Wholesale);
-				    break;
-			    default:
-				    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
-		    }
+        public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, bool sendActivation)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var entity = await InsertAsync(model, uow, sendActivation);
+                return await SelectAsync(entity.Id);
+            }
+        }
 
-		    var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int) AddressType.Profile);
-		    var appUser = new ApplicationUser()
-		    {
-			    FirstName = profileAddress.Data.FirstName,
-			    LastName = profileAddress.Data.LastName,
-			    Email = model.Email,
-			    TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Options.ActivationTokenExpirationTermDays),
-			    IsConfirmed = false,
-			    ConfirmationToken = Guid.NewGuid(),
-			    IsAdminUser = false,
-			    Profile = null,
-		    };
+        private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, bool sendActivation)
+        {
+            var roles = new List<RoleType>();
+            switch (model.IdObjectType)
+            {
+                case (int)CustomerType.Retail:
+                    roles.Add(RoleType.Retail);
+                    break;
+                case (int)CustomerType.Wholesale:
+                    roles.Add(RoleType.Wholesale);
+                    break;
+                default:
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
+            }
 
-		    using (var transaction = uow.BeginTransaction())
-		    {
-			    try
-			    {
-				    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false);
+            var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+            var appUser = new ApplicationUser()
+            {
+                FirstName = profileAddress.Data.FirstName,
+                LastName = profileAddress.Data.LastName,
+                Email = model.Email,
+                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Options.ActivationTokenExpirationTermDays),
+                IsConfirmed = false,
+                ConfirmationToken = Guid.NewGuid(),
+                IsAdminUser = false,
+                Profile = null,
+            };
 
-				    model.Id = appUser.Id;
-				    model.User.Id = appUser.Id;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false);
 
-				    var customer = await base.InsertAsync(model, uow);
+                    model.Id = appUser.Id;
+                    model.User.Id = appUser.Id;
 
-				    if (model.DictionaryData.Keys.Contains("Password")) //todo: 'wonderfull' archtecture forced me to do such comparison
-				    {
-						appUser.Email = model.Email;
-						appUser.IsConfirmed = true;
-						appUser.Status = UserStatus.Active;
+                    var customer = await base.InsertAsync(model, uow);
 
-					    string password = model.Data.Password.ToString();
+                    if (!sendActivation)
+                    {
+                        appUser.Email = model.Email;
+                        appUser.IsConfirmed = true;
+                        appUser.Status = UserStatus.Active;
+
+                        string password = model.Data.Password.ToString();
                         await _storefrontUserService.UpdateAsync(appUser, null, password);
 
-						transaction.Commit();
-					}
-				    else
-				    {
-						transaction.Commit();
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        transaction.Commit();
 
-						await _storefrontUserService.SendActivationAsync(model.Email);
-					}
+                        await _storefrontUserService.SendActivationAsync(model.Email);
+                    }
 
-				    return customer;
-			    }
-			    catch (Exception ex)
-			    {
-				    if (appUser.Id > 0)
-				    {
-					    await _storefrontUserService.DeleteAsync(appUser);
-				    }
+                    return customer;
+                }
+                catch (Exception)
+                {
+                    if (appUser.Id > 0)
+                    {
+                        await _storefrontUserService.DeleteAsync(appUser);
+                    }
 
-				    transaction.Rollback();
-				    throw;
-			    }
-		    }
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+        {
+            return await InsertAsync(model, uow, true);
 	    }
 
 	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
