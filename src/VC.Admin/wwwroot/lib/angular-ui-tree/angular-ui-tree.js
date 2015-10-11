@@ -1,5 +1,5 @@
 /**
- * @license Angular UI Tree v2.7.0
+ * @license Angular UI Tree v2.9.0
  * (c) 2010-2015. https://github.com/angular-ui-tree/angular-ui-tree
  * License: MIT
  */
@@ -519,8 +519,8 @@
 
   angular.module('ui.tree')
 
-    .directive('uiTreeNode', ['treeConfig', '$uiTreeHelper', '$window', '$document', '$timeout',
-      function (treeConfig, $uiTreeHelper, $window, $document, $timeout) {
+    .directive('uiTreeNode', ['treeConfig', 'UiTreeHelper', '$window', '$document', '$timeout',
+      function (treeConfig, UiTreeHelper, $window, $document, $timeout) {
         return {
           require: ['^uiTreeNodes', '^uiTree'],
           restrict: 'A',
@@ -550,14 +550,16 @@
               dragCancelEvent,
               dragDelay,
               bindDrag,
-              keydownHandler;
+              keydownHandler,
+              outOfBounds;
             angular.extend(config, treeConfig);
             if (config.nodeClass) {
               element.addClass(config.nodeClass);
             }
             scope.init(controllersArr);
 
-            scope.collapsed = !!$uiTreeHelper.getNodeAttribute(scope, 'collapsed');
+            scope.collapsed = !!UiTreeHelper.getNodeAttribute(scope, 'collapsed');
+            scope.sourceOnly = scope.nodropEnabled || scope.$treeScope.nodropEnabled;
 
             scope.$watch(attrs.collapsed, function (val) {
               if ((typeof val) == 'boolean') {
@@ -566,7 +568,7 @@
             });
 
             scope.$watch('collapsed', function (val) {
-              $uiTreeHelper.setNodeAttribute(scope, 'collapsed', val);
+              UiTreeHelper.setNodeAttribute(scope, 'collapsed', val);
               attrs.$set('collapsed', val);
             });
 
@@ -582,6 +584,7 @@
               // the element which is clicked.
               var eventElm = angular.element(e.target),
                 eventScope = eventElm.scope(),
+                cloneElm = element.clone(),
                 eventElmTagName, tagName,
                 eventObj, tdElm, hStyle;
               if (!eventScope || !eventScope.$type) {
@@ -606,7 +609,7 @@
 
               // check if it or it's parents has a 'data-nodrag' attribute
               while (eventElm && eventElm[0] && eventElm[0] != element) {
-                if ($uiTreeHelper.nodrag(eventElm)) { // if the node mark as `nodrag`, DONOT drag it.
+                if (UiTreeHelper.nodrag(eventElm)) { // if the node mark as `nodrag`, DONOT drag it.
                   return;
                 }
                 eventElm = eventElm.parent();
@@ -621,10 +624,10 @@
                 e.originalEvent.uiTreeDragging = true;
               }
               e.preventDefault();
-              eventObj = $uiTreeHelper.eventObj(e);
+              eventObj = UiTreeHelper.eventObj(e);
 
               firstMoving = true;
-              dragInfo = $uiTreeHelper.dragInfo(scope);
+              dragInfo = UiTreeHelper.dragInfo(scope);
 
               // Fire dragStart callback
               scope.$apply(function () {
@@ -646,12 +649,14 @@
               if (config.hiddenClass) {
                 hiddenPlaceElm.addClass(config.hiddenClass);
               }
-              pos = $uiTreeHelper.positionStarted(eventObj, scope.$element);
-              placeElm.css('height', $uiTreeHelper.height(scope.$element) + 'px');
-              placeElm.css('width', $uiTreeHelper.width(scope.$element) + 'px');
+
+              pos = UiTreeHelper.positionStarted(eventObj, scope.$element);
+              placeElm.css('height', UiTreeHelper.height(scope.$element) + 'px');
+              placeElm.css('width', UiTreeHelper.width(scope.$element) + 'px');
+
               dragElm = angular.element($window.document.createElement(scope.$parentNodesScope.$element.prop('tagName')))
                 .addClass(scope.$parentNodesScope.$element.attr('class')).addClass(config.dragClass);
-              dragElm.css('width', $uiTreeHelper.width(scope.$element) + 'px');
+              dragElm.css('width', UiTreeHelper.width(scope.$element) + 'px');
               dragElm.css('z-index', 9999);
 
               // Prevents cursor to change rapidly in Opera 12.16 and IE when dragging an element
@@ -661,9 +666,16 @@
                 $document.find('body').css({'cursor': hStyle.cursor + '!important'});
               }
 
+              if (scope.sourceOnly) {
+                placeElm.css('display', 'none');
+              }
               scope.$element.after(placeElm);
               scope.$element.after(hiddenPlaceElm);
-              dragElm.append(scope.$element);
+              if (dragInfo.isClone() && scope.sourceOnly) {
+                dragElm.append(cloneElm);
+              } else {
+                dragElm.append(scope.$element);
+              }
               $document.find('body').append(dragElm);
               dragElm.css({
                 'left': eventObj.pageX - pos.offsetX + 'px',
@@ -686,7 +698,7 @@
             };
 
             dragMove = function (e) {
-              var eventObj = $uiTreeHelper.eventObj(e),
+              var eventObj = UiTreeHelper.eventObj(e),
                 prev,
                 next,
                 leftElmPos,
@@ -754,10 +766,53 @@
                   window.scrollBy(0, -10);
                 }
 
-                $uiTreeHelper.positionMoved(e, pos, firstMoving);
+                UiTreeHelper.positionMoved(e, pos, firstMoving);
                 if (firstMoving) {
                   firstMoving = false;
                   return;
+                }
+
+                // check if add it as a child node first
+                // todo decrease is unused
+                decrease = (UiTreeHelper.offset(dragElm).left - UiTreeHelper.offset(placeElm).left) >= config.threshold;
+                targetX = eventObj.pageX - $window.document.body.scrollLeft;
+                targetY = eventObj.pageY - (window.pageYOffset || $window.document.documentElement.scrollTop);
+
+                // Select the drag target. Because IE does not support CSS 'pointer-events: none', it will always
+                // pick the drag element itself as the target. To prevent this, we hide the drag element while
+                // selecting the target.
+                if (angular.isFunction(dragElm.hide)) {
+                  dragElm.hide();
+                } else {
+                  displayElm = dragElm[0].style.display;
+                  dragElm[0].style.display = 'none';
+                }
+
+                // when using elementFromPoint() inside an iframe, you have to call
+                // elementFromPoint() twice to make sure IE8 returns the correct value
+                $window.document.elementFromPoint(targetX, targetY);
+
+                targetElm = angular.element($window.document.elementFromPoint(targetX, targetY));
+
+                if (angular.isFunction(dragElm.show)) {
+                  dragElm.show();
+                } else {
+                  dragElm[0].style.display = displayElm;
+                }
+
+                outOfBounds = !(targetElm.scope().$type);
+
+                // Detect out of bounds condition, update drop target display, and prevent drop
+                if (outOfBounds) {
+
+                  // Remove the placeholder
+                  placeElm.remove();
+
+                  // If the target was an empty tree, replace the empty element placeholder
+                  if (treeScope) {
+                    treeScope.resetEmptyElement();
+                    treeScope = null;
+                  }
                 }
 
                 // move horizontal
@@ -789,33 +844,6 @@
                   }
                 }
 
-                // check if add it as a child node first
-                // todo decrease is unused
-                decrease = ($uiTreeHelper.offset(dragElm).left - $uiTreeHelper.offset(placeElm).left) >= config.threshold;
-                targetX = eventObj.pageX - $window.document.body.scrollLeft;
-                targetY = eventObj.pageY - (window.pageYOffset || $window.document.documentElement.scrollTop);
-
-                // Select the drag target. Because IE does not support CSS 'pointer-events: none', it will always
-                // pick the drag element itself as the target. To prevent this, we hide the drag element while
-                // selecting the target.
-                if (angular.isFunction(dragElm.hide)) {
-                  dragElm.hide();
-                } else {
-                  displayElm = dragElm[0].style.display;
-                  dragElm[0].style.display = 'none';
-                }
-
-                // when using elementFromPoint() inside an iframe, you have to call
-                // elementFromPoint() twice to make sure IE8 returns the correct value
-                $window.document.elementFromPoint(targetX, targetY);
-
-                targetElm = angular.element($window.document.elementFromPoint(targetX, targetY));
-                if (angular.isFunction(dragElm.show)) {
-                  dragElm.show();
-                } else {
-                  dragElm[0].style.display = displayElm;
-                }
-
                 // move vertical
                 if (!pos.dirAx) {
                   // check it's new position
@@ -823,6 +851,11 @@
                   isEmpty = false;
                   if (!targetNode) {
                     return;
+                  }
+
+                  // Show the placeholder if it was hidden for nodrop-enabled and this is a new tree
+                  if (targetNode.$treeScope && !targetNode.$parent.nodropEnabled && !targetNode.$treeScope.nodropEnabled) {
+                    placeElm.css('display', 'block');
                   }
 
                   if (targetNode.$type == 'uiTree' && targetNode.dragEnabled) {
@@ -852,9 +885,9 @@
                     }
                   } else if (targetNode.dragEnabled()) { // drag enabled
                     targetElm = targetNode.$element; // Get the element of ui-tree-node
-                    targetOffset = $uiTreeHelper.offset(targetElm);
-                    targetBefore = targetNode.horizontal ? eventObj.pageX < (targetOffset.left + $uiTreeHelper.width(targetElm) / 2)
-                      : eventObj.pageY < (targetOffset.top + $uiTreeHelper.height(targetElm) / 2);
+                    targetOffset = UiTreeHelper.offset(targetElm);
+                    targetBefore = targetNode.horizontal ? eventObj.pageX < (targetOffset.left + UiTreeHelper.width(targetElm) / 2)
+                      : eventObj.pageY < (targetOffset.top + UiTreeHelper.height(targetElm) / 2);
 
                     if (targetNode.$parentNodesScope.accept(scope, targetNode.index())) {
                       if (targetBefore) {
@@ -867,9 +900,10 @@
                     } else if (!targetBefore && targetNode.accept(scope, targetNode.childNodesCount())) { // we have to check if it can add the dragging node as a child
                       targetNode.$childNodesScope.$element.append(placeElm);
                       dragInfo.moveTo(targetNode.$childNodesScope, targetNode.childNodes(), targetNode.childNodesCount());
+                    } else {
+                      outOfBounds = true;
                     }
                   }
-
                 }
 
                 scope.$apply(function () {
@@ -879,6 +913,7 @@
             };
 
             dragEnd = function (e) {
+
               e.preventDefault();
 
               if (dragElm) {
@@ -891,7 +926,7 @@
 
                 dragElm.remove();
                 dragElm = null;
-                if (scope.$$apply) {
+                if (scope.$$apply && !outOfBounds) {
                   scope.$treeScope.$apply(function () {
                     dragInfo.apply();
                     scope.$treeScope.$callbacks.dropped(dragInfo.eventArgs(elements, pos));
@@ -904,7 +939,6 @@
                 });
                 scope.$$apply = false;
                 dragInfo = null;
-
               }
 
               // Restore cursor in Opera 12.16 and IE
@@ -1024,9 +1058,6 @@
 
             if (ngModel) {
               ngModel.$render = function () {
-                if (!ngModel.$modelValue || !angular.isArray(ngModel.$modelValue)) {
-                  scope.$modelValue = [];
-                }
                 scope.$modelValue = ngModel.$modelValue;
               };
             }
@@ -1062,14 +1093,14 @@
 
   /**
    * @ngdoc service
-   * @name ui.tree.service:$helper
+   * @name ui.tree.service:UiTreeHelper
    * @requires ng.$document
    * @requires ng.$window
    *
    * @description
    * angular-ui-tree.
    */
-    .factory('$uiTreeHelper', ['$document', '$window',
+    .factory('UiTreeHelper', ['$document', '$window',
       function ($document, $window) {
         return {
 
@@ -1134,6 +1165,7 @@
             return {
               source: node,
               sourceInfo: {
+                cloneModel: node.$treeScope.cloneEnabled === true ? angular.copy(node.$modelValue) : undefined,
                 nodeScope: node,
                 index: node.index(),
                 nodesScope: node.$parentNodesScope
@@ -1180,9 +1212,21 @@
                 return null;
               },
 
+              isClone: function () {
+                return this.source.$treeScope.cloneEnabled === true;
+              },
+
+              clonedNode: function (node) {
+                return angular.copy(node);
+              },
+
               isDirty: function () {
                 return this.source.$parentNodesScope != this.parent ||
                   this.source.index() != this.index;
+              },
+
+              isForeign: function () {
+                return this.source.$treeScope !== this.parent.$treeScope;
               },
 
               eventArgs: function (elements, pos) {
@@ -1198,28 +1242,24 @@
               },
 
               apply: function () {
-                //no drop so no changes
-                if (this.parent.$treeScope.nodropEnabled !== true) {
-                  var nodeData = this.source.$modelValue;
 
-                  // node was dropped in the same place - do nothing
-                  if (this.index === this.sourceInfo.index) {
-                    if ((this.source.$parentNodeScope && (this.parent.$id === this.source.$parentNodeScope.$id)) ||
-                        (this.source.$parentNodesScope && (this.parent.$id === this.source.$parentNodesScope.$id))) {
-                      return;
-                    }
-                  }
+                var nodeData = this.source.$modelValue;
 
-                  //cloneEnabled so do not remove from source
-                  if (this.source.$treeScope.cloneEnabled !== true) {
-                    this.source.remove();
-                  }
+                // nodrop enabled on tree or parent
+                if (this.parent.nodropEnabled || this.parent.$treeScope.nodropEnabled) {
+                  return;
+                }
 
-                  //if the tree is set to cloneEnabled and source === dest do not insert node or it will cause a duplicate in the repeater
-                  if ((this.source.$treeScope.cloneEnabled === true) && (this.source.$treeScope === this.parent.$treeScope)) {
-                    return false;
-                  }
+                // node was dropped in the same place - do nothing
+                if (!this.isDirty()) {
+                  return;
+                }
 
+                // cloneEnabled and cross-tree so copy and do not remove from source
+                if (this.isClone() && this.isForeign()) {
+                  this.parent.insertNode(this.index, angular.copy(nodeData));
+                } else { // Any other case, remove and reinsert
+                  this.source.remove();
                   this.parent.insertNode(this.index, nodeData);
                 }
               }
@@ -1228,8 +1268,8 @@
 
           /**
            * @ngdoc method
-           * @name hippo.theme#height
-           * @methodOf ui.tree.service:$helper
+           * @name ui.tree#height
+           * @methodOf ui.tree.service:UiTreeHelper
            *
            * @description
            * Get the height of an element.
@@ -1243,8 +1283,8 @@
 
           /**
            * @ngdoc method
-           * @name hippo.theme#width
-           * @methodOf ui.tree.service:$helper
+           * @name ui.tree#width
+           * @methodOf ui.tree.service:UiTreeHelper
            *
            * @description
            * Get the width of an element.
@@ -1258,8 +1298,8 @@
 
           /**
            * @ngdoc method
-           * @name hippo.theme#offset
-           * @methodOf ui.nestedSortable.service:$helper
+           * @name ui.tree#offset
+           * @methodOf ui.nestedSortable.service:UiTreeHelper
            *
            * @description
            * Get the offset values of an element.
@@ -1280,8 +1320,8 @@
 
           /**
            * @ngdoc method
-           * @name hippo.theme#positionStarted
-           * @methodOf ui.tree.service:$helper
+           * @name ui.tree#positionStarted
+           * @methodOf ui.tree.service:UiTreeHelper
            *
            * @description
            * Get the start position of the target element according to the provided event properties.
@@ -1291,24 +1331,38 @@
            * @returns {Object} Object with properties offsetX, offsetY, startX, startY, nowX and dirX.
            */
           positionStarted: function (e, target) {
-            var pos = {};
-            pos.offsetX = e.pageX - this.offset(target).left;
-            pos.offsetY = e.pageY - this.offset(target).top;
-            pos.startX = pos.lastX = e.pageX;
-            pos.startY = pos.lastY = e.pageY;
+            var pos = {},
+              pageX = e.pageX,
+              pageY = e.pageY;
+
+            if (e.originalEvent && e.originalEvent.touches && (e.originalEvent.touches.length > 0)) {
+              pageX = e.originalEvent.touches[0].pageX;
+              pageY = e.originalEvent.touches[0].pageY;
+            }
+            pos.offsetX = pageX - this.offset(target).left;
+            pos.offsetY = pageY - this.offset(target).top;
+            pos.startX = pos.lastX = pageX;
+            pos.startY = pos.lastY = pageY;
             pos.nowX = pos.nowY = pos.distX = pos.distY = pos.dirAx = 0;
             pos.dirX = pos.dirY = pos.lastDirX = pos.lastDirY = pos.distAxX = pos.distAxY = 0;
             return pos;
           },
 
           positionMoved: function (e, pos, firstMoving) {
+            var pageX = e.pageX,
+              pageY = e.pageY,
+              newAx;
+            if (e.originalEvent && e.originalEvent.touches && (e.originalEvent.touches.length > 0)) {
+              pageX = e.originalEvent.touches[0].pageX;
+              pageY = e.originalEvent.touches[0].pageY;
+            }
             // mouse position last events
             pos.lastX = pos.nowX;
             pos.lastY = pos.nowY;
 
             // mouse position this events
-            pos.nowX = e.pageX;
-            pos.nowY = e.pageY;
+            pos.nowX = pageX;
+            pos.nowY = pageY;
 
             // distance mouse moved between events
             pos.distX = pos.nowX - pos.lastX;
@@ -1323,7 +1377,7 @@
             pos.dirY = pos.distY === 0 ? 0 : pos.distY > 0 ? 1 : -1;
 
             // axis mouse is now moving on
-            var newAx = Math.abs(pos.distX) > Math.abs(pos.distY) ? 1 : 0;
+            newAx = Math.abs(pos.distX) > Math.abs(pos.distY) ? 1 : 0;
 
             // do nothing on first move
             if (firstMoving) {

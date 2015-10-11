@@ -1,3 +1,14 @@
+# 2.9.0
+
+* Updated Bower package name to `angular-ui-tree` [#568](https://github.com/angular-ui-tree/angular-ui-tree/pull/568)
+* Remove placeholder and cancel drop on drag out of bounds [#550](https://github.com/angular-ui-tree/angular-ui-tree/pull/550)
+* Fix position detection on touch devices when using jQuery [#554](https://github.com/angular-ui-tree/angular-ui-tree/pull/554)
+
+# 2.8.0
+
+* Rename `$uiTreeHelper` service to `UiTreeHelper` [#534](https://github.com/angular-ui-tree/angular-ui-tree/pull/534)
+* Nodrop, clone, and dirty-checking fixes [#525](https://github.com/angular-ui-tree/angular-ui-tree/pull/525)
+
 # 2.7.0
 
 * Fix edge case error when you have a single node with no parents and no children and and drop the node in the same place [#510](https://github.com/angular-ui-tree/angular-ui-tree/pull/510)

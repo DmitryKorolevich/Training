@@ -1,5 +1,7 @@
 ## ngProgress.js
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/VictorBjelkholm/ngProgress?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/VictorBjelkholm/ngProgress.png?branch=master)](https://travis-ci.org/VictorBjelkholm/ngProgress)
 
 **ngProgress** is a provider for angular for showing a loading status of something.
@@ -28,17 +30,23 @@ var app = angular.module('progressApp', ['ngProgress']);
 ```
 
 
-Inject **ngProgress** provider in controller
+Inject **ngProgressFactory** in your controller
 
 ```javascript
-var MainCtrl = function($scope, $timeout, ngProgress) {}
+var MainCtrl = function($scope, $timeout, ngProgressFactory) {}
+```
+
+Create a instance of the progressbar
+
+```javascript
+$scope.progressbar = ngProgressFactory.createInstance();
 ```
 
 Use with the API down below
 
 ```javascript
-ngProgress.start();
-$timeout(ngProgress.complete(), 1000);
+$scope.progressbar.start();
+$timeout($scope.progressbar.complete(), 1000);
 ```
 
 ## API
@@ -104,6 +112,20 @@ ngProgress.setParent(document.getElementById('container'));
 ```javascript
 var element = ngProgress.getDomElement();
 ```
+
+## Releasing a new version
+
+The current (and quite hacky solution, honestly) to make a new release:
+
+* Update package.json to have new version.
+
+* Commit changes
+
+* Run ```bower version patch|minor|major```
+
+## Publishing new Github-pages version
+
+Merge ```master``` into ```gh-pages```, run ```grunt``` and push to Github
 
 ##License
 

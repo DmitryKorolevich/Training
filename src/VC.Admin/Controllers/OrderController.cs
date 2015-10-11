@@ -239,8 +239,8 @@ namespace VC.Admin.Controllers
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
                 item.PaymentMethod.Id = 0;
-                var context = await _orderService.CalculateOrder(item);
-                _orderService.UpdateOrderFromCalculationContext(item, context);
+                //var context = await _orderService.CalculateOrder(item);
+                //_orderService.UpdateOrderFromCalculationContext(item, context);
                 item = await _orderService.InsertAsync(item);
             }
 

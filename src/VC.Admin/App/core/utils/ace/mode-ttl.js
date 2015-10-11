@@ -1849,57 +1849,57 @@ var TtlHighlightRules = function(options) {
         "ttl-out": [
             {
                 token: "comment.block",
-                regex: "\\@\\*",
+                regex: /@\*/,
                 push: "ttl-comment"
             },
             {
                 token: ["keyword.operator", "paren.lparen"],
-                regex: "\\{\\{",
+                regex: /{{/,
                 push: "start"
             },
             {
                 token: ["keyword.operator", "paren.rparen"],
-                regex: "\\}\\}",
-                next: "pop"
+                regex: /}}/,
+                next: "start"
             },
             {
                 token: "variable.language",
-                regex: "[a-zA-Z_]+[a-zA-Z_0-9]*",
+                regex: /[a-zA-Z_]+[a-zA-Z_0-9]*/,
                 next: "ttl-out"
             },
             {
                 token: "punctuation.operator",
-                regex: ":",
+                regex: /:/,
                 next: "ttl-out"
             },
             {
                 token: "paren.lparen",
-                regex: "\\(",
+                regex: /\(/,
                 push: "ttl-out"
             },
             {
                 token: "paren.rparen",
-                regex: "\\)",
+                regex: /\)/,
                 next: "pop"
             },
             {
                 token: "punctuation.operator",
-                regex: ";",
+                regex: /;/,
                 next: "start"
             },
             {
                 token: ["keyword", "paren.lparen"],
-                regex: "\\@\\{",
+                regex: /@{/,
                 push: "ttl-raw"
             },
             {
                 token: ["keyword.operator", "paren.lparen"],
-                regex: "\\<\\%",
-                push: "ttl-def"
+                regex: /<%/,
+                next: "ttl-def"
             },
             {
                 token: "keyword",
-                regex: "\\@",
+                regex: /@/,
                 next: "ttl-out"
             },
             {include: "start"}
@@ -1907,89 +1907,89 @@ var TtlHighlightRules = function(options) {
         "ttl-raw": [
             {
                 token: ["keyword", "paren.rparen"],
-                regex: "\\}\\@",
+                regex: /}@/,
                 next: "pop"
             },
             {
                 token: "constant.other",
-                regex: "([^\\}]|\\}[^\\@])*",
+                regex: /([^}]|}[^@])*/,
                 next: "ttl-raw"
             }
         ],
         "ttl-def": [
             {
                 token: "comment.block",
-                regex: "\\@\\*",
+                regex: /@\*/,
                 push: "ttl-comment"
             },
             {
                 token: ["keyword.operator", "paren.rparen"],
-                regex: "\\%\\>",
-                next: "pop"
+                regex: /%>/,
+                next: "start"
             },
             {
                 token: ["punctuation.operator", "paren.lparen"],
-                regex: "\\<",
+                regex: /</,
                 next: "ttl-def_name"
             },
             {
                 token: ["keyword.operator", "paren.rparen"],
-                regex: "\\{\\{",
-                push: "start"
+                regex: /{{/,
+                next: "start"
             },
             {
                 token: "keyword.operator",
-                regex: "::",
+                regex: /::/,
                 next: "ttl-def_type"
             },
             {
                 token: "text",
-                regex: "\\s+",
+                regex: /\s+/,
                 next: "ttl-def"
             }
         ],
         "ttl-def_type": [
             {
                 token: "comment.block",
-                regex: "\\@\\*",
+                regex: /@\*/,
                 push: "ttl-comment"
             },
             {
                 token: "storage.type",
-                regex: "[a-zA-Z_]+[a-zA-Z_0-9\\.\\+]*",
+                regex: /[a-zA-Z_]+[a-zA-Z_0-9\.\+]*/,
                 next: "ttl-def"
             }
         ],
         "ttl-def_name": [
             {
                 token: "comment.block",
-                regex: "\\@\\*",
+                regex: /@\*/,
                 push: "ttl-comment"
             },
             {
                 token: "support.function",
-                regex: "[a-zA-Z_]+[a-zA-Z_0-9]*",
+                regex: /[a-zA-Z_]+[a-zA-Z_0-9]*/,
                 next: "ttl-def_name"
             }, {
                 token: ["punctuation.operator", "paren.rparen"],
-                regex: "\\>",
+                regex: />/,
                 next: "ttl-def"
             },
             {
                 token: "keyword.operator",
-                regex: ":",
+                regex: /:/,
                 next: "ttl-def_name"
             }
         ],
         "ttl-comment": [
             {
                 token: "comment.block",
-                regex: ".*?\\*\\@",
+                regex: /.*\*\@/,
                 next: "pop"
             },
             {
                 token: "comment.block",
-                regex: "([^\\*]|\\*[^\\@])*",
+                regex: /([^\*]|\*[^@])*/,
                 next: "ttl-comment"
             }
         ]
@@ -1997,37 +1997,37 @@ var TtlHighlightRules = function(options) {
     this.$rules.start.unshift(
         {
             token: ["keyword.operator", "paren.rparen"],
-            regex: "\\%\\>",
-            next: "pop"
+            regex: /%>/,
+            next: "start"
         },
         {
             token: "comment.block",
-            regex: "\\@\\*",
+            regex: /@\*/,
             push: "ttl-comment"
         },
         {
             token: ["keyword.operator", "paren.lparen"],
-            regex: "\\<\\%",
-            push: "ttl-def"
+            regex: /<%/,
+            next: "ttl-def"
         },
         {
             token: ["keyword.operator", "paren.lparen"],
-            regex: "\\{\\{",
-            push: "start"
+            regex: /{{/,
+            next: "start"
         },
         {
             token: ["keyword.operator", "paren.rparen"],
-            regex: "\\}\\}",
-            next: "pop"
+            regex: /}}/,
+            next: "start"
         },
         {
             token: ["keyword", "paren.lparen"],
-            regex: "\\@\\{",
+            regex: /@{/,
             push: "ttl-raw"
         },
         {
             token: "keyword",
-            regex: "\\@",
+            regex: /@/,
             next: "ttl-out"
         });
     this.addRules(ttlRules);
@@ -2039,44 +2039,60 @@ oop.inherits(TtlHighlightRules, HtmlHighlightRules);
 exports.TtlHighlightRules = TtlHighlightRules;
 });
 
-ace.define("ace/mode/ttl_brace_outdent",["require","exports","module","ace/range"], function(require, exports, module) {
-"use strict";
+ace.define("ace/mode/ttl_brace_outdent",["require","exports","module","ace/range"], function (require, exports, module) {
+    "use strict";
 
-var Range = require("../range").Range;
+    var Range = require("../range").Range;
 
-var TTLMatchingBraceOutdent = function () { };
+    var TTLMatchingBraceOutdent = function () { };
 
-(function() {
+    (function () {
 
-    this.checkOutdent = function(line, input) {
-        if (! /^\s+$/.test(line))
-            return false;
+        this.findMatchingBracket = function (doc, position, chr) {
+            if (position.column == 0) return null;
 
-        return /^(\s*\}\})|(\s*\%\>)/.test(input);
-    };
+            var charBeforeCursor = chr || doc.getLine(position.row).charAt(position.column - 1);
+            if (charBeforeCursor == "") return null;
 
-    this.autoOutdent = function(doc, row) {
-        var line = doc.getLine(row);
-        var match = line.match(/^(\s*\}\})|(\s*\%\>)/);
+            var match = charBeforeCursor.match(/(\{\{|<%|\()|(\}\}|%>|\))/);
+            if (!match)
+                return null;
 
-        if (!match) return 0;
+            if (match[1])
+                return doc.$findClosingBracket(match[1], position);
+            else
+                return doc.$findOpeningBracket(match[2], position);
+        };
 
-        var column = match[1].length;
-        var openBracePos = doc.findMatchingBracket({row: row, column: column});
+        this.checkOutdent = function (line, input) {
+            if (! /^\s+$/.test(line))
+                return false;
 
-        if (!openBracePos || openBracePos.row == row) return 0;
+            return /^(\s*\}\})|(\s*\%\>)|(\s*\))/.test(input);
+        };
 
-        var indent = this.$getIndent(doc.getLine(openBracePos.row));
-        doc.replace(new Range(row, 0, row, column-1), indent);
-    };
+        this.autoOutdent = function (doc, row) {
+            var line = doc.getLine(row);
+            var match = line.match(/^(\s*\}\}|\s*\%\>|\s*\))/);
 
-    this.$getIndent = function(line) {
-        return line.match(/^\s*/)[0];
-    };
+            if (!match) return 0;
 
-}).call(TTLMatchingBraceOutdent.prototype);
+            var column = match[1].length;
+            var openBracePos = this.findMatchingBracket(doc, { row: row, column: column });
 
-exports.TTLMatchingBraceOutdent = TTLMatchingBraceOutdent;
+            if (!openBracePos || openBracePos.row == row) return 0;
+
+            var indent = this.$getIndent(doc.getLine(openBracePos.row));
+            doc.replace(new Range(row, 0, row, column - 1), indent);
+        };
+
+        this.$getIndent = function (line) {
+            return line.match(/^\s*/)[0];
+        };
+
+    }).call(TTLMatchingBraceOutdent.prototype);
+
+    exports.TTLMatchingBraceOutdent = TTLMatchingBraceOutdent;
 });
 
 ace.define("ace/mode/behaviour/ttl",["require","exports","module","ace/lib/oop","ace/mode/behaviour","ace/token_iterator","ace/lib/lang"], function(require, exports, module) {
@@ -2394,7 +2410,8 @@ var defaultExtensions = [
     "if",
     "else",
     "import",
-    "using"
+    "using",
+    "for"
 ];
 
 function is(token, type) {
@@ -2487,7 +2504,7 @@ ace.define("ace/mode/ttl",["require","exports","module","ace/lib/oop","ace/mode/
                 return indent;
             }
 
-            var match = line.match(/^.*?(\<\%|\{\{)\s*$/);
+            var match = line.match(/^.*<%|{{|\(\s*$/);
             if (match) {
                 indent += tab;
             }

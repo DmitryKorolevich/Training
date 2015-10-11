@@ -3003,178 +3003,13 @@ ace.define("antlr4/tree/Tree",["require","exports","module","antlr4/Token","antl
     exports.INVALID_INTERVAL = INVALID_INTERVAL;
 });
 
-ace.define("antlr4/ParserRuleContext",["require","exports","module","antlr4/RuleContext","antlr4/tree/Tree","antlr4/IntervalSet"], function (require, exports, module) {
-
-    var RuleContext = require('./RuleContext').RuleContext;
-    var Tree = require('./tree/Tree');
-    var INVALID_INTERVAL = Tree.INVALID_INTERVAL;
-    var TerminalNode = Tree.TerminalNode;
-    var TerminalNodeImpl = Tree.TerminalNodeImpl;
-    var ErrorNodeImpl = Tree.ErrorNodeImpl;
-    var Interval = require("./IntervalSet").Interval;
-
-    function ParserRuleContext(parent, invokingStateNumber) {
-        parent = parent || null;
-        invokingStateNumber = invokingStateNumber || null;
-        RuleContext.call(this, parent, invokingStateNumber);
-        this.ruleIndex = -1;
-        this.children = null;
-        this.start = null;
-        this.stop = null;
-        this.exception = null;
-    }
-
-    ParserRuleContext.prototype = Object.create(RuleContext.prototype);
-    ParserRuleContext.prototype.constructor = ParserRuleContext;
-    ParserRuleContext.prototype.copyFrom = function (ctx) {
-        this.parentCtx = ctx.parentCtx;
-        this.invokingState = ctx.invokingState;
-        this.children = null;
-        this.start = ctx.start;
-        this.stop = ctx.stop;
-    };
-    ParserRuleContext.prototype.enterRule = function (listener) {
-    };
-
-    ParserRuleContext.prototype.exitRule = function (listener) {
-    };
-    ParserRuleContext.prototype.addChild = function (child) {
-        if (this.children === null) {
-            this.children = [];
-        }
-        this.children.push(child);
-        return child;
-    };
-    ParserRuleContext.prototype.removeLastChild = function () {
-        if (this.children !== null) {
-            this.children.pop();
-        }
-    };
-
-    ParserRuleContext.prototype.addTokenNode = function (token) {
-        var node = new TerminalNodeImpl(token);
-        this.addChild(node);
-        node.parentCtx = this;
-        return node;
-    };
-
-    ParserRuleContext.prototype.addErrorNode = function (badToken) {
-        var node = new ErrorNodeImpl(badToken);
-        this.addChild(node);
-        node.parentCtx = this;
-        return node;
-    };
-
-    ParserRuleContext.prototype.getChild = function (i, type) {
-        type = type || null;
-        if (type === null) {
-            return this.children.length >= i ? this.children[i] : null;
-        } else {
-            for (var j = 0; j < this.children.length; j++) {
-                var child = this.children[j];
-                if (child instanceof type) {
-                    if (i === 0) {
-                        return child;
-                    } else {
-                        i -= 1;
-                    }
-                }
-            }
-            return null;
-        }
-    };
-
-
-    ParserRuleContext.prototype.getToken = function (ttype, i) {
-        for (var j = 0; j < this.children.length; j++) {
-            var child = this.children[j];
-            if (child instanceof TerminalNode) {
-                if (child.symbol.type === ttype) {
-                    if (i === 0) {
-                        return child;
-                    } else {
-                        i -= 1;
-                    }
-                }
-            }
-        }
-        return null;
-    };
-
-    ParserRuleContext.prototype.getTokens = function (ttype) {
-        if (this.children === null) {
-            return [];
-        } else {
-            var tokens = [];
-            for (var j = 0; j < this.children.length; j++) {
-                var child = this.children[j];
-                if (child instanceof TerminalNode) {
-                    if (child.symbol.type === ttype) {
-                        tokens.push(child);
-                    }
-                }
-            }
-            return tokens;
-        }
-    };
-
-    ParserRuleContext.prototype.getTypedRuleContext = function (ctxType, i) {
-        return this.getChild(i, ctxType);
-    };
-
-    ParserRuleContext.prototype.getTypedRuleContexts = function (ctxType) {
-        if (this.children === null) {
-            return [];
-        } else {
-            var contexts = [];
-            for (var j = 0; j < this.children.length; j++) {
-                var child = this.children[j];
-                if (child instanceof ctxType) {
-                    contexts.push(child);
-                }
-            }
-            return contexts;
-        }
-    };
-
-    ParserRuleContext.prototype.getChildCount = function () {
-        if (this.children === null) {
-            return 0;
-        } else {
-            return this.children.length;
-        }
-    };
-
-    ParserRuleContext.prototype.getSourceInterval = function () {
-        if (this.start === null || this.stop === null) {
-            return INVALID_INTERVAL;
-        } else {
-            return Interval(this.start.tokenIndex, this.stop.tokenIndex);
-        }
-    };
-
-    RuleContext.EMPTY = new ParserRuleContext();
-
-    function InterpreterRuleContext(parent, invokingStateNumber, ruleIndex) {
-        ParserRuleContext.call(parent, invokingStateNumber);
-        this.ruleIndex = ruleIndex;
-        return this;
-    }
-
-    InterpreterRuleContext.prototype = Object.create(ParserRuleContext.prototype);
-    InterpreterRuleContext.prototype.constructor = InterpreterRuleContext;
-
-    exports.ParserRuleContext = ParserRuleContext;
-});
-
-ace.define("antlr4/tree/Trees",["require","exports","module","antlr4/Utils","antlr4/Token","antlr4/tree/Tree","antlr4/tree/Tree","antlr4/tree/Tree","antlr4/ParserRuleContext"], function (require, exports, module) {
+ace.define("antlr4/tree/Trees",["require","exports","module","antlr4/Utils","antlr4/Token","antlr4/tree/Tree","antlr4/tree/Tree","antlr4/tree/Tree"], function (require, exports, module) {
 
     var Utils = require('./../Utils');
     var Token = require('./../Token').Token;
     var RuleNode = require('./Tree').RuleNode;
     var ErrorNode = require('./Tree').ErrorNode;
     var TerminalNode = require('./Tree').TerminalNode;
-    var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
     function Trees() {
     }
     Trees.toStringTree = function (tree, ruleNames, recog) {
@@ -3256,21 +3091,6 @@ ace.define("antlr4/tree/Trees",["require","exports","module","antlr4/Utils","ant
         return nodes;
     };
 
-    Trees._findAllNodes = function (t, index, findTokens, nodes) {
-        if (findTokens && (t instanceof TerminalNode)) {
-            if (t.symbol.type === index) {
-                nodes.push(t);
-            }
-        } else if (!findTokens && (t instanceof ParserRuleContext)) {
-            if (t.ruleIndex === index) {
-                nodes.push(t);
-            }
-        }
-        for (var i = 0; i < t.getChildCount() ; i++) {
-            Trees._findAllNodes(t.getChild(i), index, findTokens, nodes);
-        }
-    };
-
     Trees.descendants = function (t) {
         var nodes = [t];
         for (var i = 0; i < t.getChildCount() ; i++) {
@@ -3343,7 +3163,7 @@ ace.define("antlr4/RuleContext",["require","exports","module","antlr4/tree/Tree"
     RuleContext.prototype.accept = function (visitor) {
         return visitor.visitChildren(this);
     };
-    exports.RuleContext = RuleContext;
+
     var Trees = require('./tree/Trees').Trees;
 
     RuleContext.prototype.toStringTree = function (ruleNames, recog) {
@@ -3374,6 +3194,8 @@ ace.define("antlr4/RuleContext",["require","exports","module","antlr4/tree/Tree"
         s += "]";
         return s;
     };
+
+    exports.RuleContext = RuleContext;
 
 });
 
@@ -6044,6 +5866,186 @@ ace.define("antlr4/atn/PredictionMode",["require","exports","module","antlr4/Uti
     };
 
     exports.PredictionMode = PredictionMode;
+});
+
+ace.define("antlr4/ParserRuleContext",["require","exports","module","antlr4/RuleContext","antlr4/tree/Tree","antlr4/IntervalSet","antlr4/tree/Trees"], function (require, exports, module) {
+
+    var RuleContext = require('./RuleContext').RuleContext;
+    var Tree = require('./tree/Tree');
+    var INVALID_INTERVAL = Tree.INVALID_INTERVAL;
+    var TerminalNode = Tree.TerminalNode;
+    var TerminalNodeImpl = Tree.TerminalNodeImpl;
+    var ErrorNodeImpl = Tree.ErrorNodeImpl;
+    var Interval = require("./IntervalSet").Interval;
+    var Trees = require('./tree/Trees').Trees;
+
+    function ParserRuleContext(parent, invokingStateNumber) {
+        parent = parent || null;
+        invokingStateNumber = invokingStateNumber || null;
+        RuleContext.call(this, parent, invokingStateNumber);
+        this.ruleIndex = -1;
+        this.children = null;
+        this.start = null;
+        this.stop = null;
+        this.exception = null;
+    }
+
+    ParserRuleContext.prototype = Object.create(RuleContext.prototype);
+    ParserRuleContext.prototype.constructor = ParserRuleContext;
+    ParserRuleContext.prototype.copyFrom = function (ctx) {
+        this.parentCtx = ctx.parentCtx;
+        this.invokingState = ctx.invokingState;
+        this.children = null;
+        this.start = ctx.start;
+        this.stop = ctx.stop;
+    };
+    ParserRuleContext.prototype.enterRule = function (listener) {
+    };
+
+    ParserRuleContext.prototype.exitRule = function (listener) {
+    };
+    ParserRuleContext.prototype.addChild = function (child) {
+        if (this.children === null) {
+            this.children = [];
+        }
+        this.children.push(child);
+        return child;
+    };
+    ParserRuleContext.prototype.removeLastChild = function () {
+        if (this.children !== null) {
+            this.children.pop();
+        }
+    };
+
+    ParserRuleContext.prototype.addTokenNode = function (token) {
+        var node = new TerminalNodeImpl(token);
+        this.addChild(node);
+        node.parentCtx = this;
+        return node;
+    };
+
+    ParserRuleContext.prototype.addErrorNode = function (badToken) {
+        var node = new ErrorNodeImpl(badToken);
+        this.addChild(node);
+        node.parentCtx = this;
+        return node;
+    };
+
+    ParserRuleContext.prototype.getChild = function (i, type) {
+        type = type || null;
+        if (type === null) {
+            return this.children.length >= i ? this.children[i] : null;
+        } else {
+            for (var j = 0; j < this.children.length; j++) {
+                var child = this.children[j];
+                if (child instanceof type) {
+                    if (i === 0) {
+                        return child;
+                    } else {
+                        i -= 1;
+                    }
+                }
+            }
+            return null;
+        }
+    };
+
+
+    ParserRuleContext.prototype.getToken = function (ttype, i) {
+        for (var j = 0; j < this.children.length; j++) {
+            var child = this.children[j];
+            if (child instanceof TerminalNode) {
+                if (child.symbol.type === ttype) {
+                    if (i === 0) {
+                        return child;
+                    } else {
+                        i -= 1;
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+    ParserRuleContext.prototype.getTokens = function (ttype) {
+        if (this.children === null) {
+            return [];
+        } else {
+            var tokens = [];
+            for (var j = 0; j < this.children.length; j++) {
+                var child = this.children[j];
+                if (child instanceof TerminalNode) {
+                    if (child.symbol.type === ttype) {
+                        tokens.push(child);
+                    }
+                }
+            }
+            return tokens;
+        }
+    };
+
+    ParserRuleContext.prototype.getTypedRuleContext = function (ctxType, i) {
+        return this.getChild(i, ctxType);
+    };
+
+    ParserRuleContext.prototype.getTypedRuleContexts = function (ctxType) {
+        if (this.children === null) {
+            return [];
+        } else {
+            var contexts = [];
+            for (var j = 0; j < this.children.length; j++) {
+                var child = this.children[j];
+                if (child instanceof ctxType) {
+                    contexts.push(child);
+                }
+            }
+            return contexts;
+        }
+    };
+
+    ParserRuleContext.prototype.getChildCount = function () {
+        if (this.children === null) {
+            return 0;
+        } else {
+            return this.children.length;
+        }
+    };
+
+    ParserRuleContext.prototype.getSourceInterval = function () {
+        if (this.start === null || this.stop === null) {
+            return INVALID_INTERVAL;
+        } else {
+            return Interval(this.start.tokenIndex, this.stop.tokenIndex);
+        }
+    };
+
+    Trees._findAllNodes = function (t, index, findTokens, nodes) {
+        if (findTokens && (t instanceof TerminalNode)) {
+            if (t.symbol.type === index) {
+                nodes.push(t);
+            }
+        } else if (!findTokens && (t instanceof ParserRuleContext)) {
+            if (t.ruleIndex === index) {
+                nodes.push(t);
+            }
+        }
+        for (var i = 0; i < t.getChildCount() ; i++) {
+            Trees._findAllNodes(t.getChild(i), index, findTokens, nodes);
+        }
+    };
+
+    RuleContext.EMPTY = new ParserRuleContext();
+
+    function InterpreterRuleContext(parent, invokingStateNumber, ruleIndex) {
+        ParserRuleContext.call(parent, invokingStateNumber);
+        this.ruleIndex = ruleIndex;
+        return this;
+    }
+
+    InterpreterRuleContext.prototype = Object.create(ParserRuleContext.prototype);
+    InterpreterRuleContext.prototype.constructor = InterpreterRuleContext;
+
+    exports.ParserRuleContext = ParserRuleContext;
 });
 
 ace.define("antlr4/atn/ParserATNSimulator",["require","exports","module","antlr4/Utils","antlr4/atn/ATN","antlr4/atn/ATNConfig","antlr4/atn/ATNConfigSet","antlr4/Token","antlr4/dfa/DFAState","antlr4/dfa/DFAState","antlr4/atn/ATNSimulator","antlr4/atn/PredictionMode","antlr4/RuleContext","antlr4/ParserRuleContext","antlr4/atn/SemanticContext","antlr4/atn/ATNState","antlr4/atn/ATNState","antlr4/PredictionContext","antlr4/IntervalSet","antlr4/atn/Transition","antlr4/error/Errors","antlr4/PredictionContext","antlr4/PredictionContext"], function (require, exports, module) {
