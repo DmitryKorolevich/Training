@@ -19,10 +19,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 			_productCategoryContenRepositoryAsync = productCategoryContenRepositoryAsync;
         }
 
-        public Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string, object> queryData)
+        public async Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string, object> queryData)
         {
 			//todo: refactor useless code in service ProductViewService (or even remove that service and make one generic instead of having tons of similar code) and place model population logic here
-			return Task.FromResult(model);
+			return model;
         }
     }
 }
