@@ -23,7 +23,7 @@ namespace VitalChoice.Core.Base
             model.Validate();
             if (model.IsValid)
             {
-                return true;
+                return ModelState.IsValid;
             }
             foreach (var validationError in model.Errors)
             {
@@ -40,7 +40,7 @@ namespace VitalChoice.Core.Base
             model.Validate();
             if (model.IsValid)
             {
-                return true;
+                return ModelState.IsValid;
             }
             foreach (var validationError in model.Errors)
             {
@@ -56,7 +56,7 @@ namespace VitalChoice.Core.Base
             model.Validate();
             if (model.IsValid)
             {
-                return true;
+                return ModelState.IsValid;
             }
             foreach (var validationError in model.Errors)
             {
@@ -72,7 +72,7 @@ namespace VitalChoice.Core.Base
             model.Validate();
             if (model.IsValid)
             {
-                return true;
+                return ModelState.IsValid;
             }
             foreach (var validationError in model.Errors)
             {
