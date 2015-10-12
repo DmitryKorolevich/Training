@@ -1838,11 +1838,103 @@ oop.inherits(HtmlHighlightRules, XmlHighlightRules);
 exports.HtmlHighlightRules = HtmlHighlightRules;
 });
 
-ace.define("ace/mode/ttl_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/html_highlight_rules"], function(require, exports, module) {
+ace.define("ace/mode/csharp_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/doc_comment_highlight_rules","ace/mode/text_highlight_rules"], function(require, exports, module) {
+"use strict";
+
+var oop = require("../lib/oop");
+var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
+var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+
+var CSharpHighlightRules = function() {
+    var keywordMapper = this.createKeywordMapper({
+        "variable.language": "this",
+        "keyword": "abstract|event|new|struct|as|explicit|null|switch|base|extern|object|this|bool|false|operator|throw|break|finally|out|true|byte|fixed|override|try|case|float|params|typeof|catch|for|private|uint|char|foreach|protected|ulong|checked|goto|public|unchecked|class|if|readonly|unsafe|const|implicit|ref|ushort|continue|in|return|using|decimal|int|sbyte|virtual|default|interface|sealed|volatile|delegate|internal|short|void|do|is|sizeof|while|double|lock|stackalloc|else|long|static|enum|namespace|string|var|dynamic",
+        "constant.language": "null|true|false"
+    }, "identifier");
+
+    this.$rules = {
+        "start" : [
+            {
+                token : "comment",
+                regex : "\\/\\/.*$"
+            },
+            DocCommentHighlightRules.getStartRule("doc-start"),
+            {
+                token : "comment", // multi line comment
+                regex : "\\/\\*",
+                next : "comment"
+            }, {
+                token : "string", // character
+                regex : /'(?:.|\\(:?u[\da-fA-F]+|x[\da-fA-F]+|[tbrf'"n]))'/
+            }, {
+                token : "string", start : '"', end : '"|$', next: [
+                    {token: "constant.language.escape", regex: /\\(:?u[\da-fA-F]+|x[\da-fA-F]+|[tbrf'"n])/},
+                    {token: "invalid", regex: /\\./}
+                ]
+            }, {
+                token : "string", start : '@"', end : '"', next:[
+                    {token: "constant.language.escape", regex: '""'}
+                ]
+            }, {
+                token : "constant.numeric", // hex
+                regex : "0[xX][0-9a-fA-F]+\\b"
+            }, {
+                token : "constant.numeric", // float
+                regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+            }, {
+                token : "constant.language.boolean",
+                regex : "(?:true|false)\\b"
+            }, {
+                token : keywordMapper,
+                regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+            }, {
+                token : "keyword.operator",
+                regex : "!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|%=|\\+=|\\-=|&=|\\^=|\\b(?:in|instanceof|new|delete|typeof|void)"
+            }, {
+                token : "keyword",
+                regex : "^\\s*#(if|else|elif|endif|define|undef|warning|error|line|region|endregion|pragma)"
+            }, {
+                token : "punctuation.operator",
+                regex : "\\?|\\:|\\,|\\;|\\."
+            }, {
+                token : "paren.lparen",
+                regex : "[[({]"
+            }, {
+                token : "paren.rparen",
+                regex : "[\\])}]"
+            }, {
+                token : "text",
+                regex : "\\s+"
+            }
+        ],
+        "comment" : [
+            {
+                token : "comment", // closing comment
+                regex : ".*?\\*\\/",
+                next : "start"
+            }, {
+                token : "comment", // comment spanning whole line
+                regex : ".+"
+            }
+        ]
+    };
+
+    this.embedRules(DocCommentHighlightRules, "doc-",
+        [ DocCommentHighlightRules.getEndRule("start") ]);
+    this.normalizeRules();
+};
+
+oop.inherits(CSharpHighlightRules, TextHighlightRules);
+
+exports.CSharpHighlightRules = CSharpHighlightRules;
+});
+
+ace.define("ace/mode/ttl_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/html_highlight_rules","ace/mode/csharp_highlight_rules"], function(require, exports, module) {
 "use strict";
 
 var oop = require("../lib/oop");
 var HtmlHighlightRules = require("./html_highlight_rules").HtmlHighlightRules;
+var CSharpHighlightRules = require("./csharp_highlight_rules").CSharpHighlightRules;
 var TtlHighlightRules = function(options) {
     HtmlHighlightRules.call(this);
     var ttlRules = {
@@ -1853,6 +1945,16 @@ var TtlHighlightRules = function(options) {
                 push: "ttl-comment"
             },
             {
+                token: "text",
+                regex: /(?=\))\s*(?!{{|\(|:|@)/,
+                next: "start"
+            },
+            {
+                token: "text",
+                regex: /(?=}})\s*/,
+                next: "start"
+            },
+            {
                 token: ["keyword.operator", "paren.lparen"],
                 regex: /{{/,
                 push: "start"
@@ -1860,7 +1962,7 @@ var TtlHighlightRules = function(options) {
             {
                 token: ["keyword.operator", "paren.rparen"],
                 regex: /}}/,
-                next: "start"
+                next: "pop"
             },
             {
                 token: "variable.language",
@@ -1875,12 +1977,7 @@ var TtlHighlightRules = function(options) {
             {
                 token: "paren.lparen",
                 regex: /\(/,
-                push: "ttl-out"
-            },
-            {
-                token: "paren.rparen",
-                regex: /\)/,
-                next: "pop"
+                push: "ttl-call"
             },
             {
                 token: "punctuation.operator",
@@ -1895,7 +1992,7 @@ var TtlHighlightRules = function(options) {
             {
                 token: ["keyword.operator", "paren.lparen"],
                 regex: /<%/,
-                next: "ttl-def"
+                push: "ttl-def"
             },
             {
                 token: "keyword",
@@ -1903,6 +2000,46 @@ var TtlHighlightRules = function(options) {
                 next: "ttl-out"
             },
             {include: "start"}
+        ],
+        "ttl-call": [
+            {
+                token: "punctuation.operator",
+                regex: /:/,
+                next: "ttl-call"
+            },
+            {
+                token: "variable.language",
+                regex: /[a-zA-Z_]+[a-zA-Z_0-9]*/,
+                next: "ttl-call"
+            },
+            {
+                token: "paren.lparen",
+                regex: /\(/,
+                push: "ttl-call"
+            },
+            {
+                token: "paren.rparen",
+                regex: /\)/,
+                next: "pop"
+            },
+            {
+                token: "paren.rparen",
+                regex: /@/,
+                next: "ttl-csharp"
+            }
+        ],
+        "ttl-csharp": [
+            {
+                token: "paren.lparen",
+                regex: /\(/,
+                push: "ttl-csharp"
+            },
+            {
+                token: "paren.rparen",
+                regex: /\)/,
+                next: "pop"
+            },
+            { include: "cs-start" }
         ],
         "ttl-raw": [
             {
@@ -1925,7 +2062,7 @@ var TtlHighlightRules = function(options) {
             {
                 token: ["keyword.operator", "paren.rparen"],
                 regex: /%>/,
-                next: "start"
+                next: "pop"
             },
             {
                 token: ["punctuation.operator", "paren.lparen"],
@@ -1935,7 +2072,7 @@ var TtlHighlightRules = function(options) {
             {
                 token: ["keyword.operator", "paren.rparen"],
                 regex: /{{/,
-                next: "start"
+                push: "start"
             },
             {
                 token: "keyword.operator",
@@ -1984,7 +2121,19 @@ var TtlHighlightRules = function(options) {
         "ttl-comment": [
             {
                 token: "comment.block",
-                regex: /.*\*\@/,
+                regex: /\*@/,
+                next: "pop"
+            },
+            {
+                token: "comment.block",
+                regex: /([^\*]|\*[^@])*/,
+                next: "ttl-comment"
+            }
+        ],
+        "ttl-template-type": [
+            {
+                token: "comment.block",
+                regex: /\*@/,
                 next: "pop"
             },
             {
@@ -1998,7 +2147,7 @@ var TtlHighlightRules = function(options) {
         {
             token: ["keyword.operator", "paren.rparen"],
             regex: /%>/,
-            next: "start"
+            next: "pop"
         },
         {
             token: "comment.block",
@@ -2008,17 +2157,17 @@ var TtlHighlightRules = function(options) {
         {
             token: ["keyword.operator", "paren.lparen"],
             regex: /<%/,
-            next: "ttl-def"
+            push: "ttl-def"
         },
         {
             token: ["keyword.operator", "paren.lparen"],
             regex: /{{/,
-            next: "start"
+            push: "start"
         },
         {
             token: ["keyword.operator", "paren.rparen"],
             regex: /}}/,
-            next: "start"
+            next: "pop"
         },
         {
             token: ["keyword", "paren.lparen"],
@@ -2030,6 +2179,7 @@ var TtlHighlightRules = function(options) {
             regex: /@/,
             next: "ttl-out"
         });
+    this.embedRules(CSharpHighlightRules, "cs-");
     this.addRules(ttlRules);
     this.normalizeRules();
 };

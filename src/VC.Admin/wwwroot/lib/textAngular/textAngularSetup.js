@@ -64,13 +64,15 @@ function registerTextAngularTool(name, toolDefinition){
 }
 
 angular.module('textAngularSetup', [])
+.constant('taRegisterTool', registerTextAngularTool)
+.value('taTools', taTools)
 // Here we set up the global display defaults, to set your own use a angular $provider#decorator.
 .value('taOptions',  {
 	//////////////////////////////////////////////////////////////////////////////////////
     // forceTextAngularSanitize
     // set false to allow the textAngular-sanitize provider to be replaced
     // with angular-sanitize or a custom provider.
-	forceTextAngularSanitize: true,
+	forceTextAngularSanitize: false,
 	///////////////////////////////////////////////////////////////////////////////////////
 	// keyMappings
 	// allow customizable keyMappings for specialized key boards or languages

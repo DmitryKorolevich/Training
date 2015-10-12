@@ -7578,27 +7578,6 @@ ace.define("antlr4/error/index",["require","exports","module","antlr4/error/Erro
     exports.ErrorListener = require('./ErrorListener').ErrorListener;
 });
 
-ace.define("antlr4/FileStream",["require","exports","module","antlr4/InputStream","fs"], function (require, exports, module) {
-    var InputStream = require('./InputStream').InputStream;
-    try {
-        var fs = require("fs");
-    } catch (ex) {
-    }
-
-    function FileStream(fileName) {
-        var data = fs.readFileSync(fileName, "utf8");
-        InputStream.call(this, data);
-        this.fileName = fileName;
-        return this;
-    }
-
-    FileStream.prototype = Object.create(InputStream.prototype);
-    FileStream.prototype.constructor = FileStream;
-
-    exports.FileStream = FileStream;
-
-});
-
 ace.define("antlr4/Parser",["require","exports","module","antlr4/Token","antlr4/tree/Tree","antlr4/Recognizer","antlr4/error/ErrorStrategy","antlr4/atn/ATNDeserializer","antlr4/atn/ATNDeserializationOptions","antlr4/Lexer"], function (require, exports, module) {
 
     var Token = require('./Token').Token;
@@ -8035,7 +8014,7 @@ ace.define("antlr4/Parser",["require","exports","module","antlr4/Token","antlr4/
     exports.Parser = Parser;
 });
 
-ace.define("antlr4/index",["require","exports","module","antlr4/atn/index","antlr4/dfa/index","antlr4/tree/index","antlr4/error/index","antlr4/Token","antlr4/Token","antlr4/InputStream","antlr4/FileStream","antlr4/CommonTokenStream","antlr4/Lexer","antlr4/Parser","antlr4/PredictionContext","antlr4/ParserRuleContext","antlr4/IntervalSet","antlr4/Utils"], function (require, exports, module) {
+ace.define("antlr4/index",["require","exports","module","antlr4/atn/index","antlr4/dfa/index","antlr4/tree/index","antlr4/error/index","antlr4/Token","antlr4/Token","antlr4/InputStream","antlr4/CommonTokenStream","antlr4/Lexer","antlr4/Parser","antlr4/PredictionContext","antlr4/ParserRuleContext","antlr4/IntervalSet","antlr4/Utils"], function (require, exports, module) {
     exports.atn = require('./atn/index');
     exports.dfa = require('./dfa/index');
     exports.tree = require('./tree/index');
@@ -8043,7 +8022,6 @@ ace.define("antlr4/index",["require","exports","module","antlr4/atn/index","antl
     exports.Token = require('./Token').Token;
     exports.CommonToken = require('./Token').CommonToken;
     exports.InputStream = require('./InputStream').InputStream;
-    exports.FileStream = require('./FileStream').FileStream;
     exports.CommonTokenStream = require('./CommonTokenStream').CommonTokenStream;
     exports.Lexer = require('./Lexer').Lexer;
     exports.Parser = require('./Parser').Parser;
@@ -8256,7 +8234,7 @@ ace.define("ace/mode/ttl/TtlLexer",["require","exports","module","antlr4/index"]
         "\u00fa\u0002\u00fc\u0002\n\u0002\u0003\u0004\u0005\u0006\u0007\b\t\u000f",
         "\u0006\u0002\f\f\u000f\u000f\u0087\u0087\u202a\u202b\u000b\u0002\u000b",
         "\u000b\r\u000e\"\"\u00a2\u00a2\u1682\u1682\u2002\u200c\u2031\u2031\u2061",
-        "\u2061\u3002\u3002\u0006\u0002C\\aac|\u00c2\u0101\u0006\u0002--002;",
+        "\u2061\u3002\u3002\u0006\u0002C\\aac|\u0412\u0451\u0006\u0002--002;",
         "^^\u0006\u0002NNWWnnww\u0005\u00022;CHch\u0004\u0002GGgg\u0004\u0002",
         "--//\b\u0002FFHHOOffhhoo\b\u0002\f\f\u000f\u000f))^^\u0087\u0087\u202a",
         "\u202b\b\u0002\f\f\u000f\u000f$$^^\u0087\u0087\u202a\u202b\u0003\u0002",
@@ -10977,6 +10955,7 @@ ace.define("ace/mode/ttl/TtlParser",["require","exports","module","antlr4/index"
 
 
     exports.TtlParser = TtlParser;
+
 });
 
 ace.define("ace/mode/ttl/TtlParserExtended",["require","exports","module","ace/mode/ttl/TtlParser","ace/mode/ttl/TtlErrorListener"], function(require, exports, module) {
