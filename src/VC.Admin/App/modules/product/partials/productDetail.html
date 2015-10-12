@@ -98,7 +98,7 @@
                                             <div class="form-group">
                                                 <label for="Description" class="col-md-3 control-label">Description</label>
                                                 <div class="col-md-4">
-                                                    <input name="DescriptionTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.DescriptionTitleOverride" data-ng-maxlength="25">
+                                                    <input name="DescriptionTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.DescriptionTitleOverride" data-max-characters="25" data-ng-maxlength="25">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.DescriptionTitleOverride.$invalid">
                                                         <small class="error" ng-show="forms.parentDetails.DescriptionTitleOverride.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Title Overwrite", "25"])}}</small>
                                                         <small class="error" ng-show="forms.parentDetails.DescriptionTitleOverride.$error.server">{{serverMessages.GetMessage('DescriptionTitleOverride')}}</small>
@@ -132,7 +132,7 @@
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Description" class="col-md-3 control-label">Nutrition & Ingredients</label>
                                                 <div class="col-md-4">
-                                                    <input name="IngredientsTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.IngredientsTitleOverride" data-ng-maxlength="25">
+                                                    <input name="IngredientsTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.IngredientsTitleOverride" data-max-characters="25" data-ng-maxlength="25">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.IngredientsTitleOverride.$invalid">
                                                         <small class="error" ng-show="forms.parentDetails.IngredientsTitleOverride.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Title Overwrite", "25"])}}</small>
                                                         <small class="error" ng-show="forms.parentDetails.IngredientsTitleOverride.$error.server">{{serverMessages.GetMessage('IngredientsTitleOverride')}}</small>
@@ -166,7 +166,7 @@
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Description" class="col-md-3 control-label">Recipes</label>
                                                 <div class="col-md-4">
-                                                    <input name="RecipesTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.RecipesTitleOverride" data-ng-maxlength="25">
+                                                    <input name="RecipesTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.RecipesTitleOverride" data-max-characters="25" data-ng-maxlength="25">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.RecipesTitleOverride.$invalid">
                                                         <small class="error" ng-show="forms.parentDetails.RecipesTitleOverride.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Title Overwrite", "25"])}}</small>
                                                         <small class="error" ng-show="forms.parentDetails.RecipesTitleOverride.$error.server">{{serverMessages.GetMessage('RecipesTitleOverride')}}</small>
@@ -200,7 +200,7 @@
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Description" class="col-md-3 control-label">Serving/Storage</label>
                                                 <div class="col-md-4">
-                                                    <input name="ServingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ServingTitleOverride" data-ng-maxlength="25">
+                                                    <input name="ServingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ServingTitleOverride" data-max-characters="25" data-ng-maxlength="25">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.ServingTitleOverride.$invalid">
                                                         <small class="error" ng-show="forms.parentDetails.ServingTitleOverride.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Title Overwrite", "25"])}}</small>
                                                         <small class="error" ng-show="forms.parentDetails.ServingTitleOverride.$error.server">{{serverMessages.GetMessage('ServingTitleOverride')}}</small>
@@ -234,7 +234,7 @@
                                             <div class="form-group" data-ng-hide="product.Type==3 || product.Type==4">
                                                 <label for="Description" class="col-md-3 control-label">Shipping</label>
                                                 <div class="col-md-4">
-                                                    <input name="ShippingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ShippingTitleOverride" data-ng-maxlength="25">
+                                                    <input name="ShippingTitleOverride" class="form-control" placeholder="Title Overwrite" data-ng-model="product.ShippingTitleOverride" data-max-characters="25" data-ng-maxlength="25">
                                                     <div class="error-container" ng-show="forms.submitted && forms.parentDetails.ServingTitleOverride.$invalid">
                                                         <small class="error" ng-show="forms.parentDetails.ShippingTitleOverride.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Title Overwrite", "25"])}}</small>
                                                         <small class="error" ng-show="forms.parentDetails.ShippingTitleOverride.$error.server">{{serverMessages.GetMessage('ShippingTitleOverride')}}</small>
@@ -468,7 +468,7 @@
                                                                                     <div class="col-md-1">
                                                                                         <div class="input-group">
                                                                                             <span class="input-group-addon">$</span>
-                                                                                            <input type="text" name="RetailPrice" class="form-control" placeholder="Retail Price" money max="100000" min="0.01" data-ng-model="subSku.RetailPrice" required>
+                                                                                            <input type="text" name="RetailPrice" class="form-control" placeholder="Retail Price" money max="100000" min="0.00" data-ng-model="subSku.RetailPrice" required>
                                                                                         </div>
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.RetailPrice.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.RetailPrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.RetailPrice")}}</small>
@@ -484,7 +484,7 @@
                                                                                     <div class="col-md-1">
                                                                                         <div class="input-group">
                                                                                             <span class="input-group-addon">$</span>
-                                                                                            <input type="text" name="WholesalePrice" class="form-control" placeholder="Wholesale Price" money max="100000" min="0.01" data-ng-model="subSku.WholesalePrice" required>
+                                                                                            <input type="text" name="WholesalePrice" class="form-control" placeholder="Wholesale Price" money max="100000" min="0.00" data-ng-model="subSku.WholesalePrice" required>
                                                                                         </div>
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.WholesalePrice.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.WholesalePrice.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.WholesalePrice")}}</small>
@@ -621,7 +621,7 @@
                                                                                 <div class="fixed-accordion-row">
                                                                                     <label for="lblSalesText{{subSku.Id}}" class="control-label">Sales Text</label>
                                                                                     <div class="col-md-1">
-                                                                                        <input type="text" id="lblSalesText{{subSku.Id}}" name="SalesText" class="form-control sales-text" placeholder="Sales Text" data-ng-model="subSku.SalesText" data-ng-maxlength="15">
+                                                                                        <input type="text" id="lblSalesText{{subSku.Id}}" name="SalesText" class="form-control sales-text" placeholder="Sales Text" data-max-characters="15" data-ng-model="subSku.SalesText" data-ng-maxlength="15">
                                                                                         <div class="error-container small-block" ng-show="forms.skussubmitted && forms.SKUs.i{{$index}}.SalesText.$invalid">
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.SalesText.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Sales Text", "15"])}}</small>
                                                                                             <small class="error" ng-show="forms.SKUs.i{{$index}}.SalesText.$error.server">{{getValidationMessage("ValidationMessages.FieldNumber","SalesText",'SKUs',$index)}}</small>

@@ -19,7 +19,7 @@ namespace VC.Admin.Validators.Product
             {
                 for (int i = 0; i < value.DiscountTiers.Count; i++)
                 {
-                    ParseResults(ValidatorsFactory.GetValidator<DiscountTierValidator>().Validate(value.DiscountTiers[i]), "DiscountTiers", i);
+                    ParseResults(new DiscountTierValidator(i== (value.DiscountTiers.Count-1)).Validate(value.DiscountTiers[i]), "DiscountTiers", i);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace VC.Admin.Validators.Product
 
         private class DiscountTierValidator : AbstractValidator<DiscountTier>
         {
-            public DiscountTierValidator()
+            public DiscountTierValidator(bool last)
             {
                 RuleFor(model => model.From)
                     .Cascade(CascadeMode.StopOnFirstFailure)
@@ -106,12 +106,15 @@ namespace VC.Admin.Validators.Product
                     .LessThanOrEqualTo(100000)
                     .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Min, 100000);
 
-                RuleFor(model => model.To)
-                    .Cascade(CascadeMode.StopOnFirstFailure)
-                    .GreaterThan(0)
-                    .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Max, 0)
-                    .LessThanOrEqualTo(100000)
-                    .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Max, 100000);
+                if (!last)
+                {
+                    RuleFor(model => model.To)
+                        .Cascade(CascadeMode.StopOnFirstFailure)
+                        .GreaterThan(0)
+                        .WithMessage(ValidationMessages.FieldMin, GeneralFieldNames.Max, 0)
+                        .LessThanOrEqualTo(100000)
+                        .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Max, 100000);
+                }
 
                 RuleFor(model => model.Amount)
                     .Cascade(CascadeMode.StopOnFirstFailure)

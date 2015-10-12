@@ -7,6 +7,9 @@
             <div class="btn-group margin-top-10px">
                 <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
             </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
+            </div>
         </div>
     </div>
     <div class="right-pane-main">
@@ -318,7 +321,7 @@
                                                             <span>{{order.StandardShippingCharges | currency}}</span>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
@@ -326,7 +329,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using VC.Public.Validators.Auth;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Auth
 {
+    [ApiValidator(typeof(LoginModelValidator))]
     public class LoginModel : BaseModel
 	{
 		[Required]

@@ -53,10 +53,10 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginModel model, string returnUrl)
 	    {
-			if (!ModelState.IsValid)
-				return View(model);
+            if (!Validate(model))
+                return View(model);
 
-			var user = await _userService.SignInAsync(model.Email, model.Password);
+            var user = await _userService.SignInAsync(model.Email, model.Password);
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);

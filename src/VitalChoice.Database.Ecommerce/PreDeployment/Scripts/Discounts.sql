@@ -232,3 +232,13 @@ BEGIN
 END
 
 GO
+
+IF ('NO' =(select TOP 1 IS_NULLABLE from INFORMATION_SCHEMA.COLUMNS 
+where TABLE_NAME ='DiscountTiers' and COLUMN_NAME ='To'))
+BEGIN
+
+ALTER TABLE DiscountTiers ALTER COLUMN [To] money NULL
+
+END
+
+GO
