@@ -21,7 +21,7 @@
 		<h4>Register a New Account</h4>
 		<div class="sub-title"><span>Create a Password</span></div>
 		<span class="form-control-hint">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
-		@Html.ValidationSummary(true, "", new { @class = "form-validation-summary" })
+		@Html.ValidationSummary(true, "")
 		<div class="form-group">
 			@Html.LabelFor(m => m.Password, new {@class = "control-label"})
 			<div class="input-group">

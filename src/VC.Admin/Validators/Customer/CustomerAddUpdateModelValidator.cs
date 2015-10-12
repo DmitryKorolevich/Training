@@ -123,9 +123,9 @@ namespace VC.Admin.Validators.Customer
 					.WithMessage(model => model.DefaultPaymentMethod, ValidationMessages.FieldRequired);
 
 				RuleFor(model => model.Reason)
-					.NotEmpty()
-					.When(p => p.SuspendUserAccount)
-					.WithMessage(model => model.Reason, ValidationMessages.FieldRequired)
+					//.NotEmpty()
+					//.When(p => p.SuspendUserAccount)
+					//.WithMessage(model => model.Reason, ValidationMessages.FieldRequired)
 					.Length(0, 1000)
 					.When(p => p.SuspendUserAccount)
 					.WithMessage(model => model.Reason, ValidationMessages.FieldLength, 1000);

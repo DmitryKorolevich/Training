@@ -14,6 +14,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string UserLockedOut = "UserLockedOut";
 		    public const string IncorrectUserPassword = "IncorrectUserPassword";
 		    public const string CantFindUser = "CantFindUser";
+		    public const string CantFindLogin = "CantFindLogin";
 		    public const string CantSignIn = "CanSignIn";
 		    public const string UserIsDisabled = "UserIsDisabled";
             public const string EmailIsTakenAlready = "EmailTakenAlready";
@@ -30,6 +31,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string AttemptToUpdateUsingWrongService = "AttemptToUpdateUsingWrongService";
 		    public const string AttemptToAssignWrongRole = "AttemptToAssignWrongRole";
 		    public const string IncorrectCustomerRole = "IncorrectCustomerRole";
+		    public const string EmailIsTakenPleaseLogon = "EmailIsTakenPleaseLogon";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -41,6 +43,7 @@ namespace VitalChoice.Domain.Constants
 		    {Keys.UserLockedOut, "User is locked out"},
 		    {Keys.IncorrectUserPassword, "Incorrect email or password"},
 		    {Keys.CantFindUser, "User not found"},
+		    {Keys.CantFindLogin, "Login information not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
 		    {Keys.UserIsDisabled, "User is disabled"},
             {Keys.EmailIsTakenAlready, "Email '{0}' is already in use"},
@@ -56,7 +59,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.AtLeastOneDefaultShipping, "At least one shipping address should be default"},
 			{Keys.AttemptToUpdateUsingWrongService, "Attempt to update user using forbidden operation"},
 			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"},
-			{Keys.IncorrectCustomerRole, "Incorrect customer type"}
+			{Keys.IncorrectCustomerRole, "Incorrect customer type"},
+			{Keys.EmailIsTakenPleaseLogon, "Email '{0}' is already registered"}
 		};
     }
 }

@@ -42,9 +42,14 @@ namespace VitalChoice.Business.Services.Users
 			});
 		}
 
-		protected override Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
+		protected override async Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
 		{
-			throw new NotImplementedException();
+			await NotificationService.SendAdminPasswordResetAsync(dbUser.Email, new PasswordReset() //for now email template is the same as for admin
+			{
+				FirstName = dbUser.FirstName,
+				LastName = dbUser.LastName,
+				Link = $"{Options.PublicHost}account/resetpassword/{token}"
+			});
 		}
 
 		protected override void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles)
@@ -69,6 +74,16 @@ namespace VitalChoice.Business.Services.Users
 			}
 
 			return base.ValidateUserInternalAsync(user);
+		}
+
+		public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+		{
+			await NotificationService.SendCustomerRegistrationSuccess(email, new SuccessfulCustomerRegistration()
+			{
+				FirstName = firstName,
+				LastName = lastName,
+				ProfileLink = $"{Options.PublicHost}profile/index"
+			});
 		}
 	}
 }

@@ -6,6 +6,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 		'$state', '$stateParams', 'customerEditService',
 		function ($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService) {
 			$scope.addEditTracker = promiseTracker("addEdit");
+			$scope.resetTracker = promiseTracker("reset");
+			$scope.resendTracker = promiseTracker("resend");
 
 			function initialize() {
 				$scope.editMode = $stateParams.id != null;
@@ -340,6 +342,45 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					$scope.forms.submitted['oac'] = true;
 					$scope.forms.submitted['check'] = true;
 				}
+			};
+
+			$scope.resend = function () {
+				customerService.resendActivation($scope.currentCustomer.PublicUserId, $scope.resendTracker)
+					.success(function (result) {
+						if (result.Success) {
+							toaster.pop('success', "Success!", "Successfully sent");
+
+						} else {
+							var messages = "";
+							if (result.Messages) {
+								$.each(result.Messages, function (index, value) {
+									messages += value.Message + "<br />";
+								});
+							}
+							toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+						}
+					}).error(function () {
+						toaster.pop('error', "Error!", "Server error occured");
+					});
+			};
+
+			$scope.resetPassword = function () {
+				customerService.resetPassword($scope.currentCustomer.PublicUserId, $scope.resetTracker)
+					.success(function (result) {
+						if (result.Success) {
+							toaster.pop('success', "Success!", "Successfully reset");
+						} else {
+							var messages = "";
+							if (result.Messages) {
+								$.each(result.Messages, function (index, value) {
+									messages += value.Message + "<br />";
+								});
+							}
+							toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+						}
+					}).error(function () {
+						toaster.pop('error', "Error!", "Server error occured");
+					});
 			};
 
 			initialize();

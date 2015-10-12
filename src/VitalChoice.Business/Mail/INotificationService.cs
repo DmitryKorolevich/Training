@@ -22,5 +22,7 @@ namespace VitalChoice.Business.Mail
         Task SendNewBugTicketAddingForSuperAdminAsync(BugTicket bugTicket);
 
         Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicket bugTicket);
+
+	    Task SendCustomerRegistrationSuccess(string email, SuccessfulCustomerRegistration registration);
     }
 }

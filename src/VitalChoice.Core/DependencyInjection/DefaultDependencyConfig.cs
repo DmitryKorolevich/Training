@@ -75,7 +75,7 @@ using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Core.DependencyInjection
 {
-    public class DefaultDependencyConfig : IDependencyConfig
+    public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         //private static bool _called = false;
 
@@ -86,14 +86,7 @@ namespace VitalChoice.Core.DependencyInjection
             //{
             //    _called = true;
 
-            services.ConfigureIdentityApplicationCookie(x =>
-            {
-                x.AuthenticationScheme = IdentityOptions.ApplicationCookieAuthenticationScheme;
-                x.LogoutPath = PathString.Empty;
-                x.AccessDeniedPath = PathString.Empty;
-                x.LoginPath = PathString.Empty;
-                x.ReturnUrlParameter = null;
-            });
+            BeginCustomRegistrations(services);
 
             // Add EF services to the services container.
             services.AddEntityFramework() //.AddMigrations()
@@ -389,5 +382,7 @@ namespace VitalChoice.Core.DependencyInjection
             var container = builder.Build();
             return container;
         }
+
+	    protected abstract void BeginCustomRegistrations(IServiceCollection builder);
     }
 }

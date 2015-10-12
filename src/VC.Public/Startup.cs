@@ -35,7 +35,7 @@ namespace VC.Public
             }
             Configuration = configuration.Build();
 
-            var reg = new DefaultDependencyConfig();
+            var reg = new StorefrontDependencyConfig();
             return reg.RegisterInfrastructure(Configuration, services, null, typeof(Startup).GetTypeInfo().Assembly);
         }
 
@@ -55,7 +55,7 @@ namespace VC.Public
             {
                 // Add Error handling middleware which catches all application specific errors and
                 // send the request to the following path or controller action.
-                app.UseErrorHandler("/Home/Error");
+                app.UseErrorHandler("/Shared/Error");
             }
 
             // Add static files to the request pipeline.
@@ -64,7 +64,7 @@ namespace VC.Public
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
 
-			//app.UseCookieAuthentication();
+			app.UseCookieAuthentication();
 
 			app.UseMvc(RouteConfig.RegisterRoutes);
         }

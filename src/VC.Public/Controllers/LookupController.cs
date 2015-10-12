@@ -19,6 +19,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using System.Linq;
+using VitalChoice.Domain.Transfer.Country;
 
 namespace VC.Public.Controllers
 {
@@ -35,7 +36,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<Result<IList<CountryListItemModel>>> GetCountries()
 		{
-			var result = await _countryService.GetCountriesAsync();
+			var result = await _countryService.GetCountriesAsync(new CountryFilter() {ActiveOnly = true});
 			return result.OrderBy(x => x.Order).Select(p => new CountryListItemModel()
 			{
 				CountryName = p.CountryName,

@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Domain.Transfer.Country;
 
 namespace VitalChoice.Interfaces.Services.Settings
 {
 	public interface ICountryService
     {
-        Task<ICollection<Country>> GetCountriesAsync();
+        Task<ICollection<Country>> GetCountriesAsync(CountryFilter filter = null);
         Task<bool> UpdateCountriesOrderAsync(ICollection<Country> model);
         Task<Country> UpdateCountryAsync(Country model);
         Task<bool> DeleteCountryAsync(int id);

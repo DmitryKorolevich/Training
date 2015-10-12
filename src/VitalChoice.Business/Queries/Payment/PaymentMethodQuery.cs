@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
@@ -28,6 +29,13 @@ namespace VitalChoice.Business.Queries.Payment
 		public PaymentMethodQuery HasCustomerAssignments()
 		{
 			Add(x => x.Customers.Any());
+
+			return this;
+		}
+
+		public PaymentMethodQuery CreditCard()
+		{
+			Add(x => x.Name.Equals("Credit Card", StringComparison.OrdinalIgnoreCase));
 
 			return this;
 		}

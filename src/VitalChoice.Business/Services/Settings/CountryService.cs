@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 
@@ -29,11 +32,21 @@ namespace VitalChoice.Business.Services.Settings
             logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task<ICollection<Country>> GetCountriesAsync()
+        public async Task<ICollection<Country>> GetCountriesAsync(CountryFilter filter = null)
         {
             List<Country> toReturn = null;
-            toReturn = await countryRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
-            var states = await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
+
+	        Expression<Func<Country, bool>> countryQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+	        Expression<Func<State, bool>> stateQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+            if (filter != null && filter.ActiveOnly)
+            {
+	            countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+				stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+            }
+
+            toReturn = await countryRepository.Query(countryQuery).SelectAsync(false);
+            var states = await stateRepository.Query(stateQuery).SelectAsync(false);
+
             toReturn = toReturn.OrderBy(p => p.Order).ToList();
             foreach(var item in toReturn)
             {

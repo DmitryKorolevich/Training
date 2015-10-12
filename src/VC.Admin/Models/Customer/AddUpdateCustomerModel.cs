@@ -4,6 +4,7 @@ using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
+using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
@@ -22,6 +23,12 @@ namespace VC.Admin.Models.Customer
             CreditCards = new List<CreditCardModel>();
 			Files = new List<CustomerFileModel>();
         }
+
+		public bool IsConfirmed { get; set; }
+
+		public Guid PublicUserId { get; set; }
+
+		public UserStatus UserStatus { get; set; }
 
 		[Map]
 		public Guid PublicId { get; set; }

@@ -81,202 +81,91 @@ namespace VitalChoice.Business.Services.Customers
 		    _userRepositoryAsync = userRepositoryAsync;
         }
 
-        protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
-	    {
-			var errors = new List<MessageInfo>();
-
-			var customerSameEmail =
-				await
-					_customerRepositoryAsync.Query(
-						new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
-						.SelectAsync(false);
-
-			if (customerSameEmail.Any())
-			{
-				errors.AddRange(
-					model.CreateError()
-						.Property(p => p.Email)
-						.Error("Customer email should be unique in the database")
-						.Build());
-			}
-
-            if (
-                model.Addresses.Where(
-                    x => x.IdObjectType == (int) AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted)
-                    .All(x => !x.Data.Default))
-            {
-                throw new AppValidationException(
-                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
-            }
-
-            return errors;
+		private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
+		{
+			return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 		}
 
-        protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
-        {
-            var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
-            var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
-			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
-            var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
-            var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
-            var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
-
-            await
-                customerToPaymentMethodRepository.DeleteAllAsync(
-                    entity.PaymentMethods.WhereAll(model.ApprovedPaymentMethods, (p, dp) => p.IdPaymentMethod != dp));
-            await
-                customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes.WhereAll(model.OrderNotes,
-                    (n, dn) => n.IdOrderNote != dn));
-            foreach (var address in entity.Addresses)
-            {
-                await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
-            }
-            foreach (var note in entity.CustomerNotes)
-            {
-                await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
-            }
-            foreach (var customerPaymentMethod in entity.CustomerPaymentMethods)
-            {
-                await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
-            }
-
-			if (model.Files != null && model.Files.Any() && entity.Files != null)
+		private IList<RoleType> MapCustomerTypeToRole(CustomerDynamic model)
+	    {
+			var roles = new List<RoleType>();
+			switch (model.IdObjectType)
 			{
-				//Update
-				var toUpdate = entity.Files.Where(e => model.Files.Select(x=>x.Id).Contains(e.Id));
-				await customerFileRepositoryAsync.UpdateRangeAsync(toUpdate);
-
-				//Delete
-				var toDelete = entity.Files.Where(e => model.Files.All(s => s.Id != e.Id));
-				await customerFileRepositoryAsync.DeleteAllAsync(toDelete);
-
-				//Insert
-				var list = model.Files.Where(s => s.Id == 0).ToList();
-				await customerFileRepositoryAsync.InsertRangeAsync(list);
+				case (int)CustomerType.Retail:
+					roles.Add(RoleType.Retail);
+					break;
+				case (int)CustomerType.Wholesale:
+					roles.Add(RoleType.Wholesale);
+					break;
+				default:
+					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
 			}
-			else if (entity.Files != null)
+
+		    return roles;
+	    }
+
+		private async Task<Customer> UpdateAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
+		{
+			var appUser = await _storefrontUserService.GetAsync(model.Id);
+			if (appUser == null)
 			{
-				foreach (var file in entity.Files)
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+			}
+
+			if (!appUser.IsConfirmed)
+			{
+				appUser.Status = UserStatus.NotActive;
+				model.StatusCode = RecordStatusCode.NotActive;
+			}
+			else if (model.StatusCode == RecordStatusCode.NotActive || model.StatusCode == RecordStatusCode.Deleted)
+			{
+				appUser.Status = UserStatus.Disabled;
+			}
+			else if (model.StatusCode == RecordStatusCode.Active)
+			{
+				appUser.Status = UserStatus.Active;
+			}
+
+			if (!string.IsNullOrWhiteSpace(password))
+			{
+				appUser.IsConfirmed = true;
+				appUser.Status = UserStatus.Active;
+				model.StatusCode = RecordStatusCode.Active;
+			}
+
+			appUser.Email = model.Email;
+
+			var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+			appUser.FirstName = profileAddress.Data.FirstName;
+			appUser.LastName = profileAddress.Data.LastName;
+
+			using (var transaction = uow.BeginTransaction())
+			{
+				try
 				{
-					await customerFileRepositoryAsync.DeleteAsync(file.Id);
+					var customer = await base.UpdateAsync(model, uow);
+
+					transaction.Commit();
+
+					var roles = MapCustomerTypeToRole(model);
+
+					await _storefrontUserService.UpdateAsync(appUser, roles, password);
+
+					return customer;
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw;
 				}
 			}
 		}
 
-        protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
-        {
-            var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
-            var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
-            var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
-            var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
+		private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
+	    {
+		    var roles = MapCustomerTypeToRole(model);
 
-            await
-                addressesRepositoryAsync.DeleteAllAsync(
-                    entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
-            await
-                customerNoteRepository.DeleteAllAsync(
-                    entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
-            
-            await
-                addressesRepositoryAsync.InsertGraphRangeAsync(
-                    entity.Addresses.Where(
-                        a =>
-                            a.Id == 0 && a.IdObjectType != (int?) AddressType.Billing &&
-                            a.StatusCode != RecordStatusCode.Deleted));
-            await
-                customerNoteRepository.InsertGraphRangeAsync(
-                    entity.CustomerNotes.Where(n => n.StatusCode != RecordStatusCode.Deleted && n.Id == 0));
-
-            foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != RecordStatusCode.Deleted))
-            {
-                await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
-                if (customerPaymentMethod.BillingAddress.Id == 0)
-                {
-                    customerPaymentMethod.IdAddress = 0;
-                    await addressesRepositoryAsync.InsertGraphAsync(customerPaymentMethod.BillingAddress);
-                }
-            }
-            var paymentsToDelete =
-                entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
-            await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
-            await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
-
-            List<string> fileNamesForDelete = new List<string>();
-            foreach(var dbFile in entity.Files)
-            {
-                bool delete = true;
-                foreach(var file in model.Files)
-                {
-                    if(dbFile.Id==file.Id)
-                    {
-                        delete = false;
-                    }
-                }
-                if(delete)
-                {
-                    fileNamesForDelete.Add(dbFile.FileName);
-                }
-            }
-
-            if(fileNamesForDelete.Count!=0)
-            {
-                var publicId = entity.PublicId;
-                Task deleteFilesTask = new Task(() =>
-                {
-                    foreach(var fileName in fileNamesForDelete)
-                    {
-                        var result = DeleteFileAsync(fileName, publicId.ToString()).Result;
-                    }
-                });
-                deleteFilesTask.Start();
-            }
-        }
-
-        protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
-        {
-            return query
-				.Include(p => p.Files)
-                .Include(p => p.DefaultPaymentMethod)
-                .Include(p => p.User)
-                .ThenInclude(p => p.Customer)
-                .Include(a => a.Addresses)
-                .ThenInclude(a => a.OptionValues)
-                .Include(p => p.CustomerNotes)
-                .ThenInclude(n => n.OptionValues)
-                .Include(p => p.OrderNotes)
-                .Include(p => p.PaymentMethods)
-                .Include(p => p.CustomerPaymentMethods)
-                .ThenInclude(p => p.OptionValues)
-                .Include(p => p.CustomerPaymentMethods)
-                .ThenInclude(p => p.BillingAddress)
-                .ThenInclude(p => p.OptionValues);
-        }
-
-        public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, bool sendActivation, string password)
-        {
-            using (var uow = CreateUnitOfWork())
-            {
-                var entity = await InsertAsync(model, uow, sendActivation, password);
-                return await SelectAsync(entity.Id);
-            }
-        }
-
-        private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, bool sendActivation, string password)
-        {
-            var roles = new List<RoleType>();
-            switch (model.IdObjectType)
-            {
-                case (int)CustomerType.Retail:
-                    roles.Add(RoleType.Retail);
-                    break;
-                case (int)CustomerType.Wholesale:
-                    roles.Add(RoleType.Wholesale);
-                    break;
-                default:
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
-            }
-
-            var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+			var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
             var appUser = new ApplicationUser()
             {
                 FirstName = profileAddress.Data.FirstName,
@@ -287,6 +176,7 @@ namespace VitalChoice.Business.Services.Customers
                 ConfirmationToken = Guid.NewGuid(),
                 IsAdminUser = false,
                 Profile = null,
+				Status = UserStatus.NotActive
             };
 
             using (var transaction = uow.BeginTransaction())
@@ -298,9 +188,10 @@ namespace VitalChoice.Business.Services.Customers
                     model.Id = appUser.Id;
                     model.User.Id = appUser.Id;
 
+					model.StatusCode = string.IsNullOrWhiteSpace(password) ? RecordStatusCode.NotActive : RecordStatusCode.Active;
                     var customer = await base.InsertAsync(model, uow);
 
-                    if (!sendActivation)
+                    if (!string.IsNullOrWhiteSpace(password))
                     {
                         appUser.Email = model.Email;
                         appUser.IsConfirmed = true;
@@ -332,12 +223,206 @@ namespace VitalChoice.Business.Services.Customers
             }
         }
 
-        protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+		protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
+		{
+			var errors = new List<MessageInfo>();
+
+			var customerSameEmail =
+				await
+					_customerRepositoryAsync.Query(
+						new CustomerQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email))
+						.SelectAsync(false);
+
+			if (customerSameEmail.Any())
+			{
+				errors.AddRange(
+					model.CreateError()
+						.Property(p => p.Email)
+						.Error("Customer email should be unique in the database")
+						.Build());
+			}
+
+			if (
+				model.Addresses.Where(
+					x => x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted)
+					.All(x => !x.Data.Default))
+			{
+				throw new AppValidationException(
+					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
+			}
+
+			return errors;
+		}
+
+		protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+		{
+			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
+			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
+			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
+			var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
+			var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
+			var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
+
+			await
+				customerToPaymentMethodRepository.DeleteAllAsync(
+					entity.PaymentMethods.WhereAll(model.ApprovedPaymentMethods, (p, dp) => p.IdPaymentMethod != dp));
+			await
+				customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes.WhereAll(model.OrderNotes,
+					(n, dn) => n.IdOrderNote != dn));
+			foreach (var address in entity.Addresses)
+			{
+				await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
+			}
+			foreach (var note in entity.CustomerNotes)
+			{
+				await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
+			}
+			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods)
+			{
+				await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
+			}
+
+			if (model.Files != null && model.Files.Any() && entity.Files != null)
+			{
+				//Update
+				var toUpdate = entity.Files.Where(e => model.Files.Select(x => x.Id).Contains(e.Id));
+				await customerFileRepositoryAsync.UpdateRangeAsync(toUpdate);
+
+				//Delete
+				var toDelete = entity.Files.Where(e => model.Files.All(s => s.Id != e.Id));
+				await customerFileRepositoryAsync.DeleteAllAsync(toDelete);
+
+				//Insert
+				var list = model.Files.Where(s => s.Id == 0).ToList();
+				await customerFileRepositoryAsync.InsertRangeAsync(list);
+			}
+			else if (entity.Files != null)
+			{
+				foreach (var file in entity.Files)
+				{
+					await customerFileRepositoryAsync.DeleteAsync(file.Id);
+				}
+			}
+		}
+
+		protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+		{
+			var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
+			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
+			var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
+			var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
+
+			await
+				addressesRepositoryAsync.DeleteAllAsync(
+					entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+			await
+				customerNoteRepository.DeleteAllAsync(
+					entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
+
+			await
+				addressesRepositoryAsync.InsertGraphRangeAsync(
+					entity.Addresses.Where(
+						a =>
+							a.Id == 0 && a.IdObjectType != (int?)AddressType.Billing &&
+							a.StatusCode != RecordStatusCode.Deleted));
+			await
+				customerNoteRepository.InsertGraphRangeAsync(
+					entity.CustomerNotes.Where(n => n.StatusCode != RecordStatusCode.Deleted && n.Id == 0));
+
+			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != RecordStatusCode.Deleted))
+			{
+				await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
+				if (customerPaymentMethod.BillingAddress.Id == 0)
+				{
+					customerPaymentMethod.IdAddress = 0;
+					await addressesRepositoryAsync.InsertGraphAsync(customerPaymentMethod.BillingAddress);
+				}
+			}
+			var paymentsToDelete =
+				entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
+			await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
+			await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
+
+			List<string> fileNamesForDelete = new List<string>();
+			foreach (var dbFile in entity.Files)
+			{
+				bool delete = true;
+				foreach (var file in model.Files)
+				{
+					if (dbFile.Id == file.Id)
+					{
+						delete = false;
+					}
+				}
+				if (delete)
+				{
+					fileNamesForDelete.Add(dbFile.FileName);
+				}
+			}
+
+			if (fileNamesForDelete.Count != 0)
+			{
+				var publicId = entity.PublicId;
+				Task deleteFilesTask = new Task(() =>
+				{
+					foreach (var fileName in fileNamesForDelete)
+					{
+						var result = DeleteFileAsync(fileName, publicId.ToString()).Result;
+					}
+				});
+				deleteFilesTask.Start();
+			}
+		}
+
+		protected override IQueryFluent<Customer> BuildQuery(IQueryFluent<Customer> query)
+		{
+			return query
+				.Include(p => p.Files)
+				.Include(p => p.DefaultPaymentMethod)
+				.Include(p => p.User)
+				.ThenInclude(p => p.Customer)
+				.Include(a => a.Addresses)
+				.ThenInclude(a => a.OptionValues)
+				.Include(p => p.CustomerNotes)
+				.ThenInclude(n => n.OptionValues)
+				.Include(p => p.OrderNotes)
+				.Include(p => p.PaymentMethods)
+				.Include(p => p.CustomerPaymentMethods)
+				.ThenInclude(p => p.OptionValues)
+				.Include(p => p.CustomerPaymentMethods)
+				.ThenInclude(p => p.BillingAddress)
+				.ThenInclude(p => p.OptionValues);
+		}
+
+		protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
         {
-            return await InsertAsync(model, uow, true, null);
+            return await InsertAsync(model, uow, null);
 	    }
 
-	    public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
+		protected override async Task<Customer> UpdateAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+		{
+			return await UpdateAsync(model, uow, null);
+		}
+
+		public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password)
+		{
+			using (var uow = CreateUnitOfWork())
+			{
+				var entity = await InsertAsync(model, uow, password);
+				return await SelectAsync(entity.Id);
+			}
+		}
+
+		public async Task<CustomerDynamic> UpdateAsync(CustomerDynamic model, string password)
+		{
+			using (var uow = CreateUnitOfWork())
+			{
+				var entity = await UpdateAsync(model, uow, password);
+				return await SelectAsync(entity.Id);
+			}
+		}
+
+		public async Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType)
 	    {
 			var condition = new OrderNoteQuery().NotDeleted().MatchByCustomerType(customerType);
 
@@ -480,11 +565,6 @@ namespace VitalChoice.Business.Services.Customers
 	    public async Task<Blob> DownloadFileAsync(string fileName, string customerPublicId)
 	    {
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
-	    }
-
-	    private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
-	    {
-		    return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
     }
 }

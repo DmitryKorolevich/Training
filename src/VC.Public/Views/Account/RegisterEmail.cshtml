@@ -11,7 +11,7 @@
 	{
 		@Html.AntiForgeryToken()
 		<h4>Register a New Account</h4>
-		@Html.ValidationSummary(true, "", new { @class = "form-validation-summary" })
+		@Html.ValidationSummary(true, "")
 		<div class="form-group">
 			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
 			<div class="input-group">
