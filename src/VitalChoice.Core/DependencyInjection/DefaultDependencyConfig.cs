@@ -300,8 +300,8 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
             builder.RegisterGeneric(typeof (GenericService<>))
                 .As(typeof (IGenericService<>));
-            builder.RegisterGeneric(typeof(ExportService<>))
-                .As(typeof(IExportService<>));
+            builder.RegisterGeneric(typeof(ExportService<,>))
+                .As(typeof(IExportService<,>));
             builder.RegisterType<ContentViewService>().As<IContentViewService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<MasterContentService>().As<IMasterContentService>();

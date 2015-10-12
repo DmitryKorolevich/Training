@@ -3,8 +3,6 @@ BEGIN
 
 	INSERT INTO DiscountOptionTypes
 	(DefaultValue, IdFieldType, IdObjectType, Name)
-	SELECT 'False', 5, 1, N'OneTimeOnly'
-	UNION
 	SELECT 'False', 5, 1, N'AllowHealthwise'
 	UNION
 	SELECT 'False', 5, 1, N'RequireMinimumPerishable'
@@ -12,8 +10,6 @@ BEGIN
 	SELECT NULL, 1, 1, N'RequireMinimumPerishableAmount'
 	UNION
 	SELECT 'False', 5, 1, N'FreeShipping'
-	UNION
-	SELECT 'False', 5, 2, N'OneTimeOnly'
 	UNION
 	SELECT 'False', 5, 2, N'AllowHealthwise'
 	UNION
@@ -23,10 +19,6 @@ BEGIN
 	UNION
 	SELECT 'False', 5, 2, N'FreeShipping'
 	UNION
-	SELECT 'False', 5, 3, N'OneTimeOnly'
-	UNION
-	SELECT 'False', 5, 4, N'OneTimeOnly'
-	UNION
 	SELECT 'False', 5, 4, N'AllowHealthwise'
 	UNION
 	SELECT 'False', 5, 4, N'RequireMinimumPerishable'
@@ -34,8 +26,6 @@ BEGIN
 	SELECT NULL, 1, 4, N'RequireMinimumPerishableAmount'
 	UNION
 	SELECT 'False', 5, 4, N'FreeShipping'
-	UNION
-	SELECT 'False', 5, 5, N'OneTimeOnly'
 	UNION
 	SELECT 'False', 5, 5, N'AllowHealthwise'
 	UNION
@@ -75,6 +65,19 @@ BEGIN
 INSERT INTO DiscountOptionTypes
 (DefaultValue, IdFieldType, IdObjectType, Name)
 SELECT NULL, 3, NULL, N'MaxTimesUse'
+
+END
+
+GO
+
+IF EXISTS (SELECT * FROM DiscountOptionTypes WHERE Name='OneTimeOnly')
+BEGIN
+
+DELETE DiscountOptionValues
+WHERE IdOptionType IN
+(SELECT Id FROM DiscountOptionTypes WHERE Name='OneTimeOnly')
+
+DELETE DiscountOptionTypes WHERE Name='OneTimeOnly'
 
 END
 

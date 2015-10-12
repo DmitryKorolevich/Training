@@ -4,9 +4,9 @@ using VitalChoice.Core.GlobalFilters;
 namespace VitalChoice.Core.Base
 {
 	//[BuildNumberValidationFilter]
-   // [ApiModelAutoValidationFilter]
+    //[ApiModelAutoValidationFilter]
     [MvcExceptionFilter]
-    public abstract class BaseMvcController : Controller
+    public abstract class BaseMvcController : BaseController
     {
     }
 }

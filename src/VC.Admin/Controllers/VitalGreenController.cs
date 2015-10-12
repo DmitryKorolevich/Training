@@ -22,6 +22,7 @@ using System;
 using VitalChoice.Domain.Transfer.VitalGreen;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.VitalGreen;
+using VitalChoice.Business.ExportMaps;
 #if DNX451
 using System.Net.Mime;
 #endif
@@ -32,13 +33,13 @@ namespace VC.Admin.Controllers
     public class VitalGreenController : BaseApiController
     {
         private readonly IVitalGreenService _vitalGreenService;
-        private readonly IExportService<VitalGreenRequest> _exportVitalGreenRequestService;
+        private readonly IExportService<VitalGreenRequest, VitalGreenRequestCsvMap> _exportVitalGreenRequestService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public VitalGreenController(
             IVitalGreenService vitalGreenService,
-            IExportService<VitalGreenRequest> exportVitalGreenRequestService,
+            IExportService<VitalGreenRequest, VitalGreenRequestCsvMap> exportVitalGreenRequestService,
             ILoggerProviderExtended loggerProvider)
         {
             _vitalGreenService = vitalGreenService;

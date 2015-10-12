@@ -151,6 +151,11 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 
         $scope.save = function () {
             clearServerValidation();
+            $scope.lastTierToAddingNewRequired = false;
+            if ($scope.discount.DiscountTiers.length != 0)
+            {
+                $scope.forms.DiscountTiers["i" + ($scope.discount.DiscountTiers.length - 1)].To.$setValidity("required", true);
+            }
 
             if (isMainFormValid() && $scope.forms.DiscountTiers.$valid) {
                 var categoryIds = [];
@@ -380,8 +385,26 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             });
         };
 
-        $scope.addTier = function () {
-            if ($scope.forms.DiscountTiers.$valid) {
+        $scope.addTier = function ()
+        {
+            $scope.lastTierToAddingNewRequired = false;
+
+            if ($scope.discount.DiscountTiers.length != 0)
+            {
+                $scope.forms.DiscountTiers["i" + ($scope.discount.DiscountTiers.length - 1)].To.$setValidity("required", true);
+                if (!$scope.discount.DiscountTiers[$scope.discount.DiscountTiers.length - 1].To)
+                {
+                    $scope.forms.DiscountTiers["i" + ($scope.discount.DiscountTiers.length - 1)].To.$setValidity("required", false);
+                    $scope.lastTierToAddingNewRequired = true;
+                }
+            }
+            if ($scope.forms.DiscountTiers.$valid)
+            {
+                if ($scope.lastTierToAddingNewRequired)
+                {
+                    return;
+                }
+
                 var tier = {
                     From: null,
                     To: null,
@@ -441,7 +464,10 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             if (currentTier.From) {
                 if(currentTier.From >= currentTier.To)
                 {
-                    currentTier.To = Math.round((currentTier.From + 0.01) * 100) / 100;
+                    if (index != ($scope.discount.DiscountTiers.length - 1))
+                    {
+                        currentTier.To = Math.round((currentTier.From + 0.01) * 100) / 100;
+                    }
                 }
                 if (index+1 < $scope.discount.DiscountTiers.length)
                 {

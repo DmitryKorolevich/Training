@@ -6,7 +6,7 @@
 
         public decimal From { get; set; }
 
-        public decimal To { get; set; }
+        public decimal? To { get; set; }
 
         public DiscountType IdDiscountType { get; set; }
 

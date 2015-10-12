@@ -73,6 +73,7 @@
 		"app/core/utils/parts/fileFieldDirective.js",
     "app/core/utils/parts/angular-money-directive.js",
     "app/core/utils/parts/numbersOnlyDirective.js",
+    "app/core/utils/parts/maxCharactersDirective.js",
     "app/core/utils/parts/maskDirective.js",
     "app/core/utils/parts/starsDirective.js",
     "app/core/utils/parts/cancelDirective.js",

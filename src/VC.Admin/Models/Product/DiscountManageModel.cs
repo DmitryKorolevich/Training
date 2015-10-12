@@ -54,9 +54,6 @@ namespace VC.Admin.Models.Product
 
 
         [Map]
-        public bool OneTimeOnly { get; set; }
-
-        [Map]
         public bool AllowHealthwise { get; set; }
 
         [Map]

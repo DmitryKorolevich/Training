@@ -26,6 +26,7 @@ angular.module('app.utils', [
 	'app.core.utils.parts.imgLoadDirective',
 	'app.core.utils.parts.fileFieldDirective',
 	'app.core.utils.parts.numbersOnlyDirective',
+	'app.core.utils.parts.maxCharactersDirective',
 	'app.core.utils.parts.maskDirective',
 	'app.core.utils.parts.starsDirective',
 	'app.core.utils.parts.cancelDirective',

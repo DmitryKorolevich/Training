@@ -92,7 +92,23 @@ namespace VitalChoice.Core.Base
         [NonAction]
         public virtual void Configure()
         {
-            var markedMethod = GetType().GetTypeInfo().DeclaredMethods.SingleOrDefault(m => m.Name == ActionContext.ActionDescriptor.Name);
+            var markedMethods = GetType().GetTypeInfo().DeclaredMethods.Where(m => m.Name == ActionContext.ActionDescriptor.Name).ToList();
+            MethodInfo markedMethod = null;
+            var httpActionMethod = ActionContext.HttpContext.Request.Method;
+            foreach(var method in markedMethods)
+            {
+                var httpMethodAttributes = method.GetCustomAttributes(typeof(HttpMethodAttribute), false).Select(p => p as HttpMethodAttribute).ToList();
+                foreach(var httpMethodAttribute in httpMethodAttributes)
+                {
+                    foreach(var httpMethod in httpMethodAttribute.HttpMethods)
+                    {
+                        if(httpMethod== httpActionMethod)
+                        {
+                            markedMethod = method;
+                        }
+                    }
+                }
+            }
             var controlMode = markedMethod?.GetCustomAttributes(typeof(ControlModeAttribute), false).SingleOrDefault() as ControlModeAttribute;
             if (controlMode != null)
             {
