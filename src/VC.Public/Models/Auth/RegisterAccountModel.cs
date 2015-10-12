@@ -68,7 +68,7 @@ namespace VC.Public.Models.Auth
 		[Required]
 		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Postal Code")]
-		[Map]
+		[Map("Zip")]
 		public string PostalCode { get; set; }
 
 		[Required]

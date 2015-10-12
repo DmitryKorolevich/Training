@@ -877,7 +877,6 @@ footer {
   margin: 0px 0px 15px 0px;
   padding: 10px 5px 0px 0px;
   text-align: left;
-  height: 20px;
   color: #990000;
 }
 .working-area-holder input[type=submit] {
@@ -963,7 +962,7 @@ footer {
   background-color: #F7F7F7;
   border: 1px solid #CCCCCC;
   color: #000;
-  height: 25px;
+  height: 31px;
   padding: 2px 5px;
   width: 200px;
 }

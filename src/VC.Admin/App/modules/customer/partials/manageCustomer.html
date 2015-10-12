@@ -125,18 +125,25 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
-                                                <div class="col-md-9">
-                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
-                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
-                                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
-                                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
-                                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Email Confirmation", "100"])}}</small>
-                                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.server">{{serverMessages.GetMessage('EmailConfirm')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
+	                                        <div class="form-group">
+		                                        <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
+		                                        <div class="col-md-9">
+			                                        <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-required="!editMode" data-ng-maxlength="100" autocomplete="off">
+			                                        <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
+				                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
+				                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
+				                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Email Confirmation", "100"])}}</small>
+				                                        <small class="error" ng-show="forms.profile.EmailConfirm.$error.server">{{serverMessages.GetMessage('EmailConfirm')}}</small>
+			                                        </div>
+		                                        </div>
+	                                        </div>
+	                                        <div class="form-group" data-ng-if="editMode">
+		                                        <div class="col-md-3"></div>
+		                                        <div class="col-md-9">
+			                                        <button class="btn btn-info" data-ng-if="currentCustomer.UserStatus != 0" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+			                                        <button class="btn btn-info" data-ng-if="currentCustomer.UserStatus == 0" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
+		                                        </div>
+	                                        </div>
                                             <span class="legend">Approved Payment Methods</span>
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
@@ -170,41 +177,43 @@
                                                 </div>
                                             </div>
                                             <span class="legend">DNM / DNR</span>
-                                            <div class="form-group">
-                                                <div class="col-md-3"></div>
-                                                <div class="col-md-9">
-                                                    <label class="checkbox-inline col-md-3">
-                                                        <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off">
-                                                        Do Not Mail
-                                                    </label>
-                                                    <label class="checkbox-inline col-md-3">
-                                                        <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off">
-                                                        Do Not Rent
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <span class="legend">Suspend User Account</span>
-                                            <div class="form-group">
-                                                <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
-                                                <div class="col-md-9">
-                                                    <div class="checkbox">
-                                                        <label>
-                                                            <input type="checkbox" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount">
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group" data-ng-if="currentCustomer.SuspendUserAccount">
-                                                <label for="reason" class="col-md-3 control-label">Reason</label>
-                                                <div class="col-md-9">
-                                                    <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
-                                                    <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
-                                                        <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
-                                                        <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
-                                                        <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
+	                                        <div class="form-group">
+		                                        <div class="col-md-3"></div>
+		                                        <div class="col-md-9">
+			                                        <label class="checkbox-inline col-md-3">
+				                                        <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off">
+				                                        Do Not Mail
+			                                        </label>
+			                                        <label class="checkbox-inline col-md-3">
+				                                        <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off">
+				                                        Do Not Rent
+			                                        </label>
+		                                        </div>
+	                                        </div>
+	                                       <div data-ng-if ="currentCustomer.UserStatus != 0">
+		                                        <span class="legend">Suspend User Account</span>
+		                                        <div class="form-group">
+			                                        <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
+			                                        <div class="col-md-9">
+				                                        <div class="checkbox">
+					                                        <label>
+						                                        <input type="checkbox" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount">
+					                                        </label>
+				                                        </div>
+			                                        </div>
+		                                        </div>
+		                                        <div class="form-group" data-ng-if="currentCustomer.SuspendUserAccount">
+			                                        <label for="reason" class="col-md-3 control-label">Reason</label>
+			                                        <div class="col-md-9">
+				                                        <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
+				                                        <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
+					                                        <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
+					                                        <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
+					                                        <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
+				                                        </div>
+			                                        </div>
+		                                        </div>
+	                                        </div>
                                         </fieldset>
                                     </form>
                                 </spinner-overlay>

@@ -85,12 +85,6 @@ namespace VitalChoice.Business.Services.Users
 			await ValidateUserInternalAsync(user);
 
 			ValidateRoleAssignments(user, roles);
-
-			var validateResult = await userValidator.ValidateAsync(UserManager, user);
-			if (!validateResult.Succeeded)
-			{
-				throw new AppValidationException(AggregateIdentityErrors(validateResult.Errors));
-			}
 		}
 
 		private async Task SendActivationAsync(ApplicationUser dbUser)
@@ -101,6 +95,13 @@ namespace VitalChoice.Business.Services.Users
 			}
 
 			await SendActivationInternalAsync(dbUser);
+		}
+
+		public async Task<bool> ValidateEmailUniquenessAsync(string email)
+		{
+			var existing = await UserManager.Users.AnyAsync(x => x.Email.Equals(email));
+
+			return !existing;
 		}
 
 		public async Task SendResetPasswordAsync(Guid publicId)
@@ -290,6 +291,11 @@ namespace VitalChoice.Business.Services.Users
 		public async Task<ApplicationUser> GetAsync(Guid publicId)
 		{
 			return await UserManager.Users.SingleOrDefaultAsync(x => x.PublicId == publicId);
+		}
+
+		public async Task<ApplicationUser> GetAsync(int internalId)
+		{
+			return await UserManager.Users.SingleOrDefaultAsync(x => x.Id == internalId);
 		}
 
 		public async Task<ApplicationUser> GetByTokenAsync(Guid token)

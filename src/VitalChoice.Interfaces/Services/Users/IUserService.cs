@@ -47,5 +47,9 @@ namespace VitalChoice.Interfaces.Services.Users
 	    Task ResetPasswordAsync(string email, string token, string newPassword);
 
 	    Task SendActivationAsync(string email);
+
+	    Task<bool> ValidateEmailUniquenessAsync(string email);
+
+	    Task<ApplicationUser> GetAsync(int internalId);
     }
 }

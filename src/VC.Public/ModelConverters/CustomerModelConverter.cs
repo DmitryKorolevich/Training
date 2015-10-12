@@ -36,6 +36,8 @@ namespace VC.Public.ModelConverters
             shippngAddress.IdObjectType = (int)AddressType.Shipping;
 		    shippngAddress.Data.Default = true;
 			dynamic.Addresses.Add(shippngAddress);
-		}
+
+			dynamic.StatusCode = RecordStatusCode.Active;
+	    }
 	}
 }

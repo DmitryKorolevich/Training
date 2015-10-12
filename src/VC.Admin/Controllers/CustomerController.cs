@@ -33,6 +33,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Workflow.Core;
 
@@ -47,6 +48,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
         private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
+        private readonly IStorefrontUserService _storefrontUserService;
 
         private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
@@ -63,7 +65,7 @@ namespace VC.Admin.Controllers
                 addressService,
             IEcommerceDynamicObjectService
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
-            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider)
+            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -74,6 +76,7 @@ namespace VC.Admin.Controllers
             _notesService = notesService;
             _noteMapper = noteMapper;
             this.logger = loggerProvider.CreateLoggerDefault();
+	        _storefrontUserService = storefrontUserService;
         }
 
         [HttpGet]
@@ -303,7 +306,17 @@ namespace VC.Admin.Controllers
 
             var customerModel = _customerMapper.ToModel<AddUpdateCustomerModel>(result);
 
-            var adminProfileCondition =
+	        var login = await _storefrontUserService.GetAsync(customerModel.Id);
+	        if (login == null)
+	        {
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+			}
+
+			customerModel.IsConfirmed = login.IsConfirmed;
+			customerModel.PublicUserId = login.PublicId;
+			customerModel.UserStatus = login.Status;
+
+			var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(
                     result.CustomerNotes.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
 
@@ -347,6 +360,22 @@ namespace VC.Admin.Controllers
 			    }
 		    }
 	    }
+
+		[HttpPost]
+		public async Task<Result<bool>> ResendActivation(Guid id)
+		{
+			await _storefrontUserService.ResendActivationAsync(id);
+
+			return true;
+		}
+
+		[HttpPost]
+		public async Task<Result<bool>> ResetPassword(Guid id)
+		{
+			await _storefrontUserService.SendResetPasswordAsync(id);
+
+			return true;
+		}
 
 #if DNX451
 		[HttpGet]

@@ -102,5 +102,17 @@ namespace VitalChoice.Business.Mail
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
+
+	    public async Task SendCustomerRegistrationSuccess(string email, SuccessfulCustomerRegistration registration)
+	    {
+			var body =
+				$"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
+				$"<p>At any time you can log into your account to check order status, update your billing information, add multiple shipping addresses, and much more. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>" +
+				$"<p>Thanks again for visiting our store. Let us know if there is anything we can do to make your experience with us a better one!</p>";
+
+			var subject = "Vital Choice - Confirmation of Customer Registration";
+
+			await emailSender.SendEmailAsync(email, subject, body);
+		}
     }
 }

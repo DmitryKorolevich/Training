@@ -9,7 +9,7 @@ using VitalChoice.Domain.Transfer.Base;
 namespace VitalChoice.Interfaces.Services.Users
 {
     public interface IStorefrontUserService: IUserService
-	{
-
+    {
+	    Task SendSuccessfulRegistration(string email, string firstName, string lastName);
     }
 }

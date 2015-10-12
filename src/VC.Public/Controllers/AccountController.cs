@@ -14,6 +14,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
@@ -25,19 +26,26 @@ namespace VC.Public.Controllers
 		private readonly IStorefrontUserService _userService;
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly ICustomerService _customerService;
+		private readonly IPaymentMethodService _paymentMethodService;
 		private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
 
-		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICustomerService customerService)
+		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICustomerService customerService, IPaymentMethodService paymentMethodService)
 		{
 			_userService = userService;
 			_contextAccessor = contextAccessor;
 			_customerMapper = customerMapper;
 			_customerService = customerService;
+			_paymentMethodService = paymentMethodService;
 		}
 
 		[HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string alreadyTakenEmail = null)
         {
+			if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
+			{
+				ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
+			}
+
             return View(new LoginModel());
         }
 
@@ -54,16 +62,15 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
 			}
 
-		    if (string.IsNullOrWhiteSpace(returnUrl))
+		    if (!string.IsNullOrWhiteSpace(returnUrl))
 		    {
-			    returnUrl = ""; //todo: refactor
+			    return Redirect(returnUrl);
 		    }
 
 			return RedirectToAction("Index", "Profile");
 	    }
 
-		[HttpPost]
-		public async Task<bool> Logout()
+		public async Task<IActionResult> Logout()
 		{
 			var context = _contextAccessor.HttpContext;
 
@@ -78,7 +85,7 @@ namespace VC.Public.Controllers
 				await _userService.SignOutAsync(user);
 			}
 
-			return true;
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpGet]
@@ -106,15 +113,21 @@ namespace VC.Public.Controllers
 
 			var user = await _userService.GetAsync(model.PublicId);
 			if (user == null)
+			{ 
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			var customer = await _customerService.SelectAsync(user.Id);
+			if (customer == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			user.Email = model.Email;
-			user.IsConfirmed = true;
-			user.Status = UserStatus.Active;
+			customer.Email = model.Email;
 
-			await _userService.UpdateAsync(user, null, model.Password);
+			await _customerService.UpdateAsync(customer, model.Password);
+
+			await _userService.SendSuccessfulRegistration(model.Email, user.FirstName, user.LastName);
 
 			return await Login(new LoginModel() {Email = model.Email, Password = model.Password}, string.Empty);
 		}
@@ -127,12 +140,18 @@ namespace VC.Public.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult RegisterEmail(RegisterEmailModel model)
+		public async Task<IActionResult> RegisterEmail(RegisterEmailModel model)
 		{
 			if (!ModelState.IsValid)
 				return View(model);
 
-			return View("RegisterAccount", new RegisterAccountModel() { Email = model.Email});
+			var validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
+			if (!validated)
+			{
+				return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
+			}
+
+			return View("RegisterAccount", new RegisterAccountModel() { Email = model.Email });
 		}
 
 		[HttpPost]
@@ -146,13 +165,50 @@ namespace VC.Public.Controllers
 
 			item.IdObjectType = (int)CustomerType.Retail;
 			item.PublicId = Guid.NewGuid();
-			item.IdDefaultPaymentMethod = 1; //todo
+			item.IdDefaultPaymentMethod = (await _paymentMethodService.GetStorefrontDefaultPaymentMenthod()).Id;
 
-			item = await _customerService.InsertAsync(item, false, model.Password);
+			item = await _customerService.InsertAsync(item, model.Password);
 			if (item == null || item.Id == 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
+
+			await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+
+			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ResetPassword(Guid id)
+		{
+			var result = await _userService.GetByTokenAsync(id);
+			if (result == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
+			}
+
+			return View(new ResetPasswordModel()
+			{
+				Token = id.ToString(),
+			});
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+		{
+			if (!ModelState.IsValid)
+				return View(model);
+
+			await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+
+			var user = await _userService.FindAsync(model.Email);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			await _userService.SignInAsync(user);
 
 			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}

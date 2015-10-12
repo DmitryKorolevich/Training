@@ -142,6 +142,15 @@ namespace VitalChoice.Business.Services.Payment
 				}
 			}
 		}
+
+		public async Task<PaymentMethod> GetStorefrontDefaultPaymentMenthod()
+		{
+			var condition = new PaymentMethodQuery().NotDeleted().CreditCard();
+
+			var creditCard = await _paymentMethodRepository.Query(condition).SelectFirstOrDefaultAsync(false);
+
+			return creditCard;
+		}
 	}
 }
 

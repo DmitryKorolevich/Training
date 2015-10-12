@@ -48,6 +48,12 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		createCheckPrototype: function (tracker) {
 		    return $http.post(baseUrl + 'CreateCheckPrototype', getConfig(tracker));
+		},
+		resendActivation: function (publicId, tracker) {
+			return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
+		},
+		resetPassword: function (publicId, tracker) {
+			return $http.post(baseUrl + 'ResetPassword/' + publicId, null, getConfig(tracker));
 		}
 	};
 }]);

@@ -11,7 +11,11 @@
 	{
 		@Html.AntiForgeryToken()
 		<h4>Account Login</h4>
-		@Html.ValidationSummary(true, "", new { @class = "form-validation-summary" })
+		if (!string.IsNullOrWhiteSpace(ViewBag.AlreadyTakenEmail))
+		{
+			<span class="form-control-hint">The e-mail address you provided already exists in our database. Please use another e-mail address to @Html.ActionLink("register", "RegisterEmail") or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.</span>
+		}
+		@Html.ValidationSummary(true, "")
 		<div class="form-group">
 			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
 			<div class="input-group">
@@ -37,7 +41,7 @@
 		<hr />
 	</div>
 	<div class="form-group">
-		@Html.ActionLink("Would you like to Register a New Account? Click Here", "Register")
+		@Html.ActionLink("Would you like to Register a New Account? Click Here", "RegisterEmail")
 	</div>
 
 </div>
