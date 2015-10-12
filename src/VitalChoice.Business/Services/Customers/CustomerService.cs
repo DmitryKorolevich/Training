@@ -134,8 +134,9 @@ namespace VitalChoice.Business.Services.Customers
 			}
 
 			appUser.Email = model.Email;
+            appUser.UserName = model.Email;
 
-			var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+            var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
 			appUser.FirstName = profileAddress.Data.FirstName;
 			appUser.LastName = profileAddress.Data.LastName;
 
