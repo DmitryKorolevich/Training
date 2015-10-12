@@ -63,4 +63,9 @@ $(function () {
 	$("#menuSidebar").accordion({
 		accordion: true
 	});
+
+	$("body").on("click", ".back-button", function() {
+		history.back();
+		return false;
+	});
 });

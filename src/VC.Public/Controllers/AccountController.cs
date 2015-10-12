@@ -53,8 +53,8 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginModel model, string returnUrl)
 	    {
-            if (!Validate(model))
-                return View(model);
+			if (!ModelState.IsValid)
+				return View(model);
 
             var user = await _userService.SignInAsync(model.Email, model.Password);
 			if (user == null)

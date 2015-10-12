@@ -11,7 +11,8 @@
 	{
 		@Html.HiddenFor(m => m.PublicId)
 		@Html.AntiForgeryToken()
-		<h4>Account Login</h4>
+		<h4>Activate Account</h4>
+		<span class="form-control-hint">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
 		@Html.ValidationSummary(true, "")
 		<div class="form-group">
 			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
