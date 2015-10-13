@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true)
+		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true, string password = null)
 		{
 			await PrepareForAdd(user, roles);
 
@@ -206,6 +206,15 @@ namespace VitalChoice.Business.Services.Users
 					var createResult = await UserManager.CreateAsync(user);
 					if (createResult.Succeeded)
 					{
+						if (!string.IsNullOrWhiteSpace(password))
+						{
+							var passwordResult = await UserManager.AddPasswordAsync(user, password);
+							if (!passwordResult.Succeeded)
+							{
+								throw new AppValidationException(AggregateIdentityErrors(passwordResult.Errors));
+							}
+						}
+
 						var roleNames = GetRoleNamesByIds(roles);
 						if (roleNames.Any())
 						{
@@ -238,6 +247,7 @@ namespace VitalChoice.Business.Services.Users
 				}
 				catch (Exception)
 				{
+					user.Id = 0;
                     transaction.Rollback();
 					throw;
 				}

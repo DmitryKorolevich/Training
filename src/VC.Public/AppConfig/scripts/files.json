@@ -8,6 +8,7 @@
     "assets/scripts/vendor/jquery.validate.unobtrusive.js",
     "lib/nivoslider/jquery.nivo.slider.js",
     "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
+    "assets/scripts/vendor/jquery.maskedinput.js",
     "assets/scripts/plugins.js"
   ]
 }

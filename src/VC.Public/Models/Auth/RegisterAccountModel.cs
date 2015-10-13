@@ -40,7 +40,7 @@ namespace VC.Public.Models.Auth
 		[Map]
 		public int IdCountry { get; set; }
 
-		[Display(Name = "State")] //required if
+		[Display(Name = "State/Province")] //required if
 		[Map]
 		public int IdState { get; set; }
 
@@ -60,7 +60,7 @@ namespace VC.Public.Models.Auth
 		[Map]
 		public string City { get; set; }
 
-		[Display(Name = "State")]
+		[Display(Name = "State/Province")]
 		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Map]
 		public string County { get; set; }

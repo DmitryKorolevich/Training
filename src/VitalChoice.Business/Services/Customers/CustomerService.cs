@@ -173,6 +173,7 @@ namespace VitalChoice.Business.Services.Customers
                 FirstName = profileAddress.Data.FirstName,
                 LastName = profileAddress.Data.LastName,
                 Email = model.Email,
+				UserName = model.Email,
                 TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Options.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
@@ -185,7 +186,13 @@ namespace VitalChoice.Business.Services.Customers
             {
                 try
                 {
-                    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false);
+	                if (!string.IsNullOrWhiteSpace(password))
+	                {
+		                appUser.IsConfirmed = true;
+		                appUser.Status = UserStatus.Active;
+	                }
+
+					appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
 
                     model.Id = appUser.Id;
                     model.User.Id = appUser.Id;
@@ -193,26 +200,16 @@ namespace VitalChoice.Business.Services.Customers
 					model.StatusCode = string.IsNullOrWhiteSpace(password) ? RecordStatusCode.NotActive : RecordStatusCode.Active;
                     var customer = await base.InsertAsync(model, uow);
 
-                    if (!string.IsNullOrWhiteSpace(password))
+                    if (string.IsNullOrWhiteSpace(password))
                     {
-                        appUser.Email = model.Email;
-                        appUser.IsConfirmed = true;
-                        appUser.Status = UserStatus.Active;
+						await _storefrontUserService.SendActivationAsync(model.Email);
+					}
 
-                        await _storefrontUserService.UpdateAsync(appUser, null, password);
-
-                        transaction.Commit();
-                    }
-                    else
-                    {
-                        transaction.Commit();
-
-                        await _storefrontUserService.SendActivationAsync(model.Email);
-                    }
+                    transaction.Commit();
 
                     return customer;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     if (appUser.Id > 0)
                     {

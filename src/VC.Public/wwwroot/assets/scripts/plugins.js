@@ -68,4 +68,6 @@ $(function () {
 		history.back();
 		return false;
 	});
+
+	$(".phone-mask").mask("(999) 999-9999? x99999");
 });

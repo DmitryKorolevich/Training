@@ -927,9 +927,17 @@ footer {
   color: #000;
   margin-right: 10px;
 }
+.working-area-holder input[type=submit]:hover,
+.working-area-holder input[type=button]:hover {
+  background-color: #E8E8E8;
+}
 .working-area-holder input[type=submit].yellow,
 .working-area-holder input[type=button].yellow {
   background-color: #FFFF99;
+}
+.working-area-holder input[type=submit].yellow:hover,
+.working-area-holder input[type=button].yellow:hover {
+  background-color: #FFE03C;
 }
 .form-group {
   margin-bottom: 15px;

@@ -11,7 +11,7 @@ namespace VitalChoice.Interfaces.Services.Users
 {
     public interface IUserService
     {
-	    Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true);
+	    Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true, string password = null);
 
 	    Task DeleteAsync(ApplicationUser user);
 
