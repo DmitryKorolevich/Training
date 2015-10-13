@@ -8,5 +8,7 @@
         public string Key { get; set; }
         public string Password { get; set; }
         public string PayAccountNumber { get; set; }
+        public string ShipServiceUrl { get; set; }
+        public string LocatorServiceUrl { get; set; }
     }
 }

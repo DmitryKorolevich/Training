@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using VitalChoice.Business.FedEx.Ship;
 using VitalChoice.Domain.Entities.Options;
@@ -141,7 +142,11 @@ namespace VitalChoice.Business.Services.FedEx
                     Minor = 0
                 }
             };
-            ShipPortTypeClient client = new ShipPortTypeClient();
+            var url = _fedExOptions.ShipServiceUrl;
+            BasicHttpBinding binding = new BasicHttpBinding();
+            binding.Security.Mode = BasicHttpSecurityMode.Transport;
+            EndpointAddress endpoint = new EndpointAddress(url);
+            ShipPortTypeClient client = new ShipPortTypeClient(binding, endpoint);
             var result = client.createPendingShipment(shipRequest);
             if (result.CompletedShipmentDetail != null)
             {
@@ -206,7 +211,11 @@ namespace VitalChoice.Business.Services.FedEx
                     FedExAuthorizedShippingCenter = true
                 }
             };
-            VitalChoice.Business.FedEx.Locator.LocatorPortTypeClient client = new VitalChoice.Business.FedEx.Locator.LocatorPortTypeClient();
+            var url = _fedExOptions.LocatorServiceUrl;
+            BasicHttpBinding binding = new BasicHttpBinding();
+            binding.Security.Mode = BasicHttpSecurityMode.Transport;
+            EndpointAddress endpoint = new EndpointAddress(url);
+            VitalChoice.Business.FedEx.Locator.LocatorPortTypeClient client = new VitalChoice.Business.FedEx.Locator.LocatorPortTypeClient(binding,endpoint);
             var result =client.fedExLocator(locationsRequest);
             if (result.DropoffLocations != null)
             {

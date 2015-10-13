@@ -62,5 +62,24 @@ namespace VitalChoice.Business.Services
 
             return toReturn;
         }
+
+        public async Task<FedExZone> GetFedExZone(string stateCode)
+        {
+            var zone = (await _fedExZoneRepository.Query(p=>p.StatesCovered.Contains(stateCode)).SelectAsync(false)).FirstOrDefault();
+            return zone;
+        }
+
+        public async Task<FedExZone> GetFedExZone(int id)
+        {
+            var zone = (await _fedExZoneRepository.Query(p => p.Id== id).SelectAsync(false)).FirstOrDefault();
+            return zone;
+        }
+
+        public async Task<VitalGreenRequest> InsertRequest(VitalGreenRequest request)
+        {
+            request.DateView = request.DateCompleted = DateTime.Now;
+            await _vitalGreenRequestRepository.InsertAsync(request);
+            return request;
+        }
     }
 }

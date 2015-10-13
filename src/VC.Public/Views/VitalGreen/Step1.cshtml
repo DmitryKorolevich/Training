@@ -1,0 +1,98 @@
+﻿@using System.Threading.Tasks
+@using VC.Public.Models
+@using VitalChoice.Interfaces.Services.Settings
+@model VitalGreenRequestModel
+
+@section Meta {
+    <title>Vital Choice | VitalGreen - Step 1</title>
+}
+
+@section PageScripts {
+}
+
+<div class="working-area-holder vitalgreen">
+    <div class="header">
+        <img src="/Assets/images/VitalGreen_350x72.jpg" alt="Vital Green">
+    </div>
+    @using (Html.BeginForm("Step1", "VitalGreen", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <h4>Vital Green Step #1: Provide Your Address and Information</h4>
+        <span class="form-control-hint">
+            Please fill in all the fields marked with a red asterisk (leave the Address 2 field blank if it does not apply to you).<br />
+            Click "Continue" to see a list of FedEx shipping centers near you.<br />
+            Click where indicated at the top of the next page, to view and print out a shipping label for the foam recycling center nearest you.<br />
+        </span>
+        @Html.ValidationSummary(true, "")
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FirstName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.LastName)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Address, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Address)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Address2, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Address2)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.City, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.City)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.StateCode, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.DropDownListFor(m => m.StateCode, (IEnumerable<SelectListItem>)ViewBag.States, new { @class = "form-control", @id = "ddState" })
+                @Html.ValidationMessageFor(m => m.StateCode)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Zip, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Zip, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Zip)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+        </div>
+        <div class="form-buttons-group">
+            <input type="submit" value="Continue" class="btn btn-default" />
+        </div>
+    }
+    <div class="form-group">
+        <hr />
+    </div>
+</div>

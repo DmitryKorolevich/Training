@@ -166,6 +166,8 @@ namespace VitalChoice.Core.DependencyInjection
                     Key = configuration.GetSection("App:FedExOptions:Key").Value,
                     Password = configuration.GetSection("App:FedExOptions:Password").Value,
                     PayAccountNumber = configuration.GetSection("App:FedExOptions:PayAccountNumber").Value,
+                    ShipServiceUrl = configuration.GetSection("App:FedExOptions:ShipServiceUrl").Value,
+                    LocatorServiceUrl = configuration.GetSection("App:FedExOptions:LocatorServiceUrl").Value,
                 };
                 options.Avatax = new AvataxOptions
                 {

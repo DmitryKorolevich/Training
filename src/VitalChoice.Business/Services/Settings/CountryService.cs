@@ -38,10 +38,17 @@ namespace VitalChoice.Business.Services.Settings
 
 	        Expression<Func<Country, bool>> countryQuery = p => p.StatusCode != RecordStatusCode.Deleted;
 	        Expression<Func<State, bool>> stateQuery = p => p.StatusCode != RecordStatusCode.Deleted;
-            if (filter != null && filter.ActiveOnly)
+            if (filter != null)
             {
-	            countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
-				stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+                if (filter.ActiveOnly)
+                {
+                    countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+                    stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+                }
+                if(!String.IsNullOrEmpty(filter.CountryCode))
+                {
+                    countryQuery = countryQuery.And(x => x.CountryCode == filter.CountryCode);
+                }
             }
 
             toReturn = await countryRepository.Query(countryQuery).SelectAsync(false);

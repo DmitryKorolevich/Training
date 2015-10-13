@@ -41,7 +41,9 @@
       "MerchantPhoneNumber": "8664825887",
       "Key": "7Ux69IBvsRj0Ep7X",
       "Password": "m0Zybyteel4RMp5j904aa1HpB",
-      "PayAccountNumber": "304955066"
+      "PayAccountNumber": "304955066",      
+      "ShipServiceUrl": "https://gateway.fedex.com/web-services/ship",
+      "LocatorServiceUrl": "https://gateway.fedex.com/web-services"
     },
     "Avatax": {
       "AccountNumber": "1100019190",
