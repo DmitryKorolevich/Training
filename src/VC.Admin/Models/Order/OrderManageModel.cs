@@ -38,6 +38,8 @@ namespace VC.Admin.Models.Order
 
         public decimal? Amount { get; set; }
 
+        public bool AutoShipProduct { get; set; }
+
         public IList<string> Messages { get; set; }
 
         public SkuOrderedManageModel(SkuOrdered dynamic)
@@ -51,6 +53,7 @@ namespace VC.Admin.Models.Order
                 Price = dynamic.Amount;
                 Amount = Price * QTY;
                 Id = dynamic.Sku.Id;
+                AutoShipProduct = dynamic.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? dynamic.Sku.Data.AutoShipProduct : false;
                 Messages = dynamic.Messages;
             }
         }

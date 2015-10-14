@@ -31,5 +31,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
         public string Url { get; set; }
 
         public string DescriptionName { get; set; }
+
+        public bool AutoShipProduct { get; set; }
     }
 }

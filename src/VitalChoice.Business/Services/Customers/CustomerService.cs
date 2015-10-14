@@ -457,7 +457,14 @@ namespace VitalChoice.Business.Services.Customers
 			var sortOrder = filter.Sorting.SortOrder;
 			switch (filter.Sorting.Path)
 			{
-				case VCustomerSortPath.Name:
+                case VCustomerSortPath.Id:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Id)
+                                : x.OrderByDescending(y => y.Id);
+                    break;
+                case VCustomerSortPath.Name:
 					sortable =
 						(x) =>
 							sortOrder == SortOrder.Asc

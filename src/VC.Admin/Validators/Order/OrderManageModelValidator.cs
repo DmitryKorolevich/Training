@@ -11,6 +11,8 @@ using VC.Admin.Models.Order;
 using VC.Admin.Validators.Customer;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using System;
+using System.Globalization;
 
 namespace VC.Admin.Validators.Order
 {
@@ -34,7 +36,7 @@ namespace VC.Admin.Validators.Order
                     int index = 0;
                     foreach (var shipping in value.Customer.Shipping)
                     {
-                        if (value.UpdateShippingAddressForCustomer || (shipping.IsSelected && value.OrderStatus!=OrderStatus.OnHold))
+                        if (value.UpdateShippingAddressForCustomer || (shipping.IsSelected && value.OrderStatus != OrderStatus.OnHold))
                         {
                             ParseResults(addressValidator.Validate(shipping), "Shipping", index, "shipping");
                         }
@@ -47,7 +49,7 @@ namespace VC.Admin.Validators.Order
                         {
                             if (value.UpdateCardForCustomer || (card.IsSelected && value.OrderStatus != OrderStatus.OnHold))
                             {
-                                ParseResults(creditCardValidator.Validate(card), "CreditCards", index,  "card");
+                                ParseResults(creditCardValidator.Validate(card), "CreditCards", index, "card");
                                 ParseResults(addressValidator.Validate(card.Address), "CreditCards", index, "card");
                             }
                             index++;
@@ -109,24 +111,41 @@ namespace VC.Admin.Validators.Order
                                .NotEmpty()
                                .When(p => p.Customer != null && p.Customer.CustomerType == CustomerType.Wholesale)
                                .WithMessage(model => model.PoNumber, ValidationMessages.FieldRequired);
+
+                             RuleFor(model => model.ShipDelayDate)
+                              .Must(p => p.HasValue)
+                              .When(p => p.ShipDelayType == 1)
+                              .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldRequired);
+                            RuleFor(model => model.ShipDelayDate)
+                              .Must(p=>p >= DateTime.Now)
+                              .When(p => p.ShipDelayDate.HasValue)
+                              .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d",CultureInfo.InvariantCulture));
+                             RuleFor(model => model.ShipDelayDateP)
+                                 .Must(p => p >= DateTime.Now)
+                                 .When(p => p.ShipDelayDateP.HasValue)
+                                 .WithMessage(model => model.ShipDelayDateP, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
+                             RuleFor(model => model.ShipDelayDateNP)
+                                 .Must(p => p >= DateTime.Now)
+                                 .When(p => p.ShipDelayDateNP.HasValue)
+                                 .WithMessage(model => model.ShipDelayDateNP, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
                          });
                 RuleSet("NewOrder",
                         () =>
                         {
                             RuleFor(model => model.Customer.Source)
-                               .Must(p => p.HasValue)
-                               .When(p => p.Customer != null && p.OrderStatus!=OrderStatus.OnHold)
+                               .Must(p=>p.HasValue)
+                               .When(p => p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.Source, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer)
                                .Must(p => p != null)
                                .WithMessage(model => model.Customer, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.CreditCards)
-                               .Must(p => p.Where(x=>x.IsSelected).Any())
+                               .Must(p => p.Where(x => x.IsSelected).Any())
                                .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 1 && p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.CreditCards, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.Oac)
                                .Must(p => p != null)
-                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2 && p.Customer!=null && p.OrderStatus != OrderStatus.OnHold)
+                               .When(p => p.IdPaymentMethodType.HasValue && p.IdPaymentMethodType.Value == 2 && p.Customer != null && p.OrderStatus != OrderStatus.OnHold)
                                .WithMessage(model => model.Customer.Oac, ValidationMessages.FieldRequired);
                             RuleFor(model => model.Customer.Check)
                                .Must(p => p != null)

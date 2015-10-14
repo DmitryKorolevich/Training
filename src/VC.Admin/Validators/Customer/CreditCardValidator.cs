@@ -46,13 +46,13 @@ namespace VC.Admin.Validators.Customer
             RuleFor(model => model.ExpirationDateMonth)
                 .NotEmpty()
                 .WithMessage(model => model.ExpirationDateMonth, ValidationMessages.FieldRequired)
-                .When(model => model.ExpirationDateMonth > 12 || model.ExpirationDateMonth < 1)
+                .Must(model => model <= 12 && model >= DateTime.Now.Month)
                 .WithMessage(model => model.ExpirationDateMonth, ValidationMessages.MonthFormat);
 
             RuleFor(model => model.ExpirationDateYear)
                 .NotEmpty()
                 .WithMessage(model => model.ExpirationDateYear, ValidationMessages.FieldRequired)
-                .When(model => model.ExpirationDateYear > 99 || model.ExpirationDateMonth < 1)
+                .Must(model => model <= 99 && model >= (DateTime.Now.Year-2000))
                 .WithMessage(model => model.ExpirationDateYear, ValidationMessages.YearFormat);
 
             RuleFor(model => model.NameOnCard)

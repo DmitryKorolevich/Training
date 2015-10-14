@@ -89,7 +89,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 {
                                     formForShowing = formName;
                                 }
-                                return false;
                             }
                         } else
                         {
@@ -104,7 +103,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                         {
                                             formForShowing = index;
                                         }
-                                        return false;
                                     }
                                 }
                             });
@@ -253,6 +251,19 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 {
                     $scope.order = result.Data;
 
+                    if ($scope.order.ShipDelayDate)
+                    {
+                        $scope.order.ShipDelayDate = Date.parseDateTime($scope.order.ShipDelayDate);
+                    }
+                    if ($scope.order.ShipDelayDateP)
+                    {
+                        $scope.order.ShipDelayDateP = Date.parseDateTime($scope.order.ShipDelayDateP);
+                    }
+                    if ($scope.order.ShipDelayDateNP)
+                    {
+                        $scope.order.ShipDelayDateNP = Date.parseDateTime($scope.order.ShipDelayDateNP);
+                    }
+
                     customerEditService.initBase($scope);
                     if ($scope.id)
                     {
@@ -325,7 +336,16 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.currentCustomer.SourceValue = $scope.currentCustomer.SourceDetails;
                 } else if ($scope.currentCustomer.Source)
                 {
-                    $scope.currentCustomer.SourceValue = $scope.currentCustomer.Source;
+                    var sourceName = $scope.currentCustomer.Source;
+                    $.each($scope.orderSources, function (index, orderSource)
+                    {
+                        if (orderSource.Key == $scope.currentCustomer.Source)
+                        {
+                            sourceName = orderSource.Text;
+                            return false;
+                        }
+                    });
+                    $scope.currentCustomer.SourceValue = sourceName;
                 }
                 $scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
                 customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
@@ -531,8 +551,39 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var oldOrderForCalculating = null;
 
+    var skusClientValid = function ()
+    {
+        var isValid = true;
+        $.each($scope.order.SkuOrdereds, function (index, uiSku)
+        {
+            uiSku.ClientMessages = [];
+        });
+        for (var i = 0; i < $scope.order.SkuOrdereds.length; i++)
+        {
+            var current = $scope.order.SkuOrdereds[i];
+            if (current.Code)
+            {
+                for (var j = i + 1; j < $scope.order.SkuOrdereds.length; j++)
+                {
+                    if (current.Code == $scope.order.SkuOrdereds[j].Code)
+                    {
+                        $scope.order.SkuOrdereds[j].ClientMessages.push("Duplicate SKU");
+                        isValid = false;
+                    }
+                }
+            }
+        }
+        return isValid;
+    };
+
     $scope.requestRecalculate = function ()
     {
+        //additional client validation
+        if (!skusClientValid())
+        {
+            return;
+        }
+
         angular.forEach($scope.currentCustomer.Shipping, function (shippingItem, index)
         {
             shippingItem.IsSelected = index.toString() == $scope.shippingAddressTab.AddressIndex;
@@ -592,6 +643,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.order.DiscountMessage = data.DiscountMessage;
         $scope.order.TaxTotal = data.TaxTotal;
         $scope.order.Total = data.Total;
+
+        $scope.order.ShouldSplit = data.ShouldSplit;
 
         $scope.shippingUpgradePOptions = data.ShippingUpgradePOptions;
         $scope.shippingUpgradeNPOptions = data.ShippingUpgradeNPOptions;
@@ -700,6 +753,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 }
             });
         }
+
+        //show/hide autoship option
+        $scope.autoShipOrderOptionShow = ($scope.order.SkuOrdereds.length == 1 || ($scope.order.SkuOrdereds.length == 2 && !$scope.order.SkuOrdereds[1].Code))
+            && $scope.order.PromoSkus.length == 0 && $scope.order.SkuOrdereds[0].AutoShipProduct;
     }
 
     var clearServerValidation = function ()
@@ -756,7 +813,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
         });
 
-        if (valid)
+        if (valid && skusClientValid())
         {
             var productErrorMessages = '';
             if ($scope.order.SkuOrdereds.length == 1 && !$scope.order.SkuOrdereds[0].Code)
@@ -836,7 +893,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     }
                     if ($scope.order.IdPaymentMethodType == 3)//check
                     {
-                        if ($scope.currentCustomer.CreditCard == null)
+                        if ($scope.currentCustomer.Check == null)
                         {
                             billingErrorMessages += "Check is required. ";
                         }
@@ -860,7 +917,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     }
                     if ($scope.order.IdPaymentMethodType == 3)//check
                     {
-                        if ($scope.order.CreditCard == null)
+                        if ($scope.order.Check == null)
                         {
                             billingErrorMessages += "Check is required. ";
                         }
@@ -886,6 +943,19 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             var order = angular.copy($scope.order);
             order.Customer = angular.copy($scope.currentCustomer);
 
+            if (order.ShipDelayDate)
+            {
+                order.ShipDelayDate = order.ShipDelayDate.toServerDateTime();
+            }
+            if (order.ShipDelayDateP)
+            {
+                order.ShipDelayDateP = order.ShipDelayDateP.toServerDateTime();
+            }
+            if (order.ShipDelayDateNP)
+            {
+                order.ShipDelayDateNP = order.ShipDelayDateNP.toServerDateTime();
+            }
+
             orderService.updateOrder(order, $scope.addEditTracker).success(function (result)
             {
                 successSaveHandler(result);
@@ -904,6 +974,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.forms.submitted['card'] = true;
             $scope.forms.submitted['oac'] = true;
             $scope.forms.submitted['check'] = true;
+            toaster.pop('error', "Error!", "Validation errors", null, 'trustedHtml');
         }
     };
 
@@ -1076,6 +1147,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 product.IdProductType = result.Data.ProductType;
                                 product.ProductName = result.Data.DescriptionName;
                                 product.Id = result.Data.Id;
+                                product.AutoShipProduct = result.Data.AutoShipProduct;
                                 if ($scope.currentCustomer.CustomerType == 1)
                                 {
                                     product.Price = result.Data.Price;
@@ -1143,6 +1215,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             product.Code = result.Data.Code;
                             product.RequestedCode = product.Code;
                             product.Id = result.Data.Id;
+                            product.AutoShipProduct = result.Data.AutoShipProduct;
                             if ($scope.currentCustomer.CustomerType == 1)
                             {
                                 product.Price = result.Data.Price;

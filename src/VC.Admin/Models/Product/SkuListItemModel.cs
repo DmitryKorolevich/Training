@@ -30,6 +30,8 @@ namespace VC.Admin.Models.Product
 
         public string DescriptionName { get; set; }
 
+        public bool AutoShipProduct { get; set; }
+
         public SkuListItemModel(VSku item)
         {
             if(item!=null)
@@ -42,6 +44,7 @@ namespace VC.Admin.Models.Product
                 WholesalePrice = item.WholesalePrice;
                 ProductType = item.IdProductType;
                 DescriptionName = item.DescriptionName;
+                AutoShipProduct = item.AutoShipProduct;
             }
         }
     }

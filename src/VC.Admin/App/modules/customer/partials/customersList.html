@@ -42,6 +42,13 @@
             <table class="table table-striped table-hover">
                 <thead>
                 <tr>
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Id')">
+                        <span>Customer #</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Id'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
                     <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Name')">
                         <span>Name</span>
                         <span data-ng-if="filter.Sorting.Path == 'Name'">
@@ -103,6 +110,7 @@
                 </thead>
                 <tbody>
                 <tr data-ng-repeat="customer in customers">
+                    <td>{{::customer.Id}}</td>
                     <td>{{::customer.Name}}</td>
                     <td>{{::customer.Country}}</td>
                     <td>{{::customer.State}}</td>

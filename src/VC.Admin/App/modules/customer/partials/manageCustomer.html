@@ -22,6 +22,12 @@
                                 <spinner-overlay data-loading="addEditTracker.active()">
                                     <form class="form-horizontal" name="forms.profile" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted['profile']}" novalidate unsaved-warning-form>
                                         <fieldset>
+                                            <div class="form-group">
+                                                <label for="" class="col-md-3 control-label">Customer ID</label>
+                                                <div class="col-md-9 form-control-static" data-ng-if="currentCustomer.Id">
+                                                    <span>{{currentCustomer.Id}}</span>
+                                                </div>
+                                            </div>
                                             <span class="legend">Customer Type</span>
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
@@ -327,7 +333,7 @@
                                                     <div class="form-group">
                                                         <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
+                                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" required autocomplete="off">
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                 <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                 <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -338,7 +344,7 @@
                                                     <div class="form-group">
                                                         <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                         <div class="col-md-4">
-                                                            <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
+                                                            <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" required autocomplete="off">
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                 <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                 <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -348,7 +354,7 @@
                                                         <label class="col-md-1">
                                                         </label>
                                                         <div class="col-md-4">
-                                                            <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
+                                                            <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" required autocomplete="off">
                                                             <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                 <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                 <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>

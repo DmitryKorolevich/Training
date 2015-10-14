@@ -255,7 +255,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										if (formForShowing == null) {
 											formForShowing = formName;
 										}
-										return false;
 									}
 								} else {
 									$.each($scope.forms, function(index, form) {
@@ -265,7 +264,6 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 												if (formForShowing == null) {
 													formForShowing = index;
 												}
-												return false;
 											}
 										}
 									});

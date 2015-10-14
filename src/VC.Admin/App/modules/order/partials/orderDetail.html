@@ -36,11 +36,11 @@
                                                     <input type="checkbox" data-ng-model="order.OnHold">Hold Order
                                                     <i class="fa fa-pause"></i>
                                                 </label>
-                                                <label class="checkbox-inline">
+                                                <label data-ng-if="autoShipOrderOptionShow" class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.AutoShip">Auto-Ship Order
                                                     <i class="fa fa-history"></i>
                                                     <select data-ng-if="order.AutoShip" class="form-control auto-ship-frequency" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies">
-                                                        <option value="" ng-if="false"></option>
+                                                        <option value="" selected hidden />
                                                     </select>
                                                 </label>
                                                 <label class="checkbox-inline">
@@ -60,7 +60,7 @@
                                         <div class="col-md-12 form-horizontal products">
                                             <table class="table table-striped">
                                                 <tbody>
-                                                    <tr data-ng-class="{warning: item.Messages.length>0}" data-ng-repeat-start="item in order.SkuOrdereds">
+                                                    <tr data-ng-class="{warning: item.Messages.length>0 || (item.ClientMessages && item.ClientMessages.length>0)}" data-ng-repeat-start="item in order.SkuOrdereds">
                                                         <td class="sku">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
@@ -98,9 +98,14 @@
                                                             <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);"><i class="glyphicon glyphicon-remove"></i></a>
                                                         </td>
                                                     </tr>
-                                                    <tr data-ng-repeat-end class="warning" data-ng-if="item.Messages.length>0">
+                                                    <tr class="warning" data-ng-if="item.Messages.length>0">
                                                         <td colspan="7">
                                                             <span class="message" data-ng-repeat="message in item.Messages">{{message}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr data-ng-repeat-end class="warning" data-ng-if="item.ClientMessages && item.ClientMessages.length>0">
+                                                        <td colspan="7">
+                                                            <span class="message" data-ng-repeat="message in item.ClientMessages">{{message}}</span>
                                                         </td>
                                                     </tr>
                                                     <tr class="warning" data-ng-if="productsPerishableThresholdIssue && !ignoneMinimumPerishableThreshold">
@@ -169,7 +174,7 @@
                                                         </div>
                                                         <div data-ng-if="!currentCustomer.SourceValue" class="col-md-9">
                                                             <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" data-ng-required="!order.OnHold">
-                                                                <option value="" ng-if="false"></option>
+                                                                <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Source.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.Source.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Source")}}</small>
@@ -184,7 +189,7 @@
                                                                 <small class="error" ng-show="forms.mainForm.SourceDetailsText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
                                                             </div>
                                                             <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" data-ng-required="!order.OnHold">
-                                                                <option value="" ng-if="false"></option>
+                                                                <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsCelebrity.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.SourceDetailsCelebrity.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
@@ -218,14 +223,14 @@
                                                         <div class="col-md-12">
                                                             <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio">None</label>
                                                             <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio">Entire Order</label>
-                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio">Perishable & Non-Perishable</label>
+                                                            <label data-ng-if="order.ShouldSplit" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio">Perishable & Non-Perishable</label>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.ShipDelayType==1" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="ShipDelayDateOpened" required />
+                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -236,11 +241,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="order.ShipDelayType==2" class="form-group">
+                                                    <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" required />
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -251,11 +256,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="order.ShipDelayType==2" class="form-group">
+                                                    <div data-ng-if="order.ShipDelayType==2 && order.ShouldSplit" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" required />
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -377,7 +382,7 @@
                                                         <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
                                                         <div class="col-md-5">
                                                             <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required>
-                                                                <option value="" ng-if="false"></option>
+                                                                <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PreferredShipMethod.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm2.PreferredShipMethod.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","PreferredShipMethod")}}</small>
@@ -838,7 +843,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -849,7 +854,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -859,7 +864,7 @@
                                                             <label class="col-md-1">
                                                             </label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
@@ -1089,7 +1094,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -1100,7 +1105,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -1110,7 +1115,7 @@
                                                             <label class="col-md-1">
                                                             </label>
                                                             <div class="col-md-4">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold" autocomplete="off">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>

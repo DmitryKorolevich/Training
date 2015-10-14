@@ -54,6 +54,8 @@ namespace VC.Admin.Models.Order
 
         public bool ProductsPerishableThresholdIssue { get; set; }
 
+        public bool ShouldSplit { get; set; }
+
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
         public IList<PromoSkuOrderedManageModel> PromoSkus { get; set; }
@@ -77,6 +79,7 @@ namespace VC.Admin.Models.Order
             ShippingOverride = context.ShippingOverride;
             SurchargeOverride = context.SurchargeOverride;
             TotalShipping = context.TotalShipping;
+            ShouldSplit = context.SplitInfo.ShouldSplit;
 
             SkuOrdereds = context.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
