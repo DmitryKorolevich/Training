@@ -165,12 +165,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.forms = { submitted: [] };
 
-        $scope.autoShipOrderFrequencies = [
-            { Key: 1, Text: '1 Month' },
-            { Key: 2, Text: '2 Months' },
-            { Key: 3, Text: '3 Months' },
-            { Key: 6, Text: '6 Months' }
-        ];
+        $scope.autoShipOrderFrequencies = [];
 
         $scope.minimumPerishableThreshold = $rootScope.ReferenceData.AppSettings.GlobalPerishableThreshold;
         $scope.ignoneMinimumPerishableThreshold = $scope.id ? true : false;//only for a new order
@@ -757,6 +752,27 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         //show/hide autoship option
         $scope.autoShipOrderOptionShow = ($scope.order.SkuOrdereds.length == 1 || ($scope.order.SkuOrdereds.length == 2 && !$scope.order.SkuOrdereds[1].Code))
             && $scope.order.PromoSkus.length == 0 && $scope.order.SkuOrdereds[0].AutoShipProduct;
+        if ($scope.autoShipOrderOptionShow)
+        {
+            var items = [];
+            if($scope.order.SkuOrdereds[0].AutoShipFrequency1)
+            {
+                items.push({ Key: 1, Text: '1 Month' });
+            }
+            if($scope.order.SkuOrdereds[0].AutoShipFrequency2)
+            {
+                items.push({ Key: 1, Text: '2 Months' });
+            }
+            if($scope.order.SkuOrdereds[0].AutoShipFrequency3)
+            {
+                items.push({ Key: 1, Text: '3 Months' });
+            }
+            if($scope.order.SkuOrdereds[0].AutoShipFrequency6)
+            {
+                items.push({ Key: 1, Text: '6 Months' });
+            }
+            $scope.autoShipOrderFrequencies = items;
+        }
     }
 
     var clearServerValidation = function ()
@@ -940,6 +956,17 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 $scope.currentCustomer.EmailConfirm = $scope.currentCustomer.Email;
             }
+
+            if ($scope.order.ShipDelayType == 1)
+            {
+                $scope.order.ShipDelayDateP = null;
+                $scope.order.ShipDelayDateNP = null;
+            }
+            if ($scope.order.ShipDelayType == 2)
+            {
+                $scope.order.ShipDelayDate = null;
+            }
+
             var order = angular.copy($scope.order);
             order.Customer = angular.copy($scope.currentCustomer);
 
@@ -1148,6 +1175,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 product.ProductName = result.Data.DescriptionName;
                                 product.Id = result.Data.Id;
                                 product.AutoShipProduct = result.Data.AutoShipProduct;
+                                product.AutoShipFrequency1 = result.Data.AutoShipFrequency1;
+                                product.AutoShipFrequency2 = result.Data.AutoShipFrequency2;
+                                product.AutoShipFrequency3 = result.Data.AutoShipFrequency3;
+                                product.AutoShipFrequency6 = result.Data.AutoShipFrequency6;
                                 if ($scope.currentCustomer.CustomerType == 1)
                                 {
                                     product.Price = result.Data.Price;
@@ -1216,6 +1247,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             product.RequestedCode = product.Code;
                             product.Id = result.Data.Id;
                             product.AutoShipProduct = result.Data.AutoShipProduct;
+                            product.AutoShipFrequency1 = result.Data.AutoShipFrequency1;
+                            product.AutoShipFrequency2 = result.Data.AutoShipFrequency2;
+                            product.AutoShipFrequency3 = result.Data.AutoShipFrequency3;
+                            product.AutoShipFrequency6 = result.Data.AutoShipFrequency6;
                             if ($scope.currentCustomer.CustomerType == 1)
                             {
                                 product.Price = result.Data.Price;

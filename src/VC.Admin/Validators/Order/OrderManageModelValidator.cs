@@ -118,16 +118,16 @@ namespace VC.Admin.Validators.Order
                               .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldRequired);
                             RuleFor(model => model.ShipDelayDate)
                               .Must(p=>p >= DateTime.Now)
-                              .When(p => p.ShipDelayDate.HasValue)
-                              .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d",CultureInfo.InvariantCulture));
+                              .When(p => p.ShipDelayDate.HasValue && p.ShipDelayType == 1)
+                              .WithMessage("Ship delay should be future date. Please review.");
                              RuleFor(model => model.ShipDelayDateP)
                                  .Must(p => p >= DateTime.Now)
-                                 .When(p => p.ShipDelayDateP.HasValue)
-                                 .WithMessage(model => model.ShipDelayDateP, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
+                                 .When(p => p.ShipDelayDateP.HasValue && p.ShipDelayType == 2)
+                                 .WithMessage("Ship delay should be future date. Please review.");
                              RuleFor(model => model.ShipDelayDateNP)
                                  .Must(p => p >= DateTime.Now)
-                                 .When(p => p.ShipDelayDateNP.HasValue)
-                                 .WithMessage(model => model.ShipDelayDateNP, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
+                                 .When(p => p.ShipDelayDateNP.HasValue && p.ShipDelayType==2)
+                                 .WithMessage("Ship delay should be future date. Please review.");
                          });
                 RuleSet("NewOrder",
                         () =>

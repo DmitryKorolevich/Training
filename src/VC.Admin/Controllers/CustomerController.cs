@@ -287,7 +287,9 @@ namespace VC.Admin.Controllers
                     State = p.StateOrCounty,
                     DateEdited = p.DateEdited,
                     EditedBy = p.AdminProfile?.AgentId,
-                    StatusCode = p.StatusCode
+                    StatusCode = p.StatusCode,
+                    LastOrderPlaced = p.LastOrderPlaced,
+                    TotalOrders = p.TotalOrders,
                 }).ToList(),
                 Count = result.Count,
             };

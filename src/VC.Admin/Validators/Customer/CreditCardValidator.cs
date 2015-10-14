@@ -46,7 +46,7 @@ namespace VC.Admin.Validators.Customer
             RuleFor(model => model.ExpirationDateMonth)
                 .NotEmpty()
                 .WithMessage(model => model.ExpirationDateMonth, ValidationMessages.FieldRequired)
-                .Must(model => model <= 12 && model >= DateTime.Now.Month)
+                .Must(model => model <= 12 && model >= 1)
                 .WithMessage(model => model.ExpirationDateMonth, ValidationMessages.MonthFormat);
 
             RuleFor(model => model.ExpirationDateYear)
@@ -54,6 +54,12 @@ namespace VC.Admin.Validators.Customer
                 .WithMessage(model => model.ExpirationDateYear, ValidationMessages.FieldRequired)
                 .Must(model => model <= 99 && model >= (DateTime.Now.Year-2000))
                 .WithMessage(model => model.ExpirationDateYear, ValidationMessages.YearFormat);
+
+            RuleFor(model => model)
+                .Must(model => (new DateTime(model.ExpirationDateYear.Value+2000, model.ExpirationDateMonth.Value,1)).AddMonths(1)>DateTime.Now)
+                .When(model => model.ExpirationDateMonth <= 12 && model.ExpirationDateMonth >= 1 && model.ExpirationDateYear <= 99 && model.ExpirationDateYear >= (DateTime.Now.Year - 2000))
+                .WithMessage("Expiration Date should be future date")
+                .WithName("ExpirationDateMonth");
 
             RuleFor(model => model.NameOnCard)
                 .NotEmpty()

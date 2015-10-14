@@ -540,8 +540,10 @@ namespace VitalChoice.Business.Services.Customers
 					Zip = x.Zip,
 					County = x.County,
 					StateOrCounty = x.StateOrCounty,
-					StatusCode = x.StatusCode
-				}).ToList(),
+					StatusCode = x.StatusCode,
+                    LastOrderPlaced = x.LastOrderPlaced,
+                    TotalOrders = x.TotalOrders,
+                }).ToList(),
 				Count = customers.Count
 			};
 

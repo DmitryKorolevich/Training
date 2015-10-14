@@ -151,7 +151,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
         $scope.save = function () {
             clearServerValidation();
             $scope.lastTierToAddingNewRequired = false;
-            if ($scope.discount.DiscountTiers.length != 0)
+            if ($scope.discount.DiscountTiers.length != 0 && $scope.discount.DiscountType==5)
             {
                 $scope.forms.DiscountTiers["i" + ($scope.discount.DiscountTiers.length - 1)].To.$setValidity("required", true);
             }

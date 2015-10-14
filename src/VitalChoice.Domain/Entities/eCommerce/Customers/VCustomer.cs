@@ -42,5 +42,9 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    public string County { get; set; }
 
 	    public string StateOrCounty { get; set; }
+
+        public DateTime? LastOrderPlaced { get; set; }
+
+        public int TotalOrders { get; set; }
     }
 }

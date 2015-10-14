@@ -40,6 +40,14 @@ namespace VC.Admin.Models.Order
 
         public bool AutoShipProduct { get; set; }
 
+        public bool AutoShipFrequency1 { get; set; }
+
+        public bool AutoShipFrequency2 { get; set; }
+
+        public bool AutoShipFrequency3 { get; set; }
+
+        public bool AutoShipFrequency6 { get; set; }
+
         public IList<string> Messages { get; set; }
 
         public SkuOrderedManageModel(SkuOrdered dynamic)
@@ -54,6 +62,10 @@ namespace VC.Admin.Models.Order
                 Amount = Price * QTY;
                 Id = dynamic.Sku.Id;
                 AutoShipProduct = dynamic.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? dynamic.Sku.Data.AutoShipProduct : false;
+                AutoShipFrequency1 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? dynamic.Sku.Data.AutoShipFrequency1 : false;
+                AutoShipFrequency2 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency2") ? dynamic.Sku.Data.AutoShipFrequency2 : false;
+                AutoShipFrequency3 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? dynamic.Sku.Data.AutoShipFrequency3 : false;
+                AutoShipFrequency6 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? dynamic.Sku.Data.AutoShipFrequency6 : false;
                 Messages = dynamic.Messages;
             }
         }
