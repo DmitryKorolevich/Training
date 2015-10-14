@@ -974,7 +974,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.forms.submitted['card'] = true;
             $scope.forms.submitted['oac'] = true;
             $scope.forms.submitted['check'] = true;
-            toaster.pop('error', "Error!", "Validation errors", null, 'trustedHtml');
+            toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
         }
     };
 

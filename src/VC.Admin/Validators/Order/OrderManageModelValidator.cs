@@ -119,15 +119,15 @@ namespace VC.Admin.Validators.Order
                             RuleFor(model => model.ShipDelayDate)
                               .Must(p=>p >= DateTime.Now)
                               .When(p => p.ShipDelayDate.HasValue)
-                              .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d",CultureInfo.InvariantCulture));
+                              .WithMessage(model => model.ShipDelayDate, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d",CultureInfo.InvariantCulture));
                              RuleFor(model => model.ShipDelayDateP)
                                  .Must(p => p >= DateTime.Now)
                                  .When(p => p.ShipDelayDateP.HasValue)
-                                 .WithMessage(model => model.ShipDelayDateP, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
+                                 .WithMessage(model => model.ShipDelayDateP, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
                              RuleFor(model => model.ShipDelayDateNP)
                                  .Must(p => p >= DateTime.Now)
                                  .When(p => p.ShipDelayDateNP.HasValue)
-                                 .WithMessage(model => model.ShipDelayDateNP, ValidationMessages.FieldMinOrEqual, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
+                                 .WithMessage(model => model.ShipDelayDateNP, ValidationMessages.FieldMin, DateTime.Now.AddDays(1).ToString("d", CultureInfo.InvariantCulture));
                          });
                 RuleSet("NewOrder",
                         () =>

@@ -31,7 +31,6 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                                             if (formForShowing == null) {
                                                 formForShowing = index;
                                             }
-                                            return false;
                                         }
                                     }
                                 });
@@ -217,6 +216,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 $scope.forms.submitted = true;
                 $scope.forms.discountTiersSubmitted = true;
                 $scope.detailsTab.active = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
             }
         };
 

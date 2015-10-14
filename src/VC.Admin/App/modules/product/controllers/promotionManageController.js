@@ -42,7 +42,6 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
                                             {
                                                 formForShowing = index;
                                             }
-                                            return false;
                                         }
                                     }
                                 });
@@ -203,6 +202,7 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
             {
                 $scope.forms.submitted = true;
                 $scope.detailsTab.active = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
             }
         };
 
