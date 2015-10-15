@@ -266,7 +266,7 @@ BEGIN
 	UNION
 	SELECT N'0', 5, 2, N'HideFromDataFeed'
 	UNION
-	SELECT N'0', 5, 2, N'AutoShipFrequency2'
+	SELECT N'0', 5, 2, N'AutoShipFrequency1'
 	UNION
 	SELECT N'0', 5, 2, N'AutoShipFrequency2'
 	UNION

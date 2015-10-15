@@ -23,6 +23,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             var messages = "";
             if (result.Messages)
             {
+                $scope.forms.topForm.submitted = true;
                 $scope.forms.mainForm.submitted = true;
                 $scope.forms.mainForm2.submitted = true;
                 $scope.forms.GCs.skussubmitted = true;
@@ -200,7 +201,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
         $scope.mainTab = {
             active: true,
-            formNames: ['mainForm', 'mainForm2', 'GCs'],
+            formNames: ['topForm', 'mainForm', 'mainForm2', 'GCs'],
             name: $scope.id ? 'Edit Order' : 'New Order',
         };
         $scope.accountProfileTab = {
@@ -761,15 +762,15 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
             if($scope.order.SkuOrdereds[0].AutoShipFrequency2)
             {
-                items.push({ Key: 1, Text: '2 Months' });
+                items.push({ Key: 2, Text: '2 Months' });
             }
             if($scope.order.SkuOrdereds[0].AutoShipFrequency3)
             {
-                items.push({ Key: 1, Text: '3 Months' });
+                items.push({ Key: 3, Text: '3 Months' });
             }
             if($scope.order.SkuOrdereds[0].AutoShipFrequency6)
             {
-                items.push({ Key: 1, Text: '6 Months' });
+                items.push({ Key: 6, Text: '6 Months' });
             }
             $scope.autoShipOrderFrequencies = items;
         }
@@ -970,6 +971,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             var order = angular.copy($scope.order);
             order.Customer = angular.copy($scope.currentCustomer);
 
+            if (!order.AutoShip)
+            {
+                order.AutoShipFrequency = null;
+            }
+
             if (order.ShipDelayDate)
             {
                 order.ShipDelayDate = order.ShipDelayDate.toServerDateTime();
@@ -994,6 +1000,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             //billing info - for exist order all data should be sent and backend will save only needed one based on IdPaymentMethodType
         } else
         {
+            $scope.forms.topForm.submitted = true;
             $scope.forms.mainForm.submitted = true;
             $scope.forms.mainForm2.submitted = true;
             $scope.forms.submitted['profile'] = true;

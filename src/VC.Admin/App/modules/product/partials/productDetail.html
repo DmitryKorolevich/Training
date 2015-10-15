@@ -563,28 +563,35 @@
                                                                                     <label for="lblAutoship{{subSku.Id}}" class="control-label">Auto-Ship Product</label>
                                                                                     <div class="checkbox">
                                                                                         <label>
-                                                                                            <input id="lblAutoship{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipProduct">
+                                                                                            <input id="lblAutoship{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipProduct" data-ng-click="autoShipProductClick(subSku);">
                                                                                         </label>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row extra-spacing" data-ng-if="subSku.AutoShipProduct">
                                                                                     <label class="control-label">Auto-Ship Frequency</label>
-                                                                                    <label class="checkbox-inline">
-                                                                                        <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
-                                                                                        1
-                                                                                    </label>
-                                                                                    <label class="checkbox-inline">
-                                                                                        <input id="lblAutoShipFrequency2{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency2">
-                                                                                        2
-                                                                                    </label>
-                                                                                    <label class="checkbox-inline">
-                                                                                        <input id="lblAutoShipFrequency3{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency3">
-                                                                                        3
-                                                                                    </label>
-                                                                                    <label class="checkbox-inline">
-                                                                                        <input id="lblAutoShipFrequency6{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency6">
-                                                                                        6
-                                                                                    </label>
+                                                                                    <div>
+                                                                                        <div>
+                                                                                            <label class="checkbox-inline">
+                                                                                                <input id="lblAutoShipFrequency1{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency1">
+                                                                                                1
+                                                                                            </label>
+                                                                                            <label class="checkbox-inline">
+                                                                                                <input id="lblAutoShipFrequency2{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency2">
+                                                                                                2
+                                                                                            </label>
+                                                                                            <label class="checkbox-inline">
+                                                                                                <input id="lblAutoShipFrequency3{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency3">
+                                                                                                3
+                                                                                            </label>
+                                                                                            <label class="checkbox-inline">
+                                                                                                <input id="lblAutoShipFrequency6{{subSku.Id}}" type="checkbox" data-ng-model="subSku.AutoShipFrequency6">
+                                                                                                6
+                                                                                            </label>
+                                                                                        </div>
+                                                                                        <div class="error-container small-block" ng-show="forms.skussubmitted">
+                                                                                            <small class="error" ng-show="subSku.AutoShipProduct && !subSku.AutoShipFrequency1 && !subSku.AutoShipFrequency2 && !subSku.AutoShipFrequency3 && !subSku.AutoShipFrequency6">At least one frequency must be selected</small>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </div>
                                                                                 <div class="fixed-accordion-row" data-ng-if="subSku.AutoShipProduct">
                                                                                     <label class="control-label">% Off</label>

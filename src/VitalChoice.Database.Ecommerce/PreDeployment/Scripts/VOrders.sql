@@ -9,16 +9,18 @@ SELECT
 	o.Id,
 	o.OrderStatus,
 	CAST(oval.Value as int) As IdOrderSource,
+	oval.Value As SIdOrderSource,
 	onval.Value As OrderNotes,
 	opm.IdObjectType As IdPaymentMethod,
 	o.DateCreated,
-	NULL As DateShipped,
+	CAST(NULL as datetime2) As DateShipped,
 	o.Total,
 	o.IdEditedBy,
 	o.DateEdited,
 	CAST(opval.Value as int) As POrderType,
+	opval.Value As SPOrderType,
 	c.IdObjectType AS IdCustomerType,
-	NULL As IdShippingMethod,
+	CASE WHEN sppval.Value IS NULL AND snpval.Value IS NULL THEN 2 ELSE 1 END As IdShippingMethod,
 	c.Id AS IdCustomer,
 	options.Company,
 	options.FirstName+' '+options.LastName As Customer,
@@ -32,6 +34,10 @@ SELECT
 	LEFT JOIN OrderOptionValues AS onval ON onval.IdOrder = o.Id AND onval.IdOptionType = onopt.Id
 	LEFT JOIN OrderOptionTypes AS opopt ON opopt.Name = N'POrderType' AND (opopt.IdObjectType = o.IdObjectType OR opopt.IdObjectType IS NULL)
 	LEFT JOIN OrderOptionValues AS opval ON opval.IdOrder = o.Id AND opval.IdOptionType = opopt.Id
+	LEFT JOIN OrderOptionTypes AS sppopt ON sppopt.Name = N'ShippingUpgradeP' AND (sppopt.IdObjectType = o.IdObjectType OR sppopt.IdObjectType IS NULL)
+	LEFT JOIN OrderOptionValues AS sppval ON sppval.IdOrder = o.Id AND sppval.IdOptionType = sppopt.Id
+	LEFT JOIN OrderOptionTypes AS snpopt ON snpopt.Name = N'ShippingUpgradeNP' AND (snpopt.IdObjectType = o.IdObjectType OR snpopt.IdObjectType IS NULL)
+	LEFT JOIN OrderOptionValues AS snpval ON snpval.IdOrder = o.Id AND snpval.IdOptionType = snpopt.Id
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
 	JOIN Addresses AS ad ON ad.IdCustomer = c.Id AND ad.IdObjectType = 1--Profile
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName], [Company]

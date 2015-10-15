@@ -18,6 +18,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 
         public int? IdOrderSource { get; set; }
 
+        public string SIdOrderSource { get; set; }
+
         public string OrderNotes { get; set; }
 
         public int? IdPaymentMethod { get; set; }
@@ -35,6 +37,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
         public DateTime DateEdited { get; set; }
 
         public int? POrderType { get; set; }
+
+        public string SPOrderType { get; set; }
 
         public int? IdShippingMethod { get; set; }
 

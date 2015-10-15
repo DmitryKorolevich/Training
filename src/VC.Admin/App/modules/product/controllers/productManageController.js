@@ -252,6 +252,8 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 }
             });
 
+            valid = valid && validateAutoShiplFrequency();
+
             if (valid) {
                 var categoryIds = [];
                 getSelected($scope.rootCategory, categoryIds);
@@ -270,6 +272,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 $scope.forms.skussubmitted = true;
                 $scope.forms.crossessubmitted = true;
                 $scope.forms.videossubmitted = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
             }
         };
 
@@ -576,6 +579,16 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.forms.skussubmitted = false;
         };
 
+        var validateAutoShiplFrequency = function ()
+        {
+            var isValid = true;
+            $.each($scope.product.SKUs, function (index, subSku)
+            {
+                isValid = isValid && !(subSku.AutoShipProduct && !subSku.AutoShipFrequency1 && !subSku.AutoShipFrequency2 && !subSku.AutoShipFrequency3 && !subSku.AutoShipFrequency6);
+            });
+            return isValid;
+        };
+
         var additionalSKUsValidatorFire = function () {
             $.each($scope.forms.SKUs, function (index, form) {
                 if (form && index.indexOf('i') == 0 && form.Name != undefined) {
@@ -662,6 +675,17 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     item.Text = null;
                 }
             });
+        };
+
+        $scope.autoShipProductClick = function (item)
+        {
+            if (item.AutoShipProduct)
+            {
+                item.AutoShipFrequency1 = true;
+                item.AutoShipFrequency2 = true;
+                item.AutoShipFrequency3 = true;
+                item.AutoShipFrequency6 = true;
+            }
         };
 
         $scope.toggleOpen = function (item, event) {

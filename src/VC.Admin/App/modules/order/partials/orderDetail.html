@@ -41,9 +41,16 @@
                                                         <input type="checkbox" data-ng-model="order.AutoShip">Auto-Ship Order
                                                         <i class="fa fa-history"></i>
                                                     </label>
-                                                    <select data-ng-if="order.AutoShip" class="form-control auto-ship-frequency" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies">
-                                                        <option value="" selected hidden />
-                                                    </select>
+                                                    <div class="auto-ship-frequency">
+                                                        <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
+                                                            <select data-ng-if="order.AutoShip" class="form-control" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies" required>
+                                                                <option value="" selected hidden />
+                                                            </select>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.AutoShipFrequency.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.AutoShipFrequency.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Frequency")}}</small>
+                                                            </div>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                                 <label class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.GiftOrder">Gift Order
