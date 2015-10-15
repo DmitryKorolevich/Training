@@ -83,7 +83,8 @@ namespace VC.Admin.Controllers
 				{
 					AgentId = userModel.AgentId,
 				},
-				IsAdminUser = true
+				IsAdminUser = true,
+				Status = UserStatus.NotActive
 			};
 
 			await userService.CreateAsync(appUser, userModel.RoleIds);

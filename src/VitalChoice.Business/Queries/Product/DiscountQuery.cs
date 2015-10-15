@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public DiscountQuery NotDeleted()
         {
-            Add(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
+            Add(x => x.StatusCode == (int)RecordStatusCode.Active || x.StatusCode == (int)RecordStatusCode.NotActive);
             return this;
         }
 
@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (status.HasValue)
             {
-                Add(x => x.StatusCode == status.Value);
+                Add(x => x.StatusCode == (int)status.Value);
             }
             return this;
         }

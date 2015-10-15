@@ -28,7 +28,8 @@ namespace VC.Admin.Models.Customer
 
 		public Guid PublicUserId { get; set; }
 
-		public UserStatus UserStatus { get; set; }
+		[Map]
+		public int StatusCode { get; set; }
 
 		[Map]
 		public Guid PublicId { get; set; }
@@ -86,8 +87,6 @@ namespace VC.Admin.Models.Customer
 
         [Map]
         public string SourceDetails { get; set; }
-
-        public bool SuspendUserAccount { get; set; }
 
 		[Map("SuspensionReason")]
 		public string Reason { get; set; }

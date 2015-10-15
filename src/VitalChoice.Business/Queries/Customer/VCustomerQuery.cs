@@ -9,7 +9,7 @@ namespace VitalChoice.Business.Queries.Customer
     {
 	    public VCustomerQuery NotDeleted()
 	    {
-			Add(x=>x.StatusCode != RecordStatusCode.Deleted);
+			Add(x=>x.StatusCode != (int)RecordStatusCode.Deleted);
 
 		    return this;
 	    }

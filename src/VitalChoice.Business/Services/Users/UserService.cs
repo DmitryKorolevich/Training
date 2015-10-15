@@ -77,7 +77,6 @@ namespace VitalChoice.Business.Services.Users
 		{
 			user.CreateDate = DateTime.Now;
 			user.UpdatedDate = DateTime.Now;
-			user.Status = UserStatus.NotActive;
 			user.LastLoginDate = null;
 			user.PublicId = Guid.NewGuid();
 			user.UserName = user.Email;

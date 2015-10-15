@@ -10,11 +10,11 @@ namespace VitalChoice.DynamicData.Base
     {
         protected MappedObject()
         {
-            StatusCode = RecordStatusCode.Active;
+            StatusCode = (int)RecordStatusCode.Active;
         }
 
         public int Id { get; set; }
-        public RecordStatusCode StatusCode { get; set; }
+        public int StatusCode { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateEdited { get; set; }
         public int? IdEditedBy { get; set; }

@@ -155,8 +155,8 @@
 	                                        <div class="form-group" data-ng-if="editMode">
 		                                        <div class="col-md-3"></div>
 		                                        <div class="col-md-9">
-			                                        <button class="btn btn-info" data-ng-if="currentCustomer.UserStatus != 0" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
-			                                        <button class="btn btn-info" data-ng-if="currentCustomer.UserStatus == 0" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
+			                                        <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+			                                        <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
 		                                        </div>
 	                                        </div>
                                             <span class="legend">Approved Payment Methods</span>
@@ -205,27 +205,25 @@
 			                                        </label>
 		                                        </div>
 	                                        </div>
-	                                       <div data-ng-if ="currentCustomer.UserStatus != 0">
-		                                        <span class="legend">Suspend User Account</span>
-		                                        <div class="form-group">
-			                                        <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
-			                                        <div class="col-md-9">
-				                                        <div class="checkbox">
-					                                        <label>
-						                                        <input type="checkbox" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount">
-					                                        </label>
-				                                        </div>
+		                                    <span class="legend">Suspend User Account</span>
+	                                        <div class="form-group">
+		                                        <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
+		                                        <div class="col-md-9">
+			                                        <div class="checkbox">
+				                                        <label>
+					                                        <input type="checkbox" id="suspendUserAccount" data-ng-click="toggleSuspended()" data-ng-checked="currentCustomer.StatusCode == 4">
+				                                        </label>
 			                                        </div>
 		                                        </div>
-		                                        <div class="form-group" data-ng-if="currentCustomer.SuspendUserAccount">
-			                                        <label for="reason" class="col-md-3 control-label">Reason</label>
-			                                        <div class="col-md-9">
-				                                        <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
-				                                        <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
-					                                        <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
-					                                        <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
-					                                        <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
-				                                        </div>
+	                                        </div>
+	                                        <div class="form-group" data-ng-if="currentCustomer.StatusCode == 4">
+		                                        <label for="reason" class="col-md-3 control-label">Reason</label>
+		                                        <div class="col-md-9">
+			                                        <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
+			                                        <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
+				                                        <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
+				                                        <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
+				                                        <small class="error" ng-show="forms.profile.Reason.$error.server">{{serverMessages.GetMessage('Reason')}}</small>
 			                                        </div>
 		                                        </div>
 	                                        </div>

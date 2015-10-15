@@ -123,7 +123,7 @@ namespace VitalChoice.Business.Services.Dynamic
             int order = 0;
             foreach (var sku in skus)
             {
-                if (sku.StatusCode != RecordStatusCode.Deleted)
+                if (sku.StatusCode != (int)RecordStatusCode.Deleted)
                 {
                     sku.Order = order;
                     order++;

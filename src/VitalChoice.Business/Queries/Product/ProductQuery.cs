@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public ProductQuery NotDeleted()
         {
-            Add(p => p.StatusCode != RecordStatusCode.Deleted);
+            Add(p => p.StatusCode != (int)RecordStatusCode.Deleted);
             return this;
         }
 

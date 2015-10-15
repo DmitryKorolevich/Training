@@ -150,7 +150,7 @@ namespace VitalChoice.Business.Services.Products
             if (model.Id == 0)
             {
                 dbItem = new ProductReview() { IdProduct = model.IdProduct };
-                var productExist = await _productRepository.Query(p => p.Id == model.IdProduct && p.StatusCode != RecordStatusCode.Deleted)
+                var productExist = await _productRepository.Query(p => p.Id == model.IdProduct && p.StatusCode != (int)RecordStatusCode.Deleted)
                     .SelectAnyAsync();
                 if (!productExist)
                 {

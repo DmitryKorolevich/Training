@@ -66,7 +66,6 @@ namespace VC.Admin.ModelConverters
 	        {
 	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
 	        }
-            model.SuspendUserAccount = dynamic.StatusCode == RecordStatusCode.NotActive;
 
 			if (dynamic.Files.Any())
 			{
@@ -122,7 +121,6 @@ namespace VC.Admin.ModelConverters
                 model.Check.PaymentMethodType = PaymentMethodType.Check;
                 dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Check));
             }
-            dynamic.StatusCode = model.SuspendUserAccount ? RecordStatusCode.NotActive : RecordStatusCode.Active;
 
 			if (model.Files.Any())
 			{
