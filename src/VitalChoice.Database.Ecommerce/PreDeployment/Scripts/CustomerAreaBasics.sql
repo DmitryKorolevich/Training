@@ -745,3 +745,9 @@ ALTER TABLE  [dbo].[CustomerFiles]
 	ALTER COLUMN [Description] [nvarchar](500) NULL
 
 GO
+
+IF (OBJECT_ID('FK_Customers_RecordStatusCode', 'F') IS NOT NULL)
+BEGIN
+	ALTER TABLE [dbo].[Customers] 
+	DROP CONSTRAINT [FK_Customers_RecordStatusCode]
+END

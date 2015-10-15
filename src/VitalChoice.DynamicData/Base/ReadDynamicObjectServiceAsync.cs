@@ -92,14 +92,14 @@ namespace VitalChoice.DynamicData.Base
         public async Task<TDynamic> SelectAsync(int id, bool withDefaults)
         {
             return
-                await SelectItemAsync(BuildQuery, p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted, withDefaults);
+                await SelectItemAsync(BuildQuery, p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults)
         {
             return
                 await
-                    SelectListAsync(BuildQuery, p => ids.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted,
+                    SelectListAsync(BuildQuery, p => ids.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted,
                         withDefaults);
         }
 
@@ -107,7 +107,7 @@ namespace VitalChoice.DynamicData.Base
         {
             return
                 await
-                    SelectListAsync(BuildQuery, p => p.StatusCode != RecordStatusCode.Deleted, withDefaults);
+                    SelectListAsync(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults)
@@ -139,7 +139,7 @@ namespace VitalChoice.DynamicData.Base
             return
                 await
                     SelectListAsync(BuildQuery,
-                        p => p.StatusCode != RecordStatusCode.Deleted && optionValues.Contains(p.Id), withDefaults);
+                        p => p.StatusCode != (int)RecordStatusCode.Deleted && optionValues.Contains(p.Id), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values,
@@ -157,7 +157,7 @@ namespace VitalChoice.DynamicData.Base
             return
                 await
                     SelectListAsync(BuildQuery,
-                        query.And(p => p.StatusCode != RecordStatusCode.Deleted).And(p => optionValues.Contains(p.Id)),
+                        query.And(p => p.StatusCode != (int)RecordStatusCode.Deleted).And(p => optionValues.Contains(p.Id)),
                         withDefaults);
         }
 

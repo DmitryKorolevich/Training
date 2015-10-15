@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Services.Products
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
             var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
             entity.Skus =
-                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != RecordStatusCode.Deleted)
+                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != (int)RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
                         .SelectAsync();
             foreach (var sku in entity.Skus)
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Products
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
             foreach (var sku in entity.Skus)
             {
-                if (sku.StatusCode == RecordStatusCode.Deleted)
+                if (sku.StatusCode == (int)RecordStatusCode.Deleted)
                 {
                     foreach (var value in sku.OptionValues)
                     {
@@ -297,7 +297,7 @@ namespace VitalChoice.Business.Services.Products
                 return null;
 
             var sku =
-                await _skuRepository.Query(s => s.Code == code && s.StatusCode != RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => s.Code == code && s.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
@@ -343,7 +343,7 @@ namespace VitalChoice.Business.Services.Products
                 return new List<SkuOrdered>();
 
             var skus =
-                await _skuRepository.Query(s => codes.Contains(s.Code) && s.StatusCode != RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => codes.Contains(s.Code) && s.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
@@ -376,7 +376,7 @@ namespace VitalChoice.Business.Services.Products
                 return new List<SkuOrdered>();
 
             var skus =
-                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
@@ -409,7 +409,7 @@ namespace VitalChoice.Business.Services.Products
                 return null;
 
             var sku =
-                await _skuRepository.Query(s => s.Code == code && s.StatusCode != RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => s.Code == code && s.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);

@@ -144,7 +144,7 @@ namespace VitalChoice.Business.Services.Content
 	        if (productIds.Count > 0)
 	        {
 		        var shortProducts =
-			        (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+			        (await _productRepository.Query(p => productIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)
 				        .SelectAsync(false)).Select(p => new ShortProductInfo(p)).ToList();
 		        foreach (var product in toReturn.RecipesToProducts)
 		        {

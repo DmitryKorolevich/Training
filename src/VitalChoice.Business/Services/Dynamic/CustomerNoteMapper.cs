@@ -72,7 +72,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 entity.IdCustomer = dynamic.IdCustomer;
                 entity.Note = dynamic.Note;
-                entity.StatusCode = RecordStatusCode.Active;
+                entity.StatusCode = (int)RecordStatusCode.Active;
             });
             return Task.Delay(0);
         }

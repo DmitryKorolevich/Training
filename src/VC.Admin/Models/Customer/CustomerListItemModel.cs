@@ -25,6 +25,6 @@ namespace VC.Admin.Models.Customer
 
 		public int TotalOrders { get; set; }
 
-		public RecordStatusCode StatusCode { get; set; }
+		public int StatusCode { get; set; }
 	}
 }

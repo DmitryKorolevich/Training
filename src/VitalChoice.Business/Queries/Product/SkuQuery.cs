@@ -12,7 +12,7 @@ namespace VitalChoice.Business.Queries.Product
     {
         public SkuQuery NotDeleted()
         {
-            Add(s => s.StatusCode != RecordStatusCode.Deleted);
+            Add(s => s.StatusCode != (int)RecordStatusCode.Deleted);
             return this;
         }
 

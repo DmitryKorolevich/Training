@@ -108,13 +108,15 @@
                     <td>
                         <span data-ng-if="customer.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
                         <span data-ng-if="customer.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 4" class="label label-danger font-default">Suspended</span>
                     </td>
                     <td>{{::customer.DateEdited | date:"MM/dd/yy"}}<br />{{::customer.DateEdited | date:"h:mm a"}}<br />{{::customer.EditedBy}}</td>
                     <td>
                         <button title="Edit" ui-sref="index.oneCol.customerDetail({id:customer.Id})" ladda="editTracker.active()" class="btn btn-default btn-success btn-xs">
                             <i class="glyphicon glyphicon-edit"></i>
                         </button>
-                        <button title="Place Order" class="btn btn-default btn-primary btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:customer.Id})">
+                        <button data-ng-if="customer.StatusCode != 4" title="Place Order" class="btn btn-default btn-primary btn-xs" ui-sref="index.oneCol.orderAdd({idcustomer:customer.Id})">
                             <i class="glyphicon glyphicon-plus"></i>
                         </button>
                     </td>

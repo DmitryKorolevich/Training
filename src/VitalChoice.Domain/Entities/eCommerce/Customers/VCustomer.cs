@@ -11,7 +11,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
         public DateTime DateEdited { get; set; }
 
-	    public RecordStatusCode StatusCode { get; set; }
+	    public int StatusCode { get; set; }
 
 	    public CustomerType IdObjectType { get; set; }
 

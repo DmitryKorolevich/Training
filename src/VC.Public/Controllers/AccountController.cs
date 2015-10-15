@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
@@ -123,7 +124,13 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
+			if (customer.StatusCode == (int)CustomerStatus.Suspended || customer.StatusCode == (int)CustomerStatus.Deleted)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
+			}
+
 			customer.Email = model.Email;
+			customer.StatusCode = (int) CustomerStatus.Active;
 
 			await _customerService.UpdateAsync(customer, model.Password);
 
@@ -165,7 +172,11 @@ namespace VC.Public.Controllers
 
 			item.IdObjectType = (int)CustomerType.Retail;
 			item.PublicId = Guid.NewGuid();
-			item.IdDefaultPaymentMethod = (await _paymentMethodService.GetStorefrontDefaultPaymentMenthod()).Id;
+			item.StatusCode = (int) CustomerStatus.Active;
+
+			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMenthod();
+            item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
+			item.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
 
 			item = await _customerService.InsertAsync(item, model.Password);
 			if (item == null || item.Id == 0)

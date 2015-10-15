@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdCountry = dynamic.IdCountry;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
-                entity.StatusCode = RecordStatusCode.Active;
+                entity.StatusCode = (int)RecordStatusCode.Active;
             });
             return Task.Delay(0);
         }
@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdCountry = dynamic.IdCountry;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
-                entity.StatusCode = RecordStatusCode.Active;
+                entity.StatusCode = (int)RecordStatusCode.Active;
             });
             return Task.Delay(0);
         }

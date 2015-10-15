@@ -9,12 +9,12 @@ namespace VC.Admin.ModelConverters
     {
         public void DynamicToModel(SKUManageModel model, SkuDynamic dynamic)
         {
-            model.Active = dynamic.StatusCode == RecordStatusCode.Active;
+            model.Active = dynamic.StatusCode == (int)RecordStatusCode.Active;
         }
 
         public void ModelToDynamic(SKUManageModel model, SkuDynamic dynamic)
         {
-            dynamic.StatusCode = model.Active ? RecordStatusCode.Active : RecordStatusCode.NotActive;
+            dynamic.StatusCode = model.Active ? (int)RecordStatusCode.Active : (int)RecordStatusCode.NotActive;
             if (!dynamic.Data.AutoShipProduct)
             {
                 dynamic.DictionaryData.Remove("AutoShipFrequency1");

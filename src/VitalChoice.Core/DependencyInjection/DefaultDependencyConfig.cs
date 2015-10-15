@@ -238,7 +238,7 @@ namespace VitalChoice.Core.DependencyInjection
             services.ConfigureIdentity(x =>
             {
                 x.User.RequireUniqueEmail = true;
-                x.Lockout.MaxFailedAccessAttempts = 5;
+                x.Lockout.MaxFailedAccessAttempts = 10;
                 x.Lockout.AllowedForNewUsers = true;
                 x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
                 x.Password.RequiredLength = 8;

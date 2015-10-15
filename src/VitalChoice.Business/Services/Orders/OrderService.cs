@@ -17,6 +17,7 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
@@ -177,7 +178,13 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
         {
-            return base.Validate(dynamic);
+			if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
+			{
+				throw new AppValidationException(
+					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
+			}
+
+			return base.Validate(dynamic);
         }
 
         protected override Task<List<MessageInfo>> ValidateDelete(int id)
@@ -188,7 +195,7 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderBy(y => y.Id);
-            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode!=RecordStatusCode.Deleted).OrderBy(sortable);
+            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode!= (int)RecordStatusCode.Deleted).OrderBy(sortable);
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 

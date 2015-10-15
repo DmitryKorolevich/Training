@@ -112,25 +112,26 @@ namespace VitalChoice.Business.Services.Customers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
 			}
 
-			if (!appUser.IsConfirmed)
+			switch (model.StatusCode)
 			{
-				appUser.Status = UserStatus.NotActive;
-				model.StatusCode = RecordStatusCode.NotActive;
-			}
-			else if (model.StatusCode == RecordStatusCode.NotActive || model.StatusCode == RecordStatusCode.Deleted)
-			{
-				appUser.Status = UserStatus.Disabled;
-			}
-			else if (model.StatusCode == RecordStatusCode.Active)
-			{
-				appUser.Status = UserStatus.Active;
+				case (int)CustomerStatus.Active:
+					appUser.Status = UserStatus.Active;
+					break;
+				case (int)CustomerStatus.NotActive:
+					appUser.Status = UserStatus.NotActive;
+					break;
+				case (int)CustomerStatus.Suspended:
+					appUser.Status = UserStatus.Disabled;
+					break;
+				case (int)CustomerStatus.Deleted:
+					appUser.Status = UserStatus.NotActive;
+					appUser.DeletedDate = DateTime.Now;
+					break;
 			}
 
 			if (!string.IsNullOrWhiteSpace(password))
 			{
 				appUser.IsConfirmed = true;
-				appUser.Status = UserStatus.Active;
-				model.StatusCode = RecordStatusCode.Active;
 			}
 
 			appUser.Email = model.Email;
@@ -182,25 +183,32 @@ namespace VitalChoice.Business.Services.Customers
 				Status = UserStatus.NotActive
             };
 
-            using (var transaction = uow.BeginTransaction())
+			var suspendedCustomer = (int) CustomerStatus.Suspended;
+
+			using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
 	                if (!string.IsNullOrWhiteSpace(password))
 	                {
 		                appUser.IsConfirmed = true;
-		                appUser.Status = UserStatus.Active;
+		                appUser.Status = model.StatusCode == suspendedCustomer
+							? UserStatus.Disabled
+			                : UserStatus.Active;
+	                }
+	                else
+	                {
+						appUser.Status = model.StatusCode == suspendedCustomer ? UserStatus.Disabled : UserStatus.NotActive;
 	                }
 
-					appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
+	                appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
 
                     model.Id = appUser.Id;
                     model.User.Id = appUser.Id;
 
-					model.StatusCode = string.IsNullOrWhiteSpace(password) ? RecordStatusCode.NotActive : RecordStatusCode.Active;
-                    var customer = await base.InsertAsync(model, uow);
+					var customer = await base.InsertAsync(model, uow);
 
-                    if (string.IsNullOrWhiteSpace(password))
+                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
                     {
 						await _storefrontUserService.SendActivationAsync(model.Email);
 					}
@@ -243,7 +251,7 @@ namespace VitalChoice.Business.Services.Customers
 
 			if (
 				model.Addresses.Where(
-					x => x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != RecordStatusCode.Deleted)
+					x => x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != (int)RecordStatusCode.Deleted)
 					.All(x => !x.Data.Default))
 			{
 				throw new AppValidationException(
@@ -313,22 +321,22 @@ namespace VitalChoice.Business.Services.Customers
 
 			await
 				addressesRepositoryAsync.DeleteAllAsync(
-					entity.Addresses.Where(a => a.StatusCode == RecordStatusCode.Deleted));
+					entity.Addresses.Where(a => a.StatusCode == (int)RecordStatusCode.Deleted));
 			await
 				customerNoteRepository.DeleteAllAsync(
-					entity.CustomerNotes.Where(n => n.StatusCode == RecordStatusCode.Deleted));
+					entity.CustomerNotes.Where(n => n.StatusCode == (int)RecordStatusCode.Deleted));
 
 			await
 				addressesRepositoryAsync.InsertGraphRangeAsync(
 					entity.Addresses.Where(
 						a =>
 							a.Id == 0 && a.IdObjectType != (int?)AddressType.Billing &&
-							a.StatusCode != RecordStatusCode.Deleted));
+							a.StatusCode != (int)RecordStatusCode.Deleted));
 			await
 				customerNoteRepository.InsertGraphRangeAsync(
-					entity.CustomerNotes.Where(n => n.StatusCode != RecordStatusCode.Deleted && n.Id == 0));
+					entity.CustomerNotes.Where(n => n.StatusCode != (int)RecordStatusCode.Deleted && n.Id == 0));
 
-			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != RecordStatusCode.Deleted))
+			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != (int)RecordStatusCode.Deleted))
 			{
 				await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
 				if (customerPaymentMethod.BillingAddress.Id == 0)
@@ -338,7 +346,7 @@ namespace VitalChoice.Business.Services.Customers
 				}
 			}
 			var paymentsToDelete =
-				entity.CustomerPaymentMethods.Where(a => a.StatusCode == RecordStatusCode.Deleted).ToList();
+				entity.CustomerPaymentMethods.Where(a => a.StatusCode == (int)RecordStatusCode.Deleted).ToList();
 			await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
 			await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
 

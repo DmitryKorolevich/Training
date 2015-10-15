@@ -98,14 +98,14 @@ namespace VitalChoice.DynamicData.Base
                 await UpdateEntityRangeAsync(itemsToUpdate);
                 foreach (var item in itemsToUpdate)
                 {
-                    item.Entity.StatusCode = RecordStatusCode.Active;
+                    item.Entity.StatusCode = (int)RecordStatusCode.Active;
                 }
 
                 //Delete
                 var toDelete = entities.Where(e => dynamics.All(s => s.Id != e.Id));
                 foreach (var paymentMethod in toDelete)
                 {
-                    paymentMethod.StatusCode = RecordStatusCode.Deleted;
+                    paymentMethod.StatusCode = (int)RecordStatusCode.Deleted;
                 }
 
                 //Insert
@@ -116,7 +116,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 foreach (var paymentMethod in entities)
                 {
-                    paymentMethod.StatusCode = RecordStatusCode.Deleted;
+                    paymentMethod.StatusCode = (int)RecordStatusCode.Deleted;
                 }
             }
         }

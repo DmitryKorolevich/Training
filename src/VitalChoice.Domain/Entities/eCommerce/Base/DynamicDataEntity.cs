@@ -8,7 +8,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
         where TOptionValue: OptionValue<TOptionType>
         where TOptionType : OptionType
     {
-        public RecordStatusCode StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         public DateTime DateCreated { get; set; }
 

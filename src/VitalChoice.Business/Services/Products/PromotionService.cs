@@ -80,7 +80,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var shortSkus =
                     (await
-                        _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+                        _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)
                             .Include(p => p.Product)
                             .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
                 foreach (var sku in entity.PromotionsToBuySkus)

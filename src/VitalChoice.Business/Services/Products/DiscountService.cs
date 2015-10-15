@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services.Products
             var codeDublicatesExist =
                 await
                     _discountRepository.Query(
-                        p => p.Code == dynamic.Code && p.Id != dynamic.Id && p.StatusCode != RecordStatusCode.Deleted)
+                        p => p.Code == dynamic.Code && p.Id != dynamic.Id && p.StatusCode != (int)RecordStatusCode.Deleted)
                         .SelectAnyAsync();
             if (codeDublicatesExist)
             {
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var shortSkus =
                     (await
-                        _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
+                        _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)
                             .Include(p => p.Product)
                             .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
                 foreach (var sku in entity.DiscountsToSelectedSkus)

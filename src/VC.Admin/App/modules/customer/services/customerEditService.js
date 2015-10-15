@@ -197,6 +197,10 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
         };
 
+        uiScope.toggleSuspended = function () {
+        	uiScope.currentCustomer.StatusCode = uiScope.currentCustomer.StatusCode == 4 ? (uiScope.currentCustomer.IsConfirmed ? 2 : 1) : 4;
+        };
+
         uiScope.$watch("currentCustomer.CustomerType", function (newValue, oldValue)
         {
             if (newValue)

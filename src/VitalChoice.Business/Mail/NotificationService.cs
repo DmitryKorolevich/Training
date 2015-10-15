@@ -39,9 +39,9 @@ namespace VitalChoice.Business.Mail
 			//todo:refactor this to user nustache or something
 
 			var body =
-				$"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Please click the following <a href=\"{activation.Link}\">link</a> to activate your account</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+				$"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
 
-			var subject = $"Your Vital Choice User Activation";
+			var subject = "Vital Choice - Setup Your Account To Order Online";
 
 			await emailSender.SendEmailAsync(email, subject, body);
 		}

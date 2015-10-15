@@ -251,7 +251,7 @@ namespace VitalChoice.DynamicData.Base
 
             var ids = models.Select(m => m.Id).ToList();
             IQueryFluent<TEntity> query =
-                mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != RecordStatusCode.Deleted)
+                mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues);
             query = BuildQuery(query);
             var entities = (await query.SelectAsync());
@@ -278,7 +278,7 @@ namespace VitalChoice.DynamicData.Base
             var valueRepository = uow.RepositoryAsync<TOptionValue>();
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             IQueryFluent<TEntity> query =
-                mainRepository.Query(o => o.Id == model.Id && o.StatusCode != RecordStatusCode.Deleted)
+                mainRepository.Query(o => o.Id == model.Id && o.StatusCode != (int)RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues);
             query = BuildQuery(query);
             var entity = await query.SelectFirstOrDefaultAsync();
@@ -388,7 +388,7 @@ namespace VitalChoice.DynamicData.Base
             }
             foreach (var entity in entities)
             {
-                entity.StatusCode = RecordStatusCode.Deleted;
+                entity.StatusCode = (int)RecordStatusCode.Deleted;
             }
             return await mainRepository.UpdateRangeAsync(entities);
         }
@@ -400,7 +400,7 @@ namespace VitalChoice.DynamicData.Base
                 await valueRepository.DeleteAllAsync(entity.OptionValues);
                 return await repository.DeleteAsync(entity);
             }
-            entity.StatusCode = RecordStatusCode.Deleted;
+            entity.StatusCode = (int)RecordStatusCode.Deleted;
             return await repository.UpdateAsync(entity);
         }
     }

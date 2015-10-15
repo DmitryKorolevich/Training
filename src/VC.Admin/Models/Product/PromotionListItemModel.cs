@@ -16,7 +16,7 @@ namespace VC.Admin.Models.Product
 
         public string Description { get; set; }
 
-        public RecordStatusCode StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         public CustomerType? Assigned { get; set; }
 

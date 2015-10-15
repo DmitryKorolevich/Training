@@ -20,6 +20,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Data.Services;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
@@ -79,7 +80,7 @@ namespace VC.Admin.Controllers
 	        _storefrontUserService = storefrontUserService;
         }
 
-        [HttpGet]
+	    [HttpGet]
         public async Task<Result<IList<OrderNoteModel>>> GetOrderNotes(CustomerType customerType)
         {
             var result = await _customerService.GetAvailableOrderNotesAsync(customerType);
@@ -122,7 +123,8 @@ namespace VC.Admin.Controllers
                 CustomerNotes = new List<CustomerNoteModel>()
                 {
                 },
-                Shipping = new List<AddressModel>() {new AddressModel() {AddressType = AddressType.Shipping}}
+                Shipping = new List<AddressModel>() {new AddressModel() {AddressType = AddressType.Shipping}},
+				StatusCode = (int)CustomerStatus.NotActive
             };
         }
 
@@ -268,7 +270,11 @@ namespace VC.Admin.Controllers
                 item = await _customerService.InsertAsync(item);
             }
             var toReturn = _customerMapper.ToModel<AddUpdateCustomerModel>(item);
-            return toReturn;
+
+			toReturn.IsConfirmed = addUpdateCustomerModel.IsConfirmed;
+			toReturn.PublicUserId = addUpdateCustomerModel.PublicId;
+
+			return toReturn;
         }
 
         [HttpPost]
@@ -316,7 +322,6 @@ namespace VC.Admin.Controllers
 
 			customerModel.IsConfirmed = login.IsConfirmed;
 			customerModel.PublicUserId = login.PublicId;
-			customerModel.UserStatus = login.Status;
 
 			var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(
