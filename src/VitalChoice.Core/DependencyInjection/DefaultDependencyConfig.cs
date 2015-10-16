@@ -97,13 +97,22 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddDbContext<VitalChoiceContext>();
 
             // Add Identity services to the services container.
-	        services.AddIdentity<ApplicationUser, ApplicationRole>()
-		        .AddEntityFrameworkStores<VitalChoiceContext, int>()
-		        .AddErrorDescriber<ExtendedIdentityErrorDescriber>()
-		        .AddUserStore<AdminUserStore>()
-		        .AddUserValidator<AdminUserValidator>()
-		        .AddUserManager<ExtendedUserManager>()
-		        .AddTokenProvider<UserTokenProvider>("user_tokes");
+            services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
+            {
+                x.User.RequireUniqueEmail = true;
+                x.Lockout.MaxFailedAccessAttempts = 10;
+                x.Lockout.AllowedForNewUsers = true;
+                x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
+                x.Password.RequiredLength = 8;
+                x.Password.RequireDigit = true;
+                x.Password.RequireNonLetterOrDigit = true;
+            })
+                .AddEntityFrameworkStores<VitalChoiceContext, int>()
+                .AddErrorDescriber<ExtendedIdentityErrorDescriber>()
+                .AddUserStore<AdminUserStore>()
+                .AddUserValidator<AdminUserValidator>()
+                .AddUserManager<ExtendedUserManager>()
+                .AddTokenProvider<UserTokenProvider>("user_tokes");
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
             services.TryAdd(
@@ -113,7 +122,7 @@ namespace VitalChoice.Core.DependencyInjection
             // Add MVC services to the services container.
             services.AddMvc();
 
-            services.AddAuthorization();
+            services.AddAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
             services.Configure<AppOptions>(options =>
             {
@@ -237,20 +246,6 @@ namespace VitalChoice.Core.DependencyInjection
                     o.OutputFormatters.Add(newFormatter);
                 }
             });
-
-            services.ConfigureIdentity(x =>
-            {
-                x.User.RequireUniqueEmail = true;
-                x.Lockout.MaxFailedAccessAttempts = 10;
-                x.Lockout.AllowedForNewUsers = true;
-                x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
-                x.Password.RequiredLength = 8;
-                x.Password.RequireDigit = true;
-                x.Password.RequireNonLetterOrDigit = true;
-            });
-
-            services.ConfigureAuthorization(
-                x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
 
 
             var builder = new ContainerBuilder();

@@ -37,7 +37,7 @@ namespace VitalChoice.Data.DataContext
 
         public void TrackGraphForAdd(object entity)
         {
-            this.ChangeTracker.TrackGraph(entity, e => e.State = EntityState.Added);
+            this.ChangeTracker.TrackGraph(entity, e => e.Entry.State = EntityState.Added);
         }
     }
 }

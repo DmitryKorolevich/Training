@@ -12,14 +12,14 @@ namespace VitalChoice.Core.DependencyInjection
     {
 	    protected override void BeginCustomRegistrations(IServiceCollection builder)
 	    {
-			builder.ConfigureIdentityApplicationCookie(x =>
-			{
-				x.AuthenticationScheme = IdentityOptions.ApplicationCookieAuthenticationScheme;
-				x.LogoutPath = PathString.Empty;
-				x.AccessDeniedPath = PathString.Empty;
-				x.LoginPath = PathString.Empty;
-				x.ReturnUrlParameter = null;
-			});
+			builder.AddCookieAuthentication(x =>
+            {
+                x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+                x.LogoutPath = PathString.Empty;
+                x.AccessDeniedPath = PathString.Empty;
+                x.LoginPath = PathString.Empty;
+                x.ReturnUrlParameter = null;
+            });
 		}
     }
 }

@@ -54,7 +54,7 @@ namespace VitalChoice.Infrastructure.Context
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-            builder.Entity<CommonLogItem>().Key(p => p.Id);
+            builder.Entity<CommonLogItem>().HasKey(p => p.Id);
 		    builder.Entity<CommonLogItem>().ToTable("CommonLogItems");
 
             base.OnModelCreating(builder);

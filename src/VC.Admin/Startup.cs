@@ -30,10 +30,10 @@ namespace VC.Admin
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath);
+		    var configuration = new ConfigurationBuilder()
+		        .SetBasePath(applicationEnvironment.ApplicationBasePath)
+		        .AddJsonFile("config.json")
+		        .AddEnvironmentVariables();
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
 			if (File.Exists(path))

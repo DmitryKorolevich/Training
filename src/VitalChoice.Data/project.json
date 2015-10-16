@@ -4,7 +4,7 @@
   "dependencies": {
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
-    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*",
+    "Autofac.Framework.DependencyInjection": "4.0.0-*",
     "EntityFramework.Relational": "7.0.0-*",
     "EntityFramework.Core": "7.0.0-*"
   },
@@ -17,8 +17,7 @@
       "compilationOptions": { "define": [ "DNXCORE50" ] },
       "dependencies": {
         "System.Runtime": "4.0.21-*",
-        "System.Linq": "4.0.0-*",
-        "System.Security.Cryptography.Encoding": "4.0.0-beta-*"
+        "System.Linq": "4.0.0-*"
       }
     }
   }

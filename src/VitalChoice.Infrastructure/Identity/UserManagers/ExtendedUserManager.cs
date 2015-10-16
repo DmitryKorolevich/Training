@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
@@ -16,11 +17,11 @@ namespace VitalChoice.Infrastructure.Identity.UserManagers
         public ExtendedUserManager(IUserStore<ApplicationUser> store, IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<ApplicationUser> passwordHasher, IEnumerable<IUserValidator<ApplicationUser>> userValidators,
             IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators, ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors, IEnumerable<IUserTokenProvider<ApplicationUser>> tokenProviders,
+            IdentityErrorDescriber errors, IServiceProvider services,
             ILoggerProviderExtended logger, IHttpContextAccessor contextAccessor)
             : base(
                 store, optionsAccessor, passwordHasher, userValidators.Where(x => x is DummyUserValidator),
-                passwordValidators, keyNormalizer, errors, tokenProviders, new Logger<UserManager<ApplicationUser>>(logger.Factory), contextAccessor)
+                passwordValidators, keyNormalizer, errors, services, new Logger<UserManager<ApplicationUser>>(logger.Factory), contextAccessor)
         {
         }
     }

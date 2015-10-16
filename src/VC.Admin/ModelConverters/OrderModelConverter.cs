@@ -84,18 +84,18 @@ namespace VC.Admin.ModelConverters
             }
 
             model.Shipping = _addressMapper.ToModel<AddressModel>(dynamic.ShippingAddress);
-            if(dynamic.PaymentMethod!=null)
+            if (dynamic.PaymentMethod != null)
             {
                 model.IdPaymentMethodType = dynamic.PaymentMethod.IdObjectType;
-                if (dynamic.PaymentMethod.IdObjectType== (int)PaymentMethodType.CreditCard)
+                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
                     model.CreditCard = _paymentMethodMapper.ToModel<CreditCardModel>(dynamic.PaymentMethod);
                 }
-                if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Oac)
+                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.Oac)
                 {
                     model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(dynamic.PaymentMethod);
                 }
-                if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Check)
+                if (dynamic.PaymentMethod.IdObjectType == (int) PaymentMethodType.Check)
                 {
                     model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(dynamic.PaymentMethod);
                 }

@@ -29,10 +29,10 @@ namespace VC.Public.Controllers.Content
             Dictionary<string, object> result = new Dictionary<string, object>();
             foreach (var actionParam in ActionContext.ActionDescriptor.Parameters)
             {
-                var valueItem = BindingContext.ValueProvider.GetValueAsync(actionParam.Name).Result;
-                if (valueItem != null)
+                var values = BindingContext.ValueProvider.GetValue(actionParam.Name).Values;
+                foreach (var stringValue in values)
                 {
-                    result.Add(actionParam.Name, valueItem.RawValue);
+                    result.Add(actionParam.Name, stringValue);
                 }
             }
             foreach (var queryParam in Request.Query)

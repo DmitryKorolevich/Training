@@ -11,9 +11,9 @@ namespace VitalChoice.Core.DependencyInjection
     {
 	    protected override void BeginCustomRegistrations(IServiceCollection builder)
 	    {
-			builder.ConfigureIdentityApplicationCookie(x =>
+			builder.AddCookieAuthentication(x =>
 			{
-				x.AuthenticationScheme = IdentityOptions.ApplicationCookieAuthenticationScheme;
+				x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
 				x.LogoutPath = "/Account/Logout";
 				x.AccessDeniedPath = "/Shared/AccessDenied";
 				x.LoginPath = "/Account/Login";

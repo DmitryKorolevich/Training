@@ -285,7 +285,7 @@ namespace VC.Admin.Controllers
             int? butTicketCommentId = null;
             string publicId=null;
             string description = String.Empty;
-            foreach (string pairs in data.Split('&'))
+            foreach (string pairs in data)
             {
                 if (!String.IsNullOrEmpty(pairs))
                 {
@@ -322,17 +322,19 @@ namespace VC.Admin.Controllers
                     var fileName = await _helpService.UploadBugFileToStoreAsync(mode, fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId, contentType);
                     if(!String.IsNullOrEmpty(fileName) && ((bugTicketId.HasValue && bugTicketId!=0) || (butTicketCommentId.HasValue && butTicketCommentId!=0)))
                     {
-                        file = new BugFile();
-                        file.IdBugTicket = bugTicketId;
-                        file.IdBugTicketComment = butTicketCommentId;
-                        file.FileName = fileName;
-                        file.Description = description;
+                        file = new BugFile
+                        {
+                            IdBugTicket = bugTicketId,
+                            IdBugTicketComment = butTicketCommentId,
+                            FileName = fileName,
+                            Description = description
+                        };
 
                         file = await _helpService.AddBugFileAsync(file);
                     }
 
-                    var uploadDate = file != null ? file.UploadDate : DateTime.Now;
-                    var id = file != null ? file.Id : 0;
+                    var uploadDate = file?.UploadDate ?? DateTime.Now;
+                    var id = file?.Id ?? 0;
                     return new FileModel() { FileName = fileName, UploadDate = uploadDate, Id=id };
                 }
                 catch (Exception ex)
@@ -343,16 +345,14 @@ namespace VC.Admin.Controllers
             }
         }
 
-#if DNX451
         [HttpGet]
         public async Task<FileResult> GetBugTicketFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)
         {
             var blob = await _helpService.DownloadBugFileAsync(BugFileType.Ticket, fileName, publicId);
 
-            var contentDisposition = new ContentDisposition()
+            var contentDisposition = new ContentDispositionHeaderValue(viewMode ? "inline" : "attachment")
             {
-                FileName = fileName,
-                Inline = viewMode
+                FileName = fileName
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
@@ -364,16 +364,14 @@ namespace VC.Admin.Controllers
         {
             var blob = await _helpService.DownloadBugFileAsync(BugFileType.Comment, fileName, publicId);
 
-            var contentDisposition = new ContentDisposition()
+            var contentDisposition = new ContentDispositionHeaderValue(viewMode ? "inline" : "attachment")
             {
-                FileName = fileName,
-                Inline = viewMode
+                FileName = fileName
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(blob.File, blob.ContentType);
         }
-#endif
 
         [HttpPost]
         public async Task<Result<bool>> DeleteBugTicketFile([FromBody]DeleteFileModel model)

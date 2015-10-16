@@ -8,10 +8,10 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Newtonsoft.Json": "6.0.8-*",
+    "Newtonsoft.Json": "7.0.1",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
-    "Autofac.Framework.DependencyInjection": "4.0.0-beta7-*"
+    "Autofac.Framework.DependencyInjection": "4.0.0-*"
   },
 
   "frameworks": {
