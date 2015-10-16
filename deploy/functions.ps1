@@ -23,7 +23,7 @@ function DnuAll($deployPath) {
 }
 function GruntTask($taskName) {
 	Push-Location ".."
-	echo "Running grunt task..."
+	echo "Running grunt task ${taskName}..."
 	grunt $taskName > grunt.log
 	Pop-Location
 }
