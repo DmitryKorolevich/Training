@@ -50,6 +50,7 @@
     }
   },
   "commands": {
+    "web": "Microsoft.AspNet.Server.Kestrel",
     "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5010",
     "gen": "Microsoft.Framework.CodeGeneration",
     "ef": "EntityFramework.Commands"
