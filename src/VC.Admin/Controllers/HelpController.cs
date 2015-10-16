@@ -281,8 +281,6 @@ namespace VC.Admin.Controllers
 
             var data = form["data"];
 
-            StringValues
-
             int? bugTicketId = null;
             int? butTicketCommentId = null;
             string publicId=null;
