@@ -9,7 +9,8 @@ using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
-using AuthorizationContext = Microsoft.AspNet.Mvc.AuthorizationContext;
+using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
+using Microsoft.AspNet.Mvc.Filters;
 
 namespace VitalChoice.Core.Infrastructure
 {

@@ -30,9 +30,10 @@ namespace VC.Admin
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
-            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
+            var configuration = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .SetBasePath(applicationEnvironment.ApplicationBasePath);
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
 			if (File.Exists(path))
@@ -54,7 +55,7 @@ namespace VC.Admin
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
-                app.UseErrorPage(new ErrorPageOptions
+                app.UseDeveloperExceptionPage(new ErrorPageOptions
                 {
                     SourceCodeLineCount = 150
                 });

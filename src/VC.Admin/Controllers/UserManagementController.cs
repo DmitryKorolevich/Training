@@ -76,7 +76,7 @@ namespace VC.Admin.Controllers
 				FirstName = userModel.FirstName,
 				LastName = userModel.LastName,
 				Email = userModel.Email,
-				TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays),
+				TokenExpirationDate = DateTime.Now.AddDays(appOptions.Value.ActivationTokenExpirationTermDays),
 				IsConfirmed = false,
 				ConfirmationToken = Guid.NewGuid(),
                 Profile = new AdminProfile()

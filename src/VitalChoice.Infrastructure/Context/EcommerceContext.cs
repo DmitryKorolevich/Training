@@ -46,14 +46,14 @@ namespace VitalChoice.Infrastructure.Context
 		{
             var connectionString = (new SqlConnectionStringBuilder
             {
-                DataSource = _options.Options.Connection.Server,
+                DataSource = _options.Value.Connection.Server,
                 // TODO: Currently nested queries are run while processing the results of outer queries
                 // This either requires MARS or creation of a new connection for each query. Currently using
                 // MARS since cloning connections is known to be problematic.
                 MultipleActiveResultSets = true,
                 InitialCatalog = "VitalChoice.Ecommerce",
-                UserID = _options.Options.Connection.UserName,
-                Password = _options.Options.Connection.Password,
+                UserID = _options.Value.Connection.UserName,
+                Password = _options.Value.Connection.Password,
                 ConnectTimeout = 60
             }).ConnectionString;
             builder.UseSqlServer(connectionString);

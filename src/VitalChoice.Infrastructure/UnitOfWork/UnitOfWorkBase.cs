@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity.Relational;
 using Microsoft.Data.Entity.Storage;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Data.DataContext;

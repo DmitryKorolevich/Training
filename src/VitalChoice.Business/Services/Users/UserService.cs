@@ -55,7 +55,7 @@ namespace VitalChoice.Business.Services.Users
 			NotificationService = notificationService;
 			this.ecommerceRepositoryAsync = ecommerceRepositoryAsync;
 			this.userValidator = userValidator;
-			Options = options.Options;
+			Options = options.Value;
 		}
 
 		protected abstract Task SendActivationInternalAsync(ApplicationUser dbUser);

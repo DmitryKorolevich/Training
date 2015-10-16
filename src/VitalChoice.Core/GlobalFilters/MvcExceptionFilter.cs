@@ -8,6 +8,7 @@ using Microsoft.Framework.Logging;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
+using Microsoft.AspNet.Mvc.Filters;
 
 namespace VitalChoice.Core.GlobalFilters
 {

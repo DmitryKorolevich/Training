@@ -6,72 +6,91 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Notification;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Models.Interfaces;
+using Microsoft.AspNet.Mvc.Abstractions;
+using Microsoft.AspNet.Mvc.Controllers;
+using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNet.Mvc.Formatters;
+using Microsoft.AspNet.Mvc.Infrastructure;
+using System.Diagnostics.Tracing;
+using System;
 
 namespace VitalChoice.Core.Base
 {
-
     public class ValidationActionInvokerProvider : IActionInvokerProvider
     {
+#pragma warning disable 0618
         private readonly IControllerActionArgumentBinder _argumentBinder;
         private readonly IControllerFactory _controllerFactory;
-        private readonly IReadOnlyList<IFilterProvider> _filterProviders;
+        private readonly IFilterProvider[] _filterProviders;
         private readonly IReadOnlyList<IInputFormatter> _inputFormatters;
-        private readonly IReadOnlyList<IOutputFormatter> _outputFormatters;
         private readonly IReadOnlyList<IModelBinder> _modelBinders;
+        private readonly IReadOnlyList<IOutputFormatter> _outputFormatters;
         private readonly IReadOnlyList<IModelValidatorProvider> _modelValidatorProviders;
         private readonly IReadOnlyList<IValueProviderFactory> _valueProviderFactories;
         private readonly IActionBindingContextAccessor _actionBindingContextAccessor;
-        private readonly ILoggerProviderExtended _loggerProvider;
-        private readonly INotifier _notifier;
-        //private readonly int _maxModelValidationErrors;
+        private readonly int _maxModelValidationErrors;
+        private readonly ILogger _logger;
+        private readonly TelemetrySource _telemetry;
 
         public ValidationActionInvokerProvider(
-                    IControllerFactory controllerFactory,
-                    IReadOnlyList<IFilterProvider> filterProviders,
-                    IControllerActionArgumentBinder argumentBinder,
-                    IActionBindingContextAccessor actionBindingContextAccessor,
-                    ILoggerProviderExtended loggerProvider, IOptions<MvcOptions> mvcOptions, INotifier notifier)
+            IControllerFactory controllerFactory,
+            IEnumerable<IFilterProvider> filterProviders,
+            IControllerActionArgumentBinder argumentBinder,
+            IOptions<MvcOptions> optionsAccessor,
+            IActionBindingContextAccessor actionBindingContextAccessor,
+            ILoggerFactory loggerFactory,
+            TelemetrySource telemetry)
         {
             _controllerFactory = controllerFactory;
-            _filterProviders = new ReadOnlyCollection<IFilterProvider>(filterProviders.OrderBy(item => item.Order).ToList());
+            _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();
             _argumentBinder = argumentBinder;
-            _outputFormatters = new ReadOnlyCollection<IOutputFormatter>(mvcOptions.Options.OutputFormatters);
-            _inputFormatters = new ReadOnlyCollection<IInputFormatter>(mvcOptions.Options.InputFormatters);
-            _modelBinders = new ReadOnlyCollection<IModelBinder>(mvcOptions.Options.ModelBinders);
-            _modelValidatorProviders = new ReadOnlyCollection<IModelValidatorProvider>(mvcOptions.Options.ModelValidatorProviders);
-            _valueProviderFactories = new ReadOnlyCollection<IValueProviderFactory>(mvcOptions.Options.ValueProviderFactories);
+            _inputFormatters = optionsAccessor.Value.InputFormatters.ToArray();
+            _outputFormatters = optionsAccessor.Value.OutputFormatters.ToArray();
+            _modelBinders = optionsAccessor.Value.ModelBinders.ToArray();
+            _modelValidatorProviders = optionsAccessor.Value.ModelValidatorProviders.ToArray();
+            _valueProviderFactories = optionsAccessor.Value.ValueProviderFactories.ToArray();
             _actionBindingContextAccessor = actionBindingContextAccessor;
-            _loggerProvider = loggerProvider;
-            _notifier = notifier;
-            //_maxModelValidationErrors = optionsAccessor.Options.MaxModelValidationErrors;
+            _maxModelValidationErrors = optionsAccessor.Value.MaxModelValidationErrors;
+            _logger = loggerFactory.CreateLogger<ControllerActionInvoker>();
+            _telemetry = telemetry;
         }
+#pragma warning restore 0618
 
-        public int Order => DefaultOrder.DefaultFrameworkSortOrder;
+        public int Order
+        {
+            get { return -1000; }
+        }
 
         /// <inheritdoc />
         public void OnProvidersExecuting(ActionInvokerProviderContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var actionDescriptor = context.ActionContext.ActionDescriptor as ControllerActionDescriptor;
 
             if (actionDescriptor != null)
             {
                 context.Result = new BaseControllerActionInvoker(
-                                                    context.ActionContext,
-                                                    _filterProviders,
-                                                    _controllerFactory,
-                                                    actionDescriptor,
-                                                    _inputFormatters,
-                                                    _outputFormatters,
-                                                    _argumentBinder,
-                                                    _modelBinders,
-                                                    _modelValidatorProviders,
-                                                    _valueProviderFactories,
-                                                    _actionBindingContextAccessor,
-                                                    _loggerProvider.CreateLoggerDefault(), _notifier);
+                    context.ActionContext,
+                    _filterProviders,
+                    _controllerFactory,
+                    actionDescriptor,
+                    _inputFormatters,
+                    _outputFormatters,
+                    _argumentBinder,
+                    _modelBinders,
+                    _modelValidatorProviders,
+                    _valueProviderFactories,
+                    _actionBindingContextAccessor,
+                    _logger,
+                    _telemetry,
+                    _maxModelValidationErrors);
             }
         }
 

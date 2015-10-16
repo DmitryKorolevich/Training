@@ -78,7 +78,7 @@ namespace VitalChoice.Business.Services.Customers
 		    _adminProfileRepository = adminProfileRepository;
 		    _storageClient = storageClient;
 		    _storefrontUserService = storefrontUserService;
-		    _customerContainerName = appOptions.Options.AzureStorage.CustomerContainerName;
+		    _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
         }
@@ -177,7 +177,7 @@ namespace VitalChoice.Business.Services.Customers
                 LastName = profileAddress.Data.LastName,
                 Email = model.Email,
 				UserName = model.Email,
-                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Options.ActivationTokenExpirationTermDays),
+                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
                 IsAdminUser = false,

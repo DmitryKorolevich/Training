@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Services.FedEx
 
         public FedExService(IOptions<AppOptions> appOptions)
         {
-            _fedExOptions = appOptions.Options.FedExOptions;
+            _fedExOptions = appOptions.Value.FedExOptions;
         }
 
         public string CreateLabel(VitalGreenRequest request, FedExZone zone)

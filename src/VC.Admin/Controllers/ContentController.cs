@@ -68,7 +68,7 @@ namespace VC.Admin.Controllers
                     IsDefault = false,
                 };
             }
-            var user = Context.Request.HttpContext.User.GetUserId();
+            var user = HttpContext.Request.HttpContext.User.GetUserId();
 
             return new MasterContentItemManageModel((await masterContentService.GetMasterContentItemAsync(id)));
         }

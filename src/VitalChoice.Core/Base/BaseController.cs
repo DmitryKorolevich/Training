@@ -5,6 +5,7 @@ using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
+using Microsoft.AspNet.Mvc.Routing;
 
 namespace VitalChoice.Core.Base
 {

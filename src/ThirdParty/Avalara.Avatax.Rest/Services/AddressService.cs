@@ -23,9 +23,9 @@ namespace Avalara.Avatax.Rest.Services
 
         public AddressService(IOptions<AppOptions> options)
         {
-            _accountNumber = options.Options.Avatax.AccountNumber;
-            _license = options.Options.Avatax.LicenseKey;
-            _svcUrl = options.Options.Avatax.ServiceUrl.TrimEnd('/') + "/1.0/";
+            _accountNumber = options.Value.Avatax.AccountNumber;
+            _license = options.Value.Avatax.LicenseKey;
+            _svcUrl = options.Value.Avatax.ServiceUrl.TrimEnd('/') + "/1.0/";
             _serializer =
                 JsonSerializer.Create(new JsonSerializerSettings
                 {

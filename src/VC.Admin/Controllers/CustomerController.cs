@@ -83,7 +83,7 @@ namespace VC.Admin.Controllers
             _noteMapper = noteMapper;
             this.logger = loggerProvider.CreateLoggerDefault();
 	        _storefrontUserService = storefrontUserService;
-            _defaultCountry = appOptions.Options.DefaultCountry;
+            _defaultCountry = appOptions.Value.DefaultCountry;
         }
 
 	    [HttpGet]

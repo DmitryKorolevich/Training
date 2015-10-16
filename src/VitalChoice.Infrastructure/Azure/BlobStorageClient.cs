@@ -13,7 +13,7 @@ namespace VitalChoice.Infrastructure.Azure
 
 	    public BlobStorageClient(IOptions<AppOptions> appOptions)
 	    {
-		    var storageAccount = CloudStorageAccount.Parse(appOptions.Options.AzureStorage.StorageConnectionString);
+		    var storageAccount = CloudStorageAccount.Parse(appOptions.Value.AzureStorage.StorageConnectionString);
 
 		    _blobClient = storageAccount.CreateCloudBlobClient();
 		   

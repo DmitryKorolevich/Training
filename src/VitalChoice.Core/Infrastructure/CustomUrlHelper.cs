@@ -4,6 +4,8 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
+using Microsoft.AspNet.Mvc.Routing;
+using Microsoft.AspNet.Mvc.Infrastructure;
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -52,7 +54,7 @@ namespace VitalChoice.Core.Infrastructure
 		private string ConvertToLowercaseUrl(string url)
 		{
 			if (!string.IsNullOrEmpty(url)
-				&& appOptions.Options.GenerateLowercaseUrls)
+				&& appOptions.Value.GenerateLowercaseUrls)
 			{
 				return url.ToLowerInvariant();
 			}

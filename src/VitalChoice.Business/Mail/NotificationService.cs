@@ -18,8 +18,8 @@ namespace VitalChoice.Business.Mail
         public NotificationService(IEmailSender emailSender, IOptions<AppOptions> appOptions)
 	    {
 		    this.emailSender = emailSender;
-            _mainSuperAdminEmail = appOptions.Options.MainSuperAdminEmail;
-            _adminHost = appOptions.Options.AdminHost;
+            _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
+            _adminHost = appOptions.Value.AdminHost;
         }
 
 	    public async Task SendAdminUserActivationAsync(string email, UserActivation activation)

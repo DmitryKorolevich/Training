@@ -37,6 +37,7 @@ using VC.Admin.Models.Help;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain.Entities.Help;
+using Microsoft.Framework.Primitives;
 #if DNX451
 using System.Net.Mime;
 #endif
@@ -164,7 +165,7 @@ namespace VC.Admin.Controllers
             };
 
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
-            var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
+            var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
             int userId = Int32.Parse(Request.HttpContext.User.GetUserId());
             foreach (var item in toReturn.Items)
             {
@@ -197,7 +198,7 @@ namespace VC.Admin.Controllers
             var toReturn= new BugTicketManageModel(result);
 
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
-            if(Context.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(Request.HttpContext.User.GetUserId()))
+            if(HttpContext.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(Request.HttpContext.User.GetUserId()))
             {
                 toReturn.IsAllowEdit = true;
             }
@@ -213,7 +214,7 @@ namespace VC.Admin.Controllers
             var item = model.Convert();
 
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
-            var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
+            var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
             item = await _helpService.UpdateBugTicketAsync(item, Int32.Parse(Request.HttpContext.User.GetUserId()), isSuperAdmin);
 
             return new BugTicketManageModel(item);
@@ -223,7 +224,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteBugTicket(int id)
         {
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
-            var isSuperAdmin = Context.User.IsInRole(superAdmin.Normalize());
+            var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
 
             return await _helpService.DeleteBugTicketAsync(id, isSuperAdmin ? (int?)null : Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
@@ -279,6 +280,8 @@ namespace VC.Admin.Controllers
             var form = await Request.ReadFormAsync();
 
             var data = form["data"];
+
+            StringValues
 
             int? bugTicketId = null;
             int? butTicketCommentId = null;
@@ -354,7 +357,7 @@ namespace VC.Admin.Controllers
                 Inline = viewMode
             };
 
-            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(blob.File, blob.ContentType);
         }
 
@@ -369,7 +372,7 @@ namespace VC.Admin.Controllers
                 Inline = viewMode
             };
 
-            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(blob.File, blob.ContentType);
         }
 #endif

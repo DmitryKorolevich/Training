@@ -39,10 +39,10 @@ namespace VitalChoice.Business.Services.Avatax
         {
             _taxService = taxService;
             _mapper = mapper;
-            _accountName = options.Options.Avatax.AccountName;
-            _profileName = options.Options.Avatax.ProfileName;
-            _companyCode = options.Options.Avatax.CompanyCode;
-            _turnOffCommit = options.Options.Avatax.TurnOffCommit;
+            _accountName = options.Value.Avatax.AccountName;
+            _profileName = options.Value.Avatax.ProfileName;
+            _companyCode = options.Value.Avatax.CompanyCode;
+            _turnOffCommit = options.Value.Avatax.TurnOffCommit;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 

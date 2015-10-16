@@ -24,9 +24,10 @@ namespace VC.Public
         {
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
-            var configuration = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
+            var configuration = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .SetBasePath(applicationEnvironment.ApplicationBasePath);
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
             if (File.Exists(path))
@@ -45,7 +46,7 @@ namespace VC.Public
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
-                app.UseErrorPage(new ErrorPageOptions()
+                app.UseDeveloperExceptionPage(new ErrorPageOptions()
                 {
                     SourceCodeLineCount = 25
                 });
@@ -55,7 +56,7 @@ namespace VC.Public
             {
                 // Add Error handling middleware which catches all application specific errors and
                 // send the request to the following path or controller action.
-                app.UseErrorHandler("/Shared/Error");
+                app.UseExceptionHandler("/Shared/Error");
             }
 
             // Add static files to the request pipeline.

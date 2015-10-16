@@ -43,7 +43,7 @@ namespace VitalChoice.Infrastructure.Context
                 // This either requires MARS or creation of a new connection for each query. Currently using
                 // MARS since cloning connections is known to be problematic.
                 MultipleActiveResultSets = true,
-                AttachDBFilename = appOptionsAccessor.Options.LogPath + "\\Logs.mdf",
+                AttachDBFilename = appOptionsAccessor.Value.LogPath + "\\Logs.mdf",
                 IntegratedSecurity = true,
                 ConnectTimeout = 60
             }).ConnectionString;

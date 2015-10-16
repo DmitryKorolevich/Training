@@ -91,8 +91,8 @@ namespace VitalChoice.Business.Services.HelpService
             _customerService = customerService;
             _notificationService = notificationService;
             _storageClient = storageClient;
-            _bugTicketFilesContainerName = appOptions.Options.AzureStorage.BugTicketFilesContainerName;
-            _bugTicketCommentFilesContainerName = appOptions.Options.AzureStorage.BugTicketCommentFilesContainerName;
+            _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
+            _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 

@@ -132,7 +132,7 @@ namespace VitalChoice.Business.Services
             if (dirInfo.Exists)
             {
                 toReturn = dirInfo.GetFiles().Select(p => new FileInfoObject(p.Name, ConvertPathToUrl(p.FullName),
-                    ConvertPathToUrl(dirInfo.FullName), p.Length, p.LastWriteTime, appOptions.Options.FilesRelativePath)).ToList();
+                    ConvertPathToUrl(dirInfo.FullName), p.Length, p.LastWriteTime, appOptions.Value.FilesRelativePath)).ToList();
             }
 
             return toReturn;
@@ -190,7 +190,7 @@ namespace VitalChoice.Business.Services
                 resDir = "/";
             }
             toReturn = new FileInfoObject(Path.GetFileName(path).ToLower(), ConvertPathToUrl(path), resDir, content.Length, fileInfo.LastWriteTime,
-                appOptions.Options.FilesRelativePath);
+                appOptions.Value.FilesRelativePath);
 
             return toReturn;
         }
@@ -213,9 +213,9 @@ namespace VitalChoice.Business.Services
         public bool DeleteFile(string fullRelativeName)
         {
             bool toReturn = false;
-            if(fullRelativeName.StartsWith(appOptions.Options.FilesRelativePath))
+            if(fullRelativeName.StartsWith(appOptions.Value.FilesRelativePath))
             {
-                fullRelativeName = fullRelativeName.Substring(appOptions.Options.FilesRelativePath.Length, fullRelativeName.Length - appOptions.Options.FilesRelativePath.Length);
+                fullRelativeName = fullRelativeName.Substring(appOptions.Value.FilesRelativePath.Length, fullRelativeName.Length - appOptions.Value.FilesRelativePath.Length);
             }
             var path = ConvertUrlToPath(fullRelativeName);
             FileInfo fileInfo = new FileInfo(path);

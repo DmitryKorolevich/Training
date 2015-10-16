@@ -5,8 +5,12 @@ using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Notification;
 using VitalChoice.Interfaces.Services;
+using Microsoft.AspNet.Mvc.Controllers;
+using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNet.Mvc.Formatters;
+using Microsoft.AspNet.Mvc.Infrastructure;
+using System.Diagnostics.Tracing;
 
 namespace VitalChoice.Core.Base
 {
@@ -24,11 +28,13 @@ namespace VitalChoice.Core.Base
             IReadOnlyList<IModelValidatorProvider> modelValidatorProviders,
             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
             IActionBindingContextAccessor actionBindingContextAccessor,
-            ILogger logger, INotifier notifier)
+            ILogger logger,
+            TelemetrySource telemetry,
+            int maxModelValidationErrors)
             : base(
                 actionContext, filterProviders, controllerFactory, descriptor, inputFormatters, outputFormatters,
                 controllerActionArgumentBinder, modelBinders, modelValidatorProviders, valueProviderFactories,
-                actionBindingContextAccessor, logger, notifier, 1000)
+                actionBindingContextAccessor, logger, telemetry, maxModelValidationErrors)
         {
 
         }

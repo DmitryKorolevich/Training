@@ -67,8 +67,8 @@ namespace VitalChoice.Workflow.Configuration
             var applicationEnvironment =
                 (IApplicationEnvironment)
                     CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
-            var configurationBuilder = new ConfigurationBuilder(applicationEnvironment.ApplicationBasePath)
-                .AddJsonFile("config.json");
+            var configurationBuilder = new ConfigurationBuilder()
+                .AddJsonFile("config.json").SetBasePath(applicationEnvironment.ApplicationBasePath);
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
             if (File.Exists(path))

@@ -32,10 +32,10 @@ namespace VitalChoice.Business.Services
 
         public void Init()
         {
-            _appOptions.Options.DefaultCountry = _countryRepository.Query(p => p.CountryCode == "US").Select(false).FirstOrDefault();
-            if(_appOptions.Options.DefaultCountry!=null)
+            _appOptions.Value.DefaultCountry = _countryRepository.Query(p => p.CountryCode == "US").Select(false).FirstOrDefault();
+            if(_appOptions.Value.DefaultCountry!=null)
             {
-                _appOptions.Options.DefaultCountry.States = _stateRepository.Query(p => p.CountryCode == "US").Select(false);
+                _appOptions.Value.DefaultCountry.States = _stateRepository.Query(p => p.CountryCode == "US").Select(false);
             }
         }
     }

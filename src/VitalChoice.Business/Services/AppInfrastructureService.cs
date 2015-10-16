@@ -54,7 +54,7 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService, ILocalizationService localizationService)
         {
             this.cache = cache;
-            this.expirationTerm = appOptions.Options.DefaultCacheExpirationTermMinutes;
+            this.expirationTerm = appOptions.Value.DefaultCacheExpirationTermMinutes;
             this.roleManager = roleManager;
             this.contentProcessorRepository = contentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
@@ -114,8 +114,8 @@ namespace VitalChoice.Business.Services
                     Text = months[i],
                 });
             }
-            referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Options.PublicHost)
-                ? appOptionsAccessor.Options.PublicHost
+            referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Value.PublicHost)
+                ? appOptionsAccessor.Value.PublicHost
                 : "http://notdefined/";
             referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
             referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>

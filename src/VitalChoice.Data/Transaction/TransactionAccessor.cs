@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Relational;
 using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.DataContext;
 

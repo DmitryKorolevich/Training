@@ -82,7 +82,7 @@ namespace VC.Admin.Controllers
                 Inline = false
             };
 
-            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(data, "text/csv");
         }
 #endif

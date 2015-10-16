@@ -25,7 +25,7 @@ namespace VC.Public.Components
 				throw new ArgumentNullException(nameof(appOptionsAccessor));
 			}
 			this.urlHelper = urlHelper;
-			this.appOptions = appOptionsAccessor.Options;
+			this.appOptions = appOptionsAccessor.Value;
 		}
 
 		public IViewComponentResult Invoke(string assetType)

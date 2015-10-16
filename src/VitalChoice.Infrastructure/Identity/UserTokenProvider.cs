@@ -23,7 +23,7 @@ namespace VitalChoice.Infrastructure.Identity
 
 	    public async Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Options.ActivationTokenExpirationTermDays);
+		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Value.ActivationTokenExpirationTermDays);
 		    user.IsConfirmed = false;
 		    user.ConfirmationToken = Guid.NewGuid();
 
