@@ -18,7 +18,10 @@ namespace VitalChoice.Core.GlobalFilters
                 foreach (KeyValuePair<string, ModelState> keyValue in context.ModelState)
                 {
                     if (keyValue.Value.Errors != null && keyValue.Value.Errors.Count > 0)
-                        result.AddMessage(keyValue.Key, keyValue.Value.Errors.First().ErrorMessage == string.Empty ? (keyValue.Value.Errors.First().Exception ?? new ApiException()).Message : keyValue.Value.Errors.First().ErrorMessage);
+                        result.AddMessage(keyValue.Key,
+                            keyValue.Value.Errors.First().ErrorMessage == string.Empty
+                                ? (keyValue.Value.Errors.First().Exception ?? new ApiException()).Message
+                                : keyValue.Value.Errors.First().ErrorMessage);
                 }
 
                 context.Result = new JsonResult(result);
