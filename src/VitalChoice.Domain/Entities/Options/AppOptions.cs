@@ -1,4 +1,5 @@
 ﻿using System;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Domain.Entities.Options
 {
@@ -20,5 +21,6 @@ namespace VitalChoice.Domain.Entities.Options
 		public AzureStorage AzureStorage { get; set; }
         public FedExOptions FedExOptions { get; set; }
         public AvataxOptions Avatax { get; set; }
+        public Country DefaultCountry { get; set; }
     }
 }

@@ -138,6 +138,11 @@ namespace VitalChoice.Business.Services
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
+            referenceData.CustomerStatuses = LookupHelper.GetCustomerStatuses().Select(x => new LookupItem<int>
+            {
+                Key = x.Key,
+                Text = x.Value
+            }).ToList();
             referenceData.ProductTypes = LookupHelper.GetProductTypes().Select(x => new LookupItem<int>
             {
                 Key = x.Key,

@@ -23,6 +23,7 @@ using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Business.FedEx;
 using System.ServiceModel;
+using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -38,8 +39,9 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper)
-            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectHistoryLogItemRepository)
         {
             _discountRepository = discountRepository;
             _skuRepository = skuRepository;
@@ -145,6 +147,8 @@ namespace VitalChoice.Business.Services.Products
                 await discountTierRepository.InsertRangeAsync(entity.DiscountTiers);
             }
         }
+
+        protected override bool LogObject { get { return false; } }
 
         #region Discounts
 

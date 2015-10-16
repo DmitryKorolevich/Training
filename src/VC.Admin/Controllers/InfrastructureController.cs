@@ -50,6 +50,7 @@ namespace VC.Admin.Controllers
                     ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,
                     GCTypes = referenceData.GCTypes,
                     RecordStatuses = referenceData.RecordStatuses,
+                    CustomerStatuses = referenceData.CustomerStatuses,
                     ProductTypes = referenceData.ProductTypes,
                     DiscountTypes = referenceData.DiscountTypes,
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,

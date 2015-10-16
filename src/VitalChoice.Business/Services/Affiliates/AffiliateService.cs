@@ -32,6 +32,7 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Mail;
 using VitalChoice.Business.Mail;
+using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -46,16 +47,19 @@ namespace VitalChoice.Business.Services.Affiliates
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             AffiliateMapper mapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService)
             : base(
                 mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;
             _notificationService = notificationService;
         }
+
+        protected override bool LogObject { get { return false; } }
 
         public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
         {

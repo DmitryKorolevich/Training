@@ -81,6 +81,18 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static Dictionary<int, string> GetCustomerStatuses()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) CustomerStatus.Active, "Active"},
+                {(int) CustomerStatus.NotActive, "Not Active"},
+                {(int) CustomerStatus.Deleted, "Deleted"},
+                {(int) CustomerStatus.Suspended, "Suspended"},
+            };
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetProductTypes()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>

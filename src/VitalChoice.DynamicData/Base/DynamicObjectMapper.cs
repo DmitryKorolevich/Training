@@ -15,6 +15,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Helpers;
+using System.Collections;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -34,6 +35,7 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         public abstract Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
         private Action<TOptionValue, int> _valueSetter;
+        private HashSet<object> _removeSerurityInformationVisitedHashSet;
 
         protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
             IIndex<TypePair, IModelToDynamicConverter> converters,
@@ -52,7 +54,7 @@ namespace VitalChoice.DynamicData.Base
             var expressionBody = ObjectIdSelector.Body;
             if (expressionBody.NodeType == ExpressionType.Convert)
             {
-                memberExpression = ((UnaryExpression) expressionBody).Operand as MemberExpression;
+                memberExpression = ((UnaryExpression)expressionBody).Operand as MemberExpression;
             }
             else
             {
@@ -60,7 +62,7 @@ namespace VitalChoice.DynamicData.Base
             }
             if (memberExpression?.Member is PropertyInfo)
             {
-                var property = (PropertyInfo) memberExpression.Member;
+                var property = (PropertyInfo)memberExpression.Member;
                 if (property.CanWrite)
                 {
                     _valueSetter = property.SetMethod.CompileVoidAccessor<TOptionValue, int>();
@@ -249,10 +251,10 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TModel();
-            ToModelItem(dynamic, result, typeof (TModel), typeof (TDynamic));
-            
+            ToModelItem(dynamic, result, typeof(TModel), typeof(TDynamic));
+
             IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(new TypePair(typeof (TModel), typeof(TDynamic)), out conv))
+            if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
             {
                 var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
                 converter?.DynamicToModel(result, dynamic);
@@ -266,7 +268,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TDynamic();
-            FromModelItem(result, model, typeof (TModel), typeof (TDynamic));
+            FromModelItem(result, model, typeof(TModel), typeof(TDynamic));
 
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
@@ -284,7 +286,7 @@ namespace VitalChoice.DynamicData.Base
 
             dynamic result = Activator.CreateInstance(modelType);
             ToModelItem(dynamic, result, modelType,
-                typeof (TDynamic));
+                typeof(TDynamic));
 
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
@@ -302,7 +304,7 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TDynamic();
-            FromModelItem(result, model, modelType, typeof (TDynamic));
+            FromModelItem(result, model, modelType, typeof(TDynamic));
 
             IModelToDynamicConverter conv;
             if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
@@ -352,7 +354,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 UpdateEntityItem(pair);
             }
-            
+
             UpdateEntityRangeInternalAsync(items).Wait();
             var valueObjectIdSetter = GetValueObjectIdSetter();
             items.ForEach(item =>
@@ -679,6 +681,93 @@ namespace VitalChoice.DynamicData.Base
                         data.Add(mappingName, value);
                     }
                 }
+            }
+        }
+
+        public void RemoveSerurityInformation(MappedObject dynamic)
+        {
+            _removeSerurityInformationVisitedHashSet = new HashSet<object>();
+            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, typeof(TDynamic), true);
+            foreach (var pair in cache)
+            {
+                GenericProperty dynamicProperty = pair.Value;
+                RemoveSerurityInformationForProperty(dynamicProperty, dynamic);
+            }
+        }
+
+        private void RemoveSerurityInformationForProperty(GenericProperty property, object model)
+        {
+            if (model == null || property.PropertyType.Name== "Type")
+            {
+                return;
+            }
+
+            if (property.NotLoggedInfo)
+            {
+                var value = GetDefaultValue(property.PropertyType);
+                property.Set?.Invoke(model, value);
+            }
+            else
+            {
+                if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType.Name!="String")
+                {
+                    Type elementType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
+                    if (elementType != null)
+                    {
+                        if (!elementType.GetTypeInfo().IsValueType && elementType.Name != "String")
+                        {
+                            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
+                            var items = (IEnumerable)property.Get?.Invoke(model);
+                            if (items != null)
+                            {
+                                foreach (var item in items)
+                                {
+                                    var type = item.GetType();
+                                    if (!type.GetTypeInfo().IsValueType && type.Name != "String")
+                                    {
+                                        if (_removeSerurityInformationVisitedHashSet.Contains(model))
+                                        {
+                                            return;
+                                        }
+                                        _removeSerurityInformationVisitedHashSet.Add(item);
+                                        foreach (var pair in cache)
+                                        {
+                                            GenericProperty dynamicProperty = pair.Value;
+                                            RemoveSerurityInformationForProperty(dynamicProperty, item);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var item = property.Get?.Invoke(model);
+                        if (_removeSerurityInformationVisitedHashSet.Contains(model))
+                        {
+                            return;
+                        }
+                        _removeSerurityInformationVisitedHashSet.Add(item);
+                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, property.PropertyType, true);
+                        foreach (var pair in cache)
+                        {
+                            GenericProperty dynamicProperty = pair.Value;
+                            RemoveSerurityInformationForProperty(dynamicProperty, item);
+                        }
+                    }
+                }
+            }
+        }
+
+        public object GetDefaultValue(Type t)
+        {
+            if (t.GetTypeInfo().IsValueType)
+            {
+                return Activator.CreateInstance(t);
+            }
+            else
+            {
+                return null;
             }
         }
 

@@ -13,6 +13,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				$scope.editMode = $stateParams.id != null;
 
 				$scope.inceptionDateOpened = false;
+				$scope.options = {};
 
 				$scope.accountProfileTab = {
 					active: true,
@@ -60,7 +61,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							customerService.createCustomerPrototype($scope.addEditTracker)
 								.success(function(result) {
 									if (result.Success) {
-										$scope.currentCustomer = result.Data;
+									    $scope.currentCustomer = result.Data;
+									    $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 										$scope.shippingAddressTab.AddressIndex = "0";
 										$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
@@ -80,7 +82,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 							customerService.getExistingCustomer($stateParams.id, $scope.addEditTracker)
 								.success(function(result) {
 									if (result.Success) {
-										$scope.currentCustomer = result.Data;
+									    $scope.currentCustomer = result.Data;
+									    $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
 										$scope.accountProfileTab.Address = $scope.currentCustomer.ProfileAddress;
 										$scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
 										$scope.paymentInfoTab.Address = {};
@@ -199,6 +202,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    if (result.Success)
 			    {
 			        $scope.currentCustomer.Id = result.Data.Id;
+			        $scope.options.DBStatusCode = result.Data.StatusCode;
 					toaster.pop('success', "Success!", "Successfully saved");
 				} else {
 					var messages = "";
@@ -339,6 +343,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					$scope.forms.submitted['card'] = true;
 					$scope.forms.submitted['oac'] = true;
 					$scope.forms.submitted['check'] = true;
+					toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
 				}
 			};
 

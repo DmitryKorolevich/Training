@@ -15,6 +15,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -170,12 +171,15 @@ namespace VitalChoice.Business.Services.Products
             return new List<MessageInfo>();
         }
 
+        protected override bool LogObject { get { return false; } }
+
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
@@ -186,7 +190,7 @@ namespace VitalChoice.Business.Services.Products
             INotificationService notificationService)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
-                bigStringValueRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

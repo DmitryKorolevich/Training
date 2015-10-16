@@ -24,6 +24,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -1121,6 +1122,30 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.Key(t => t.Id);
                 entity.ToTable("VHelpTickets");
+            });
+
+            #endregion
+
+            #region ObjectHistory
+
+            builder.Entity<ObjectHistoryLogDataItem>(entity =>
+            {
+                entity.Key(t => t.IdObjectHistoryLogDataItem);
+                entity.ToTable("ObjectHistoryLogDataItems");
+                entity.Ignore(p => p.Id);
+            });
+
+            builder.Entity<ObjectHistoryLogItem>(entity =>
+            {
+                entity.Key(t => t.IdObjectHistoryLogItem);
+                entity.ToTable("ObjectHistoryLogItems");
+                entity.Ignore(p => p.Id);
+                entity.Ignore(p => p.EditedBy);
+                entity.Reference(p => p.DataItem)
+                    .InverseCollection()
+                    .ForeignKey(p => p.IdObjectHistoryLogDataItem)
+                    .PrincipalKey(p => p.IdObjectHistoryLogDataItem)
+                    .Required(false);
             });
 
             #endregion

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
@@ -21,6 +22,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public OrderStatus OrderStatus { get; set; }
 
+        [NotLoggedInfo]
         public CustomerDynamic Customer { get; set; }
 
         public ICollection<SkuOrdered> Skus { get; set; }
@@ -29,6 +31,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public ICollection<GiftCertificateInOrder> GiftCertificates { get; set; }
 
+        [NotLoggedInfo]
         public OrderPaymentMethodDynamic PaymentMethod { get; set; }
 
         public OrderAddressDynamic ShippingAddress { get; set; }

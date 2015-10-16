@@ -106,10 +106,10 @@
                     <td>{{::customer.LastOrderPlaced | date:"MM/dd/yy"}}<br />{{::customer.LastOrderPlaced | date:"h:mm a"}}</td>
                     <td>{{::customer.TotalOrders}}</td>
                     <td>
-                        <span data-ng-if="customer.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
-                        <span data-ng-if="customer.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
-                        <span data-ng-if="customer.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, customer.StatusCode).Text}}</span>
-                        <span data-ng-if="customer.StatusCode == 4" class="label label-danger font-default">Suspended</span>
+                        <span data-ng-if="customer.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 4" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span></span>
                     </td>
                     <td>{{::customer.DateEdited | date:"MM/dd/yy"}}<br />{{::customer.DateEdited | date:"h:mm a"}}<br />{{::customer.EditedBy}}</td>
                     <td>

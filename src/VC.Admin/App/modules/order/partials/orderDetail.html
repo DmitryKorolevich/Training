@@ -679,12 +679,12 @@
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="suspendUserAccount" data-ng-model="currentCustomer.SuspendUserAccount">
+                                                            <input type="checkbox" id="suspendUserAccount" data-ng-click="toggleSuspended()" data-ng-checked="currentCustomer.StatusCode == 4">
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group" data-ng-if="currentCustomer.SuspendUserAccount">
+                                            <div class="form-group" data-ng-if="currentCustomer.StatusCode == 4">
                                                 <label for="reason" class="col-md-3 control-label">Reason</label>
                                                 <div class="col-md-9">
                                                     <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>

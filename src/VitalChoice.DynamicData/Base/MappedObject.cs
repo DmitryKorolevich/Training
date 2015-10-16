@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
@@ -26,5 +27,7 @@ namespace VitalChoice.DynamicData.Base
         public dynamic Data => DynamicData;
 
         protected internal ExpandoObject DynamicData { get; } = new ExpandoObject();
+
+        public ICollection<ObjectHistoryLogItem> HistoryLogItems { get; set; }
     }
 }

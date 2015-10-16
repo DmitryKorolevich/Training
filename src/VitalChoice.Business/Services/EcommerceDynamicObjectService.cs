@@ -1,8 +1,11 @@
-﻿using VitalChoice.Data.Repositories;
+﻿using System;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
+using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -22,9 +25,26 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TEntity> objectRepository,
             IEcommerceRepositoryAsync<TOptionType> optionTypesRepository,
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepository)
-            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository, objectHistoryLogItemRepository)
         {
+        }
+
+        private ObjectType? _idObjectType;
+
+        public override ObjectType IdObjectType
+        {
+            get
+            {
+                if (!_idObjectType.HasValue)
+                {
+                    var result = ObjectType.Unknown;
+                    Enum.TryParse<ObjectType>(typeof(TEntity).Name, out result);
+                    _idObjectType = result;
+                }
+                return _idObjectType.Value;
+            }
         }
 
         protected override sealed IUnitOfWorkAsync CreateUnitOfWork()

@@ -21,6 +21,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -36,8 +37,9 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Promotion> promotionRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper)
-            : base(mapper, promotionRepository, promotionOptionTypeRepository, promotionOptionValueRepository, bigStringRepositoryAsync)
+            IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+            : base(mapper, promotionRepository, promotionOptionTypeRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectHistoryLogItemRepository)
         {
             _promotionRepository = promotionRepository;
             _skuRepository = skuRepository;
@@ -129,6 +131,8 @@ namespace VitalChoice.Business.Services.Products
             await promotionToSkuRepository.InsertRangeAsync(entity.PromotionsToGetSkus);
             await promotionToSelectedCategoryRepository.InsertRangeAsync(entity.PromotionsToSelectedCategories);
         }
+        
+        protected override bool LogObject { get { return false; } }
 
         #region Promotions
 

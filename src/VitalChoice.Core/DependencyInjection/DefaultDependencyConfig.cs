@@ -72,6 +72,7 @@ using VitalChoice.Infrastructure.Identity.UserStores;
 using VitalChoice.Infrastructure.Identity.Validators;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Domain.Entities.Settings;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -278,6 +279,8 @@ namespace VitalChoice.Core.DependencyInjection
                 FileService.Init(appPath);
             }
 
+            var service = container.Resolve<IBackendSettingsService>();
+            service.Init();
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
 
             return container.Resolve<IServiceProvider>();
@@ -381,6 +384,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<TaxService>().As<ITaxService>();
             builder.RegisterType<AddressService>().As<IAddressService>();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();
+            builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             var container = builder.Build();
             return container;
         }

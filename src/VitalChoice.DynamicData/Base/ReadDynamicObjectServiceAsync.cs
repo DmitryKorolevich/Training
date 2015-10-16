@@ -7,7 +7,9 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 
@@ -24,20 +26,25 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
+        protected readonly IReadRepositoryAsync<ObjectHistoryLogItem> ObjectHistoryLogItemRepository;
 
         protected ReadDynamicObjectServiceAsync(
             IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
-            IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository)
+            IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository,
+            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
         {
             Mapper = mapper;
             ObjectRepository = objectRepository;
             OptionTypesRepository = optionTypesRepository;
             BigStringRepository = bigStringRepository;
             OptionValuesRepository = optionValuesRepository;
+            ObjectHistoryLogItemRepository = objectHistoryLogItemRepository;
         }
 
         #region Extension Points
+
+        public abstract ObjectType IdObjectType { get;}
 
         protected virtual Task AfterSelect(TEntity entity)
         {

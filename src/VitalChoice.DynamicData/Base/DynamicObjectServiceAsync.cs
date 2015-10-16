@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,6 +11,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
@@ -25,8 +27,9 @@ namespace VitalChoice.DynamicData.Base
         protected DynamicObjectServiceAsync(IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
-            IReadRepositoryAsync<BigStringValue> bigStringRepository)
-            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync)
+            IReadRepositoryAsync<BigStringValue> bigStringRepository,
+            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync, objectHistoryLogItemRepository)
         {
         }
 
@@ -199,6 +202,49 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
+        protected virtual void LogItemInfoSetAfter(ObjectHistoryLogItem log, TDynamic model)
+        {
+
+        }
+
+        protected virtual bool LogObject { get { return true; } }
+
+        protected virtual bool LogObjectFullData { get { return true; } }
+
+        private async Task LogItemChanges(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
+        {
+            if (LogObject)
+            {
+                List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
+                foreach (var model in models)
+                {
+                    Mapper.RemoveSerurityInformation(model);
+                    ObjectHistoryLogItem item = new ObjectHistoryLogItem();
+                    item.IdObject = model.Id;
+                    item.IdObjectType = this.IdObjectType;
+                    item.IdObjectStatus = model.StatusCode;
+                    item.DateCreated = DateTime.Now;
+                    item.IdEditedBy = model.IdEditedBy;
+                    LogItemInfoSetAfter(item, model);
+
+                    if (LogObjectFullData)
+                    {
+                        item.DataItem = new ObjectHistoryLogDataItem();
+                        item.DataItem.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                            NullValueHandling = NullValueHandling.Ignore,
+                        });
+                    }
+                    items.Add(item);
+                }
+
+                var objectHistoryLogItemRepository = uow.RepositoryAsync<ObjectHistoryLogItem>();
+                await objectHistoryLogItemRepository.InsertGraphRangeAsync(items);
+                await uow.SaveChangesAsync();
+            }
+        }
+
         protected virtual async Task<List<TEntity>> InsertRangeAsync(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
             (await ValidateCollection(models)).Raise();
@@ -225,6 +271,9 @@ namespace VitalChoice.DynamicData.Base
                 entity.Value1.OptionTypes = entity.Value2;
             }
             await uow.SaveChangesAsync();
+
+            await LogItemChanges(models, uow);
+
             return toInsertList;
         }
 
@@ -239,6 +288,9 @@ namespace VitalChoice.DynamicData.Base
             var productRepository = uow.RepositoryAsync<TEntity>();
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
+
+            await LogItemChanges(new TDynamic[1] { model }, uow);
+
             return entity;
         }
 
@@ -268,6 +320,9 @@ namespace VitalChoice.DynamicData.Base
             await mainRepository.UpdateRangeAsync(entities);
             await uow.SaveChangesAsync(CancellationToken.None);
             await AfterSelect(entities);
+
+            await LogItemChanges(models, uow);
+
             return entities;
         }
 
@@ -296,6 +351,9 @@ namespace VitalChoice.DynamicData.Base
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
             await AfterSelect(entity);
+
+            await LogItemChanges(new TDynamic[1] { model }, uow);
+
             return entity;
         }
 

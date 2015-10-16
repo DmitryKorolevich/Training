@@ -19,6 +19,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }
         public IList<LookupItem<int>> GCTypes { get; set; }
         public IList<LookupItem<int>> RecordStatuses { get; set; }
+        public IList<LookupItem<int>> CustomerStatuses { get; set; }
         public IList<LookupItem<int>> ProductTypes { get; set; }
         public IList<LookupItem<int>> DiscountTypes { get; set; }
         public IList<LookupItem<int>> AssignedCustomerTypes { get; set; }

@@ -67,7 +67,7 @@ namespace VC.Admin.ModelConverters
 	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
 	        }
 
-			if (dynamic.Files.Any())
+			if (dynamic.Files!=null && dynamic.Files.Any())
 			{
 				foreach (var fileDynamic in dynamic.Files.Select(x => new CustomerFileModel()
 				{

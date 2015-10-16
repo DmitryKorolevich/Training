@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Domain.Attributes;
 
 namespace VitalChoice.DynamicData.Entities.Transfer
 {

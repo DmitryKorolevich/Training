@@ -45,3 +45,5 @@
 :r .\Scripts\HelpTickets.sql
 :r .\Scripts\Promotions.sql
 :r .\Scripts\ProductsOutOfStock.sql
+
+:r .\Scripts\ObjectHistoryLogItems.sql

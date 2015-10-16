@@ -268,6 +268,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     }
                     else
                     {
+                        if ($scope.idCustomer == 0)
+                        {
+                            $state.go('index.oneCol.manageCustomers', {});
+                            return;
+                        }
                         $scope.order.UpdateShippingAddressForCustomer = true;
                         customerEditService.initCustomerEdit($scope);
                     }
@@ -327,6 +332,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                if ($scope.currentCustomer && $scope.currentCustomer.StatusCode==4)
+                {
+                    $state.go('index.oneCol.customerDetail', { id: $scope.currentCustomer.Id });
+                    return;
+                }
                 if ($scope.currentCustomer.SourceDetails)
                 {
                     $scope.currentCustomer.SourceValue = $scope.currentCustomer.SourceDetails;

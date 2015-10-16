@@ -22,6 +22,7 @@ namespace VitalChoice.DynamicData.Services
                     var property in objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var mapAttribute = property.GetCustomAttribute<MapAttribute>(true);
+                    var notLoggedInfoAttribute = property.GetCustomAttribute<NotLoggedInfoAttribute>(true);
                     if (mapAttribute != null || ignoreMapAttribute)
                     {
                         resultProperties.Add(property.Name, new GenericProperty
@@ -29,6 +30,7 @@ namespace VitalChoice.DynamicData.Services
                             Get = property.GetMethod?.CompileAccessor<object, object>(),
                             Set = property.SetMethod?.CompileVoidAccessor<object, object>(),
                             Map = mapAttribute,
+                            NotLoggedInfo =  notLoggedInfoAttribute!=null,                             
                             PropertyType = property.PropertyType
                         });
                     }
@@ -43,6 +45,9 @@ namespace VitalChoice.DynamicData.Services
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
         internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
+            new Dictionary<Type, Dictionary<string, GenericProperty>>();
+
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> AllTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
     }
 }

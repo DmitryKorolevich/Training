@@ -37,6 +37,9 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Workflow.Core;
+using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Settings;
+using Microsoft.Framework.OptionsModel;
 
 namespace VC.Admin.Controllers
 {
@@ -50,6 +53,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
         private readonly IStorefrontUserService _storefrontUserService;
+        private readonly Country _defaultCountry;
 
         private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
@@ -66,7 +70,8 @@ namespace VC.Admin.Controllers
                 addressService,
             IEcommerceDynamicObjectService
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
-            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService)
+            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
+            IOptions<AppOptions> appOptions)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -78,6 +83,7 @@ namespace VC.Admin.Controllers
             _noteMapper = noteMapper;
             this.logger = loggerProvider.CreateLoggerDefault();
 	        _storefrontUserService = storefrontUserService;
+            _defaultCountry = appOptions.Options.DefaultCountry;
         }
 
 	    [HttpGet]
@@ -110,22 +116,21 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public Result<AddUpdateCustomerModel> CreateCustomerPrototype()
+        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
         {
-            return new AddUpdateCustomerModel()
-            {
-				PublicId = Guid.NewGuid(),
-                CustomerType = CustomerType.Retail,
-                TaxExempt = TaxExempt.YesCurrentCertificate,
-                Tier = Tier.Tier1,
-                InceptionDate = DateTime.Now,
-                TradeClass = 1,
-                CustomerNotes = new List<CustomerNoteModel>()
-                {
-                },
-                Shipping = new List<AddressModel>() {new AddressModel() {AddressType = AddressType.Shipping}},
-				StatusCode = (int)CustomerStatus.NotActive
-            };
+            var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int?)CustomerType.Retail);
+            model.PublicId = Guid.NewGuid();
+            model.TaxExempt = TaxExempt.YesCurrentCertificate;
+            model.Tier = Tier.Tier1;
+            model.InceptionDate = DateTime.Now;
+            model.TradeClass = 1;
+            model.CustomerNotes = new List<CustomerNoteModel>();
+            model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
+            model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
+            model.StatusCode = (int)CustomerStatus.NotActive;
+            model.ApprovedPaymentMethods = new List<int>() { 1 };//card
+            model.DefaultPaymentMethod = 1;//card
+            return model;
         }
 
         [HttpPost]
@@ -133,7 +138,7 @@ namespace VC.Admin.Controllers
         {
             return new CreditCardModel
             {
-                Address = new AddressModel {AddressType = AddressType.Billing},
+                Address = new AddressModel {AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) },
                 CardType = CreditCardType.MasterCard
             };
         }
@@ -143,7 +148,7 @@ namespace VC.Admin.Controllers
         {
             return new OacPaymentModel
             {
-                Address = new AddressModel { AddressType = AddressType.Billing },
+                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) },
                 Fob = 1,
                 Terms = 1
             };
@@ -154,14 +159,14 @@ namespace VC.Admin.Controllers
         {
             return new CheckPaymentModel
             {
-                Address = new AddressModel {AddressType = AddressType.Billing}
+                Address = new AddressModel {AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
         }
             
         [HttpPost]
         public Result<AddressModel> CreateAddressPrototype()
         {
-            return new AddressModel() {AddressType = AddressType.Shipping};
+            return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]

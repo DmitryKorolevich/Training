@@ -19,6 +19,7 @@ using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
@@ -61,12 +62,13 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IAvalaraTax avataxService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
-                bigStringValueRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;
@@ -131,6 +133,13 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
+        protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
+        {
+            log.IdObjectStatus = (int)model.OrderStatus;
+        }
+
+        protected override bool LogObjectFullData { get { return false; } }
+
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
         {
             var order = await SelectAsync(id, withDefaults);
@@ -178,13 +187,13 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
         {
-			if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
-			{
-				throw new AppValidationException(
-					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
-			}
+            if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
+            {
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
+            }
 
-			return base.Validate(dynamic);
+            return base.Validate(dynamic);
         }
 
         protected override Task<List<MessageInfo>> ValidateDelete(int id)
@@ -195,7 +204,7 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderBy(y => y.Id);
-            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode!= (int)RecordStatusCode.Deleted).OrderBy(sortable);
+            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode != (int)RecordStatusCode.Deleted).OrderBy(sortable);
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 
@@ -212,7 +221,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions= conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).
+            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).
                 WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);

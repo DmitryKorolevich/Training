@@ -36,6 +36,7 @@ using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -58,6 +59,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
@@ -67,7 +69,7 @@ namespace VitalChoice.Business.Services.Customers
 			IEcommerceRepositoryAsync<User> userRepositoryAsync)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectHistoryLogItemRepository)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -411,7 +413,9 @@ namespace VitalChoice.Business.Services.Customers
 			return await UpdateAsync(model, uow, null);
 		}
 
-		public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password)
+        protected override bool LogObject { get { return false; } }
+
+        public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password)
 		{
 			using (var uow = CreateUnitOfWork())
 			{
