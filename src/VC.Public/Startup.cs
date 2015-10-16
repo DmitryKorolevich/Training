@@ -25,9 +25,9 @@ namespace VC.Public
             var applicationEnvironment = services.BuildServiceProvider().GetRequiredService<IApplicationEnvironment>();
 
             var configuration = new ConfigurationBuilder()
+                .SetBasePath(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath);
+                .AddEnvironmentVariables();
 
             var path = PathResolver.ResolveAppRelativePath("config.local.json");
             if (File.Exists(path))
