@@ -442,7 +442,7 @@ namespace VitalChoice.Business.Services.Customers
 
 	    public async Task<IList<PaymentMethod>> GetAvailablePaymentMethodsAsync(CustomerType? customerType)
 	    {
-			var condition = new PaymentMethodQuery().NotDeleted().MatchByCustomerType(customerType);
+	        var condition = new PaymentMethodQuery().NotDeleted().MatchByCustomerType(customerType);
 
 		    return await _paymentMethodRepositoryAsync.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false);
 		}

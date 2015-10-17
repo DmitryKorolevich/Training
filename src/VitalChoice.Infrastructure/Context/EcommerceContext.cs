@@ -745,7 +745,11 @@ namespace VitalChoice.Infrastructure.Context
 			builder.Entity<PaymentMethod>().ToTable("PaymentMethods");
 			builder.Entity<PaymentMethod>().HasOne(p => p.EditedBy).WithMany().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id)
 				.Required(false);
-			builder.Entity<PaymentMethod>().HasMany(p => p.Customers).WithOne(p => p.PaymentMethod).ForeignKey(p => p.IdPaymentMethod).PrincipalKey(p => p.Id);
+		    builder.Entity<PaymentMethod>()
+		        .HasMany(p => p.Customers)
+		        .WithOne(p => p.PaymentMethod)
+		        .ForeignKey(p => p.IdPaymentMethod)
+		        .PrincipalKey(p => p.Id);
 			builder.Entity<PaymentMethod>()
 				.HasMany(p => p.CustomerTypes)
 				.WithOne(p => p.PaymentMethod)

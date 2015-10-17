@@ -20,7 +20,8 @@ namespace VitalChoice.Business.Queries.Payment
 		{
             if (customerType.HasValue)
             {
-                Add(x => x.CustomerTypes.Select(y => y.IdCustomerType).Contains((int)customerType.Value));
+                int customerTypeValue = (int) customerType.Value;
+                Add(x => x.CustomerTypes.Any(c => c.IdCustomerType == customerTypeValue));
             }
 
 			return this;

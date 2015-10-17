@@ -15,7 +15,7 @@ namespace VitalChoice.Domain.Entities.Content
 
         public ContentCategory Parent { get; set; }
 
-        public IEnumerable<ContentCategory> SubCategories { get; set; }
+        public ICollection<ContentCategory> SubCategories { get; set; }
 
         public virtual MasterContentItem MasterContentItem { get; set; }
 

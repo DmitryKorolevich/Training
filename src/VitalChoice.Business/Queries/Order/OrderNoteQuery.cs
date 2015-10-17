@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Queries.Order
 
 	    public OrderNoteQuery MatchByCustomerType(CustomerType customerType)
 	    {
-			Add(x => x.CustomerTypes.Select(y=>y.IdCustomerType).Contains((int)customerType));
+			Add(x => x.CustomerTypes.Any(c => c.IdCustomerType == (int)customerType));
 
 			return this;
 		}
