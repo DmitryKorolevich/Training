@@ -364,7 +364,9 @@ namespace Microsoft.Data.Entity.Query
                     var propertyInfo in
                         chainedNavigationProperties)
                 {
-                    var navigation = Model.FindEntityType(navigationType)?.FindNavigation(propertyInfo.Name);
+                    var navigation =
+                        Model.FindEntityType(propertyInfo.DeclaringType)?.FindNavigation(propertyInfo.Name) ??
+                        Model.FindEntityType(navigationType)?.FindNavigation(propertyInfo.Name);
                     if (navigation == null)
                     {
                         throw new Exception($"Cannot find navigation {propertyInfo}.");
