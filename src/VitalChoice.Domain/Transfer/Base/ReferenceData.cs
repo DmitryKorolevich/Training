@@ -11,6 +11,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> AdminRoles { get; set; }
 
+        public IList<LookupItem<int>> CustomerRoles { get; set; }
+
         public IList<LookupItem<byte>> UserStatuses { get; set; }
 
         public IList<LookupItem<int>> ContentTypes { get; set; }

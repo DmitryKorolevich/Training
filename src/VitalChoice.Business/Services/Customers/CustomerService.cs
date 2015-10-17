@@ -206,7 +206,7 @@ namespace VitalChoice.Business.Services.Customers
 	                appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
 
                     model.Id = appUser.Id;
-                    model.User.Id = appUser.Id;
+                    //model.User.Id = appUser.Id;
 
 					var customer = await base.InsertAsync(model, uow);
 

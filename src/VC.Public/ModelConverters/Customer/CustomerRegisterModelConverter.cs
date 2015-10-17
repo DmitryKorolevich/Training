@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Linq;
 using VC.Public.Models.Auth;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Infrastructure.Utils;
 
-namespace VC.Public.ModelConverters
+namespace VC.Public.ModelConverters.Customer
 {
-    public class CustomerModelConverter : IModelToDynamicConverter<RegisterAccountModel, CustomerDynamic>
+    public class CustomerRegisterModelConverter : IModelToDynamicConverter<RegisterAccountModel, CustomerDynamic>
     {
         private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
 
-        public CustomerModelConverter(IDynamicToModelMapper<CustomerAddressDynamic> addressMapper)
+        public CustomerRegisterModelConverter(IDynamicToModelMapper<CustomerAddressDynamic> addressMapper)
         {
             _addressMapper = addressMapper;
         }

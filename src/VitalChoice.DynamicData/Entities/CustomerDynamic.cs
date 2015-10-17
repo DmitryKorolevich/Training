@@ -11,7 +11,6 @@ namespace VitalChoice.DynamicData.Entities
     {
 	    public CustomerDynamic()
 	    {
-			User = new User();
 			ApprovedPaymentMethods = new List<int>();
 			OrderNotes = new List<int>();
 			Addresses = new List<CustomerAddressDynamic>();
@@ -19,8 +18,6 @@ namespace VitalChoice.DynamicData.Entities
             CustomerPaymentMethods = new List<CustomerPaymentMethodDynamic>();
 			Files = new List<CustomerFile>();
         }
-
-	    public User User { get; set; }
 
 		public string Email { get; set; }
 

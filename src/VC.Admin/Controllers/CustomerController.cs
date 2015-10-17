@@ -89,14 +89,13 @@ namespace VC.Admin.Controllers
 	    [HttpGet]
         public async Task<Result<IList<OrderNoteModel>>> GetOrderNotes(CustomerType customerType)
 	    {
-	        return new List<OrderNoteModel>();
-	        //var result = await _customerService.GetAvailableOrderNotesAsync(customerType);
-	        //return result.Select(x => new OrderNoteModel()
-	        //{
-	        //    Id = x.Id,
-	        //    Name = x.Title
-	        //}).ToList();
-	    }
+			var result = await _customerService.GetAvailableOrderNotesAsync(customerType);
+			return result.Select(x => new OrderNoteModel()
+			{
+				Id = x.Id,
+				Name = x.Title
+			}).ToList();
+		}
 
         [HttpGet]
         public async Task<Result<IList<PaymentMethodModel>>> GetPaymentMethods(CustomerType customerType)

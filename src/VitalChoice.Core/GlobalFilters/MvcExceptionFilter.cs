@@ -9,6 +9,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNet.Mvc.ViewFeatures;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -19,8 +20,9 @@ namespace VitalChoice.Core.GlobalFilters
 			var currentActionName = (string)context.RouteData.Values["action"];
 
 			var result = new ViewResult();
+			result.ViewData = null;
 
-			var apiException = context.Exception as ApiException;
+			var apiException = context.Exception  as ApiException;
 			if (apiException == null)
 			{
 				var exception = context.Exception as AppValidationException;

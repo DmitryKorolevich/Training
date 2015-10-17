@@ -16,6 +16,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
@@ -48,7 +49,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                dynamic.User = entity.User;
                 dynamic.Email = entity.Email;
                 dynamic.PublicId = entity.PublicId;
                 dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
@@ -118,7 +118,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.User = dynamic.User;
+	            if (entity.User == null)
+	            {
+		            entity.User = new User();
+	            }
+                entity.User.Id = dynamic.Id;
                 entity.Email = dynamic.Email;
                 entity.PublicId = dynamic.PublicId;
                 entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
