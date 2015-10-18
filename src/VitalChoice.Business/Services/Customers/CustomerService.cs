@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Customers
 						.Property(p => p.Email)
 						.Error("Customer email should be unique in the database")
 						.Build());
-			}
+            }
 
 			if (
 				model.Addresses.Where(
