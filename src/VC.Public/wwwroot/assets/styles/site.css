@@ -288,7 +288,7 @@ header .search-area form input[type=image] {
   float: left;
   clear: both;
   width: 100%;
-  min-height: 350px;
+  min-height: 450px;
 }
 .nav-shadow {
   background-color: #fff;
@@ -875,7 +875,7 @@ footer {
   position: absolute;
   width: 200px;
   padding: 10px 15px 0 0;
-  min-height: 324px;
+  min-height: 400px;
   border-right: 1px solid #DD4E02;
 }
 .working-area-holder .right-pane {
@@ -1027,6 +1027,7 @@ footer {
   border: 1px solid red;
 }
 .form-regular .form-buttons-group {
+  margin-top: 15px;
   margin-bottom: 15px;
   float: left;
   clear: left;

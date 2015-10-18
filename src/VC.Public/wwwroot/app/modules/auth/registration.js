@@ -4,6 +4,11 @@
 			$("#ddCountry").append($('<option></option>').val(country.Id).html(country.CountryName));
 		});
 
+		var idCountry = $("#ddCountry").attr("data-initial");
+		if (idCountry) {
+			$("#ddCountry").val(idCountry);
+		}
+
 		populateStates(result.Data);
 
 		$("#ddCountry").on("change", function () {
@@ -32,6 +37,11 @@ function populateStates(result) {
 		$.each(selectedCountry.States, function(stateIndex, state) {
 			$("#ddState").append($('<option></option>').val(state.Id).html(state.StateName));
 		});
+
+		var idState = $("#ddState").attr("data-initial");
+		if (idState) {
+			$("#ddState").val(idState);
+		}
 	} else {
 		$("#txtState").closest(".form-group").show();
 		$("#ddState").closest(".form-group").hide();

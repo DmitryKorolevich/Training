@@ -9,7 +9,9 @@ using VitalChoice.Core.Services;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Mvc.Filters;
+using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.Framework.DependencyInjection;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -19,8 +21,11 @@ namespace VitalChoice.Core.GlobalFilters
 		{
 			var currentActionName = (string)context.RouteData.Values["action"];
 
-			var result = new ViewResult();
-			result.ViewData = null;
+			var result = new ViewResult
+			{
+			    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
+                TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
+            };
 
 			var apiException = context.Exception  as ApiException;
 			if (apiException == null)
@@ -49,8 +54,7 @@ namespace VitalChoice.Core.GlobalFilters
 				result.ViewName = "Error";
 				result.StatusCode = (int) apiException.Status;
 			}
-
-			context.Result = result;
+            context.Result = result;
 		}
 	}
 }

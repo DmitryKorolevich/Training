@@ -92,23 +92,6 @@ namespace VC.Public.Controllers
 			var model = _addressConverter.ToModel<ChangeProfileModel>(currentCustomer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile));
 
 			return View(model);
-
-			//return View(new ChangeProfileModel()
-			//{
-			//	Email = currentCustomer.Email,
-			//	Address1 = profileAddress.Data.Address1,
-			//	Address2 = profileAddress.Data.Address2,
-			//	FirstName = profileAddress.Data.FirstName,
-			//	LastName = profileAddress.Data.LastName,
-			//	City = profileAddress.Data.City,
-			//	Company = profileAddress.Data.Company,
-			//	Fax = profileAddress.Data.Fax,
-			//	Phone = profileAddress.Data.Phone,
-			//	County = profileAddress.Data.County,
-			//	IdState = profileAddress.Data.IdState,
-			//	IdCountry = profileAddress.Data.IdCountry,
-			//	PostalCode = profileAddress.Data.Zip
-			//});
 		}
 
 		[HttpPost]
@@ -139,7 +122,10 @@ namespace VC.Public.Controllers
 			var oldEmail = customer.Email;
 			
 			customer.Addresses.Remove(profileAddress);
-			customer.Addresses.Add(_addressConverter.FromModel(model));
+			var newProfileAddress = _addressConverter.FromModel(model);
+			newProfileAddress.IdObjectType = (int) AddressType.Profile;
+            customer.Addresses.Add(newProfileAddress);
+			customer.Email = model.Email;
 
 			customer =  await _customerService.UpdateAsync(customer);
 
