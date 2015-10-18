@@ -17,8 +17,8 @@ namespace VitalChoice.DynamicData.Validation
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
-            if (obj.ModelType == null)
-                throw new ArgumentException($"{obj} didn't have ModelType set, seems object was never created from model");
+            //if (obj.ModelType == null)
+            //    throw new ArgumentException($"{obj} didn't have ModelType set, seems object was never created from model");
         }
 
         public IErrorResult Property(
@@ -39,6 +39,12 @@ namespace VitalChoice.DynamicData.Validation
                 return this;
             }
             throw new ArgumentException("collectionExpression should contain member access expression");
+        }
+
+        public IErrorResult Property(string propertyName)
+        {
+            PropertyName = propertyName;
+            return this;
         }
 
         public IDynamicCollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty> Collection<TResultProperty>(

@@ -34,9 +34,6 @@ namespace VitalChoice.DynamicData.Validation
                 MemberExpression member = (MemberExpression) fieldSelector;
                 var dynamicFieldName = member.Member.Name;
                 var modelType = Data.FirstOrDefault()?.ModelType;
-                if (modelType == null)
-                    throw new ArgumentException("There are no objects to enumerate or object didn't ModelType");
-
                 var modelFieldName = GetModelName(dynamicFieldName, modelType);
                 var indexes = CompareCollections(Data, propertySelector, values, valueSelector);
                 Indexes = indexes.ToArray();
