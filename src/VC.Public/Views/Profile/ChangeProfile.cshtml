@@ -16,10 +16,12 @@
 	<div class="right-pane">
 	@using (Html.BeginForm("ChangeProfile", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
 	{
+		@Html.HiddenFor(x=>x.IdCountry, new { @id = "hdCountry" } )
+		@Html.HiddenFor(x=>x.IdState, new { @id = "hdState" } )
 		@Html.AntiForgeryToken()
 		<h4>Update Profile</h4>
+		@Html.ValidationSummary(true, "")
 		<div class="form-two-column">
-			@Html.ValidationSummary(true, "")
 			<div class="form-group">
 				@Html.LabelFor(m => m.Email, new {@class = "control-label"})
 				<div class="input-group">
@@ -67,7 +69,7 @@
 			<div class="form-group">
 				@Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
 				<div class="input-group">
-					@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry", @data_initial = Model.IdCountry })
+					@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
 					@Html.ValidationMessageFor(m => m.IdCountry)
 				</div>
 			</div>
@@ -82,7 +84,7 @@
 				<!--todo-->
 				@Html.LabelFor(m => m.IdState, new {@class = "control-label"})
 				<div class="input-group">
-					@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState", @data_initial = Model.IdState })
+					@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new {@class = "form-control", @id = "ddState" })
 					@Html.ValidationMessageFor(m => m.IdState)
 				</div>
 			</div>

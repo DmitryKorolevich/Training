@@ -4,7 +4,7 @@
 			$("#ddCountry").append($('<option></option>').val(country.Id).html(country.CountryName));
 		});
 
-		var idCountry = $("#ddCountry").attr("data-initial");
+		var idCountry = $("#hdCountry").val();
 		if (idCountry) {
 			$("#ddCountry").val(idCountry);
 		}
@@ -38,7 +38,7 @@ function populateStates(result) {
 			$("#ddState").append($('<option></option>').val(state.Id).html(state.StateName));
 		});
 
-		var idState = $("#ddState").attr("data-initial");
+		var idState = $("#hdState").val();
 		if (idState) {
 			$("#ddState").val(idState);
 		}
