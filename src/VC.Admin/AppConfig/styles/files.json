@@ -11,6 +11,7 @@
 		"lib/AngularJS-Toaster/toaster.css",
 		"lib/ngProgress/ngProgress.css",
 		"lib/ladda/ladda-themeless.min.css",
+		"lib/json-formatter/json-formatter.css",
 		"assets/styles/site.css"
 	]
 }

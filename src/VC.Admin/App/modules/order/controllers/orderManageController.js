@@ -2,9 +2,9 @@
 
 angular.module('app.modules.order.controllers.orderManageController', [])
 .controller('orderManageController', ['$q', '$scope', '$rootScope', '$filter', '$injector', '$state', '$stateParams', '$timeout', 'modalUtil', 'orderService', 'customerService',
-    'productService', 'gcService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService', 'gridSorterUtil',
+    'productService', 'gcService', 'discountService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker', 'customerEditService', 'gridSorterUtil',
 function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
-    toaster, confirmUtil, promiseTracker, customerEditService, gridSorterUtil)
+    settingService, toaster, confirmUtil, promiseTracker, customerEditService, gridSorterUtil)
 {
     $scope.addEditTracker = promiseTracker("addEdit");
 
@@ -197,6 +197,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             Paging: { PageIndex: 1, PageItemCount: 1 },
         };
 
+        $scope.historyFilter = {
+            IdObject: $scope.id,
+            IdObjectType: 2,//order,
+            IdBeforeObjectHistoryLogItem: null,
+            Paging: { PageIndex: 1, PageItemCount: 20 },
+        };
+
         $scope.legend = {};
 
         $scope.mainTab = {
@@ -320,6 +327,28 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             });
     };
 
+    var refreshOrderHistory = function ()
+    {
+        $scope.historyItems = null;
+        $scope.historyItemsCount = 0;
+        settingService.getObjectHistoryLogItems($scope.historyFilter, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    $scope.historyItems = result.Data.Items;
+                    $scope.historyItemsCount = result.Data.Count;
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
     var loadReferencedData = function ()
     {
         $q.all({
@@ -329,6 +358,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             if (result.countriesCall.data.Success && result.customerGetCall.data.Success)
             {
+                refreshOrderHistory();
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
@@ -1295,6 +1325,26 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
+    };
+
+    $scope.openHistoryReport = function (id)
+    {
+        $scope.historyFilter.IdBeforeObjectHistoryLogItem = id;
+        orderService.getHistoryReport($scope.historyFilter, $scope.addEditTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    modalUtil.open('app/modules/setting/partials/objectLogReportPopup.html', 'objectLogReportController', result.Data, { size: 'lg' });
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
     };
 
     initialize();

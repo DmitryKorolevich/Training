@@ -15,6 +15,17 @@ using VitalChoice.Core.Services;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Domain.Transfer.Settings;
+using Newtonsoft.Json;
+using Microsoft.Dnx.Runtime.Infrastructure;
+using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Domain.Entities.eCommerce;
+using System;
+using VitalChoice.DynamicData.Entities;
+using VC.Admin.Models.Order;
+using Autofac;
+using Microsoft.Framework.DependencyInjection;
 
 namespace VC.Admin.Controllers
 {
@@ -24,15 +35,22 @@ namespace VC.Admin.Controllers
         private readonly ICountryService countryService;
         private readonly ISettingService settingService;
         private readonly IFileService fileService;
+        private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
 
-        public SettingController(ILogViewService logViewService, ICountryService countryService, ISettingService settingService, IFileService fileService,
+        public SettingController(
+            ILogViewService logViewService,
+            ICountryService countryService, 
+            ISettingService settingService,
+            IFileService fileService,
+            IObjectHistoryLogService objectHistoryLogService,
             ILoggerProviderExtended loggerProvider)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
             this.settingService = settingService;
             this.fileService = fileService;
+            this.objectHistoryLogService = objectHistoryLogService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -142,6 +160,23 @@ namespace VC.Admin.Controllers
             {
                 Items = result.Items.Select(p=>new LogListItemModel(p)).ToList(),
                 Count= result.Count,
+            };
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region ObjectHistoryLogs
+
+        [HttpPost]
+        public async Task<Result<PagedList<ObjectHistoryLogListItemModel>>> GetObjectHistoryLogItems([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var result = await objectHistoryLogService.GetObjectHistoryLogItems(filter);
+            var toReturn = new PagedList<ObjectHistoryLogListItemModel>
+            {
+                Items = result.Items.Select(p => new ObjectHistoryLogListItemModel(p)).ToList(),
+                Count = result.Count,
             };
 
             return toReturn;

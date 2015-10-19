@@ -65,10 +65,11 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IAvalaraTax avataxService)
+            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IAvalaraTax avataxService,
+            ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;
@@ -138,7 +139,7 @@ namespace VitalChoice.Business.Services.Orders
             log.IdObjectStatus = (int)model.OrderStatus;
         }
 
-        protected override bool LogObjectFullData { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
         {

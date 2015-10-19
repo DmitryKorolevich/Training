@@ -42,5 +42,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'MoveOrder/' + id + '?idcustomer=' + idCustomer, {}, getConfig(tracker));
 	    },
+	    getHistoryReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

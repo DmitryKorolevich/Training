@@ -382,6 +382,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AddressService>().As<IAddressService>();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
+            builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             var container = builder.Build();
             return container;
         }

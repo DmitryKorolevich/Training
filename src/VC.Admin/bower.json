@@ -18,7 +18,8 @@
     "angular-ladda": "~0.3.1",
     "angular-promise-tracker": "~2.1.0",
     "css-spinners": "~2.2.0",
-    "jquery.maskedinput": "~1.4.1"
+    "jquery.maskedinput": "~1.4.1",
+    "json-formatter": "0.4.0"
   },
   "exportsOverride": {
     "bootstrap": {

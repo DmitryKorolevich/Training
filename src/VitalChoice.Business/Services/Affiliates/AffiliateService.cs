@@ -33,6 +33,7 @@ using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Mail;
 using VitalChoice.Business.Mail;
 using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -49,10 +50,11 @@ namespace VitalChoice.Business.Services.Affiliates
             AffiliateMapper mapper,
             IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService)
+            IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService,
+            ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;

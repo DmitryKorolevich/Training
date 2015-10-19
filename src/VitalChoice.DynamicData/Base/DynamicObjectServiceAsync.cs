@@ -1,3 +1,4 @@
+using Microsoft.Framework.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,9 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
-            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
-            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync, objectHistoryLogItemRepository)
+            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            ILogger logger)
+            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync, objectHistoryLogItemRepository, logger)
         {
         }
 
@@ -209,39 +211,46 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual bool LogObject { get { return true; } }
 
-        protected virtual bool LogObjectFullData { get { return true; } }
+        protected virtual bool LogObjectFullData { get { return false; } }
 
         private async Task LogItemChanges(ICollection<TDynamic> models, IUnitOfWorkAsync uow)
         {
-            if (LogObject)
+            try
             {
-                List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
-                foreach (var model in models)
+                if (LogObject)
                 {
-                    Mapper.RemoveSerurityInformation(model);
-                    ObjectHistoryLogItem item = new ObjectHistoryLogItem();
-                    item.IdObject = model.Id;
-                    item.IdObjectType = this.IdObjectType;
-                    item.IdObjectStatus = model.StatusCode;
-                    item.DateCreated = DateTime.Now;
-                    item.IdEditedBy = model.IdEditedBy;
-                    LogItemInfoSetAfter(item, model);
-
-                    if (LogObjectFullData)
+                    List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
+                    foreach (var model in models)
                     {
-                        item.DataItem = new ObjectHistoryLogDataItem();
-                        item.DataItem.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
-                        {
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                            NullValueHandling = NullValueHandling.Ignore,
-                        });
-                    }
-                    items.Add(item);
-                }
+                        Mapper.RemoveSerurityInformation(model);
+                        ObjectHistoryLogItem item = new ObjectHistoryLogItem();
+                        item.IdObject = model.Id;
+                        item.IdObjectType = this.IdObjectType;
+                        item.IdObjectStatus = model.StatusCode;
+                        item.DateCreated = DateTime.Now;
+                        item.IdEditedBy = model.IdEditedBy;
+                        LogItemInfoSetAfter(item, model);
 
-                var objectHistoryLogItemRepository = uow.RepositoryAsync<ObjectHistoryLogItem>();
-                await objectHistoryLogItemRepository.InsertGraphRangeAsync(items);
-                await uow.SaveChangesAsync();
+                        if (LogObjectFullData)
+                        {
+                            item.DataItem = new ObjectHistoryLogDataItem();
+                            item.DataItem.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                            {
+                                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                                NullValueHandling = NullValueHandling.Ignore,
+                            });
+                        }
+                        items.Add(item);
+                    }
+
+                    var objectHistoryLogItemRepository = uow.RepositoryAsync<ObjectHistoryLogItem>();
+                    await objectHistoryLogItemRepository.InsertGraphRangeAsync(items);
+                    await uow.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("[Object log error]",e);
             }
         }
 
@@ -257,7 +266,7 @@ namespace VitalChoice.DynamicData.Base
                         new GenericPair<TDynamic, ICollection<TOptionType>>(d,
                             Mapper.FilterByType(optionTypes, d.IdObjectType).ToList())).ToList();
             var mappedList = await Mapper.ToEntityRangeAsync(toInsert);
-            foreach (var entity in mappedList)
+            foreach (var entity in mappedList.Select(p=>p.Entity).ToList())
             {
                 if (entity == null)
                     continue;
@@ -272,6 +281,10 @@ namespace VitalChoice.DynamicData.Base
             }
             await uow.SaveChangesAsync();
 
+            foreach (var mappedListItem in mappedList)
+            {
+                mappedListItem.Dynamic.Id = mappedListItem.Entity.Id;
+            }
             await LogItemChanges(models, uow);
 
             return toInsertList;
@@ -289,6 +302,7 @@ namespace VitalChoice.DynamicData.Base
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
 
+            model.Id = entity.Id;
             await LogItemChanges(new TDynamic[1] { model }, uow);
 
             return entity;

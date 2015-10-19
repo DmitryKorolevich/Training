@@ -34,6 +34,9 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Settings;
+using VitalChoice.Interfaces.Services.Settings;
+using Newtonsoft.Json;
 
 namespace VC.Admin.Controllers
 {
@@ -45,16 +48,19 @@ namespace VC.Admin.Controllers
         private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
         private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
         private readonly ICustomerService _customerService;
+        private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger logger;
 
         public OrderController(IOrderService orderService, IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> simpleOrderService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService, IDynamicToModelMapper<OrderAddressDynamic> addressMapper)
+            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService, IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
+            IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
             _simpleOrderService = simpleOrderService;
             _mapper = mapper;
             _customerService = customerService;
             _addressMapper = addressMapper;
+            _objectHistoryLogService = objectHistoryLogService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -247,6 +253,35 @@ namespace VC.Admin.Controllers
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);
 
             //TODO: - add sign up for newsletter(SignUpNewsletter)
+
+            return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
+
+            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            {
+                var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
+                var model = _mapper.ToModel<OrderManageModel>(dynamic);
+                toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            {
+                var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
+                var model = _mapper.ToModel<OrderManageModel>(dynamic);
+                toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
 
             return toReturn;
         }

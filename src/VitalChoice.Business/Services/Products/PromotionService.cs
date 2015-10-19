@@ -22,6 +22,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -38,8 +39,10 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
-            : base(mapper, promotionRepository, promotionOptionTypeRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectHistoryLogItemRepository)
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            ILoggerProviderExtended loggerProvider)
+            : base(mapper, promotionRepository, promotionOptionTypeRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectHistoryLogItemRepository,
+                loggerProvider)
         {
             _promotionRepository = promotionRepository;
             _skuRepository = skuRepository;

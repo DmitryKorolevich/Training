@@ -26,8 +26,9 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TOptionType> optionTypesRepository,
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
-            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository, objectHistoryLogItemRepository)
+            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            ILoggerProviderExtended loggerProvider)
+            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository, objectHistoryLogItemRepository, loggerProvider.CreateLoggerDefault())
         {
         }
 

@@ -201,6 +201,10 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			function successHandler(result) {
 			    if (result.Success)
 			    {
+			        if (!$scope.currentCustomer.Id)
+			        {
+			            $state.go('index.oneCol.orderAdd', { idcustomer : result.Data.Id});
+			        }
 			        $scope.currentCustomer.Id = result.Data.Id;
 			        $scope.options.DBStatusCode = result.Data.StatusCode;
 					toaster.pop('success', "Success!", "Successfully saved");

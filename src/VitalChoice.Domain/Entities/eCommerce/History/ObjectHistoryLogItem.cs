@@ -11,7 +11,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.History
 
         public ObjectType IdObjectType { get; set; }
 
-        public long IdObject { get; set; }
+        public int IdObject { get; set; }
 
         public int IdObjectStatus { get; set; }
 

@@ -7,6 +7,8 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Domain.Transfer.Settings;
 
 namespace VitalChoice.Business.Services.Settings
 {

@@ -28,6 +28,7 @@ using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 
@@ -187,10 +188,11 @@ namespace VitalChoice.Business.Services.Products
             SkuMapper skuMapper,
             IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
             ISettingService settingService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository)
+                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

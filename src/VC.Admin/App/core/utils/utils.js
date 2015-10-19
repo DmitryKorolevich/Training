@@ -11,6 +11,7 @@ angular.module('app.utils', [
 	'ajoslin.promise-tracker',
     'ngFileUpload',
     'fiestah.money',
+    'jsonFormatter',
     'app.core.utils.unsavedChanges.unsavedChangesFacilities',
 	'app.core.utils.httpInterceptor',
 	'app.core.utils.appBootstrap',

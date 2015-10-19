@@ -563,10 +563,10 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Entity).ToList();
         }
 
-        public async Task<List<TEntity>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
+        public async Task<ICollection<DynamicEntityPair<TDynamic, TEntity>>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items)
         {
             if (items == null)
-                return new List<TEntity>();
+                return new List<DynamicEntityPair<TDynamic, TEntity>>();
 
             ICollection<TOptionType> optionTypes = null;
             foreach (var pair in items.Where(pair => pair.Value2 == null))
@@ -583,7 +583,7 @@ namespace VitalChoice.DynamicData.Base
                         new DynamicEntityPair<TDynamic, TEntity>(pair.Value1, ToEntityItem(pair.Value1, pair.Value2)))
                     .ToList();
             await ToEntityRangeInternalAsync(results);
-            return results.Select(r => r.Entity).ToList();
+            return results.ToList();
         }
 
         public async Task<List<TDynamic>> FromEntityRangeAsync(ICollection<TEntity> items, bool withDefaults = false)

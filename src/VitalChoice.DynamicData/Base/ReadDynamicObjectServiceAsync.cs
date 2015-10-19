@@ -1,3 +1,4 @@
+using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +28,14 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IReadRepositoryAsync<ObjectHistoryLogItem> ObjectHistoryLogItemRepository;
+        protected readonly ILogger Logger;
 
         protected ReadDynamicObjectServiceAsync(
             IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository,
-            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            ILogger logger)
         {
             Mapper = mapper;
             ObjectRepository = objectRepository;
@@ -40,6 +43,7 @@ namespace VitalChoice.DynamicData.Base
             BigStringRepository = bigStringRepository;
             OptionValuesRepository = optionValuesRepository;
             ObjectHistoryLogItemRepository = objectHistoryLogItemRepository;
+            Logger = logger;
         }
 
         #region Extension Points

@@ -1058,14 +1058,14 @@ th.sortable-column {
 	background-color: @table-attention;
 }
 
-.orders .table > tbody > tr > td > i { margin-right: 5px;}
-.orders .table > tbody > tr .ban { color: red;}
-.orders .table > tbody > tr .exclamation-triangle { color: orange;}
-.orders .table > tbody > tr .truck { color: green;}
-.orders .table > tbody > tr .minus-circle{ color:red;}
-.orders .table > tbody > tr .check-circle{ color:green;}
-.orders .table > tbody > tr .calendar{ color:blue;}
-.orders .table > tbody > tr .pause{ color:blue;}
+.table.order-statuses > tbody > tr > td > i { margin-right: 5px;}
+.table.order-statuses > tbody > tr .ban { color: red;}
+.table.order-statuses > tbody > tr .exclamation-triangle { color: orange;}
+.table.order-statuses > tbody > tr .truck { color: green;}
+.table.order-statuses > tbody > tr .minus-circle{ color:red;}
+.table.order-statuses > tbody > tr .check-circle{ color:green;}
+.table.order-statuses > tbody > tr .calendar{ color:blue;}
+.table.order-statuses > tbody > tr .pause{ color:blue;}
 
 .orders .table > tbody > tr > td.order-source { color:grey;}
 .orders .table > tbody > tr > td.payment-methods { color:grey;}
@@ -1094,3 +1094,18 @@ th.sortable-column {
 .vital-green-report table > tbody > tr.container-row { cursor:pointer;}
 .vital-green-report table > tbody > tr.request-row { background:white;}
 .vital-green-report table > thead > tr > th.completions { width: 50px; }
+
+.object-history { padding: 19px 0 0;}
+.object-history .header { margin-left: 19px; margin-right: 19px; text-align: center;}
+.object-history .header .lenged { margin-bottom: 10px;}
+.object-history .table { font-size: 12px; position: relative; height: 532px; margin-bottom: 5px;}
+.object-history .table>tbody>tr>td, .object-history .table>tbody>tr>th,.object-history .table>tfoot>tr>td,.object-history .table>tfoot>tr>th,.object-history .table>thead>tr>td,.object-history .table>thead>tr>th {
+    padding-left: 4px;
+    padding-right: 4px;    
+}
+.object-history .table>tbody { overflow-y: scroll; height: 500px; width: 100%;position: absolute; top: 30px;}
+.object-history .table>tbody .btn-xs { font-size: 10px;}
+
+.object-history-report .wrapper{ margin-bottom: 0px;}
+.object-history-report .left-area { padding-left: 0px;}
+.object-history-report .right-area { padding-right: 0px;}

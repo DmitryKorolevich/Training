@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -66,10 +67,11 @@ namespace VitalChoice.Business.Services.Customers
 			IBlobStorageClient storageClient,
 			IOptions<AppOptions> appOptions,
 			IStorefrontUserService storefrontUserService,
-			IEcommerceRepositoryAsync<User> userRepositoryAsync)
+			IEcommerceRepositoryAsync<User> userRepositoryAsync,
+            ILoggerProviderExtended loggerProvider)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectHistoryLogItemRepository)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectHistoryLogItemRepository, loggerProvider)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
