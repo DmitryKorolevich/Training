@@ -32,7 +32,7 @@ function populateStates(result) {
 		$("#ddState").closest(".form-group").show();
 
 		$("#txtState").val("");
-		$("#ddState").html();
+		$("#ddState").html("");
 
 		$.each(selectedCountry.States, function(stateIndex, state) {
 			$("#ddState").append($('<option></option>').val(state.Id).html(state.StateName));
@@ -46,6 +46,6 @@ function populateStates(result) {
 		$("#txtState").closest(".form-group").show();
 		$("#ddState").closest(".form-group").hide();
 
-		$("#ddState").html();
+		$("#ddState").html("");
 	}
 };
