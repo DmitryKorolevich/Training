@@ -19,7 +19,8 @@
     "angular-promise-tracker": "~2.1.0",
     "css-spinners": "~2.2.0",
     "jquery.maskedinput": "~1.4.1",
-    "json-formatter": "0.4.0"
+    "json-formatter": "0.4.0",
+    "jsondiffpatch": "~0.1.37"
   },
   "exportsOverride": {
     "bootstrap": {
@@ -39,6 +40,14 @@
       ".": [
         "./promise-tracker-http-interceptor.js",
         "./promise-tracker.js"
+      ]
+    },
+    "jsondiffpatch": {
+      ".": [
+        "./public/build/jsondiffpatch.js",
+        "./public/build/jsondiffpatch-formatters.js",
+        "./public/formatters-styles/html.css",
+        "./public/formatters-styles/annotated.css"
       ]
     }
   },

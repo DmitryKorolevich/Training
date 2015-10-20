@@ -54,18 +54,25 @@ namespace VC.Admin.Models.Order
         {
             if (dynamic != null)
             {
-                Code = dynamic.Sku.Code;
-                ProductName = dynamic.ProductWithoutSkus.Name;
-                IdProductType = dynamic.ProductWithoutSkus.IdObjectType;
+                if (dynamic.ProductWithoutSkus != null)
+                {
+                    ProductName = dynamic.ProductWithoutSkus.Name;
+                    IdProductType = dynamic.ProductWithoutSkus.IdObjectType;
+                }
                 QTY = dynamic.Quantity;
                 Price = dynamic.Amount;
                 Amount = Price * QTY;
-                Id = dynamic.Sku.Id;
-                AutoShipProduct = dynamic.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? dynamic.Sku.Data.AutoShipProduct : false;
-                AutoShipFrequency1 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? dynamic.Sku.Data.AutoShipFrequency1 : false;
-                AutoShipFrequency2 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency2") ? dynamic.Sku.Data.AutoShipFrequency2 : false;
-                AutoShipFrequency3 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? dynamic.Sku.Data.AutoShipFrequency3 : false;
-                AutoShipFrequency6 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? dynamic.Sku.Data.AutoShipFrequency6 : false;
+
+                if (dynamic.Sku != null)
+                {
+                    Id = dynamic.Sku.Id;
+                    Code = dynamic.Sku.Code;
+                    AutoShipProduct = dynamic.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? dynamic.Sku.Data.AutoShipProduct : false;
+                    AutoShipFrequency1 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? dynamic.Sku.Data.AutoShipFrequency1 : false;
+                    AutoShipFrequency2 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency2") ? dynamic.Sku.Data.AutoShipFrequency2 : false;
+                    AutoShipFrequency3 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? dynamic.Sku.Data.AutoShipFrequency3 : false;
+                    AutoShipFrequency6 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? dynamic.Sku.Data.AutoShipFrequency6 : false;
+                }
                 Messages = dynamic.Messages;
             }
         }

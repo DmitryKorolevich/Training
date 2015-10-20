@@ -12,6 +12,8 @@
 		"lib/ngProgress/ngProgress.css",
 		"lib/ladda/ladda-themeless.min.css",
 		"lib/json-formatter/json-formatter.css",
+		"lib/jsondiffpatch/annotated.css",
+		"lib/jsondiffpatch/html.css",
 		"assets/styles/site.css"
 	]
 }

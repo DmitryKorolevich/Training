@@ -34,6 +34,8 @@
 		"lib/angular-promise-tracker/promise-tracker.js",
 		"lib/angular-promise-tracker/promise-tracker-http-interceptor.js",
 		"lib/json-formatter/json-formatter.js",
+		"lib/jsondiffpatch/jsondiffpatch.js",
+		"lib/jsondiffpatch/jsondiffpatch-formatters.js",
 		"app/templates.js",
 		"app/app.common.js",
 		"app/app.js",
