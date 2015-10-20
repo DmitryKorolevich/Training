@@ -50,6 +50,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
+        private readonly IEcommerceRepositoryAsync<Product> _productsRepository;
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
@@ -58,15 +59,16 @@ namespace VitalChoice.Business.Services.Orders
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Order> orderRepository,
-            IEcommerceRepositoryAsync<Sku> skuRepository,
+            IEcommerceRepositoryAsync<Order> orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
             IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository, IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService, IWorkflowFactory treeFactory, IAppInfrastructureService appInfrastructureService, ICountryService countryService, IAvalaraTax avataxService,
-            ILoggerProviderExtended loggerProvider)
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
+            IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
+            ICustomerService customerService, IWorkflowFactory treeFactory, ICountryService countryService,
+            IAvalaraTax avataxService,
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Product> productsRepository)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
@@ -79,6 +81,7 @@ namespace VitalChoice.Business.Services.Orders
             _treeFactory = treeFactory;
             _countryService = countryService;
             _avataxService = avataxService;
+            _productsRepository = productsRepository;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -115,6 +118,23 @@ namespace VitalChoice.Business.Services.Orders
                     .WithObjectType(orderToSku.Sku.Product.IdObjectType)
                     .Query()
                     .Compile()).ToList();
+                orderToSku.Sku.OptionTypes = optionTypes;
+                orderToSku.Sku.Product.OptionTypes = optionTypes;
+            }
+            foreach (var orderToSku in entity.Skus.Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null))
+            {
+                var product = await _productsRepository.Query(p => p.Skus.Any(s => s.Id == orderToSku.IdSku))
+                    .Include(p => p.Skus)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.OptionValues)
+                    .SelectFirstOrDefaultAsync(false);
+                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
+                    .WithObjectType(product.IdObjectType)
+                    .Query()
+                    .Compile()).ToList();
+                orderToSku.Sku = product.Skus.Single(s => s.Id == orderToSku.IdSku);
+                product.Skus = null;
+                orderToSku.Sku.Product = product;
                 orderToSku.Sku.OptionTypes = optionTypes;
                 orderToSku.Sku.Product.OptionTypes = optionTypes;
             }

@@ -50,30 +50,30 @@ namespace VC.Admin.Models.Order
 
         public IList<string> Messages { get; set; }
 
-        public SkuOrderedManageModel(SkuOrdered dynamic)
+        public SkuOrderedManageModel(SkuOrdered model)
         {
-            if (dynamic != null)
+            if (model != null)
             {
-                if (dynamic.ProductWithoutSkus != null)
+                if (model.ProductWithoutSkus != null)
                 {
-                    ProductName = dynamic.ProductWithoutSkus.Name;
-                    IdProductType = dynamic.ProductWithoutSkus.IdObjectType;
+                    ProductName = model.ProductWithoutSkus.Name;
+                    IdProductType = model.ProductWithoutSkus.IdObjectType;
                 }
-                QTY = dynamic.Quantity;
-                Price = dynamic.Amount;
+                QTY = model.Quantity;
+                Price = model.Amount;
                 Amount = Price * QTY;
 
-                if (dynamic.Sku != null)
+                if (model.Sku != null)
                 {
-                    Id = dynamic.Sku.Id;
-                    Code = dynamic.Sku.Code;
-                    AutoShipProduct = dynamic.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? dynamic.Sku.Data.AutoShipProduct : false;
-                    AutoShipFrequency1 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? dynamic.Sku.Data.AutoShipFrequency1 : false;
-                    AutoShipFrequency2 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency2") ? dynamic.Sku.Data.AutoShipFrequency2 : false;
-                    AutoShipFrequency3 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? dynamic.Sku.Data.AutoShipFrequency3 : false;
-                    AutoShipFrequency6 = dynamic.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? dynamic.Sku.Data.AutoShipFrequency6 : false;
+                    Id = model.Sku.Id;
+                    Code = model.Sku.Code;
+                    AutoShipProduct = model.Sku.DictionaryData.ContainsKey("AutoShipProduct") ? model.Sku.Data.AutoShipProduct : false;
+                    AutoShipFrequency1 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency1") ? model.Sku.Data.AutoShipFrequency1 : false;
+                    AutoShipFrequency2 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency2") ? model.Sku.Data.AutoShipFrequency2 : false;
+                    AutoShipFrequency3 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency3") ? model.Sku.Data.AutoShipFrequency3 : false;
+                    AutoShipFrequency6 = model.Sku.DictionaryData.ContainsKey("AutoShipFrequency6") ? model.Sku.Data.AutoShipFrequency6 : false;
                 }
-                Messages = dynamic.Messages;
+                Messages = model.Messages;
             }
         }
     }
@@ -84,9 +84,9 @@ namespace VC.Admin.Models.Order
 
         public bool IsAllowDisable { get; set; }
 
-        public PromoSkuOrderedManageModel(SkuOrdered dynamic) : base(dynamic)
+        public PromoSkuOrderedManageModel(SkuOrdered model) : base(model)
         {
-            if (dynamic != null)
+            if (model != null)
             {
                 IsEnabled = true;
                 IsAllowDisable = true;
