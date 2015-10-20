@@ -96,6 +96,7 @@ namespace VC.Admin.ModelConverters
 			{
 				var addressDynamic = _addressMapper.FromModel(model.ProfileAddress);
 				addressDynamic.IdObjectType = (int)AddressType.Profile;
+				addressDynamic.Data.Email = model.Email;
 				dynamic.Addresses.Add(addressDynamic);
 			}
 			if (model.Shipping.Any())

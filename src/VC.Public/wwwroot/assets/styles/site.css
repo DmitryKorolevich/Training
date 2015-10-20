@@ -978,6 +978,9 @@ footer {
   float: left;
   width: 50%;
 }
+.form-regular .form-two-column .input-group .field-validation-error {
+  max-width: 200px;
+}
 .form-regular .sub-title {
   background-color: #f5f5f5;
   font-weight: bold;
