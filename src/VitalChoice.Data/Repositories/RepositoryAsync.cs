@@ -300,5 +300,18 @@ namespace VitalChoice.Data.Repositories
             await Context.SaveChangesAsync(cancellationToken);
             return true;
         }
+
+        public void Detach(TEntity entity)
+        {
+            Context.SetState(entity, EntityState.Detached);
+        }
+
+        public void DetachAll(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Context.SetState(entity, EntityState.Detached);
+            }
+        }
     }
 }

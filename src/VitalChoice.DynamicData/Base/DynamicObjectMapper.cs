@@ -684,7 +684,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public void RemoveSerurityInformation(MappedObject dynamic)
+        public void RemoveSeсurityInformation(MappedObject dynamic)
         {
             _removeSerurityInformationVisitedHashSet = new HashSet<object>();
             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, typeof(TDynamic), true);
