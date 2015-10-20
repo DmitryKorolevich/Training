@@ -22,7 +22,7 @@ namespace VitalChoice.DynamicData.Entities
 
         public OrderStatus OrderStatus { get; set; }
 
-        [NotLoggedInfo]
+        //[NotLoggedInfo]
         public CustomerDynamic Customer { get; set; }
 
         public ICollection<SkuOrdered> Skus { get; set; }

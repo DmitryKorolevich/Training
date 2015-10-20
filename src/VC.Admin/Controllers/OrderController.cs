@@ -45,19 +45,20 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
-        private readonly IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> _simpleOrderService;
         private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
         private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger logger;
 
-        public OrderController(IOrderService orderService, IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue> simpleOrderService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService, IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
+        public OrderController(
+            IOrderService orderService,
+            ILoggerProviderExtended loggerProvider,
+            IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService,
+            IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
-            _simpleOrderService = simpleOrderService;
             _mapper = mapper;
             _customerService = customerService;
             _addressMapper = addressMapper;
@@ -81,14 +82,14 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> UpdateOrderStatus(int id, int status)
         {
-            var order = await _simpleOrderService.SelectAsync(id,false);
+            var order = await _orderService.SelectAsync(id,false);
 
             if(order==null)
             {
                 throw new AppValidationException("Id", "The given order doesn't exist.");
             }
             order.OrderStatus = (OrderStatus)status;
-            order = await _simpleOrderService.UpdateAsync(order);
+            order = await _orderService.UpdateAsync(order);
 
             return order!=null;
         }
@@ -96,7 +97,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> MoveOrder(int id, int idcustomer)
         {
-            var order = await _simpleOrderService.SelectAsync(id, false);
+            var order = await _orderService.SelectAsync(id, false);
             var customer = await _customerService.SelectAsync(idcustomer, false);
 
             if (order == null)
@@ -108,7 +109,7 @@ namespace VC.Admin.Controllers
                 throw new AppValidationException("IdCustomer", "The given customer doesn't exist.");
             }
             order.Customer.Id = idcustomer;
-            order = await _simpleOrderService.UpdateAsync(order);
+            order = await _orderService.UpdateAsync(order);
 
             return order != null;
         }

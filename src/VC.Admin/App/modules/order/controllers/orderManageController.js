@@ -517,6 +517,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         });
     };
 
+    $scope.goToCustomer = function ()
+    {
+        $state.go('index.oneCol.customerDetail', { id: $scope.idCustomer });
+    };
+
     $scope.buildOrderShippingAddressForPartial = function (disableValidation)
     {
         if ($scope.order === undefined || $scope.order.Shipping === undefined)
