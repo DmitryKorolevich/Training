@@ -40,6 +40,7 @@ using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Transfer.Azure;
 using VitalChoice.Domain.Entities.Help;
+using VitalChoice.Domain.Mail;
 
 namespace VitalChoice.Business.Services.HelpService
 {
@@ -375,7 +376,12 @@ namespace VitalChoice.Business.Services.HelpService
             var helpTicket = await GetHelpTicketAsync(idHelpTicket);
             if (helpTicket != null)
             {
-                await _notificationService.SendHelpTicketUpdatingEmailForCustomerAsync(helpTicket.CustomerEmail, helpTicket);
+                await _notificationService.SendHelpTicketUpdatingEmailForCustomerAsync(helpTicket.CustomerEmail, new HelpTicketEmail()
+                {
+                    Id=helpTicket.Id,
+                    IdOrder=helpTicket.IdOrder,
+                    Customer=helpTicket.Customer,
+                });
 
                 return true;
             }
@@ -515,7 +521,7 @@ namespace VitalChoice.Business.Services.HelpService
                         item.DateCreated = item.DateEdited = DateTime.Now;
                         item.IdAddedBy = item.IdEditedBy = adminId;
                         await _bugTicketRepository.InsertGraphAsync(item);
-                        await _notificationService.SendNewBugTicketAddingForSuperAdminAsync(item);
+                        await _notificationService.SendNewBugTicketAddingForSuperAdminAsync(new BugTicketEmail { Id = item.Id });
 
                         var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
                         if (adminProfile != null)
@@ -712,7 +718,11 @@ namespace VitalChoice.Business.Services.HelpService
             var bugTicket = await GetBugTicketAsync(idBugTicket);
             if (bugTicket != null)
             {
-                await _notificationService.SendBugTicketUpdatingEmailForAuthorAsync(bugTicket.AddedByEmail, bugTicket);
+                await _notificationService.SendBugTicketUpdatingEmailForAuthorAsync(bugTicket.AddedByEmail, new BugTicketEmail()
+                {
+                    Id=bugTicket.Id,
+                    Customer=bugTicket.AddedBy,
+                });
 
                 return true;
             }
