@@ -1,6 +1,7 @@
 ﻿using System;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.eCommerce;
@@ -26,9 +27,9 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TOptionType> optionTypesRepository,
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider)
-            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository, objectHistoryLogItemRepository, loggerProvider.CreateLoggerDefault())
+            : base(mapper, objectRepository, optionTypesRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, loggerProvider.CreateLoggerDefault())
         {
         }
 

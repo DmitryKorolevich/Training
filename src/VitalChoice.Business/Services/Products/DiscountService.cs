@@ -25,6 +25,7 @@ using VitalChoice.Business.FedEx;
 using System.ServiceModel;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -41,9 +42,9 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider)
-            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectHistoryLogItemRepository, 
+            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
                   loggerProvider)
         {
             _discountRepository = discountRepository;

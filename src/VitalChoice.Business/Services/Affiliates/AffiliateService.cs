@@ -34,6 +34,7 @@ using VitalChoice.Domain.Mail;
 using VitalChoice.Business.Mail;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -48,13 +49,13 @@ namespace VitalChoice.Business.Services.Affiliates
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             AffiliateMapper mapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService,
             ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;
