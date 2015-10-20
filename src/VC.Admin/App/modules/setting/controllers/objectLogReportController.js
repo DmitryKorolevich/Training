@@ -58,7 +58,7 @@
 	    });
 
 	    var delta = jsondiffpatch.diff($scope.BeforeJsonData, $scope.MainJsonData);
-	    if (delta === 'undefined')
+	    if (delta === undefined)
 	    {
 	        $scope.visualDiff = "No Diff";
 	    }
