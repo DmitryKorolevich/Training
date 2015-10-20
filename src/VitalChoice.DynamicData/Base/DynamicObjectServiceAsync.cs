@@ -1,5 +1,6 @@
 using Microsoft.Framework.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -234,11 +235,12 @@ namespace VitalChoice.DynamicData.Base
                         if (LogObjectFullData)
                         {
                             item.DataItem = new ObjectHistoryLogDataItem();
-                            item.DataItem.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                            var settings = new JsonSerializerSettings()
                             {
                                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                                 NullValueHandling = NullValueHandling.Ignore,
-                            });
+                            };
+                            item.DataItem.Data = JsonConvert.SerializeObject(model, settings);
                         }
                         items.Add(item);
                     }

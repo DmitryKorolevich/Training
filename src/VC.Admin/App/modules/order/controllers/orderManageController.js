@@ -17,6 +17,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 $state.go('index.oneCol.orderDetail', { id: result.Data.Id });
             }
+            else
+            {
+                refreshOrderHistory();
+            }
         }
         else
         {
@@ -362,7 +366,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.countries = result.countriesCall.data.Data;
 
                 $scope.currentCustomer = result.customerGetCall.data.Data;
-                if ($scope.currentCustomer && $scope.currentCustomer.StatusCode==4)
+                if ($scope.id==0 && $scope.currentCustomer && $scope.currentCustomer.StatusCode == 4)
                 {
                     $state.go('index.oneCol.customerDetail', { id: $scope.currentCustomer.Id });
                     return;

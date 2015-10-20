@@ -37,6 +37,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace VC.Admin.Controllers
 {

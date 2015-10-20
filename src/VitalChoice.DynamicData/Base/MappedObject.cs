@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Interfaces;
@@ -22,12 +24,15 @@ namespace VitalChoice.DynamicData.Base
         public Type ModelType { get; internal set; }
         public int? IdObjectType { get; set; }
 
+        [JsonIgnore]
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
 
+        [JsonIgnore]
         public dynamic Data => DynamicData;
 
-        protected internal ExpandoObject DynamicData { get; } = new ExpandoObject();
+        public ExpandoObject DynamicData { get; set; } = new ExpandoObject();
 
+        [JsonIgnore]
         public ICollection<ObjectHistoryLogItem> HistoryLogItems { get; set; }
     }
 }
