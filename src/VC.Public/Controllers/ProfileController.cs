@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Mvc.ModelBinding;
 using VC.Public.ModelConverters;
 using VC.Public.Models.Auth;
 using VC.Public.Models.Profile;
@@ -56,6 +57,13 @@ namespace VC.Public.Controllers
 			return View();
 		}
 
+		private void CleanProfileEmailFields(ChangeProfileModel model)
+		{
+			model.ConfirmEmail = model.NewEmail = string.Empty;
+			ModelState["NewEmail"] = new ModelState();
+			ModelState["ConfirmEmail"] = new ModelState();
+		}
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
@@ -100,6 +108,7 @@ namespace VC.Public.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
+				CleanProfileEmailFields(model);
 				return View(model);
 			}
 
@@ -125,8 +134,9 @@ namespace VC.Public.Controllers
 			var newProfileAddress = _addressConverter.FromModel(model);
 			newProfileAddress.IdObjectType = (int) AddressType.Profile;
             customer.Addresses.Add(newProfileAddress);
-			customer.Email = model.Email;
+			customer.Email = newProfileAddress.Data.Email = !string.IsNullOrWhiteSpace(model.NewEmail) && !string.IsNullOrWhiteSpace(model.ConfirmEmail) ? model.NewEmail : oldEmail;
 
+			CleanProfileEmailFields(model);
 			customer =  await _customerService.UpdateAsync(customer);
 
 			if (oldEmail != customer.Email)
@@ -140,6 +150,22 @@ namespace VC.Public.Controllers
 			}
 
 			return RedirectToAction("Index");
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ChangeBillingInfo()
+		{
+			var context = _contextAccessor.HttpContext;
+
+			var currentCustomer = await _customerService.SelectAsync(Convert.ToInt32(context.User.GetUserId()));
+			if (currentCustomer == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+			}
+
+			var model = _addressConverter.ToModel<ChangeProfileModel>(currentCustomer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile));
+
+			return View(model);
 		}
 	}
 }

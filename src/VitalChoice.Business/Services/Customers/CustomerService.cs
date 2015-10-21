@@ -247,11 +247,8 @@ namespace VitalChoice.Business.Services.Customers
 
 			if (customerSameEmail.Any())
 			{
-				errors.AddRange(
-					model.CreateError()
-						.Property(p => p.Email)
-						.Error("Customer email should be unique in the database")
-						.Build());
+				throw new AppValidationException(
+					string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
             }
 
 			if (
