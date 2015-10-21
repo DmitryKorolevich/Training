@@ -15,11 +15,25 @@ angular.module('app.modules.product.controllers.productManageController', [])
         var hideFromDataFeedFieldName = 'HideFromDataFeed';
         var qTYThresholdFieldName = 'QTYThreshold';
 
+        function refreshHistory()
+        {
+            if ($scope.product && $scope.product.Id)
+            {
+                var data = {};
+                data.service = productService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.product.Id;
+                data.idObjectType = 3//product
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
+
         function successSaveHandler(result) {
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.product.Id = result.Data.Id;
                 refreshPossiableProductTypes();
+                refreshHistory();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -193,6 +207,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			                    $scope.product.Type = 2;//Perishable
 			                }
 			            }
+			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
 			            refreshPossiableProductTypes();

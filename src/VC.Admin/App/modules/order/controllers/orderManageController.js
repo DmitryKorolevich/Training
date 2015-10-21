@@ -201,13 +201,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             Paging: { PageIndex: 1, PageItemCount: 1 },
         };
 
-        $scope.historyFilter = {
-            IdObject: $scope.id,
-            IdObjectType: 2,//order,
-            IdBeforeObjectHistoryLogItem: null,
-            Paging: { PageIndex: 1, PageItemCount: 20 },
-        };
-
         $scope.legend = {};
 
         $scope.mainTab = {
@@ -333,24 +326,15 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     var refreshOrderHistory = function ()
     {
-        $scope.historyItems = null;
-        $scope.historyItemsCount = 0;
-        settingService.getObjectHistoryLogItems($scope.historyFilter, $scope.addEditTracker)
-            .success(function (result)
-            {
-                if (result.Success)
-                {
-                    $scope.historyItems = result.Data.Items;
-                    $scope.historyItemsCount = result.Data.Count;
-                } else
-                {
-                    errorHandler(result);
-                }
-            })
-            .error(function (result)
-            {
-                errorHandler(result);
-            });
+        if ($scope.id)
+        {
+            var data = {};
+            data.service = orderService;
+            data.tracker = $scope.addEditTracker;
+            data.idObject = $scope.id;
+            data.idObjectType = 2//order
+            $scope.$broadcast('objectHistorySection#in#refresh', data);
+        }
     };
 
     var loadReferencedData = function ()
@@ -1334,26 +1318,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
-    };
-
-    $scope.openHistoryReport = function (id)
-    {
-        $scope.historyFilter.IdBeforeObjectHistoryLogItem = id;
-        orderService.getHistoryReport($scope.historyFilter, $scope.addEditTracker)
-            .success(function (result)
-            {
-                if (result.Success)
-                {
-                    modalUtil.open('app/modules/setting/partials/objectLogReportPopup.html', 'objectLogReportController', result.Data, { size: 'lg' });
-                } else
-                {
-                    errorHandler(result);
-                }
-            })
-            .error(function (result)
-            {
-                errorHandler(result);
-            });
     };
 
     initialize();

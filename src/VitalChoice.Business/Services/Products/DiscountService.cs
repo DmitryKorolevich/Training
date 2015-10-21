@@ -152,7 +152,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         #region Discounts
 

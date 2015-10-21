@@ -4,11 +4,25 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 .controller('discountManageController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', '$modal', 'productService', 'discountService', 'toaster', 'confirmUtil', 'promiseTracker',
     function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, productService, discountService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
+        
+        function refreshHistory()
+        {
+            if ($scope.discount && $scope.discount.Id)
+            {
+                var data = {};
+                data.service = discountService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.discount.Id;
+                data.idObjectType = 4//discount
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
 
         function successSaveHandler(result) {
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.discount.Id = result.Data.Id;
+                refreshHistory();
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -132,6 +146,8 @@ angular.module('app.modules.product.controllers.discountManageController', [])
 			            {
 			                $scope.options.maxTimesUseMode = 2;
 			            }
+
+			            refreshHistory();
 
 			            setSelected($scope.rootCategory, $scope.discount.CategoryIds);
 			            setSelected($scope.rootAppliedCategory, $scope.discount.CategoryIdsAppliedOnlyTo);

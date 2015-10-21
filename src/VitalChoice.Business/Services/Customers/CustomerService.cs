@@ -413,7 +413,7 @@ namespace VitalChoice.Business.Services.Customers
 			return await UpdateAsync(model, uow, null);
 		}
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password)
 		{

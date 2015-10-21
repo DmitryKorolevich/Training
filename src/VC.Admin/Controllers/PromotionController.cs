@@ -19,6 +19,9 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.DynamicData.Entities;
 using System;
+using VitalChoice.Domain.Transfer.Settings;
+using Newtonsoft.Json;
+using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Admin.Controllers
 {
@@ -28,15 +31,22 @@ namespace VC.Admin.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IProductService _productService;
         private readonly IDynamicToModelMapper<PromotionDynamic> _mapper;
+        private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
-        public PromotionController(IPromotionService promotionService, IProductService productService, ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<PromotionDynamic> mapper)
+        public PromotionController(
+            IPromotionService promotionService, 
+            IProductService productService, 
+            ILoggerProviderExtended loggerProvider, 
+            IDynamicToModelMapper<PromotionDynamic> mapper,
+            IObjectHistoryLogService objectHistoryLogService)
         {
-            this._promotionService = promotionService;
-            this._productService = productService;
+            _promotionService = promotionService;
+            _productService = productService;
+            _objectHistoryLogService = objectHistoryLogService;
             _mapper = mapper;
-            this._logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLoggerDefault();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
@@ -113,5 +123,34 @@ namespace VC.Admin.Controllers
         }
 
         #endregion
+
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
+
+            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            {
+                var dynamic = (PromotionDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(PromotionDynamic));
+                var model = _mapper.ToModel<PromotionManageModel>(dynamic);
+                toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            {
+                var dynamic = (PromotionDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(PromotionDynamic));
+                var model = _mapper.ToModel<PromotionManageModel>(dynamic);
+                toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+
+            return toReturn;
+        }
     }
 }

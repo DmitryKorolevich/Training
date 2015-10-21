@@ -135,8 +135,8 @@ namespace VitalChoice.Business.Services.Products
             await promotionToSkuRepository.InsertRangeAsync(entity.PromotionsToGetSkus);
             await promotionToSelectedCategoryRepository.InsertRangeAsync(entity.PromotionsToSelectedCategories);
         }
-        
-        protected override bool LogObject { get { return false; } }
+
+        protected override bool LogObjectFullData { get { return true; } }
 
         #region Promotions
 

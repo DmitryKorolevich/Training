@@ -173,7 +173,7 @@ namespace VitalChoice.Business.Services.Products
             return new List<MessageInfo>();
         }
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
