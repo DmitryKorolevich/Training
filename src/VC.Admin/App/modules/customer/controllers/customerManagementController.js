@@ -4,7 +4,7 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 	.controller('customerManagementController', [
 		'$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', 'gridSorterUtil', function ($scope, customerService, toaster, promiseTracker, $rootScope, gridSorterUtil) {
 			$scope.refreshTracker = promiseTracker("refresh");
-			$scope.editTracker = promiseTracker("edit");
+			$scope.editTracker = promiseTracker("edit");           
 
 			function refreshCustomers() {
 				customerService.getCustomers($scope.filter, $scope.refreshTracker)

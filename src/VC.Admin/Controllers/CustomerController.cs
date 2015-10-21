@@ -40,6 +40,8 @@ using VitalChoice.Workflow.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Settings;
 using Microsoft.Framework.OptionsModel;
+using VitalChoice.Domain.Transfer.Settings;
+using Newtonsoft.Json;
 
 namespace VC.Admin.Controllers
 {
@@ -53,6 +55,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
         private readonly IStorefrontUserService _storefrontUserService;
+        private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
 
         private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
@@ -71,7 +74,8 @@ namespace VC.Admin.Controllers
             IEcommerceDynamicObjectService
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
             IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
-            IOptions<AppOptions> appOptions)
+            IOptions<AppOptions> appOptions,
+            IObjectHistoryLogService objectHistoryLogService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -83,6 +87,7 @@ namespace VC.Admin.Controllers
             _noteMapper = noteMapper;
             this.logger = loggerProvider.CreateLoggerDefault();
 	        _storefrontUserService = storefrontUserService;
+            _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appOptions.Value.DefaultCountry;
         }
 
@@ -116,7 +121,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
+        public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype([FromBody] object temp)
         {
             var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int?)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
@@ -134,7 +139,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public Result<CreditCardModel> CreateCreditCardPrototype()
+        public Result<CreditCardModel> CreateCreditCardPrototype([FromBody] object model)
         {
             return new CreditCardModel
             {
@@ -144,7 +149,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public Result<OacPaymentModel> CreateOacPrototype()
+        public Result<OacPaymentModel> CreateOacPrototype([FromBody] object model)
         {
             return new OacPaymentModel
             {
@@ -155,7 +160,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public Result<CheckPaymentModel> CreateCheckPrototype()
+        public Result<CheckPaymentModel> CreateCheckPrototype([FromBody] object model)
         {
             return new CheckPaymentModel
             {
@@ -164,13 +169,13 @@ namespace VC.Admin.Controllers
         }
             
         [HttpPost]
-        public Result<AddressModel> CreateAddressPrototype()
+        public Result<AddressModel> CreateAddressPrototype([FromBody] object model)
         {
             return new AddressModel() {AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry)};
         }
 
         [HttpPost]
-        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype()
+        public async Task<Result<CustomerNoteModel>> CreateCustomerNotePrototype([FromBody] object model)
         {
             var toReturn = new CustomerNoteModel()
             {
@@ -211,7 +216,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteNote(int idNote)
+        public async Task<Result<bool>> DeleteNote(int idNote, [FromBody] object model)
         {
             if (idNote > 0)
                 return await _notesService.DeleteAsync(idNote, true);
@@ -237,7 +242,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteAddress(int idAddress)
+        public async Task<Result<bool>> DeleteAddress(int idAddress, [FromBody] object model)
         {
             if (idAddress > 0)
                 return await _addressService.DeleteAsync(idAddress, true);
@@ -351,7 +356,7 @@ namespace VC.Admin.Controllers
 	    {
 		    var form = await Request.ReadFormAsync();
 
-			var publicId = form["data"];
+			var publicId = form["publicId"];
 			
 			var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
 
@@ -374,7 +379,7 @@ namespace VC.Admin.Controllers
 	    }
 
 		[HttpPost]
-		public async Task<Result<bool>> ResendActivation(Guid id)
+		public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
 		{
 			await _storefrontUserService.ResendActivationAsync(id);
 
@@ -382,7 +387,7 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<Result<bool>> ResetPassword(Guid id)
+		public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
 		{
 			await _storefrontUserService.SendResetPasswordAsync(id);
 
@@ -405,5 +410,34 @@ namespace VC.Admin.Controllers
 			return File(blob.File, blob.ContentType);
 		}
 #endif
+
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
+
+            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            {
+                var dynamic = (CustomerDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(CustomerDynamic));
+                var model = _customerMapper.ToModel<AddUpdateCustomerModel>(dynamic);
+                toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            {
+                var dynamic = (CustomerDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(CustomerDynamic));
+                var model = _customerMapper.ToModel<AddUpdateCustomerModel>(dynamic);
+                toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+
+            return toReturn;
+        }
     }
 }

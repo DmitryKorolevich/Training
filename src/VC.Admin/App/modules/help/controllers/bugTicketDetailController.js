@@ -283,16 +283,16 @@ function ($scope, $rootScope, $state, $stateParams, helpService, toaster, modalU
         {
             logRequest.name = files[0].FileName;
 
-            var data = '';
+            var data = {};
             if (comment)
             {                
-                data += 'public-id={0}&'.format(comment.PublicId);
-                data += 'bug-ticket-comment-id={0}&'.format(comment.Id);
+                data.publicId = comment.PublicId;
+                data.bugTicketCommentId =comment.Id;
             }
             else
             {
-                data += 'public-id={0}&'.format($scope.bugTicket.PublicId);
-                data += 'bug-ticket-id={0}&'.format($scope.bugTicket.Id);
+                data.publicId = $scope.bugTicket.PublicId;
+                data.bugTicketId = $scope.bugTicket.Id;
             }
             $scope.uploading = true;
             Upload.upload({

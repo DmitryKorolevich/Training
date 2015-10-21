@@ -8,6 +8,7 @@ using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using VitalChoice.Domain.Transfer;
 using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Business.Helpers
@@ -266,6 +267,17 @@ namespace VitalChoice.Business.Helpers
                     toReturn = "Category Discount";
                     break;
             }
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int?>> GetExpiredTypes()
+        {
+            IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
+            {
+                new LookupItem<int?>() {Key = (int?) null, Text="All" },
+                new LookupItem<int?>() {Key = (int?) ExpiredType.NotExpired, Text="NotExpired" },
+                new LookupItem<int?>() {Key = (int?) ExpiredType.Expired, Text="Expired" },
+            };
             return toReturn;
         }
     }

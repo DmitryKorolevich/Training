@@ -105,7 +105,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicket(int id)
+        public async Task<Result<bool>> DeleteHelpTicket(int id, [FromBody] object model)
         {
             return await _helpService.DeleteHelpTicketAsync(id);
         }
@@ -144,7 +144,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicketComment(int id)
+        public async Task<Result<bool>> DeleteHelpTicketComment(int id, [FromBody] object model)
         {
             return await _helpService.DeleteHelpTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
@@ -221,7 +221,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicket(int id)
+        public async Task<Result<bool>> DeleteBugTicket(int id, [FromBody] object model)
         {
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
@@ -265,7 +265,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicketComment(int id)
+        public async Task<Result<bool>> DeleteBugTicketComment(int id, [FromBody] object model)
         {
             return await _helpService.DeleteBugTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
@@ -279,34 +279,21 @@ namespace VC.Admin.Controllers
         {
             var form = await Request.ReadFormAsync();
 
-            var data = form["data"];
-
             int? bugTicketId = null;
-            int? butTicketCommentId = null;
+            int? bugTicketCommentId = null;
             string publicId=null;
             string description = String.Empty;
-            foreach (string pairs in data)
+            if (!StringValues.IsNullOrEmpty(form["bugTicketId"]))
             {
-                if (!String.IsNullOrEmpty(pairs))
-                {
-                    string[] values = pairs.Split('=');
-                    if (values[0] == "bug-ticket-id")
-                    {
-                        bugTicketId = Int32.Parse(values[1]);
-                    }
-                    if (values[0] == "bug-ticket-comment-id")
-                    {
-                        butTicketCommentId = Int32.Parse(values[1]);
-                    }
-                    if (values[0] == "public-id")
-                    {
-                        publicId = values[1];
-                    }
-                    if (values[0] == "description")
-                    {
-                        description = values[1];
-                    }
-                }
+                bugTicketId = Int32.Parse(form["bugTicketId"]);
+            }
+            if (!StringValues.IsNullOrEmpty(form["bugTicketCommentId"]))
+            {
+                bugTicketCommentId = Int32.Parse(form["bugTicketCommentId"]);
+            }
+            if (!StringValues.IsNullOrEmpty(form["bugTicketCommentId"]))
+            {
+                publicId = form["publicId"];
             }
 
             var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
@@ -320,12 +307,12 @@ namespace VC.Admin.Controllers
                     BugFile file = null;
                     var mode = bugTicketId.HasValue ? BugFileType.Ticket : BugFileType.Comment;
                     var fileName = await _helpService.UploadBugFileToStoreAsync(mode, fileContent, parsedContentDisposition.FileName.Replace("\"", ""), publicId, contentType);
-                    if(!String.IsNullOrEmpty(fileName) && ((bugTicketId.HasValue && bugTicketId!=0) || (butTicketCommentId.HasValue && butTicketCommentId!=0)))
+                    if(!String.IsNullOrEmpty(fileName) && ((bugTicketId.HasValue && bugTicketId!=0) || (bugTicketCommentId.HasValue && bugTicketCommentId != 0)))
                     {
                         file = new BugFile
                         {
                             IdBugTicket = bugTicketId,
-                            IdBugTicketComment = butTicketCommentId,
+                            IdBugTicketComment = bugTicketCommentId,
                             FileName = fileName,
                             Description = description
                         };

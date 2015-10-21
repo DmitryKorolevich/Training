@@ -11,6 +11,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
@@ -172,7 +173,7 @@ namespace VitalChoice.Business.Services.Products
             return new List<MessageInfo>();
         }
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
@@ -180,7 +181,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
             IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
@@ -192,7 +193,7 @@ namespace VitalChoice.Business.Services.Products
             ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

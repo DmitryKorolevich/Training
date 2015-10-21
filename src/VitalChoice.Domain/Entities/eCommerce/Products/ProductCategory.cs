@@ -13,7 +13,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public ProductCategory Parent { get; set; }
 
-        public IEnumerable<ProductCategory> SubCategories { get; set; }
+        public ICollection<ProductCategory> SubCategories { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
 

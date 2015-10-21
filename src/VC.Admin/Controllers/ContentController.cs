@@ -94,7 +94,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.ManageMasterTemplates)]
-        public async Task<Result<bool>> DeleteMasterContentItem(int id)
+        public async Task<Result<bool>> DeleteMasterContentItem(int id, [FromBody] object model)
         {
             return await masterContentService.DeleteMasterContentItemAsync(id);
         }
@@ -150,7 +150,7 @@ namespace VC.Admin.Controllers
         
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteCategory(int id)
+        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
         {
             return await categoryService.DeleteCategoryAsync(id);
         }
@@ -235,7 +235,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteRecipe(int id)
+        public async Task<Result<bool>> DeleteRecipe(int id, [FromBody] object model)
         {
             return await recipeService.DeleteRecipeAsync(id);
         }
@@ -296,7 +296,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteFAQ(int id)
+        public async Task<Result<bool>> DeleteFAQ(int id, [FromBody] object model)
         {
             return await faqService.DeleteFAQAsync(id);
         }
@@ -359,7 +359,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteArticle(int id)
+        public async Task<Result<bool>> DeleteArticle(int id, [FromBody] object model)
         {
             return await articleService.DeleteArticleAsync(id);
         }
@@ -422,7 +422,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Content)]
-        public async Task<Result<bool>> DeleteContentPage(int id)
+        public async Task<Result<bool>> DeleteContentPage(int id, [FromBody] object model)
         {
             return await contentPageService.DeleteContentPageAsync(id);
         }

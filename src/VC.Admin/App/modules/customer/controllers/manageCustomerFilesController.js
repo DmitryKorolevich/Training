@@ -37,7 +37,7 @@
                 $scope.uploading = true;
                 Upload.upload({
                     url: '/api/customer/UploadCustomerFile',
-                    data: $scope.publicId,
+                    data: { publicId: $scope.publicId },
                     file: $scope.uploadFile
                 }).progress(function (evt)
                 {

@@ -149,6 +149,7 @@
 		"app/modules/setting/controllers/orderNotesManagementController.js",
 		"app/modules/setting/controllers/addEditOrderNoteController.js",
 		"app/modules/setting/controllers/objectLogReportController.js",
+		"app/modules/setting/controllers/objectHistorySectionController.js",
 		"app/modules/setting/setting.js",
 		"app/modules/product/controllers/productCategoriesController.js",
 		"app/modules/product/controllers/productCategoryManageController.js",

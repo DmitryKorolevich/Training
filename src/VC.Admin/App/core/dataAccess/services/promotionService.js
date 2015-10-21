@@ -27,5 +27,9 @@ angular.module('app.core.dataAccess.services.promotionService', [])
 	    deletePromotion: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeletePromotion/' + id, null, getConfig(tracker));
 	    },
+	    getHistoryReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

@@ -9,6 +9,19 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
 
+			function refreshHistory()
+			{
+			    if ($scope.currentCustomer && $scope.currentCustomer.Id)
+			    {
+			        var data = {};
+			        data.service = customerService;
+			        data.tracker = $scope.addEditTracker;
+			        data.idObject = $scope.currentCustomer.Id;
+			        data.idObjectType = 6//customer
+			        $scope.$broadcast('objectHistorySection#in#refresh', data);
+			    }
+			}
+
 			function initialize() {
 				$scope.editMode = $stateParams.id != null;
 
@@ -68,6 +81,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										$scope.customerNotesTab.CustomerNote = $scope.currentCustomer.CustomerNotes[0];
 										$scope.paymentInfoTab.Address = {};
 
+										refreshHistory();
 										initCustomerFiles();
 										initCustomerNotes();
 										initOrdersList();
@@ -115,7 +129,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 										customerEditService.syncDefaultPaymentMethod($scope);
 										customerEditService.showHighPriNotes($scope);
-
+                                        
+										refreshHistory();
 										initCustomerFiles();
 										initCustomerNotes();
 										initOrdersList();
@@ -203,10 +218,11 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    {
 			        if (!$scope.currentCustomer.Id)
 			        {
-			            $state.go('index.oneCol.orderAdd', { idcustomer : result.Data.Id});
+			            $state.go('index.oneCol.orderAdd', { idcustomer: result.Data.Id });
 			        }
 			        $scope.currentCustomer.Id = result.Data.Id;
 			        $scope.options.DBStatusCode = result.Data.StatusCode;
+			        refreshHistory();
 					toaster.pop('success', "Success!", "Successfully saved");
 				} else {
 					var messages = "";

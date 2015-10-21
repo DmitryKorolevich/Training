@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.eCommerce.Base;
@@ -27,14 +28,14 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
-        protected readonly IReadRepositoryAsync<ObjectHistoryLogItem> ObjectHistoryLogItemRepository;
+        protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
         protected readonly ILogger Logger;
 
         protected ReadDynamicObjectServiceAsync(
             IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository,
-            IReadRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             ILogger logger)
         {
             Mapper = mapper;
@@ -42,7 +43,7 @@ namespace VitalChoice.DynamicData.Base
             OptionTypesRepository = optionTypesRepository;
             BigStringRepository = bigStringRepository;
             OptionValuesRepository = optionValuesRepository;
-            ObjectHistoryLogItemRepository = objectHistoryLogItemRepository;
+            ObjectLogItemExternalService = objectLogItemExternalService;
             Logger = logger;
         }
 

@@ -24,6 +24,9 @@ using System.Security.Claims;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Domain.Transfer.Settings;
+using VitalChoice.Interfaces.Services.Settings;
+using Newtonsoft.Json;
 
 namespace VC.Admin.Controllers
 {
@@ -36,18 +39,21 @@ namespace VC.Admin.Controllers
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
         private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
+        private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
             IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
             IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper)
+            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper,
+            IObjectHistoryLogService objectHistoryLogService)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
             this.productService = productService;
             this.productUniversalService = productUniversalService;
             this.productReviewService = productReviewService;
+            this.objectHistoryLogService = objectHistoryLogService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
@@ -237,7 +243,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteProduct(int id)
+        public async Task<Result<bool>> DeleteProduct(int id, [FromBody] object model)
         {
             return await productService.DeleteAsync(id);
         }
@@ -292,7 +298,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteCategory(int id)
+        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
         }
@@ -348,7 +354,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteInventoryCategory(int id)
+        public async Task<Result<bool>> DeleteInventoryCategory(int id, [FromBody] object model)
         {
             return await inventoryCategoryService.DeleteCategoryAsync(id);
         }
@@ -411,7 +417,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteProductReview(int id)
+        public async Task<Result<bool>> DeleteProductReview(int id, [FromBody] object model)
         {
             return await productReviewService.DeleteProductReviewAsync(id);
         }
@@ -421,7 +427,7 @@ namespace VC.Admin.Controllers
         #region ProductOutOfStockRequests
 
         [HttpPost]
-        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers([FromBody] object model)
         {
             var toReturn = await productService.GetProductOutOfStockContainers();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();
@@ -434,5 +440,34 @@ namespace VC.Admin.Controllers
         }
 
         #endregion
+
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await objectHistoryLogService.GetObjectHistoryReport(filter);
+
+            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            {
+                var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(ProductDynamic));
+                var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            {
+                var dynamic = (ProductDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(ProductDynamic));
+                var model = _mapper.ToModel<ProductManageModel>(dynamic);
+                toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+
+            return toReturn;
+        }
     }
 }

@@ -26,5 +26,9 @@ angular.module('app.core.dataAccess.services.discountService', [])
 	    deleteDiscount: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteDiscount/' + id, null, getConfig(tracker));
 	    },
+	    getHistoryReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

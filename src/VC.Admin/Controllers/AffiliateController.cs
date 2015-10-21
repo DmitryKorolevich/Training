@@ -162,7 +162,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteAffiliate(int id)
+        public async Task<Result<bool>> DeleteAffiliate(int id, [FromBody] object model)
         {
             return await _affiliateService.DeleteAsync(id);
         }

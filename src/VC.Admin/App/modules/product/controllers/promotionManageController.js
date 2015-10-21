@@ -6,12 +6,26 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
     {
         $scope.refreshTracker = promiseTracker("get");
 
+        function refreshHistory()
+        {
+            if ($scope.promotion && $scope.promotion.Id)
+            {
+                var data = {};
+                data.service = promotionService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.promotion.Id;
+                data.idObjectType = 5//discount
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
+
         function successSaveHandler(result)
         {
             if (result.Success)
             {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.promotion.Id = result.Data.Id;
+                refreshHistory();
             } else
             {
                 var messages = "";
@@ -145,6 +159,8 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
 			            {
 			                $scope.options.maxTimesUseMode = 2;
 			            }
+
+			            refreshHistory();
 
 			            setSelected($scope.rootCategory, $scope.promotion.SelectedCategoryIds);
 			            addProductsListWatchers();

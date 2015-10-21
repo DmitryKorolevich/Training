@@ -37,12 +37,12 @@
                         $scope.ordersTotalItems = result.Data.Count;
                     } else
                     {
-                        errorHandler(result);
+                        toaster.pop('error', 'Error!', "Can't process order history");
                     }
                 })
                 .error(function (result)
                 {
-                    errorHandler(result);
+                    toaster.pop('error', 'Error!', "Can't process order history");
                 });
         };
 

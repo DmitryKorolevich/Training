@@ -50,7 +50,7 @@ namespace VC.Public
                 {
                     SourceCodeLineCount = 25
                 });
-                app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+                //app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
             }
             else
             {

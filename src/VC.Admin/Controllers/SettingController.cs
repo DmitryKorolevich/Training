@@ -58,7 +58,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries()
+        public async Task<Result<IEnumerable<CountryListItemModel>>> GetCountries([FromBody] object model)
         {
             var result = await countryService.GetCountriesAsync();
 
@@ -92,7 +92,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<bool>> DeleteCountry(int id)
+        public async Task<Result<bool>> DeleteCountry(int id, [FromBody] object model)
         {
             return await countryService.DeleteCountryAsync(id);
         }
@@ -111,7 +111,7 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<bool>> DeleteState(int id)
+        public async Task<Result<bool>> DeleteState(int id, [FromBody] object model)
         {
             return await countryService.DeleteStateAsync(id);
         }

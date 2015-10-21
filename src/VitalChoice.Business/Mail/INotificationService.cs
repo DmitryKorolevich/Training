@@ -17,11 +17,11 @@ namespace VitalChoice.Business.Mail
 
         Task<bool> SendBasicEmailAsync(BasicEmail email);
 
-        Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicket helpTicket);
+        Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail);
 
-        Task SendNewBugTicketAddingForSuperAdminAsync(BugTicket bugTicket);
+        Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail);
 
-        Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicket bugTicket);
+        Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicketEmail bugTicketEmail);
 
 	    Task SendCustomerRegistrationSuccess(string email, SuccessfulCustomerRegistration registration);
     }

@@ -65,40 +65,40 @@ namespace VitalChoice.Business.Mail
             return true;
         }
 
-        public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicket helpTicket)
+        public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail)
         {
             //todo:refactor this to user nustache or something
 
             var body =
-                $"<p>Dear {helpTicket.Customer},</p><p>Details regarding your help desk ticket that you submitted regarding order #{helpTicket.IdOrder} has been updated. Please click here to review or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
+                $"<p>Dear {helpTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted regarding order #{helpTicketEmail.IdOrder} has been updated. Please click here to review or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
                 $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
                 $"<p>Sincerely,</p>" +
                 $"<p>Vital Choice</p>";
 
-            var subject = $"Your Vital Choice Help Desk #{helpTicket.Id} Has Been Updated";
+            var subject = $"Your Vital Choice Help Desk #{helpTicketEmail.Id} Has Been Updated";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
 
-        public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicket bugTicket)
+        public async Task SendNewBugTicketAddingForSuperAdminAsync(BugTicketEmail bugTicketEmail)
         {
             var body =
-                $"<p>New bug ticket was added - {_adminHost}help/bugs/{bugTicket.Id}</p>";
+                $"<p>New bug ticket was added - {_adminHost}help/bugs/{bugTicketEmail.Id}</p>";
 
-            var subject = $"Vital Choice - new bug ticket was added #{bugTicket.Id}";
+            var subject = $"Vital Choice - new bug ticket was added #{bugTicketEmail.Id}";
 
             await emailSender.SendEmailAsync(_mainSuperAdminEmail, subject, body);
         }
 
-        public async Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicket bugTicket)
+        public async Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicketEmail bugTicketEmail)
         {
             var body =
-                $"<p>Dear {bugTicket.AddedBy},</p><p>Details regarding your help desk ticket that you submitted has been updated. Please click here to review or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
+                $"<p>Dear {bugTicketEmail.Customer},</p><p>Details regarding your help desk ticket that you submitted has been updated. Please click here to review or log into your Vital Choice customer profile to review your help desk tickets.</p><br/>" +
                 $"<p>Please note that this is an automated message and this mailbox is not monitored. To make changes to your help desk tickets please submit a reply within the help desk ticket system found within your customer profile.</p><br/>" +
                 $"<p>Sincerely,</p>" +
                 $"<p>Vital Choice</p>";
 
-            var subject = $"Your Vital Choice Help Desk #{bugTicket.Id} Has Been Updated";
+            var subject = $"Your Vital Choice Help Desk #{bugTicketEmail.Id} Has Been Updated";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }

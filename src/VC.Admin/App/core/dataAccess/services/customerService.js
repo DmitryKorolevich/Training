@@ -54,6 +54,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		},
 		resetPassword: function (publicId, tracker) {
 			return $http.post(baseUrl + 'ResetPassword/' + publicId, null, getConfig(tracker));
-		}
+		},
+		getHistoryReport: function (filter, tracker)
+		{
+		    return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
+		},
 	};
 }]);

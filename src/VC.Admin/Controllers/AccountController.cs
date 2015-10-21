@@ -137,7 +137,7 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<bool> Logout()
+		public async Task<bool> Logout([FromBody] object model)
 		{
 			var context = contextAccessor.HttpContext;
 

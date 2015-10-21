@@ -1,4 +1,5 @@
-﻿@model VC.Public.Models.Profile.ChangeProfileModel
+﻿@using VC.Public.Helpers
+@model VC.Public.Models.Profile.ChangeProfileModel
 
 @section Meta {
 	<title>Vital Choice | Update Profile</title>
@@ -16,19 +17,35 @@
 	<div class="right-pane">
 	@using (Html.BeginForm("ChangeProfile", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
 	{
-		@Html.HiddenFor(x=>x.IdCountry, new { @id = "hdCountry" } )
-		@Html.HiddenFor(x=>x.IdState, new { @id = "hdState" } )
+		<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
+		<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
+		@Html.HiddenFor(x=>x.CurrentEmail)
 		@Html.AntiForgeryToken()
 		<h4>Update Profile</h4>
+		<div class="sub-title"><span>Update Email</span></div>
 		@Html.ValidationSummary(true, "")
-		<div class="form-two-column">
-			<div class="form-group">
-				@Html.LabelFor(m => m.Email, new {@class = "control-label"})
-				<div class="input-group">
-					@Html.TextBoxFor(m => m.Email, new {@class = "form-control"})
-					@Html.ValidationMessageFor(m => m.Email)
-				</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.CurrentEmail, new { @class = "control-label" })
+			<div class="input-group">
+				<label class="form-control-static">@Html.DisplayForEx(m => m.CurrentEmail)</label>
 			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.NewEmail, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.NewEmail, new {@class = "form-control"})
+				@Html.ValidationMessageFor(m => m.NewEmail)
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.ConfirmEmail, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.ConfirmEmail, new {@class = "form-control"})
+				@Html.ValidationMessageFor(m => m.ConfirmEmail)
+			</div>
+		</div>
+		<div class="sub-title"><span>Profile Details</span></div>
+		<div class="form-two-column">
 			<div class="form-group">
 				@Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
 				<div class="input-group">
@@ -51,6 +68,13 @@
 				</div>
 			</div>
 			<div class="form-group">
+				@Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
+				<div class="input-group">
+					@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+					@Html.ValidationMessageFor(m => m.IdCountry)
+				</div>
+			</div>
+			<div class="form-group">
 				@Html.LabelFor(m => m.Address1, new { @class = "control-label" })
 				<div class="input-group">
 					@Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
@@ -66,13 +90,6 @@
 			</div>
 		</div>
 		<div class="form-two-column">
-			<div class="form-group">
-				@Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
-				<div class="input-group">
-					@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
-					@Html.ValidationMessageFor(m => m.IdCountry)
-				</div>
-			</div>
 			<div class="form-group">
 				@Html.LabelFor(m => m.City, new {@class = "control-label"})
 				<div class="input-group">

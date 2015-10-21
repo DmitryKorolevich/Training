@@ -11,6 +11,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Avatax;
 using VitalChoice.Domain.Constants;
@@ -62,7 +63,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<Order> orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
@@ -71,7 +72,7 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Product> productsRepository)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectHistoryLogItemRepository, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;

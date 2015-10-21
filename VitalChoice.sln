@@ -91,11 +91,11 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Core", "src
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Relational", "src\ThirdParty\EntityFramework.Relational\EntityFramework.Relational.xproj", "{AD2D13EB-AA07-45FB-B946-1F61CCC0D9F7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.Server.Kestrel", "src\ThirdParty\Microsoft.AspNet.Server.Kestrel\Microsoft.AspNet.Server.Kestrel.xproj", "{F510611A-3BEE-4B88-A613-5F4A74ED82A1}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.SharedWeb", "src\VitalChoice.SharedWeb\VitalChoice.SharedWeb.xproj", "{C59FD1F8-6950-433C-8208-E7935F9BD02E}"
+EndProjectProject("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.Server.Kestrel", "src\ThirdParty\Microsoft.AspNet.Server.Kestrel\Microsoft.AspNet.Server.Kestrel.xproj", "{F510611A-3BEE-4B88-A613-5F4A74ED82A1}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.StandardsPolice", "src\ThirdParty\Microsoft.StandardsPolice\Microsoft.StandardsPolice.xproj", "{82295647-7C1C-4671-BAB6-0FEF58F949EC}"
-EndProject
-Global
+EndProjectGlobal
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -263,7 +263,14 @@ Global
 		{AD2D13EB-AA07-45FB-B946-1F61CCC0D9F7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD2D13EB-AA07-45FB-B946-1F61CCC0D9F7}.Release|x64.ActiveCfg = Release|Any CPU
 		{AD2D13EB-AA07-45FB-B946-1F61CCC0D9F7}.Release|x64.Build.0 = Release|Any CPU
-		{F510611A-3BEE-4B88-A613-5F4A74ED82A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Debug|x64.Build.0 = Debug|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Release|x64.ActiveCfg = Release|Any CPU
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E}.Release|x64.Build.0 = Release|Any CPU	{F510611A-3BEE-4B88-A613-5F4A74ED82A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F510611A-3BEE-4B88-A613-5F4A74ED82A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F510611A-3BEE-4B88-A613-5F4A74ED82A1}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{F510611A-3BEE-4B88-A613-5F4A74ED82A1}.Debug|x64.Build.0 = Debug|Any CPU
@@ -278,8 +285,7 @@ Global
 		{82295647-7C1C-4671-BAB6-0FEF58F949EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82295647-7C1C-4671-BAB6-0FEF58F949EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{82295647-7C1C-4671-BAB6-0FEF58F949EC}.Release|x64.ActiveCfg = Release|Any CPU
-		{82295647-7C1C-4671-BAB6-0FEF58F949EC}.Release|x64.Build.0 = Release|Any CPU
-	EndGlobalSection
+		{82295647-7C1C-4671-BAB6-0FEF58F949EC}.Release|x64.Build.0 = Release|Any CPU	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
@@ -306,7 +312,6 @@ Global
 		{AF977E74-364C-495E-A841-2C415A76EBAE} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
 		{CE8F7D9C-FAC7-4BA9-868F-47A8BA3C381B} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
 		{AD2D13EB-AA07-45FB-B946-1F61CCC0D9F7} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
-		{F510611A-3BEE-4B88-A613-5F4A74ED82A1} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
-		{82295647-7C1C-4671-BAB6-0FEF58F949EC} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
-	EndGlobalSection
+		{C59FD1F8-6950-433C-8208-E7935F9BD02E} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}		{F510611A-3BEE-4B88-A613-5F4A74ED82A1} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
+		{82295647-7C1C-4671-BAB6-0FEF58F949EC} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}	EndGlobalSection
 EndGlobal

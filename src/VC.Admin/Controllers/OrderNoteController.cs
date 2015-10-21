@@ -44,7 +44,7 @@ namespace VC.Admin.Controllers
 		}
 
 		[HttpPost]
-		public Result<ManageOrderNoteModel> CreateOrderNotePrototype()
+		public Result<ManageOrderNoteModel> CreateOrderNotePrototype([FromBody] object model)
 		{
 			return new ManageOrderNoteModel();
 		}

@@ -10,7 +10,8 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.paymentMethodsController',
 	'app.modules.setting.controllers.orderNotesManagementController',
 	'app.modules.setting.controllers.addEditOrderNoteController',
-	'app.modules.setting.controllers.objectLogReportController'
+	'app.modules.setting.controllers.objectLogReportController',
+	'app.modules.setting.controllers.objectHistorySectionController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

@@ -38,6 +38,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -60,7 +61,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
+            IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<CustomerOptionValue> customerOptionValueRepositoryAsync,
@@ -71,7 +72,7 @@ namespace VitalChoice.Business.Services.Customers
             ILoggerProviderExtended loggerProvider)
             : base(
                 customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectHistoryLogItemRepository, loggerProvider)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -246,11 +247,8 @@ namespace VitalChoice.Business.Services.Customers
 
 			if (customerSameEmail.Any())
 			{
-				errors.AddRange(
-					model.CreateError()
-						.Property(p => p.Email)
-						.Error("Customer email should be unique in the database")
-						.Build());
+				throw new AppValidationException(
+					string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
             }
 
 			if (
@@ -415,7 +413,7 @@ namespace VitalChoice.Business.Services.Customers
 			return await UpdateAsync(model, uow, null);
 		}
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public async Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password)
 		{
