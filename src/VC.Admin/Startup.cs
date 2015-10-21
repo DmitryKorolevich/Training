@@ -59,7 +59,7 @@ namespace VC.Admin
                 {
                     SourceCodeLineCount = 150
                 });
-				app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+				//app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
 			}
 			else
 			{
