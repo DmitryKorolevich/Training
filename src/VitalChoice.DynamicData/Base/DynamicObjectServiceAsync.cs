@@ -223,7 +223,7 @@ namespace VitalChoice.DynamicData.Base
                     List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
                     foreach (var model in models)
                     {
-                        Mapper.RemoveSeñurityInformation(model);
+                        Mapper.RemoveSecurityInformation(model);
                         ObjectHistoryLogItem item = new ObjectHistoryLogItem
                         {
                             IdObject = model.Id,

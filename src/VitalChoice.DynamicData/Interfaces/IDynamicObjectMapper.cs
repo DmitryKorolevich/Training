@@ -94,6 +94,6 @@ namespace VitalChoice.DynamicData.Interfaces
         Task<ICollection<DynamicEntityPair<TDynamic, TEntity>>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items);
         Task<List<TDynamic>> FromEntityRangeAsync(ICollection<TEntity> items, bool withDefaults = false);
 
-        void RemoveSeсurityInformation(MappedObject dynamic);
+        void RemoveSecurityInformation(MappedObject dynamic);
     }
 }
