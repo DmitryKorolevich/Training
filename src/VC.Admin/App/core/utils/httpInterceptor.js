@@ -6,7 +6,7 @@ angular
 				'$q', 'toaster', '$rootScope', 'dataStateRemediator', function ($q, toaster, $rootScope, dataStateRemediator) {
 					return {
 						'request': function (config) {
-							config.headers['Build-Number'] = $rootScope.buildNumber;
+						    config.headers['Build-Number'] = $rootScope.buildNumber;
 							return config;
 						},
 						'response': function (response) {

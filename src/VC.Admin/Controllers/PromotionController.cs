@@ -117,7 +117,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeletePromotion(int id)
+        public async Task<Result<bool>> DeletePromotion(int id, [FromBody] object model)
         {
             return await _promotionService.DeleteAsync(id);
         }

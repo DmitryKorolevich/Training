@@ -299,6 +299,7 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.Name
                 }).ToList();
+            referenceData.ExpiredTypes = LookupHelper.GetExpiredTypes();
 
             return referenceData;
             

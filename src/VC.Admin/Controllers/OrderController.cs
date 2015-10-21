@@ -80,7 +80,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> UpdateOrderStatus(int id, int status)
+        public async Task<Result<bool>> UpdateOrderStatus(int id, int status, [FromBody] object model)
         {
             var order = await _orderService.SelectAsync(id,false);
 
@@ -95,7 +95,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> MoveOrder(int id, int idcustomer)
+        public async Task<Result<bool>> MoveOrder(int id, int idcustomer, [FromBody] object model)
         {
             var order = await _orderService.SelectAsync(id, false);
             var customer = await _customerService.SelectAsync(idcustomer, false);

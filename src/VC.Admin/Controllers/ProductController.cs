@@ -243,7 +243,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteProduct(int id)
+        public async Task<Result<bool>> DeleteProduct(int id, [FromBody] object model)
         {
             return await productService.DeleteAsync(id);
         }
@@ -298,7 +298,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteCategory(int id)
+        public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
         }
@@ -354,7 +354,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteInventoryCategory(int id)
+        public async Task<Result<bool>> DeleteInventoryCategory(int id, [FromBody] object model)
         {
             return await inventoryCategoryService.DeleteCategoryAsync(id);
         }
@@ -417,7 +417,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteProductReview(int id)
+        public async Task<Result<bool>> DeleteProductReview(int id, [FromBody] object model)
         {
             return await productReviewService.DeleteProductReviewAsync(id);
         }
@@ -427,7 +427,7 @@ namespace VC.Admin.Controllers
         #region ProductOutOfStockRequests
 
         [HttpPost]
-        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers()
+        public async Task<Result<ICollection<ProductOutOfStockContainerListItemModel>>> GetProductOutOfStockContainers([FromBody] object model)
         {
             var toReturn = await productService.GetProductOutOfStockContainers();
             return toReturn.Select(p => new ProductOutOfStockContainerListItemModel(p)).ToList();

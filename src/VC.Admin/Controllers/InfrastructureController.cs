@@ -78,6 +78,7 @@ namespace VC.Admin.Controllers
                     TicketStatuses = referenceData.TicketStatuses,
                     Priorities = referenceData.Priorities,
                     PromotionTypes = referenceData.PromotionTypes,
+                    ExpiredTypes = referenceData.ExpiredTypes,
                 };
 	        }
 			else

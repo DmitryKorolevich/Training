@@ -105,7 +105,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicket(int id)
+        public async Task<Result<bool>> DeleteHelpTicket(int id, [FromBody] object model)
         {
             return await _helpService.DeleteHelpTicketAsync(id);
         }
@@ -144,7 +144,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteHelpTicketComment(int id)
+        public async Task<Result<bool>> DeleteHelpTicketComment(int id, [FromBody] object model)
         {
             return await _helpService.DeleteHelpTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
         }
@@ -221,7 +221,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicket(int id)
+        public async Task<Result<bool>> DeleteBugTicket(int id, [FromBody] object model)
         {
             var superAdmin = _appInfrastructureService.Get().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
@@ -265,7 +265,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteBugTicketComment(int id)
+        public async Task<Result<bool>> DeleteBugTicketComment(int id, [FromBody] object model)
         {
             return await _helpService.DeleteBugTicketCommentAsync(id, Int32.Parse(Request.HttpContext.User.GetUserId()));
         }

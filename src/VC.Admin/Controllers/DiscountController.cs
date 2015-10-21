@@ -118,7 +118,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> DeleteDiscount(int id)
+        public async Task<Result<bool>> DeleteDiscount(int id, [FromBody] object model)
         {
             return await _discountService.DeleteAsync(id);
         }
