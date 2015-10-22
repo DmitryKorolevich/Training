@@ -25,8 +25,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.History
 
         public ObjectHistoryLogDataItem DataItem { get; set; }
 
-        public object LogObject { get; set; }
-
         public string OptionalData { get; set; }
     }
 }

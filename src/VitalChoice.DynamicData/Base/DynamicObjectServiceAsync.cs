@@ -231,23 +231,11 @@ namespace VitalChoice.DynamicData.Base
             {
                 if (LogObject)
                 {
-                    List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
                     foreach (var model in models)
                     {
                         Mapper.RemoveSecurityInformation(model);
-                        ObjectHistoryLogItem item = new ObjectHistoryLogItem
-                        {
-                            IdObject = model.Id,
-                            IdObjectType = this.IdObjectType,
-                            IdObjectStatus = model.StatusCode,
-                            DateCreated = DateTime.Now,
-                            IdEditedBy = model.IdEditedBy
-                        };
-                        LogItemInfoSetAfter(item, model);
-                        item.LogObject = model;
-                        items.Add(item);
                     }
-                    await ObjectLogItemExternalService.LogItems(items, LogObjectFullData);
+                    await ObjectLogItemExternalService.LogItems(models.Select(p=>(object)p).ToList(), LogObjectFullData);
                 }
             }
             catch (Exception e)
@@ -287,7 +275,6 @@ namespace VitalChoice.DynamicData.Base
             {
                 mappedListItem.Dynamic.Id = mappedListItem.Entity.Id;
             }
-            await LogItemChanges(models);
 
             return toInsertList;
         }
@@ -305,7 +292,6 @@ namespace VitalChoice.DynamicData.Base
             await uow.SaveChangesAsync(CancellationToken.None);
 
             model.Id = entity.Id;
-            await LogItemChanges(new TDynamic[1] { model });
 
             return entity;
         }

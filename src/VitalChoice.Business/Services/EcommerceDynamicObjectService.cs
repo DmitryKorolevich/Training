@@ -33,22 +33,6 @@ namespace VitalChoice.Business.Services
         {
         }
 
-        private ObjectType? _idObjectType;
-
-        public override int IdObjectType
-        {
-            get
-            {
-                if (!_idObjectType.HasValue)
-                {
-                    ObjectType result;
-                    Enum.TryParse(typeof(TEntity).Name, out result);
-                    _idObjectType = result;
-                }
-                return (int) _idObjectType.Value;
-            }
-        }
-
         protected override sealed IUnitOfWorkAsync CreateUnitOfWork()
         {
             return new EcommerceUnitOfWork();

@@ -48,9 +48,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         #region Extension Points
-
-        public abstract int IdObjectType { get; }
-
+        
         protected virtual Task AfterSelect(List<TEntity> entity)
         {
             return Task.Delay(0);

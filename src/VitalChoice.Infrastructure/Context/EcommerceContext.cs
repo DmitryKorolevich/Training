@@ -1150,7 +1150,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("ObjectHistoryLogItems");
                 entity.Ignore(p => p.Id);
                 entity.Ignore(p => p.EditedBy);
-                entity.Ignore(p => p.LogObject);
                 entity.HasOne(p => p.DataItem)
                     .WithMany()
                     .ForeignKey(p => p.IdObjectHistoryLogDataItem)

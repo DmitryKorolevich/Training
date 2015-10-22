@@ -11,6 +11,6 @@ namespace VitalChoice.Data.Services
 {
     public interface IObjectLogItemExternalService
     {
-        Task LogItems(List<ObjectHistoryLogItem> items, bool logFullObjects);
+        Task LogItems(ICollection<object> models, bool logFullObjects);
     }
 }

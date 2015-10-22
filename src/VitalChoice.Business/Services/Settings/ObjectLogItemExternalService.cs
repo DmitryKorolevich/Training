@@ -21,6 +21,11 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Data.Services;
 using Newtonsoft.Json;
+using VitalChoice.Domain.Entities.eCommerce;
+using System.Reflection;
+using VitalChoice.Domain;
+using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Entities;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -37,22 +42,80 @@ namespace VitalChoice.Business.Services.Settings
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task LogItems(List<ObjectHistoryLogItem> items, bool logFullObjects)
+        public async Task LogItems(ICollection<object> models, bool logFullObjects)
         {
-            if (logFullObjects)
+            if (models != null && models.Count > 0)
             {
-                foreach (var item in items)
+                var type = models.First().GetType();
+                var isDynamic = type.GetTypeInfo().IsSubclassOf(typeof(MappedObject));
+                var isEntity = type.GetTypeInfo().IsSubclassOf(typeof(Entity));
+                var objectType = GetObjectType(type.Name, isDynamic, isEntity);
+
+                List<ObjectHistoryLogItem> items = new List<ObjectHistoryLogItem>();
+                foreach (var model in models)
                 {
-                    item.DataItem = new ObjectHistoryLogDataItem();
-                    var settings = new JsonSerializerSettings()
+                    ObjectHistoryLogItem item = new ObjectHistoryLogItem();
+                    item.IdObjectType = (int)objectType;
+                    item.DateCreated = DateTime.Now;
+                    if (isDynamic)
                     {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                    };
-                    item.DataItem.Data = JsonConvert.SerializeObject(item.LogObject, settings);
+                        TransformForDynamic(item, (MappedObject)model, objectType);
+                    }
+                    if (isEntity)
+                    {
+                        TransformForEntity(item, (Entity)model, objectType);
+                    }
+                    if (logFullObjects)
+                    {
+                        item.DataItem = new ObjectHistoryLogDataItem();
+                        var settings = new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                            NullValueHandling = NullValueHandling.Ignore,
+                        };
+                        item.DataItem.Data = JsonConvert.SerializeObject(model, settings);
+                    }
+                    items.Add(item);
+                }
+                await _objectHistoryLogItemRepository.InsertGraphRangeAsync(items);
+            }
+        }
+
+        private ObjectHistoryLogItem TransformForDynamic(ObjectHistoryLogItem item, MappedObject model, ObjectType objectType)
+        {
+            item.IdObject = model.Id;
+            item.IdObjectStatus = model.StatusCode;
+            item.IdEditedBy = model.IdEditedBy;
+            if(objectType == ObjectType.Order)
+            {
+                item.IdObjectStatus = (int)((OrderDynamic)model).OrderStatus;
+            }
+            return item;
+        }
+
+        private ObjectHistoryLogItem TransformForEntity(ObjectHistoryLogItem item, Entity model, ObjectType objectType)
+        {
+            item.IdObject = model.Id;
+            //TODO - add needed fields to general implementiotn of Entity
+            return item;
+        }
+
+        private ObjectType GetObjectType(string name, bool isDynamic, bool isEntity)
+        {
+            ObjectType result = ObjectType.Unknown;
+            if (isDynamic || isEntity)
+            {
+                if (isDynamic)
+                {
+                    name = name.Replace("Dynamic", "");
+                }
+                Enum.TryParse<ObjectType>(name, out result);
+                if (result == default(ObjectType))
+                {
+                    result = ObjectType.Unknown;
                 }
             }
-            await _objectHistoryLogItemRepository.InsertGraphRangeAsync(items);
+            return result;
         }
     }
 }
