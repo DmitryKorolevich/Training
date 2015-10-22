@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypesRepository;
-        private readonly IEcommerceRepositoryAsync<Product> _productsRepository;
+        private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory, ICountryService countryService,
             IAvalaraTax avataxService,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Product> productsRepository)
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
@@ -82,7 +82,7 @@ namespace VitalChoice.Business.Services.Orders
             _treeFactory = treeFactory;
             _countryService = countryService;
             _avataxService = avataxService;
-            _productsRepository = productsRepository;
+            _skusRepository = skusRepository;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -110,10 +110,13 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(p => p.OptionValues);
         }
 
-        protected override async Task AfterSelect(Order entity)
+        //TODO: lambda caching
+        protected override async Task AfterSelect(List<Order> entities)
         {
             var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
-            foreach (var orderToSku in entity.Skus.Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
+            foreach (
+                var orderToSku in
+                    entities.SelectMany(o => o.Skus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
             {
                 var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
                     .WithObjectType(orderToSku.Sku.Product.IdObjectType)
@@ -122,36 +125,30 @@ namespace VitalChoice.Business.Services.Orders
                 orderToSku.Sku.OptionTypes = optionTypes;
                 orderToSku.Sku.Product.OptionTypes = optionTypes;
             }
-            foreach (var orderToSku in entity.Skus.Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null))
+            var invalidSkuOrdered =
+                entities.SelectMany(o => o.Skus)
+                    .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                    .ToList();
+            var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+            var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                .Include(p => p.Product)
+                .ThenInclude(s => s.OptionValues)
+                .Include(p => p.OptionValues)
+                .SelectAsync(false)).ToDictionary(s => s.Id);
+            foreach (var orderToSku in invalidSkuOrdered)
             {
-                var product = await _productsRepository.Query(p => p.Skus.Any(s => s.Id == orderToSku.IdSku))
-                    .Include(p => p.Skus)
-                    .ThenInclude(s => s.OptionValues)
-                    .Include(p => p.OptionValues)
-                    .SelectFirstOrDefaultAsync(false);
-                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                    .WithObjectType(product.IdObjectType)
-                    .Query()
-                    .Compile()).ToList();
-                orderToSku.Sku = product.Skus.Single(s => s.Id == orderToSku.IdSku);
-                product.Skus = null;
-                orderToSku.Sku.Product = product;
-                orderToSku.Sku.OptionTypes = optionTypes;
-                orderToSku.Sku.Product.OptionTypes = optionTypes;
-            }
-        }
-
-        protected override async Task AfterSelect(List<Order> entity)
-        {
-            var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
-            foreach (var orderToSku in entity.SelectMany(e => e.Skus))
-            {
-                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                    .WithObjectType(orderToSku.Sku.Product.IdObjectType)
-                    .Query()
-                    .Compile()).ToList();
-                orderToSku.Sku.OptionTypes = optionTypes;
-                orderToSku.Sku.Product.OptionTypes = optionTypes;
+                Sku sku;
+                if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                {
+                    var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
+                        .WithObjectType(sku.Product.IdObjectType)
+                        .Query()
+                        .Compile()).ToList();
+                    orderToSku.Sku = sku;
+                    orderToSku.Sku.Product = sku.Product;
+                    orderToSku.Sku.OptionTypes = optionTypes;
+                    orderToSku.Sku.Product.OptionTypes = optionTypes;
+                }
             }
         }
 
@@ -160,7 +157,7 @@ namespace VitalChoice.Business.Services.Orders
             log.IdObjectStatus = (int)model.OrderStatus;
         }
 
-        protected override bool LogObjectFullData { get { return true; } }
+        protected override bool LogObjectFullData => true;
 
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
         {

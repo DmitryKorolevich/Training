@@ -35,17 +35,17 @@ namespace VitalChoice.Business.Services
 
         private ObjectType? _idObjectType;
 
-        public override ObjectType IdObjectType
+        public override int IdObjectType
         {
             get
             {
                 if (!_idObjectType.HasValue)
                 {
-                    var result = ObjectType.Unknown;
-                    Enum.TryParse<ObjectType>(typeof(TEntity).Name, out result);
+                    ObjectType result;
+                    Enum.TryParse(typeof(TEntity).Name, out result);
                     _idObjectType = result;
                 }
-                return _idObjectType.Value;
+                return (int) _idObjectType.Value;
             }
         }
 

@@ -89,7 +89,9 @@ namespace VitalChoice.DynamicData.Base
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await InsertAsync(model, uow);
-                return await SelectAsync(entity.Id);
+                entity = await SelectEntityAsync(entity.Id);
+                await LogItemChanges(new[] {await Mapper.FromEntityAsync(entity)});
+                return await Mapper.FromEntityAsync(entity);
             }
         }
 
@@ -99,8 +101,8 @@ namespace VitalChoice.DynamicData.Base
             {
                 var entity = await UpdateAsync(model, uow);
 
-                await LogItemChanges(new TDynamic[1] { Mapper.FromEntity(entity) });
-                return Mapper.FromEntity(entity);
+                await LogItemChanges(new [] {await Mapper.FromEntityAsync(entity)});
+                return await Mapper.FromEntityAsync(entity);
             }
         }
 
@@ -108,8 +110,10 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
-                var entities = (await InsertRangeAsync(models, uow)).Select(e => e.Id).ToList();
-                return await SelectAsync(entities);
+                var entityIds = (await InsertRangeAsync(models, uow)).Select(e => e.Id).ToList();
+                var entities = await SelectEntityListAsync(entityIds);
+                await LogItemChanges(await Mapper.FromEntityRangeAsync(entities));
+                return await Mapper.FromEntityRangeAsync(entities);
             }
         }
 
@@ -119,8 +123,8 @@ namespace VitalChoice.DynamicData.Base
             {
                 var entities = await UpdateRangeAsync(models, uow);
 
-                await LogItemChanges(Mapper.FromEntityRange(entities));
-                return Mapper.FromEntityRange(entities);
+                await LogItemChanges(await Mapper.FromEntityRangeAsync(entities));
+                return await Mapper.FromEntityRangeAsync(entities);
             }
         }
 
@@ -360,7 +364,7 @@ namespace VitalChoice.DynamicData.Base
                     }, bigValueRepository, valueRepository);
             await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-            await AfterSelect(entity);
+            await AfterSelect(new List<TEntity> {entity});
 
             return entity;
         }

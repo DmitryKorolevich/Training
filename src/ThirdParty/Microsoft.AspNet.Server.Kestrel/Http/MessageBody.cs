@@ -98,6 +98,13 @@ namespace Microsoft.AspNet.Server.Kestrel.Http
             return true;
         }
 
+        protected abstract void Dispose(bool disposing);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         class ForRemainingData : MessageBody
         {
@@ -388,14 +395,6 @@ namespace Microsoft.AspNet.Server.Kestrel.Http
                 ChunkSuffix,
                 Complete,
             };
-        }
-
-        protected abstract void Dispose(bool disposing);
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

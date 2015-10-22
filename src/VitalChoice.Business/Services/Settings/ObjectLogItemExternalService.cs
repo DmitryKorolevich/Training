@@ -27,14 +27,14 @@ namespace VitalChoice.Business.Services.Settings
     public class ObjectLogItemExternalService : IObjectLogItemExternalService
     {
         private readonly IEcommerceRepositoryAsync<ObjectHistoryLogItem> _objectHistoryLogItemRepository;
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
         public ObjectLogItemExternalService(
             IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository,
             ILoggerProviderExtended loggerProvider)
         {
             _objectHistoryLogItemRepository = objectHistoryLogItemRepository;
-            logger = loggerProvider.CreateLoggerDefault();
+            _logger = loggerProvider.CreateLoggerDefault();
         }
 
         public async Task LogItems(List<ObjectHistoryLogItem> items, bool logFullObjects)

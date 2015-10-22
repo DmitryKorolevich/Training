@@ -38,7 +38,7 @@ namespace VitalChoice.Domain.Transfer.Settings
                 Id = item.IdObjectHistoryLogItem;
                 IdObject = item.IdObject;
                 IdObjectStatus = item.IdObjectStatus;
-                IdObjectType = item.IdObjectType;
+                IdObjectType = (ObjectType)item.IdObjectType;
                 DateCreated = item.DateCreated;
                 IdEditedBy = item.IdEditedBy;
                 EditedBy = item.EditedBy;

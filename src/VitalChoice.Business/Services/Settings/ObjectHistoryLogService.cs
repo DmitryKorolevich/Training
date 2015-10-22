@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Settings
                 filter.Paging.PageItemCount = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT;
             }
             Func<IQueryable<ObjectHistoryLogItem>, IOrderedQueryable<ObjectHistoryLogItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-            var toReturn = await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == filter.IdObjectType && p.IdObject == filter.IdObject).
+            var toReturn = await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == (int)filter.IdObjectType && p.IdObject == filter.IdObject).
                 OrderBy(sortable).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
 
@@ -74,7 +74,7 @@ namespace VitalChoice.Business.Services.Settings
             var ids = new List<int>();
             Func<IQueryable<ObjectHistoryLogItem>, IOrderedQueryable<ObjectHistoryLogItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             toReturn.Main =new ObjectHistoryLogListItemModel(
-                (await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == filter.IdObjectType && p.IdObject == filter.IdObject).
+                (await _objectHistoryLogItemRepository.Query(p => p.IdObjectType == (int)filter.IdObjectType && p.IdObject == filter.IdObject).
                 Include(p=>p.DataItem).
                 OrderBy(sortable).
                 SelectPageAsync(1, 1)).Items.FirstOrDefault());

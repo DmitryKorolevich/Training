@@ -49,12 +49,7 @@ namespace VitalChoice.DynamicData.Base
 
         #region Extension Points
 
-        public abstract ObjectType IdObjectType { get;}
-
-        protected virtual Task AfterSelect(TEntity entity)
-        {
-            return Task.Delay(0);
-        }
+        public abstract int IdObjectType { get; }
 
         protected virtual Task AfterSelect(List<TEntity> entity)
         {
@@ -64,26 +59,6 @@ namespace VitalChoice.DynamicData.Base
         protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
         {
             return query;
-        }
-
-        protected virtual async Task<TDynamic> SelectItemAsync(
-            Func<IQueryFluent<TEntity>, IQueryFluent<TEntity>> queryBuilder, Expression<Func<TEntity, bool>> condition, bool withDefaults)
-        {
-            if (queryBuilder == null)
-                throw new ArgumentNullException(nameof(queryBuilder));
-
-            var res = CreateQuery(queryBuilder, condition);
-            return await SelectItemInternal(res, withDefaults);
-        }
-
-        protected virtual async Task<List<TDynamic>> SelectListAsync(
-            Func<IQueryFluent<TEntity>, IQueryFluent<TEntity>> queryBuilder, Expression<Func<TEntity, bool>> condition, bool withDefaults)
-        {
-            if (queryBuilder == null)
-                throw new ArgumentNullException(nameof(queryBuilder));
-
-            var res = CreateQuery(queryBuilder, condition);
-            return await SelectListInternal(res, withDefaults);
         }
 
         #endregion
@@ -103,40 +78,32 @@ namespace VitalChoice.DynamicData.Base
 
         public async Task<TDynamic> SelectAsync(int id, bool withDefaults)
         {
-            return
-                await SelectItemAsync(BuildQuery, p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults);
+            return await Mapper.FromEntityAsync(await SelectEntityAsync(id), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults)
         {
-            return
-                await
-                    SelectListAsync(BuildQuery, p => ids.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted,
-                        withDefaults);
+            return await Mapper.FromEntityRangeAsync(await SelectEntityListAsync(ids), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(bool withDefaults)
         {
-            return
-                await
-                    SelectListAsync(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted, withDefaults);
+            var res = CreateQuery(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted);
+            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults)
         {
             if (queryObject == null)
                 throw new ArgumentNullException(nameof(queryObject));
-
-            return
-                await
-                    SelectListAsync(BuildQuery, queryObject.Query(), withDefaults);
+            var res = CreateQuery(BuildQuery, queryObject.Query());
+            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults)
         {
-            return
-                await
-                    SelectListAsync(BuildQuery, query, withDefaults);
+            var res = CreateQuery(BuildQuery, query);
+            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values, bool withDefaults)
@@ -148,10 +115,8 @@ namespace VitalChoice.DynamicData.Base
                 (await
                     OptionValuesRepository.Query(valuesSelector)
                         .SelectAsync(Mapper.ObjectIdSelector)).Distinct().ToList();
-            return
-                await
-                    SelectListAsync(BuildQuery,
-                        p => p.StatusCode != (int)RecordStatusCode.Deleted && optionValues.Contains(p.Id), withDefaults);
+            var res = CreateQuery(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted && optionValues.Contains(p.Id));
+            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
         }
 
         public async Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values,
@@ -166,11 +131,48 @@ namespace VitalChoice.DynamicData.Base
                     OptionValuesRepository.Query(valuesSelector)
                         .SelectAsync(Mapper.ObjectIdSelector))
                     .Distinct().ToList();
-            return
-                await
-                    SelectListAsync(BuildQuery,
-                        query.And(p => p.StatusCode != (int)RecordStatusCode.Deleted).And(p => optionValues.Contains(p.Id)),
-                        withDefaults);
+            var res = CreateQuery(BuildQuery,
+                query.And(p => p.StatusCode != (int) RecordStatusCode.Deleted).And(p => optionValues.Contains(p.Id)));
+            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+        }
+
+        protected virtual async Task<List<TEntity>> SelectListAsync(IQueryFluent<TEntity> query)
+        {
+            var entities = await query.SelectAsync(false);
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+            foreach (var entity in entities)
+            {
+                entity.OptionTypes = optionTypes.Where(GetOptionTypeQuery(entity).Query().Compile()).ToList();
+            }
+            await SetBigValuesAsync(entities);
+            await AfterSelect(entities);
+            return entities;
+        }
+
+        protected virtual async Task<TEntity> SelectItemAsync(IQueryFluent<TEntity> query)
+        {
+            var entity = (await query.SelectAsync(false)).FirstOrDefault();
+
+            if (entity != null)
+            {
+                await SetBigValuesAsync(entity);
+                entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
+                await AfterSelect(new List<TEntity> {entity});
+                return entity;
+            }
+            return null;
+        }
+
+        protected async Task<TEntity> SelectEntityAsync(int id)
+        {
+            var res = CreateQuery(BuildQuery, p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted);
+            return await SelectItemAsync(res);
+        }
+
+        protected async Task<List<TEntity>> SelectEntityListAsync(ICollection<int> ids)
+        {
+            var res = CreateQuery(BuildQuery, p => ids.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted);
+            return await SelectListAsync(res);
         }
 
         public TDynamic CreatePrototype(int? idObjectType = null)
@@ -273,33 +275,6 @@ namespace VitalChoice.DynamicData.Base
             IQueryFluent<TEntity> res = ObjectRepository.Query(condition).Include(p => p.OptionValues);
             res = queryBuilder(res);
             return res;
-        }
-
-        private async Task<List<TDynamic>> SelectListInternal(IQueryFluent<TEntity> res, bool withDefaults)
-        {
-            var entities = await res.SelectAsync(false);
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            foreach (var entity in entities)
-            {
-                entity.OptionTypes = optionTypes.Where(GetOptionTypeQuery(entity).Query().Compile()).ToList();
-            }
-            await SetBigValuesAsync(entities);
-            await AfterSelect(entities);
-            return Mapper.FromEntityRange(entities, withDefaults);
-        }
-
-        private async Task<TDynamic> SelectItemInternal(IQueryFluent<TEntity> res, bool withDefaults)
-        {
-            var entity = (await res.SelectAsync(false)).FirstOrDefault();
-
-            if (entity != null)
-            {
-                await SetBigValuesAsync(entity);
-                entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
-                await AfterSelect(entity);
-                return Mapper.FromEntity(entity, withDefaults);
-            }
-            return null;
         }
 
         private static Expression<Func<TOptionValue, bool>> CreateValuesSelector(

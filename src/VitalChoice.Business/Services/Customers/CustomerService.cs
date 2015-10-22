@@ -222,7 +222,7 @@ namespace VitalChoice.Business.Services.Customers
 
                     return customer;
                 }
-                catch (Exception ex)
+                catch
                 {
                     if (appUser.Id > 0)
                     {

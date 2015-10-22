@@ -9,7 +9,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.History
     {
         public long IdObjectHistoryLogItem { get; set; }
 
-        public ObjectType IdObjectType { get; set; }
+        public int IdObjectType { get; set; }
 
         public int IdObject { get; set; }
 

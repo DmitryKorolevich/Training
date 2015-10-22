@@ -16,7 +16,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 
         public ShortSkuInfo(Sku sku)
         {
-            if(sku!=null && sku.Product!=null)
+            if(sku?.Product != null)
             {
                 Id = sku.Id;
                 IdProduct = sku.IdProduct;

@@ -51,16 +51,19 @@ namespace VitalChoice.Business.Services.Products
         private readonly ISettingService _settingService;
         private readonly INotificationService _notificationService;
 
-        protected override async Task AfterSelect(Product entity)
+        protected override async Task AfterSelect(List<Product> entities)
         {
-            entity.Skus =
-                await
-                    _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
-                        .Include(p => p.OptionValues)
-                        .OrderBy(skus => skus.OrderBy(s => s.Order))
-                        .SelectAsync(false);
-            entity.ProductsToCategories =
-                await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+            foreach (var entity in entities)
+            {
+                entity.Skus =
+                    await
+                        _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
+                            .Include(p => p.OptionValues)
+                            .OrderBy(skus => skus.OrderBy(s => s.Order))
+                            .SelectAsync(false);
+                entity.ProductsToCategories =
+                    await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+            }
         }
 
         protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)

@@ -75,39 +75,43 @@ namespace VitalChoice.Business.Services.Products
                         .Include(p => p.PromotionsToSelectedCategories);
         }
 
-        protected override async Task AfterSelect(Promotion entity)
+        protected override async Task AfterSelect(List<Promotion> entities)
         {
-            var skuIds = new HashSet<int>(entity.PromotionsToBuySkus.Select(p => p.IdSku));
-            foreach (var id in entity.PromotionsToGetSkus.Select(p => p.IdSku))
+            foreach (var entity in entities)
             {
-                skuIds.Add(id);
-            }
-            if (skuIds.Count > 0)
-            {
-                var shortSkus =
-                    (await
-                        _skuRepository.Query(p => skuIds.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted)
-                            .Include(p => p.Product)
-                            .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
-                foreach (var sku in entity.PromotionsToBuySkus)
+                var skuIds = new HashSet<int>(entity.PromotionsToBuySkus.Select(p => p.IdSku));
+                foreach (var id in entity.PromotionsToGetSkus.Select(p => p.IdSku))
                 {
-                    foreach (var shortSku in shortSkus)
+                    skuIds.Add(id);
+                }
+                if (skuIds.Count > 0)
+                {
+                    var shortSkus =
+                        (await
+                            _skuRepository.Query(
+                                p => skuIds.Contains(p.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
+                                .Include(p => p.Product)
+                                .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToList();
+                    foreach (var sku in entity.PromotionsToBuySkus)
                     {
-                        if (sku.IdSku == shortSku.Id)
+                        foreach (var shortSku in shortSkus)
                         {
-                            sku.ShortSkuInfo = shortSku;
-                            break;
+                            if (sku.IdSku == shortSku.Id)
+                            {
+                                sku.ShortSkuInfo = shortSku;
+                                break;
+                            }
                         }
                     }
-                }
-                foreach (var sku in entity.PromotionsToGetSkus)
-                {
-                    foreach (var shortSku in shortSkus)
+                    foreach (var sku in entity.PromotionsToGetSkus)
                     {
-                        if (sku.IdSku == shortSku.Id)
+                        foreach (var shortSku in shortSkus)
                         {
-                            sku.ShortSkuInfo = shortSku;
-                            break;
+                            if (sku.IdSku == shortSku.Id)
+                            {
+                                sku.ShortSkuInfo = shortSku;
+                                break;
+                            }
                         }
                     }
                 }
