@@ -193,9 +193,9 @@ namespace Microsoft.AspNet.Server.Kestrel.Http
                                 FireOnCompleted();
                                 ProduceEnd(error);
                             }
-
-                            terminated = !_keepAlive;
                         }
+
+                        terminated = !_keepAlive;
                     }
 
                     Reset();
