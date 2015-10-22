@@ -206,9 +206,9 @@ namespace Microsoft.AspNet.Server.Kestrel.Infrastructure
             var block = _block;
             var index = _index;
             var remaining = length;
-            var following = block.End - index;
             while (true)
             {
+                var following = block.End - index;
                 if (remaining <= following)
                 {
                     return new MemoryPoolIterator2(block, index + remaining);

@@ -180,12 +180,13 @@ namespace Microsoft.AspNet.Server.Kestrel.Http
 
             protected override void Dispose(bool disposing)
             {
-                if (_inputLength > 0)
+                if (disposing && _inputLength > 0)
                 {
                     var input = _context.SocketInput;
                     var begin = input.ConsumingStart();
                     var end = begin.Skip(_inputLength);
                     input.ConsumingComplete(end, end);
+                    _inputLength = 0;
                 }
             }
         }
@@ -280,12 +281,13 @@ namespace Microsoft.AspNet.Server.Kestrel.Http
 
             protected override void Dispose(bool disposing)
             {
-                if (_inputLength > 0)
+                if (disposing && _inputLength > 0)
                 {
                     var input = _context.SocketInput;
                     var begin = input.ConsumingStart();
                     var end = begin.Skip(_inputLength);
                     input.ConsumingComplete(end, end);
+                    _inputLength = 0;
                 }
             }
 
