@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Logs;
+using VitalChoice.Domain.Transfer;
 
 namespace VitalChoice.Business.Queries.Product
 {
@@ -71,6 +72,23 @@ namespace VitalChoice.Business.Queries.Product
             {
                 var to = validTo;
                 Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
+            }
+            return this;
+        }
+
+        public DiscountQuery WithExpiredType(ExpiredType? expiredType)
+        {
+            if (expiredType.HasValue)
+            {
+                DateTime date = DateTime.Now.AddDays(-1);//Discount is valid the entire end date
+                if (expiredType.Value==ExpiredType.Expired)
+                {
+                    Add(x => x.ExpirationDate<= date);
+                }
+                if (expiredType.Value == ExpiredType.NotExpired)
+                {
+                    Add(x => x.ExpirationDate > date);
+                }
             }
             return this;
         }

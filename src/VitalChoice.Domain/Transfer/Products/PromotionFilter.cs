@@ -11,5 +11,7 @@ namespace VitalChoice.Domain.Transfer.Products
         public DateTime? ValidFrom { get; set; }
 
         public DateTime? ValidTo { get; set; }
+
+        public ExpiredType? ExpiredType { get; set; }
     }
 }

@@ -37,11 +37,7 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    },
 	    deleteAffiliate: function (id, tracker)
 	    {
-	        return $http.post(baseUrl + 'DeleteAffiliate/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteAffiliate/' + id, null, getConfig(tracker));
 	    },
-	    //deleteAffiliate: function (id, tracker)
-	    //{
-	    //    return $http.post(baseUrl + 'DeleteAffiliate', { Id: id }, getConfig(tracker));
-	    //},
 	};
 }]);

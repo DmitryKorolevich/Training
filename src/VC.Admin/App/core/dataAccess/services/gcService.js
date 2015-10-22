@@ -20,7 +20,7 @@ angular.module('app.core.dataAccess.services.gcService', [])
             return $http.get(baseUrl + 'GetGiftCertificate/' + id, getConfig(tracker));
         },
         getGiftCertificatesAdding: function (tracker) {
-            return $http.post(baseUrl + 'GetGiftCertificatesAdding', getConfig(tracker));
+            return $http.post(baseUrl + 'GetGiftCertificatesAdding', null, getConfig(tracker));
         },
         addGiftCertificates: function (quantity, model, tracker) {
             return $http.post(baseUrl + 'AddGiftCertificates/?quantity=' + quantity, model, getConfig(tracker));
@@ -32,7 +32,7 @@ angular.module('app.core.dataAccess.services.gcService', [])
             return $http.post(baseUrl + 'SendGiftCertificateEmail', model, getConfig(tracker));
         },
         deleteGiftCertificate: function (id, tracker) {
-            return $http.post(baseUrl + 'DeleteGiftCertificate/' + id, getConfig(tracker));
+            return $http.post(baseUrl + 'DeleteGiftCertificate/' + id, null, getConfig(tracker));
         },
     };
 }]);

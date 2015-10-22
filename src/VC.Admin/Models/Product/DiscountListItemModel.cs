@@ -33,6 +33,8 @@ namespace VC.Admin.Models.Product
 
         public string AddedByAgentId { get; set; }
 
+        public bool Expired { get; set; }
+
         public DiscountListItemModel(DiscountDynamic item)
         {
             if(item!=null)
@@ -52,6 +54,10 @@ namespace VC.Admin.Models.Product
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
                 }
                 ExpirationDate = ExpirationDate;
+                if(DateTime.Now.AddDays(-1)>=ExpirationDate)
+                {
+                    Expired = true;
+                }
             }
         }
     }
