@@ -143,7 +143,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<PagedList<PromotionDynamic>> GetPromotionsAsync(PromotionFilter filter)
         {
             var conditions = new PromotionQuery().NotDeleted().WithValidFrom(filter.ValidFrom).WithValidTo(filter.ValidTo).
-                WithDescription(filter.SearchText).WithStatus(filter.Status);
+                WithExpiredType(filter.ExpiredType).WithDescription(filter.SearchText).WithStatus(filter.Status);
             var query = _promotionRepository.Query(conditions);
 
             Func<IQueryable<Promotion>, IOrderedQueryable<Promotion>> sortable = x => x.OrderByDescending(y => y.DateCreated);

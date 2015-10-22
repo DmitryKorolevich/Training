@@ -27,7 +27,7 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return $http.post(baseUrl + 'UpdateCategory', model, getConfig(tracker));
 	    },
 	    deleteCategory: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteCategory/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteCategory/' + id, null, getConfig(tracker));
 	    },
 
 	    //inventoryCategories
@@ -44,7 +44,7 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return $http.post(baseUrl + 'UpdateInventoryCategory', model, getConfig(tracker));
 	    },
 	    deleteInventoryCategory: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteInventoryCategory/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteInventoryCategory/' + id, null, getConfig(tracker));
 	    },
 
 	    //products  
@@ -74,7 +74,7 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return $http.post(baseUrl + 'UpdateProductTaxCodes', model, getConfig(tracker));
 	    },
 	    deleteProduct: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteProduct/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteProduct/' + id, null, getConfig(tracker));
 	    },
 	    getHistoryReport: function (filter, tracker)
 	    {
@@ -95,7 +95,7 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return $http.post(baseUrl + 'UpdateProductReview', model, getConfig(tracker));
 	    },
 	    deleteProductReview: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteProductReview/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteProductReview/' + id, null, getConfig(tracker));
 	    },
 
 	    //product out of stock requests

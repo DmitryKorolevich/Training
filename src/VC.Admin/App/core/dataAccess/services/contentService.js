@@ -27,7 +27,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 	        return $http.post(baseUrl + 'UpdateCategory', model, getConfig(tracker));
 	    },
 	    deleteCategory: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteCategory/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteCategory/' + id, null, getConfig(tracker));
 	    },
 
 	    //master templates
@@ -41,7 +41,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 	        return $http.post(baseUrl + 'UpdateMasterContentItem', model, getConfig(tracker));
 	    },
 	    deleteMasterContentItem: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteMasterContentItem/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteMasterContentItem/' + id, null, getConfig(tracker));
 	    },
 
         //recipes
@@ -58,7 +58,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 			return $http.post(baseUrl + 'DeleteRecipe/'+ id, getConfig(tracker));
 		},
 		getRecipeSettings: function(tracker) {
-			return $http.get(baseUrl + 'GetRecipeSettings', getConfig(tracker));
+		    return $http.get(baseUrl + 'GetRecipeSettings', null, getConfig(tracker));
 		},
 
 	    //faq
@@ -72,7 +72,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		    return $http.post(baseUrl + 'UpdateFAQ', model, getConfig(tracker));
 		},
 		deleteFAQ: function (id, tracker) {
-		    return $http.post(baseUrl + 'DeleteFAQ/' + id, getConfig(tracker));
+		    return $http.post(baseUrl + 'DeleteFAQ/' + id, null, getConfig(tracker));
 		},
 
 	    //articles
@@ -86,7 +86,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		    return $http.post(baseUrl + 'UpdateArticle', model, getConfig(tracker));
 		},
 		deleteArticle: function (id, tracker) {
-		    return $http.post(baseUrl + 'DeleteArticle/' + id, getConfig(tracker));
+		    return $http.post(baseUrl + 'DeleteArticle/' + id, null, getConfig(tracker));
 		},
 
 	    //recipes
@@ -100,7 +100,7 @@ angular.module('app.core.dataAccess.services.contentService', [])
 		    return $http.post(baseUrl + 'UpdateContentPage', model, getConfig(tracker));
 		},
 		deleteContentPage: function (id, tracker) {
-		    return $http.post(baseUrl + 'DeleteContentPage/'+ id, getConfig(tracker));
+		    return $http.post(baseUrl + 'DeleteContentPage/' + id, null, getConfig(tracker));
 		},
 	};
 }]);

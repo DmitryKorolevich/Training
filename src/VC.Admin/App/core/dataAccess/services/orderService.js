@@ -36,11 +36,11 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    },
 	    updateOrderStatus: function (id, status, tracker)
 	    {
-	        return $http.post(baseUrl + 'UpdateOrderStatus/' + id + '?status=' + status, {}, getConfig(tracker));
+	        return $http.post(baseUrl + 'UpdateOrderStatus/' + id + '?status=' + status, null, getConfig(tracker));
 	    },
 	    moveOrder: function (id, idCustomer, tracker)
 	    {
-	        return $http.post(baseUrl + 'MoveOrder/' + id + '?idcustomer=' + idCustomer, {}, getConfig(tracker));
+	        return $http.post(baseUrl + 'MoveOrder/' + id + '?idcustomer=' + idCustomer, null, getConfig(tracker));
 	    },
 	    getHistoryReport: function (filter, tracker)
 	    {

@@ -35,13 +35,13 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	        return $http.post(baseUrl + 'UpdateCountry', model, getConfig(tracker));
 	    },
 	    deleteCountry: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteCountry/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteCountry/' + id, null, getConfig(tracker));
 	    },        
 	    updateState: function (model, tracker) {
 	        return $http.post(baseUrl + 'UpdateState', model, getConfig(tracker));
 	    },
 	    deleteState: function (id, tracker) {
-	        return $http.post(baseUrl + 'DeleteState/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'DeleteState/' + id, null, getConfig(tracker));
 	    },
 
 	    //settings

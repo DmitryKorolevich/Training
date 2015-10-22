@@ -275,7 +275,7 @@ namespace VitalChoice.Business.Helpers
             IList<LookupItem<int?>> toReturn = new List<LookupItem<int?>>
             {
                 new LookupItem<int?>() {Key = (int?) null, Text="All" },
-                new LookupItem<int?>() {Key = (int?) ExpiredType.NotExpired, Text="NotExpired" },
+                new LookupItem<int?>() {Key = (int?) ExpiredType.NotExpired, Text="Not Expired" },
                 new LookupItem<int?>() {Key = (int?) ExpiredType.Expired, Text="Expired" },
             };
             return toReturn;
