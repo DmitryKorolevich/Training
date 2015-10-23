@@ -3,6 +3,7 @@
 
   "files": [
     "lib/jquery/jquery.js",
+    "assets/scripts/vendor/jquery-ui/jquery-ui.min.js",
     "assets/scripts/vendor/jquery.validate.js",
     "assets/scripts/vendor/additional-methods.js",
     "assets/scripts/vendor/jquery.validate.unobtrusive.js",

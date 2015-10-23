@@ -14,15 +14,18 @@ $(function () {
 		//todo: handle result
 	});
 
-	creditCards = $.parseJSON(creditCardsJson);
-	if (creditCards && creditCards.length > 0) {
-		$.each(creditCards, function (creditCardIndex, creditCard) {
-			$("#ddCreditCardsSelection").append($('<option></option>').val(creditCard.Id).html(creditCard.CardNumber));
-		});
+	creditCards = [];
+	if (creditCardsJson != "") {
+		creditCards = $.parseJSON(creditCardsJson);
+	} else {
+		$("#delSelected").hide();
 	}
+	populateCreditCardsSelection(creditCards);
 
 	$("body").on("change", "#ddCreditCardsSelection", function() {
 		changeSelection($("#ddCreditCardsSelection").val());
+
+		$("#delSelected").show();
 	});
 
 	$("body").on("click", "#addNew", function() {
@@ -47,19 +50,53 @@ $(function () {
 			Fax: ""
 		}
 
+		$("#ddCreditCardsSelection").val("");
+
+		$("#delSelected").hide();
+
 		setChangedData(newItem);
 	});
 
 	$("body").on("click", "#delSelected", function() {
 		var idToRemove = $("#ddCreditCardsSelection").val();
 
-		deleteCreditCard(idToRemove, function (result) {
-			$("ddCreditCardsSelection option[value=" + idToRemove + "]").remove();
-		}, function (errorResult) {
-			//todo: handle result
+		confirmAction(function() {
+			deleteCreditCard(idToRemove, function (result, creditCards) {
+				if (result.Success) {
+					var creditCards = $.grep(creditCards, function (item) {
+						return item.Id != idToRemove;
+					});
+
+					populateCreditCardsSelection(creditCards);
+
+					if (!creditCards || creditCards.length < 1) {
+						$("#addNew").trigger("click");
+					}
+
+					notifySuccess();
+				} else {
+					notifyError(result.Messages[0].Message);
+				}
+			}, function(errorResult) {
+				//todo: handle result
+			});
 		});
 	});
 });
+
+function populateCreditCardsSelection(creditCards) {
+	$("#ddCreditCardsSelection").html("");
+
+	if (creditCards && creditCards.length > 0) {
+		$.each(creditCards, function (creditCardIndex, creditCard) {
+			$("#ddCreditCardsSelection").append($('<option></option>').val(creditCard.Id).html(creditCard.CardNumber));
+		});
+	}
+
+	if ($("#hdCreditCard").val() == 0) {
+		$("#ddCreditCardsSelection").val("");
+	}
+}
 
 function changeSelection(id) {
 	var selectedCreditCard = $.grep(creditCards, function(item) {
@@ -67,6 +104,8 @@ function changeSelection(id) {
 	})[0];
 
 	setChangedData(selectedCreditCard);
+
+	$("#ddCountry").trigger("change");
 }
 
 function setChangedData(selectedCreditCard) {
@@ -97,4 +136,20 @@ function setChangedData(selectedCreditCard) {
 	$("form").removeData("validator");
 	$("form").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse("form");
+}
+
+function deleteCreditCard(idCreditCard, successCallback, errorCallback) {
+	$.ajax({
+		type: "POST",
+		url: "/Profile/DeleteBillingInfo/" + idCreditCard,
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result, creditCards);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result, creditCards);
+		}
+	});
 }

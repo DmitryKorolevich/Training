@@ -884,9 +884,16 @@ footer {
   min-height: 325px;
   border-right: 1px solid #DD4E02;
 }
+.working-area-holder .left-pane.clean-border {
+  border-right: none;
+}
 .working-area-holder .right-pane {
   margin: 0 0 0 216px;
   padding: 0 0px 0 15px;
+}
+.working-area-holder .right-pane.clean-indent {
+  padding: 0 0px 0 0px;
+  margin: 0 0 0 215px;
 }
 .working-area-holder hr {
   margin: 20px 0 10px 0;
@@ -955,11 +962,18 @@ footer {
 .working-area-holder input[type=submit].inline-button,
 .working-area-holder input[type=button].inline-button {
   vertical-align: top;
+  margin-right: 0px;
 }
 .form-group {
   margin-bottom: 15px;
   float: left;
   clear: left;
+  width: 100%;
+}
+.form-regular.border-form-left {
+  float: left;
+  border-left: 1px solid #DD4E02;
+  padding-left: 15px;
   width: 100%;
 }
 .form-regular.medium .control-label {

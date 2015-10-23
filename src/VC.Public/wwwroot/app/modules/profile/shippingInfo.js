@@ -1,15 +1,40 @@
 ﻿var shippingAddresses = null;
 
 $(function () {
-	shippingAddresses = $.parseJSON(shippingAddressesJson);
-	if (shippingAddresses && shippingAddresses.length > 0) {
-		$.each(shippingAddresses, function (shippingAddressIndex, shippingAddress) {
-			$("#ddShippingAddressesSelection").append($('<option></option>').val(shippingAddress.Id).html(shippingAddress.FirstName + " " + shippingAddress.LastName + " " + shippingAddress.Address1 + " " + (shippingAddress.Default ? "(Default)" : "")));
-		});
+	shippingAddresses = [];
+	if (shippingAddressesJson != "") {
+		shippingAddresses = $.parseJSON(shippingAddressesJson);
 	}
+	populateAddressesSelection(shippingAddresses);
+
+	syncDefaultBtnState();
 
 	$("body").on("change", "#ddShippingAddressesSelection", function () {
 		changeSelection($("#ddShippingAddressesSelection").val());
+
+		syncDefaultBtnState();
+
+		$("#delSelected").show();
+	});
+
+	$("body").on("click", "#setDefaultSelected", function () {
+		$("#hdDefault").val(true);
+
+		$.each(shippingAddresses, function(index, item) {
+			item.Default = false;
+		});
+
+		var selectedShippingAddress = $.grep(shippingAddresses, function (item) {
+			return item.Id == $("#hdShipping").val();
+		})[0];
+
+		if (selectedShippingAddress) {
+			selectedShippingAddress.Default = true;
+
+			updateOptionsText();
+		}
+
+		$('#setDefaultSelected').hide();
 	});
 
 	$("body").on("click", "#addNew", function() {
@@ -27,8 +52,13 @@ $(function () {
 			PostalCode: "",
 			Phone: "",
 			Fax: "",
-			Email: ""
+			Email: "",
+			Default: false
 		}
+
+		$("#ddShippingAddressesSelection").val("");
+
+		$("#delSelected").hide();
 
 		setChangedData(newItem);
 	});
@@ -36,41 +66,120 @@ $(function () {
 	$("body").on("click", "#delSelected", function() {
 		var idToRemove = $("#ddShippingAddressesSelection").val();
 
-		deleteShippingAddress(idToRemove, function (result) {
-			$("ddShippingAddressesSelection option[value=" + idToRemove + "]").remove();
-		}, function (errorResult) {
-			//todo: handle result
+		confirmAction(function () {
+			deleteShippingAddress(idToRemove, function (result, shippingAddresses) {
+				if (result.Success) {
+					var shippingAddresses = $.grep(shippingAddresses, function (item) {
+						return item.Id != idToRemove;
+					});
+
+					populateAddressesSelection(shippingAddresses);
+
+					notifySuccess();
+				} else {
+					notifyError(result.Messages[0].Message);
+				}
+
+			}, function(errorResult) {
+				//todo: handle result
+			});
 		});
 	});
 });
 
+function populateAddressesSelection(shippingAddresses) {
+	$("#ddShippingAddressesSelection").html("");
+	if (shippingAddresses && shippingAddresses.length > 0) {
+		$.each(shippingAddresses, function (shippingAddressIndex, shippingAddress) {
+			var option = $('<option></option>').val(shippingAddress.Id).html(shippingAddress.FirstName + " " + shippingAddress.LastName + " " + shippingAddress.Address1 + " " + (shippingAddress.Default ? "(Default)" : ""));
+			if (shippingAddress.Default) {
+				$(option).attr("selected", "selected")
+			}
+
+			$("#ddShippingAddressesSelection").append(option);
+		});
+	}
+
+	if ($("#hdShipping").val() == 0) {
+		$("#ddShippingAddressesSelection").val("");
+	}
+}
+
+function updateOptionsText() {
+	$.each($("#ddShippingAddressesSelection option"), function (index, option) {
+		var shippingAddress = $.grep(shippingAddresses, function (item) {
+			return item.Id == $(option).val();
+		})[0];
+
+		$(option).html(shippingAddress.FirstName + " " + shippingAddress.LastName + " " + shippingAddress.Address1 + " " + (shippingAddress.Default ? "(Default)" : ""));
+	});
+}
+
+function syncDefaultBtnState() {
+	var selectedShippingAddress = $.grep(shippingAddresses, function (item) {
+		return item.Id == $("#ddShippingAddressesSelection").val();
+	})[0];
+
+	if (!selectedShippingAddress) {
+		$('#setDefaultSelected').show();
+	} else {
+		if (selectedShippingAddress.Default) {
+			$('#setDefaultSelected').hide();
+		} else {
+			$('#setDefaultSelected').show();
+		}
+	}
+}
+
 function changeSelection(id) {
-	var selectedCreditCard = $.grep(creditCards, function(item) {
+	var selectedshippingAddress = $.grep(shippingAddresses, function (item) {
 		return item.Id == id;
 	})[0];
 
-	setChangedData(selectedCreditCard);
+	setChangedData(selectedshippingAddress);
+
+	$("#ddCountry").trigger("change");
 }
 
-function setChangedData(selectedCreditCard) {
-	$("#hdCountry").val(selectedCreditCard.IdCountry);
-	$("#hdState").val(selectedCreditCard.IdState);
+function setChangedData(selectedShippingAddress) {
+	$("#hdShipping").val(selectedShippingAddress.Id);
+	$("#hdCountry").val(selectedShippingAddress.IdCountry);
+	$("#hdState").val(selectedShippingAddress.IdState);
+	$("#hdDefault").val(selectedShippingAddress.Default);
 
-	$("input[name=FirstName]").val(selectedCreditCard.FirstName);
-	$("input[name=LastName]").val(selectedCreditCard.LastName);
-	$("input[name=Company]").val(selectedCreditCard.Company);
-	$("#ddCountry").val(selectedCreditCard.IdCountry);
-	$("input[name=Address1]").val(selectedCreditCard.Address1);
-	$("input[name=Address2]").val(selectedCreditCard.Address2);
-	$("input[name=City]").val(selectedCreditCard.City);
-	$("#ddState").val(selectedCreditCard.IdState);
-	$("input[name=County]").val(selectedCreditCard.County);
-	$("input[name=PostalCode]").val(selectedCreditCard.PostalCode);
-	$("input[name=Phone]").val(selectedCreditCard.Phone);
-	$("input[name=Fax]").val(selectedCreditCard.Fax);
-	$("input[name=Email]").val(selectedCreditCard.Email);
+	$("input[name=FirstName]").val(selectedShippingAddress.FirstName);
+	$("input[name=LastName]").val(selectedShippingAddress.LastName);
+	$("input[name=Company]").val(selectedShippingAddress.Company);
+	$("#ddCountry").val(selectedShippingAddress.IdCountry);
+	$("input[name=Address1]").val(selectedShippingAddress.Address1);
+	$("input[name=Address2]").val(selectedShippingAddress.Address2);
+	$("input[name=City]").val(selectedShippingAddress.City);
+	$("#ddState").val(selectedShippingAddress.IdState);
+	$("input[name=County]").val(selectedShippingAddress.County);
+	$("input[name=PostalCode]").val(selectedShippingAddress.PostalCode);
+	$("input[name=Phone]").val(selectedShippingAddress.Phone);
+	$("input[name=Fax]").val(selectedShippingAddress.Fax);
+	$("input[name=Email]").val(selectedShippingAddress.Email);
 
 	$("form").removeData("validator");
 	$("form").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse("form");
+
+	syncDefaultBtnState();
+}
+
+function deleteShippingAddress(idAddress, successCallback, errorCallback) {
+	$.ajax({
+		type: "POST",
+		url: "/Profile/DeleteShippingInfo/" + idAddress,
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result, shippingAddresses);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result, shippingAddresses);
+		}
+	});
 }

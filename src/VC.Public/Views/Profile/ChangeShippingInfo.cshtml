@@ -18,15 +18,16 @@
 </script>
 
 <div class="working-area-holder">
-	<div class="left-pane">
+	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-	<div class="right-pane">
-		@using (Html.BeginForm("ChangeShippingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+	<div class="right-pane clean-indent">
+		@using (Html.BeginForm("ChangeShippingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
 		{
 			<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
 			<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
 			@Html.HiddenFor(m => m.Id, new { @id = "hdShipping" })
+			@Html.HiddenFor(m => m.Default, new { @id = "hdDefault" })
 			@Html.AntiForgeryToken()
 			<h4>Update Shipping Information</h4>
 			<div class="form-group">
@@ -38,6 +39,7 @@
 				@Html.Label("SavedAddresses", "Saved Addresses", new {@class = "control-label"})
 				<div class="input-group">
 					<select class="form-control" id="ddShippingAddressesSelection"></select>
+					<input id="setDefaultSelected" class="left-indent-small inline-button" type="button" value="Set as Default" style="display:none;" />
 					<input id="delSelected" class="red left-indent-small inline-button" type="button" value="Delete Address" />
 				</div>
 			</div>

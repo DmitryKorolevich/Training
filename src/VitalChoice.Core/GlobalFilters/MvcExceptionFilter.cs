@@ -19,42 +19,50 @@ namespace VitalChoice.Core.GlobalFilters
 	{
 		public override void OnException(ExceptionContext context)
 		{
-			var currentActionName = (string)context.RouteData.Values["action"];
-
-			var result = new ViewResult
+			var acceptHeader = context.HttpContext.Request.Headers["Accept"];
+            if (acceptHeader.Any() && acceptHeader.First().Contains("application/json"))
 			{
-			    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
-                TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
-            };
-
-			var apiException = context.Exception  as ApiException;
-			if (apiException == null)
+				new ApiExceptionFilterAttribute().OnException(context);
+			}
+			else
 			{
-				var exception = context.Exception as AppValidationException;
-				if (exception != null)
+				var currentActionName = (string)context.RouteData.Values["action"];
+
+				var result = new ViewResult
 				{
-					foreach (var message in exception.Messages)
-					{
-						context.ModelState.AddModelError(message.Field, message.Message);
-					}
+					ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState),
+					TempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>()
+				};
 
-					result.ViewName = currentActionName;
-					result.StatusCode = (int) HttpStatusCode.OK;
+				var apiException = context.Exception as ApiException;
+				if (apiException == null)
+				{
+					var exception = context.Exception as AppValidationException;
+					if (exception != null)
+					{
+						foreach (var message in exception.Messages)
+						{
+							context.ModelState.AddModelError(message.Field, message.Message);
+						}
+
+						result.ViewName = currentActionName;
+						result.StatusCode = (int)HttpStatusCode.OK;
+					}
+					else
+					{
+						result.ViewName = "Error";
+						result.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+						LoggerService.GetDefault().LogError(context.Exception.ToString());
+					}
 				}
 				else
 				{
 					result.ViewName = "Error";
-                    result.StatusCode = (int) HttpStatusCode.InternalServerError;
-
-					LoggerService.GetDefault().LogError(context.Exception.ToString());
+					result.StatusCode = (int)apiException.Status;
 				}
+				context.Result = result;
 			}
-			else
-			{
-				result.ViewName = "Error";
-				result.StatusCode = (int) apiException.Status;
-			}
-            context.Result = result;
 		}
 	}
 }

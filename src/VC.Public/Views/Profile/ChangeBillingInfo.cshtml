@@ -18,11 +18,11 @@
 </script>
 
 <div class="working-area-holder">
-	<div class="left-pane">
+	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-	<div class="right-pane">
-		@using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+	<div class="right-pane clean-indent">
+		@using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
 		{
 			<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
 			<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
@@ -68,12 +68,12 @@
 				</div>
 			</div>
 			<div class="form-group form-control-container">
-				@Html.LabelFor(m => m.ExpirationDateMonth, new {@class = "control-label"})
+				@Html.Label("ExpirationDate", "Expiration Date", new {@class = "control-label"})
 				<div class="input-group">
 					@Html.TextBoxFor(m => m.ExpirationDateMonth, new {@class = "form-control small-form-control"})
-					@Html.ValidationMessageFor(m => m.ExpirationDateMonth)
 					<span>/</span>
 					@Html.TextBoxFor(m => m.ExpirationDateYear, new {@class = "form-control small-form-control"})
+					@Html.ValidationMessageFor(m => m.ExpirationDateMonth)
 					@Html.ValidationMessageFor(m => m.ExpirationDateYear)
 				</div>
 			</div>

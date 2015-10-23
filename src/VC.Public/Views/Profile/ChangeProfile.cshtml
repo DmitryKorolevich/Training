@@ -11,11 +11,11 @@
 }
 
 <div class="working-area-holder">
-	<div class="left-pane">
+	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-	<div class="right-pane">
-	@using (Html.BeginForm("ChangeProfile", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+	<div class="right-pane clean-indent">
+	@using (Html.BeginForm("ChangeProfile", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
 	{
 		<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
 		<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
