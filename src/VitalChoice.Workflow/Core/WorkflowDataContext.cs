@@ -6,11 +6,11 @@ using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Workflow.Core
 {
-    public abstract class WorkflowContext<T>
+    public abstract class WorkflowDataContext<T>
     {
         private readonly ExpandoObject _data;
 
-        protected WorkflowContext()
+        protected WorkflowDataContext()
         {
             _data = new ExpandoObject();
             _actionRunningList = new HashSet<string>();

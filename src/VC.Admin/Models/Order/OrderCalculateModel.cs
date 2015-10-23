@@ -62,30 +62,30 @@ namespace VC.Admin.Models.Order
 
         public IList<MessageInfo> Messages { get; set; }
 
-        public OrderCalculateModel(OrderContext context)
+        public OrderCalculateModel(OrderDataContext dataContext)
         {
-            AlaskaHawaiiSurcharge = context.AlaskaHawaiiSurcharge;
-            CanadaSurcharge = context.CanadaSurcharge;
-            StandardShippingCharges = context.StandardShippingCharges;
-            ShippingUpgradePOptions = context.ShippingUpgradePOptions;
-            ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
-            ShippingTotal = context.ShippingTotal;
-            ProductsSubtotal = context.ProductsSubtotal;
-            DiscountTotal = context.DiscountTotal;
-            DiscountedSubtotal = context.DiscountedSubtotal;
-            DiscountMessage = context.DiscountMessage;
-            TaxTotal = context.TaxTotal;
-            Total = context.Total;
-            ShippingOverride = context.ShippingOverride;
-            SurchargeOverride = context.SurchargeOverride;
-            TotalShipping = context.TotalShipping;
-            ShouldSplit = context.SplitInfo.ShouldSplit;
+            AlaskaHawaiiSurcharge = dataContext.AlaskaHawaiiSurcharge;
+            CanadaSurcharge = dataContext.CanadaSurcharge;
+            StandardShippingCharges = dataContext.StandardShippingCharges;
+            ShippingUpgradePOptions = dataContext.ShippingUpgradePOptions;
+            ShippingUpgradeNPOptions = dataContext.ShippingUpgradeNpOptions;
+            ShippingTotal = dataContext.ShippingTotal;
+            ProductsSubtotal = dataContext.ProductsSubtotal;
+            DiscountTotal = dataContext.DiscountTotal;
+            DiscountedSubtotal = dataContext.DiscountedSubtotal;
+            DiscountMessage = dataContext.DiscountMessage;
+            TaxTotal = dataContext.TaxTotal;
+            Total = dataContext.Total;
+            ShippingOverride = dataContext.ShippingOverride;
+            SurchargeOverride = dataContext.SurchargeOverride;
+            TotalShipping = dataContext.TotalShipping;
+            ShouldSplit = dataContext.SplitInfo.ShouldSplit;
 
-            SkuOrdereds = context.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
+            SkuOrdereds = dataContext.SkuOrdereds?.Select(item => new SkuOrderedManageModel(item)).ToList() ?? new List<SkuOrderedManageModel>();
 
-            PromoSkus = context.PromoSkus?.Select(item => new PromoSkuOrderedManageModel(item)).ToList() ?? new List<PromoSkuOrderedManageModel>();
+            PromoSkus = dataContext.PromoSkus?.Select(item => new PromoSkuOrderedManageModel(item)).ToList() ?? new List<PromoSkuOrderedManageModel>();
 
-            Messages = context.Messages;
+            Messages = dataContext.Messages;
         }
 
     }

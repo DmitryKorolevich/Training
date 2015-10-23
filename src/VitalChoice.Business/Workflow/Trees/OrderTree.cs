@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Base;
@@ -7,12 +8,12 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Trees
 {
-    public class OrderTree: ComputableTree<OrderContext>
+    public class OrderTree: ComputableTree<OrderDataContext>
     {
-        public override decimal Execute(OrderContext context)
+        public override async Task<decimal> Execute(OrderDataContext dataContext)
         {
-            var result = Execute<TotalAction>(context);
-            context.Total = result;
+            var result = await Execute<TotalAction>(dataContext);
+            dataContext.Total = result;
             return result;
         }
 

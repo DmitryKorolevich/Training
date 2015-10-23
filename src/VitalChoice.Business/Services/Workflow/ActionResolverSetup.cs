@@ -7,7 +7,7 @@ using VitalChoice.Workflow.Core;
 namespace VitalChoice.Business.Services.Workflow
 {
     public class ActionResolverSetup<TContext, TResult> : IActionResolverSetup<TContext, TResult> 
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         internal Dictionary<int, WorkflowActionResolverPathDefinition> Actions { get; }
         internal HashSet<Type> Dependencies { get; }

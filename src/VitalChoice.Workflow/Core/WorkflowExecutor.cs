@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VitalChoice.Workflow.Core
 {
     public abstract class WorkflowExecutor<TContext, TResult> : IWorkflowExecutor<TContext, TResult>
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         protected WorkflowExecutor(IWorkflowTree<TContext, TResult> workflowTree, string actionName)
         {
@@ -12,7 +13,7 @@ namespace VitalChoice.Workflow.Core
             Name = actionName;
         }
 
-        public abstract TResult Execute(TContext context);
+        public abstract Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext);
 
         public string Name { get; }
 

@@ -5,20 +5,21 @@ using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Discounts
 {
-    public class DiscountFreeShippingAction : ComputableAction<OrderContext>
+    public class DiscountFreeShippingAction : ComputableAction<OrderDataContext>
     {
-        public DiscountFreeShippingAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public DiscountFreeShippingAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            context.DiscountMessage = "Free Shipping Discount";
-            context.FreeShipping = true;
-            return 0;
+            dataContext.DiscountMessage = "Free Shipping Discount";
+            dataContext.FreeShipping = true;
+            return Task.FromResult((decimal)0);
         }
     }
 }

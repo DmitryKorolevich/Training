@@ -1,44 +1,46 @@
-﻿using VitalChoice.Workflow.Base;
+﻿using System.Threading.Tasks;
+using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Shipping
 {
-    public class StandardShippingUsWholesaleAction : ComputableAction<OrderContext>
+    public class StandardShippingUsWholesaleAction : ComputableAction<OrderDataContext>
     {
-        public StandardShippingUsWholesaleAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public StandardShippingUsWholesaleAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (context.Data.PromoProducts < 200 && context.Data.DeliveredAmount > 0)
+            if (dataContext.Data.PromoProducts < 200 && dataContext.Data.DeliveredAmount > 0)
             {
-                if (context.Data.PromoProducts < 50)
+                if (dataContext.Data.PromoProducts < 50)
                 {
-                    context.StandardShippingCharges = (decimal) 4.95;
-                    return context.StandardShippingCharges;
+                    dataContext.StandardShippingCharges = (decimal) 4.95;
+                    return Task.FromResult(dataContext.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.FirstCost;
                 }
-                if (context.Data.PromoProducts < 100)
+                if (dataContext.Data.PromoProducts < 100)
                 {
-                    context.StandardShippingCharges = (decimal) 9.95;
-                    return context.StandardShippingCharges;
+                    dataContext.StandardShippingCharges = (decimal) 9.95;
+                    return Task.FromResult(dataContext.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
-                if (context.Data.PromoProducts < 150)
+                if (dataContext.Data.PromoProducts < 150)
                 {
-                    context.StandardShippingCharges = (decimal)14.95;
-                    return context.StandardShippingCharges;
+                    dataContext.StandardShippingCharges = (decimal)14.95;
+                    return Task.FromResult(dataContext.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
-                if (context.Data.PromoProducts < 200)
+                if (dataContext.Data.PromoProducts < 200)
                 {
-                    context.StandardShippingCharges = (decimal)19.95;
-                    return context.StandardShippingCharges;
+                    dataContext.StandardShippingCharges = (decimal)19.95;
+                    return Task.FromResult(dataContext.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
             }
-            return 0;
+            return Task.FromResult<decimal>(0);
         }
     }
 }

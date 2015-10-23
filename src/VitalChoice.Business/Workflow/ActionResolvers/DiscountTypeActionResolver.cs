@@ -11,64 +11,64 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.ActionResolvers
 {
-    public class DiscountTypeActionResolver : ComputableActionResolver<OrderContext>
+    public class DiscountTypeActionResolver : ComputableActionResolver<OrderDataContext>
     {
-        public DiscountTypeActionResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
+        public DiscountTypeActionResolver(IWorkflowTree<OrderDataContext, decimal> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override int GetActionKey(OrderContext context)
+        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (context.Order.Discount == null)
-                return 0;
-            if (!ValidateDiscount(context))
+            if (dataContext.Order.Discount == null)
+                return Task.FromResult(0);
+            if (!ValidateDiscount(dataContext))
             {
-                return 0;
+                return Task.FromResult(0);
             }
-            return context.Order.Discount.IdObjectType ?? 0;
+            return Task.FromResult(dataContext.Order.Discount.IdObjectType ?? 0);
         }
 
-        private static bool ValidateDiscount(OrderContext context)
+        private static bool ValidateDiscount(OrderDataContext dataContext)
         {
             var error = true;
 
-            if (context.Order.Discount.DictionaryData.ContainsKey("RequireMinimumPerishable") &&
-                context.Order.Discount.Data.RequireMinimumPerishable &&
-                context.Data.PerishableSubtotal < context.Order.Discount.Data.RequireMinimumPerishableAmount)
+            if (dataContext.Order.Discount.DictionaryData.ContainsKey("RequireMinimumPerishable") &&
+                dataContext.Order.Discount.Data.RequireMinimumPerishable &&
+                dataContext.Data.PerishableSubtotal < dataContext.Order.Discount.Data.RequireMinimumPerishableAmount)
             {
-                context.Messages.Add(new MessageInfo
+                dataContext.Messages.Add(new MessageInfo
                 {
                     Message =
-                        $"Minimum perishable {context.Order.Discount.Data.RequireMinimumPerishableAmount:C} not reached",
+                        $"Minimum perishable {dataContext.Order.Discount.Data.RequireMinimumPerishableAmount:C} not reached",
                     Field = "DiscountCode"
                 });
                 error = false;
             }
             var now = DateTime.Now;
-            if (context.Order.Discount.StartDate > now)
+            if (dataContext.Order.Discount.StartDate > now)
             {
-                context.Messages.Add(new MessageInfo
+                dataContext.Messages.Add(new MessageInfo
                 {
-                    Message = $"Discount not started, start date: {context.Order.Discount.StartDate:d}",
+                    Message = $"Discount not started, start date: {dataContext.Order.Discount.StartDate:d}",
                     Field = "DiscountCode"
                 });
                 error = false;
             }
-            if (context.Order.Discount.ExpirationDate < now)
+            if (dataContext.Order.Discount.ExpirationDate < now)
             {
-                context.Messages.Add(new MessageInfo
+                dataContext.Messages.Add(new MessageInfo
                 {
-                    Message = $"Discount expired {context.Order.Discount.ExpirationDate:d}",
+                    Message = $"Discount expired {dataContext.Order.Discount.ExpirationDate:d}",
                     Field = "DiscountCode"
                 });
                 error = false;
             }
-            if (context.Order.Discount.Assigned.HasValue && context.Order.Customer.IdObjectType.HasValue &&
-                (int) context.Order.Discount.Assigned.Value != context.Order.Customer.IdObjectType.Value)
+            if (dataContext.Order.Discount.Assigned.HasValue && dataContext.Order.Customer.IdObjectType.HasValue &&
+                (int) dataContext.Order.Discount.Assigned.Value != dataContext.Order.Customer.IdObjectType.Value)
             {
-                context.Messages.Add(new MessageInfo
+                dataContext.Messages.Add(new MessageInfo
                 {
-                    Message = $"Discount could only be applied for {context.Order.Discount.Assigned.Value} customer",
+                    Message = $"Discount could only be applied for {dataContext.Order.Discount.Assigned.Value} customer",
                     Field = "DiscountCode"
                 });
                 error = false;

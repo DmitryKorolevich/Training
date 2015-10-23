@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
@@ -8,35 +9,35 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.ActionResolvers
 {
-    public class ShippingStandardResolver : ComputableActionResolver<OrderContext>
+    public class ShippingStandardResolver : ComputableActionResolver<OrderDataContext>
     {
-        public ShippingStandardResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
+        public ShippingStandardResolver(IWorkflowTree<OrderDataContext, decimal> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override int GetActionKey(OrderContext context)
+        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (context.FreeShipping)
-                return 0;
-            if (context.Order.ShippingAddress == null)
-                return 0;
-            if (context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
+            if (dataContext.FreeShipping)
+                return Task.FromResult(0);
+            if (dataContext.Order.ShippingAddress == null)
+                return Task.FromResult(0);
+            if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
             {
-                if (context.IsCountry(context.Order.ShippingAddress, "us"))
+                if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us"))
                 {
-                    return (int) CustomerType.Wholesale;
+                    return Task.FromResult((int) CustomerType.Wholesale);
                 }
             }
-            if (context.Order.Customer.IdObjectType == (int) CustomerType.Retail)
+            if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Retail)
             {
-                if (context.IsCountry(context.Order.ShippingAddress, "us") ||
-                    context.IsCountry(context.Order.ShippingAddress, "ca"))
+                if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us") ||
+                    dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
                 {
-                    return (int) CustomerType.Retail;
+                    return Task.FromResult((int) CustomerType.Retail);
                 }
             }
 
-            return 0;
+            return Task.FromResult(0);
         }
     }
 }

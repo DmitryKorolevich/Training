@@ -5,7 +5,7 @@ using VitalChoice.Workflow.Core;
 namespace VitalChoice.Business.Services.Workflow
 {
     public class ActionSetup<TContext, TResult> : IActionSetup<TContext, TResult> 
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         public ActionSetup()
         {

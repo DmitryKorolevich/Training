@@ -21,7 +21,7 @@ using VitalChoice.Workflow.Core;
 namespace VitalChoice.Business.Services.Workflow
 {
     public class TreeSetup<TContext, TResult> : ITreeSetup<TContext, TResult>
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         private readonly IEcommerceRepositoryAsync<WorkflowTree> _treeRepository;
         private readonly IEcommerceRepositoryAsync<WorkflowExecutor> _executorsRepository;

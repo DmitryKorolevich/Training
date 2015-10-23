@@ -5,28 +5,29 @@ using System.Threading.Tasks;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
 {
-    public class GiftCertificatesPaymentAction : ComputableAction<OrderContext>
+    public class GiftCertificatesPaymentAction : ComputableAction<OrderDataContext>
     {
-        public GiftCertificatesPaymentAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public GiftCertificatesPaymentAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (!(context.Order?.GiftCertificates?.Any() ?? false))
+            if (!(dataContext.Order?.GiftCertificates?.Any() ?? false))
             {
-                return 0;
+                return Task.FromResult<decimal>(0);
             }
-            decimal orderSubTotal = context.Data.SubTotal;
-            foreach (var gc in context.Order.GiftCertificates)
+            decimal orderSubTotal = dataContext.Data.SubTotal;
+            foreach (var gc in dataContext.Order.GiftCertificates)
             {
                 var totalGcAmount = gc.Amount + gc.GiftCertificate.Balance;
                 if (totalGcAmount == 0)
                 {
-                    context.Messages.Add(new MessageInfo
+                    dataContext.Messages.Add(new MessageInfo
                     {
                         Message = "Zero balance Gift Certificate",
                         Field = "GiftCertificateCode"
@@ -37,7 +38,7 @@ namespace VitalChoice.Business.Workflow.Actions.GiftCertificates
                 gc.Amount = charge;
                 orderSubTotal -= charge;
             }
-            return orderSubTotal - (decimal)context.Data.SubTotal;
+            return Task.FromResult(orderSubTotal - (decimal) dataContext.Data.SubTotal);
         }
     }
 }

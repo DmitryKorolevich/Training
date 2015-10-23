@@ -38,7 +38,7 @@ namespace VitalChoice.Workflow.Configuration
                 using (var scope = container.BeginLifetimeScope())
                 {
                     Console.WriteLine($"[{DateTime.Now:O}] Configuring DB");
-                    var setup = scope.Resolve<ITreeSetup<OrderContext, decimal>>();
+                    var setup = scope.Resolve<ITreeSetup<OrderDataContext, decimal>>();
                     DefaultConfiguration.Configure(setup);
                     if (await setup.UpdateAsync())
                     {

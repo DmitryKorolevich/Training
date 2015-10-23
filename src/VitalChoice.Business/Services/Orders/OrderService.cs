@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Order;
-using VitalChoice.Business.Queries.Product;
-using VitalChoice.Business.Services.Customers;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain.Avatax;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
@@ -29,24 +24,17 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.Validation;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
-using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Orders
 {
-    public class OrderService : EcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>, IOrderService
+    public class OrderService : EcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
+        IOrderService
     {
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -55,8 +43,6 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
-        private readonly ICountryService _countryService;
-        private readonly IAvalaraTax _avataxService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -67,8 +53,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
-            ICustomerService customerService, IWorkflowFactory treeFactory, ICountryService countryService,
-            IAvalaraTax avataxService,
+            ICustomerService customerService, IWorkflowFactory treeFactory,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
@@ -80,8 +65,6 @@ namespace VitalChoice.Business.Services.Orders
             _productMapper = productMapper;
             _customerService = customerService;
             _treeFactory = treeFactory;
-            _countryService = countryService;
-            _avataxService = avataxService;
             _skusRepository = skusRepository;
         }
 
@@ -154,7 +137,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
         {
-            log.IdObjectStatus = (int)model.OrderStatus;
+            log.IdObjectStatus = (int) model.OrderStatus;
         }
 
         protected override bool LogObjectFullData => true;
@@ -166,25 +149,24 @@ namespace VitalChoice.Business.Services.Orders
             return order;
         }
 
-        public async Task<OrderContext> CalculateOrder(OrderDynamic order)
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order)
         {
-            var context = new OrderContext(await _countryService.GetCountriesAsync())
+            var context = new OrderDataContext
             {
                 Order = order
             };
-            var tree = await _treeFactory.CreateTreeAsync<OrderContext, decimal>("Order");
-            tree.Execute(context);
-            context.TaxTotal = await _avataxService.GetTax(context, TaxGetType.PerishableOnly) +
-                               await _avataxService.GetTax(context, TaxGetType.NonPerishableOnly);
+            var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
+            await tree.Execute(context);
+            UpdateOrderFromCalculationContext(order, context);
             return context;
         }
 
-        public void UpdateOrderFromCalculationContext(OrderDynamic order, OrderContext context)
+        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
         {
-            order.TaxTotal = context.TaxTotal;
-            order.Total = context.Total;
-            order.DiscountTotal = context.DiscountTotal;
-            order.ShippingTotal = context.ShippingTotal;
+            order.TaxTotal = dataContext.TaxTotal;
+            order.Total = dataContext.Total;
+            order.DiscountTotal = dataContext.DiscountTotal;
+            order.ShippingTotal = dataContext.ShippingTotal;
             //TODO: Add promo skus and skus to order
         }
 
@@ -206,7 +188,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
         {
-            if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
+            if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
@@ -223,7 +205,10 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderBy(y => y.Id);
-            var query = this.ObjectRepository.Query(p => p.Id.ToString().Contains(filter.Id) && p.StatusCode != (int)RecordStatusCode.Deleted).OrderBy(sortable);
+            var query =
+                this.ObjectRepository.Query(
+                    p => p.Id.ToString().Contains(filter.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
+                    .OrderBy(sortable);
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }
 
@@ -240,7 +225,11 @@ namespace VitalChoice.Business.Services.Orders
             {
                 conditions = conditions.WithShippedDate(filter.From, filter.To);
             }
-            conditions = conditions.WithOrderStatus(filter.OrderStatus).WithoutIncomplete(filter.OrderStatus).WithOrderSource(filter.IdOrderSource).WithPOrderType(filter.POrderType).
+            conditions = conditions.WithOrderStatus(filter.OrderStatus)
+                .WithoutIncomplete(filter.OrderStatus)
+                .WithOrderSource(filter.IdOrderSource)
+                .WithPOrderType(filter.POrderType)
+                .
                 WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
@@ -335,7 +324,8 @@ namespace VitalChoice.Business.Services.Orders
                     break;
             }
 
-            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var toReturn =
+                await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             if (toReturn.Items.Any())
             {
                 var ids = toReturn.Items.Select(p => p.IdEditedBy).ToList();

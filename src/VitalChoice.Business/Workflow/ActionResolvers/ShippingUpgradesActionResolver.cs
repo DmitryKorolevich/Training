@@ -15,22 +15,22 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         UsCa = 1
     }
 
-    public class ShippingUpgradesActionResolver : ComputableActionResolver<OrderContext>
+    public class ShippingUpgradesActionResolver : ComputableActionResolver<OrderDataContext>
     {
-        public ShippingUpgradesActionResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName) : base(tree, actionName)
+        public ShippingUpgradesActionResolver(IWorkflowTree<OrderDataContext, decimal> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override int GetActionKey(OrderContext context)
+        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (context.Order.ShippingAddress == null)
-                return (int) ShippingUpgradeGroup.None;
-            if (context.IsCountry(context.Order.ShippingAddress, "us") ||
-                context.IsCountry(context.Order.ShippingAddress, "ca"))
+            if (dataContext.Order.ShippingAddress == null)
+                return Task.FromResult((int) ShippingUpgradeGroup.None);
+            if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "us") ||
+                dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
             {
-                return (int)ShippingUpgradeGroup.UsCa;
+                return Task.FromResult((int)ShippingUpgradeGroup.UsCa);
             }
-            return (int) ShippingUpgradeGroup.None;
+            return Task.FromResult((int) ShippingUpgradeGroup.None);
         }
     }
 }

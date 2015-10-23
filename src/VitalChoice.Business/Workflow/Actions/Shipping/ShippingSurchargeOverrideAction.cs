@@ -4,25 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Shipping
 {
-    public class ShippingSurchargeOverrideAction : ComputableAction<OrderContext>
+    public class ShippingSurchargeOverrideAction : ComputableAction<OrderDataContext>
     {
-        public ShippingSurchargeOverrideAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public ShippingSurchargeOverrideAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            decimal surchargeOverride = context.Order.Data.SurchargeOverride;
-            decimal surchargeTotal = context.AlaskaHawaiiSurcharge + context.CanadaSurcharge;
+            decimal surchargeOverride = dataContext.Order.Data.SurchargeOverride;
+            decimal surchargeTotal = dataContext.AlaskaHawaiiSurcharge + dataContext.CanadaSurcharge;
             if (surchargeOverride > surchargeTotal)
             {
                 surchargeOverride = surchargeTotal;
             }
-            context.SurchargeOverride = surchargeOverride;
-            return -surchargeOverride;
+            dataContext.SurchargeOverride = surchargeOverride;
+            return Task.FromResult(-surchargeOverride);
         }
     }
 }

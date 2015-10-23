@@ -17,7 +17,7 @@ namespace VitalChoice.Workflow.Core
         }
 
         public async Task<IWorkflowTree<TContext, TResult>> CreateTreeAsync<TContext, TResult>(string name)
-            where TContext : WorkflowContext<TResult>
+            where TContext : WorkflowDataContext<TResult>
         {
             object cachedResult;
             lock (Cache)

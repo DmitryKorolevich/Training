@@ -16,27 +16,27 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         Canada = 2
     }
 
-    public class ShippingSurchargeResolver : ComputableActionResolver<OrderContext>
+    public class ShippingSurchargeResolver : ComputableActionResolver<OrderDataContext>
     {
-        public ShippingSurchargeResolver(IWorkflowTree<OrderContext, decimal> tree, string actionName)
+        public ShippingSurchargeResolver(IWorkflowTree<OrderDataContext, decimal> tree, string actionName)
             : base(tree, actionName)
         {
         }
 
-        public override int GetActionKey(OrderContext context)
+        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            if (context.Order.ShippingAddress == null)
-                return (int) SurchargeType.None;
-            if (context.IsState(context.Order.ShippingAddress, "us", "hi") ||
-                context.IsState(context.Order.ShippingAddress, "us", "ak"))
+            if (dataContext.Order.ShippingAddress == null)
+                return Task.FromResult((int) SurchargeType.None);
+            if (dataContext.IsState(dataContext.Order.ShippingAddress, "us", "hi") ||
+                dataContext.IsState(dataContext.Order.ShippingAddress, "us", "ak"))
             {
-                return (int) SurchargeType.AlaskaHawaii;
+                return Task.FromResult((int) SurchargeType.AlaskaHawaii);
             }
-            if (context.IsCountry(context.Order.ShippingAddress, "ca"))
+            if (dataContext.IsCountry(dataContext.Order.ShippingAddress, "ca"))
             {
-                return (int) SurchargeType.Canada;
+                return Task.FromResult((int) SurchargeType.Canada);
             }
-            return (int) SurchargeType.None;
+            return Task.FromResult((int) SurchargeType.None);
         }
     }
 }

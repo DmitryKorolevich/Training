@@ -1,23 +1,25 @@
-﻿using VitalChoice.Workflow.Base;
+﻿using System.Threading.Tasks;
+using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions
 {
-    public class OrderSubTotalAction: ComputableAction<OrderContext>
+    public class OrderSubTotalAction: ComputableAction<OrderDataContext>
     {
-        public OrderSubTotalAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public OrderSubTotalAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            context.DiscountTotal = -context.Data.Discount;
-            context.DiscountedSubtotal = context.Data.Products + context.Data.Discount;
-            context.ShippingTotal = context.StandardShippingCharges + context.CanadaSurcharge +
-                                    context.AlaskaHawaiiSurcharge + context.Data.ShippingUpgrade +
-                                    context.Data.ShippingOverride + context.Data.SurchargeOverride;
-            context.TotalShipping = context.StandardShippingCharges + context.Data.ShippingUpgrade;
-            return 0;
+            dataContext.DiscountTotal = -dataContext.Data.Discount;
+            dataContext.DiscountedSubtotal = dataContext.Data.Products + dataContext.Data.Discount;
+            dataContext.ShippingTotal = dataContext.StandardShippingCharges + dataContext.CanadaSurcharge +
+                                    dataContext.AlaskaHawaiiSurcharge + dataContext.Data.ShippingUpgrade +
+                                    dataContext.Data.ShippingOverride + dataContext.Data.SurchargeOverride;
+            dataContext.TotalShipping = dataContext.StandardShippingCharges + dataContext.Data.ShippingUpgrade;
+            return Task.FromResult<decimal>(0);
         }
     }
 }

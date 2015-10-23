@@ -75,6 +75,7 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.Settings;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Formatters;
+using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -90,7 +91,6 @@ namespace VitalChoice.Core.DependencyInjection
             //    _called = true;
 
             BeginCustomRegistrations(services);
-
             // Add EF services to the services container.
             services.AddEntityFramework() //.AddMigrations()
                 .AddSqlServer()
@@ -270,6 +270,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .SingleInstance();
 
             var container = BuildContainer(projectAssembly, builder);
+            AutofacExecutionContext.Configure(container);
 
             if (!string.IsNullOrEmpty(appPath))
             {

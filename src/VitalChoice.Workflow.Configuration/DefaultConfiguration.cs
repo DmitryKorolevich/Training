@@ -8,6 +8,7 @@ using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.GiftCertificates;
 using VitalChoice.Business.Workflow.Actions.Products;
 using VitalChoice.Business.Workflow.Actions.Shipping;
+using VitalChoice.Business.Workflow.Actions.Tax;
 using VitalChoice.Business.Workflow.Trees;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
@@ -18,12 +19,21 @@ namespace VitalChoice.Workflow.Configuration
 {
     public static class DefaultConfiguration
     {
-        public static void Configure(ITreeSetup<OrderContext, decimal> setup)
+        public static void Configure(ITreeSetup<OrderDataContext, decimal> setup)
         {
             setup.Action<TotalAction>("Total", action =>
             {
                 action.Aggregate<OrderSubTotalAction>();
                 action.Aggregate<GiftCertificatesPaymentAction>();
+                action.Aggregate<GetTaxAction>();
+            });
+
+            setup.Action<CountriesSetUpAction>("Countries");
+
+            setup.Action<GetTaxAction>("TaxTotal", action =>
+            {
+                action.Dependency<CountriesSetUpAction>();
+                action.Dependency<OrderSubTotalAction>();
             });
 
             setup.Action<OrderSubTotalAction>("SubTotal", action =>
@@ -122,11 +132,13 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
             {
+                action.Dependency<CountriesSetUpAction>();
                 action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
             });
 
             setup.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>
             {
+                action.Dependency<CountriesSetUpAction>();
                 action.ResolvePath<ShippingSurchargeUsAkHiAction>((int) SurchargeType.AlaskaHawaii,
                     "ShippingSurchargeUs");
                 action.ResolvePath<ShippingSurchargeCaAction>((int) SurchargeType.Canada,
@@ -146,6 +158,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
+                action.Dependency<CountriesSetUpAction>();
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
             });

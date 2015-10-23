@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.Workflow.Core
@@ -6,7 +8,7 @@ namespace VitalChoice.Workflow.Core
     public abstract class WorkflowActionResolver<TContext, TResult> :
         WorkflowExecutor<TContext, TResult>,
         IWorkflowActionResolver<TContext, TResult>
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         protected WorkflowActionResolver(IWorkflowTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
@@ -14,9 +16,9 @@ namespace VitalChoice.Workflow.Core
             DependendActions = new List<string>();
         }
 
-        public abstract int GetActionKey(TContext context);
+        public abstract Task<int> GetActionKey(TContext context, IWorkflowExecutionContext executionContext);
 
-        public override TResult Execute(TContext context)
+        public override async Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext)
         {
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))
@@ -25,16 +27,16 @@ namespace VitalChoice.Workflow.Core
             foreach (var dependentActionName in DependendActions)
             {
                 context.ActionLock(dependentActionName);
-                Tree.GetAction(dependentActionName).Execute(context);
+                await Tree.GetAction(dependentActionName).Execute(context, executionContext);
                 context.ActionUnlock(dependentActionName);
             }
 
-            var key = GetActionKey(context);
+            var key = await GetActionKey(context, executionContext);
             if (Actions.ContainsKey(key))
             {
                 var actionName = Actions[key];
                 context.ActionLock(actionName);
-                result = Tree.GetAction(actionName).Execute(context);
+                result = await Tree.GetAction(actionName).Execute(context, executionContext);
                 context.ActionUnlock(actionName);
                 context.ActionSetResult(Name, result);
                 return result;

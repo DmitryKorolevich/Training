@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Workflow;
+using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Workflow.Core
 {
     public abstract class WorkflowTree<TContext, TResult>:
         IWorkflowTree<TContext, TResult>
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         private readonly IActionItemProvider _itemProvider;
         private readonly Dictionary<string, IWorkflowExecutor<TContext, TResult>> _actions;
@@ -25,13 +26,16 @@ namespace VitalChoice.Workflow.Core
 
         public string Name { get; }
 
-        public TResult GetActionResult(string actionName, TContext context)
+        public async Task<TResult> GetActionResult(string actionName, TContext context)
         {
             object result;
             if (context.DictionaryData.TryGetValue(actionName, out result)) {
                 return (TResult)result;
             }
-            return GetAction(actionName).Execute(context);
+            using (var executionContext = new AutofacExecutionContext())
+            {
+                return await GetAction(actionName).Execute(context, executionContext);
+            }
         }
 
         public bool TryGetActionResult(string actionName, TContext context, out TResult result)
@@ -127,26 +131,32 @@ namespace VitalChoice.Workflow.Core
             }
         }
 
-        public TResult Execute(string actionName, TContext context)
+        public async Task<TResult> Execute(string actionName, TContext context)
         {
             var action = GetAction(actionName);
-            return action.Execute(context);
+            using (var executionContext = new AutofacExecutionContext())
+            {
+                return await action.Execute(context, executionContext);
+            }
         }
 
-        public TResult Execute<TAction>(TContext context) 
+        public async Task<TResult> Execute<TAction>(TContext context) 
             where TAction : IWorkflowExecutor<TContext, TResult>
         {
             var action = GetAction<TAction>();
-            return action.Execute(context);
+            using (var executionContext = new AutofacExecutionContext())
+            {
+                return await action.Execute(context, executionContext);
+            }
         }
 
-        public virtual IWorkflowExecutor<TContext, TResult> GetAction<TAction>() 
+        public IWorkflowExecutor<TContext, TResult> GetAction<TAction>() 
             where TAction : IWorkflowExecutor<TContext, TResult>
         {
             return GetAction(_reverseAccessActions[typeof (TAction)]);
         }
 
-        public virtual IWorkflowExecutor<TContext, TResult> GetAction(string actionName)
+        public IWorkflowExecutor<TContext, TResult> GetAction(string actionName)
         {
             if (actionName == null)
                 throw new ArgumentNullException(nameof(actionName));
@@ -163,6 +173,6 @@ namespace VitalChoice.Workflow.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public abstract TResult Execute(TContext context);
+        public abstract Task<TResult> Execute(TContext context);
     }
 }

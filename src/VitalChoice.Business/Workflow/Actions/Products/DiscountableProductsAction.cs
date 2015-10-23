@@ -7,25 +7,26 @@ using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Products
 {
-    public class DiscountableProductsAction : ComputableAction<OrderContext>
+    public class DiscountableProductsAction : ComputableAction<OrderDataContext>
     {
-        public DiscountableProductsAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public DiscountableProductsAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            IEnumerable<SkuOrdered> skus = context.SkuOrdereds;
-            if (context.Order.Discount != null)
+            IEnumerable<SkuOrdered> skus = dataContext.SkuOrdereds;
+            if (dataContext.Order.Discount != null)
             {
-                if (context.Order.Discount.ExcludeCategories)
+                if (dataContext.Order.Discount.ExcludeCategories)
                 {
-                    if (context.Order.Discount.CategoryIds.Any())
+                    if (dataContext.Order.Discount.CategoryIds.Any())
                     {
-                        HashSet<int> categories = new HashSet<int>(context.Order.Discount.CategoryIds);
+                        HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
@@ -34,15 +35,15 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return 0;
+                            return Task.FromResult<decimal>(0);
                         }
                     }
                 }
                 else
                 {
-                    if (context.Order.Discount.CategoryIds.Any())
+                    if (dataContext.Order.Discount.CategoryIds.Any())
                     {
-                        HashSet<int> categories = new HashSet<int>(context.Order.Discount.CategoryIds);
+                        HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
                         var excludedSkus =
                             skus.Where(s => s.ProductWithoutSkus.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
                         foreach (var sku in excludedSkus)
@@ -51,16 +52,16 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return 0;
+                            return Task.FromResult<decimal>(0);
                         }
                     }
                 }
-                if (context.Order.Discount.ExcludeSkus)
+                if (dataContext.Order.Discount.ExcludeSkus)
                 {
-                    if (context.Order.Discount.SkusFilter.Any())
+                    if (dataContext.Order.Discount.SkusFilter.Any())
                     {
                         HashSet<int> filteredSkus =
-                            new HashSet<int>(context.Order.Discount.SkusFilter.Select(s => s.IdSku));
+                            new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
                         foreach (var sku in excludedSkus)
@@ -69,16 +70,16 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return 0;
+                            return Task.FromResult<decimal>(0);
                         }
                     }
                 }
                 else
                 {
-                    if (context.Order.Discount.SkusFilter.Any())
+                    if (dataContext.Order.Discount.SkusFilter.Any())
                     {
                         HashSet<int> filteredSkus =
-                            new HashSet<int>(context.Order.Discount.SkusFilter.Select(s => s.IdSku));
+                            new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
                         var excludedSkus =
                             skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
                         foreach (var sku in excludedSkus)
@@ -87,17 +88,17 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                         }
                         if (excludedSkus.Any())
                         {
-                            return 0;
+                            return Task.FromResult<decimal>(0);
                         }
                     }
                 }
-                if (context.Order.Discount.SkusAppliedOnlyTo.Any())
+                if (dataContext.Order.Discount.SkusAppliedOnlyTo.Any())
                 {
-                    var selectedSkus = skus.IntersectKeyedWith(context.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
+                    var selectedSkus = skus.IntersectKeyedWith(dataContext.Order.Discount.SkusAppliedOnlyTo, sku => sku.Sku.Id,
                         selectedSku => selectedSku.IdSku);
                     if (!selectedSkus.Any())
                     {
-                        context.Messages.Add(new MessageInfo
+                        dataContext.Messages.Add(new MessageInfo
                         {
                             Message = "Cannot apply discount. Discountable products not found.",
                             Field = "DiscountCode"
@@ -106,7 +107,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return skus.Where(s => !s.Sku.Data.NonDiscountable).Sum(s => s.Amount * s.Quantity);
+            return Task.FromResult(skus.Where(s => !s.Sku.Data.NonDiscountable).Sum(s => s.Amount*s.Quantity));
         }
     }
 }

@@ -38,24 +38,18 @@ namespace VitalChoice.Workflow.Contexts
         public POrderType ProductTypes { get; set; }
     }
 
-    public class OrderContext : ComputableContext
+    public class OrderDataContext : ComputableDataContext
     {
-        private readonly Dictionary<string, int> _coutries;
+        public Dictionary<string, int> Coutries { get; set; }
 
-        private readonly Dictionary<string, Dictionary<string, int>> _states;
+        public Dictionary<string, Dictionary<string, int>> States { get; set; }
 
-        private readonly Dictionary<int, Country> _coutryCodes;
+        public Dictionary<int, Country> CoutryCodes { get; set; }
 
-        private readonly Dictionary<int, Dictionary<int, State>> _stateCodes;
+        public Dictionary<int, Dictionary<int, State>> StateCodes { get; set; }
 
-        public OrderContext(ICollection<Country> coutries)
+        public OrderDataContext()
         {
-            _coutries = coutries.ToDictionary(c => c.CountryCode, c => c.Id, StringComparer.OrdinalIgnoreCase);
-            _states = coutries.ToDictionary(c => c.CountryCode,
-                c => c.States.ToDictionary(s => s.StateCode, s => s.Id, StringComparer.OrdinalIgnoreCase),
-                StringComparer.OrdinalIgnoreCase);
-            _coutryCodes = coutries.ToDictionary(c => c.Id);
-            _stateCodes = coutries.ToDictionary(c => c.Id, c => c.States.ToDictionary(s => s.Id));
             Messages = new List<MessageInfo>();
             PromoSkus = new List<SkuOrdered>();
             SplitInfo = new SplitInfo();
@@ -117,32 +111,32 @@ namespace VitalChoice.Workflow.Contexts
 
         public bool IsState(AddressDynamic address, string countryCode, string stateCode)
         {
-            return _states.GetStateId(countryCode, stateCode) == address.IdState;
+            return States.GetStateId(countryCode, stateCode) == address.IdState;
         }
 
         public bool IsCountry(AddressDynamic address, string countryCode)
         {
-            return _coutries.GetCountryId(countryCode) == address.IdCountry;
+            return Coutries.GetCountryId(countryCode) == address.IdCountry;
         }
 
         public string GetCountryCode(int idCountry)
         {
-            return _coutryCodes.GetCountry(idCountry)?.CountryCode;
+            return CoutryCodes.GetCountry(idCountry)?.CountryCode;
         }
 
         public string GetStateCode(int idCountry, int idState)
         {
-            return _stateCodes.GetState(idCountry, idState)?.StateCode;
+            return StateCodes.GetState(idCountry, idState)?.StateCode;
         }
 
         public string GetCountryCode(AddressDynamic address)
         {
-            return _coutryCodes.GetCountry(address.IdCountry)?.CountryCode;
+            return CoutryCodes.GetCountry(address.IdCountry)?.CountryCode;
         }
 
         public string GetRegionOrStateCode(AddressDynamic address)
         {
-            return _stateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode ?? address.County;
+            return StateCodes.GetState(address.IdCountry, address.IdState ?? 0)?.StateCode ?? address.County;
         }
     }
 }

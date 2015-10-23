@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VitalChoice.Workflow.Core
 {
     public abstract class WorkflowAction<TContext, TResult> : WorkflowExecutor<TContext, TResult>, IWorkflowAction<TContext, TResult> 
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         protected WorkflowAction(IWorkflowTree<TContext, TResult> tree, string actionName) : base(tree, actionName)
         {
@@ -14,9 +15,9 @@ namespace VitalChoice.Workflow.Core
         }
 
         public abstract TResult AggregateResult(TResult result, TResult currentValue, string actionName);
-        public abstract TResult ExecuteAction(TContext context);
+        public abstract Task<TResult> ExecuteAction(TContext context, IWorkflowExecutionContext executionContext);
 
-        public override TResult Execute(TContext context)
+        public override async Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext)
         {
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))
@@ -24,16 +25,16 @@ namespace VitalChoice.Workflow.Core
             foreach (var actionName in DependendActions)
             {
                 context.ActionLock(actionName);
-                Tree.GetAction(actionName).Execute(context);
+                await Tree.GetAction(actionName).Execute(context, executionContext);
                 context.ActionUnlock(actionName);
             }
             foreach (var actionName in AggreagatedActions)
             {
                 context.ActionLock(actionName);
-                result = AggregateResult(Tree.GetAction(actionName).Execute(context), result, actionName);
+                result = AggregateResult(await Tree.GetAction(actionName).Execute(context, executionContext), result, actionName);
                 context.ActionUnlock(actionName);
             }
-            result = AggregateResult(ExecuteAction(context), result, null);
+            result = AggregateResult(await ExecuteAction(context, executionContext), result, null);
             context.ActionSetResult(Name, result);
             return result;
         }

@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Discounts
 {
-    public class DiscountPriceAction : ComputableAction<OrderContext>
+    public class DiscountPriceAction : ComputableAction<OrderDataContext>
     {
-        public DiscountPriceAction(ComputableTree<OrderContext> tree, string actionName) : base(tree, actionName)
+        public DiscountPriceAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override decimal ExecuteAction(OrderContext context)
+        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            context.DiscountMessage = $"Price Discount ({context.Order.Discount.Data.Amount:C})";
-            context.FreeShipping = context.Order.Discount.Data.FreeShipping;
-            return -Math.Min(context.Data.DiscountableSubtotal, context.Order.Discount.Data.Amount);
+            dataContext.DiscountMessage = $"Price Discount ({dataContext.Order.Discount.Data.Amount:C})";
+            dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
+            return Task.FromResult<decimal>(-Math.Min(dataContext.Data.DiscountableSubtotal, dataContext.Order.Discount.Data.Amount));
         }
     }
 }

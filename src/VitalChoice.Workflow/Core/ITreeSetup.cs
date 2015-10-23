@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace VitalChoice.Workflow.Core
 {
     public interface ITreeSetup<TContext, TResult> 
-        where TContext : WorkflowContext<TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         ITreeSetup<TContext, TResult> Tree<T>(string treeName, Action<ITreeActionSetup<TContext, TResult>> actions)
             where T: IWorkflowTree<TContext, TResult>;

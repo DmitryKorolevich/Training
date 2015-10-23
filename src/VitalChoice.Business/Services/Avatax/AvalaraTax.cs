@@ -87,24 +87,24 @@ namespace VitalChoice.Business.Services.Avatax
             return postTaxResult.ResultCode == SeverityLevel.Success;
         }
 
-        public async Task<decimal> GetTax(OrderContext order, TaxGetType taxGetType = TaxGetType.UseBoth)
+        public async Task<decimal> GetTax(OrderDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
         {
-            if (!order.IsState(order.Order.ShippingAddress, "us", "va") &&
-                !order.IsState(order.Order.ShippingAddress, "us", "wa"))
+            if (!context.IsState(context.Order.ShippingAddress, "us", "va") &&
+                !context.IsState(context.Order.ShippingAddress, "us", "wa"))
                 return 0;
 
             taxGetType = CommitProtect(taxGetType);
 
             Address origin;
             Address destination;
-            FillAddresses(order, out origin, out destination);
+            FillAddresses(context, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(order, taxGetType, destination, origin);
+            var request = FillGetTaxBaseRequest(context, taxGetType, destination, origin);
 
-            var lines = ToTaxLines(order, taxGetType, 1).ToArray();
+            var lines = ToTaxLines(context, taxGetType, 1).ToArray();
             if (!lines.Any())
                 return 0;
-            lines = UnionTaxShipping(lines, order).ToArray();
+            lines = UnionTaxShipping(lines, context).ToArray();
             request.Lines = lines;
 
             var result = await _taxService.GetTax(request);
@@ -118,10 +118,10 @@ namespace VitalChoice.Business.Services.Avatax
             return 0;
         }
 
-        private GetTaxRequest FillGetTaxBaseRequest(OrderContext order, TaxGetType taxGetType,
+        private GetTaxRequest FillGetTaxBaseRequest(OrderDataContext context, TaxGetType taxGetType,
             Address destinationAddress, Address originAddress)
         {
-            int customerId = order.Order.Customer.Id;
+            int customerId = context.Order.Customer.Id;
 
             GetTaxRequest getTaxRequest = new GetTaxRequest
             {
@@ -129,27 +129,27 @@ namespace VitalChoice.Business.Services.Avatax
                 DocDate = DateTime.Now,
                 CompanyCode = _companyCode,
                 CustomerUsageType =
-                    order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                    order.Order.Customer.Data.TaxExempt
+                    context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+                    context.Order.Customer.Data.TaxExempt
                         ? "G"
                         : null,
                 DocCode =
                     "TAX" +
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{order.Order.Id}-P" : $"{order.Order.Id}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{context.Order.Id}-P" : $"{context.Order.Id}-NP"),
                 DetailLevel = DetailLevel.Tax,
                 Commit = taxGetType.HasFlag(TaxGetType.Commit),
                 DocType =
                     taxGetType.HasFlag(TaxGetType.SavePermanent) ? DocType.SalesInvoice : DocType.SalesOrder,
                 PurchaseOrderNo =
-                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{order.Order.Id}-P" : $"{order.Order.Id}-NP"),
+                    (taxGetType.HasFlag(TaxGetType.PerishableOnly) ? $"{context.Order.Id}-P" : $"{context.Order.Id}-NP"),
                 CurrencyCode = "USD",
-                Discount = order.DiscountTotal,
+                Discount = context.DiscountTotal,
                 Addresses = new[] {originAddress, destinationAddress}
             };
             return getTaxRequest;
         }
 
-        private void FillAddresses(OrderContext orderContext, out Address originAddress,
+        private void FillAddresses(OrderDataContext orderDataContext, out Address originAddress,
             out Address destinationAddress)
         {
             originAddress = new Address
@@ -162,10 +162,10 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-            destinationAddress = _mapper.ToModel<Address>(orderContext.Order.ShippingAddress);
+            destinationAddress = _mapper.ToModel<Address>(orderDataContext.Order.ShippingAddress);
             destinationAddress.AddressCode = "02";
-            destinationAddress.Country = orderContext.GetCountryCode(orderContext.Order.ShippingAddress);
-            destinationAddress.Region = orderContext.GetRegionOrStateCode(orderContext.Order.ShippingAddress);
+            destinationAddress.Country = orderDataContext.GetCountryCode(orderDataContext.Order.ShippingAddress);
+            destinationAddress.Region = orderDataContext.GetRegionOrStateCode(orderDataContext.Order.ShippingAddress);
         }
 
         private TaxGetType CommitProtect(TaxGetType taxGetType)
@@ -184,7 +184,7 @@ namespace VitalChoice.Business.Services.Avatax
             return taxGetType;
         }
 
-        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderContext order)
+        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderDataContext order)
         {
             return lines.Union(new List<Line>
             {
@@ -207,7 +207,7 @@ namespace VitalChoice.Business.Services.Avatax
             });
         }
 
-        private static IEnumerable<Line> ToTaxLines(OrderContext order, TaxGetType taxGetType, int startNumber)
+        private static IEnumerable<Line> ToTaxLines(OrderDataContext order, TaxGetType taxGetType, int startNumber)
         {
             IEnumerable<SkuOrdered> items;
             if (taxGetType.HasFlag(TaxGetType.PerishableOnly))

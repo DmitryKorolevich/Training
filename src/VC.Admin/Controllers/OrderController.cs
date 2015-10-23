@@ -38,6 +38,7 @@ using VitalChoice.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using static System.String;
 
 namespace VC.Admin.Controllers
 {
@@ -194,7 +195,7 @@ namespace VC.Admin.Controllers
 
             var sUserId = Request.HttpContext.User.GetUserId();
             int userId;
-            if (Int32.TryParse(sUserId, out userId))
+            if (int.TryParse(sUserId, out userId))
             {
                 item.IdEditedBy = userId;
             }
@@ -226,15 +227,14 @@ namespace VC.Admin.Controllers
                     }
                     else
                     {
-                        item.Data.OrderType = orderType.HasValue ? orderType.Value : dbItem.Data.OrderType;
+                        item.Data.OrderType = orderType ?? dbItem.Data.OrderType;
                     }
                 }
                 else
                 {
-                    item.Data.OrderType = orderType.HasValue ? orderType.Value : (int)SourceOrderType.Phone;
+                    item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                 }
-                var context = await _orderService.CalculateOrder(item);
-                _orderService.UpdateOrderFromCalculationContext(item, context);
+                await _orderService.CalculateOrder(item);
                 item = await _orderService.UpdateAsync(item);
             }
             else
@@ -247,8 +247,7 @@ namespace VC.Admin.Controllers
                 item.ShippingAddress.Id = 0;
                 item.PaymentMethod.Address.Id = 0;
                 item.PaymentMethod.Id = 0;
-                //var context = await _orderService.CalculateOrder(item);
-                //_orderService.UpdateOrderFromCalculationContext(item, context);
+                await _orderService.CalculateOrder(item);
                 item = await _orderService.InsertAsync(item);
             }
 
@@ -264,7 +263,7 @@ namespace VC.Admin.Controllers
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
 
-            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            if (toReturn.Main != null && !IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
                 var model = _mapper.ToModel<OrderManageModel>(dynamic);
@@ -274,7 +273,7 @@ namespace VC.Admin.Controllers
                     NullValueHandling = NullValueHandling.Include,
                 });
             }
-            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            if (toReturn.Before != null && !IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
                 var model = _mapper.ToModel<OrderManageModel>(dynamic);

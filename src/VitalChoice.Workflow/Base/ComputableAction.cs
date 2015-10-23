@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Base
 {
     public abstract class ComputableAction<TContext>: WorkflowAction<TContext, decimal> 
-        where TContext : ComputableContext {
+        where TContext : ComputableDataContext {
         protected ComputableAction(ComputableTree<TContext> tree, string actionName) : base(tree, actionName)
         {
         }
@@ -14,6 +15,6 @@ namespace VitalChoice.Workflow.Base
             return currentValue + result;
         }
 
-        public abstract override decimal ExecuteAction(TContext context);
+        public abstract override Task<decimal> ExecuteAction(TContext context, IWorkflowExecutionContext executionContext);
     }
 }

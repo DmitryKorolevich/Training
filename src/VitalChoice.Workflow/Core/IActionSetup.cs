@@ -1,7 +1,7 @@
 ﻿namespace VitalChoice.Workflow.Core
 {
-    public interface IActionSetup<out TContext, in TResult> 
-        where TContext : WorkflowContext<TResult>
+    public interface IActionSetup<out TContext, TResult> 
+        where TContext : WorkflowDataContext<TResult>
     {
         IActionSetup<TContext, TResult> Aggregate<T>()
             where T : IWorkflowExecutor<TContext, TResult>;
