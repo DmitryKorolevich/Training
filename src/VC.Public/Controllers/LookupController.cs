@@ -19,7 +19,10 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using System.Linq;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Country;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Public.Controllers
 {
@@ -27,10 +30,12 @@ namespace VC.Public.Controllers
     public class LookupController : BaseMvcController
 	{
 		private readonly ICountryService _countryService;
+		private readonly IAppInfrastructureService _appInfrastructureService;
 
-		public LookupController(ICountryService countryService)
+		public LookupController(ICountryService countryService, IAppInfrastructureService appInfrastructureService)
 		{
 			_countryService = countryService;
+			_appInfrastructureService = appInfrastructureService;
 		}
 
 		[HttpGet]
@@ -47,6 +52,17 @@ namespace VC.Public.Controllers
 					Id = x.Id
 				}).OrderBy(x => x.StateName).ToList()
 			}).ToList();
+		}
+
+		[CustomerAuthorize]
+		[HttpGet]
+		public Result<IList<LookupItem<int>>> GetCreditCardTypes()
+		{
+			var referenceData = _appInfrastructureService.Get();
+
+			var creditCardTypes = referenceData.CreditCardTypes;
+
+			return new Result<IList<LookupItem<int>>>(true, creditCardTypes);
 		}
 	}
 }

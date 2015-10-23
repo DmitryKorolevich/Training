@@ -1000,6 +1000,14 @@ footer{
 		margin-bottom:5px;
 	}
 
+	.left-indent-small{
+		margin-left:10px;
+	}
+
+	.left-indent-medium{
+		margin-left:25px;
+	}
+
 	.length-restricted-text{
 		max-width: 200px;
 		text-overflow:ellipsis;
@@ -1075,7 +1083,7 @@ footer{
 		cursor: pointer;
 		border: 1px solid #CCCCCC;
 		white-space: nowrap;
-		padding: 8px 12px;
+		padding: 7px 12px;
 		color: #000;
 		margin-right: 10px;
 
@@ -1090,6 +1098,20 @@ footer{
 		&.yellow:hover{
 			background-color: #FFE03C;
 		}
+
+		&.red{
+
+		}
+
+		&.red:hover{
+			background-color: #FFBFBF;
+		}
+	}
+
+	
+	input[type=submit].inline-button,
+	input[type=button].inline-button{
+		vertical-align: top;
 	}
 }
 
@@ -1121,6 +1143,10 @@ footer{
 .form-regular.medium-small{
 	.control-label{
 		width:120px;
+	}
+
+	.control-label-indent{
+		margin-left:136px;
 	}
 
 	.form-buttons-group{
@@ -1191,6 +1217,10 @@ footer{
 				height: 31px;
 				padding: 2px 5px;
 				width:200px;
+
+				&.small-form-control{
+					width:50px;
+				}
 			}
 
 			.form-control-static{
@@ -1224,6 +1254,10 @@ footer{
 		:first-child{
 			margin-left:215px;
 		}
+	}
+
+	.pull-right{
+		float:right;
 	}
 }
 

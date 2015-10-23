@@ -251,35 +251,62 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var result = new TModel();
-            ToModelItem(dynamic, result, typeof(TModel), typeof(TDynamic));
 
-            IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
-            {
-                var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
-                converter?.DynamicToModel(result, dynamic);
-            }
+	        ToModel(dynamic, result);
+
             return result;
         }
 
-        public TDynamic FromModel<TModel>(TModel model)
+		public void ToModel<TModel>(TDynamic dynamic, TModel result)
+		   where TModel : class, new()
+		{
+			if (dynamic == null)
+				return;
+
+			if (result == null)
+				return;
+
+			ToModelItem(dynamic, result, typeof(TModel), typeof(TDynamic));
+
+			IModelToDynamicConverter conv;
+			if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
+			{
+				var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
+				converter?.DynamicToModel(result, dynamic);
+			}
+		}
+
+		public TDynamic FromModel<TModel>(TModel model)
         {
             if (model == null)
                 return null;
 
             var result = new TDynamic();
-            FromModelItem(result, model, typeof(TModel), typeof(TDynamic));
 
-            IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
-            {
-                var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
-                converter?.ModelToDynamic(model, result);
-            }
+			FromModel(model, result);
+
             return result;
         }
 
-        object IDynamicToModelMapper.ToModel(dynamic dynamic, Type modelType)
+		public void FromModel<TModel>(TModel model, TDynamic result)
+		{
+			if (model == null)
+				return;
+
+			if (result == null)
+				return;
+
+			FromModelItem(result, model, typeof(TModel), typeof(TDynamic));
+
+			IModelToDynamicConverter conv;
+			if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
+			{
+				var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
+				converter?.ModelToDynamic(model, result);
+			}
+		}
+
+		object IDynamicToModelMapper.ToModel(dynamic dynamic, Type modelType)
         {
             if (dynamic == null)
                 return null;
@@ -288,34 +315,58 @@ namespace VitalChoice.DynamicData.Base
             ToModelItem(dynamic, result, modelType,
                 typeof(TDynamic));
 
-            IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
-            {
-                dynamic converter = conv;
-                converter?.DynamicToModel(result, dynamic);
-            }
+			ToModel(dynamic, result);  //!!!
 
-            return result;
+			return result;
         }
 
-        MappedObject IDynamicToModelMapper.FromModel(Type modelType, dynamic model)
+	    void IDynamicToModelMapper.ToModel(dynamic dynamic, Type modelType, dynamic result)
+	    {
+		    if (dynamic == null)
+			    return;
+
+		    if (result == null)
+			    return;
+
+			IModelToDynamicConverter conv;
+			if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
+			{
+				dynamic converter = conv;
+				converter?.DynamicToModel(result, dynamic);
+			}
+		}
+
+	    MappedObject IDynamicToModelMapper.FromModel(Type modelType, dynamic model)
         {
             if (model == null)
                 return null;
 
             var result = new TDynamic();
-            FromModelItem(result, model, modelType, typeof(TDynamic));
 
-            IModelToDynamicConverter conv;
-            if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
-            {
-                dynamic converter = conv;
-                converter?.ModelToDynamic(model, result);
-            }
+		    FromModel(model, result); //!!!
+
             return result;
         }
 
-        public void UpdateEntity(TDynamic dynamic, TEntity entity)
+		void IDynamicToModelMapper.FromModel(Type modelType, dynamic model, dynamic result)
+		{
+			if (model == null)
+				return;
+
+			if (result == null)
+				return;
+
+			FromModelItem(result, model, modelType, typeof(TDynamic));
+
+			IModelToDynamicConverter conv;
+			if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
+			{
+				dynamic converter = conv;
+				converter?.ModelToDynamic(model, result);
+			}
+		}
+
+		public void UpdateEntity(TDynamic dynamic, TEntity entity)
         {
             if (entity == null)
                 return;

@@ -13,7 +13,9 @@ namespace VitalChoice.DynamicData.Interfaces
     public interface IDynamicToModelMapper
     {
         object ToModel(dynamic dynamic, Type modelType);
+        void ToModel(dynamic dynamic, Type modelType, dynamic model);
         MappedObject FromModel(Type modelType, dynamic model);
+        void FromModel(Type modelType, dynamic model, dynamic dynamic);
     }
 
     public interface IDynamicToModelMapper<TDynamic>
@@ -22,7 +24,12 @@ namespace VitalChoice.DynamicData.Interfaces
         TModel ToModel<TModel>(TDynamic dynamic)
             where TModel : class, new();
 
-        TDynamic FromModel<TModel>(TModel model);
+		void ToModel<TModel>(TDynamic dynamic, TModel model)
+		  where TModel : class, new();
+
+		TDynamic FromModel<TModel>(TModel model);
+
+		void FromModel<TModel>(TModel model, TDynamic dynamic);
     }
 
     public class DynamicEntityPair<TDynamic, TEntity>

@@ -27,7 +27,7 @@ namespace VC.Public.Models.Profile
 		public string CardNumber { get; set; }
 
 		[Required]
-		[Display(Name = "Expiration Date Month")]
+		[Display(Name = "Expiration Date")]
 		[Map]
 		public int? ExpirationDateMonth { get; set; }
 
@@ -36,8 +36,10 @@ namespace VC.Public.Models.Profile
 		[Map]
 		public int? ExpirationDateYear { get; set; }
 
+		[Required]
+		[Display(Name = "Card Type")]
 		[Map]
-		public CreditCardType CardType { get; set; }
+		public int CardType { get; set; }
 
 		public bool IsSelected { get; set; }
 	}

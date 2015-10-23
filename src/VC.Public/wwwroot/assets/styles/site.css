@@ -865,6 +865,12 @@ footer {
 .working-area-holder .bottom-indent-small {
   margin-bottom: 5px;
 }
+.working-area-holder .left-indent-small {
+  margin-left: 10px;
+}
+.working-area-holder .left-indent-medium {
+  margin-left: 25px;
+}
 .working-area-holder .length-restricted-text {
   max-width: 200px;
   text-overflow: ellipsis;
@@ -926,7 +932,7 @@ footer {
   cursor: pointer;
   border: 1px solid #CCCCCC;
   white-space: nowrap;
-  padding: 8px 12px;
+  padding: 7px 12px;
   color: #000;
   margin-right: 10px;
 }
@@ -941,6 +947,14 @@ footer {
 .working-area-holder input[type=submit].yellow:hover,
 .working-area-holder input[type=button].yellow:hover {
   background-color: #FFE03C;
+}
+.working-area-holder input[type=submit].red:hover,
+.working-area-holder input[type=button].red:hover {
+  background-color: #FFBFBF;
+}
+.working-area-holder input[type=submit].inline-button,
+.working-area-holder input[type=button].inline-button {
+  vertical-align: top;
 }
 .form-group {
   margin-bottom: 15px;
@@ -959,6 +973,9 @@ footer {
 }
 .form-regular.medium-small .control-label {
   width: 120px;
+}
+.form-regular.medium-small .control-label-indent {
+  margin-left: 136px;
 }
 .form-regular.medium-small .form-buttons-group :first-child {
   margin-left: 135px;
@@ -1018,6 +1035,9 @@ footer {
   padding: 2px 5px;
   width: 200px;
 }
+.form-regular .form-group .input-group .form-control.small-form-control {
+  width: 50px;
+}
 .form-regular .form-group .input-group .form-control-static {
   padding: 8px 5px;
   display: block;
@@ -1042,6 +1062,9 @@ footer {
 }
 .form-regular .form-buttons-group :first-child {
   margin-left: 215px;
+}
+.form-regular .pull-right {
+  float: right;
 }
 .validation-summary-errors {
   color: red;
