@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Domain.Mail
 {
-    public class SuccessfulCustomerRegistration
+    public class SuccessfulUserRegistration
     {
 		public string FirstName { get; set; }
 		public string LastName { get; set; }

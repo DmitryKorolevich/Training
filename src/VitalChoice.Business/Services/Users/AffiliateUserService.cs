@@ -27,19 +27,38 @@ using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Business.Services.Users
 {
-	public class StorefrontUserService : UserService, IStorefrontUserService
-	{
-		public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, IUserValidator<ApplicationUser> userValidator) : base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator)
+	public class AffiliateUserService : UserService, IAffiliateUserService
+    {
+		public AffiliateUserService(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
+            IDataContextAsync context, 
+            SignInManager<ApplicationUser> signInManager, 
+            IAppInfrastructureService appInfrastructureService,
+            INotificationService notificationService,
+            IOptions<AppOptions> options, 
+            IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, 
+            IUserValidator<ApplicationUser> userValidator) :
+            base(
+                userManager,
+                roleManager,
+                context, 
+                signInManager, 
+                appInfrastructureService,
+                notificationService, 
+                options, 
+                ecommerceRepositoryAsync,
+                userValidator)
 		{
 		}
 
 		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{
-			await NotificationService.SendCustomerActivationAsync(dbUser.Email, new UserActivation()
+			await NotificationService.SendAffiliateActivationAsync(dbUser.Email, new UserActivation()
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}account/activate/{dbUser.ConfirmationToken}"
+				Link = $"{Options.PublicHost}affiliateaccount/activate/{dbUser.ConfirmationToken}"
 			});
 		}
 
@@ -49,7 +68,7 @@ namespace VitalChoice.Business.Services.Users
 			{
 				FirstName = dbUser.FirstName,
 				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}account/resetpassword/{token}"
+				Link = $"{Options.PublicHost}affiliateaccount/resetpassword/{token}"
 			});
 		}
 
@@ -61,7 +80,7 @@ namespace VitalChoice.Business.Services.Users
 			}
 
 			var ids = roles.Select(x => (int)x).ToList();
-			if (RoleManager.Roles.Any(x => x.IdUserType != UserType.Customer && ids.Contains(x.Id)))
+			if (RoleManager.Roles.Any(x => x.IdUserType != UserType.Affiliate && ids.Contains(x.Id)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToAssignWrongRole]);
 			}
@@ -69,7 +88,7 @@ namespace VitalChoice.Business.Services.Users
 
 		protected override Task ValidateUserInternalAsync(ApplicationUser user)
 		{
-			if (user.IdUserType!= UserType.Customer)
+			if (user.IdUserType!= UserType.Affiliate)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToUpdateUsingWrongService]);
 			}
@@ -79,11 +98,11 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
-			await NotificationService.SendCustomerRegistrationSuccess(email, new SuccessfulUserRegistration()
+			await NotificationService.SendAffiliateRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{
 				FirstName = firstName,
 				LastName = lastName,
-				ProfileLink = $"{Options.PublicHost}profile/index"
+				ProfileLink = $"{Options.PublicHost}affiliateprofile/index"
 			});
 		}
 	}

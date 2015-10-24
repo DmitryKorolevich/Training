@@ -10,9 +10,7 @@ namespace VitalChoice.Business.Mail
     public interface INotificationService
     {
 	    Task SendAdminUserActivationAsync(string email, UserActivation activation);
-
-		Task SendStorefrontUserActivationAsync(string email, UserActivation activation);
-
+        
 		Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset);
 
         Task<bool> SendBasicEmailAsync(BasicEmail email);
@@ -23,6 +21,12 @@ namespace VitalChoice.Business.Mail
 
         Task SendBugTicketUpdatingEmailForAuthorAsync(string email, BugTicketEmail bugTicketEmail);
 
-	    Task SendCustomerRegistrationSuccess(string email, SuccessfulCustomerRegistration registration);
+        Task SendCustomerActivationAsync(string email, UserActivation activation);
+
+        Task SendCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration);
+
+        Task SendAffiliateActivationAsync(string email, UserActivation activation);
+
+        Task SendAffiliateRegistrationSuccess(string email, SuccessfulUserRegistration registration);
     }
 }

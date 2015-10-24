@@ -87,12 +87,12 @@ namespace VitalChoice.Business.Services
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
-	        referenceData.AdminRoles = roleManager.Roles.Where(x => !x.IsStorefrontRole).Select(x => new LookupItem<int>
+	        referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType== UserType.Admin).Select(x => new LookupItem<int>
 	        {
 		        Key = x.Id,
 		        Text = x.Name
 	        }).ToList();
-			referenceData.CustomerRoles = roleManager.Roles.Where(x => x.IsStorefrontRole).Select(x => new LookupItem<int>
+			referenceData.CustomerRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
 			{
 				Key = x.Id,
 				Text = x.Name

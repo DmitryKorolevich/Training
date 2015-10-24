@@ -116,3 +116,18 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM AffiliateOptionTypes WHERE Name='Email')
+BEGIN
+
+DELETE AffiliateOptionValues
+
+DELETE Affiliates
+
+DELETE AffiliateOptionTypes WHERE Name='Email'
+
+ALTER TABLE Affiliates ADD Email NVARCHAR(100) NOT NULL DEFAULT('')
+
+END
+
+GO

@@ -34,18 +34,6 @@ namespace VitalChoice.Business.Mail
 		    await emailSender.SendEmailAsync(email, subject, body);
 	    }
 
-		public async Task SendStorefrontUserActivationAsync(string email, UserActivation activation)
-		{
-			//todo:refactor this to user nustache or something
-
-			var body =
-				$"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
-
-			var subject = "Vital Choice - Setup Your Account To Order Online";
-
-			await emailSender.SendEmailAsync(email, subject, body);
-		}
-
 		public async Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset)
 	    {
 			//todo:refactor this to user nustache or something
@@ -103,7 +91,21 @@ namespace VitalChoice.Business.Mail
             await emailSender.SendEmailAsync(email, subject, body);
         }
 
-	    public async Task SendCustomerRegistrationSuccess(string email, SuccessfulCustomerRegistration registration)
+
+
+        public async Task SendCustomerActivationAsync(string email, UserActivation activation)
+        {
+            //todo:refactor this to user nustache or something
+
+            var body =
+                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+            var subject = "Vital Choice - Setup Your Account To Order Online";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task SendCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
 	    {
 			var body =
 				$"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
@@ -114,5 +116,31 @@ namespace VitalChoice.Business.Mail
 
 			await emailSender.SendEmailAsync(email, subject, body);
 		}
+
+
+
+        public async Task SendAffiliateActivationAsync(string email, UserActivation activation)
+        {
+            //todo:refactor this to user nustache or something
+
+            var body =
+                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+            var subject = "Vital Choice - Setup Your Account To Order Online";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task SendAffiliateRegistrationSuccess(string email, SuccessfulUserRegistration registration)
+        {
+            var body =
+                $"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
+                $"<p>At any time you can log into your account to check order status, update your billing information, add multiple shipping addresses, and much more. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>" +
+                $"<p>Thanks again for visiting our store. Let us know if there is anything we can do to make your experience with us a better one!</p>";
+
+            var subject = "Vital Choice - Confirmation of Affiliate Registration";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
     }
 }

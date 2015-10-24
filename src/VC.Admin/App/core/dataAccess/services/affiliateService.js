@@ -39,5 +39,13 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.post(baseUrl + 'DeleteAffiliate/' + id, null, getConfig(tracker));
 	    },
+	    resendActivation: function (publicId, tracker)
+	    {
+	        return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
+	    },
+	    resetPassword: function (publicId, tracker)
+	    {
+	        return $http.post(baseUrl + 'ResetPassword/' + publicId, null, getConfig(tracker));
+	    },
 	};
 }]);

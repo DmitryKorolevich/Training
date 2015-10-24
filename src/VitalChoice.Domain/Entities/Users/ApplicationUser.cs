@@ -34,6 +34,6 @@ namespace VitalChoice.Domain.Entities.Users
 
 		public bool IsConfirmed { get; set; }
 
-		public bool IsAdminUser { get; set; }
-	}
+        public UserType IdUserType { get; set; }
+    }
 }

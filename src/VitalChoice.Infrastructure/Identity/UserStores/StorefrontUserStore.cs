@@ -8,6 +8,7 @@ using Microsoft.Data.Entity;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Infrastructure.Identity.UserStores
 {
@@ -18,6 +19,6 @@ namespace VitalChoice.Infrastructure.Identity.UserStores
 
 	    }
 
-		public override IQueryable<ApplicationUser> Users => Context.Users.Include(x => x.Roles).Where(x => !x.IsAdminUser && !x.DeletedDate.HasValue);
+		public override IQueryable<ApplicationUser> Users => Context.Users.Include(x => x.Roles).Where(x => x.IdUserType == UserType.Customer && !x.DeletedDate.HasValue);
 	}
 }

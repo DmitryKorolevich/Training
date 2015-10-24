@@ -35,6 +35,10 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
+using VitalChoice.Domain.Entities.Roles;
+using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Domain.Entities.Options;
+using Microsoft.Framework.OptionsModel;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -43,6 +47,8 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly INotificationService _notificationService;
+        private readonly IAffiliateUserService _affiliateUserService;
+        private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
             IEcommerceRepositoryAsync<AffiliateOptionType> affiliateOptionTypeRepository,
@@ -51,7 +57,10 @@ namespace VitalChoice.Business.Services.Affiliates
             AffiliateMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository, INotificationService notificationService,
+            IRepositoryAsync<AdminProfile> adminProfileRepository, 
+            INotificationService notificationService,
+            IAffiliateUserService affiliateUserService,
+            IOptions<AppOptions> appOptions,
             ILoggerProviderExtended loggerProvider)
             : base(
                 mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
@@ -60,6 +69,8 @@ namespace VitalChoice.Business.Services.Affiliates
             _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;
             _notificationService = notificationService;
+            _affiliateUserService = affiliateUserService;
+            _appOptions = appOptions;
         }
 
         protected override bool LogObject { get { return false; } }
@@ -157,6 +168,173 @@ namespace VitalChoice.Business.Services.Affiliates
         {
             await _notificationService.SendBasicEmailAsync(model);
             return true;
+        }
+
+        public async Task<AffiliateDynamic> InsertAsync(AffiliateDynamic model, string password)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var entity = await InsertAsync(model, uow, password);
+                return await SelectAsync(entity.Id);
+            }
+        }
+
+        public async Task<AffiliateDynamic> UpdateAsync(AffiliateDynamic model, string password)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var entity = await UpdateAsync(model, uow, password);
+                return await SelectAsync(entity.Id);
+            }
+        }
+
+        protected override async Task<Affiliate> InsertAsync(AffiliateDynamic model, IUnitOfWorkAsync uow)
+        {
+            return await InsertAsync(model, uow, null);
+        }
+
+        protected override async Task<Affiliate> UpdateAsync(AffiliateDynamic model, IUnitOfWorkAsync uow)
+        {
+            return await UpdateAsync(model, uow, null);
+        }
+
+        protected override async Task<List<MessageInfo>> Validate(AffiliateDynamic model)
+        {
+            var errors = new List<MessageInfo>();
+
+            var itemSameEmail = await ObjectRepository.Query(
+                        new AffiliateQuery().NotDeleted().Excluding(model.Id).WithEmail(model.Email)).SelectAsync(false);
+
+            if (itemSameEmail.Any())
+            {
+                throw new AppValidationException(
+                    string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
+            }
+
+            return errors;
+        }
+
+        private async Task<Affiliate> InsertAsync(AffiliateDynamic model, IUnitOfWorkAsync uow, string password)
+        {
+            var roles = new List<RoleType>() { RoleType.Affiliate };
+            
+            var appUser = new ApplicationUser()
+            {
+                FirstName = model.Name,
+                LastName = String.Empty,
+                Email = model.Email,
+                UserName = model.Email,
+                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
+                IsConfirmed = false,
+                ConfirmationToken = Guid.NewGuid(),
+                IdUserType = UserType.Customer,
+                Profile = null,
+                Status = UserStatus.NotActive
+            };
+
+            var suspendedCustomer = (int)AffiliateStatus.Suspended;
+
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(password))
+                    {
+                        appUser.IsConfirmed = true;
+                        appUser.Status = model.StatusCode == suspendedCustomer
+                            ? UserStatus.Disabled
+                            : UserStatus.Active;
+                    }
+                    else
+                    {
+                        appUser.Status = model.StatusCode == suspendedCustomer ? UserStatus.Disabled : UserStatus.NotActive;
+                    }
+
+                    appUser = await _affiliateUserService.CreateAsync(appUser, roles, false, false, password);
+
+                    model.Id = appUser.Id;
+
+                    var customer = await base.InsertAsync(model, uow);
+
+                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
+                    {
+                        await _affiliateUserService.SendActivationAsync(model.Email);
+                    }
+
+                    transaction.Commit();
+
+                    return customer;
+                }
+                catch
+                {
+                    if (appUser.Id > 0)
+                    {
+                        await _affiliateUserService.DeleteAsync(appUser);
+                    }
+
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        private async Task<Affiliate> UpdateAsync(AffiliateDynamic model, IUnitOfWorkAsync uow, string password)
+        {
+            var appUser = await _affiliateUserService.GetAsync(model.Id);
+            if (appUser == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+            }
+
+            switch (model.StatusCode)
+            {
+                case (int)AffiliateStatus.Active:
+                    appUser.Status = UserStatus.Active;
+                    break;
+                case (int)AffiliateStatus.NotActive:
+                    appUser.Status = UserStatus.NotActive;
+                    break;
+                case (int)AffiliateStatus.Suspended:
+                    appUser.Status = UserStatus.Disabled;
+                    break;
+                case (int)AffiliateStatus.Deleted:
+                    appUser.Status = UserStatus.NotActive;
+                    appUser.DeletedDate = DateTime.Now;
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                appUser.IsConfirmed = true;
+            }
+
+            appUser.Email = model.Email;
+            appUser.UserName = model.Email;
+            
+            appUser.FirstName = model.Name;
+            appUser.LastName = String.Empty;
+
+            //TODO: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //try
+            //{
+            var customer = await base.UpdateAsync(model, uow);
+
+            //transaction.Commit();
+
+            var roles = new List<RoleType>() { RoleType.Affiliate };
+
+            await _affiliateUserService.UpdateAsync(appUser, roles, password);
+
+            return customer;
+            //}
+            //catch (Exception ex)
+            //{
+            //	transaction.Rollback();
+            //	throw;
+            //}
+            //}
         }
     }
 }

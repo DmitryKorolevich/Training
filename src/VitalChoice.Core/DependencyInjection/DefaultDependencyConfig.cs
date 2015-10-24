@@ -112,7 +112,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddUserStore<AdminUserStore>()
                 .AddUserValidator<AdminUserValidator>()
                 .AddUserManager<ExtendedUserManager>()
-                .AddTokenProvider<UserTokenProvider>("user_tokes");
+                .AddTokenProvider<UserTokenProvider>("Default");
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
             services.TryAdd(
@@ -319,6 +319,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CacheProvider>().As<ICacheProvider>().SingleInstance();
             builder.RegisterType<AppInfrastructureService>().As<IAppInfrastructureService>();
 	        builder.RegisterType<AdminUserService>().As<IAdminUserService>();
+
 	        builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("storefronUserStore");
 	        builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("storefrontUserValidator");
 	        builder.RegisterType<ExtendedUserManager>()
@@ -337,7 +338,26 @@ namespace VitalChoice.Core.DependencyInjection
 			        (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("storefrontUserValidator"))
 		        .WithParameter((pi, cc) => pi.Name == "signInManager",
 			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager"));
-			builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
+
+            builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore");
+            builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("affiliateUserValidator");
+            builder.RegisterType<ExtendedUserManager>()
+                .Named<ExtendedUserManager>("affiliateUserManager")
+                .WithParameter((pi, cc) => pi.Name == "store",
+                    (pi, cc) => cc.ResolveNamed<IUserStore<ApplicationUser>>("affiliateUserStore"));
+            builder.RegisterType<SignInManager<ApplicationUser>>()
+                .Named<SignInManager<ApplicationUser>>("affiliateSignInManager")
+                .WithParameter((pi, cc) => pi.Name == "userManager",
+                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("affiliateUserManager"));
+            builder.RegisterType<AffiliateUserService>()
+                .As<IAffiliateUserService>()
+                .WithParameter((pi, cc) => pi.Name == "userManager",
+                    (pi, cc) => cc.ResolveNamed<ExtendedUserManager>("affiliateUserManager"))
+                .WithParameter((pi, cc) => pi.Name == "userValidator",
+                    (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("affiliateUserValidator"))
+                .WithParameter((pi, cc) => pi.Name == "signInManager",
+                    (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager"));
+            builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
             builder.RegisterType<ProductReviewService>().As<IProductReviewService>();

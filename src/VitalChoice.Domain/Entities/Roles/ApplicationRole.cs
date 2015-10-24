@@ -8,6 +8,6 @@ namespace VitalChoice.Domain.Entities.Roles
 {
     public class ApplicationRole: IdentityRole<int>
     {
-	    public bool IsStorefrontRole { get; set; }
+	    public UserType IdUserType { get; set; }
     }
 }
