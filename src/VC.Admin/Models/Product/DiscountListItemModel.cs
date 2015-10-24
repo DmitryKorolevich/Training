@@ -44,8 +44,8 @@ namespace VC.Admin.Models.Product
                 Description = item.Description;
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
-                DiscountType = (DiscountType)(item.IdObjectType ?? 0);
-                DiscountTypeName = LookupHelper.GetDiscountTypeName((DiscountType)(item.IdObjectType ?? 0));
+                DiscountType = (DiscountType)item.IdObjectType;
+                DiscountTypeName = LookupHelper.GetDiscountTypeName((DiscountType)item.IdObjectType);
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;

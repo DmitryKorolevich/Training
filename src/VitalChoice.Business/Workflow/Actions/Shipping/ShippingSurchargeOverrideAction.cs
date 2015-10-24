@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             decimal surchargeOverride = dataContext.Order.Data.SurchargeOverride;
             decimal surchargeTotal = dataContext.AlaskaHawaiiSurcharge + dataContext.CanadaSurcharge;

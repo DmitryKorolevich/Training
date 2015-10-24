@@ -12,6 +12,7 @@ using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Promotion;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
 namespace VitalChoice.Business.Services.Dynamic

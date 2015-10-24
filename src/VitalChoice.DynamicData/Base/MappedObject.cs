@@ -22,7 +22,7 @@ namespace VitalChoice.DynamicData.Base
         public DateTime DateEdited { get; set; }
         public int? IdEditedBy { get; set; }
         public Type ModelType { get; internal set; }
-        public int? IdObjectType { get; set; }
+        public int IdObjectType { get; set; }
 
         [JsonIgnore]
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;

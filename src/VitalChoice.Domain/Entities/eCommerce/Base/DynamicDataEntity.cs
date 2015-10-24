@@ -16,7 +16,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
 
 		public int? IdEditedBy { get; set; }
 
-        public int? IdObjectType { get; set; }
+        public int IdObjectType { get; set; }
 
         public User EditedBy { get; set; }
 

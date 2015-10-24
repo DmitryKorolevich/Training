@@ -2,8 +2,10 @@
 
 namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
-    public class ShortSkuInfo : Entity
+    public class ShortSkuInfo
     {
+        public int Id { get; set; }
+
         public int IdProduct { get; set; }
 
         public string Code { get; set; }

@@ -42,8 +42,8 @@ namespace VC.Admin.Models.Product
                 Description = item.Description;
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
-                PromotionType = (PromotionType)(item.IdObjectType ?? 0);
-                PromotionTypeName = LookupHelper.GetPromotionTypeName((PromotionType)(item.IdObjectType ?? 0));
+                PromotionType = (PromotionType)item.IdObjectType;
+                PromotionTypeName = LookupHelper.GetPromotionTypeName((PromotionType)item.IdObjectType);
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;

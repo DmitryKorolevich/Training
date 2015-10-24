@@ -123,7 +123,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype([FromBody] object temp)
         {
-            var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int?)CustomerType.Retail);
+            var model = await _customerService.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
             model.TaxExempt = TaxExempt.YesCurrentCertificate;
             model.Tier = Tier.Tier1;

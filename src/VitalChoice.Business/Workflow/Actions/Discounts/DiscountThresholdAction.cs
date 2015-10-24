@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
             if (dataContext.ProductsSubtotal < dataContext.Order.Discount.Data.Threshold)

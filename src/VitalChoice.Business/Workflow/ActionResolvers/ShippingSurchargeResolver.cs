@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
         }
 
-        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             if (dataContext.Order.ShippingAddress == null)
                 return Task.FromResult((int) SurchargeType.None);

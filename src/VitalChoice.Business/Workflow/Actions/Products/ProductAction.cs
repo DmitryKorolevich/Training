@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             //TODO: check if skus is unique
             dataContext.SkuOrdereds = dataContext.Order.Skus.ToList();

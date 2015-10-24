@@ -498,7 +498,6 @@ namespace VitalChoice.DynamicData.Base
                 return null;
 
             var task = ToEntityAsync(dynamic, optionTypes);
-            task.Wait();
             return task.Result;
         }
 

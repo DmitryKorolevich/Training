@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             if (dataContext.Data.PromoProducts < 200 && dataContext.Data.DeliveredAmount > 0)
             {

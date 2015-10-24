@@ -36,7 +36,7 @@ namespace VC.Admin.Models.Order
                 DateCreated = item.DateCreated;
                 Total = item.Total;
                 DateEdited = item.DateEdited;
-                IdObjectType = item.IdObjectType.HasValue ? (OrderType)item.IdObjectType.Value : OrderType.Normal;
+                IdObjectType = (OrderType)item.IdObjectType;
             }
         }
     }

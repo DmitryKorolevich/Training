@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
-namespace VitalChoice.Domain.Entities.eCommerce.Promotions
+namespace VitalChoice.Domain.Entities.eCommerce.Promotion
 {
     public class Promotion : DynamicDataEntity<PromotionOptionValue, PromotionOptionType>
     {

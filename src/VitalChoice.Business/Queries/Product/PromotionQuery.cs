@@ -4,8 +4,10 @@ using VitalChoice.Domain;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.eCommerce.Promotion;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using VitalChoice.Domain.Entities.Logs;
 using VitalChoice.Domain.Transfer;
@@ -20,6 +22,12 @@ namespace VitalChoice.Business.Queries.Product
             {
                 Add(x => x.Description.Contains(description));
             }
+            return this;
+        }
+
+        public PromotionQuery IsActive()
+        {
+            Add(x => x.StatusCode == (int)RecordStatusCode.Active);
             return this;
         }
 
@@ -82,6 +90,12 @@ namespace VitalChoice.Business.Queries.Product
                     Add(x => x.ExpirationDate > date);
                 }
             }
+            return this;
+        }
+
+        public PromotionQuery AllowCustomerType(CustomerType customerType)
+        {
+            Add(p => p.Assigned == null || p.Assigned == customerType);
             return this;
         }
     }

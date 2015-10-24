@@ -15,9 +15,9 @@ namespace VitalChoice.Workflow.Core
         }
 
         public abstract TResult AggregateResult(TResult result, TResult currentValue, string actionName);
-        public abstract Task<TResult> ExecuteAction(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract Task<TResult> ExecuteActionAsync(TContext context, IWorkflowExecutionContext executionContext);
 
-        public override async Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<TResult> ExecuteAsync(TContext context, IWorkflowExecutionContext executionContext)
         {
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))
@@ -25,16 +25,16 @@ namespace VitalChoice.Workflow.Core
             foreach (var actionName in DependendActions)
             {
                 context.ActionLock(actionName);
-                await Tree.GetAction(actionName).Execute(context, executionContext);
+                await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
                 context.ActionUnlock(actionName);
             }
             foreach (var actionName in AggreagatedActions)
             {
                 context.ActionLock(actionName);
-                result = AggregateResult(await Tree.GetAction(actionName).Execute(context, executionContext), result, actionName);
+                result = AggregateResult(await Tree.GetAction(actionName).ExecuteAsync(context, executionContext), result, actionName);
                 context.ActionUnlock(actionName);
             }
-            result = AggregateResult(await ExecuteAction(context, executionContext), result, null);
+            result = AggregateResult(await ExecuteActionAsync(context, executionContext), result, null);
             context.ActionSetResult(Name, result);
             return result;
         }

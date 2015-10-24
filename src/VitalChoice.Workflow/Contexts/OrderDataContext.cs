@@ -48,6 +48,8 @@ namespace VitalChoice.Workflow.Contexts
 
         public Dictionary<int, Dictionary<int, State>> StateCodes { get; set; }
 
+        public List<PromotionDynamic> Promotions { get; set; }
+
         public OrderDataContext()
         {
             Messages = new List<MessageInfo>();

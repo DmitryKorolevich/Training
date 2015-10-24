@@ -25,6 +25,7 @@ using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Domain.Entities.eCommerce.Promotion;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -941,7 +942,7 @@ namespace VitalChoice.Infrastructure.Context
                     .WithOne()
                     .ForeignKey<OrderPaymentMethod>(s => s.IdObjectType)
                     .PrincipalKey<PaymentMethod>(o => o.Id)
-                    .Required(false);
+                    .Required();
                 entity.HasMany(o => o.OptionValues)
                     .WithOne()
                     .ForeignKey(g => g.IdOrderPaymentMethod)

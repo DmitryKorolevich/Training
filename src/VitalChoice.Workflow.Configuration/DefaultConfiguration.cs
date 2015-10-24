@@ -7,6 +7,7 @@ using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.GiftCertificates;
 using VitalChoice.Business.Workflow.Actions.Products;
+using VitalChoice.Business.Workflow.Actions.Promo;
 using VitalChoice.Business.Workflow.Actions.Shipping;
 using VitalChoice.Business.Workflow.Actions.Tax;
 using VitalChoice.Business.Workflow.Trees;
@@ -28,8 +29,6 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<GetTaxAction>();
             });
 
-            setup.Action<CountriesSetUpAction>("Countries");
-
             setup.Action<GetTaxAction>("TaxTotal", action =>
             {
                 action.Dependency<CountriesSetUpAction>();
@@ -47,17 +46,32 @@ namespace VitalChoice.Workflow.Configuration
                 action.Aggregate<ShippingSurchargeOverrideAction>();
             });
 
+            setup.Action<SetupPromoAction>("PromoSetup");
+            setup.Action<CategoryPromoAction>("CategoryPromotions", action =>
+            {
+                action.Dependency<SetupPromoAction>();
+            });
+            setup.Action<BuyXGetYPromoAction>("PromoBuyXGetY", action =>
+            {
+                action.Dependency<SetupPromoAction>();
+            });
+
+            setup.Action<CountriesSetUpAction>("Countries");
+
             setup.Action<GiftCertificatesPaymentAction>("GiftCertificates", action =>
             {
                 action.Dependency<OrderSubTotalAction>();
             });
 
-            setup.Action<ProductAction>("Products");
+            setup.Action<ProductAction>("Products", action =>
+            {
+                action.Dependency<CategoryPromoAction>();
+            });
 
             setup.Action<ProductsWithPromoAction>("PromoProducts", action =>
             {
                 action.Dependency<DiscountTypeActionResolver>();
-
+                action.Dependency<BuyXGetYPromoAction>();
                 action.Aggregate<ProductAction>();
             });
 

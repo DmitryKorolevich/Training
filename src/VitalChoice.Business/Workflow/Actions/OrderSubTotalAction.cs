@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Actions
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             dataContext.DiscountTotal = -dataContext.Data.Discount;
             dataContext.DiscountedSubtotal = dataContext.Data.Products + dataContext.Data.Discount;

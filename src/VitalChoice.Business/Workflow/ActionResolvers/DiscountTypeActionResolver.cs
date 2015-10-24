@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
         {
         }
 
-        public override Task<int> GetActionKey(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<int> GetActionKeyAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             if (dataContext.Order.Discount == null)
                 return Task.FromResult(0);
@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
             {
                 return Task.FromResult(0);
             }
-            return Task.FromResult(dataContext.Order.Discount.IdObjectType ?? 0);
+            return Task.FromResult(dataContext.Order.Discount.IdObjectType);
         }
 
         private static bool ValidateDiscount(OrderDataContext dataContext)
@@ -63,8 +63,8 @@ namespace VitalChoice.Business.Workflow.ActionResolvers
                 });
                 error = false;
             }
-            if (dataContext.Order.Discount.Assigned.HasValue && dataContext.Order.Customer.IdObjectType.HasValue &&
-                (int) dataContext.Order.Discount.Assigned.Value != dataContext.Order.Customer.IdObjectType.Value)
+            if (dataContext.Order.Discount.Assigned.HasValue &&
+                (int) dataContext.Order.Discount.Assigned.Value != dataContext.Order.Customer.IdObjectType)
             {
                 dataContext.Messages.Add(new MessageInfo
                 {

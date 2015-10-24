@@ -58,7 +58,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (dynamic.IdObjectType == (int)DiscountType.Threshold && withDefaults)
                 {
                     var task = _productService.GetSkuOrderedAsync((string)dynamic.Data.ProductSKU);
-                    task.Wait();
                     dynamic.Data.ThresholdSku = task.Result;
                 }
             });

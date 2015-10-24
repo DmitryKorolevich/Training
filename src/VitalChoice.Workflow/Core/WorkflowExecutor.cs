@@ -13,7 +13,7 @@ namespace VitalChoice.Workflow.Core
             Name = actionName;
         }
 
-        public abstract Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract Task<TResult> ExecuteAsync(TContext context, IWorkflowExecutionContext executionContext);
 
         public string Name { get; }
 

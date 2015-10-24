@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Actions.Tax
         {
         }
 
-        public override async Task<decimal> ExecuteAction(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
             context.TaxTotal = (await

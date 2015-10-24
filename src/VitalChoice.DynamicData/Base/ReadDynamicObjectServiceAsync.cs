@@ -61,14 +61,14 @@ namespace VitalChoice.DynamicData.Base
 
         #endregion
 
-        public virtual async Task<TDynamic> CreatePrototypeAsync(int? idObjectType = null)
+        public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
         {
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
             var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType };
             return await Mapper.FromEntityAsync(entity, true);
         }
 
-        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int? idObjectType = null) 
+        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType) 
             where TModel : class, new()
         {
             return Mapper.ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
@@ -173,18 +173,16 @@ namespace VitalChoice.DynamicData.Base
             return await SelectListAsync(res);
         }
 
-        public TDynamic CreatePrototype(int? idObjectType = null)
+        public TDynamic CreatePrototype(int idObjectType)
         {
             var task = CreatePrototypeAsync(idObjectType);
-            task.Wait();
             return task.Result;
         }
 
-        public TModel CreatePrototypeFor<TModel>(int? idObjectType = null)
+        public TModel CreatePrototypeFor<TModel>(int idObjectType)
             where TModel : class, new()
         {
             var task = CreatePrototypeForAsync<TModel>(idObjectType);
-            task.Wait();
             return task.Result;
         }
 
@@ -193,49 +191,42 @@ namespace VitalChoice.DynamicData.Base
         public TDynamic Select(int id, bool withDefaults)
         {
             var task = SelectAsync(id, withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(ICollection<int> ids, bool withDefaults)
         {
             var task = SelectAsync(ids, withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(bool withDefaults)
         {
             var task = SelectAsync(withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(IQueryObject<TEntity> queryObject, bool withDefaults)
         {
             var task = SelectAsync(queryObject, withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query, bool withDefaults)
         {
             var task = SelectAsync(query, withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(IDictionary<string, object> values, bool withDefaults)
         {
             var task = SelectAsync(values, withDefaults);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> Select(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults)
         {
             var task = SelectAsync(values, query, withDefaults);
-            task.Wait();
             return task.Result;
         }
 

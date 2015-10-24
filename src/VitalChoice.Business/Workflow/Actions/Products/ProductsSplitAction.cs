@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             var products = dataContext.SkuOrdereds.Union(dataContext.PromoSkus).ToArray();
             var perishableProducts =

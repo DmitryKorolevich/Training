@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteAction(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
             dataContext.CanadaSurcharge = 0;
             return Task.FromResult<decimal>(0);

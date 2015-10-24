@@ -26,7 +26,7 @@ namespace VitalChoice.Workflow.Core
 
         public string Name { get; }
 
-        public async Task<TResult> GetActionResult(string actionName, TContext context)
+        public async Task<TResult> GetActionResultAsync(string actionName, TContext context)
         {
             object result;
             if (context.DictionaryData.TryGetValue(actionName, out result)) {
@@ -34,7 +34,7 @@ namespace VitalChoice.Workflow.Core
             }
             using (var executionContext = new AutofacExecutionContext())
             {
-                return await GetAction(actionName).Execute(context, executionContext);
+                return await GetAction(actionName).ExecuteAsync(context, executionContext);
             }
         }
 
@@ -131,22 +131,22 @@ namespace VitalChoice.Workflow.Core
             }
         }
 
-        public async Task<TResult> Execute(string actionName, TContext context)
+        public async Task<TResult> ExecuteAsync(string actionName, TContext context)
         {
             var action = GetAction(actionName);
             using (var executionContext = new AutofacExecutionContext())
             {
-                return await action.Execute(context, executionContext);
+                return await action.ExecuteAsync(context, executionContext);
             }
         }
 
-        public async Task<TResult> Execute<TAction>(TContext context) 
+        public async Task<TResult> ExecuteAsync<TAction>(TContext context) 
             where TAction : IWorkflowExecutor<TContext, TResult>
         {
             var action = GetAction<TAction>();
             using (var executionContext = new AutofacExecutionContext())
             {
-                return await action.Execute(context, executionContext);
+                return await action.ExecuteAsync(context, executionContext);
             }
         }
 
@@ -173,6 +173,6 @@ namespace VitalChoice.Workflow.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public abstract Task<TResult> Execute(TContext context);
+        public abstract Task<TResult> ExecuteAsync(TContext context);
     }
 }

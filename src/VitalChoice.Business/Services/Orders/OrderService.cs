@@ -156,7 +156,7 @@ namespace VitalChoice.Business.Services.Orders
                 Order = order
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
-            await tree.Execute(context);
+            await tree.ExecuteAsync(context);
             UpdateOrderFromCalculationContext(order, context);
             return context;
         }

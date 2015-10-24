@@ -163,56 +163,48 @@ namespace VitalChoice.DynamicData.Base
         public TDynamic Insert(TDynamic model)
         {
             var task = InsertAsync(model);
-            task.Wait();
             return task.Result;
         }
 
         public TDynamic Update(TDynamic model)
         {
             var task = UpdateAsync(model);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> InsertRange(ICollection<TDynamic> models)
         {
             var task = InsertRangeAsync(models);
-            task.Wait();
             return task.Result;
         }
 
         public List<TDynamic> UpdateRange(ICollection<TDynamic> models)
         {
             var task = UpdateRangeAsync(models);
-            task.Wait();
             return task.Result;
         }
 
         public bool DeleteAll(ICollection<TDynamic> models, bool physically = false)
         {
             var task = DeleteAllAsync(models, physically);
-            task.Wait();
             return task.Result;
         }
 
         public bool Delete(TDynamic model, bool physically = false)
         {
             var task = DeleteAsync(model, physically);
-            task.Wait();
             return task.Result;
         }
 
         public bool DeleteAll(ICollection<int> list, bool physically = false)
         {
             var task = DeleteAllAsync(list, physically);
-            task.Wait();
             return task.Result;
         }
 
         public bool Delete(int id, bool physically = false)
         {
             var task = DeleteAsync(id, physically);
-            task.Wait();
             return task.Result;
         }
 

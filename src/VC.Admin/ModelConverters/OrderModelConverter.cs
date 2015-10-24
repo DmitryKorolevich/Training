@@ -111,14 +111,207 @@ namespace VC.Admin.ModelConverters
                         .FirstOrDefault();
             }
 
-            if(model.GCs!=null)
+            ModelToGcsDynamic(model, dynamic);
+
+            ModelToSkusDynamic(model, dynamic);
+
+            if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)
+            {
+                dynamic.DictionaryData["ShipDelayType"] = null;
+            }
+
+            if (model.Id != 0)
+            {
+                if (model.Shipping != null)
+                {
+                    var addressDynamic = _addressMapper.FromModel(model.Shipping);
+                    addressDynamic.IdObjectType = (int)AddressType.Shipping;
+                    dynamic.ShippingAddress = addressDynamic;
+                }
+            }
+            else
+            {
+                var shippingAddress = model.Customer?.Shipping.FirstOrDefault(p => p.IsSelected);
+                if(shippingAddress!=null)
+                {
+                    var addressDynamic = _addressMapper.FromModel(shippingAddress);
+                    addressDynamic.IdObjectType = (int)AddressType.Shipping;
+                    dynamic.ShippingAddress = addressDynamic;
+                }
+            }
+
+            ModelToPaymentDynamic(model, dynamic);
+
+            UpdateCustomer(model, dynamic);
+        }
+
+        private void UpdateCustomer(OrderManageModel model, OrderDynamic dynamic)
+        {
+            if (model.Customer != null)
+            {
+                //update customer
+                var dbCustomer = _customerService.Select(model.Customer.Id, true);
+                if (dbCustomer != null)
+                {
+                    dbCustomer.IdObjectType = (int) model.Customer.CustomerType;
+                    dbCustomer.CustomerNotes = dynamic.Customer.CustomerNotes;
+                    dbCustomer.Files = dynamic.Customer.Files;
+                    if (model.Id == 0)
+                    {
+                        if (dynamic.Customer.DictionaryData.ContainsKey("Source"))
+                        {
+                            dbCustomer.Data.Source = dynamic.Customer.Data.Source;
+                        }
+                        if (dynamic.Customer.DictionaryData.ContainsKey("SourceDetails"))
+                        {
+                            dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
+                        }
+                        dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
+                        dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
+
+                        var profileAddress =
+                            dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
+                        if (profileAddress != null)
+                        {
+                            dbCustomer.Addresses.Remove(profileAddress);
+                        }
+                        profileAddress =
+                            dynamic.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
+                        if (profileAddress != null)
+                        {
+                            dbCustomer.Addresses.Add(profileAddress);
+                        }
+
+                        if (model.UpdateShippingAddressForCustomer)
+                        {
+                            var shippingAddresses =
+                                dbCustomer.Addresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
+                            foreach (var address in shippingAddresses)
+                            {
+                                dbCustomer.Addresses.Remove(address);
+                            }
+                            shippingAddresses =
+                                dynamic.Customer.Addresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
+                            foreach (var address in shippingAddresses)
+                            {
+                                dbCustomer.Addresses.Add(address);
+                            }
+                        }
+
+                        if (model.UpdateCardForCustomer && dynamic.PaymentMethod != null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
+                                PaymentMethodType.CreditCard);
+                            foreach (
+                                var method in
+                                    dynamic.Customer.CustomerPaymentMethods.Where(
+                                        p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                        if (model.UpdateOACForCustomer && dynamic.PaymentMethod != null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
+                                PaymentMethodType.Oac);
+                            foreach (
+                                var method in
+                                    dynamic.Customer.CustomerPaymentMethods.Where(
+                                        p => p.IdObjectType == (int) PaymentMethodType.Oac))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        {
+                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
+                                PaymentMethodType.Check);
+                            foreach (
+                                var method in
+                                    dynamic.Customer.CustomerPaymentMethods.Where(
+                                        p => p.IdObjectType == (int) PaymentMethodType.Check))
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(method);
+                            }
+                        }
+                    }
+
+                    dynamic.Customer = dbCustomer;
+                }
+            }
+        }
+
+        private void ModelToPaymentDynamic(OrderManageModel model, OrderDynamic dynamic)
+        {
+            if (model.Id != 0)
+            {
+                if (model.IdPaymentMethodType.HasValue)
+                {
+                    if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.CreditCard)
+                    {
+                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.CreditCard);
+                    }
+                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Oac)
+                    {
+                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac);
+                    }
+                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Check)
+                    {
+                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Check);
+                    }
+                    else
+                    {
+                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                    }
+                    if (dynamic.PaymentMethod != null)
+                    {
+                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    }
+                }
+            }
+            else
+            {
+                if (model.IdPaymentMethodType.HasValue)
+                {
+                    if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.CreditCard)
+                    {
+                        var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
+                        if (card != null)
+                        {
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card);
+                        }
+                    }
+                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Oac)
+                    {
+                        if (model.Customer != null)
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
+                    }
+                    else if (model.IdPaymentMethodType.Value == (int) PaymentMethodType.Check)
+                    {
+                        if (model.Customer != null)
+                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
+                    }
+                    else
+                    {
+                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
+                    }
+                    if (dynamic.PaymentMethod != null)
+                    {
+                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
+                    }
+                }
+            }
+        }
+
+        private void ModelToGcsDynamic(OrderManageModel model, OrderDynamic dynamic)
+        {
+            if (model.GCs != null)
             {
                 if (model.GCs.Any())
                 {
                     ICollection<string> codes =
                         model.GCs.Select(g => g.Code).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
                     var task = _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
-                    task.Wait();
                     dynamic.GiftCertificates = task.Result.Select(g => new GiftCertificateInOrder
                     {
                         GiftCertificate = g,
@@ -126,7 +319,10 @@ namespace VC.Admin.ModelConverters
                     }).ToList();
                 }
             }
+        }
 
+        private void ModelToSkusDynamic(OrderManageModel model, OrderDynamic dynamic)
+        {
             if (model.SkuOrdereds != null)
             {
                 model.SkuOrdereds = model.SkuOrdereds.Where(s => !(s.Promo ?? false)).ToList();
@@ -134,10 +330,8 @@ namespace VC.Admin.ModelConverters
                 var validList = model.SkuOrdereds.Where(s => s.Id.HasValue).Select(s => s.Id.Value).ToList();
                 var notValidList = model.SkuOrdereds.Where(s => !s.Id.HasValue).Select(s => s.Code).ToList();
                 var task = _productService.GetSkusOrderedAsync(validList);
-                task.Wait();
                 var validSkus = task.Result;
                 task = _productService.GetSkusOrderedAsync(notValidList);
-                task.Wait();
                 var notValidSkus = task.Result;
                 Dictionary<int, SkuOrderedManageModel> valid =
                     // ReSharper disable once PossibleInvalidOperationException
@@ -157,162 +351,6 @@ namespace VC.Admin.ModelConverters
                     sku.Quantity = item.QTY ?? 0;
                 }
                 dynamic.Skus = new List<SkuOrdered>(validSkus.Union(notValidSkus));
-            }
-
-            if(dynamic.DictionaryData.ContainsKey("ShipDelayType") && (int?)dynamic.DictionaryData["ShipDelayType"] == 0)
-            {
-                dynamic.DictionaryData["ShipDelayType"] = null;
-            }
-
-            if (model.Id != 0)
-            {
-                if (model.Shipping != null)
-                {
-                    var addressDynamic = _addressMapper.FromModel(model.Shipping);
-                    addressDynamic.IdObjectType = (int)AddressType.Shipping;
-                    dynamic.ShippingAddress = addressDynamic;
-                }
-
-                if (model.IdPaymentMethodType.HasValue)
-                {
-                    if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.CreditCard)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.CreditCard);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Oac)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Oac);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Check)
-                    {
-                        dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Check);
-                    }
-                    else
-                    {
-                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
-                    }
-                    if (dynamic.PaymentMethod != null)
-                    {
-                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
-                    }
-                }
-            }
-            else
-            {
-                var shippingAddress = model.Customer?.Shipping.FirstOrDefault(p => p.IsSelected);
-                if(shippingAddress!=null)
-                {
-                    var addressDynamic = _addressMapper.FromModel(shippingAddress);
-                    addressDynamic.IdObjectType = (int)AddressType.Shipping;
-                    dynamic.ShippingAddress = addressDynamic;
-                }
-
-                if (model.IdPaymentMethodType.HasValue)
-                {
-                    if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.CreditCard)
-                    {
-                        var card = model.Customer?.CreditCards.FirstOrDefault(p => p.IsSelected);
-                        if (card != null)
-                        {
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(card);
-                        }
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Oac)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Oac);
-                    }
-                    else if (model.IdPaymentMethodType.Value == (int)PaymentMethodType.Check)
-                    {
-                        if (model.Customer != null)
-                            dynamic.PaymentMethod = _paymentMethodMapper.FromModel(model.Customer.Check);
-                    }
-                    else
-                    {
-                        dynamic.PaymentMethod = new OrderPaymentMethodDynamic();
-                    }
-                    if (dynamic.PaymentMethod != null)
-                    {
-                        dynamic.PaymentMethod.IdObjectType = model.IdPaymentMethodType.Value;
-                    }
-                }
-            }
-
-            if (model.Customer != null)
-            {
-                //update customer
-                var dbCustomer = _customerService.Select(model.Customer.Id, true);
-                if (dbCustomer != null)
-                {
-                    dbCustomer.IdObjectType = (int?) model.Customer.CustomerType;
-                    dbCustomer.CustomerNotes = dynamic.Customer.CustomerNotes;
-                    dbCustomer.Files = dynamic.Customer.Files;
-                    if (model.Id == 0)
-                    {
-                        if (dynamic.Customer.DictionaryData.ContainsKey("Source"))
-                        {
-                            dbCustomer.Data.Source = dynamic.Customer.Data.Source;
-                        }
-                        if (dynamic.Customer.DictionaryData.ContainsKey("SourceDetails"))
-                        {
-                            dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
-                        }
-                        dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
-                        dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
-
-                        var profileAddress = dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
-                        if (profileAddress != null)
-                        {
-                            dbCustomer.Addresses.Remove(profileAddress);
-                        }
-                        profileAddress = dynamic.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int)AddressType.Profile);
-                        if (profileAddress != null)
-                        {
-                            dbCustomer.Addresses.Add(profileAddress);
-                        }
-
-                        if (model.UpdateShippingAddressForCustomer)
-                        {
-                            var shippingAddresses = dbCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).ToList();
-                            foreach(var address in shippingAddresses)
-                            { 
-                                dbCustomer.Addresses.Remove(address);
-                            }
-                            shippingAddresses = dynamic.Customer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping).ToList();
-                            foreach (var address in shippingAddresses)
-                            {
-                                dbCustomer.Addresses.Add(address);
-                            }
-                        }
-
-                        if (model.UpdateCardForCustomer && dynamic.PaymentMethod!=null)
-                        {
-                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.CreditCard);
-                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
-                            {
-                                dbCustomer.CustomerPaymentMethods.Add(method);
-                            }
-                        }
-                        if (model.UpdateOACForCustomer && dynamic.PaymentMethod != null)
-                        {
-                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.Oac);
-                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Oac))
-                            {
-                                dbCustomer.CustomerPaymentMethods.Add(method);
-                            }
-                        }
-                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
-                        {
-                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType, PaymentMethodType.Check);
-                            foreach (var method in dynamic.Customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.Check))
-                            {
-                                dbCustomer.CustomerPaymentMethods.Add(method);
-                            }
-                        }
-                    }
-
-                    dynamic.Customer = dbCustomer;
-                }
             }
         }
 

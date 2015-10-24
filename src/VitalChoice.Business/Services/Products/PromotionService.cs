@@ -24,6 +24,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
+using VitalChoice.Domain.Entities.eCommerce.Promotion;
 
 namespace VitalChoice.Business.Services.Products
 {

@@ -15,6 +15,6 @@ namespace VitalChoice.Workflow.Base
             return currentValue + result;
         }
 
-        public abstract override Task<decimal> ExecuteAction(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract override Task<decimal> ExecuteActionAsync(TContext context, IWorkflowExecutionContext executionContext);
     }
 }

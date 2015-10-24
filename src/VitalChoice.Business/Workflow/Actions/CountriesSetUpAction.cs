@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Workflow.Actions
         {
         }
 
-        public override async Task<decimal> ExecuteAction(OrderDataContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, IWorkflowExecutionContext executionContext)
         {
             var countryService = executionContext.Resolve<ICountryService>();
             var countries = await countryService.GetCountriesAsync();

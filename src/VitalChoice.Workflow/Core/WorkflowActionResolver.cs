@@ -16,9 +16,9 @@ namespace VitalChoice.Workflow.Core
             DependendActions = new List<string>();
         }
 
-        public abstract Task<int> GetActionKey(TContext context, IWorkflowExecutionContext executionContext);
+        public abstract Task<int> GetActionKeyAsync(TContext context, IWorkflowExecutionContext executionContext);
 
-        public override async Task<TResult> Execute(TContext context, IWorkflowExecutionContext executionContext)
+        public override async Task<TResult> ExecuteAsync(TContext context, IWorkflowExecutionContext executionContext)
         {
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))
@@ -27,16 +27,16 @@ namespace VitalChoice.Workflow.Core
             foreach (var dependentActionName in DependendActions)
             {
                 context.ActionLock(dependentActionName);
-                await Tree.GetAction(dependentActionName).Execute(context, executionContext);
+                await Tree.GetAction(dependentActionName).ExecuteAsync(context, executionContext);
                 context.ActionUnlock(dependentActionName);
             }
 
-            var key = await GetActionKey(context, executionContext);
+            var key = await GetActionKeyAsync(context, executionContext);
             if (Actions.ContainsKey(key))
             {
                 var actionName = Actions[key];
                 context.ActionLock(actionName);
-                result = await Tree.GetAction(actionName).Execute(context, executionContext);
+                result = await Tree.GetAction(actionName).ExecuteAsync(context, executionContext);
                 context.ActionUnlock(actionName);
                 context.ActionSetResult(Name, result);
                 return result;
