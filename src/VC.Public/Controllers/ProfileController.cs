@@ -49,7 +49,7 @@ namespace VC.Public.Controllers
 			_paymentMethodConverter = paymentMethodConverter;
 		}
 
-		private IActionResult RenderCreditCardView(CustomerDynamic currentCustomer, BillingInfoModel model)
+		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer)
 		{
 			var creditCards = new List<BillingInfoModel>();
 			foreach (
@@ -63,16 +63,22 @@ namespace VC.Public.Controllers
 			}
 
 			ViewBag.CreditCards = null;
+
+			BillingInfoModel model = null;
 			if (creditCards.Any())
 			{
 				model = creditCards.First();
 				ViewBag.CreditCards = JsonConvert.SerializeObject(creditCards, Formatting.None);
 			}
+			else
+			{
+				model = new BillingInfoModel();
+			}
 
-			return View(model);
+			return model;
 		}
 
-		private IActionResult RenderShippingAddressView(CustomerDynamic currentCustomer, ShippingInfoModel model)
+		private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer)
 		{
 			var shippingAddresses = new List<ShippingInfoModel>();
 			foreach (
@@ -85,13 +91,18 @@ namespace VC.Public.Controllers
 			}
 
 			ViewBag.ShippingAddresses = null;
-			if (shippingAddresses.Any())
+			ShippingInfoModel model;
+            if (shippingAddresses.Any())
 			{
-				model = shippingAddresses.First();
+				model = shippingAddresses.First(x => x.Default);
 				ViewBag.ShippingAddresses = JsonConvert.SerializeObject(shippingAddresses, Formatting.None);
 			}
+			else
+            {
+	            model = new ShippingInfoModel();
+            }
 
-			return View(model);
+			return model;
 		}
 
 		private int GetInternalCustomerId()
@@ -223,7 +234,7 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
-			return RenderCreditCardView(currentCustomer, new BillingInfoModel());
+			return View(PopulateCreditCard(currentCustomer));
 		}
 
 		[HttpPost]
@@ -232,9 +243,11 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
+			PopulateCreditCard(currentCustomer);
+
 			if (!ModelState.IsValid)
 			{
-				return RenderCreditCardView(currentCustomer, model);
+				return View(model);
 			}
 
 			if (model.Id > 0)
@@ -267,7 +280,8 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			creditCardToDelete.StatusCode = (int)RecordStatusCode.Deleted;
+			currentCustomer.Addresses = currentCustomer.Addresses.Where(x=>x.Id != creditCardToDelete.Address.Id).ToList();
+			currentCustomer.CustomerPaymentMethods.Remove(creditCardToDelete);
 
 			await _customerService.UpdateAsync(currentCustomer);
 
@@ -279,7 +293,7 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
-			return RenderShippingAddressView(currentCustomer, new ShippingInfoModel());
+			return View(PopulateShippingAddress(currentCustomer));
 		}
 
 		[HttpPost]
@@ -288,15 +302,26 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
+			PopulateShippingAddress(currentCustomer);
+
 			if (!ModelState.IsValid)
 			{
-				return RenderShippingAddressView(currentCustomer, model);
+				return View(model);
 			}
 
 			if (model.Id > 0)
 			{
 				var shippingAddressToUpdate = currentCustomer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Shipping && x.Id == model.Id);
 				currentCustomer.Addresses.Remove(shippingAddressToUpdate);
+			}
+
+			if (model.Default)
+			{
+				var otherAddresses = currentCustomer.Addresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
+				foreach (var otherAddress in otherAddresses)
+				{
+					otherAddress.Data.Default = false;
+				}
 			}
 
 			var newAddress = _addressConverter.FromModel(model);
@@ -320,7 +345,7 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			shippingAddressToDelete.StatusCode = (int)RecordStatusCode.Deleted;
+			currentCustomer.Addresses.Remove(shippingAddressToDelete);
 
 			await _customerService.UpdateAsync(currentCustomer);
 

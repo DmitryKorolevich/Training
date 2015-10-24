@@ -27,12 +27,12 @@ namespace VC.Public.Models.Profile
 		public string CardNumber { get; set; }
 
 		[Required]
-		[Display(Name = "Expiration Date")]
+		[Display(Name = "Month")]
 		[Map]
 		public int? ExpirationDateMonth { get; set; }
 
 		[Required]
-		[Display(Name = "Expiration Date Year")]
+		[Display(Name = "Year")]
 		[Map]
 		public int? ExpirationDateYear { get; set; }
 

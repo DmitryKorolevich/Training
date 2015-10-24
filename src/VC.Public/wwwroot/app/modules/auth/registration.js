@@ -27,7 +27,7 @@ function populateStates(result) {
 		}
 	})[0];
 
-	if (selectedCountry.States && selectedCountry.States.length > 0) {
+	if (selectedCountry && selectedCountry.States && selectedCountry.States.length > 0) {
 		$("#txtState").closest(".form-group").hide();
 		$("#ddState").closest(".form-group").show();
 

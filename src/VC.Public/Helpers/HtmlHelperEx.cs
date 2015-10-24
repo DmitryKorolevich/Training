@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Html.Abstractions;
+using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.AspNet.Mvc.ViewFeatures;
 
@@ -33,7 +34,11 @@ namespace VC.Public.Helpers
 						memberExpression = expressionBody as MemberExpression;
 					}
 
-					value = htmlHelper.ViewContext.ModelState[memberExpression?.Member.Name].RawValue;
+					ModelState modelState;
+					if (memberExpression != null && (modelState = htmlHelper.ViewContext.ModelState[memberExpression.Member.Name]) != null)
+					{
+						value = modelState.RawValue;
+					}
 				}
 
 				return new HtmlString(value?.ToString() ?? string.Empty);

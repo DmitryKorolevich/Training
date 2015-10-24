@@ -71,3 +71,66 @@ $(function () {
 
 	$(".phone-mask").mask("(999) 999-9999? x99999");
 });
+
+function confirmAction(successCallback, errorCallback, text) {
+	var message = "Are you sure?";
+	if (text != null) {
+		message = text;
+	}
+
+	$('<div id="dialog-confirm" title="Confirm your action">' +
+		'<p>' + message + '</p></div>').dialog({
+		resizable: false,
+		modal: true,
+		buttons: {
+			"Ok": function () {
+				if (successCallback) {
+					successCallback();
+				}
+				$(this).dialog("close");
+			},
+			Cancel: function () {
+				if (errorCallback) {
+					errorCallback();
+				}
+				$(this).dialog("close");
+			}
+		}
+	});
+}
+
+function notifySuccess(text) {
+	var message = "Action has been successfully completed";
+	if (text != null) {
+		message = text;
+	}
+
+	$('<div id="dialog-success" title="Success">' +
+		'<p>' + message + '</p></div>').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				"Ok": function () {
+					$(this).dialog("close");
+				}
+			}
+		});
+}
+
+function notifyError(text) {
+	var message = "Unknown error occured";
+	if (text != null) {
+		message = text;
+	}
+
+	$('<div id="dialog-error" title="Fail">' +
+		'<p>' + message + '</p></div>').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				"Ok": function () {
+					$(this).dialog("close");
+				}
+			}
+		});
+}
