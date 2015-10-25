@@ -183,7 +183,7 @@ namespace VitalChoice.Business.Services.Customers
                 TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
-                IsAdminUser = false,
+                IdUserType = UserType.Customer,
                 Profile = null,
 				Status = UserStatus.NotActive
             };

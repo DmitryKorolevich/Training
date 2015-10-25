@@ -74,16 +74,6 @@ namespace VC.Admin.Validators.Affiliate
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.ChecksPayableTo, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
-                RuleFor(model => model.Email)
-                    .NotEmpty()
-                    .WithMessage(model => model.Email, ValidationMessages.FieldRequired)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.Email, ValidationMessages.FieldLength,
-                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .EmailAddress()
-                    .When(x => !string.IsNullOrWhiteSpace(x.Email))
-                    .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
-
                 RuleFor(model => model.TaxID)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.TaxID, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
@@ -160,24 +150,26 @@ namespace VC.Admin.Validators.Affiliate
                     .LessThanOrEqualTo(100)
                     .WithMessage(ValidationMessages.FieldMax, GeneralFieldNames.Percent, 100);
 
-
-                RuleFor(model => model.Password)
+                RuleFor(model => model.Email)
                     .NotEmpty()
-                    .When(model => model.Id == 0)
-                    .WithMessage(model => model.Password, ValidationMessages.FieldRequired)
+                    .WithMessage(model => model.Email, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.Password, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .WithMessage(model => model.Email, ValidationMessages.FieldLength,
+                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .EmailAddress()
+                    .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
 
-                RuleFor(model => model.ConfirmPassword)
+
+                RuleFor(model => model.EmailConfirm)
                     .NotEmpty()
-                    .When(model => model.Id==0)
-                    .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldRequired)
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
-
-                RuleFor(model => model.Password)
-                    .Equal(x => x.ConfirmPassword)
-                    .WithMessage(model => model.Password, ValidationMessages.PasswordMustMatch);                
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.FieldLength,
+                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .EmailAddress()
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.EmailFormat)
+                    .Equal(x => x.Email)
+                    .WithMessage(model => model.EmailConfirm, ValidationMessages.EmailMustMatch);
             }
         }
     }

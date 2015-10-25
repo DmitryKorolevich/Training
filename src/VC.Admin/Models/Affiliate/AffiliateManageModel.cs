@@ -20,6 +20,10 @@ namespace VC.Admin.Models.Affiliate
     [ApiValidator(typeof(AffiliatetManageModelValidator))]
     public class AffiliateManageModel : BaseModel
     {
+        public bool IsConfirmed { get; set; }
+
+        public Guid PublicUserId { get; set; }
+
         [Map]
         public int Id { get; set; }
 
@@ -101,6 +105,9 @@ namespace VC.Admin.Models.Affiliate
 
         [Map]
         public string Email { get; set; }
+
+        [Map]
+        public string EmailConfirm { get; set; }
 
         [Map]
         public string TaxID { get; set; }

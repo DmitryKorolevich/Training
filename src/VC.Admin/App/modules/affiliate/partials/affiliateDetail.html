@@ -33,10 +33,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Active</label>
+                                                <label for="active" class="col-md-3 control-label">Suspend</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="StatusCode" data-ng-model="affiliate.StatusCode" data-ng-true-value="2" data-ng-false-value="1" /></label>
+                                                        <label><input type="checkbox" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4"/></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -54,6 +54,13 @@
                                                         <small class="error" ng-show="forms.mainForm.MyAppBalance.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.Balance")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.MyAppBalance.$error.server">{{serverMessages.GetMessage('MyAppBalance')}}</small>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="affiliate.Id">
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-9">
+                                                    <button class="btn btn-info" data-ng-if="affiliate.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword();">Reset Password</button>
+                                                    <button class="btn btn-info" data-ng-if="affiliate.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend();">Resend Activation Email</button>
                                                 </div>
                                             </div>
 
@@ -274,17 +281,38 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="form-group" data-ng-if="affiliate.Id">
+                                                <label for="currentEmail" class="col-md-3 control-label">Current Email</label>
+                                                <div class="col-md-9 form-control-static">
+                                                    <span data-ng-bind="affiliate.Email"></span>
+                                                </div>
+                                            </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Email</label>
+                                                <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="Email" class="form-control" data-ng-model="affiliate.Email" placeholder="Email" data-ng-maxlength="100" autocomplete="off" required>
+                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="affiliate.newEmail" placeholder="Enter Email" data-ng-required="!affiliate.Id" data-ng-maxlength="100" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.Email.$invalid">
                                                         <small class="error" ng-show="forms.mainForm.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Email.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Email", "100"])}}</small>
                                                         <small class="error" ng-show="forms.mainForm.Email.$error.server">{{serverMessages.GetMessage('Email')}}</small>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="form-group">
+                                                <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
+                                                <div class="col-md-9">
+                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="affiliate.emailConfirm" placeholder="Re-enter Email" data-ng-required="!affiliate.Id" data-ng-maxlength="100" autocomplete="off">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.EmailConfirm.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.EmailConfirm.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Email Confirmation", "100"])}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.EmailConfirm.$error.server">{{serverMessages.GetMessage('EmailConfirm')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Tax ID / SSN</label>
                                                 <div class="col-md-9">
@@ -435,28 +463,6 @@
                                                         <small class="error" ng-show="forms.mainForm.CommissionAll.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Commission: for all other orders",100)}}</small>
                                                         <small class="error" ng-show="forms.mainForm.CommissionAll.$error.min">{{getValidationMessage("{0} must be over 0.00","Commission: for all other orders")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.CommissionAll.$error.server">{{serverMessages.GetMessage('CommissionAll')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <span class="legend">Reset Password</span>
-                                            <div class="form-group">
-                                                <label for="enterPassword" class="col-md-3 control-label">Enter New Password</label>
-                                                <div class="col-md-9">
-                                                    <input type="password" name="Password" class="form-control" id="enterPassword" placeholder="Enter New Password" data-ng-model="affiliate.Password" data-ng-required="!affiliate.Id">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Password.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Password.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Password")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.Password.$error.server">{{serverMessages.GetMessage('Password')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="reEnterPassword" class="col-md-3 control-label">Re-enter New Password</label>
-                                                <div class="col-md-9">
-                                                    <input type="password" name="ConfirmPassword" class="form-control" id="reEnterPassword" placeholder="Re-enter New Password" data-ng-model="affiliate.ConfirmPassword" data-ng-required="!affiliate.Id">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ConfirmPassword.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.ConfirmPassword.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ConfirmPassword")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.ConfirmPassword.$error.server">{{serverMessages.GetMessage('ConfirmPassword')}}</small>
                                                     </div>
                                                 </div>
                                             </div>

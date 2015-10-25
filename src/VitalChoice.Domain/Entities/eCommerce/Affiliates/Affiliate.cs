@@ -26,5 +26,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
         public int? IdState { get; set; }
 
         public string County { get; set; }
+
+        public string Email { get; set; }
     }
 }

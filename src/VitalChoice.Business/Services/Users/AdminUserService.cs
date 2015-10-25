@@ -23,6 +23,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Domain.Entities;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -67,7 +68,7 @@ namespace VitalChoice.Business.Services.Users
 			}
 			
 			var ids = roles.Select(x => (int) x).ToList();
-			if (RoleManager.Roles.Any(x=> x.IsStorefrontRole && ids.Contains(x.Id)))
+			if (RoleManager.Roles.Any(x=> x.IdUserType != UserType.Admin && ids.Contains(x.Id)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToAssignWrongRole]);
 			}
@@ -75,7 +76,7 @@ namespace VitalChoice.Business.Services.Users
 
 		protected override Task ValidateUserInternalAsync(ApplicationUser user)
 		{
-			if (!user.IsAdminUser)
+			if (user.IdUserType != UserType.Admin)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToUpdateUsingWrongService]);
 			}

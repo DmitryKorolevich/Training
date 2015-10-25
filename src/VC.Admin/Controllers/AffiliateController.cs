@@ -30,6 +30,9 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Admin.Models.Affiliate;
 using VitalChoice.Domain.Transfer.Affiliates;
 using System.Text;
+using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Constants;
 
 namespace VC.Admin.Controllers
 {
@@ -38,12 +41,17 @@ namespace VC.Admin.Controllers
     {
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicToModelMapper<AffiliateDynamic> _mapper;
+        private readonly IAffiliateUserService _affiliateUserService;
         private readonly ILogger logger;
 
-        public AffiliateController(IAffiliateService affiliateService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<AffiliateDynamic> mapper)
+        public AffiliateController(
+            IAffiliateService affiliateService,
+            IAffiliateUserService affiliateUserService,
+            ILoggerProviderExtended loggerProvider,
+            IDynamicToModelMapper<AffiliateDynamic> mapper)
         {
             this._affiliateService = affiliateService;
+            this._affiliateUserService = affiliateUserService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
@@ -80,7 +88,21 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _affiliateService.SelectAsync(id);
+            if (item == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+            }
             AffiliateManageModel toReturn = _mapper.ToModel<AffiliateManageModel>(item);
+
+            var login = await _affiliateUserService.GetAsync(toReturn.Id);
+            if (login == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+            }
+
+            toReturn.IsConfirmed = login.IsConfirmed;
+            toReturn.PublicUserId = login.PublicId;
+
             return toReturn;
         }
 
@@ -106,7 +128,12 @@ namespace VC.Admin.Controllers
                 item = await _affiliateService.InsertAsync(item);
             }
 
-            return _mapper.ToModel<AffiliateManageModel>(item);
+            var toReturn = _mapper.ToModel<AffiliateManageModel>(item);
+            
+            toReturn.IsConfirmed = model.IsConfirmed;
+            toReturn.PublicUserId = model.PublicUserId;
+
+            return toReturn;
         }
 
         [HttpGet]
@@ -165,6 +192,22 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteAffiliate(int id, [FromBody] object model)
         {
             return await _affiliateService.DeleteAsync(id);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> ResendActivation(Guid id, [FromBody] object model)
+        {
+            await _affiliateUserService.ResendActivationAsync(id);
+
+            return true;
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> ResetPassword(Guid id, [FromBody] object model)
+        {
+            await _affiliateUserService.SendResetPasswordAsync(id);
+
+            return true;
         }
     }
 }

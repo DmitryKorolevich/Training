@@ -21,6 +21,7 @@ using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Domain.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -83,7 +84,7 @@ namespace VC.Admin.Controllers
 				{
 					AgentId = userModel.AgentId,
 				},
-				IsAdminUser = true,
+				IdUserType = UserType.Admin,
 				Status = UserStatus.NotActive
 			};
 
@@ -119,7 +120,7 @@ namespace VC.Admin.Controllers
 			user.Status = userModel.Status;
 			user.Email = userModel.Email;
 			user.UserName = userModel.Email;
-			user.IsAdminUser = true;
+			user.IdUserType = UserType.Admin;
 
 			await userService.UpdateAsync(user, userModel.RoleIds);
 

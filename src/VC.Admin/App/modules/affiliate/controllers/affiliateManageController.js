@@ -6,6 +6,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
     function ($scope, $rootScope, $state, $stateParams, $timeout, $modal, affiliateService, customerService, modalUtil, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
+        $scope.resetTracker = promiseTracker("reset");
+        $scope.resendTracker = promiseTracker("resend");
 
         function successSaveHandler(result)
         {
@@ -14,6 +16,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.affiliate.Id = result.Data.Id;
                 $scope.affiliate.DateEdited = result.Data.DateEdited;
+                $scope.affiliate.Email = result.Data.Email;
             } else
             {
                 var messages = "";
@@ -48,6 +51,19 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         function errorHandler(result)
         {
             toaster.pop('error', "Error!", "Server error occured");
+        };
+
+        function errorHandlerEmail(result)
+        {
+            var messages = "";
+            if (result.Messages)
+            {
+                $.each(result.Messages, function (index, value)
+                {
+                    messages += value.Message + "<br />";
+                });
+            }
+            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         };
 
         function initialize()
@@ -109,6 +125,15 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
 
             if ($scope.forms.mainForm.$valid)
             {
+                var data = angular.copy($scope.affiliate);
+                if (data.newEmail || data.emailConfirm)
+                {
+                    data.Email = data.newEmail;
+                    data.EmailConfirm = data.emailConfirm;
+                } else
+                {
+                    data.EmailConfirm = data.Email;
+                }
 
                 affiliateService.updateAffiliate($scope.affiliate, $scope.refreshTracker).success(function (result)
                 {
@@ -121,6 +146,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             {
                 $scope.forms.submitted = true;
                 $scope.detailsTab.active = true;
+                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
             }
         };
 
@@ -183,6 +209,48 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     ToEmail: $scope.affiliate.Email,
                 };
             modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
+        };
+
+        $scope.toggleSuspended = function ()
+        {
+            $scope.affiliate.StatusCode = $scope.affiliate.StatusCode == 4 ? ($scope.affiliate.IsConfirmed ? 2 : 1) : 4;
+        };
+
+        $scope.resend = function ()
+        {
+            affiliateService.resendActivation($scope.affiliate.PublicUserId, $scope.resendTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        toaster.pop('success', "Success!", "Successfully sent");
+
+                    } else
+                    {
+                        errorHandlerEmail(result);
+                    }
+                }).error(function ()
+                {
+                    toaster.pop('error', "Error!", "Server error occured");
+                });
+        };
+
+        $scope.resetPassword = function ()
+        {
+            affiliateService.resetPassword($scope.affiliate.PublicUserId, $scope.resetTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        toaster.pop('success', "Success!", "Successfully reset");
+                    } else
+                    {
+                        errorHandlerEmail(result);
+                    }
+                }).error(function ()
+                {
+                    toaster.pop('error', "Error!", "Server error occured");
+                });
         };
 
         initialize();

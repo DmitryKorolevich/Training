@@ -11,9 +11,11 @@ namespace VitalChoice.Domain.Entities.Roles
 		ProductUser = 4,
 		SuperAdminUser = 5,
 
-		/*Public*/
+		/*Customers*/
 		Retail = 6,
 		Wholesale = 7,
-		Affiliate = 8
+
+        /*Affiliates*/
+        Affiliate = 8
 	}
 }
