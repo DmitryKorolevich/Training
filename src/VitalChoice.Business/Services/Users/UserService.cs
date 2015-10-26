@@ -62,7 +62,9 @@ namespace VitalChoice.Business.Services.Users
 
 		protected abstract Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token);
 
-		protected abstract void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles);
+        protected abstract Task SendForgotPasswordInternalAsync(ApplicationUser dbUser, string token);
+
+        protected abstract void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles);
 
 		protected virtual async Task ValidateUserInternalAsync(ApplicationUser user)
 		{
@@ -112,7 +114,16 @@ namespace VitalChoice.Business.Services.Users
 			await SendResetPasswordInternalAsync(user, token);
 		}
 
-		private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
+        public async Task SendForgotPasswordAsync(Guid publicId)
+        {
+            var user = await GetAsync(publicId);
+
+            var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+
+            await SendForgotPasswordInternalAsync(user, token);
+        }
+
+        private IList<string> GetRoleNamesByIds(IList<RoleType> roles)
 		{
 			return RoleManager.Roles.Where(x => roles.Contains((RoleType)x.Id))
 						.Select(x => x.Name)

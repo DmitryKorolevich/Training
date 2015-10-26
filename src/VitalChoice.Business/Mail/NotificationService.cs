@@ -124,9 +124,9 @@ namespace VitalChoice.Business.Mail
             //todo:refactor this to user nustache or something
 
             var body =
-                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. Your account is currently only available for phone orders. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account for online ordering</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+                $"<p>Dear {activation.FirstName} {activation.LastName},</p><p>Our records show that you recently had an account created for you. To begin using your account on our storefront please click the following <a href=\"{activation.Link}\">link</a> to setup a password and activate your account.</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
 
-            var subject = "Vital Choice - Setup Your Account To Order Online";
+            var subject = "Vital Choice - Setup Your Affiliate Account";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
@@ -135,10 +135,21 @@ namespace VitalChoice.Business.Mail
         {
             var body =
                 $"<p>Dear {registration.FirstName} {registration.LastName},  thank you for registering with our store!</p>" +
-                $"<p>At any time you can log into your account to check order status, update your billing information, add multiple shipping addresses, and much more. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>" +
-                $"<p>Thanks again for visiting our store. Let us know if there is anything we can do to make your experience with us a better one!</p>";
+                $"<p>At any time you can log into your affiliate account. To log in, use <a href=\"{registration.ProfileLink}\">link</a></p>";
 
             var subject = "Vital Choice - Confirmation of Affiliate Registration";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset)
+        {
+            //todo:refactor this to user nustache or something
+
+            var body =
+                $"<p>Dear {passwordReset.FirstName} {passwordReset.LastName},</p><p>Please click the following <a href=\"{passwordReset.Link}\">link</a> to setup a new password</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+            var subject = $"Your Vital Choice User Setup New Password";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }

@@ -16,5 +16,9 @@ namespace VitalChoice.Interfaces.Services.Affiliates
         Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter);
 
         Task<bool> SendAffiliateEmailAsync(BasicEmail model);
+
+        Task<AffiliateDynamic> InsertAsync(AffiliateDynamic model, string password);
+
+        Task<AffiliateDynamic> UpdateAsync(AffiliateDynamic model, string password);
     }
 }

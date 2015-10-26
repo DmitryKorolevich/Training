@@ -43,10 +43,10 @@ namespace VitalChoice.Core.Infrastructure
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)
 		{
-			if (HasAllowAnonymous(context))
-			{
-				return;
-			}
+			//if (HasAllowAnonymous(context))
+			//{
+			//	return;
+			//}
 
 			var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
 
@@ -54,10 +54,10 @@ namespace VitalChoice.Core.Infrastructure
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
 			if (result)
 			{
-				if (_roles == null || !_roles.Any())
-				{
-					return;
-				}
+				//if (_roles == null || !_roles.Any())
+				//{
+				//	return;
+				//}
 
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
 				{
@@ -71,6 +71,16 @@ namespace VitalChoice.Core.Infrastructure
 						return;
 					}
 				}
+                else
+                {
+                    if(claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
+                    {
+                        Dictionary<string, object> parameters = new Dictionary<string, object>();
+                        parameters.Add("returnUrl", context.HttpContext.Request.Path);
+                        context.Result = new RedirectToActionResult("Login", "Account", parameters);
+                        return;
+                    }
+                }
 			}
 
 			Fail(context);

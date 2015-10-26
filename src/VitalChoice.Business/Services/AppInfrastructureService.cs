@@ -98,7 +98,12 @@ namespace VitalChoice.Business.Services
 				Key = x.Id,
 				Text = x.Name
 			}).ToList();
-			referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
+            referenceData.AffiliateRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
+            {
+                Key = x.Id,
+                Text = x.Name
+            }).ToList();
+            referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
             {
                 Key = x.Key,
                 Text = x.Value

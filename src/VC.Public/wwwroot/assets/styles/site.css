@@ -1030,6 +1030,9 @@ footer {
   color: #737373;
   margin-bottom: 15px;
 }
+.form-regular .success-message {
+  color: green;
+}
 .form-regular .form-group .control-label {
   text-align: left;
   margin-bottom: 0;

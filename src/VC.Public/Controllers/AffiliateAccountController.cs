@@ -18,25 +18,29 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
+using VitalChoice.Interfaces.Services.Affiliates;
 
 namespace VC.Public.Controllers
 {
 	[AllowAnonymous]
-    public class AccountController : BaseMvcController
+    public class AffiliateAccountController : BaseMvcController
 	{
-		private readonly IStorefrontUserService _userService;
+		private readonly IAffiliateUserService _userService;
 		private readonly IHttpContextAccessor _contextAccessor;
-		private readonly ICustomerService _customerService;
+		private readonly IAffiliateService _affiliateService;
 		private readonly IPaymentMethodService _paymentMethodService;
-		private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
+		private readonly IDynamicToModelMapper<AffiliateDynamic> _affiliateMapper;
 
-		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICustomerService customerService, IPaymentMethodService paymentMethodService)
+		public AffiliateAccountController(
+            IAffiliateUserService userService,
+            IHttpContextAccessor contextAccessor,
+            IDynamicToModelMapper<AffiliateDynamic> affiliateMapper, 
+            IAffiliateService affiliateService)
 		{
 			_userService = userService;
 			_contextAccessor = contextAccessor;
-			_customerMapper = customerMapper;
-			_customerService = customerService;
-			_paymentMethodService = paymentMethodService;
+            _affiliateMapper = affiliateMapper;
+            _affiliateService = affiliateService;
 		}
 
 		[HttpGet]
@@ -68,7 +72,7 @@ namespace VC.Public.Controllers
 			    return Redirect(returnUrl);
 		    }
 
-			return RedirectToAction("Index", "Profile");
+			return RedirectToAction("Index", "AffiliateProfile");
 	    }
 
 		public async Task<IActionResult> Logout()
@@ -118,75 +122,25 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			var customer = await _customerService.SelectAsync(user.Id);
-			if (customer == null)
+			var affiliate = await _affiliateService.SelectAsync(user.Id);
+			if (affiliate == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			if (customer.StatusCode == (int)CustomerStatus.Suspended || customer.StatusCode == (int)CustomerStatus.Deleted)
+			if (affiliate.StatusCode == (int)CustomerStatus.Suspended || affiliate.StatusCode == (int)CustomerStatus.Deleted)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
 			}
 
-			customer.Email = model.Email;
-			customer.StatusCode = (int) CustomerStatus.Active;
+            affiliate.Email = model.Email;
+            affiliate.StatusCode = (int) CustomerStatus.Active;
 
-			await _customerService.UpdateAsync(customer, model.Password);
+			await _affiliateService.UpdateAsync(affiliate, model.Password);
 
 			await _userService.SendSuccessfulRegistration(model.Email, user.FirstName, user.LastName);
 
 			return await Login(new LoginModel() {Email = model.Email, Password = model.Password}, string.Empty);
-		}
-
-		[HttpGet]
-		public IActionResult RegisterEmail()
-		{
-			return View(new RegisterEmailModel());
-		}
-
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> RegisterEmail(RegisterEmailModel model)
-		{
-			if (!ModelState.IsValid)
-				return View(model);
-
-			var validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
-			if (!validated)
-			{
-				return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
-			}
-
-			return View("RegisterAccount", new RegisterAccountModel() { Email = model.Email });
-		}
-
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> RegisterAccount(RegisterAccountModel model)
-		{
-			if (!ModelState.IsValid)
-				return View(model);
-
-			var item = _customerMapper.FromModel(model);
-
-			item.IdObjectType = (int)CustomerType.Retail;
-			item.PublicId = Guid.NewGuid();
-			item.StatusCode = (int) CustomerStatus.Active;
-
-			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMenthod();
-            item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
-			item.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
-
-			item = await _customerService.InsertAsync(item, model.Password);
-			if (item == null || item.Id == 0)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
-			}
-
-			await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
-
-			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}
 
 		[HttpGet]
@@ -247,6 +201,13 @@ namespace VC.Public.Controllers
 
             ViewBag.SuccessSend = true;
             return View(new ForgotPasswordEmailModel());
+        }
+
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
         }
     }
 }

@@ -3,14 +3,14 @@
 @model LoginModel
 
 @section Meta {
-	<title>Vital Choice | Login</title>
+	<title>Vital Choice | Affiliate Login</title>
 }
 
 <div class="working-area-holder">
-	@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
+	@using (Html.BeginForm("Login", "AffiliateAccount", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular small", role = "form" }))
 	{
 		@Html.AntiForgeryToken()
-		<h4>Account Login</h4>
+		<h4>Login below to access your affiliate account</h4>
 		if (!string.IsNullOrWhiteSpace(ViewBag.AlreadyTakenEmail))
 		{
 			<span class="form-control-hint">The e-mail address you provided already exists in our database. Please use another e-mail address to @Html.ActionLink("register", "RegisterEmail") or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.</span>
@@ -34,14 +34,14 @@
 			<input type="submit" value="Login"/>
 		</div>
 		<div class="form-group">
-            Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword")
+			Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword")
 		</div>
 	}
 	<div class="form-group">
 		<hr />
 	</div>
 	<div class="form-group">
-		@Html.ActionLink("Would you like to Register a New Account? Click Here", "RegisterEmail")
+		@Html.ActionLink("Would you like to Register a New Affiliate Account? Click Here", "Register")
 	</div>
 
-</div>
+</div> 

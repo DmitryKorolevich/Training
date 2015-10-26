@@ -67,3 +67,18 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM AspNetRoleClaims WHERE ClaimType='AffiliateRole')
+BEGIN
+
+INSERT INTO [dbo].[AspNetRoleClaims]
+           ([ClaimType]
+           ,[ClaimValue]
+           ,[RoleId])
+     VALUES
+           ('AffiliateRole'
+           ,'true'
+           ,8)
+
+END
+GO
