@@ -6,7 +6,7 @@
 <div ui-tree-handle class="">
 	<div class="ya-treeview-content clearfix">
 		<div class="checkbox">
-			<label><input data-ng-model="item.IsSelected" type="checkbox">{{item.Name}}</label>
+			<label><input data-ng-model="item.IsSelected" data-ng-click="treeItemClick && treeItemClick(item)" type="checkbox">{{item.Name}}</label>
 			<span data-ng-if="item.StatusCode == 1" class="label label-warning category-status">Hidden</span>
 		</div>
 	</div>

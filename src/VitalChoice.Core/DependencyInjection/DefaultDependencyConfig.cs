@@ -340,7 +340,7 @@ namespace VitalChoice.Core.DependencyInjection
 		        .WithParameter((pi, cc) => pi.Name == "signInManager",
 			        (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("storefrontSignInManager"));
 
-            builder.RegisterType<StorefrontUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore");
+            builder.RegisterType<AffiliateUserStore>().Named<IUserStore<ApplicationUser>>("affiliateUserStore");
             builder.RegisterType<UserValidator<ApplicationUser>>().Named<IUserValidator<ApplicationUser>>("affiliateUserValidator");
             builder.RegisterType<ExtendedUserManager>()
                 .Named<ExtendedUserManager>("affiliateUserManager")

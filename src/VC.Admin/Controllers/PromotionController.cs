@@ -78,6 +78,7 @@ namespace VC.Admin.Controllers
                     StatusCode = RecordStatusCode.Active,
                     Assigned = null,//All
                     IdObjectType = PromotionType.BuyXGetY,
+                    IdPromotionBuyType=1,//Any
                     StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
                     ExpirationDate = TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
                     PromotionsToBuySkus = new List<PromotionToBuySkuModel>(),

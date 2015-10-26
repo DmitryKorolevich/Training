@@ -79,6 +79,7 @@ namespace VC.Admin.Controllers
                     Priorities = referenceData.Priorities,
                     PromotionTypes = referenceData.PromotionTypes,
                     ExpiredTypes = referenceData.ExpiredTypes,
+                    PromotionBuyTypes = referenceData.PromotionBuyTypes,
                 };
 	        }
 			else

@@ -198,6 +198,21 @@ namespace VitalChoice.Business.Services.Affiliates
             return await UpdateAsync(model, uow, null);
         }
 
+        protected override async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
+        {
+            var toReturn = await base.DeleteAsync(id, uow, physically);
+            if(toReturn)
+            {
+                var appUser = await _affiliateUserService.GetAsync(id);
+                if (appUser != null)
+                {
+                    await _affiliateUserService.DeleteAsync(appUser);
+                }
+            }
+
+            return toReturn;
+        }
+
         protected override async Task<List<MessageInfo>> Validate(AffiliateDynamic model)
         {
             var errors = new List<MessageInfo>();
@@ -227,7 +242,7 @@ namespace VitalChoice.Business.Services.Affiliates
                 TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
-                IdUserType = UserType.Customer,
+                IdUserType = UserType.Affiliate,
                 Profile = null,
                 Status = UserStatus.NotActive
             };
@@ -254,7 +269,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     model.Id = appUser.Id;
 
-                    var customer = await base.InsertAsync(model, uow);
+                    var affiliate = await base.InsertAsync(model, uow);
 
                     if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
                     {
@@ -263,9 +278,9 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     transaction.Commit();
 
-                    return customer;
+                    return affiliate;
                 }
-                catch
+                catch(Exception e)
                 {
                     if (appUser.Id > 0)
                     {
@@ -319,7 +334,7 @@ namespace VitalChoice.Business.Services.Affiliates
             //{
             //try
             //{
-            var customer = await base.UpdateAsync(model, uow);
+            var affiliate = await base.UpdateAsync(model, uow);
 
             //transaction.Commit();
 
@@ -327,7 +342,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
             await _affiliateUserService.UpdateAsync(appUser, roles, password);
 
-            return customer;
+            return affiliate;
             //}
             //catch (Exception ex)
             //{

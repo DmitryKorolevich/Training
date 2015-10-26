@@ -55,6 +55,9 @@ namespace VC.Admin.Models.Product
         [Map]
         public decimal Percent { get; set; }
 
+        [Map]
+        public int IdPromotionBuyType { get; set; }
+
 
         [Map]
         public IList<PromotionToBuySkuModel> PromotionsToBuySkus { get; set; }

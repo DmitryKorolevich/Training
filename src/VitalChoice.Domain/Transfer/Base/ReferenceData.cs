@@ -80,5 +80,7 @@ namespace VitalChoice.Domain.Transfer.Base
         public IList<LookupItem<int>> PromotionTypes { get; set; }
 
         public IList<LookupItem<int?>> ExpiredTypes { get; set; }
+
+        public IList<LookupItem<int>> PromotionBuyTypes { get; set; }
     }
 }

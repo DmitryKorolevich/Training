@@ -13,6 +13,11 @@ namespace VC.Admin.ModelConverters
     {
         public void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
         {
+            if(model.IdPromotionBuyType==0)
+            {
+                model.IdPromotionBuyType = 1;
+            }
+
             if(dynamic.PromotionsToBuySkus!=null)
             {
                 model.PromotionsToBuySkus = new List<PromotionToBuySkuModel>();

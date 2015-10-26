@@ -25,3 +25,28 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM [Lookups] WHERE Name='PromotionBuyTypes')
+BEGIN
+
+	DECLARE @IdLookupPromotionBuyType INT
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], Name)
+	VALUES
+	(N'string', N'PromotionBuyTypes')
+
+	SET @IdLookupPromotionBuyType = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookupPromotionBuyType, 'Any'),
+	(2, @IdLookupPromotionBuyType, 'All')
+
+	INSERT INTO PromotionOptionTypes
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	SELECT 'IdPromotionBuyType', 3, @IdLookupPromotionBuyType, 1, N'1'
+END
+
+GO

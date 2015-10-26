@@ -79,7 +79,7 @@ namespace VC.Admin.Controllers
                 now = new DateTime(now.Year, now.Month, now.Day);
                 return new AffiliateManageModel()
                 {
-                    StatusCode = RecordStatusCode.Active,
+                    StatusCode = RecordStatusCode.NotActive,
                     PaymentType=2,//Credit
                     Tier = 1,
                     CommissionFirst = 8,

@@ -134,7 +134,9 @@
 
                                     <div data-ng-show="promotion.IdObjectType==1">
                                         <div class="products">
-                                            <span class="legend">Buy X</span>
+                                            <span class="legend">Buy 
+                                                <select class="form-control buy-types" name="IdPromotionBuyType" data-ng-model="promotion.IdPromotionBuyType" ng-options="item.Key as item.Text for item in ReferenceData.PromotionBuyTypes"></select>
+                                             X</span>
                                             <form class="form-horizontal" name="forms.PromotionsToBuySkus" data-ng-class="{submitted: forms.submitted}" novalidate>
                                                 <table class="table table-striped table-hover ">
                                                     <thead>

@@ -13,6 +13,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
+using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -39,6 +40,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = item.Dynamic;
 
                 dynamic.Name = entity.Name;
+                dynamic.Email = entity.Email;
                 dynamic.MyAppBalance = entity.MyAppBalance;
                 dynamic.CommissionFirst = entity.CommissionFirst;
                 dynamic.CommissionAll = entity.CommissionAll;
@@ -58,6 +60,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = item.Dynamic;
 
                 entity.Name = dynamic.Name;
+                entity.Email = dynamic.Email;
                 entity.MyAppBalance = dynamic.MyAppBalance;
                 entity.CommissionFirst = dynamic.CommissionFirst;
                 entity.CommissionAll = dynamic.CommissionAll;
@@ -75,7 +78,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
+                if (entity.User == null)
+                {
+                    entity.User = new User();
+                }
+                entity.User.Id = dynamic.Id;
                 entity.Name = dynamic.Name;
+                entity.Email = dynamic.Email;
                 entity.MyAppBalance = dynamic.MyAppBalance;
                 entity.CommissionFirst = dynamic.CommissionFirst;
                 entity.CommissionAll = dynamic.CommissionAll;

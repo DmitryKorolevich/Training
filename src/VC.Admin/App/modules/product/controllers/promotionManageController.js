@@ -409,6 +409,29 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
             });
         };
 
+        $scope.treeItemClick = function (item)
+        {
+            if (item.IsSelected && item.SubItems)
+            {
+                $.each(item.SubItems, function (index, value)
+                {
+                    setAllSelected(value);
+                });
+            }
+        };
+
+        function setAllSelected(item)
+        {
+            item.IsSelected = true;
+            if (item.SubItems)
+            {
+                $.each(item.SubItems, function (index, value)
+                {
+                    setAllSelected(value);
+                });
+            }
+        }
+
         initialize();
     }
 ]);

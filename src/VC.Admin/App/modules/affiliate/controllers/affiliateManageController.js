@@ -135,7 +135,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     data.EmailConfirm = data.Email;
                 }
 
-                affiliateService.updateAffiliate($scope.affiliate, $scope.refreshTracker).success(function (result)
+                affiliateService.updateAffiliate(data, $scope.refreshTracker).success(function (result)
                 {
                     successSaveHandler(result);
                 }).error(function (result)

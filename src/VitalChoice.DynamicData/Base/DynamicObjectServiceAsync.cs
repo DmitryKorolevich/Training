@@ -397,7 +397,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
+        protected virtual async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
         {
             (await ValidateDelete(id)).Raise();
             var mainRepository = uow.RepositoryAsync<TEntity>();

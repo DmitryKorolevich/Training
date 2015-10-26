@@ -1,7 +1,56 @@
-﻿IF OBJECT_ID(N'[dbo].[Affiliates]', N'U') IS NULL
+﻿IF (1=(select TOP 1 columnproperty(object_id('Affiliates'),'Id','IsIdentity')))
+BEGIN
+
+ALTER TABLE [dbo].[Customers] DROP CONSTRAINT [FK_CustomersToAffiliates]
+
+DROP TABLE [dbo].[AffiliateOptionValues]
+
+DROP TABLE [dbo].[AffiliateOptionTypes]
+
+DROP TABLE [dbo].[Affiliates]
+
+DELETE LookupVariants
+WHERE IdLookup IN
+(SELECT Id FROM Lookups
+WHERE Name='AffiliateProfessionalPractices')
+
+DELETE Lookups
+WHERE Name='AffiliateProfessionalPractices'
+
+DELETE LookupVariants
+WHERE IdLookup IN
+(SELECT Id FROM Lookups
+WHERE Name='AffiliateMonthlyEmailsSentOptions')
+
+DELETE Lookups
+WHERE Name='AffiliateMonthlyEmailsSentOptions'
+
+DELETE LookupVariants
+WHERE IdLookup IN
+(SELECT Id FROM Lookups
+WHERE Name='AffiliateTiers')
+
+DELETE Lookups
+WHERE Name='AffiliateTiers'
+
+DELETE LookupVariants
+WHERE IdLookup IN
+(SELECT Id FROM Lookups
+WHERE Name='AffiliatePaymentTypes')
+
+DELETE Lookups
+WHERE Name='AffiliatePaymentTypes'
+
+ALTER TABLE [dbo].[Affiliates] DROP CONSTRAINT [FK_AffiliatesToStatus]
+
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[Affiliates]', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[Affiliates] (
-		Id INT NOT NULL IDENTITY CONSTRAINT PK_Affiliates PRIMARY KEY,
+		Id INT NOT NULL CONSTRAINT PK_Affiliates PRIMARY KEY,
 		Name NVARCHAR(50) NOT NULL,
 		MyAppBalance MONEY NOT NULL DEFAULT(0),
 		[StatusCode] INT NOT NULL

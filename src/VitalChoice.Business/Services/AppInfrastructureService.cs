@@ -85,6 +85,7 @@ namespace VitalChoice.Business.Services
             var affiliateProfessionalPractices = lookupRepository.Query(x => x.Name == LookupNames.AffiliateProfessionalPractices).Select(false).Single().Id;
             var affiliateMonthlyEmailsSentOptions = lookupRepository.Query(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Select(false).Single().Id;
             var affiliateTiers = lookupRepository.Query(x => x.Name == LookupNames.AffiliateTiers).Select(false).Single().Id;
+            var promotionBuyTypes = lookupRepository.Query(x => x.Name == LookupNames.PromotionBuyTypes).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
 	        referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType== UserType.Admin).Select(x => new LookupItem<int>
@@ -300,6 +301,14 @@ namespace VitalChoice.Business.Services
                     Text = x.Name
                 }).ToList();
             referenceData.ExpiredTypes = LookupHelper.GetExpiredTypes();
+            referenceData.PromotionBuyTypes = lookupVariantRepository.Query()
+                .Where(x => x.IdLookup == promotionBuyTypes)
+                .Select(false)
+                .Select(x => new LookupItem<int>()
+                {
+                    Key = x.Id,
+                    Text = x.ValueVariant
+                }).ToList();
 
             return referenceData;
             

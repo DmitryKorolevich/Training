@@ -13,7 +13,9 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
 	    {
         }
 
-	    public string Name{ get; set; }
+        public User User { get; set; }
+
+        public string Name{ get; set; }
 
 	    public decimal MyAppBalance { get; set; }
 

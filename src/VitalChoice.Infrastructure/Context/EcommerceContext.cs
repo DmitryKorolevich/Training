@@ -1084,6 +1084,11 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("Affiliates");
+                entity.HasOne(p => p.User)
+                    .WithMany()
+                    .ForeignKey(p => p.Id)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
                 entity.HasMany(p => p.OptionValues)
                     .WithOne()
                     .ForeignKey(o => o.IdAffiliate)
