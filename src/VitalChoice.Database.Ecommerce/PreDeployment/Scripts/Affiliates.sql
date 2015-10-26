@@ -41,8 +41,6 @@ WHERE Name='AffiliatePaymentTypes')
 DELETE Lookups
 WHERE Name='AffiliatePaymentTypes'
 
-ALTER TABLE [dbo].[Affiliates] DROP CONSTRAINT [FK_AffiliatesToStatus]
-
 END
 
 GO
@@ -53,8 +51,7 @@ BEGIN
 		Id INT NOT NULL CONSTRAINT PK_Affiliates PRIMARY KEY,
 		Name NVARCHAR(50) NOT NULL,
 		MyAppBalance MONEY NOT NULL DEFAULT(0),
-		[StatusCode] INT NOT NULL
-			CONSTRAINT FK_AffiliatesToStatus FOREIGN KEY (StatusCode) REFERENCES dbo.RecordStatusCodes (StatusCode),
+		[StatusCode] INT NOT NULL,
 		[DateCreated] [datetime2] NOT NULL,
 		[DateEdited] [datetime2] NOT NULL,
 		[IdEditedBy] [int] NULL
