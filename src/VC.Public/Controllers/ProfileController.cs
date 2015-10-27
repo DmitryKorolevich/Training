@@ -127,6 +127,8 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
 			}
 
+			customer.IdEditedBy = null;
+
 			return customer;
 		}
 

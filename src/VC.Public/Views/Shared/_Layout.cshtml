@@ -115,11 +115,11 @@
 				<ul>
 					@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
 					{
-						<text>@await Component.InvokeAsync("Area", "Secondary Menu for Wholesale")</text>
+						<text>@await Component.InvokeAsync("Area", "Secondary Wholesale Menu")</text>
 					}
 					else
 					{
-						<text>@await Component.InvokeAsync("Area", "Secondary Menu")</text>
+						<text>@await Component.InvokeAsync("Area", "Secondary Retail Menu")</text>
 					}
 				</ul>
 			</nav>
@@ -161,7 +161,7 @@
 		<footer>
 			<div class="footer-main">
 				<nav class="footer-nav">
-					@await Component.InvokeAsync("Area", "Footer Nav")
+					@await Component.InvokeAsync("Area", "Footer Links")
 				</nav>
 				<div class="footer-market">
 					<div class="market-left">

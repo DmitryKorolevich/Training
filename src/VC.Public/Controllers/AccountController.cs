@@ -131,6 +131,7 @@ namespace VC.Public.Controllers
 
 			customer.Email = model.Email;
 			customer.StatusCode = (int) CustomerStatus.Active;
+			customer.IdEditedBy = null;
 
 			await _customerService.UpdateAsync(customer, model.Password);
 
@@ -177,6 +178,7 @@ namespace VC.Public.Controllers
 			var defaultPaymentMethod = await _paymentMethodService.GetStorefrontDefaultPaymentMenthod();
             item.IdDefaultPaymentMethod = defaultPaymentMethod.Id;
 			item.ApprovedPaymentMethods = new List<int> {defaultPaymentMethod.Id};
+			item.IdEditedBy = null;
 
 			item = await _customerService.InsertAsync(item, model.Password);
 			if (item == null || item.Id == 0)
