@@ -277,8 +277,6 @@ namespace VitalChoice.Core.DependencyInjection
                 FileService.Init(appPath);
             }
 
-            var service = container.Resolve<IBackendSettingsService>();
-            service.Init();
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
 
             return container.Resolve<IServiceProvider>();

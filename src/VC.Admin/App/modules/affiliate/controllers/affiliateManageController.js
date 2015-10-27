@@ -9,6 +9,19 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         $scope.resetTracker = promiseTracker("reset");
         $scope.resendTracker = promiseTracker("resend");
 
+        function refreshHistory()
+        {
+            if ($scope.affiliate && $scope.affiliate.Id)
+            {
+                var data = {};
+                data.service = affiliateService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.affiliate.Id;
+                data.idObjectType = 7//customer
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
+
         function successSaveHandler(result)
         {
             if (result.Success)
@@ -17,6 +30,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 $scope.affiliate.Id = result.Data.Id;
                 $scope.affiliate.DateEdited = result.Data.DateEdited;
                 $scope.affiliate.Email = result.Data.Email;
+                refreshHistory();
             } else
             {
                 var messages = "";
@@ -108,6 +122,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     if (result.Success)
                     {
                         $scope.affiliate = result.Data;
+                        refreshHistory();
                     } else
                     {
                         errorHandler(result);
@@ -133,6 +148,11 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 } else
                 {
                     data.EmailConfirm = data.Email;
+                }
+
+                if (data.StatusCode != 4)
+                {
+                    data.SuspendMessage = null;
                 }
 
                 affiliateService.updateAffiliate(data, $scope.refreshTracker).success(function (result)
@@ -187,17 +207,6 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 }
             }
             return states;
-        };
-
-        $scope.notify = function ()
-        {
-            var data =
-                {
-                    Type: 1,//notify
-                    ToName: $scope.affiliate.Name,
-                    ToEmail: $scope.affiliate.Email,
-                };
-            modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
         };
 
         $scope.email = function ()

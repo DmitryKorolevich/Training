@@ -42,6 +42,7 @@ using VitalChoice.Domain.Entities.Settings;
 using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
+using Microsoft.Framework.DependencyInjection;
 
 namespace VC.Admin.Controllers
 {
@@ -75,6 +76,7 @@ namespace VC.Admin.Controllers
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
             IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
+            IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _customerService = customerService;
@@ -88,7 +90,7 @@ namespace VC.Admin.Controllers
             this.logger = loggerProvider.CreateLoggerDefault();
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
-            _defaultCountry = appOptions.Value.DefaultCountry;
+            _defaultCountry = appInfrastructureService.Get().DefaultCountry;
         }
 
 	    [HttpGet]

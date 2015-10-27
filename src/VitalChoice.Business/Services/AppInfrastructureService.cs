@@ -44,6 +44,7 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
         private readonly ISettingService settingService;
+        private readonly IBackendSettingsService _backendSettingsService;
         private readonly ILocalizationService _localizationService;
 
         public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<ApplicationRole> roleManager,
@@ -51,7 +52,9 @@ namespace VitalChoice.Business.Services
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
             IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository,
-            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService, ILocalizationService localizationService)
+            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService,
+            IBackendSettingsService backendSettingsService,
+            ILocalizationService localizationService)
         {
             this.cache = cache;
             this.expirationTerm = appOptions.Value.DefaultCacheExpirationTermMinutes;
@@ -67,6 +70,7 @@ namespace VitalChoice.Business.Services
             this.lookupRepository = lookupRepository;
             this.settingService = settingService;
             _localizationService = localizationService;
+            _backendSettingsService = backendSettingsService;
         }
 
         private ReferenceData Populate()
@@ -88,6 +92,7 @@ namespace VitalChoice.Business.Services
             var promotionBuyTypes = lookupRepository.Query(x => x.Name == LookupNames.PromotionBuyTypes).Select(false).Single().Id;
 
             var referenceData = new ReferenceData();
+            referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
 	        referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType== UserType.Admin).Select(x => new LookupItem<int>
 	        {
 		        Key = x.Id,

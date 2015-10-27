@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services.Affiliates
             _appOptions = appOptions;
         }
 
-        protected override bool LogObject { get { return false; } }
+        protected override bool LogObjectFullData { get { return true; } }
 
         public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
         {

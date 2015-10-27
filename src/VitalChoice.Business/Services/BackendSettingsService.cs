@@ -30,13 +30,14 @@ namespace VitalChoice.Business.Services
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public void Init()
+        public Country GetDefaultCountry()
         {
-            _appOptions.Value.DefaultCountry = _countryRepository.Query(p => p.CountryCode == "US").Select(false).FirstOrDefault();
-            if(_appOptions.Value.DefaultCountry!=null)
+            var toReturn = _countryRepository.Query(p => p.CountryCode == "US").Select(false).FirstOrDefault();
+            if(toReturn != null)
             {
-                _appOptions.Value.DefaultCountry.States = _stateRepository.Query(p => p.CountryCode == "US").Select(false);
+                toReturn.States = _stateRepository.Query(p => p.CountryCode == "US").Select(false);
             }
+            return toReturn;
         }
     }
 }

@@ -33,6 +33,10 @@ using System.Text;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Constants;
+using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Domain.Transfer.Settings;
+using Newtonsoft.Json;
 
 namespace VC.Admin.Controllers
 {
@@ -42,18 +46,24 @@ namespace VC.Admin.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly IDynamicToModelMapper<AffiliateDynamic> _mapper;
         private readonly IAffiliateUserService _affiliateUserService;
+        private readonly IObjectHistoryLogService _objectHistoryLogService;
+        private readonly Country _defaultCountry;
         private readonly ILogger logger;
 
         public AffiliateController(
             IAffiliateService affiliateService,
             IAffiliateUserService affiliateUserService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicToModelMapper<AffiliateDynamic> mapper)
+            IDynamicToModelMapper<AffiliateDynamic> mapper,
+            IAppInfrastructureService appInfrastructureService,
+            IObjectHistoryLogService objectHistoryLogService)
         {
-            this._affiliateService = affiliateService;
-            this._affiliateUserService = affiliateUserService;
+            _affiliateService = affiliateService;
+            _affiliateUserService = affiliateUserService;
             _mapper = mapper;
-            this.logger = loggerProvider.CreateLoggerDefault();
+            _objectHistoryLogService = objectHistoryLogService;
+            _defaultCountry = appInfrastructureService.Get().DefaultCountry;
+            logger = loggerProvider.CreateLoggerDefault();
         }
         
         [HttpPost]
@@ -80,7 +90,8 @@ namespace VC.Admin.Controllers
                 return new AffiliateManageModel()
                 {
                     StatusCode = RecordStatusCode.NotActive,
-                    PaymentType=2,//Credit
+                    IdCountry = _defaultCountry!=null ? _defaultCountry.Id : (int?)null,
+                    PaymentType =2,//Credit
                     Tier = 1,
                     CommissionFirst = 8,
                     CommissionAll = 5,
@@ -208,6 +219,35 @@ namespace VC.Admin.Controllers
             await _affiliateUserService.SendResetPasswordAsync(id);
 
             return true;
+        }
+
+        [HttpPost]
+        public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
+        {
+            var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
+
+            if (toReturn.Main != null && !String.IsNullOrEmpty(toReturn.Main.Data))
+            {
+                var dynamic = (AffiliateDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(AffiliateDynamic));
+                var model = _mapper.ToModel<AffiliateManageModel>(dynamic);
+                toReturn.Main.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+            if (toReturn.Before != null && !String.IsNullOrEmpty(toReturn.Before.Data))
+            {
+                var dynamic = (AffiliateDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(AffiliateDynamic));
+                var model = _mapper.ToModel<AffiliateManageModel>(dynamic);
+                toReturn.Before.Data = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Include,
+                });
+            }
+
+            return toReturn;
         }
     }
 }

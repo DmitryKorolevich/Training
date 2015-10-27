@@ -5,8 +5,7 @@
                 <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
             </div>
             <div data-ng-if="affiliate.Id" class="btn-group margin-top-10px">
-                <button class="btn btn-info width-80px" data-ng-click="notify()">Notify</button>
-                <button class="btn btn-primary-orange width-80px" data-ng-click="email()">Email</button>
+                <button class="btn btn-info width-160px" data-ng-click="email()">Email</button>
             </div>
             <div class="btn-group margin-top-10px">
                 <button cancel-button-default-state="index.oneCol.manageAffiliates" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
@@ -15,6 +14,7 @@
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageAffiliates">Manage All</button>
             </div>
         </div>
+        <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/customer/partials/customerObjectHistorySection.html'"></div>
     </div>
     <div class="right-pane-main">
         <div class="container-fluid">
@@ -32,11 +32,22 @@
                                                     <span>{{affiliate.Id}}</span>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+                                            <div data-ng-if="affiliate.Id" class="form-group">
                                                 <label for="active" class="col-md-3 control-label">Suspend</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label><input type="checkbox" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4"/></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="affiliate.Id && affiliate.StatusCode == 4">
+                                                <label for="reason" class="col-md-3 control-label">Reason</label>
+                                                <div class="col-md-9">
+                                                    <textarea type="text" name="SuspendMessage" class="form-control" placeholder="Reason" rows="10" data-ng-model="affiliate.SuspendMessage" required data-ng-maxlength="250"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.SuspendMessage.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.SuspendMessage.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.SuspendMessage.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.SuspendMessage.$error.server">{{serverMessages.GetMessage('SuspendMessage')}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -68,9 +79,17 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="active" class="col-md-3 control-label">Website</label>
-                                                <div class="col-md-9">
+                                                <div class="col-md-1">
                                                     <div class="checkbox">
                                                         <label><input type="checkbox" name="PromoteByWebsite" data-ng-model="affiliate.PromoteByWebsite" /></label>
+                                                    </div>
+                                                </div>
+                                                <label data-ng-if="affiliate.PromoteByWebsite" class="col-md-3 control-label">Website URL</label>
+                                                <div data-ng-if="affiliate.PromoteByWebsite" class="col-md-5">
+                                                    <input type="text" name="WebSite" class="form-control" placeholder="Website URL" data-ng-model="affiliate.WebSite" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.WebSite.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.WebSite.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","WebSite URL")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.WebSite.$error.server">{{serverMessages.GetMessage('WebSite')}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -201,15 +220,6 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Website URL</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="WebSite" class="form-control" placeholder="Website URL" data-ng-model="affiliate.WebSite">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.WebSite.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.WebSite.$error.server">{{serverMessages.GetMessage('WebSite')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
                                                 <label class="col-md-3 control-label">Reach</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="Reach" class="form-control" placeholder="Reach" data-ng-model="affiliate.Reach">
@@ -247,12 +257,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Last Updated</label>
-                                                <div class="col-md-9 form-control-static" data-ng-if="affiliate.Id">
-                                                    <span>{{affiliate.DateEdited | date:"MM/dd/yy h:mm a"}}</span>
-                                                </div>
-                                            </div>
 
                                             <span class="legend">Details</span>
 
@@ -266,7 +270,120 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Checks payable to</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="ChecksPayableTo" class="form-control" placeholder="Checks payable to" data-ng-model="affiliate.ChecksPayableTo">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ChecksPayableTo.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.ChecksPayableTo.$error.server">{{serverMessages.GetMessage('ChecksPayableTo')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Tax ID / SSN</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="TaxID" class="form-control" placeholder="Tax ID / SSN" data-ng-model="affiliate.TaxID">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.TaxID.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.TaxID.$error.server">{{serverMessages.GetMessage('TaxID')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Company</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Company" class="form-control" placeholder="Company" data-ng-model="affiliate.Company">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Company.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Company.$error.server">{{serverMessages.GetMessage('Company')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Address 1</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Address1" class="form-control" placeholder="Address 1" data-ng-model="affiliate.Address1" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Address1.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Address1.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Address 1")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Address1.$error.server">{{serverMessages.GetMessage('Address1')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Address 2</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Address2" class="form-control" placeholder="Address 2" data-ng-model="affiliate.Address2">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Address2.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Address2.$error.server">{{serverMessages.GetMessage('Address2')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Country</label>
+                                                <div class="col-md-9">
+                                                    <select name="IdCountry" class="form-control" data-ng-model="affiliate.IdCountry" data-ng-options="country.Id as country.CountryName for country in countries" required>
+                                                        <option value="">Select Country</option>
+                                                    </select>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.IdCountry.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.IdCountry.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Country")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.IdCountry.$error.server">{{serverMessages.GetMessage('IdCountry')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="affiliate.IdCountry">
+                                                <label class="col-md-3 control-label">State/Province</label>
+                                                <div class="col-md-9" data-ng-if="statesByCountryId(affiliate.IdCountry) && statesByCountryId(affiliate.IdCountry).length > 0">
+                                                    <select name="IdState" class="form-control" data-ng-model="affiliate.IdState" data-ng-options="item.Id as item.StateName for item in statesByCountryId(affiliate.IdCountry)" required>
+                                                        <option value="">Select State</option>
+                                                    </select>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.IdState.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.IdState.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","State")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.IdState.$error.server">{{serverMessages.GetMessage('IdState')}}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-9" data-ng-if="!(statesByCountryId(affiliate.IdCountry) && statesByCountryId(affiliate.IdCountry).length > 0)">
+                                                    <input type="text" name="County" class="form-control" data-ng-model="affiliate.County" placeholder="State"/>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.County.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.County.$error.server">{{serverMessages.GetMessage('County')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">City</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="City" class="form-control" placeholder="City" data-ng-model="affiliate.City" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.City.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.City.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","City")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.City.$error.server">{{serverMessages.GetMessage('City')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Zip</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Zip" class="form-control" placeholder="Zip" data-ng-model="affiliate.Zip" required>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Zip.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Zip.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Zip")}}</small>
+                                                        <small class="error" ng-show="forms.mainForm.Zip.$error.server">{{serverMessages.GetMessage('Zip')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Phone</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Phone" class="form-control" placeholder="Phone" data-ng-model="affiliate.Phone" data-mask="(999) 999-9999? x99999" data-clean="true" autocomplete="off">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Phone.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Phone.$error.server">{{serverMessages.GetMessage('Phone')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Fax</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" name="Fax" class="form-control" placeholder="Fax" data-ng-model="affiliate.Fax" data-mask="(999) 999-9999? x99999" data-clean="true" autocomplete="off">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Fax.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Fax.$error.server">{{serverMessages.GetMessage('Fax')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="form-group" data-ng-if="affiliate.Id">
                                                 <label for="currentEmail" class="col-md-3 control-label">Current Email</label>
                                                 <div class="col-md-9 form-control-static">
@@ -302,123 +419,6 @@
                                                 <div class="col-md-9">
                                                     <button class="btn btn-info" data-ng-if="affiliate.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword();">Reset Password</button>
                                                     <button class="btn btn-info" data-ng-if="affiliate.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend();">Resend Activation Email</button>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Checks payable to</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="ChecksPayableTo" class="form-control" placeholder="Checks payable to" data-ng-model="affiliate.ChecksPayableTo">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.ChecksPayableTo.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.ChecksPayableTo.$error.server">{{serverMessages.GetMessage('ChecksPayableTo')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Tax ID / SSN</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="TaxID" class="form-control" placeholder="Tax ID / SSN" data-ng-model="affiliate.TaxID">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.TaxID.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.TaxID.$error.server">{{serverMessages.GetMessage('TaxID')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Company</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Company" class="form-control" placeholder="Company" data-ng-model="affiliate.Company">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Company.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Company.$error.server">{{serverMessages.GetMessage('Company')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Phone</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Phone" class="form-control" placeholder="Phone" data-ng-model="affiliate.Phone" data-mask="(999) 999-9999? x99999" data-clean="true" autocomplete="off">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Phone.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Phone.$error.server">{{serverMessages.GetMessage('Phone')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Fax</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Fax" class="form-control" placeholder="Fax" data-ng-model="affiliate.Fax" data-mask="(999) 999-9999? x99999" data-clean="true" autocomplete="off">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Fax.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Fax.$error.server">{{serverMessages.GetMessage('Fax')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Address 1</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Address1" class="form-control" placeholder="Address 1" data-ng-model="affiliate.Address1" required>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Address1.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Address1.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Address 1")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.Address1.$error.server">{{serverMessages.GetMessage('Address1')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Address 2</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Address2" class="form-control" placeholder="Address 2" data-ng-model="affiliate.Address2">
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Address2.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Address2.$error.server">{{serverMessages.GetMessage('Address2')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Country</label>
-                                                <div class="col-md-9">
-                                                    <select name="IdCountry" class="form-control" data-ng-model="affiliate.IdCountry" data-ng-options="country.Id as country.CountryName for country in countries" required>
-                                                        <option value="">Select Country</option>
-                                                    </select>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.IdCountry.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.IdCountry.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Country")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.IdCountry.$error.server">{{serverMessages.GetMessage('IdCountry')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group" data-ng-if="affiliate.IdCountry">
-                                                <label class="col-md-3 control-label">State/Province</label>
-                                                <div class="col-md-9" data-ng-if="statesByCountryId(affiliate.IdCountry) && statesByCountryId(affiliate.IdCountry).length > 0">
-                                                    <select name="IdState" class="form-control" data-ng-model="affiliate.IdState" data-ng-options="item.Id as item.StateName for item in statesByCountryId(affiliate.IdCountry)" required>
-                                                        <option value="">Select State</option>
-                                                    </select>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.IdState.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.IdState.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","State")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.IdState.$error.server">{{serverMessages.GetMessage('IdState')}}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-9" data-ng-if="!(statesByCountryId(affiliate.IdCountry) && statesByCountryId(affiliate.IdCountry).length > 0)">
-                                                    <input type="text" name="County" class="form-control" data-ng-model="affiliate.County" placeholder="State"/>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.County.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.County.$error.server">{{serverMessages.GetMessage('County')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">City</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="City" class="form-control" placeholder="City" data-ng-model="affiliate.City" required>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.City.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.City.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","City")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.City.$error.server">{{serverMessages.GetMessage('City')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Zip</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Zip" class="form-control" placeholder="Zip" data-ng-model="affiliate.Zip" required>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.mainForm.Zip.$invalid">
-                                                        <small class="error" ng-show="forms.mainForm.Zip.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Zip")}}</small>
-                                                        <small class="error" ng-show="forms.mainForm.Zip.$error.server">{{serverMessages.GetMessage('Zip')}}</small>
-                                                    </div>
                                                 </div>
                                             </div>
 

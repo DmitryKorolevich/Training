@@ -31,6 +31,9 @@ namespace VC.Admin.Models.Affiliate
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
+        public string SuspendMessage { get; set; }
+
+        [Map]
         public string Name { get; set; }
 
         [Map]
@@ -153,14 +156,6 @@ namespace VC.Admin.Models.Affiliate
 
         [Map]
         public int PaymentType { get; set; }
-
-        [Map]
-        [Localized(GeneralFieldNames.Password)]
-        public string Password { get; set; }
-
-        [Map]
-        [Localized(GeneralFieldNames.ConfirmPassword)]
-        public string ConfirmPassword { get; set; }
 
 
         public AffiliateManageModel()

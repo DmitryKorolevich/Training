@@ -131,3 +131,16 @@ ALTER TABLE Affiliates ADD Email NVARCHAR(100) NOT NULL DEFAULT('')
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM AffiliateOptionTypes WHERE Name='SuspendMessage')
+BEGIN
+
+	INSERT INTO [dbo].[AffiliateOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [DefaultValue])
+	VALUES
+	(N'SuspendMessage', 4, NULL, NULL)
+
+END
+
+GO
+

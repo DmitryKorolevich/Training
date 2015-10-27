@@ -9,6 +9,8 @@ namespace VitalChoice.Domain.Transfer.Base
     {
         public AppSettings AppSettings { get; set; }
 
+        public VitalChoice.Domain.Entities.Settings.Country DefaultCountry { get; set; }
+
         public IList<LookupItem<int>> AdminRoles { get; set; }
 
         public IList<LookupItem<int>> CustomerRoles { get; set; }
