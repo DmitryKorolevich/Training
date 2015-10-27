@@ -13,7 +13,7 @@
 		<h4>Login below to access your affiliate account</h4>
 		if (!string.IsNullOrWhiteSpace(ViewBag.AlreadyTakenEmail))
 		{
-			<span class="form-control-hint">The e-mail address you provided already exists in our database. Please use another e-mail address to @Html.ActionLink("register", "RegisterEmail") or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.</span>
+			<span class="form-control-important-info">The e-mail address you provided already exists in our database. Please use another e-mail address to @Html.ActionLink("register", "RegisterEmail") or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.</span>
 		}
 		@Html.ValidationSummary(true, "")
 		<div class="form-group">

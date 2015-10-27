@@ -1030,6 +1030,18 @@ footer {
   color: #737373;
   margin-bottom: 15px;
 }
+.form-regular .form-control-important-info {
+  float: left;
+  width: 100%;
+  margin-bottom: 15px;
+  background-color: #FFC;
+  border: 1px solid #F90;
+  padding: 8px 10px 8px 10px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  color: red;
+}
 .form-regular .success-message {
   color: green;
 }
