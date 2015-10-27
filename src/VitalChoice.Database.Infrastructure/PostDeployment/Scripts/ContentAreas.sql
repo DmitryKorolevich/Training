@@ -25,12 +25,42 @@ BEGIN
 
 END
 
+UPDATE [dbo].[ContentAreas] 
+SET [Name] = N'Secondary Wholesale Menu'
+WHERE [Name] = N'Secondary Menu for Wholesale'
+
+GO
+
+UPDATE [dbo].[ContentAreas] 
+SET [Name] = N'Footer Links'
+WHERE [Name] = N'Footer Nav'
+
+GO
+
+UPDATE [dbo].[ContentAreas] 
+SET [Name] = N'Home Bottom Banners'
+WHERE [Name] = N'Home Banners'
+
+GO
+
+UPDATE [dbo].[ContentAreas] 
+SET [Name] = N'Home Banner Carousel'
+WHERE [Name] = N'Home Carousel'
+
+GO
+
+UPDATE [dbo].[ContentAreas] 
+SET [Name] = N'Secondary Retail Menu'
+WHERE [Name] = N'Secondary Menu'
+
+GO
+
 IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas])
 BEGIN
 	INSERT INTO [dbo].[ContentAreas]
 	([Name], [Template], [StatusCode], [Created], [Updated])
 	VALUES
-	(N'Secondary Menu', N'
+	(N'Secondary Retail Menu', N'
 					<li>
 						<a href="#">New</a>
 					</li>
@@ -150,7 +180,7 @@ BEGIN
 	INSERT INTO [dbo].[ContentAreas]
 	([Name], [Template], [StatusCode], [Created], [Updated])
 	VALUES
-	(N'Home Carousel', N'<a href="#"><img src="/Assets/images/King_C3_cover_slide_v2.jpg" alt=""/></a>
+	(N'Home Banner Carousel', N'<a href="#"><img src="/Assets/images/King_C3_cover_slide_v2.jpg" alt=""/></a>
 		<a href="#"><img src="/Assets/images/chicken-hp-banner-v6.jpg" alt=""/></a>
 		<a href="#"><img src="/Assets/images/HP_banner_bonebroth_web.jpg" alt=""/></a>
 		<a href="#"><img src="/Assets/images/HP_banner_sardines_2.jpg" alt=""/></a>', 2, GETDATE(), GETDATE())
@@ -158,7 +188,7 @@ BEGIN
 	INSERT INTO [dbo].[ContentAreas]
 	([Name], [Template], [StatusCode], [Created], [Updated])
 	VALUES
-	(N'Home Banners', N'<div>
+	(N'Home Bottom Banners', N'<div>
 			<img src="/Assets/images/homebanner_sausagebaconburger_v2.jpg" usemap="#btmbanner2">
 		</div>
 		<map name="btmbanner2" id="btmbanner2">
@@ -181,12 +211,12 @@ BEGIN
 		</map>', 2, GETDATE(), GETDATE())
 END
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Footer Nav')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Footer Links')
 BEGIN
 	INSERT INTO [dbo].[ContentAreas]
 	([Name], [Template], [StatusCode], [Created], [Updated])
 	VALUES
-	(N'Footer Nav', N'<div class="footer-links-column">
+	(N'Footer Links', N'<div class="footer-links-column">
 						<span>Need Help?</span>
 						<ul>
 							<li><a href="#">Customer Service</a></li>
@@ -238,12 +268,12 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Menu for Wholesale')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Wholesale Menu')
 BEGIN
 	INSERT INTO [dbo].[ContentAreas]
 	([Name], [Template], [StatusCode], [Created], [Updated])
 	VALUES
-	(N'Secondary Menu for Wholesale', N'
+	(N'Secondary Wholesale Menu', N'
 					<li>
 						<a href="#">New</a>
 					</li>
@@ -363,7 +393,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Menu for Wholesale' AND [Updated] = N'09/09/2015')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name] = N'Secondary Wholesale Menu' AND [Updated] = N'09/09/2015')
 BEGIN
 	UPDATE [dbo].[ContentAreas]
 	SET [Updated] = N'09/09/2015',
@@ -505,5 +535,7 @@ BEGIN
 						</div>
 					</li>
 				'
-	WHERE [Name] = N'Secondary Menu for Wholesale'
+	WHERE [Name] = N'Secondary Wholesale Menu'
 END
+
+GO
