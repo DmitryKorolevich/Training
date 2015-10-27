@@ -976,6 +976,9 @@ footer {
   padding-left: 15px;
   width: 100%;
 }
+.form-regular.border-form-left .form-control-important-info {
+  width: auto;
+}
 .form-regular.medium .control-label {
   width: 200px;
 }
