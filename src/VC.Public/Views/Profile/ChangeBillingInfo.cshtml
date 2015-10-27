@@ -4,7 +4,7 @@
 @model VC.Public.Models.Profile.BillingInfoModel
 
 @section Meta {
-	<title>Vital Choice | Update Billing Information</title>
+	<title>Vital Choice | Manage Billing Information</title>
 }
 
 @section PageScripts {
@@ -15,6 +15,7 @@
 
 <script>
 	var creditCardsJson = '@Html.Raw(ViewBag.CreditCards)';
+	successMessage = '@ViewBag.SuccessMessage';
 </script>
 
 <div class="working-area-holder">
@@ -29,7 +30,7 @@
 			<input id="hdCardType" value="@Html.DisplayForEx(x=>x.CardType)" type="hidden">
 			@Html.HiddenFor(m => m.Id, new { @id = "hdCreditCard" })
 			@Html.AntiForgeryToken()
-			<h4>Update Billing Information</h4>
+			<h4>Manage Billing Information</h4>
 			<div class="form-group">
 				<div class="input-group control-label-indent">
 					<input id="addNew" class="yellow inline-button" type="button" value="Add New" />

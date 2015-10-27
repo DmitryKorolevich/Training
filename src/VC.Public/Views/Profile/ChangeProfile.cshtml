@@ -2,13 +2,17 @@
 @model VC.Public.Models.Profile.ChangeProfileModel
 
 @section Meta {
-	<title>Vital Choice | Update Profile</title>
+	<title>Vital Choice | Manage Account Profile</title>
 }
 
 @section PageScripts {
 	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
 	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
 }
+
+<script>
+	successMessage = '@ViewBag.SuccessMessage';
+</script>
 
 <div class="working-area-holder">
 	<div class="left-pane clean-border">
@@ -21,7 +25,7 @@
 		<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
 		@Html.HiddenFor(x=>x.CurrentEmail)
 		@Html.AntiForgeryToken()
-		<h4>Update Profile</h4>
+		<h4>Manage Account Profile</h4>
 		<div class="sub-title"><span>Update Email</span></div>
 		@Html.ValidationSummary(true, "")
 		<div class="form-group">

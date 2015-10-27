@@ -1091,6 +1091,12 @@ footer {
   padding-left: 0;
   margin: 15px 0;
 }
+.jq-toast-single {
+  font-size: 13px;
+}
+.jq-toast-wrap.bottom-right {
+  right: 60px;
+}
 .vitalgreen .header {
   margin-bottom: 20px;
   margin-top: 20px;

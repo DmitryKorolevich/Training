@@ -49,7 +49,7 @@ namespace VC.Public.Controllers
 			_paymentMethodConverter = paymentMethodConverter;
 		}
 
-		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer)
+		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
 		{
 			var creditCards = new List<BillingInfoModel>();
 			foreach (
@@ -67,7 +67,7 @@ namespace VC.Public.Controllers
 			BillingInfoModel model = null;
 			if (creditCards.Any())
 			{
-				model = creditCards.First();
+				model = selectedId > 0 ? creditCards.Single(x=>x.Id == selectedId) : creditCards.First();
 				ViewBag.CreditCards = JsonConvert.SerializeObject(creditCards, Formatting.None);
 			}
 			else
@@ -78,7 +78,7 @@ namespace VC.Public.Controllers
 			return model;
 		}
 
-		private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer)
+		private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer, int selectedId = 0)
 		{
 			var shippingAddresses = new List<ShippingInfoModel>();
 			foreach (
@@ -94,7 +94,7 @@ namespace VC.Public.Controllers
 			ShippingInfoModel model;
             if (shippingAddresses.Any())
 			{
-				model = shippingAddresses.First(x => x.Default);
+				model = selectedId > 0 ? shippingAddresses.Single(x => x.Id == selectedId) : shippingAddresses.First(x => x.Default);
 				ViewBag.ShippingAddresses = JsonConvert.SerializeObject(shippingAddresses, Formatting.None);
 			}
 			else
@@ -172,7 +172,9 @@ namespace VC.Public.Controllers
 
 			await _storefrontUserService.UpdateWithPasswordChangeAsync(user, model.OldPassword, model.Password);
 
-			return RedirectToAction("Index");
+			ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated];
+
+			return View(new ChangePasswordModel());
 		}
 
 		[HttpGet]
@@ -199,11 +201,9 @@ namespace VC.Public.Controllers
 
 			var customer = await GetCurrentCustomerDynamic();
 
-			var profileAddress = customer.Addresses.Single(x => x.IdObjectType == (int) AddressType.Profile);
-
 			var oldEmail = customer.Email;
 
-			customer.Addresses.Remove(profileAddress);
+			customer.Addresses = customer.Addresses.Where(x => x.IdObjectType != (int)AddressType.Profile).ToList();
 			var newProfileAddress = _addressConverter.FromModel(model);
 			newProfileAddress.IdObjectType = (int) AddressType.Profile;
 			customer.Addresses.Add(newProfileAddress);
@@ -226,7 +226,13 @@ namespace VC.Public.Controllers
 				await _storefrontUserService.RefreshSignInAsync(user);
 			}
 
-			return RedirectToAction("Index");
+			ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated];
+
+			model =
+				_addressConverter.ToModel<ChangeProfileModel>(
+					customer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile && x.StatusCode != (int)RecordStatusCode.Deleted));
+
+			return View(model);
 		}
 
 		[HttpGet]
@@ -243,10 +249,9 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
-			PopulateCreditCard(currentCustomer);
-
 			if (!ModelState.IsValid)
 			{
+				PopulateCreditCard(currentCustomer, model.Id);
 				return View(model);
 			}
 
@@ -264,9 +269,18 @@ namespace VC.Public.Controllers
 
 			currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
 
-			await _customerService.UpdateAsync(currentCustomer);
+			currentCustomer = await _customerService.UpdateAsync(currentCustomer);
 
-			return RedirectToAction("Index");
+			ViewBag.SuccessMessage = model.Id > 0
+				? InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated]
+				: InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+
+			if (model.Id == 0)
+			{
+				ModelState["Id"].RawValue = model.Id = currentCustomer.CustomerPaymentMethods.Last(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).Id;
+			}
+
+			return View(PopulateCreditCard(currentCustomer, model.Id));
 		}
 
 		[HttpPost]
@@ -298,14 +312,13 @@ namespace VC.Public.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> ChangeShippingInfo(ShippingInfoModel model)
+		public async Task<IActionResult> ChangeShippingInfo([FromForm]ShippingInfoModel model)
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
-			PopulateShippingAddress(currentCustomer);
-
 			if (!ModelState.IsValid)
 			{
+				PopulateShippingAddress(currentCustomer, model.Id);
 				return View(model);
 			}
 
@@ -329,9 +342,18 @@ namespace VC.Public.Controllers
 
 			currentCustomer.Addresses.Add(newAddress);
 
-			await _customerService.UpdateAsync(currentCustomer);
+			currentCustomer = await _customerService.UpdateAsync(currentCustomer);
 
-			return RedirectToAction("Index");
+			ViewBag.SuccessMessage = model.Id > 0
+				? InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated]
+				: InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+
+			if (model.Id == 0 )
+			{
+				ModelState["Id"].RawValue = model.Id = currentCustomer.Addresses.Last(x => x.IdObjectType == (int) AddressType.Shipping).Id;
+			}
+
+			return View(PopulateShippingAddress(currentCustomer, model.Id));
 		}
 
 		[HttpPost]
@@ -346,6 +368,36 @@ namespace VC.Public.Controllers
 			}
 
 			currentCustomer.Addresses.Remove(shippingAddressToDelete);
+
+			await _customerService.UpdateAsync(currentCustomer);
+
+			return true;
+		}
+
+		[HttpPost]
+		public async Task<Result<bool>> SetDefaultShippingInfo(int id)
+		{
+			var currentCustomer = await GetCurrentCustomerDynamic();
+
+			var found = false;
+			var addresses = currentCustomer.Addresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
+			foreach (var address in addresses)
+			{
+				if (address.Id == id)
+				{
+					address.Data.Default = true;
+					found = true;
+				}
+				else
+				{
+					address.Data.Default = false;
+				}
+			}
+
+			if (!found)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+			}
 
 			await _customerService.UpdateAsync(currentCustomer);
 

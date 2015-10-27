@@ -5,7 +5,7 @@ $(function () {
 	if (shippingAddressesJson != "") {
 		shippingAddresses = $.parseJSON(shippingAddressesJson);
 	}
-	populateAddressesSelection(shippingAddresses);
+	populateAddressesSelection(shippingAddresses, false);
 
 	syncDefaultBtnState();
 
@@ -29,9 +29,20 @@ $(function () {
 		})[0];
 
 		if (selectedShippingAddress) {
-			selectedShippingAddress.Default = true;
+			setDefaultShippingAddress($("#hdShipping").val(), function (result, shippingAddresses) {
+				if (result.Success) {
+					selectedShippingAddress.Default = true;
 
-			updateOptionsText();
+					updateOptionsText();
+
+					notifySuccess("Successfully updated");
+				} else {
+					notifyError(result.Messages[0].Message);
+				}
+
+			}, function (errorResult) {
+				//todo: handle result
+			});
 		}
 
 		$('#setDefaultSelected').hide();
@@ -67,15 +78,15 @@ $(function () {
 		var idToRemove = $("#ddShippingAddressesSelection").val();
 
 		confirmAction(function () {
-			deleteShippingAddress(idToRemove, function (result, shippingAddresses) {
+			deleteShippingAddress(idToRemove, function (result) {
 				if (result.Success) {
-					var shippingAddresses = $.grep(shippingAddresses, function (item) {
+					shippingAddresses = $.grep(shippingAddresses, function (item) {
 						return item.Id != idToRemove;
 					});
 
-					populateAddressesSelection(shippingAddresses);
+					populateAddressesSelection(shippingAddresses, true);
 
-					notifySuccess();
+					notifySuccess("Successfully deleted");
 				} else {
 					notifyError(result.Messages[0].Message);
 				}
@@ -87,12 +98,12 @@ $(function () {
 	});
 });
 
-function populateAddressesSelection(shippingAddresses) {
+function populateAddressesSelection(shippingAddresses, setDefault) {
 	$("#ddShippingAddressesSelection").html("");
 	if (shippingAddresses && shippingAddresses.length > 0) {
 		$.each(shippingAddresses, function (shippingAddressIndex, shippingAddress) {
 			var option = $('<option></option>').val(shippingAddress.Id).html(shippingAddress.FirstName + " " + shippingAddress.LastName + " " + shippingAddress.Address1 + " " + (shippingAddress.Default ? "(Default)" : ""));
-			if (shippingAddress.Default) {
+			if ((setDefault && shippingAddress.Default) || (!setDefault && shippingAddress.Id == $("#hdShipping").val())) {
 				$(option).attr("selected", "selected")
 			}
 
@@ -180,6 +191,22 @@ function deleteShippingAddress(idAddress, successCallback, errorCallback) {
 	}).error(function (result) {
 		if (errorCallback) {
 			errorCallback(result, shippingAddresses);
+		}
+	});
+}
+
+function setDefaultShippingAddress(idAddress, successCallback, errorCallback) {
+	$.ajax({
+		type: "POST",
+		url: "/Profile/SetDefaultShippingInfo/" + idAddress,
+		dataType: "json"
+	}).success(function (result) {
+		if (successCallback) {
+			successCallback(result);
+		}
+	}).error(function (result) {
+		if (errorCallback) {
+			errorCallback(result);
 		}
 	});
 }

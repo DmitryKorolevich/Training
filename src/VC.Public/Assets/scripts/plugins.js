@@ -27,6 +27,7 @@
 	$.support.placeholder = ('placeholder' in document.createElement('input'));
 })(jQuery);
 
+var successMessage;
 
 $(function () {
 	//fix for IE7 and IE8
@@ -70,6 +71,10 @@ $(function () {
 	});
 
 	$(".phone-mask").mask("(999) 999-9999? x99999");
+
+	if (successMessage) {
+		notifySuccess(successMessage);
+	}
 });
 
 function confirmAction(successCallback, errorCallback, text) {
@@ -100,21 +105,18 @@ function confirmAction(successCallback, errorCallback, text) {
 }
 
 function notifySuccess(text) {
-	var message = "Action has been successfully completed";
+	var message = "Successfully saved";
 	if (text != null) {
 		message = text;
 	}
 
-	$('<div id="dialog-success" title="Success">' +
-		'<p>' + message + '</p></div>').dialog({
-			resizable: false,
-			modal: true,
-			buttons: {
-				"Ok": function () {
-					$(this).dialog("close");
-				}
-			}
-		});
+	$.toast({
+		heading: 'Success',
+		text: message,
+		showHideTransition: 'slide',
+		icon: 'success',
+		position: 'bottom-right'
+	})
 }
 
 function notifyError(text) {
@@ -123,14 +125,11 @@ function notifyError(text) {
 		message = text;
 	}
 
-	$('<div id="dialog-error" title="Fail">' +
-		'<p>' + message + '</p></div>').dialog({
-			resizable: false,
-			modal: true,
-			buttons: {
-				"Ok": function () {
-					$(this).dialog("close");
-				}
-			}
-		});
+	$.toast({
+		heading: 'Error',
+		text: message,
+		showHideTransition: 'slide',
+		icon: 'error',
+		position: 'bottom-right'
+	})
 }

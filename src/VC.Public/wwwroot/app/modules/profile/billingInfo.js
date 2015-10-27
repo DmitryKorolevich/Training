@@ -20,7 +20,7 @@ $(function () {
 	} else {
 		$("#delSelected").hide();
 	}
-	populateCreditCardsSelection(creditCards);
+	populateCreditCardsSelection(creditCards, false);
 
 	$("body").on("change", "#ddCreditCardsSelection", function() {
 		changeSelection($("#ddCreditCardsSelection").val());
@@ -61,19 +61,19 @@ $(function () {
 		var idToRemove = $("#ddCreditCardsSelection").val();
 
 		confirmAction(function() {
-			deleteCreditCard(idToRemove, function (result, creditCards) {
+			deleteCreditCard(idToRemove, function (result) {
 				if (result.Success) {
-					var creditCards = $.grep(creditCards, function (item) {
+					creditCards = $.grep(creditCards, function (item) {
 						return item.Id != idToRemove;
 					});
 
-					populateCreditCardsSelection(creditCards);
+					populateCreditCardsSelection(creditCards, true);
 
 					if (!creditCards || creditCards.length < 1) {
 						$("#addNew").trigger("click");
 					}
 
-					notifySuccess();
+					notifySuccess("Successfully deleted");
 				} else {
 					notifyError(result.Messages[0].Message);
 				}
@@ -84,12 +84,17 @@ $(function () {
 	});
 });
 
-function populateCreditCardsSelection(creditCards) {
+function populateCreditCardsSelection(creditCards, setDefault) {
 	$("#ddCreditCardsSelection").html("");
 
 	if (creditCards && creditCards.length > 0) {
 		$.each(creditCards, function (creditCardIndex, creditCard) {
-			$("#ddCreditCardsSelection").append($('<option></option>').val(creditCard.Id).html(creditCard.CardNumber));
+			var option = $('<option></option>').val(creditCard.Id).html(creditCard.CardNumber);
+			if ((setDefault && creditCardIndex == 0) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
+				$(option).attr("selected", "selected")
+			}
+
+			$("#ddCreditCardsSelection").append(option);
 		});
 	}
 
@@ -145,11 +150,11 @@ function deleteCreditCard(idCreditCard, successCallback, errorCallback) {
 		dataType: "json"
 	}).success(function (result) {
 		if (successCallback) {
-			successCallback(result, creditCards);
+			successCallback(result);
 		}
 	}).error(function (result) {
 		if (errorCallback) {
-			errorCallback(result, creditCards);
+			errorCallback(result);
 		}
 	});
 }

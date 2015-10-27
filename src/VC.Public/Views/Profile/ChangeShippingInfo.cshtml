@@ -4,7 +4,7 @@
 @model VC.Public.Models.Profile.ShippingInfoModel
 
 @section Meta {
-	<title>Vital Choice | Update Shipping Information</title>
+	<title>Vital Choice | Manage Shipping Information</title>
 }
 
 @section PageScripts {
@@ -15,6 +15,7 @@
 
 <script>
 	var shippingAddressesJson = '@Html.Raw(ViewBag.ShippingAddresses)';
+	successMessage = '@ViewBag.SuccessMessage';
 </script>
 
 <div class="working-area-holder">
@@ -22,14 +23,14 @@
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
 	<div class="right-pane clean-indent">
-		@using (Html.BeginForm("ChangeShippingInfo", "Profile", null, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
+		@using (Html.BeginForm("ChangeShippingInfo", "Profile", new {}, FormMethod.Post, new { @class = "form-regular medium-small border-form-left", role = "form" }))
 		{
 			<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
 			<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
 			@Html.HiddenFor(m => m.Id, new { @id = "hdShipping" })
 			@Html.HiddenFor(m => m.Default, new { @id = "hdDefault" })
 			@Html.AntiForgeryToken()
-			<h4>Update Shipping Information</h4>
+			<h4>Manage Shipping Information</h4>
 			<div class="form-group">
 				<div class="input-group control-label-indent">
 					<input id="addNew" class="yellow inline-button" type="button" value="Add New" />
