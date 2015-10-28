@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 
@@ -13,9 +14,9 @@ namespace VC.Admin.ModelConverters
     {
         public void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
         {
-            if(model.IdPromotionBuyType==0)
+            if(model.PromotionBuyType == 0)
             {
-                model.IdPromotionBuyType = 1;
+                model.PromotionBuyType = PromoBuyType.Any;
             }
 
             if(dynamic.PromotionsToBuySkus!=null)

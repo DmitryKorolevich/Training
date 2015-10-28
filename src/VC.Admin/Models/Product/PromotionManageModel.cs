@@ -15,6 +15,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using VitalChoice.Domain.Transfer.Products;
 
 namespace VC.Admin.Models.Product
 {
@@ -56,7 +57,7 @@ namespace VC.Admin.Models.Product
         public decimal Percent { get; set; }
 
         [Map]
-        public int IdPromotionBuyType { get; set; }
+        public PromoBuyType PromotionBuyType { get; set; }
 
 
         [Map]

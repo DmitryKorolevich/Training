@@ -49,4 +49,11 @@ BEGIN
 	SELECT 'IdPromotionBuyType', 3, @IdLookupPromotionBuyType, 1, N'1'
 END
 
+IF EXISTS(SELECT * FROM PromotionOptionTypes WHERE Name='IdPromotionBuyType')
+BEGIN
+	UPDATE PromotionOptionTypes
+	SET Name = 'PromotionBuyType'
+	WHERE Name = 'IdPromotionBuyType'
+END
+
 GO
