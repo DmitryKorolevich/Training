@@ -1,39 +1,203 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Models.Affiliate
 @using VitalChoice.Interfaces.Services.Settings
+@using VC.Public.Helpers
 @model AffiliateManageModel
 
 @section Meta {
-	<title>Vital Choice | Affiliate Registration</title>
+    <title>Vital Choice | Affiliate Registration</title>
 }
 
 @section PageScripts {
-	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
-	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
+    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="@Url.Content("/app/modules/affiliateaccount/register.js")"></script>
 }
 
 <div class="working-area-holder">
-	@using (Html.BeginForm("Register", "AffiliateAccount", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
-	{
-		@Html.AntiForgeryToken()
-		<h4>Register a New Affiliate Account</h4>
-		<div class="sub-title"><span>Create a Password</span></div>
-		<span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
-		@Html.ValidationSummary(true, "")
-		<div class="form-group">
+    @using (Html.BeginForm("Register", "AffiliateAccount", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <h4>Register a New Affiliate Account</h4>
+        @Html.ValidationSummary(true, "")
+        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+            <div class="sub-title"><span>Specify an Email</span></div>
+        }
+        @if (!String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+            <div class="sub-title"><span>Update Email</span></div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CurrentEmail, new { @class = "control-label" })
+                <div class="input-group">
+                    <label class="form-control-static">@Html.DisplayForEx(m => m.CurrentEmail)</label>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ConfirmEmail, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.ConfirmEmail, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ConfirmEmail)
+            </div>
+        </div>
 
-		</div>
+        <div class="sub-title"><span>Create a Password</span></div>
+        <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword)
+            </div>
+        </div>
 
-		<div class="sub-title"><span>Profile Address</span></div>
-		<div class="form-two-column">
-		</div>
-		<div class="form-two-column">
-		</div>
-		<div class="form-buttons-group">
-			<input type="submit" value="Continue" class="btn btn-default" />
-		</div>
-	}
-		<div class="form-group">
-			<hr />
-		</div>
-	</div>
+        <div class="sub-title"><span>Promoting Vital Choice</span></div>
+        <div class="form-group">
+            <div class="form-two-column">
+                @Html.LabelFor(m => m.PromoteByWebsite, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.CheckBoxFor(m => m.PromoteByWebsite, new { @class = "form-control cb-promote" })
+                </div>
+            </div>
+            <div class="form-two-column section" style="display: none;">
+                @Html.LabelFor(m => m.WebSite, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.WebSite, new { @class = "form-control", @data_val= "true", @data_val_required = "The Website URL field is required." })
+                    @Html.ValidationMessageFor(m => m.WebSite)
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-title"><span>Details</span></div>
+        @Html.HiddenFor(m => m.IdDefaultCountry, new { @id = "hdCountry" })
+        <div class="form-two-column">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ChecksPayableTo, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ChecksPayableTo, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ChecksPayableTo)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.TaxID, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.TaxID, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.TaxID)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Company, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Company, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Company)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+                    @Html.ValidationMessageFor(m => m.IdCountry)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address1)
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address2)
+                </div>
+            </div>
+        </div>
+        <div class="form-two-column">
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+                    @Html.ValidationMessageFor(m => m.IdState)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.County, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
+                    @Html.ValidationMessageFor(m => m.County)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PostalCode)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
+                    @Html.ValidationMessageFor(m => m.Phone)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Fax, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask" })
+                    @Html.ValidationMessageFor(m => m.Fax)
+                </div>
+            </div>
+            @if (String.IsNullOrEmpty(Model.CurrentEmail))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.HearAbout, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.HearAbout, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.HearAbout)
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="form-buttons-group">
+            <input type="submit" value="Continue" class="btn btn-default" />
+        </div>
+    }
+    <div class="form-group">
+        <hr />
+    </div>
+</div>

@@ -17,6 +17,8 @@ namespace VC.Public.Models.Affiliate
     [ApiValidator(typeof(AffiliateManageModelValidator))]
     public class AffiliateManageModel : BaseModel
 	{
+        public string CurrentEmail { get; set; }
+
         [Required]
         [EmailAddress]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
@@ -118,7 +120,6 @@ namespace VC.Public.Models.Affiliate
         [Map]
         public string ChecksPayableTo { get; set; }
 
-        [Required]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Tax ID / SSN")]
         [Map]
@@ -186,17 +187,9 @@ namespace VC.Public.Models.Affiliate
         [Display(Name = "I would like payment as")]
         [Map]
         public int PaymentType { get; set; }
-
-
-
-        private bool isNotSpamTrue { get { return true; } }
-
-        [Compare("isNotSpamTrue", ErrorMessage = "Please agree to SPAM Agreement")]
+                
         public bool IsNotSpam { get; set; }
-
-        private bool IsAllowAgreementTrue { get { return true; } }
-
-        [Compare("IsAllowAgreementTrue", ErrorMessage = "Please agree to Web Affiliate Agreement.")]
+        
         public bool IsAllowAgreement { get; set; }
     }
 }

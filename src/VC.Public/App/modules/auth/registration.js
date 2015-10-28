@@ -5,7 +5,8 @@
 		});
 
 		var idCountry = $("#hdCountry").val();
-		if (idCountry) {
+		if (idCountry)
+		{
 			$("#ddCountry").val(idCountry);
 		}
 

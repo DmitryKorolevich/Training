@@ -33,6 +33,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string IncorrectCustomerRole = "IncorrectCustomerRole";
 		    public const string EmailIsTakenPleaseLogon = "EmailIsTakenPleaseLogon";
 		    public const string SuspendedCustomer = "SuspendedCustomer";
+		    public const string PasswordRequiresSpecialCharacter = "PasswordRequiresSpecialCharacter";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -62,7 +63,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.AttemptToAssignWrongRole, "Attempt to assign forbidden role"},
 			{Keys.IncorrectCustomerRole, "Incorrect customer type"},
 			{Keys.EmailIsTakenPleaseLogon, "Email '{0}' is already registered"},
-			{Keys.SuspendedCustomer, "Operation can not be completed since associated customer is suspended"}
+			{Keys.SuspendedCustomer, "Operation can not be completed since associated customer is suspended"},
+			{Keys.PasswordRequiresSpecialCharacter, "Passwords must contain at least 1 special character."}
 		};
     }
 }

@@ -630,7 +630,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+											<div class="form-group">
+												<div class="col-md-3"></div>
+												<div class="col-md-9">
+													<button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+													<button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
+												</div>
+											</div>
                                             <span class="legend">Approved Payment Methods</span>
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>

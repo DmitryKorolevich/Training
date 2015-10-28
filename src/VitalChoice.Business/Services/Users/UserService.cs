@@ -118,7 +118,7 @@ namespace VitalChoice.Business.Services.Users
         {
             var user = await GetAsync(publicId);
 
-            var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+            var token = await UserManager.GenerateUserTokenAsync(user, IdentityConstants.TokenProviderName,IdentityConstants.ForgotPasswordResetPurpose);
 
             await SendForgotPasswordInternalAsync(user, token);
         }

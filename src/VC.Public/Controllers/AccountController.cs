@@ -39,13 +39,14 @@ namespace VC.Public.Controllers
 			_paymentMethodService = paymentMethodService;
 		}
 
-		[HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null)
+        [HttpGet]
+        public IActionResult Login(string alreadyTakenEmail = null, bool forgot = false)
         {
-			if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
-			{
-				ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
-			}
+            if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
+            {
+                ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
+            }
+            ViewBag.ForgotPassSuccess = forgot;
 
             return View(new LoginModel());
         }
@@ -247,8 +248,7 @@ namespace VC.Public.Controllers
 
             await _userService.SendForgotPasswordAsync(user.PublicId);
 
-            ViewBag.SuccessSend = true;
-            return View(new ForgotPasswordEmailModel());
+            return RedirectToAction("Login",new { forgot = true });
         }
     }
 }

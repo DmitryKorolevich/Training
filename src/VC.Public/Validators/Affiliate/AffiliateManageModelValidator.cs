@@ -23,6 +23,26 @@ namespace VC.Public.Validators.Affiliate
         {
             public AffiliateManageInnerModelValidator()
             {
+                RuleFor(model => model.WebSite)
+                 .NotEmpty()
+                 .When(p => p.PromoteByWebsite)
+                 .WithMessage(model => model.WebSite, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Facebook)
+                 .NotEmpty()
+                 .When(p => p.PromoteByFacebook)
+                 .WithMessage(model => model.Facebook, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Twitter)
+                 .NotEmpty()
+                 .When(p => p.PromoteByTwitter)
+                 .WithMessage(model => model.Twitter, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Blog)
+                 .NotEmpty()
+                 .When(p => p.PromoteByBlog)
+                 .WithMessage(model => model.Blog, ValidationMessages.FieldRequired);
+
                 RuleFor(model => model.MonthlyEmailsSent)
                  .Must(p => p.HasValue)
                  .When(p => p.PromoteByEmails)
@@ -32,6 +52,14 @@ namespace VC.Public.Validators.Affiliate
                  .Must(p => p.HasValue)
                  .When(p => p.PromoteByProfessionalPractice)
                  .WithMessage(model => model.ProfessionalPractice, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.IsAllowAgreement)
+                 .Must(p=>p)
+                 .WithMessage("Please agree to Web Affiliate Agreement");
+
+                RuleFor(model => model.IsNotSpam)
+                 .Must(p => p)
+                 .WithMessage("Please agree to SPAM Agreement");
             }
         }
     }
