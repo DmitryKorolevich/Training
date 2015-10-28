@@ -6,7 +6,9 @@ angular.module('app.modules.order.controllers.orderManageController', [])
 function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $timeout, modalUtil, orderService, customerService, productService, gcService, discountService,
     settingService, toaster, confirmUtil, promiseTracker, customerEditService, gridSorterUtil)
 {
-    $scope.addEditTracker = promiseTracker("addEdit");
+	$scope.addEditTracker = promiseTracker("addEdit");
+	$scope.resetTracker = promiseTracker("reset");
+	$scope.resendTracker = promiseTracker("resend");
 
     function successSaveHandler(result)
     {
@@ -1318,6 +1320,45 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     errorHandler(result);
                 });
         }
+    };
+
+    $scope.resend = function () {
+    	customerService.resendActivation($scope.currentCustomer.PublicUserId, $scope.resendTracker)
+			.success(function (result) {
+				if (result.Success) {
+					toaster.pop('success', "Success!", "Successfully sent");
+
+				} else {
+					var messages = "";
+					if (result.Messages) {
+						$.each(result.Messages, function (index, value) {
+							messages += value.Message + "<br />";
+						});
+					}
+					toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+				}
+			}).error(function () {
+				toaster.pop('error', "Error!", "Server error occured");
+			});
+    };
+
+    $scope.resetPassword = function () {
+    	customerService.resetPassword($scope.currentCustomer.PublicUserId, $scope.resetTracker)
+			.success(function (result) {
+				if (result.Success) {
+					toaster.pop('success', "Success!", "Successfully reset");
+				} else {
+					var messages = "";
+					if (result.Messages) {
+						$.each(result.Messages, function (index, value) {
+							messages += value.Message + "<br />";
+						});
+					}
+					toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+				}
+			}).error(function () {
+				toaster.pop('error', "Error!", "Server error occured");
+			});
     };
 
     initialize();
