@@ -1,6 +1,8 @@
 ﻿var shippingAddresses = null;
 
 $(function () {
+	changeSaveButtonLabel($("#hdShipping").val());
+
 	shippingAddresses = [];
 	if (shippingAddressesJson != "") {
 		shippingAddresses = $.parseJSON(shippingAddressesJson);
@@ -152,7 +154,17 @@ function changeSelection(id) {
 	$("#ddCountry").trigger("change");
 }
 
+function changeSaveButtonLabel(id) {
+	if (id == 0) {
+		$("input[type=submit]").val("Save");
+	} else {
+		$("input[type=submit]").val("Update");
+	}
+}
+
 function setChangedData(selectedShippingAddress) {
+	changeSaveButtonLabel(selectedShippingAddress.Id);
+
 	$("#hdShipping").val(selectedShippingAddress.Id);
 	$("#hdCountry").val(selectedShippingAddress.IdCountry);
 	$("#hdState").val(selectedShippingAddress.IdState);

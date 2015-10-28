@@ -1,6 +1,8 @@
 ﻿var creditCards = null;
 
 $(function () {
+	changeSaveButtonLabel($("#hdCreditCard").val());
+
 	getCreditCardTypes(function (result) {
 		$.each(result.Data, function (creditTypeIndex, creditType) {
 			$("#ddCardType").append($('<option></option>').val(creditType.Key).html(creditType.Text));
@@ -113,7 +115,17 @@ function changeSelection(id) {
 	$("#ddCountry").trigger("change");
 }
 
+function changeSaveButtonLabel(id) {
+	if (id == 0) {
+		$("input[type=submit]").val("Save");
+	} else {
+		$("input[type=submit]").val("Update");
+	}
+}
+
 function setChangedData(selectedCreditCard) {
+	changeSaveButtonLabel(selectedCreditCard.Id);
+
 	$("#hdCreditCard").val(selectedCreditCard.Id);
 	$("#hdCardType").val(selectedCreditCard.CardType);
 	$("#hdCountry").val(selectedCreditCard.IdCountry);

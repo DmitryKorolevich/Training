@@ -4,7 +4,7 @@
 @model VC.Public.Models.Profile.BillingInfoModel
 
 @section Meta {
-	<title>Vital Choice | Manage Billing Information</title>
+	<title>Vital Choice | Manage Billing Addresses</title>
 }
 
 @section PageScripts {
@@ -30,7 +30,7 @@
 			<input id="hdCardType" value="@Html.DisplayForEx(x=>x.CardType)" type="hidden">
 			@Html.HiddenFor(m => m.Id, new { @id = "hdCreditCard" })
 			@Html.AntiForgeryToken()
-			<h4>Manage Billing Information</h4>
+			<h4>Manage Billing Addresses</h4>
 			<div class="form-group">
 				<div class="input-group control-label-indent">
 					<input id="addNew" class="yellow inline-button" type="button" value="Add New" />
@@ -173,7 +173,7 @@
 			</div>
 			<div class="form-buttons-group">
 				<input data-back-button="@Url.Action("TopFavoriteItems","Profile")" type="button" value="Back"/>
-				<input class="yellow" type="submit" value="Update"/>
+				<input class="yellow" type="submit" value="Save"/>
 			</div>
 		}
 	</div>
