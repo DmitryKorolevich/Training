@@ -32,7 +32,7 @@ $(function () {
 		var newItem = {
 			Id: 0,
 			CardType: 1,
-			IdCountry: null,
+			IdCountry: appSettings.DefaultCountryId,
 			IdState: null,
 			CardNumber: "",
 			NameOnCard: "",

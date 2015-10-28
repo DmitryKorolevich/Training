@@ -65,8 +65,14 @@ $(function () {
 		accordion: true
 	});
 
-	$("body").on("click", ".back-button", function() {
-		history.back();
+	$("body").on("click", "[data-back-button]", function () {
+		var customNav = $(this).attr("data-back-button");
+		if (customNav) {
+			location.href = customNav;
+		} else {
+			history.back();
+		}
+		
 		return false;
 	});
 

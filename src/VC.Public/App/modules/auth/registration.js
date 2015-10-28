@@ -5,9 +5,10 @@
 		});
 
 		var idCountry = $("#hdCountry").val();
-		if (idCountry)
-		{
+		if (idCountry) {
 			$("#ddCountry").val(idCountry);
+		} else {
+			$("#ddCountry").val(appSettings.DefaultCountryId);
 		}
 
 		populateStates(result.Data);

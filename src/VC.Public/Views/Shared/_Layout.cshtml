@@ -1,6 +1,8 @@
 ﻿@using VitalChoice.Domain.Entities.Options;
 @using VitalChoice.Infrastructure.Identity
+@using VitalChoice.Interfaces.Services
 @inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
+@inject IAppInfrastructureService appInfrastructureService;
 
 <!DOCTYPE html>
 <!--[if lt IE 9]>
@@ -32,6 +34,13 @@
 	<style>
 		@await Component.InvokeAsync("CustomStyles")
 	</style>
+	<script>
+		@{
+			var appInfrastructure = appInfrastructureService.Get();
+		}
+
+		var appSettings = { DefaultCountryId : @(appInfrastructure.DefaultCountry.Id) }
+	</script>
 	<script src="/assets/scripts/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 <body>
@@ -73,7 +82,7 @@
 			</div>
 			<div class="header-main">
 				<div class="logo-holder">
-					<a href="#">
+					<a href="/">
 						<img alt="Vital Choice" src="/Assets/images/VCwso.png" />
 					</a>
 				</div>

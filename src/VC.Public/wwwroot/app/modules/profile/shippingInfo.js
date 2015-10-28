@@ -51,7 +51,7 @@ $(function () {
 	$("body").on("click", "#addNew", function() {
 		var newItem = {
 			Id: 0,
-			IdCountry: null,
+			IdCountry: appSettings.DefaultCountryId,
 			IdState: null,
 			FirstName: "",
 			LastName: "",
