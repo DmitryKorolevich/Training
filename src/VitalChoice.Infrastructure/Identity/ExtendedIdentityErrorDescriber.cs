@@ -24,5 +24,13 @@ namespace VitalChoice.Infrastructure.Identity
 
 			return result;
 		}
-	}
+
+	    public override IdentityError PasswordRequiresNonLetterAndDigit()
+	    {
+			var result = base.PasswordRequiresNonLetterAndDigit();
+			result.Description = ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.PasswordRequiresSpecialCharacter];
+
+			return result;
+		}
+    }
 }
