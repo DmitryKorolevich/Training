@@ -15,5 +15,9 @@ namespace VitalChoice.Infrastructure.Identity
 	    public const string RetailCustomer = "Retail";
 
 	    public const string WholesaleCustomer = "Wholesale";
+
+        public const string ForgotPasswordResetPurpose = "ForgotPasswordReset";
+
+        public const string TokenProviderName = "Default";
     }
 }

@@ -100,6 +100,7 @@ namespace VitalChoice.DynamicData.Base
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await UpdateAsync(model, uow);
+                entity = await SelectEntityAsync(entity.Id);
 
                 await LogItemChanges(new [] {await Mapper.FromEntityAsync(entity)});
                 return await Mapper.FromEntityAsync(entity);
@@ -122,6 +123,7 @@ namespace VitalChoice.DynamicData.Base
             using (var uow = CreateUnitOfWork())
             {
                 var entities = await UpdateRangeAsync(models, uow);
+                entities = await SelectEntityListAsync(entities.Select(e => e.Id).ToList());
 
                 await LogItemChanges(await Mapper.FromEntityRangeAsync(entities));
                 return await Mapper.FromEntityRangeAsync(entities);

@@ -112,7 +112,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddUserStore<AdminUserStore>()
                 .AddUserValidator<AdminUserValidator>()
                 .AddUserManager<ExtendedUserManager>()
-                .AddTokenProvider<UserTokenProvider>("Default");
+                .AddTokenProvider<UserTokenProvider>(IdentityConstants.TokenProviderName);
 
             //Temp work arround for using custom pre-configuration action logic(BaseControllerActionInvoker).
             services.TryAdd(

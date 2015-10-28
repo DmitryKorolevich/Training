@@ -50,12 +50,13 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null)
+        public IActionResult Login(string alreadyTakenEmail = null, bool forgot=false)
         {
             if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
             {
                 ViewBag.AlreadyTakenEmail = alreadyTakenEmail;
             }
+            ViewBag.ForgotPassSuccess = forgot;
 
             return View(new LoginModel());
         }
@@ -205,8 +206,7 @@ namespace VC.Public.Controllers
 
             await _userService.SendForgotPasswordAsync(user.PublicId);
 
-            ViewBag.SuccessSend = true;
-            return View(new ForgotPasswordEmailModel());
+            return RedirectToAction("Login",new { forgot = true });
         }
 
         [HttpGet]
@@ -221,7 +221,15 @@ namespace VC.Public.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(AffiliateManageModel model)
         {
-            if (!ModelState.IsValid)
+            if (!model.IsAllowAgreement)
+            {
+                ModelState.AddModelError(String.Empty, "Please agree to Web Affiliate Agreement");
+            }
+            if (!model.IsNotSpam)
+            {
+                ModelState.AddModelError(String.Empty, "Please agree to SPAM Agreement");
+            }
+            if (!Validate(model))
             {
                 InitRegisterModel(model);
                 return View(model);
@@ -249,7 +257,7 @@ namespace VC.Public.Controllers
             return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
         }
 
-        private void InitRegisterModel(AffiliateManageModel model)
+        private void InitRegisterModel(AffiliateManageModel model,bool edit=false)
         {
             var settings = this.HttpContext.ApplicationServices.GetService<IAppInfrastructureService>().Get();
             model.MonthlyEmailsSentOptions = settings.AffiliateMonthlyEmailsSentOptions.Select(p => new SelectListItem()
@@ -262,7 +270,7 @@ namespace VC.Public.Controllers
                 Value = p.Key.ToString(),
                 Text = p.Text,
             }).ToList();
-            if (settings.DefaultCountry != null)
+            if (!edit && settings.DefaultCountry != null)
             {
                 model.IdDefaultCountry = settings.DefaultCountry.Id;
             }

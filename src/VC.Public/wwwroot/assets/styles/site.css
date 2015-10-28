@@ -1045,9 +1045,6 @@ footer {
   border-radius: 5px;
   color: red;
 }
-.form-regular .success-message {
-  color: green;
-}
 .form-regular .form-group .control-label {
   text-align: left;
   margin-bottom: 0;
@@ -1069,6 +1066,12 @@ footer {
 }
 .form-regular .form-group .input-group .form-control.small-form-control {
   width: 50px;
+}
+.form-regular .form-group .input-group input[type="checkbox"].form-control,
+.form-regular .form-group .input-group input[type="radio"].form-control {
+  height: auto;
+  margin-top: 9px;
+  width: auto;
 }
 .form-regular .form-group .input-group .form-control-static {
   padding: 8px 5px;
