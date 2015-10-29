@@ -9,6 +9,7 @@ using VC.Public.Validators.Affiliate;
 using VitalChoice.Domain.Attributes;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.DynamicData.Entities;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
@@ -19,25 +20,21 @@ namespace VC.Public.Models.Affiliate
 	{
         public string CurrentEmail { get; set; }
 
-        [Required]
         [EmailAddress]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Email")]
         [Map]
         public string Email { get; set; }
 
-        [Required]
         [EmailAddress]
         [Compare("Email")]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Email Confirm")]
         public string ConfirmEmail { get; set; }
 
-        [Required]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Password { get; set; }
 
-		[Required]
 		[Compare("Password")]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Password Confirm")]
@@ -96,15 +93,12 @@ namespace VC.Public.Models.Affiliate
 
         public IList<SelectListItem> ProfessionalPracticeOptions { get; set; }
 
-        [Display(Name = "Dr. Sears LEAN Coach Ambassador* (*Must already be in the LEAN Program)")]
         [Map]
         public bool PromoteByDrSearsLEANCoachAmbassador { get; set; }
 
-        [Display(Name = "Vertical Response Email")]
         [Map]
         public bool PromoteByVerticalResponseEmail { get; set; }
 
-        [Display(Name = "Lean Email")]
         [Map]
         public bool PromoteByLeanEmail { get; set; }
 
@@ -134,8 +128,6 @@ namespace VC.Public.Models.Affiliate
 		[Display(Name = "Country")]
 		[Map]
 		public int IdCountry { get; set; }
-
-        public int? IdDefaultCountry { get; set; }
 
         [Display(Name = "State/Province")] //required if
 		[Map]
@@ -187,9 +179,41 @@ namespace VC.Public.Models.Affiliate
         [Display(Name = "I would like payment as")]
         [Map]
         public int PaymentType { get; set; }
-                
+
+        [Map]
+        public decimal CommissionAll { get; set; }
+
+        [Map]
+        public decimal CommissionFirst { get; set; }
+
         public bool IsNotSpam { get; set; }
         
         public bool IsAllowAgreement { get; set; }
+
+        public AffiliateDynamic Update(AffiliateDynamic item)
+        {
+            if (item != null)
+            {
+                if (!String.IsNullOrEmpty(Email))
+                {
+                    item.Email = Email;
+                }
+                item.Name = Name;
+                item.Data.ChecksPayableTo = ChecksPayableTo;
+                item.Data.TaxID = TaxID;
+                item.Data.Company = Company;
+                item.IdCountry = IdCountry;
+                item.IdState = IdState;
+                item.County = County;
+                item.Data.Address1 = Address1;
+                item.Data.Address2 = Address2;
+                item.Data.City = City;
+                item.Data.Zip = PostalCode;
+                item.Data.Phone = Phone;
+                item.Data.Fax = Fax;
+                item.Data.PaymentType = PaymentType;
+            }
+            return item;
+        }
     }
 }

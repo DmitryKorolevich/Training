@@ -9,6 +9,12 @@
 </div>
 <div class="profile-sidebar-links">
     <div class="form-group">
+        @Html.ActionLink("Manage Affiliate Account", "ChangeProfile", "AffiliateProfile")
+    </div>
+    <div class="form-group">
+        @Html.ActionLink("Change Password", "ChangePassword", "AffiliateProfile")
+    </div>
+    <div class="form-group">
         @Html.ActionLink("Logout", "Logout", "AffiliateAccount")
     </div>
 </div>

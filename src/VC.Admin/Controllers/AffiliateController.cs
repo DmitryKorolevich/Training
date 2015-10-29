@@ -91,10 +91,10 @@ namespace VC.Admin.Controllers
                 {
                     StatusCode = RecordStatusCode.NotActive,
                     IdCountry = _defaultCountry!=null ? _defaultCountry.Id : (int?)null,
-                    PaymentType =2,//Credit
-                    Tier = 1,
-                    CommissionFirst = 8,
-                    CommissionAll = 5,
+                    PaymentType = AffiliateConstants.DefaultPaymentType,//Credit
+                    Tier = AffiliateConstants.DefaultTier,
+                    CommissionFirst = AffiliateConstants.DefaultCommissionFirst,
+                    CommissionAll = AffiliateConstants.DefaultCommissionAll,
                 };
             }
 

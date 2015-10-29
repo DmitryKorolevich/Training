@@ -213,6 +213,7 @@ namespace VC.Public.Controllers
         public IActionResult Register()
         {
             AffiliateManageModel model = new AffiliateManageModel();
+            model.IdCountry = 4;
             InitRegisterModel(model);
             return View(model);
         }
@@ -221,6 +222,7 @@ namespace VC.Public.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(AffiliateManageModel model)
         {
+            InitRegisterModel(model, true);
             if (!model.IsAllowAgreement)
             {
                 ModelState.AddModelError(String.Empty, "Please agree to Web Affiliate Agreement");
@@ -231,33 +233,46 @@ namespace VC.Public.Controllers
             }
             if (!Validate(model))
             {
-                InitRegisterModel(model);
                 return View(model);
             }
 
-            var validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
-            if (!validated)
+            try
             {
-                return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
+                var validated = await _userService.ValidateEmailUniquenessAsync(model.Email);
+                if (!validated)
+                {
+                    return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
+                }
+
+                var item = _affiliateMapper.FromModel(model);
+
+                item.IdObjectType = 1;
+                item.StatusCode = (int)AffiliateStatus.Active;
+                item.CommissionAll = AffiliateConstants.DefaultCommissionAll;
+                item.CommissionFirst = AffiliateConstants.DefaultCommissionFirst;
+                item.Data.Tier = AffiliateConstants.DefaultTier;
+
+                item = await _affiliateService.InsertAsync(item, model.Password);
+                if (item == null || item.Id == 0)
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                }
+
+                await _userService.SendSuccessfulRegistration(model.Email, model.Name, String.Empty);
             }
-
-            var item = _affiliateMapper.FromModel(model);
-
-            item.IdObjectType = 1;
-            item.StatusCode = (int)AffiliateStatus.Active;
-
-            item = await _affiliateService.InsertAsync(item, model.Password);
-            if (item == null || item.Id == 0)
+            catch (AppValidationException e)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                foreach (var message in e.Messages)
+                {
+                    ModelState.AddModelError(message.Field, message.Message);
+                }
+                return View(model);
             }
-
-            await _userService.SendSuccessfulRegistration(model.Email, model.Name, String.Empty);
 
             return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
         }
 
-        private void InitRegisterModel(AffiliateManageModel model,bool edit=false)
+        private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
         {
             var settings = this.HttpContext.ApplicationServices.GetService<IAppInfrastructureService>().Get();
             model.MonthlyEmailsSentOptions = settings.AffiliateMonthlyEmailsSentOptions.Select(p => new SelectListItem()
@@ -265,14 +280,20 @@ namespace VC.Public.Controllers
                 Value = p.Key.ToString(),
                 Text = p.Text,
             }).ToList();
-            model.MonthlyEmailsSentOptions = settings.AffiliateProfessionalPractices.Select(p => new SelectListItem()
+            model.ProfessionalPracticeOptions = settings.AffiliateProfessionalPractices.Select(p => new SelectListItem()
             {
                 Value = p.Key.ToString(),
                 Text = p.Text,
             }).ToList();
-            if (!edit && settings.DefaultCountry != null)
+            model.CommissionAll = AffiliateConstants.DefaultCommissionAll;
+            model.CommissionFirst = AffiliateConstants.DefaultCommissionFirst;
+            if (!refresh)
             {
-                model.IdDefaultCountry = settings.DefaultCountry.Id;
+                model.PaymentType = AffiliateConstants.DefaultPaymentType;//Credit
+                if (settings.DefaultCountry != null)
+                {
+                    model.IdCountry = settings.DefaultCountry.Id;
+                }
             }
         }
     }

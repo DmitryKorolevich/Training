@@ -8,6 +8,7 @@ using VitalChoice.Domain.Constants;
 using VC.Public.Models.Auth;
 using VC.Public.Models;
 using VC.Public.Models.Affiliate;
+using System;
 
 namespace VC.Public.Validators.Affiliate
 {
@@ -53,13 +54,25 @@ namespace VC.Public.Validators.Affiliate
                  .When(p => p.PromoteByProfessionalPractice)
                  .WithMessage(model => model.ProfessionalPractice, ValidationMessages.FieldRequired);
 
-                RuleFor(model => model.IsAllowAgreement)
-                 .Must(p=>p)
-                 .WithMessage("Please agree to Web Affiliate Agreement");
+                RuleFor(model => model.Email)
+                 .NotEmpty()
+                 .When(p =>String.IsNullOrEmpty(p.CurrentEmail))
+                 .WithMessage(model => model.Email, ValidationMessages.FieldRequired);
 
-                RuleFor(model => model.IsNotSpam)
-                 .Must(p => p)
-                 .WithMessage("Please agree to SPAM Agreement");
+                RuleFor(model => model.ConfirmEmail)
+                 .NotEmpty()
+                 .When(p => String.IsNullOrEmpty(p.CurrentEmail))
+                 .WithMessage(model => model.ConfirmEmail, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.Password)
+                 .NotEmpty()
+                 .When(p => String.IsNullOrEmpty(p.CurrentEmail))
+                 .WithMessage(model => model.Password, ValidationMessages.FieldRequired);
+
+                RuleFor(model => model.ConfirmPassword)
+                 .NotEmpty()
+                 .When(p => String.IsNullOrEmpty(p.CurrentEmail))
+                 .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldRequired);
             }
         }
     }

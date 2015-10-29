@@ -67,7 +67,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
         uiScope.deleteSelectedCreditCard = function ()
         {
             uiScope.currentCustomer.CreditCards.splice(uiScope.paymentInfoTab.CreditCardIndex, 1);
-            if (uiScope.currentCustomer.CreditCards.length > 0 && uiScope.paymentInfoTab.CreditCardIndex >= uiScope.currentCustomer.CreditCards.length)
+            if (uiScope.currentCustomer.CreditCards.length > 0)
             {
                 uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length - 1).toString();
             }
@@ -125,7 +125,8 @@ angular.module('app.modules.customer.services.customerEditService', [])
         uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation, forOrder) {
             if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
                 return undefined;
-            if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined)
+            if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined ||
+                uiScope.shippingAddressTab.ShippingEditModels[index].Address != collection[index])
             {
                 uiScope.shippingAddressTab.ShippingEditModels[index] = { Address: collection[index], formName: 'shipping', index: index, collectionName: 'Shipping', recalculate: forOrder };
             }
@@ -137,7 +138,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
         {
             if (collection === undefined || collection[index] === undefined || collection[index].Address === undefined || uiScope.paymentInfoTab.AddressEditModels === undefined)
                 return undefined;
-            if (uiScope.paymentInfoTab.AddressEditModels[index] === undefined) {
+            if (uiScope.paymentInfoTab.AddressEditModels[index] === undefined ||
+                uiScope.paymentInfoTab.AddressEditModels[index].Address != collection[index].Address)
+            {
                 uiScope.paymentInfoTab.AddressEditModels[index] = { Address: collection[index].Address, formName: 'card', index: index, collectionName: 'CreditCards' };
             }
             uiScope.paymentInfoTab.AddressEditModels[index].disableValidation = disableValidation;

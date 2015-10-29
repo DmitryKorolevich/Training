@@ -1045,6 +1045,15 @@ footer {
   border-radius: 5px;
   color: red;
 }
+.form-regular .form-group .radio-inline {
+  padding-left: 10px;
+}
+.form-regular .form-group .radio-inline input[type=radio] {
+  vertical-align: middle;
+}
+.form-regular .form-group .message-group {
+  color: #333333;
+}
 .form-regular .form-group .control-label {
   text-align: left;
   margin-bottom: 0;
@@ -1071,6 +1080,7 @@ footer {
 .form-regular .form-group .input-group input[type="radio"].form-control {
   height: auto;
   margin-top: 9px;
+  margin-right: 7px;
   width: auto;
 }
 .form-regular .form-group .input-group .form-control-static {

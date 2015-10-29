@@ -13,5 +13,6 @@
                 section.hide();
             }
         });
+        $('.cb-promote').change();
     });
 });

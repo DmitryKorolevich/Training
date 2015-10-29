@@ -241,7 +241,7 @@
                                                 <label class="col-md-3 control-label">Tier</label>
                                                 <div class="col-md-9">
                                                     <select name="Tier" class="form-control" data-ng-model="affiliate.Tier" data-ng-options="tier.Key as tier.Text for tier in affiliateTiers" required>
-                                                        <option value="" ng-if="false"></option>
+                                                        <option value="" selected hidden />
                                                     </select>
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.Tier.$invalid">
                                                         <small class="error" ng-show="forms.mainForm.Tier.$error.server">{{serverMessages.GetMessage('Tier')}}</small>
