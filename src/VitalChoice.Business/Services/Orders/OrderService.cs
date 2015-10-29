@@ -167,6 +167,7 @@ namespace VitalChoice.Business.Services.Orders
             order.Total = dataContext.Total;
             order.DiscountTotal = dataContext.DiscountTotal;
             order.ShippingTotal = dataContext.ShippingTotal;
+            order.ProductsSubtotal = dataContext.ProductsSubtotal;
             //TODO: Add promo skus and skus to order
         }
 
