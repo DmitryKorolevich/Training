@@ -149,7 +149,7 @@ namespace VitalChoice.Business.Mail
             var body =
                 $"<p>Dear {passwordReset.FirstName} {passwordReset.LastName},</p><p>Please click the following <a href=\"{passwordReset.Link}\">link</a> to setup a new password</p><p></p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
 
-            var subject = $"Your Vital Choice User Setup New Password";
+            var subject = "Vital Choice - Recover Your Forgot Password";
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
