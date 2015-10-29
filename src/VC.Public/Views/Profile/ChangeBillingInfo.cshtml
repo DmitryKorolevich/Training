@@ -57,7 +57,7 @@
 			<div class="form-group">
 				@Html.LabelFor(m => m.CardNumber, new {@class = "control-label"})
 				<div class="input-group">
-					@Html.TextBoxFor(m => m.CardNumber, new {@class = "form-control"})
+					@Html.TextBoxFor(m => m.CardNumber, new {@class = "form-control", maxlength = "16" })
 					@Html.ValidationMessageFor(m => m.CardNumber)
 				</div>
 			</div>
@@ -71,9 +71,9 @@
 			<div class="form-group form-control-container">
 				@Html.Label("ExpirationDate", "Expiration Date", new {@class = "control-label"})
 				<div class="input-group">
-					@Html.TextBoxFor(m => m.ExpirationDateMonth, new {@class = "form-control small-form-control"})
+					@Html.TextBoxFor(m => m.ExpirationDateMonth, new {@class = "form-control small-form-control", maxlength = "2" })
 					<span>/</span>
-					@Html.TextBoxFor(m => m.ExpirationDateYear, new {@class = "form-control small-form-control"})
+					@Html.TextBoxFor(m => m.ExpirationDateYear, new {@class = "form-control small-form-control", maxlength = "2" })
 					@Html.ValidationMessageFor(m => m.ExpirationDateMonth)
 					@Html.ValidationMessageFor(m => m.ExpirationDateYear)
 				</div>

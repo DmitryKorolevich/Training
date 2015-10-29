@@ -139,3 +139,12 @@ function notifyError(text) {
 		position: 'bottom-right'
 	})
 }
+
+function getLast4(str) {
+	if (str == null)
+		return undefined;
+	var start = str.length - 4;
+	if (start < 0)
+		start = 0;
+	return str.slice(start, str.length);
+};

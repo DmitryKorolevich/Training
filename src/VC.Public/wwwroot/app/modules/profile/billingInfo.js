@@ -1,9 +1,19 @@
 ﻿var creditCards = null;
+var creditCardTypes = null;
 
 $(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
+	creditCards = [];
+	if (creditCardsJson != "") {
+		creditCards = $.parseJSON(creditCardsJson);
+	} else {
+		$("#delSelected").hide();
+	}
+
 	getCreditCardTypes(function (result) {
+		creditCardTypes = result.Data;
+
 		$.each(result.Data, function (creditTypeIndex, creditType) {
 			$("#ddCardType").append($('<option></option>').val(creditType.Key).html(creditType.Text));
 		});
@@ -12,17 +22,11 @@ $(function () {
 		if (idCreditType) {
 			$("#ddCardType").val(idCreditType);
 		}
+
+		populateCreditCardsSelection(creditCards, false);
 	}, function(errorResult) {
 		//todo: handle result
 	});
-
-	creditCards = [];
-	if (creditCardsJson != "") {
-		creditCards = $.parseJSON(creditCardsJson);
-	} else {
-		$("#delSelected").hide();
-	}
-	populateCreditCardsSelection(creditCards, false);
 
 	$("body").on("change", "#ddCreditCardsSelection", function() {
 		changeSelection($("#ddCreditCardsSelection").val());
@@ -57,6 +61,8 @@ $(function () {
 		$("#delSelected").hide();
 
 		setChangedData(newItem);
+
+		$("#ddCountry").trigger("change");
 	});
 
 	$("body").on("click", "#delSelected", function() {
@@ -91,7 +97,7 @@ function populateCreditCardsSelection(creditCards, setDefault) {
 
 	if (creditCards && creditCards.length > 0) {
 		$.each(creditCards, function (creditCardIndex, creditCard) {
-			var option = $('<option></option>').val(creditCard.Id).html(creditCard.CardNumber);
+			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber));
 			if ((setDefault && creditCardIndex == 0) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
 				$(option).attr("selected", "selected")
 			}

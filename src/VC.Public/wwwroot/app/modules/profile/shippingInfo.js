@@ -74,6 +74,8 @@ $(function () {
 		$("#delSelected").hide();
 
 		setChangedData(newItem);
+
+		$("#ddCountry").trigger("change");
 	});
 
 	$("body").on("click", "#delSelected", function() {
