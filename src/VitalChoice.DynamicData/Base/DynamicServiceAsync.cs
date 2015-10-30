@@ -89,6 +89,7 @@ namespace VitalChoice.DynamicData.Base
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await InsertAsync(model, uow);
+
                 entity = await SelectEntityAsync(entity.Id);
                 await LogItemChanges(new[] {await Mapper.FromEntityAsync(entity)});
                 return await Mapper.FromEntityAsync(entity);
@@ -100,8 +101,8 @@ namespace VitalChoice.DynamicData.Base
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await UpdateAsync(model, uow);
-                entity = await SelectEntityAsync(entity.Id);
 
+                entity = await SelectEntityAsync(entity.Id);
                 await LogItemChanges(new [] {await Mapper.FromEntityAsync(entity)});
                 return await Mapper.FromEntityAsync(entity);
             }
@@ -219,7 +220,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected virtual bool LogObjectFullData => false;
 
-        private async Task LogItemChanges(ICollection<TDynamic> models)
+        protected async Task LogItemChanges(ICollection<TDynamic> models)
         {
             try
             {

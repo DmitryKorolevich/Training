@@ -186,7 +186,7 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		private async Task ValidateUserOnSignIn(string login)
+		protected virtual async Task ValidateUserOnSignIn(string login)
 		{
 			var disabled = (await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Disabled && x.Email.Equals(login))) != null;
 

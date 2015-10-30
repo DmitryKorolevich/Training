@@ -52,6 +52,7 @@ namespace VC.Admin.Controllers
                     GCTypes = referenceData.GCTypes,
                     RecordStatuses = referenceData.RecordStatuses,
                     CustomerStatuses = referenceData.CustomerStatuses,
+                    AffiliateStatuses = referenceData.AffiliateStatuses,
                     ProductTypes = referenceData.ProductTypes,
                     DiscountTypes = referenceData.DiscountTypes,
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,

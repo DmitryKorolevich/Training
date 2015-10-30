@@ -24,7 +24,20 @@
 // Place any jQuery/helper plugins in here.
 
 (function ($) {
-	$.support.placeholder = ('placeholder' in document.createElement('input'));
+    $.support.placeholder = ('placeholder' in document.createElement('input'));
+
+    //checkbox required validation
+    $.validator.unobtrusive.adapters.add("checkboxtrue", function (options)
+    {
+        if (options.element.tagName.toUpperCase() == "INPUT" && options.element.type.toUpperCase() == "CHECKBOX")
+        {
+            options.rules["required"] = true;
+            if (options.message)
+            {
+                options.messages["required"] = options.message;
+            }
+        }
+    });
 })(jQuery);
 
 var successMessage;
@@ -147,4 +160,13 @@ function getLast4(str) {
 	if (start < 0)
 		start = 0;
 	return str.slice(start, str.length);
+};
+
+function reInitFormValidation(form)
+{
+    if ($(form).length > 0)
+    {
+        $(form).removeData("validator").removeData("unobtrusiveValidation");
+        jQuery.validator.unobtrusive.parse($(form));
+    }
 };

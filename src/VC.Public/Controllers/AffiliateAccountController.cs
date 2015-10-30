@@ -68,10 +68,17 @@ namespace VC.Public.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userService.SignInAsync(model.Email, model.Password);
-            if (user == null)
+            try
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                var user = await _userService.SignInAsync(model.Email, model.Password);
+                if (user == null)
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+                }
+            }
+            catch(AffiliatePendingException ex)
+            {
+                return View("Pending");
             }
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -225,11 +232,11 @@ namespace VC.Public.Controllers
             InitRegisterModel(model, true);
             if (!model.IsAllowAgreement)
             {
-                ModelState.AddModelError(String.Empty, "Please agree to Web Affiliate Agreement");
+                ModelState.AddModelError(String.Empty, "Please agree to Web Affiliate Agreement.");
             }
             if (!model.IsNotSpam)
             {
-                ModelState.AddModelError(String.Empty, "Please agree to SPAM Agreement");
+                ModelState.AddModelError(String.Empty, "Please agree to SPAM Agreement.");
             }
             if (!Validate(model))
             {
@@ -247,7 +254,7 @@ namespace VC.Public.Controllers
                 var item = _affiliateMapper.FromModel(model);
 
                 item.IdObjectType = 1;
-                item.StatusCode = (int)AffiliateStatus.Active;
+                item.StatusCode = (int)AffiliateStatus.Pending;
                 item.CommissionAll = AffiliateConstants.DefaultCommissionAll;
                 item.CommissionFirst = AffiliateConstants.DefaultCommissionFirst;
                 item.Data.Tier = AffiliateConstants.DefaultTier;
@@ -269,7 +276,7 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
+            return View("Pending");
         }
 
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)

@@ -175,7 +175,10 @@ namespace VitalChoice.Business.Services.Affiliates
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await InsertAsync(model, uow, password);
-                return await SelectAsync(entity.Id);
+
+                entity = await SelectEntityAsync(entity.Id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
             }
         }
 
@@ -184,7 +187,10 @@ namespace VitalChoice.Business.Services.Affiliates
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await UpdateAsync(model, uow, password);
-                return await SelectAsync(entity.Id);
+
+                entity = await SelectEntityAsync(entity.Id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
             }
         }
 
@@ -315,6 +321,9 @@ namespace VitalChoice.Business.Services.Affiliates
                 case (int)AffiliateStatus.Deleted:
                     appUser.Status = UserStatus.NotActive;
                     appUser.DeletedDate = DateTime.Now;
+                    break;
+                case (int)AffiliateStatus.Pending:
+                    appUser.Status = UserStatus.Active;
                     break;
             }
 

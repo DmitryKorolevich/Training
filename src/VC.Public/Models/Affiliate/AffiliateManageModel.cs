@@ -114,6 +114,7 @@ namespace VC.Public.Models.Affiliate
         [Map]
         public string ChecksPayableTo { get; set; }
 
+        [Required]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Tax ID / SSN")]
         [Map]

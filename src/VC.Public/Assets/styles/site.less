@@ -1080,6 +1080,15 @@ footer{
 		color: #990000;
 	}
 
+    h3{
+		font-size: 16px;
+		font-weight: bold;
+		margin: 0px 0px 15px 0px;
+		padding: 10px 5px 0px 0px;
+		text-align: left;
+		color: rgb(8, 107, 252);
+	}
+
 	input[type=submit],
 	input[type=button]{
 		border-radius: 3px;
@@ -1181,6 +1190,10 @@ footer{
 	}
 }
 
+.message-group {            
+	color:rgb(51, 51, 51);
+}
+
 .form-regular{
 	font-family: Arial;
 	font-size: 13px;
@@ -1244,7 +1257,12 @@ footer{
         }
 
         .message-group {            
-			color:rgb(51, 51, 51);
+
+            .field-validation-error{
+				color:red;
+				margin: 5px 0 0 0px;
+				display:block;
+			}
         }
 
 		.control-label{
@@ -1333,3 +1351,9 @@ footer{
 .vitalgreen .header { margin-bottom: 20px; margin-top: 20px;}
 .vitalgreen .items .item { width: 250px; float: left; margin-bottom: 20px;}
 .vitalgreen .items .item .hours {padding-left: 15px; font-size: 12px;}
+
+.form-regular .affiliate-manage .promote-area .form-group .control-label {width: 125px;}
+
+.affiliate-registration .form-regular.medium-small .form-buttons-group :first-child { margin-left: 0px;}
+
+.affiliate-pending .form-buttons-group :first-child { margin-left: 0px;}

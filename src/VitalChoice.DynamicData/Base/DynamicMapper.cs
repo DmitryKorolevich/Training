@@ -730,7 +730,7 @@ namespace VitalChoice.DynamicData.Base
 
         private void RemoveSerurityInformationForProperty(GenericProperty property, object model)
         {
-            if (model == null || property.PropertyType.Name== "Type")
+            if (model == null || property.PropertyType == typeof(Type))
             {
                 return;
             }
@@ -742,12 +742,14 @@ namespace VitalChoice.DynamicData.Base
             }
             else
             {
-                if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType.Name!="String")
+                //if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType!=typeof(string))
+                if (property.PropertyType != typeof(string))
                 {
-                    Type elementType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
+                    Type elementType = property.PropertyType.TryGetElementType(typeof(IEnumerable<>));
                     if (elementType != null)
                     {
-                        if (!elementType.GetTypeInfo().IsValueType && elementType.Name != "String")
+                        //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
+                        if (elementType != typeof(string))
                         {
                             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
                             var items = (IEnumerable)property.Get?.Invoke(model);
@@ -756,7 +758,8 @@ namespace VitalChoice.DynamicData.Base
                                 foreach (var item in items)
                                 {
                                     var type = item.GetType();
-                                    if (!type.GetTypeInfo().IsValueType && type.Name != "String")
+                                    //if (!type.GetTypeInfo().IsValueType && type != typeof(string))
+                                    if (type != typeof(string))
                                     {
                                         if (_removeSerurityInformationVisitedHashSet.Contains(model))
                                         {

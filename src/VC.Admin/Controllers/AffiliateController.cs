@@ -37,6 +37,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 
 namespace VC.Admin.Controllers
 {
@@ -65,7 +66,7 @@ namespace VC.Admin.Controllers
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             logger = loggerProvider.CreateLoggerDefault();
         }
-        
+
         [HttpPost]
         public async Task<Result<PagedList<AffiliateListItemModel>>> GetAffiliates([FromBody]VAffiliateFilter filter)
         {
@@ -90,7 +91,7 @@ namespace VC.Admin.Controllers
                 return new AffiliateManageModel()
                 {
                     StatusCode = RecordStatusCode.NotActive,
-                    IdCountry = _defaultCountry!=null ? _defaultCountry.Id : (int?)null,
+                    IdCountry = _defaultCountry != null ? _defaultCountry.Id : (int?)null,
                     PaymentType = AffiliateConstants.DefaultPaymentType,//Credit
                     Tier = AffiliateConstants.DefaultTier,
                     CommissionFirst = AffiliateConstants.DefaultCommissionFirst,
@@ -140,7 +141,7 @@ namespace VC.Admin.Controllers
             }
 
             var toReturn = _mapper.ToModel<AffiliateManageModel>(item);
-            
+
             toReturn.IsConfirmed = model.IsConfirmed;
             toReturn.PublicUserId = model.PublicUserId;
 

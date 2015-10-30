@@ -420,8 +420,11 @@ namespace VitalChoice.Business.Services.Customers
 			using (var uow = CreateUnitOfWork())
 			{
 				var entity = await InsertAsync(model, uow, password);
-				return await SelectAsync(entity.Id);
-			}
+
+                entity = await SelectEntityAsync(entity.Id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
+            }
 		}
 
 		public async Task<CustomerDynamic> UpdateAsync(CustomerDynamic model, string password)
@@ -429,7 +432,10 @@ namespace VitalChoice.Business.Services.Customers
 			using (var uow = CreateUnitOfWork())
 			{
 				var entity = await UpdateAsync(model, uow, password);
-				return await SelectAsync(entity.Id);
+
+                entity = await SelectEntityAsync(entity.Id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
 			}
 		}
 
