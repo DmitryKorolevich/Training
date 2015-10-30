@@ -1,4 +1,7 @@
-﻿$(function() {
+﻿$(function ()
+{
+    reInitFormValidation(".working-area-holder form");
+
     $(document).ready(function ()
     {
         $('.cb-promote').change(function ()

@@ -24,12 +24,15 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 
 namespace VitalChoice.Business.Services.Users
 {
 	public class AffiliateUserService : UserService, IAffiliateUserService
     {
-		public AffiliateUserService(
+        private readonly IEcommerceRepositoryAsync<Affiliate> _affiliateRepositoryAsync;
+
+        public AffiliateUserService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             IDataContextAsync context, 
@@ -37,7 +40,8 @@ namespace VitalChoice.Business.Services.Users
             IAppInfrastructureService appInfrastructureService,
             INotificationService notificationService,
             IOptions<AppOptions> options, 
-            IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, 
+            IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
+            IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
             IUserValidator<ApplicationUser> userValidator) :
             base(
                 userManager,
@@ -50,7 +54,8 @@ namespace VitalChoice.Business.Services.Users
                 ecommerceRepositoryAsync,
                 userValidator)
 		{
-		}
+            _affiliateRepositoryAsync = affiliateRepositoryAsync;
+        }
 
 		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{
@@ -106,7 +111,24 @@ namespace VitalChoice.Business.Services.Users
 			return base.ValidateUserInternalAsync(user);
 		}
 
-		public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+
+        protected override async Task ValidateUserOnSignIn(string login)
+        {
+            var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
+
+            if (appUser!=null)
+            {
+                var affiliate = (await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectAsync()).FirstOrDefault();
+                if(affiliate.StatusCode==(int)AffiliateStatus.Pending)
+                {
+                    throw new AffiliatePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+                }
+            }
+
+            await base.ValidateUserOnSignIn(login);
+        }
+
+        public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
 			await NotificationService.SendAffiliateRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{

@@ -30,6 +30,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 $scope.affiliate.Id = result.Data.Id;
                 $scope.affiliate.DateEdited = result.Data.DateEdited;
                 $scope.affiliate.Email = result.Data.Email;
+                $scope.affiliate.StatusCode = result.Data.StatusCode;
+                $scope.affiliate.ActivatePending = false;
                 refreshHistory();
             } else
             {
@@ -122,6 +124,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     if (result.Success)
                     {
                         $scope.affiliate = result.Data;
+                        $scope.affiliate.ActivatePending = false;
                         refreshHistory();
                     } else
                     {
@@ -153,6 +156,10 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 if (data.StatusCode != 4)
                 {
                     data.SuspendMessage = null;
+                }
+                if (data.ActivatePending)
+                {
+                    data.StatusCode = 2;//active
                 }
 
                 affiliateService.updateAffiliate(data, $scope.refreshTracker).success(function (result)

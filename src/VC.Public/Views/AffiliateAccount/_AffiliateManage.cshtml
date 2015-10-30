@@ -4,345 +4,334 @@
 @using VC.Public.Helpers
 @model AffiliateManageModel
 
-<div>
+<div class="affiliate-manage">
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "")
     @if (Model != null)
     {
-    <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
-    <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
-    <input id="hdCurrentEmail" name="CurrentEmail" value="@Html.DisplayForEx(x => x.CurrentEmail)" type="hidden">
-    @if (String.IsNullOrEmpty(Model.CurrentEmail))
-    {
-        <div class="sub-title"><span>Specify an Email</span></div>
-    }
-    @if (!String.IsNullOrEmpty(Model.CurrentEmail))
-    {
-        <div class="sub-title"><span>Update Email</span></div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.CurrentEmail, new { @class = "control-label" })
-            <div class="input-group">
-                <label class="form-control-static">@Html.DisplayForEx(m => m.CurrentEmail)</label>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Email)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ConfirmEmail, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.ConfirmEmail, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.ConfirmEmail)
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="form-group">
-            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @data_val = "true", @data_val_required = "The Email field is required." })
-                @Html.ValidationMessageFor(m => m.Email)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ConfirmEmail, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.ConfirmEmail, new { @class = "form-control", @data_val = "true", @data_val_required = "The Email Confirm field is required." })
-                @Html.ValidationMessageFor(m => m.ConfirmEmail)
-            </div>
-        </div>
-    }
-
-    @if (String.IsNullOrEmpty(Model.CurrentEmail))
-    {
-    <div class="sub-title"><span>Create a Password</span></div>
-    <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
-        <div class="input-group">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control", @data_val = "true", @data_val_required = "The Password field is required." })
-            @Html.ValidationMessageFor(m => m.Password)
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
-        <div class="input-group">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @data_val = "true", @data_val_required = "The Password Confirm field is required." })
-            @Html.ValidationMessageFor(m => m.ConfirmPassword)
-        </div>
-    </div>
-    }
-
-    @if (String.IsNullOrEmpty(Model.CurrentEmail))
-    {
-    <div class="sub-title"><span>Promoting Vital Choice</span></div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByWebsite, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByWebsite, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.WebSite, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.WebSite, new { @class = "form-control", @data_val = "true", @data_val_required = "The Website URL field is required." })
-                @Html.ValidationMessageFor(m => m.WebSite)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByEmails, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByEmails, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.MonthlyEmailsSent, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.MonthlyEmailsSent, Model.MonthlyEmailsSentOptions, String.Empty, new { @class = "form-control", @data_val = "true", @data_val_required = "The Monthly Emails sent field is required." })
-                @Html.ValidationMessageFor(m => m.MonthlyEmailsSent)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByFacebook, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByFacebook, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.Facebook, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Facebook, new { @class = "form-control", @data_val = "true", @data_val_required = "The Facebook page URL field is required." })
-                @Html.ValidationMessageFor(m => m.Facebook)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByTwitter, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByTwitter, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.Twitter, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Twitter, new { @class = "form-control", @data_val = "true", @data_val_required = "The Twitter page URL field is required." })
-                @Html.ValidationMessageFor(m => m.Twitter)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByBlog, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByBlog, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.Blog, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Blog, new { @class = "form-control", @data_val = "true", @data_val_required = "The Blog site URL field is required." })
-                @Html.ValidationMessageFor(m => m.Blog)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-two-column">
-            @Html.LabelFor(m => m.PromoteByProfessionalPractice, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.CheckBoxFor(m => m.PromoteByProfessionalPractice, new { @class = "form-control cb-promote" })
-            </div>
-        </div>
-        <div class="form-two-column section" style="display: none;">
-            @Html.LabelFor(m => m.ProfessionalPractice, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.ProfessionalPractice, Model.ProfessionalPracticeOptions, String.Empty, new { @class = "form-control", @data_val = "true", @data_val_required = "The Practice field is required." })
-                @Html.ValidationMessageFor(m => m.ProfessionalPractice)
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label" for="PromoteByDrSearsLEANCoachAmbassador"></label>
-        <div class="input-group">
-            @Html.CheckBoxFor(m => m.PromoteByDrSearsLEANCoachAmbassador, new { @class = "form-control" })
-            <span>Dr. Sears LEAN Coach Ambassador* (*Must already be in the LEAN Program)</span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label" for="PromoteByVerticalResponseEmail"></label>
-        <div class="input-group">
-            @Html.CheckBoxFor(m => m.PromoteByVerticalResponseEmail, new { @class = "form-control" })
-            <span>Vertical Response Email</span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label" for="PromoteByLeanEmail"></label>
-        <div class="input-group">
-            @Html.CheckBoxFor(m => m.PromoteByLeanEmail, new { @class = "form-control" })
-            <span>Lean Email</span>
-        </div>
-    </div>
-    }
-
-    <div class="sub-title"><span>Details</span></div>
-    <div class="form-two-column">
-        <div class="form-group">
-            @Html.LabelFor(m => m.Name, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Name)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ChecksPayableTo, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.ChecksPayableTo, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.ChecksPayableTo)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.TaxID, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.TaxID, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.TaxID)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Company, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Company, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Company)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
-                @Html.ValidationMessageFor(m => m.IdCountry)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Address1)
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label"></label>
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Address2)
-            </div>
-        </div>
-    </div>
-    <div class="form-two-column">
-        <div class="form-group">
-            @Html.LabelFor(m => m.City, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.City)
-            </div>
-        </div>
-        <div class="form-group">
-            <!--todo-->
-            @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
-                @Html.ValidationMessageFor(m => m.IdState)
-            </div>
-        </div>
-        <div class="form-group">
-            <!--todo-->
-            @Html.LabelFor(m => m.County, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
-                @Html.ValidationMessageFor(m => m.County)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PostalCode)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
-                @Html.ValidationMessageFor(m => m.Phone)
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Fax, new { @class = "control-label" })
-            <div class="input-group">
-                @Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask" })
-                @Html.ValidationMessageFor(m => m.Fax)
-            </div>
-        </div>
+        <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+        <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
+        <input id="hdCurrentEmail" name="CurrentEmail" value="@Html.DisplayForEx(x => x.CurrentEmail)" type="hidden">
         @if (String.IsNullOrEmpty(Model.CurrentEmail))
         {
+            <div class="sub-title"><span>Specify an Email</span></div>
+        }
+        @if (!String.IsNullOrEmpty(Model.CurrentEmail))
+        {
             <div class="form-group">
-                @Html.LabelFor(m => m.HearAbout, new { @class = "control-label" })
+                @Html.LabelFor(m => m.CurrentEmail, new { @class = "control-label" })
                 <div class="input-group">
-                    @Html.TextBoxFor(m => m.HearAbout, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.HearAbout)
+                    <label class="form-control-static">@Html.DisplayForEx(m => m.CurrentEmail)</label>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConfirmEmail, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ConfirmEmail, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ConfirmEmail)
                 </div>
             </div>
         }
-    </div>
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @data_val = "true", @data_val_required = "The Email field is required." })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConfirmEmail, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ConfirmEmail, new { @class = "form-control", @data_val = "true", @data_val_required = "The Email Confirm field is required." })
+                    @Html.ValidationMessageFor(m => m.ConfirmEmail)
+                </div>
+            </div>
+        }
 
-    <div class="form-group">
-        <div class="message-group">
-            <strong>I would like payment as</strong>
-            <span class="radio-inline">
-                @Html.RadioButtonFor(m => m.PaymentType, 1, new { @class = "form-control" })
-                Cash
-            </span>
-            <span class="radio-inline">
-                @Html.RadioButtonFor(m => m.PaymentType, 2, new { @class = "form-control" })
-                Credit
-            </span>
-            <br/>
-            <br />
-            <span>Credit Payments are issued at 110% of the cash commission earned.</span>
-            <br />
-            <br />
-            <span>Commission: @Html.DisplayTextFor(p => p.CommissionFirst)% first sale; @Html.DisplayTextFor(p => p.CommissionAll)% thereafter</span>
+        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+            <div class="sub-title"><span>Create a Password</span></div>
+            <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @data_val = "true", @data_val_required = "The Password field is required." })
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @data_val = "true", @data_val_required = "The Password Confirm field is required." })
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                </div>
+            </div>
+        }
+
+        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+            <div class="promote-area">
+                <div class="sub-title"><span>Promoting Vital Choice</span></div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByWebsite, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByWebsite, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.WebSite, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.WebSite, new { @class = "form-control", @data_val = "true", @data_val_required = "The Website URL field is required." })
+                            @Html.ValidationMessageFor(m => m.WebSite)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByEmails, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByEmails, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.MonthlyEmailsSent, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.DropDownListFor(m => m.MonthlyEmailsSent, Model.MonthlyEmailsSentOptions, String.Empty, new { @class = "form-control", @data_val = "true", @data_val_required = "The Monthly Emails sent field is required." })
+                            @Html.ValidationMessageFor(m => m.MonthlyEmailsSent)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByFacebook, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByFacebook, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.Facebook, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Facebook, new { @class = "form-control", @data_val = "true", @data_val_required = "The Facebook page URL field is required." })
+                            @Html.ValidationMessageFor(m => m.Facebook)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByTwitter, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByTwitter, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.Twitter, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Twitter, new { @class = "form-control", @data_val = "true", @data_val_required = "The Twitter page URL field is required." })
+                            @Html.ValidationMessageFor(m => m.Twitter)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByBlog, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByBlog, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.Blog, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Blog, new { @class = "form-control", @data_val = "true", @data_val_required = "The Blog site URL field is required." })
+                            @Html.ValidationMessageFor(m => m.Blog)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PromoteByProfessionalPractice, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByProfessionalPractice, new { @class = "form-control cb-promote" })
+                    </div>
+                    <div class="section" style="display: none;">
+                        @Html.LabelFor(m => m.ProfessionalPractice, new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.DropDownListFor(m => m.ProfessionalPractice, Model.ProfessionalPracticeOptions, String.Empty, new { @class = "form-control", @data_val = "true", @data_val_required = "The Practice field is required." })
+                            @Html.ValidationMessageFor(m => m.ProfessionalPractice)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="PromoteByDrSearsLEANCoachAmbassador"></label>
+                    <div class="input-group">
+                        @Html.CheckBoxFor(m => m.PromoteByDrSearsLEANCoachAmbassador, new { @class = "form-control" })
+                        <label for="PromoteByDrSearsLEANCoachAmbassador">Dr. Sears LEAN Coach Ambassador* (*Must already be in the LEAN Program)</label>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+        <div class="sub-title"><span>Details</span></div>
+        }
+        else
+        {
+        <div class="form-group">
+            <hr />
         </div>
-    </div>
-
-    <div class="form-group">
-        <hr />
-    </div>
-
-
-    @if (String.IsNullOrEmpty(Model.CurrentEmail))
-    {
-    <div class="form-group">
-        <div class="message-group">
-            @Html.CheckBoxFor(m => m.IsAllowAgreement, new { @class = "form-control" })
-            <strong>I understand that I may not promote these products/services or this Affiliate Program by sending unsolicited mailings (SPAM).</strong><br>
-            <span>International orders: non-perishable orders can be shipped outside the U.S. and Canada for an additional fee, some restrictions apply.</span>
+        }
+        <div class="form-two-column">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ChecksPayableTo, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ChecksPayableTo, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ChecksPayableTo)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.TaxID, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.TaxID, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.TaxID)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Company, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Company, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Company)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+                    @Html.ValidationMessageFor(m => m.IdCountry)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address1)
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address2)
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="message-group">
-            @Html.CheckBoxFor(m => m.IsNotSpam, new { @class = "form-control" })
-            <strong>I certify that the above information is true and that I have read and agree to the terms of the Web Affiliate Agreement. </strong>
+        <div class="form-two-column">
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+                    @Html.ValidationMessageFor(m => m.IdState)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.County, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
+                    @Html.ValidationMessageFor(m => m.County)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PostalCode)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
+                    @Html.ValidationMessageFor(m => m.Phone)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Fax, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask" })
+                    @Html.ValidationMessageFor(m => m.Fax)
+                </div>
+            </div>
+            @if (String.IsNullOrEmpty(Model.CurrentEmail))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.HearAbout, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.HearAbout, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.HearAbout)
+                    </div>
+                </div>
+            }
         </div>
-    </div>
-    }
+
+        <div class="form-group">
+            <div class="message-group">
+                <strong>I would like payment as</strong>
+                <span class="radio-inline">
+                    @Html.RadioButtonFor(m => m.PaymentType, 1, new { @class = "form-control" })
+                    Cash
+                </span>
+                <span class="radio-inline">
+                    @Html.RadioButtonFor(m => m.PaymentType, 2, new { @class = "form-control" })
+                    Credit
+                </span>
+                <br />
+                <br />
+                <span>Credit Payments are issued at 110% of the cash commission earned.</span>
+                @if (!String.IsNullOrEmpty(Model.CurrentEmail))
+                {
+                <br />
+                <br />
+                <span>Commission: @Html.DisplayTextFor(p => p.CommissionFirst)% first sale; @Html.DisplayTextFor(p => p.CommissionAll)% thereafter</span>
+                }
+            </div>
+        </div>
+
+
+        @if (String.IsNullOrEmpty(Model.CurrentEmail))
+        {
+            <div class="form-group">
+                <hr />
+            </div>
+
+            <div class="form-group">
+                <div class="message-group">
+                    @Html.CheckBoxFor(m => m.IsAllowAgreement, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to Web Affiliate Agreement." })
+                    <strong>I understand that I may not promote these products/services or this Affiliate Program by sending unsolicited mailings (SPAM).</strong><br>
+                    <span>International orders: non-perishable orders can be shipped outside the U.S. and Canada for an additional fee, some restrictions apply.</span>
+                    @Html.ValidationMessageFor(m => m.IsAllowAgreement)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="message-group">
+                    @Html.CheckBoxFor(m => m.IsNotSpam, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to SPAM Agreement." })
+                    <strong>I certify that the above information is true and that I have read and agree to the terms of the Web Affiliate Agreement. </strong>
+                    @Html.ValidationMessageFor(m => m.IsNotSpam)
+                </div>
+            </div>
+        }
     }
 </div>

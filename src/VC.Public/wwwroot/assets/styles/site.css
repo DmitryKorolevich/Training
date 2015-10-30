@@ -927,6 +927,14 @@ footer {
   text-align: left;
   color: #990000;
 }
+.working-area-holder h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0px 0px 15px 0px;
+  padding: 10px 5px 0px 0px;
+  text-align: left;
+  color: #086bfc;
+}
 .working-area-holder input[type=submit],
 .working-area-holder input[type=button] {
   border-radius: 3px;
@@ -997,6 +1005,9 @@ footer {
 .form-regular.medium-small .form-buttons-group :first-child {
   margin-left: 135px;
 }
+.message-group {
+  color: #333333;
+}
 .form-regular {
   font-family: Arial;
   font-size: 13px;
@@ -1051,8 +1062,10 @@ footer {
 .form-regular .form-group .radio-inline input[type=radio] {
   vertical-align: middle;
 }
-.form-regular .form-group .message-group {
-  color: #333333;
+.form-regular .form-group .message-group .field-validation-error {
+  color: red;
+  margin: 5px 0 0 0px;
+  display: block;
 }
 .form-regular .form-group .control-label {
   text-align: left;
@@ -1137,4 +1150,13 @@ footer {
 .vitalgreen .items .item .hours {
   padding-left: 15px;
   font-size: 12px;
+}
+.form-regular .affiliate-manage .promote-area .form-group .control-label {
+  width: 125px;
+}
+.affiliate-registration .form-regular.medium-small .form-buttons-group :first-child {
+  margin-left: 0px;
+}
+.affiliate-pending .form-buttons-group :first-child {
+  margin-left: 0px;
 }

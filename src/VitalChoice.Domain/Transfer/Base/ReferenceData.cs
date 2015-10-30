@@ -41,6 +41,8 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> CustomerStatuses { get; set; }
 
+        public IList<LookupItem<int>> AffiliateStatuses { get; set; }
+
         public IList<LookupItem<int>> ProductTypes { get; set; }
 
         public IList<LookupItem<int>> DiscountTypes { get; set; }

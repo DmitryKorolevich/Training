@@ -14,14 +14,14 @@
     <script src="@Url.Content("/app/modules/affiliateaccount/register.js")"></script>
 }
 
-<div class="working-area-holder">
+<div class="working-area-holder affiliate-registration">
     @using (Html.BeginForm("Register", "AffiliateAccount", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
     {
         <h4>Register a New Affiliate Account</h4>
         await Html.RenderPartialAsync("_AffiliateManage", Model);
 
         <div class="form-buttons-group">
-            <input type="submit" value="Continue" class="btn btn-default" />
+            <input type="submit" value="Submit My Application" class="yellow" />
         </div>
     }
     <div class="form-group">

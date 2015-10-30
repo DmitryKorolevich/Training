@@ -647,12 +647,14 @@ namespace VitalChoice.DynamicData.Base
             }
             else
             {
-                if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType != typeof(string))
+                //if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType!=typeof(string))
+                if (property.PropertyType != typeof(string))
                 {
-                    Type elementType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
+                    Type elementType = property.PropertyType.TryGetElementType(typeof(IEnumerable<>));
                     if (elementType != null)
                     {
-                        if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
+                        //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
+                        if (elementType != typeof(string))
                         {
                             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
                             var items = (IEnumerable<object>)property.Get?.Invoke(model);
@@ -664,7 +666,9 @@ namespace VitalChoice.DynamicData.Base
                                         .Select(@t => @t.item);
                                 foreach (var item in includeItems)
                                 {
-                                    if (_removeSerurityInformationVisitedHashSet.Contains(model))
+                                    var type = item.GetType();
+                                    //if (!type.GetTypeInfo().IsValueType && type != typeof(string))
+                                    if (type != typeof(string))
                                     {
                                         return;
                                     }

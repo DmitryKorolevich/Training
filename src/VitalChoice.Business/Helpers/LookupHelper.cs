@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Help;
@@ -90,6 +91,19 @@ namespace VitalChoice.Business.Helpers
                 {(int) CustomerStatus.NotActive, "Not Active"},
                 {(int) CustomerStatus.Deleted, "Deleted"},
                 {(int) CustomerStatus.Suspended, "Suspended"},
+            };
+            return toReturn;
+        }
+
+        public static Dictionary<int, string> GetAffiliateStatuses()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) AffiliateStatus.Active, "Active"},
+                {(int) AffiliateStatus.Pending, "Pending"},
+                {(int) AffiliateStatus.NotActive, "Not Active"},
+                {(int) AffiliateStatus.Deleted, "Deleted"},
+                {(int) AffiliateStatus.Suspended, "Suspended"},
             };
             return toReturn;
         }
