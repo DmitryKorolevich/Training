@@ -1,5 +1,6 @@
 ﻿using System;
 using VC.Admin.Models.Customer;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 

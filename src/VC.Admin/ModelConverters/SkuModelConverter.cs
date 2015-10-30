@@ -1,5 +1,6 @@
 ﻿using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 

@@ -10,40 +10,30 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IDynamicMapper
-    {
-        object ToModel(MappedObject dynamic, Type modelType);
-        void ToModel(MappedObject dynamic, Type modelType, object model);
-        MappedObject FromModel(Type modelType, object model);
-        void FromModel(Type modelType, object model, MappedObject dynamic);
-    }
-
-    public interface IDynamicMapper<TDynamic>
+    public interface IDynamicMapper<TDynamic> : IObjectMapper<TDynamic> 
         where TDynamic : MappedObject
     {
-        TModel ToModel<TModel>(TDynamic dynamic)
-            where TModel : class, new();
-
-		void ToModel<TModel>(TDynamic dynamic, TModel model)
-		  where TModel : class, new();
-
-		TDynamic FromModel<TModel>(TModel model);
-
-		void FromModel<TModel>(TModel model, TDynamic dynamic);
     }
 
-    public class DynamicEntityPair<TDynamic, TEntity>
-        where TEntity: Entity
-        where TDynamic: MappedObject
+    public class DynamicEntityPair<TDynamic, TEntity> : GenericPair<TDynamic, TEntity>
+        where TEntity : Entity
+        where TDynamic : MappedObject
     {
-        public DynamicEntityPair(TDynamic dynamic, TEntity entity)
+        public DynamicEntityPair(TDynamic dynamic, TEntity entity) : base(dynamic, entity)
         {
-            Dynamic = dynamic;
-            Entity = entity;
         }
 
-        public TEntity Entity { get; set; }
-        public TDynamic Dynamic { get; set; }
+        public TEntity Entity
+        {
+            get { return Value2; }
+            set { Value2 = value; }
+        }
+
+        public TDynamic Dynamic
+        {
+            get { return Value1; }
+            set { Value1 = value; }
+        }
     }
 
     public class GenericPair<T1, T2>
@@ -71,7 +61,7 @@ namespace VitalChoice.DynamicData.Interfaces
         public TDynamic Dynamic { get; set; }
     }
 
-    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper, IDynamicMapper<TDynamic>
+    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IObjectMapper, IDynamicMapper<TDynamic>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

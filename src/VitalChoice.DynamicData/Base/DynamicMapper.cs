@@ -19,8 +19,7 @@ using System.Collections;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class DynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> :
-        IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue>
+    public abstract class DynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : ObjectMapper<TDynamic>, IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
@@ -39,7 +38,7 @@ namespace VitalChoice.DynamicData.Base
 
         protected DynamicMapper(ITypeConverter typeConverter,
             IModelConverterService converterService, 
-            IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
+            IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync) : base(typeConverter, converterService)
         {
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
             _typeConverter = typeConverter;
@@ -244,86 +243,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public TModel ToModel<TModel>(TDynamic dynamic)
-            where TModel : class, new()
-        {
-            if (dynamic == null)
-                return null;
-
-            var result = new TModel();
-
-	        ToModel(dynamic, result);
-
-            return result;
-        }
-
-        public void ToModel<TModel>(TDynamic dynamic, TModel result)
-            where TModel : class, new()
-        {
-            if (dynamic == null)
-                return;
-
-            if (result == null)
-                return;
-
-            ToModelItem(dynamic, result, typeof (TModel), typeof (TDynamic));
-
-            var converter = _converterService.GetConverter<TModel, TDynamic>();
-            converter?.DynamicToModel(result, dynamic);
-        }
-
-        public TDynamic FromModel<TModel>(TModel model)
-        {
-            if (model == null)
-                return null;
-
-            var result = new TDynamic();
-
-			FromModel(model, result);
-
-            return result;
-        }
-
-		public void FromModel<TModel>(TModel model, TDynamic result)
-		{
-			if (model == null)
-				return;
-
-			if (result == null)
-				return;
-
-			FromModelItem(result, model, typeof(TModel), typeof(TDynamic));
-
-            var converter = _converterService.GetConverter<TModel, TDynamic>();
-		    converter?.ModelToDynamic(result, result);
-		}
-
-		object IDynamicMapper.ToModel(MappedObject dynamic, Type modelType)
-        {
-            if (dynamic == null)
-                return null;
-
-            dynamic result = Activator.CreateInstance(modelType);
-            ToModelItem(dynamic, result, modelType, typeof(TDynamic));
-
-			ToModel((TDynamic)dynamic, result);  //!!!
-
-			return result;
-        }
-
-	    void IDynamicMapper.ToModel(MappedObject dynamic, Type modelType, object result)
-	    {
-		    if (dynamic == null)
-			    return;
-
-		    if (result == null)
-			    return;
-
-            var converter = _converterService.GetConverter(modelType, typeof(TDynamic));
-            converter?.DynamicToModel(result, dynamic);
-        }
-
-	    MappedObject IDynamicMapper.FromModel(Type modelType, object model)
+        object IObjectMapper.FromModel(Type modelType, object model)
         {
             if (model == null)
                 return null;
@@ -335,18 +255,18 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-		void IDynamicMapper.FromModel(Type modelType, object model, MappedObject dynamic)
+		void IObjectMapper.FromModel(Type modelType, object model, object obj)
 		{
 			if (model == null)
 				return;
 
-			if (dynamic == null)
+			if (obj == null)
 				return;
 
-			FromModelItem(dynamic, model, modelType, typeof(TDynamic));
+			FromModelItem((MappedObject)obj, model, modelType, typeof(TDynamic));
 
 			var converter = _converterService.GetConverter(modelType, typeof(TDynamic));
-			converter?.ModelToDynamic(model, dynamic);
+			converter?.ModelToDynamic(model, obj);
 		}
 
 		public void UpdateEntity(TDynamic dynamic, TEntity entity)
@@ -641,77 +561,62 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Dynamic).ToList();
         }
 
-        private void ToModelItem(MappedObject dynamic, object result,
+        protected override void ToModelItem(object obj, object result,
             Type modelType, Type dynamicType)
         {
-            if (dynamic == null)
-                return;
-
-            dynamic.ModelType = modelType;
-            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-            var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);
-            var data = dynamic.DictionaryData;
-            foreach (var pair in cache)
+            base.ToModelItem(obj, result, modelType, dynamicType);
+            var dynamic = obj as MappedObject;
+            if (dynamic != null)
             {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                dynamic.ModelType = modelType;
+                var data = dynamic.DictionaryData;
+                var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType,
+                    true);
+                foreach (var pair in cache)
                 {
-                    var value = _typeConverter.ConvertToObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(dynamic));
-                    if (value != null)
+                    var mappingName = pair.Value.Map.Name ?? pair.Key;
+                    if (!dynamicCache.ContainsKey(mappingName))
                     {
-                        MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
-                        pair.Value.Set?.Invoke(result, value);
-                    }
-                }
-                else
-                {
-                    object dynamicValue;
-                    if (data.TryGetValue(mappingName, out dynamicValue))
-                    {
-                        var value = _typeConverter.ConvertToObject(pair.Value.PropertyType, dynamicValue);
-                        if (value != null)
+                        object dynamicValue;
+                        if (data.TryGetValue(mappingName, out dynamicValue))
                         {
-                            MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value,
-                                true);
-                            pair.Value.Set?.Invoke(result, value);
+                            var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue);
+                            if (value != null)
+                            {
+                                MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value,
+                                    true);
+                                pair.Value.Set?.Invoke(result, value);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private void FromModelItem(MappedObject dynamic, object model,
+        protected override void FromModelItem(object obj, object model,
             Type modelType, Type dynamicType)
         {
-            if (dynamic == null)
-                return;
-
-            dynamic.ModelType = modelType;
-            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-            var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType, true);
-            var data = dynamic.DictionaryData;
-            foreach (var pair in cache)
+            base.FromModelItem(obj, model, modelType, dynamicType);
+            var dynamic = obj as MappedObject;
+            if (dynamic != null)
             {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
-                GenericProperty dynamicProperty;
-                if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
+                dynamic.ModelType = modelType;
+                var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType,
+                    true);
+                var data = dynamic.DictionaryData;
+                foreach (var pair in cache)
                 {
-                    var value = _typeConverter.ConvertFromObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
-                        pair.Value.Get?.Invoke(model));
-                    if (value != null)
+                    var mappingName = pair.Value.Map.Name ?? pair.Key;
+                    if (!dynamicCache.ContainsKey(mappingName))
                     {
-                        MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, mappingName, dynamicProperty,
-                            false);
-                        dynamicProperty.Set?.Invoke(dynamic, value);
-                    }
-                }
-                else
-                {
-                    var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType, pair.Value.Get?.Invoke(model));
-                    if (value != null)
-                    {
-                        data.Add(mappingName, value);
+                        var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
+                            pair.Value.Get?.Invoke(model));
+                        if (value != null)
+                        {
+                            data.Add(mappingName, value);
+                        }
                     }
                 }
             }
@@ -730,7 +635,7 @@ namespace VitalChoice.DynamicData.Base
 
         private void RemoveSerurityInformationForProperty(GenericProperty property, object model)
         {
-            if (model == null || property.PropertyType.Name== "Type")
+            if (model == null || property.PropertyType == typeof(Type))
             {
                 return;
             }
@@ -742,32 +647,32 @@ namespace VitalChoice.DynamicData.Base
             }
             else
             {
-                if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType.Name!="String")
+                if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType != typeof(string))
                 {
                     Type elementType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
                     if (elementType != null)
                     {
-                        if (!elementType.GetTypeInfo().IsValueType && elementType.Name != "String")
+                        if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
                         {
                             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
-                            var items = (IEnumerable)property.Get?.Invoke(model);
+                            var items = (IEnumerable<object>)property.Get?.Invoke(model);
                             if (items != null)
                             {
-                                foreach (var item in items)
+                                var includeItems =
+                                    items.Select(item => new {item, type = item.GetType()})
+                                        .Where(@t => !@t.type.GetTypeInfo().IsValueType && @t.type != typeof(string))
+                                        .Select(@t => @t.item);
+                                foreach (var item in includeItems)
                                 {
-                                    var type = item.GetType();
-                                    if (!type.GetTypeInfo().IsValueType && type.Name != "String")
+                                    if (_removeSerurityInformationVisitedHashSet.Contains(model))
                                     {
-                                        if (_removeSerurityInformationVisitedHashSet.Contains(model))
-                                        {
-                                            return;
-                                        }
-                                        _removeSerurityInformationVisitedHashSet.Add(item);
-                                        foreach (var pair in cache)
-                                        {
-                                            GenericProperty dynamicProperty = pair.Value;
-                                            RemoveSerurityInformationForProperty(dynamicProperty, item);
-                                        }
+                                        return;
+                                    }
+                                    _removeSerurityInformationVisitedHashSet.Add(item);
+                                    foreach (var pair in cache)
+                                    {
+                                        GenericProperty dynamicProperty = pair.Value;
+                                        RemoveSerurityInformationForProperty(dynamicProperty, item);
                                     }
                                 }
                             }
@@ -792,16 +697,13 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public object GetDefaultValue(Type t)
+        private static object GetDefaultValue(Type t)
         {
             if (t.GetTypeInfo().IsValueType)
             {
                 return Activator.CreateInstance(t);
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         private static void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)

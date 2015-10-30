@@ -11,11 +11,13 @@ namespace VitalChoice.DynamicData.Base
 {
     public class TypeConverter : ITypeConverter
     {
-        private readonly IIndex<Type, IDynamicMapper> _mappers;
+        private readonly IIndex<Type, IObjectMapper> _mappers;
+        private readonly IModelConverterService _converterService;
 
-        public TypeConverter(IIndex<Type, IDynamicMapper> mappers)
+        public TypeConverter(IIndex<Type, IObjectMapper> mappers, IModelConverterService converterService)
         {
             _mappers = mappers;
+            _converterService = converterService;
         }
 
         public static object ConvertFromModelObject(Type sourceType, object obj)
@@ -33,17 +35,11 @@ namespace VitalChoice.DynamicData.Base
             return obj;
         }
 
-        public object ConvertFromObject(Type sourceType, Type destType, object obj)
+        public object ConvertFromModel(Type sourceType, Type destType, object obj)
         {
             if (obj == null)
                 return null;
 
-            if (typeof(MappedObject).IsAssignableFrom(destType))
-            {
-                IDynamicMapper mapper;
-                _mappers.TryGetValue(destType, out mapper);
-                return mapper?.FromModel(sourceType, obj);
-            }
             if (destType.IsInstanceOfType(obj))
             {
                 return obj;
@@ -60,42 +56,47 @@ namespace VitalChoice.DynamicData.Base
                 return destType.IsAssignableFrom(enumType) ? Convert.ChangeType(obj, enumType) : null;
             }
 
+            IObjectMapper objectMapper;
+            if (_mappers.TryGetValue(destType, out objectMapper))
+            {
+                return objectMapper.FromModel(sourceType, obj);
+            }
+
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
             Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
             if (destElementType != null && srcElementType != null)
             {
                 IList results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
-                if (typeof(MappedObject).IsAssignableFrom(destElementType))
-                {
-                    foreach (var item in (IEnumerable) obj)
-                    {
-                        IDynamicMapper mapper;
-                        _mappers.TryGetValue(destElementType, out mapper);
-                        var dynamicObject = mapper?.FromModel(srcElementType, item);
-                        results.Add(dynamicObject);
-                    }
-                }
-                else if (destElementType.IsAssignableFrom(srcElementType))
+                IObjectMapper itemMapper;
+                if (destElementType.IsAssignableFrom(srcElementType))
                 {
                     results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
-
+                else if (_mappers.TryGetValue(destElementType, out itemMapper))
+                {
+                    foreach (var item in (IEnumerable) obj)
+                    {
+                        results.Add(itemMapper.FromModel(srcElementType, item));
+                    }
+                }
+                else
+                {
+                    foreach (var item in (IEnumerable) obj)
+                    {
+                        results.Add(ConvertFromModel(srcElementType, destElementType, item));
+                    }
+                }
                 return results;
             }
-            return null;
+            var mapper = ObjectMapper.CreateObjectMapper(this, _converterService, destType);
+            return mapper?.FromModel(sourceType, obj);
         }
 
-        public object ConvertToObject(Type destType, object obj)
+        public object ConvertToModel(Type sourceType, Type destType, object obj)
         {
-            if (obj == null)
+            if (obj == null || sourceType == null)
                 return null;
-            var mappedObject = obj as MappedObject;
-            if (mappedObject != null)
-            {
-                IDynamicMapper mapper;
-                _mappers.TryGetValue(obj.GetType(), out mapper);
-                return mapper?.ToModel(mappedObject, destType);
-            }
+
             if (destType.IsInstanceOfType(obj))
             {
                 return obj;
@@ -106,27 +107,40 @@ namespace VitalChoice.DynamicData.Base
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
 
+            IObjectMapper objectMapper;
+            if (_mappers.TryGetValue(sourceType, out objectMapper))
+            {
+                return objectMapper.ToModel(obj, destType);
+            }
+
             Type destElementType = destType.TryGetElementType(typeof (ICollection<>));
-            Type srcElementType = obj.GetType().TryGetElementType(typeof (ICollection<>));
+            Type srcElementType = sourceType.TryGetElementType(typeof (ICollection<>));
             if (destElementType != null && srcElementType != null)
             {
                 var results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
-                if (typeof(MappedObject).IsAssignableFrom(srcElementType))
-                {
-                    IDynamicMapper mapper;
-                    _mappers.TryGetValue(srcElementType, out mapper);
-                    foreach (MappedObject item in (IEnumerable) obj)
-                    {
-                        results.Add(mapper?.ToModel(item, destElementType));
-                    }
-                }
-                else if (destElementType.IsAssignableFrom(srcElementType))
+                IObjectMapper itemMapper;
+                if (destElementType.IsAssignableFrom(srcElementType))
                 {
                     results.AddCast(obj as IEnumerable, srcElementType, destElementType);
                 }
+                else if (_mappers.TryGetValue(srcElementType, out itemMapper))
+                {
+                    foreach (var item in (IEnumerable)obj)
+                    {
+                        results.Add(itemMapper.ToModel(item, destElementType));
+                    }
+                }
+                else
+                {
+                    foreach (var item in (IEnumerable)obj)
+                    {
+                        results.Add(ConvertToModel(srcElementType, destElementType, item));
+                    }
+                }
                 return results;
             }
-            return null;
+            var mapper = ObjectMapper.CreateObjectMapper(this, _converterService, sourceType);
+            return mapper?.ToModel(obj, destType);
         }
     }
 }

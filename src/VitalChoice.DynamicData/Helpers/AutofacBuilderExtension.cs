@@ -18,6 +18,7 @@ namespace VitalChoice.DynamicData.Helpers
                     t =>
                         t.IsImplementGeneric(typeof (DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
                         !t.GetTypeInfo().IsGenericType);
+            builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>));
             foreach (var mapperType in mapperTypes)
             {
                 builder.RegisterType(mapperType)
@@ -27,8 +28,10 @@ namespace VitalChoice.DynamicData.Helpers
                     .As(
                         typeof (IDynamicMapper<>).MakeGenericType(
                             mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
+                    .As(typeof(IObjectMapper<>).MakeGenericType(
+                            mapperType.TryGetElementType(typeof(IDynamicMapper<>))))
                     .AsSelf()
-                    .Keyed<IDynamicMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)));
+                    .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)));
             }
             builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
             builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();

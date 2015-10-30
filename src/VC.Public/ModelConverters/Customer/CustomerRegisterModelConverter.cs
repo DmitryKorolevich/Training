@@ -2,6 +2,7 @@
 using VC.Public.Models.Auth;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 

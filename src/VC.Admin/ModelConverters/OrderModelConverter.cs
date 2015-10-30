@@ -18,6 +18,7 @@ using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;

@@ -13,7 +13,7 @@ namespace VitalChoice.DynamicData.Helpers
         public static void ThrowIfNotValid(Type modelType, Type dynamicType, object value, string propertyName,
             GenericProperty destProperty, bool toModelDirection)
         {
-            if (value == null && !destProperty.PropertyType.IsImplementGeneric(typeof(Nullable<>)))
+            if (value == null && destProperty.PropertyType.GetTypeInfo().IsValueType && !destProperty.PropertyType.IsImplementGeneric(typeof(Nullable<>)))
             {
                 throw new ApiException(
                     $"Value is null while it should be a ValueType {destProperty.PropertyType}.\r\n [{modelType} <-> {dynamicType}]");
