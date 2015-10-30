@@ -28,7 +28,7 @@ using VitalChoice.Domain.Entities.eCommerce.Promotion;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class PromotionService : EcommerceDynamicObjectService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>, IPromotionService
+    public class PromotionService : EcommerceDynamicService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>, IPromotionService
     {
         private readonly IEcommerceRepositoryAsync<Promotion> _promotionRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;

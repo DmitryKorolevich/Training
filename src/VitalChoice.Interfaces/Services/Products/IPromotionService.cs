@@ -9,7 +9,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IPromotionService : IDynamicObjectServiceAsync<PromotionDynamic, Promotion>
+	public interface IPromotionService : IDynamicServiceAsync<PromotionDynamic, Promotion>
 	{
         Task<PagedList<PromotionDynamic>> GetPromotionsAsync(PromotionFilter filter);
     }

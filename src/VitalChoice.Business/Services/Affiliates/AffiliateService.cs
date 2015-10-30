@@ -42,7 +42,7 @@ using Microsoft.Framework.OptionsModel;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
-    public class AffiliateService : EcommerceDynamicObjectService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>, IAffiliateService
+    public class AffiliateService : EcommerceDynamicService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>, IAffiliateService
     {
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;

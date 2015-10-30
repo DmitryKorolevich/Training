@@ -8,7 +8,7 @@ using VitalChoice.Workflow.Contexts;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
-	public interface IOrderService: IEcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
+	public interface IOrderService: IEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
 	{
         Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);

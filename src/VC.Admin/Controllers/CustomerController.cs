@@ -51,30 +51,30 @@ namespace VC.Admin.Controllers
     {
         private readonly ICountryService _countryService;
         private readonly IGenericService<AdminProfile> _adminProfileService;
-	    private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
-        private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
-        private readonly IDynamicToModelMapper<CustomerNoteDynamic> _noteMapper;
+	    private readonly IDynamicMapper<CustomerDynamic> _customerMapper;
+        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<CustomerNoteDynamic> _noteMapper;
         private readonly ICustomerService _customerService;
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
 
-        private readonly IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+        private readonly IEcommerceDynamicService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
-        private readonly IEcommerceDynamicObjectService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
+        private readonly IEcommerceDynamicService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
             _notesService;
 
 		private readonly ILogger logger;
 
         public CustomerController(ICustomerService customerService,
-            IDynamicToModelMapper<CustomerDynamic> customerMapper,
-            IDynamicToModelMapper<CustomerAddressDynamic> addressMapper, ICountryService countryService,
+            IDynamicMapper<CustomerDynamic> customerMapper,
+            IDynamicMapper<CustomerAddressDynamic> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
-            IEcommerceDynamicObjectService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+            IEcommerceDynamicService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
                 addressService,
-            IEcommerceDynamicObjectService
+            IEcommerceDynamicService
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
-            IDynamicToModelMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
+            IDynamicMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService)

@@ -5,6 +5,6 @@ namespace VitalChoice.Interfaces.Services
 {
 	public interface IContentProcessor
 	{
-		Task<dynamic> ExecuteAsync(dynamic model,Dictionary<string,object> queryData);
+		Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string,object> queryData);
 	}
 }

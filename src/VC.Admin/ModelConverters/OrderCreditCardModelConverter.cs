@@ -5,9 +5,9 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class OrderCreditCardModelConverter : IModelToDynamicConverter<CreditCardModel, OrderPaymentMethodDynamic>
+    public class OrderCreditCardModelConverter : BaseModelConverter<CreditCardModel, OrderPaymentMethodDynamic>
     {
-        public void DynamicToModel(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
+        public override void DynamicToModel(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
         {
             if (dynamic.DictionaryData.ContainsKey("ExpDate"))
             {
@@ -17,7 +17,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public void ModelToDynamic(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
+        public override void ModelToDynamic(CreditCardModel model, OrderPaymentMethodDynamic dynamic)
         {
             if (model.ExpirationDateYear.HasValue && model.ExpirationDateMonth.HasValue)
             {

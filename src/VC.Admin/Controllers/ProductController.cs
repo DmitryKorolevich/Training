@@ -35,17 +35,17 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
-        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService;
+        private readonly IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService;
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
-        private readonly IDynamicToModelMapper<ProductDynamic> _mapper;
+        private readonly IDynamicMapper<ProductDynamic> _mapper;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
-            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
+            IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
             IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
-            ILoggerProviderExtended loggerProvider, IDynamicToModelMapper<ProductDynamic> mapper,
+            ILoggerProviderExtended loggerProvider, IDynamicMapper<ProductDynamic> mapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             this.productCategoryService = productCategoryService;

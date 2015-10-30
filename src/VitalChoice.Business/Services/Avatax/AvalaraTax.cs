@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services.Avatax
     public class AvalaraTax : IAvalaraTax
     {
         private readonly ITaxService _taxService;
-        private readonly IDynamicToModelMapper<OrderAddressDynamic> _mapper;
+        private readonly IDynamicMapper<OrderAddressDynamic> _mapper;
         private readonly ILogger _logger;
         private readonly string _accountName;
         private readonly string _profileName;
@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Avatax
         internal const string ShippingTaxCode = "FR020100";
 
         public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider,
-            IDynamicToModelMapper<OrderAddressDynamic> mapper)
+            IDynamicMapper<OrderAddressDynamic> mapper)
         {
             _taxService = taxService;
             _mapper = mapper;

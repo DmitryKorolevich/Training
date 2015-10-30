@@ -10,22 +10,22 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class CustomerModelConverter : IModelToDynamicConverter<AddUpdateCustomerModel, CustomerDynamic>
+    public class CustomerModelConverter : BaseModelConverter<AddUpdateCustomerModel, CustomerDynamic>
     {
-	    private readonly IDynamicToModelMapper<CustomerNoteDynamic> _customerNoteMapper;
-        private readonly IDynamicToModelMapper<CustomerPaymentMethodDynamic> _paymentMethodMapper;
-        private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
+	    private readonly IDynamicMapper<CustomerNoteDynamic> _customerNoteMapper;
+        private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodMapper;
+        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
 
-        public CustomerModelConverter(IDynamicToModelMapper<CustomerNoteDynamic> customerNoteMapper,
-            IDynamicToModelMapper<CustomerAddressDynamic> addressMapper,
-            IDynamicToModelMapper<CustomerPaymentMethodDynamic> paymentMethodMapper)
+        public CustomerModelConverter(IDynamicMapper<CustomerNoteDynamic> customerNoteMapper,
+            IDynamicMapper<CustomerAddressDynamic> addressMapper,
+            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodMapper)
         {
             _customerNoteMapper = customerNoteMapper;
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
         }
 
-        public void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
+        public override void DynamicToModel(AddUpdateCustomerModel model, CustomerDynamic dynamic)
 	    {
 		    if (dynamic.CustomerNotes.Any())
 		    {
@@ -82,7 +82,7 @@ namespace VC.Admin.ModelConverters
 			}
 		}
 
-	    public void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
+	    public override void ModelToDynamic(AddUpdateCustomerModel model, CustomerDynamic dynamic)
         {
 			if (model.CustomerNotes.Any() && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
 			{

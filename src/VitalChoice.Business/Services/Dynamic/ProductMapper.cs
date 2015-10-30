@@ -18,13 +18,14 @@ using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class ProductMapper : DynamicObjectMapper<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
+    public class ProductMapper : DynamicMapper<ProductDynamic, Product, ProductOptionType, ProductOptionValue>
     {
         private readonly SkuMapper _skuMapper;
 
-        public ProductMapper(IIndex<Type, IDynamicToModelMapper> mappers, IIndex<TypePair, IModelToDynamicConverter> container,
+        public ProductMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
-            : base(mappers, container, productRepositoryAsync)
+            : base(converter, converterService, productRepositoryAsync)
         {
             _skuMapper = skuMapper;
         }

@@ -4,8 +4,8 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services
 {
-    public interface IEcommerceDynamicObjectService<TDynamic, TEntity, TOptionType, TOptionValue> :
-        IDynamicObjectServiceAsync<TDynamic, TEntity>
+    public interface IEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue> :
+        IDynamicServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>
         where TOptionType : OptionType
         where TOptionValue : OptionValue<TOptionType>

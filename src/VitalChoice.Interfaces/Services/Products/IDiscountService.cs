@@ -7,7 +7,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IDiscountService : IDynamicObjectServiceAsync<DiscountDynamic, Discount>
+	public interface IDiscountService : IDynamicServiceAsync<DiscountDynamic, Discount>
 	{
         Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter);
     }

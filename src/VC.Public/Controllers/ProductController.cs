@@ -29,7 +29,7 @@ namespace VC.Public.Controllers
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
+            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -40,7 +40,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters(), url);
+            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

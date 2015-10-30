@@ -2,9 +2,9 @@
 
 namespace VitalChoice.Domain.Entities.Content
 {
-    public class ExecutedContentItem
+    public class ContentViewModel
     {
-        public string HTML { get; set; }
+        public string Body { get; set; }
 
         public string Title { get; set; }
 

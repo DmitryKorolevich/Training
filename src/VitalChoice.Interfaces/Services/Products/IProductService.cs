@@ -12,7 +12,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IProductService : IDynamicObjectServiceAsync<ProductDynamic, Product>
+	public interface IProductService : IDynamicServiceAsync<ProductDynamic, Product>
 	{
         #region Products
 

@@ -11,7 +11,7 @@ namespace VitalChoice.DynamicData.Validation
     public static class RaiseErrorExtension
     {
         public static IDynamicErrorBuilder<TDynamic> CreateError<TDynamic>(this TDynamic obj)
-            where TDynamic : class, IModelTypeContainer
+            where TDynamic : class, IModelType
         {
             return new DynamicErrorBuilder<TDynamic>(obj);
         }

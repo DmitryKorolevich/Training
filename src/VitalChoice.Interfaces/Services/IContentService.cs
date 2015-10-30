@@ -8,6 +8,6 @@ namespace VitalChoice.Interfaces.Services
 {
     interface IContentService
     {
-        Task<ExecutedContentItem> GetContent(Dictionary<string, object> parameters);
+        Task<ContentViewModel> GetContent(Dictionary<string, object> parameters);
     }
 }

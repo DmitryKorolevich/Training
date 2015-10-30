@@ -8,13 +8,13 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Public.ModelConverters.Customer
 {
-	public class BillingInfoModelConverter : IModelToDynamicConverter<BillingInfoModel, CustomerPaymentMethodDynamic>
+	public class BillingInfoModelConverter : BaseModelConverter<BillingInfoModel, CustomerPaymentMethodDynamic>
 	{
 		public BillingInfoModelConverter()
 		{
 		}
 
-		public void DynamicToModel(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
+		public override void DynamicToModel(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
 		{
 			if (dynamic.DictionaryData.ContainsKey("ExpDate"))
 			{
@@ -24,7 +24,7 @@ namespace VC.Public.ModelConverters.Customer
 			}
 		}
 
-		public void ModelToDynamic(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
+		public override void ModelToDynamic(BillingInfoModel model, CustomerPaymentMethodDynamic dynamic)
 		{
 			if (model.ExpirationDateYear.HasValue && model.ExpirationDateMonth.HasValue)
 			{

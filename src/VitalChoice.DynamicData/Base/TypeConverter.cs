@@ -9,11 +9,11 @@ using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public class DynamicTypeConverter
+    public class TypeConverter : ITypeConverter
     {
-        private readonly IIndex<Type, IDynamicToModelMapper> _mappers;
+        private readonly IIndex<Type, IDynamicMapper> _mappers;
 
-        public DynamicTypeConverter(IIndex<Type, IDynamicToModelMapper> mappers)
+        public TypeConverter(IIndex<Type, IDynamicMapper> mappers)
         {
             _mappers = mappers;
         }
@@ -33,15 +33,16 @@ namespace VitalChoice.DynamicData.Base
             return obj;
         }
 
-        public object ConvertFromModelObject(Type sourceType, Type destType, object obj)
+        public object ConvertFromObject(Type sourceType, Type destType, object obj)
         {
             if (obj == null)
                 return null;
 
             if (typeof(MappedObject).IsAssignableFrom(destType))
             {
-                var mapper = _mappers[destType];
-                return mapper.FromModel(sourceType, obj);
+                IDynamicMapper mapper;
+                _mappers.TryGetValue(destType, out mapper);
+                return mapper?.FromModel(sourceType, obj);
             }
             if (destType.IsInstanceOfType(obj))
             {
@@ -68,8 +69,9 @@ namespace VitalChoice.DynamicData.Base
                 {
                     foreach (var item in (IEnumerable) obj)
                     {
-                        var mapper = _mappers[destElementType];
-                        var dynamicObject = mapper.FromModel(srcElementType, item);
+                        IDynamicMapper mapper;
+                        _mappers.TryGetValue(destElementType, out mapper);
+                        var dynamicObject = mapper?.FromModel(srcElementType, item);
                         results.Add(dynamicObject);
                     }
                 }
@@ -83,15 +85,16 @@ namespace VitalChoice.DynamicData.Base
             return null;
         }
 
-        public object ConvertToModelObject(Type destType, object obj)
+        public object ConvertToObject(Type destType, object obj)
         {
             if (obj == null)
                 return null;
             var mappedObject = obj as MappedObject;
             if (mappedObject != null)
             {
-                var mapper = _mappers[obj.GetType()];
-                return mapper.ToModel(mappedObject, destType);
+                IDynamicMapper mapper;
+                _mappers.TryGetValue(obj.GetType(), out mapper);
+                return mapper?.ToModel(mappedObject, destType);
             }
             if (destType.IsInstanceOfType(obj))
             {
@@ -110,10 +113,11 @@ namespace VitalChoice.DynamicData.Base
                 var results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(destElementType));
                 if (typeof(MappedObject).IsAssignableFrom(srcElementType))
                 {
-                    var mapper = _mappers[srcElementType];
-                    foreach (var item in (IEnumerable) obj)
+                    IDynamicMapper mapper;
+                    _mappers.TryGetValue(srcElementType, out mapper);
+                    foreach (MappedObject item in (IEnumerable) obj)
                     {
-                        results.Add(mapper.ToModel(item, destElementType));
+                        results.Add(mapper?.ToModel(item, destElementType));
                     }
                 }
                 else if (destElementType.IsAssignableFrom(srcElementType))

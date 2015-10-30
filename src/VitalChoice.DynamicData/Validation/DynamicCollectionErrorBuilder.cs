@@ -9,7 +9,7 @@ using VitalChoice.DynamicData.Validation.Abstractions;
 namespace VitalChoice.DynamicData.Validation
 {
     public class DynamicCollectionErrorBuilder<TCollection, TProperty> : ErrorBuilderBase<TCollection>, IDynamicCollectionErrorBuilder<TCollection, TProperty>, IErrorResult
-        where TProperty: class, IModelTypeContainer
+        where TProperty: class, IModelType
         where TCollection : ICollection<TProperty>
     {
         public DynamicCollectionErrorBuilder(TCollection obj, string collectionName = null, int[] indexes = null,

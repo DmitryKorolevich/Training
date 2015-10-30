@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IModelTypeContainer
+    public interface IModelType
     {
         Type ModelType { get; }
     }

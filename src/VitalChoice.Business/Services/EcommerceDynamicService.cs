@@ -14,15 +14,15 @@ using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
 {
-    public class EcommerceDynamicObjectService<TDynamic, TEntity, TOptionType, TOptionValue> :
-        DynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>,
-        IEcommerceDynamicObjectService<TDynamic, TEntity, TOptionType, TOptionValue>
+    public class EcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue> :
+        DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>,
+        IEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        public EcommerceDynamicObjectService(IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
+        public EcommerceDynamicService(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IEcommerceRepositoryAsync<TEntity> objectRepository,
             IEcommerceRepositoryAsync<TOptionType> optionTypesRepository,
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,

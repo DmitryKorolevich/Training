@@ -6,9 +6,9 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class ProductModelConverter : IModelToDynamicConverter<ProductManageModel, ProductDynamic>
+    public class ProductModelConverter : BaseModelConverter<ProductManageModel, ProductDynamic>
     {
-        public void DynamicToModel(ProductManageModel model, ProductDynamic dynamic)
+        public override void DynamicToModel(ProductManageModel model, ProductDynamic dynamic)
         {
             model.CrossSellProducts = new List<CrossSellProductModel>()
             {
@@ -54,7 +54,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public void ModelToDynamic(ProductManageModel model, ProductDynamic dynamic)
+        public override void ModelToDynamic(ProductManageModel model, ProductDynamic dynamic)
         {
             if (model.CrossSellProducts != null)
             {

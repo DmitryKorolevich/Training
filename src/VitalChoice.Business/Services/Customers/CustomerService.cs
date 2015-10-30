@@ -42,7 +42,7 @@ using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: EcommerceDynamicObjectService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
+    public class CustomerService: EcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;

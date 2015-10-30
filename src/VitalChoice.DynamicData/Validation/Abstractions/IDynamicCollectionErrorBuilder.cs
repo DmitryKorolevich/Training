@@ -6,7 +6,7 @@ using VitalChoice.DynamicData.Interfaces;
 namespace VitalChoice.DynamicData.Validation.Abstractions
 {
     public interface IDynamicCollectionErrorBuilder<out TCollection, TProperty> : IDataContainer<TCollection>
-        where TProperty : class, IModelTypeContainer
+        where TProperty : class, IModelType
         where TCollection : ICollection<TProperty>
     {
         IErrorResult Property<T, TPropertyResult>(

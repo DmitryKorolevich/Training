@@ -11,7 +11,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Affiliates
 {
-    public interface IAffiliateService : IDynamicObjectServiceAsync<AffiliateDynamic, Affiliate>
+    public interface IAffiliateService : IDynamicServiceAsync<AffiliateDynamic, Affiliate>
     {
         Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter);
 

@@ -162,7 +162,7 @@ namespace VitalChoice.Business.Services.Products
 
 		#region Public
 
-        public async Task<ExecutedContentItem> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes, Dictionary<string, object> parameters, string categoryUrl = null)
+        public async Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes, Dictionary<string, object> parameters, string categoryUrl = null)
         {
             ProductCategoryContent category=null;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
@@ -229,9 +229,9 @@ namespace VitalChoice.Business.Services.Products
             }
             catch (Exception e) {
                 _logger.LogError(e.ToString());
-                return new ExecutedContentItem
+                return new ContentViewModel
                 {
-                    HTML = (e as TemplateCompileException)?.ToString()
+                    Body = (e as TemplateCompileException)?.ToString()
                 };
             }
 
@@ -285,9 +285,9 @@ namespace VitalChoice.Business.Services.Products
 
             var generatedHtml = template.Generate(model);
 
-            var toReturn = new ExecutedContentItem
+            var toReturn = new ContentViewModel
             {
-                HTML = generatedHtml,
+                Body = generatedHtml,
                 Title = category.ContentItem.Title,
                 MetaDescription = category.ContentItem.MetaDescription,
                 MetaKeywords = category.ContentItem.MetaKeywords,

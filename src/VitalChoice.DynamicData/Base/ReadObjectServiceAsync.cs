@@ -8,7 +8,7 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract partial class ReadDynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>
+    public abstract partial class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

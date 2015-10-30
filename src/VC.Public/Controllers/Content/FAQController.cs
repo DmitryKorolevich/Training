@@ -15,7 +15,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters());
+            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -26,7 +26,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            ExecutedContentItem toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters(), url);
+            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.FAQCategory, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -37,7 +37,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> FAQ(string url)
         {
-            ExecutedContentItem toReturn = await ContentService.GetContentItemContentAsync(ContentType.FAQ, GetParameters(), url);
+            var toReturn = await ContentService.GetContentItemContentAsync(ContentType.FAQ, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

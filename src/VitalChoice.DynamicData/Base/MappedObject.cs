@@ -9,7 +9,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class MappedObject: IModelTypeContainer
+    public abstract class MappedObject: IModelType
     {
         protected MappedObject()
         {

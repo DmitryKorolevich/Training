@@ -10,15 +10,15 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IDynamicToModelMapper
+    public interface IDynamicMapper
     {
-        object ToModel(dynamic dynamic, Type modelType);
-        void ToModel(dynamic dynamic, Type modelType, dynamic model);
-        MappedObject FromModel(Type modelType, dynamic model);
-        void FromModel(Type modelType, dynamic model, dynamic dynamic);
+        object ToModel(MappedObject dynamic, Type modelType);
+        void ToModel(MappedObject dynamic, Type modelType, object model);
+        MappedObject FromModel(Type modelType, object model);
+        void FromModel(Type modelType, object model, MappedObject dynamic);
     }
 
-    public interface IDynamicToModelMapper<TDynamic>
+    public interface IDynamicMapper<TDynamic>
         where TDynamic : MappedObject
     {
         TModel ToModel<TModel>(TDynamic dynamic)
@@ -71,7 +71,7 @@ namespace VitalChoice.DynamicData.Interfaces
         public TDynamic Dynamic { get; set; }
     }
 
-    public interface IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicToModelMapper, IDynamicToModelMapper<TDynamic>
+    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper, IDynamicMapper<TDynamic>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

@@ -33,7 +33,7 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Orders
 {
-    public class OrderService : EcommerceDynamicObjectService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
+    public class OrderService : EcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
         IOrderService
     {
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
@@ -194,7 +194,6 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
             }
-
             return base.Validate(dynamic);
         }
 

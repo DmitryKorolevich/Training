@@ -16,7 +16,7 @@ using VitalChoice.Data.Repositories.Specifics;
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class OrderPaymentMethodMapper :
-        DynamicObjectMapper
+        DynamicMapper
             <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType,
                 OrderPaymentMethodOptionValue>
     {
@@ -25,10 +25,10 @@ namespace VitalChoice.Business.Services.Dynamic
         public override Expression<Func<OrderPaymentMethodOptionValue, int?>> ObjectIdSelector
             => v => v.IdOrderPaymentMethod;
 
-        public OrderPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> converters,
+        public OrderPaymentMethodMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> optionTypeRepositoryAsync,
-            OrderAddressMapper orderAddressMapper) : base(mappers, converters, optionTypeRepositoryAsync)
+            OrderAddressMapper orderAddressMapper) : base(converter, converterService, optionTypeRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
         }

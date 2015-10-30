@@ -17,13 +17,13 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract partial class ReadDynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : IReadDynamicObjectServiceAsync<TDynamic, TEntity>
+    public abstract partial class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicReadServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        protected readonly IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> Mapper;
+        protected readonly IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> Mapper;
         protected readonly IReadRepositoryAsync<TEntity> ObjectRepository;
         protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
@@ -31,8 +31,8 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
         protected readonly ILogger Logger;
 
-        protected ReadDynamicObjectServiceAsync(
-            IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
+        protected DynamicReadServiceAsync(
+            IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository,
             IObjectLogItemExternalService objectLogItemExternalService,

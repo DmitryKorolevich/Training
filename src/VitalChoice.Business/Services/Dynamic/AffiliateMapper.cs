@@ -17,12 +17,12 @@ using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class AffiliateMapper : DynamicObjectMapper<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>
+    public class AffiliateMapper : DynamicMapper<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>
     {
-        public AffiliateMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public AffiliateMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<AffiliateOptionType> optionTypesRepositoryAsync)
-            : base(mappers, container, optionTypesRepositoryAsync)
+            : base(converter, converterService, optionTypesRepositoryAsync)
         {
         }
 

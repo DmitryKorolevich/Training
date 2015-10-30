@@ -44,7 +44,7 @@ namespace VC.Admin.Controllers
     public class AffiliateController : BaseApiController
     {
         private readonly IAffiliateService _affiliateService;
-        private readonly IDynamicToModelMapper<AffiliateDynamic> _mapper;
+        private readonly IDynamicMapper<AffiliateDynamic> _mapper;
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
@@ -54,7 +54,7 @@ namespace VC.Admin.Controllers
             IAffiliateService affiliateService,
             IAffiliateUserService affiliateUserService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicToModelMapper<AffiliateDynamic> mapper,
+            IDynamicMapper<AffiliateDynamic> mapper,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService)
         {

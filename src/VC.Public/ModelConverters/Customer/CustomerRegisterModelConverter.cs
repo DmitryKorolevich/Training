@@ -7,21 +7,21 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Public.ModelConverters.Customer
 {
-    public class CustomerRegisterModelConverter : IModelToDynamicConverter<RegisterAccountModel, CustomerDynamic>
+    public class CustomerRegisterModelConverter : BaseModelConverter<RegisterAccountModel, CustomerDynamic>
     {
-        private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
 
-        public CustomerRegisterModelConverter(IDynamicToModelMapper<CustomerAddressDynamic> addressMapper)
+        public CustomerRegisterModelConverter(IDynamicMapper<CustomerAddressDynamic> addressMapper)
         {
             _addressMapper = addressMapper;
         }
 
-        public void DynamicToModel(RegisterAccountModel model, CustomerDynamic dynamic)
+        public override void DynamicToModel(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
 		    throw new NotImplementedException();
 		}
 
-	    public void ModelToDynamic(RegisterAccountModel model, CustomerDynamic dynamic)
+	    public override void ModelToDynamic(RegisterAccountModel model, CustomerDynamic dynamic)
 	    {
 			var addressDynamic = _addressMapper.FromModel(model);
 				

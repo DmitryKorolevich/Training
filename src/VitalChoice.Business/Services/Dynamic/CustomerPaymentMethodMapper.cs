@@ -15,16 +15,16 @@ using VitalChoice.Domain.Entities.eCommerce.Addresses;
 namespace VitalChoice.Business.Services.Dynamic
 {
     public class CustomerPaymentMethodMapper :
-        DynamicObjectMapper
+        DynamicMapper
             <CustomerPaymentMethodDynamic, CustomerPaymentMethod, CustomerPaymentMethodOptionType,
                 CustomerPaymentMethodOptionValue>
     {
         private readonly CustomerAddressMapper _customerAddressMapper;
 
-        public CustomerPaymentMethodMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> converters,
+        public CustomerPaymentMethodMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<CustomerPaymentMethodOptionType> repo, CustomerAddressMapper customerAddressMapper)
-            : base(mappers, converters, repo)
+            : base(converter, converterService, repo)
         {
             _customerAddressMapper = customerAddressMapper;
         }

@@ -19,16 +19,16 @@ using System.Collections;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class DynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> :
-        IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue>
+    public abstract class DynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> :
+        IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        private readonly IIndex<TypePair, IModelToDynamicConverter> _converters;
         private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
-        private readonly ModelTypeConverter _typeConverter;
+        private readonly ITypeConverter _typeConverter;
+        private readonly IModelConverterService _converterService;
 
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
@@ -37,13 +37,13 @@ namespace VitalChoice.DynamicData.Base
         private Action<TOptionValue, int> _valueSetter;
         private HashSet<object> _removeSerurityInformationVisitedHashSet;
 
-        protected DynamicObjectMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> converters,
+        protected DynamicMapper(ITypeConverter typeConverter,
+            IModelConverterService converterService, 
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
         {
-            _converters = converters;
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
-            _typeConverter = new ModelTypeConverter(mappers);
+            _typeConverter = typeConverter;
+            _converterService = converterService;
         }
 
         public Action<TOptionValue, int> GetValueObjectIdSetter()
@@ -257,26 +257,22 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-		public void ToModel<TModel>(TDynamic dynamic, TModel result)
-		   where TModel : class, new()
-		{
-			if (dynamic == null)
-				return;
+        public void ToModel<TModel>(TDynamic dynamic, TModel result)
+            where TModel : class, new()
+        {
+            if (dynamic == null)
+                return;
 
-			if (result == null)
-				return;
+            if (result == null)
+                return;
 
-			ToModelItem(dynamic, result, typeof(TModel), typeof(TDynamic));
+            ToModelItem(dynamic, result, typeof (TModel), typeof (TDynamic));
 
-			IModelToDynamicConverter conv;
-			if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
-			{
-				var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
-				converter?.DynamicToModel(result, dynamic);
-			}
-		}
+            var converter = _converterService.GetConverter<TModel, TDynamic>();
+            converter?.DynamicToModel(result, dynamic);
+        }
 
-		public TDynamic FromModel<TModel>(TModel model)
+        public TDynamic FromModel<TModel>(TModel model)
         {
             if (model == null)
                 return null;
@@ -298,29 +294,24 @@ namespace VitalChoice.DynamicData.Base
 
 			FromModelItem(result, model, typeof(TModel), typeof(TDynamic));
 
-			IModelToDynamicConverter conv;
-			if (_converters.TryGetValue(new TypePair(typeof(TModel), typeof(TDynamic)), out conv))
-			{
-				var converter = conv as IModelToDynamicConverter<TModel, TDynamic>;
-				converter?.ModelToDynamic(model, result);
-			}
+            var converter = _converterService.GetConverter<TModel, TDynamic>();
+		    converter?.ModelToDynamic(result, result);
 		}
 
-		object IDynamicToModelMapper.ToModel(dynamic dynamic, Type modelType)
+		object IDynamicMapper.ToModel(MappedObject dynamic, Type modelType)
         {
             if (dynamic == null)
                 return null;
 
             dynamic result = Activator.CreateInstance(modelType);
-            ToModelItem(dynamic, result, modelType,
-                typeof(TDynamic));
+            ToModelItem(dynamic, result, modelType, typeof(TDynamic));
 
-			ToModel(dynamic, result);  //!!!
+			ToModel((TDynamic)dynamic, result);  //!!!
 
 			return result;
         }
 
-	    void IDynamicToModelMapper.ToModel(dynamic dynamic, Type modelType, dynamic result)
+	    void IDynamicMapper.ToModel(MappedObject dynamic, Type modelType, object result)
 	    {
 		    if (dynamic == null)
 			    return;
@@ -328,15 +319,11 @@ namespace VitalChoice.DynamicData.Base
 		    if (result == null)
 			    return;
 
-			IModelToDynamicConverter conv;
-			if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
-			{
-				dynamic converter = conv;
-				converter?.DynamicToModel(result, dynamic);
-			}
-		}
+            var converter = _converterService.GetConverter(modelType, typeof(TDynamic));
+            converter?.DynamicToModel(result, dynamic);
+        }
 
-	    MappedObject IDynamicToModelMapper.FromModel(Type modelType, dynamic model)
+	    MappedObject IDynamicMapper.FromModel(Type modelType, object model)
         {
             if (model == null)
                 return null;
@@ -348,22 +335,18 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-		void IDynamicToModelMapper.FromModel(Type modelType, dynamic model, dynamic result)
+		void IDynamicMapper.FromModel(Type modelType, object model, MappedObject dynamic)
 		{
 			if (model == null)
 				return;
 
-			if (result == null)
+			if (dynamic == null)
 				return;
 
-			FromModelItem(result, model, modelType, typeof(TDynamic));
+			FromModelItem(dynamic, model, modelType, typeof(TDynamic));
 
-			IModelToDynamicConverter conv;
-			if (_converters.TryGetValue(new TypePair(modelType, typeof(TDynamic)), out conv))
-			{
-				dynamic converter = conv;
-				converter?.ModelToDynamic(model, result);
-			}
+			var converter = _converterService.GetConverter(modelType, typeof(TDynamic));
+			converter?.ModelToDynamic(model, dynamic);
 		}
 
 		public void UpdateEntity(TDynamic dynamic, TEntity entity)
@@ -674,7 +657,7 @@ namespace VitalChoice.DynamicData.Base
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    var value = _typeConverter.ConvertToModelObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(dynamic));
+                    var value = _typeConverter.ConvertToObject(pair.Value.PropertyType, dynamicProperty.Get?.Invoke(dynamic));
                     if (value != null)
                     {
                         MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value, true);
@@ -686,7 +669,7 @@ namespace VitalChoice.DynamicData.Base
                     object dynamicValue;
                     if (data.TryGetValue(mappingName, out dynamicValue))
                     {
-                        var value = _typeConverter.ConvertToModelObject(pair.Value.PropertyType, dynamicValue);
+                        var value = _typeConverter.ConvertToObject(pair.Value.PropertyType, dynamicValue);
                         if (value != null)
                         {
                             MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value,
@@ -714,7 +697,7 @@ namespace VitalChoice.DynamicData.Base
                 GenericProperty dynamicProperty;
                 if (dynamicCache.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    var value = _typeConverter.ConvertFromModelObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
+                    var value = _typeConverter.ConvertFromObject(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model));
                     if (value != null)
                     {
@@ -725,7 +708,7 @@ namespace VitalChoice.DynamicData.Base
                 }
                 else
                 {
-                    var value = ModelTypeConverter.ConvertFromModelObject(pair.Value.PropertyType, pair.Value.Get?.Invoke(model));
+                    var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType, pair.Value.Get?.Invoke(model));
                     if (value != null)
                     {
                         data.Add(mappingName, value);

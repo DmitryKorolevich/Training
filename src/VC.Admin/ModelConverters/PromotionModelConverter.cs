@@ -10,9 +10,9 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VC.Admin.ModelConverters
 {
-    public class PromotionModelConverter : IModelToDynamicConverter<PromotionManageModel, PromotionDynamic>
+    public class PromotionModelConverter : BaseModelConverter<PromotionManageModel, PromotionDynamic>
     {
-        public void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
+        public override void DynamicToModel(PromotionManageModel model, PromotionDynamic dynamic)
         {
             if(model.PromotionBuyType == 0)
             {
@@ -52,7 +52,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public void ModelToDynamic(PromotionManageModel model, PromotionDynamic dynamic)
+        public override void ModelToDynamic(PromotionManageModel model, PromotionDynamic dynamic)
         {
             if (model.PromotionsToBuySkus != null)
             {

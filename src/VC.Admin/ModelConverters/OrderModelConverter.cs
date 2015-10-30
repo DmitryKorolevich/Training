@@ -24,17 +24,17 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.ModelConverters
 {
-    public class OrderModelConverter : IModelToDynamicConverter<OrderManageModel, OrderDynamic>
+    public class OrderModelConverter : BaseModelConverter<OrderManageModel, OrderDynamic>
     {
-        private readonly IDynamicToModelMapper<OrderPaymentMethodDynamic> _paymentMethodMapper;
-        private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic> _paymentMethodMapper;
+        private readonly IDynamicMapper<OrderAddressDynamic> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
         private readonly IGcService _gcService;
         private readonly IProductService _productService;
 
-        public OrderModelConverter(IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
-            IDynamicToModelMapper<OrderPaymentMethodDynamic> paymentMethodMapper, ICustomerService customerService,
+        public OrderModelConverter(IDynamicMapper<OrderAddressDynamic> addressMapper,
+            IDynamicMapper<OrderPaymentMethodDynamic> paymentMethodMapper, ICustomerService customerService,
             IDiscountService discountService, IGcService gcService, IProductService productService)
         {
             _addressMapper = addressMapper;
@@ -45,7 +45,7 @@ namespace VC.Admin.ModelConverters
             _productService = productService;
         }
 
-        public void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
+        public override void DynamicToModel(OrderManageModel model, OrderDynamic dynamic)
         {
             if(dynamic.Customer!=null)
             {
@@ -102,7 +102,7 @@ namespace VC.Admin.ModelConverters
             }
         }
 
-        public void ModelToDynamic(OrderManageModel model, OrderDynamic dynamic)
+        public override void ModelToDynamic(OrderManageModel model, OrderDynamic dynamic)
         {
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {

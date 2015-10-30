@@ -23,7 +23,7 @@ using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class OrderMapper : DynamicObjectMapper<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
+    public class OrderMapper : DynamicMapper<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
     {
         private readonly OrderAddressMapper _orderAddressMapper;
         private readonly CustomerMapper _customerMapper;
@@ -32,12 +32,12 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
 
-        public OrderMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public OrderMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             CustomerMapper customerMapper, DiscountMapper discountMapper,
             OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper)
-            : base(mappers, container, orderRepositoryAsync)
+            : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
             _customerMapper = customerMapper;

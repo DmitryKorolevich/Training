@@ -30,7 +30,7 @@ namespace VC.Admin.Controllers
     {
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
-        private readonly IDynamicToModelMapper<DiscountDynamic> _mapper;
+        private readonly IDynamicMapper<DiscountDynamic> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -39,7 +39,7 @@ namespace VC.Admin.Controllers
             IDiscountService discountService, 
             IProductService productService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicToModelMapper<DiscountDynamic> mapper,
+            IDynamicMapper<DiscountDynamic> mapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _discountService = discountService;

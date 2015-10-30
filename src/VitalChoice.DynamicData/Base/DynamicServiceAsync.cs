@@ -21,13 +21,13 @@ using VitalChoice.DynamicData.Validation;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class DynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : ReadDynamicObjectServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IDynamicObjectServiceAsync<TDynamic, TEntity>
+    public abstract class DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IDynamicServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        protected DynamicObjectServiceAsync(IDynamicObjectMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
+        protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,

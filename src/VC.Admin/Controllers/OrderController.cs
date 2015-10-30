@@ -46,8 +46,8 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
-        private readonly IDynamicToModelMapper<OrderDynamic> _mapper;
-        private readonly IDynamicToModelMapper<OrderAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<OrderDynamic> _mapper;
+        private readonly IDynamicMapper<OrderAddressDynamic> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger logger;
@@ -55,8 +55,8 @@ namespace VC.Admin.Controllers
         public OrderController(
             IOrderService orderService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicToModelMapper<OrderDynamic> mapper, ICustomerService customerService,
-            IDynamicToModelMapper<OrderAddressDynamic> addressMapper,
+            IDynamicMapper<OrderDynamic> mapper, ICustomerService customerService,
+            IDynamicMapper<OrderAddressDynamic> addressMapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;

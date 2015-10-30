@@ -17,12 +17,12 @@ using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class CustomerNoteMapper : DynamicObjectMapper<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
+    public class CustomerNoteMapper : DynamicMapper<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
     {
-        public CustomerNoteMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public CustomerNoteMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<CustomerNoteOptionType> customerNoteRepositoryAsync)
-            : base(mappers, container, customerNoteRepositoryAsync)
+            : base(converter, converterService, customerNoteRepositoryAsync)
         {
         }
 

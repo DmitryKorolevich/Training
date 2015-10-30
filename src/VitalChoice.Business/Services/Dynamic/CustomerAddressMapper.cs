@@ -15,12 +15,12 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class CustomerAddressMapper : DynamicObjectMapper<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+    public class CustomerAddressMapper : DynamicMapper<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
-        public CustomerAddressMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public CustomerAddressMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<AddressOptionType> optionTypesRepositoryAsync)
-            : base(mappers, container, optionTypesRepositoryAsync)
+            : base(converter, converterService, optionTypesRepositoryAsync)
         {
         }
 

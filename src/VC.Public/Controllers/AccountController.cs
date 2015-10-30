@@ -28,9 +28,9 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly ICustomerService _customerService;
 		private readonly IPaymentMethodService _paymentMethodService;
-		private readonly IDynamicToModelMapper<CustomerDynamic> _customerMapper;
+		private readonly IDynamicMapper<CustomerDynamic> _customerMapper;
 
-		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicToModelMapper<CustomerDynamic> customerMapper, ICustomerService customerService, IPaymentMethodService paymentMethodService)
+		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicMapper<CustomerDynamic> customerMapper, ICustomerService customerService, IPaymentMethodService paymentMethodService)
 		{
 			_userService = userService;
 			_contextAccessor = contextAccessor;

@@ -21,16 +21,16 @@ using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class CustomerMapper: DynamicObjectMapper<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>
+    public class CustomerMapper: DynamicMapper<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>
     {
         private readonly CustomerAddressMapper _customerAddressMapper;
 	    private readonly CustomerNoteMapper _customerNoteMapper;
         private readonly CustomerPaymentMethodMapper _paymentMethodMapper;
 
-        public CustomerMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container, CustomerAddressMapper customerAddressMapper,
+        public CustomerMapper(ITypeConverter converter,
+            IModelConverterService converterService, CustomerAddressMapper customerAddressMapper,
             CustomerNoteMapper customerNoteMapper, IEcommerceRepositoryAsync<CustomerOptionType> customerRepositoryAsync, CustomerPaymentMethodMapper paymentMethodMapper)
-            : base(mappers, container, customerRepositoryAsync)
+            : base(converter, converterService, customerRepositoryAsync)
         {
             _customerAddressMapper = customerAddressMapper;
             _customerNoteMapper = customerNoteMapper;

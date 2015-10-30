@@ -35,7 +35,7 @@ using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : EcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
+    public class ProductService : EcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;

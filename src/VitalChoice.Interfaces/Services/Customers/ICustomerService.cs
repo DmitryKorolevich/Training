@@ -12,7 +12,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Interfaces.Services.Customers
 {
-	public interface ICustomerService : IDynamicObjectServiceAsync<CustomerDynamic, Customer>
+	public interface ICustomerService : IDynamicServiceAsync<CustomerDynamic, Customer>
 	{
 		Task<IList<OrderNote>> GetAvailableOrderNotesAsync(CustomerType customerType);
 

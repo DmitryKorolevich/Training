@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Content
 
 	    #region Public
 
-        public async Task<ExecutedContentItem> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null)
+        public async Task<ContentViewModel> GetCategoryContentAsync(ContentType type, Dictionary<string, object> parameters, string categoryUrl = null)
         {
             ContentCategory category;
             //TODO: - use standard where syntax instead of this logic(https://github.com/aspnet/EntityFramework/issues/1460)
@@ -105,9 +105,9 @@ namespace VitalChoice.Business.Services.Content
             }
             catch (Exception e) {
                 _logger.LogError(e.ToString());
-                return new ExecutedContentItem
+                return new ContentViewModel
                 {
-                    HTML = (e as TemplateCompileException)?.ToString()
+                    Body = (e as TemplateCompileException)?.ToString()
                 };
             }
             dynamic model = new ExpandoObject();
@@ -126,9 +126,9 @@ namespace VitalChoice.Business.Services.Content
 
             var generatedHtml = template.Generate(model);
 
-            var toReturn = new ExecutedContentItem
+            var toReturn = new ContentViewModel
             {
-                HTML = generatedHtml,
+                Body = generatedHtml,
                 Title = category.ContentItem.Title,
                 MetaDescription = category.ContentItem.MetaDescription,
                 MetaKeywords = category.ContentItem.MetaKeywords,
@@ -137,7 +137,7 @@ namespace VitalChoice.Business.Services.Content
             return toReturn;
         }
         
-        public async Task<ExecutedContentItem> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl)
+        public async Task<ContentViewModel> GetContentItemContentAsync(ContentType type, Dictionary<string, object> parameters, string contentDataItemUrl)
         {
             ContentDataItem contentDataItem = null;
             switch(type)
@@ -194,9 +194,9 @@ namespace VitalChoice.Business.Services.Content
             }
             catch (Exception e) {
                 _logger.LogError(e.ToString());
-                return new ExecutedContentItem
+                return new ContentViewModel
                 {
-                    HTML = (e as TemplateCompileException)?.ToString()
+                    Body = (e as TemplateCompileException)?.ToString()
                 };
             }
             dynamic model = new ExpandoObject();
@@ -214,9 +214,9 @@ namespace VitalChoice.Business.Services.Content
 
             var generatedHtml = template.Generate(model);
 
-            var toReturn = new ExecutedContentItem
+            var toReturn = new ContentViewModel
             {
-                HTML = generatedHtml,
+                Body = generatedHtml,
                 Title = contentDataItem.ContentItem.Title,
                 MetaDescription = contentDataItem.ContentItem.MetaDescription,
                 MetaKeywords = contentDataItem.ContentItem.MetaKeywords,

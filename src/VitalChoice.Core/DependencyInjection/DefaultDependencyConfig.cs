@@ -392,8 +392,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
-            builder.RegisterGeneric(typeof (EcommerceDynamicObjectService<,,,>))
-                .As(typeof (IEcommerceDynamicObjectService<,,,>));
+            builder.RegisterGeneric(typeof (EcommerceDynamicService<,,,>))
+                .As(typeof (IEcommerceDynamicService<,,,>));
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
             builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>();
             builder.RegisterProcessors(typeof (ContentProcessorsService).GetTypeInfo().Assembly);

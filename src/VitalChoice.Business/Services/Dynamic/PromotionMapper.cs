@@ -17,12 +17,12 @@ using VitalChoice.Domain.Entities.eCommerce.Promotions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class PromotionMapper : DynamicObjectMapper<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>
+    public class PromotionMapper : DynamicMapper<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>
     {
-        public PromotionMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public PromotionMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<PromotionOptionType> promotionRepositoryAsync)
-            : base(mappers, container, promotionRepositoryAsync)
+            : base(converter, converterService, promotionRepositoryAsync)
         {
         }
 

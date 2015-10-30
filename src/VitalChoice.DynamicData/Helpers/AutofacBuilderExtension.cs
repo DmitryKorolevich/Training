@@ -16,20 +16,22 @@ namespace VitalChoice.DynamicData.Helpers
                 .GetExportedTypes()
                 .Where(
                     t =>
-                        t.IsImplementGeneric(typeof (DynamicObjectMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
+                        t.IsImplementGeneric(typeof (DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
                         !t.GetTypeInfo().IsGenericType);
             foreach (var mapperType in mapperTypes)
             {
                 builder.RegisterType(mapperType)
                     .As(
-                        typeof (IDynamicObjectMapper<,,,>).MakeGenericType(
-                            mapperType.TryGetTypeArguments(typeof (IDynamicObjectMapper<,,,>))))
+                        typeof (IDynamicMapper<,,,>).MakeGenericType(
+                            mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,,,>))))
                     .As(
-                        typeof (IDynamicToModelMapper<>).MakeGenericType(
-                            mapperType.TryGetElementType(typeof (IDynamicToModelMapper<>))))
+                        typeof (IDynamicMapper<>).MakeGenericType(
+                            mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
                     .AsSelf()
-                    .Keyed<IDynamicToModelMapper>(mapperType.TryGetElementType(typeof (DynamicObjectMapper<,,,>)));
+                    .Keyed<IDynamicMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)));
             }
+            builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
+            builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();
             return builder;
         }
 
@@ -37,18 +39,18 @@ namespace VitalChoice.DynamicData.Helpers
         {
             var converters =
                 containAssembly.ExportedTypes.Where(
-                    t => t.IsImplementGeneric(typeof (IModelToDynamicConverter<,>)) && !t.GetTypeInfo().IsAbstract);
+                    t => t.IsImplementGeneric(typeof (IModelConverter<,>)) && !t.GetTypeInfo().IsAbstract);
             foreach (var converter in converters)
             {
-                var types = converter.TryGetTypeArguments(typeof (IModelToDynamicConverter<,>));
+                var types = converter.TryGetTypeArguments(typeof (IModelConverter<,>));
                 if (types != null && types.Length == 2)
                 {
                     builder.RegisterType(converter)
                         .As(
-                            typeof (IModelToDynamicConverter<,>).MakeGenericType(
-                                converter.TryGetTypeArguments(typeof (IModelToDynamicConverter<,>))))
+                            typeof (IModelConverter<,>).MakeGenericType(
+                                converter.TryGetTypeArguments(typeof (IModelConverter<,>))))
                         .AsSelf()
-                        .Keyed<IModelToDynamicConverter>(new TypePair(types[0], types[1]));
+                        .Keyed<IModelConverter>(new TypePair(types[0], types[1]));
                 }
             }
             return builder;

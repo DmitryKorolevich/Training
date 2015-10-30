@@ -17,14 +17,14 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class DiscountMapper : DynamicObjectMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
+    public class DiscountMapper : DynamicMapper<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>
     {
         private readonly IProductService _productService;
 
-        public DiscountMapper(IIndex<Type, IDynamicToModelMapper> mappers,
-            IIndex<TypePair, IModelToDynamicConverter> container,
+        public DiscountMapper(ITypeConverter converter,
+            IModelConverterService converterService,
             IEcommerceRepositoryAsync<DiscountOptionType> discountRepositoryAsync, IProductService productService)
-            : base(mappers, container, discountRepositoryAsync)
+            : base(converter, converterService, discountRepositoryAsync)
         {
             _productService = productService;
         }

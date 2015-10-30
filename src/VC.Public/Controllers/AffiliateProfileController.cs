@@ -40,13 +40,13 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IAffiliateUserService _affiliateUserService;
 		private readonly IAffiliateService _affiliateService;
-        private readonly IDynamicToModelMapper<AffiliateDynamic> _affiliateMapper;
+        private readonly IDynamicMapper<AffiliateDynamic> _affiliateMapper;
 
 		public AffiliateProfileController(
             IHttpContextAccessor contextAccessor,
             IAffiliateUserService affiliateUserService,
 			IAffiliateService affiliateService,
-            IDynamicToModelMapper<AffiliateDynamic> affiliateMapper)
+            IDynamicMapper<AffiliateDynamic> affiliateMapper)
 		{
 			_contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;

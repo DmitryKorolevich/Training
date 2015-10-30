@@ -35,12 +35,12 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IStorefrontUserService _storefrontUserService;
 		private readonly ICustomerService _customerService;
-		private readonly IDynamicToModelMapper<CustomerAddressDynamic> _addressConverter;
-		private readonly IDynamicToModelMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
+		private readonly IDynamicMapper<CustomerAddressDynamic> _addressConverter;
+		private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
 
 		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-			ICustomerService customerService, IDynamicToModelMapper<CustomerAddressDynamic> addressConverter,
-			IDynamicToModelMapper<CustomerPaymentMethodDynamic> paymentMethodConverter)
+			ICustomerService customerService, IDynamicMapper<CustomerAddressDynamic> addressConverter,
+            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;

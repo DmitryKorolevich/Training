@@ -29,7 +29,7 @@ using VitalChoice.Data.Services;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class DiscountService : EcommerceDynamicObjectService<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
+    public class DiscountService : EcommerceDynamicService<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
     {
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;

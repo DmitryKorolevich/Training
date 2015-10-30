@@ -22,11 +22,11 @@ namespace VitalChoice.Business.Services.Products
     public class InventoryCategoryService : IInventoryCategoryService
     {
         private readonly IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository;
-        private readonly IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService;
+        private readonly IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService;
         private readonly ILogger logger;
 
         public InventoryCategoryService(IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository,
-            IEcommerceDynamicObjectService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService,
+            IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService,
             ILoggerProviderExtended loggerProvider)
         {
             this.inventoryCategoryEcommerceRepository = inventoryCategoryEcommerceRepository;
