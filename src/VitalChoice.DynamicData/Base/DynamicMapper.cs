@@ -27,14 +27,12 @@ namespace VitalChoice.DynamicData.Base
     {
         private readonly IReadRepositoryAsync<TOptionType> _optionTypeRepositoryAsync;
         private readonly ITypeConverter _typeConverter;
-        private readonly IModelConverterService _converterService;
 
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         public abstract Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
         private Action<TOptionValue, int> _valueSetter;
-        private HashSet<object> _removeSerurityInformationVisitedHashSet;
 
         protected DynamicMapper(ITypeConverter typeConverter,
             IModelConverterService converterService, 
@@ -42,7 +40,6 @@ namespace VitalChoice.DynamicData.Base
         {
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
             _typeConverter = typeConverter;
-            _converterService = converterService;
         }
 
         public Action<TOptionValue, int> GetValueObjectIdSetter()
@@ -242,32 +239,6 @@ namespace VitalChoice.DynamicData.Base
                 valueObjectIdSetter(value, dynamic.Id);
             }
         }
-
-        object IObjectMapper.FromModel(Type modelType, object model)
-        {
-            if (model == null)
-                return null;
-
-            var result = new TDynamic();
-
-		    FromModel(model, result); //!!!
-
-            return result;
-        }
-
-		void IObjectMapper.FromModel(Type modelType, object model, object obj)
-		{
-			if (model == null)
-				return;
-
-			if (obj == null)
-				return;
-
-			FromModelItem((MappedObject)obj, model, modelType, typeof(TDynamic));
-
-			var converter = _converterService.GetConverter(modelType, typeof(TDynamic));
-			converter?.ModelToDynamic(model, obj);
-		}
 
 		public void UpdateEntity(TDynamic dynamic, TEntity entity)
         {
@@ -620,94 +591,6 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
             }
-        }
-
-        public void RemoveSecurityInformation(MappedObject dynamic)
-        {
-            _removeSerurityInformationVisitedHashSet = new HashSet<object>();
-            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, typeof(TDynamic), true);
-            foreach (var pair in cache)
-            {
-                GenericProperty dynamicProperty = pair.Value;
-                RemoveSerurityInformationForProperty(dynamicProperty, dynamic);
-            }
-        }
-
-        private void RemoveSerurityInformationForProperty(GenericProperty property, object model)
-        {
-            if (model == null || property.PropertyType == typeof(Type))
-            {
-                return;
-            }
-
-            if (property.NotLoggedInfo)
-            {
-                var value = GetDefaultValue(property.PropertyType);
-                property.Set?.Invoke(model, value);
-            }
-            else
-            {
-                //if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType!=typeof(string))
-                if (property.PropertyType != typeof(string))
-                {
-                    Type elementType = property.PropertyType.TryGetElementType(typeof(IEnumerable<>));
-                    if (elementType != null)
-                    {
-                        //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
-                        if (elementType != typeof(string))
-                        {
-                            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
-                            var items = (IEnumerable<object>)property.Get?.Invoke(model);
-                            if (items != null)
-                            {
-                                var includeItems =
-                                    items.Select(item => new {item, type = item.GetType()})
-                                        .Where(@t => !@t.type.GetTypeInfo().IsValueType && @t.type != typeof(string))
-                                        .Select(@t => @t.item);
-                                foreach (var item in includeItems)
-                                {
-                                    var type = item.GetType();
-                                    //if (!type.GetTypeInfo().IsValueType && type != typeof(string))
-                                    if (type != typeof(string))
-                                    {
-                                        return;
-                                    }
-                                    _removeSerurityInformationVisitedHashSet.Add(item);
-                                    foreach (var pair in cache)
-                                    {
-                                        GenericProperty dynamicProperty = pair.Value;
-                                        RemoveSerurityInformationForProperty(dynamicProperty, item);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var item = property.Get?.Invoke(model);
-                        if (_removeSerurityInformationVisitedHashSet.Contains(model))
-                        {
-                            return;
-                        }
-                        _removeSerurityInformationVisitedHashSet.Add(item);
-                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, property.PropertyType, true);
-                        foreach (var pair in cache)
-                        {
-                            GenericProperty dynamicProperty = pair.Value;
-                            RemoveSerurityInformationForProperty(dynamicProperty, item);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static object GetDefaultValue(Type t)
-        {
-            if (t.GetTypeInfo().IsValueType)
-            {
-                return Activator.CreateInstance(t);
-            }
-            return null;
         }
 
         private static void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)

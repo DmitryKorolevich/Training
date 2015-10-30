@@ -228,7 +228,7 @@ namespace VitalChoice.DynamicData.Base
                 {
                     foreach (var model in models)
                     {
-                        Mapper.RemoveSecurityInformation(model);
+                        Mapper.SecureObject(model);
                     }
                     await ObjectLogItemExternalService.LogItems(models.Select(p=>(object)p).ToList(), LogObjectFullData);
                 }

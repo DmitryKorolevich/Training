@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -29,11 +31,23 @@ namespace VitalChoice.DynamicData.Base
     {
         private readonly ITypeConverter _typeConverter;
         private readonly IModelConverterService _converterService;
+        private HashSet<object> _processedObjectsSet;
 
         public ObjectMapper(ITypeConverter typeConverter, IModelConverterService converterService)
         {
             _typeConverter = typeConverter;
             _converterService = converterService;
+        }
+
+        public void SecureObject(TObject obj)
+        {
+            _processedObjectsSet = new HashSet<object>();
+            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, typeof(TObject), true);
+            foreach (var pair in cache)
+            {
+                GenericProperty dynamicProperty = pair.Value;
+                SecureProperty(dynamicProperty, obj);
+            }
         }
 
         public TModel ToModel<TModel>(TObject obj)
@@ -73,6 +87,16 @@ namespace VitalChoice.DynamicData.Base
             throw new NotImplementedException();
         }
 
+        public TObject FromDictionary(IDictionary<string, object> model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FromDictionary(IDictionary<string, object> model, TObject obj)
+        {
+            throw new NotImplementedException();
+        }
+
         public TObject FromModel<TModel>(TModel model)
         {
             if (model == null)
@@ -96,17 +120,24 @@ namespace VitalChoice.DynamicData.Base
             FromModelItem(obj, model, typeof (TModel), typeof (TObject));
 
             var converter = _converterService.GetConverter<TModel, TObject>();
-            converter?.ModelToDynamic(obj, obj);
+            converter?.ModelToDynamic(model, obj);
         }
 
         object IObjectMapper.ToModel(object obj, Type modelType)
         {
-            if (obj == null)
+            var result = CreateInstance(modelType);
+            (this as IObjectMapper).ToModel(obj, modelType, result);
+
+            return result;
+        }
+
+        private static object CreateInstance(Type modelType)
+        {
+            if (!modelType.GetTypeInfo().IsClass ||
+                modelType.GetConstructors().All(c => c.GetParameters().Length > 0))
                 return null;
 
             object result = Activator.CreateInstance(modelType);
-            ToModel(obj, modelType, result);
-
             return result;
         }
 
@@ -118,24 +149,9 @@ namespace VitalChoice.DynamicData.Base
             if (model == null)
                 return;
 
-            ToModel(obj, modelType, model);
-        }
-
-        private void ToModel(object obj, Type modelType, object model)
-        {
             ToModelItem(obj, model, modelType, typeof(TObject));
             var converter = _converterService.GetConverter(modelType, typeof(TObject));
             converter?.DynamicToModel(model, obj);
-        }
-
-        IDictionary<string, object> IObjectMapper.ToDictionary(object obj)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IObjectMapper.ToDictionary(object obj, IDictionary<string, object> model)
-        {
-            throw new NotImplementedException();
         }
 
         object IObjectMapper.FromModel(Type modelType, object model)
@@ -145,7 +161,7 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TObject();
 
-            FromModel(model, result);
+            (this as IObjectMapper).FromModel(modelType, model, result);
 
             return result;
         }
@@ -164,24 +180,108 @@ namespace VitalChoice.DynamicData.Base
             converter?.ModelToDynamic(model, obj);
         }
 
-        object IObjectMapper.FromDictionary(IDictionary<string, object> model)
+        private static object GetDefaultValue(Type t)
         {
-            return FromDictionary(model);
+            if (t.GetTypeInfo().IsValueType)
+            {
+                return Activator.CreateInstance(t);
+            }
+            return null;
         }
 
-        void IObjectMapper.FromDictionary(IDictionary<string, object> model, object obj)
+        protected virtual void SecureProperty(GenericProperty property, object obj)
         {
-            throw new NotImplementedException();
+            if (obj == null || property.PropertyType == typeof(Type))
+            {
+                return;
+            }
+            if (!property.NotLoggedInfo)
+            {
+                //if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType!=typeof(string))
+                if (property.PropertyType == typeof (string))
+                    return;
+
+                Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
+                if (elementType != null)
+                {
+                    //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
+                    if (elementType == typeof (string) || IsSystemValueType(elementType))
+                        return;
+
+                    var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
+                    var items = (IEnumerable) property.Get?.Invoke(obj);
+                    if (items != null)
+                    {
+                        //BUG: We already checked T of IEnumerable<T>, makes no sense to check type of object from IEnumerable, 
+                        //BUG: since all realizations of IEnumerable inside IEnumerable<T> doesn't change type
+                        //var includeItems =
+                        //    items.Cast<object>().Select(item => new { item, type = item.GetType() })
+                        //        .Where(itemType => !itemType.type.GetTypeInfo().IsValueType && itemType.type != typeof(string))
+                        //        .Select(item => item.item);
+                        foreach (var item in items)
+                        {
+                            //var type = item.GetType();
+                            //if (!type.GetTypeInfo().IsValueType && type != typeof(string))
+                            //if (type != typeof(string))
+                            //{
+                            //    return;
+                            //}
+                            _processedObjectsSet.Add(item);
+                            foreach (var pair in cache)
+                            {
+                                GenericProperty dynamicProperty = pair.Value;
+                                SecureProperty(dynamicProperty, item);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var item = property.Get?.Invoke(obj);
+                    if (item != null)
+                    {
+                        //BUG: we should of already checked this object
+                        //if (_removeSerurityInformationVisitedHashSet.Contains(obj))
+                        if (IsSystemValueType(item.GetType()))
+                        {
+                            return;
+                        }
+                        if (_processedObjectsSet.Contains(item))
+                        {
+                            return;
+                        }
+                        _processedObjectsSet.Add(item);
+                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache,
+                            property.PropertyType, true);
+                        foreach (var pair in cache)
+                        {
+                            GenericProperty dynamicProperty = pair.Value;
+                            SecureProperty(dynamicProperty, item);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var value = GetDefaultValue(property.PropertyType);
+                property.Set?.Invoke(obj, value);
+            }
         }
 
-        public TObject FromDictionary(IDictionary<string, object> model)
+        private bool IsSystemValueType(Type type)
         {
-            throw new NotImplementedException();
-        }
-
-        public void FromDictionary(IDictionary<string, object> model, TObject obj)
-        {
-            throw new NotImplementedException();
+            var typeCode = type.GetTypeCode();
+            if (typeCode != TypeCode.Object)
+                return true;
+            if (type.GetTypeInfo().IsGenericType && type.IsImplementGeneric(typeof(Nullable<>)))
+            {
+                var unwrapped = type.UnwrapNullable();
+                var unwrappedTypeCode = unwrapped.GetTypeCode();
+                if (unwrappedTypeCode != TypeCode.Object)
+                    return true;
+                return false;
+            }
+            return false;
         }
 
         protected virtual void FromModelItem(object obj, object model,

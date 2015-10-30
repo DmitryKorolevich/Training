@@ -10,12 +10,8 @@ namespace VitalChoice.DynamicData.Interfaces
     { 
         object ToModel(object obj, Type modelType);
         void ToModel(object obj, Type modelType, object model);
-        IDictionary<string, object> ToDictionary(object obj);
-        void ToDictionary(object obj, IDictionary<string, object> model);
         object FromModel(Type modelType, object model);
         void FromModel(Type modelType, object model, object obj);
-        object FromDictionary(IDictionary<string, object> model);
-        void FromDictionary(IDictionary<string, object> model, object obj);
     }
 
     public interface IObjectMapper<TObject>
@@ -29,5 +25,6 @@ namespace VitalChoice.DynamicData.Interfaces
         void FromModel<TModel>(TModel model, TObject obj);
         TObject FromDictionary(IDictionary<string, object> model);
         void FromDictionary(IDictionary<string, object> model, TObject obj);
+        void SecureObject(TObject obj);
     }
 }

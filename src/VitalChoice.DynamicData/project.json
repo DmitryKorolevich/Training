@@ -26,7 +26,7 @@
         "System.Linq": "4.0.1-*",
         "System.Threading": "4.0.11-*",
         "Microsoft.CSharp": "4.0.1-*",
-        "System.Runtime.Extensions": "4.0.11-*"
+        "System.Dynamic.Runtime": "4.0.11-*"
       }
     }
   }
