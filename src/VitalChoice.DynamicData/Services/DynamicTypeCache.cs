@@ -44,10 +44,7 @@ namespace VitalChoice.DynamicData.Services
         internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ModelTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
 
-        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> DynamicTypeMappingCache =
-            new Dictionary<Type, Dictionary<string, GenericProperty>>();
-
-        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> AllTypeMappingCache =
+        internal static readonly Dictionary<Type, Dictionary<string, GenericProperty>> ObjectTypeMappingCache =
             new Dictionary<Type, Dictionary<string, GenericProperty>>();
     }
 }

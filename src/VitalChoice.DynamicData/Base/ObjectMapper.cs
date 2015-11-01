@@ -42,7 +42,7 @@ namespace VitalChoice.DynamicData.Base
         public void SecureObject(TObject obj)
         {
             _processedObjectsSet = new HashSet<object>();
-            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, typeof(TObject), true);
+            var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, typeof(TObject), true);
             foreach (var pair in cache)
             {
                 GenericProperty dynamicProperty = pair.Value;
@@ -63,38 +63,64 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public void ToModel<TModel>(TObject obj, TModel result)
+        public void ToModel<TModel>(TObject obj, TModel model)
         {
             if (obj == null)
                 return;
 
-            if (result == null)
+            if (model == null)
                 return;
 
-            ToModelItem(obj, result, typeof (TModel), typeof (TObject));
+            ToModelInternal(obj, model, typeof (TModel), typeof (TObject));
 
             var converter = _converterService.GetConverter<TModel, TObject>();
-            converter?.DynamicToModel(result, obj);
+            converter?.DynamicToModel(model, obj);
         }
 
         public IDictionary<string, object> ToDictionary(TObject obj)
         {
-            throw new NotImplementedException();
+            if (obj == null)
+                return null;
+
+            var result = new Dictionary<string, object>();
+
+            ToDictionary(obj, result);
+
+            return result;
         }
 
         public void ToDictionary(TObject obj, IDictionary<string, object> model)
         {
-            throw new NotImplementedException();
+            if (obj == null)
+                return;
+
+            if (model == null)
+                return;
+
+            ToDictionaryInternal(obj, model, typeof(TObject));
         }
 
         public TObject FromDictionary(IDictionary<string, object> model)
         {
-            throw new NotImplementedException();
+            if (model == null)
+                return null;
+
+            var result = new TObject();
+
+            FromDictionary(model, result);
+
+            return result;
         }
 
         public void FromDictionary(IDictionary<string, object> model, TObject obj)
         {
-            throw new NotImplementedException();
+            if (model == null)
+                return;
+
+            if (obj == null)
+                return;
+
+            FromDictionaryInternal(obj, model, typeof(TObject));
         }
 
         public TObject FromModel<TModel>(TModel model)
@@ -117,7 +143,7 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            FromModelItem(obj, model, typeof (TModel), typeof (TObject));
+            FromModelInternal(obj, model, typeof (TModel), typeof (TObject));
 
             var converter = _converterService.GetConverter<TModel, TObject>();
             converter?.ModelToDynamic(model, obj);
@@ -149,7 +175,7 @@ namespace VitalChoice.DynamicData.Base
             if (model == null)
                 return;
 
-            ToModelItem(obj, model, modelType, typeof(TObject));
+            ToModelInternal(obj, model, modelType, typeof(TObject));
             var converter = _converterService.GetConverter(modelType, typeof(TObject));
             converter?.DynamicToModel(model, obj);
         }
@@ -174,19 +200,10 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            FromModelItem(obj, model, modelType, typeof(TObject));
+            FromModelInternal(obj, model, modelType, typeof(TObject));
 
             var converter = _converterService.GetConverter(modelType, typeof(TObject));
             converter?.ModelToDynamic(model, obj);
-        }
-
-        private static object GetDefaultValue(Type t)
-        {
-            if (t.GetTypeInfo().IsValueType)
-            {
-                return Activator.CreateInstance(t);
-            }
-            return null;
         }
 
         protected virtual void SecureProperty(GenericProperty property, object obj)
@@ -207,8 +224,9 @@ namespace VitalChoice.DynamicData.Base
                     //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
                     if (elementType == typeof (string) || IsSystemValueType(elementType))
                         return;
-
-                    var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache, elementType, true);
+                    //BUG: as we work with dynamic (mapped object) it makes no sense to create new cache, 
+                    //BUG: just a waste of memory, so changed to use the same as for dynamics
+                    var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, elementType, true);
                     var items = (IEnumerable) property.Get?.Invoke(obj);
                     if (items != null)
                     {
@@ -251,7 +269,7 @@ namespace VitalChoice.DynamicData.Base
                             return;
                         }
                         _processedObjectsSet.Add(item);
-                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.AllTypeMappingCache,
+                        var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache,
                             property.PropertyType, true);
                         foreach (var pair in cache)
                         {
@@ -268,7 +286,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private bool IsSystemValueType(Type type)
+        private static bool IsSystemValueType(Type type)
         {
             var typeCode = type.GetTypeCode();
             if (typeCode != TypeCode.Object)
@@ -284,14 +302,61 @@ namespace VitalChoice.DynamicData.Base
             return false;
         }
 
-        protected virtual void FromModelItem(object obj, object model,
+        protected virtual void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
+        {
+            if (obj == null)
+                return;
+            if (model == null)
+                return;
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache)
+            {
+                GenericProperty dynamicProperty = pair.Value;
+                object modelValue;
+                if (model.TryGetValue(pair.Key, out modelValue) && modelValue != null)
+                {
+                    var valueType = modelValue.GetType();
+                    var value = _typeConverter.ConvertFromModel(valueType, dynamicProperty.PropertyType, modelValue);
+                    if (value != null)
+                    {
+                        MapperTypeConverter.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
+                            false);
+                        dynamicProperty.Set?.Invoke(obj, value);
+                    }
+                }
+            }
+        }
+
+        protected virtual void ToDictionaryInternal(object obj, IDictionary<string, object> model,
+            Type objectType)
+        {
+            if (obj == null)
+                return;
+
+            if (model == null)
+                return;
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache)
+            {
+                GenericProperty dynamicProperty = pair.Value;
+                if (!model.ContainsKey(pair.Key))
+                {
+                    var value = dynamicProperty.Get?.Invoke(obj);
+                    model.Add(pair.Key, value);
+                }
+            }
+        }
+
+        protected virtual void FromModelInternal(object obj, object model,
             Type modelType, Type objectType)
         {
             if (obj == null)
                 return;
 
             var modelCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {
                 var mappingName = pair.Value.Map.Name ?? pair.Key;
@@ -310,14 +375,14 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        protected virtual void ToModelItem(object obj, object result,
+        protected virtual void ToModelInternal(object obj, object result,
             Type modelType, Type objectType)
         {
             if (obj == null)
                 return;
 
             var modelCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, objectType, true);
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {
                 var mappingName = pair.Value.Map.Name ?? pair.Key;
@@ -333,6 +398,15 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
             }
+        }
+
+        private static object GetDefaultValue(Type type)
+        {
+            if (type.GetTypeInfo().IsValueType)
+            {
+                return Activator.CreateInstance(type);
+            }
+            return null;
         }
     }
 }

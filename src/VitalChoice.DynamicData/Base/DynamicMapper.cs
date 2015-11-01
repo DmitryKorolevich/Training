@@ -532,17 +532,59 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Dynamic).ToList();
         }
 
-        protected override void ToModelItem(object obj, object result,
-            Type modelType, Type dynamicType)
+        protected override void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
         {
-            base.ToModelItem(obj, result, modelType, dynamicType);
+            base.FromDictionaryInternal(obj, model, objectType);
+            var dynamic = obj as MappedObject;
+            if (dynamic != null)
+            {
+                dynamic.ModelType = model.GetType();
+                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
+                    true);
+                var data = dynamic.DictionaryData;
+                foreach (var pair in model)
+                {
+                    if (!dynamicCache.ContainsKey(pair.Key))
+                    {
+                        var value = TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
+                        if (value != null)
+                        {
+                            data.Add(pair.Key, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void ToDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
+        {
+            base.ToDictionaryInternal(obj, model, objectType);
+            var dynamic = obj as MappedObject;
+            if (dynamic != null)
+            {
+                dynamic.ModelType = model.GetType();
+                var data = dynamic.DictionaryData;
+                foreach (var pair in data)
+                {
+                    if (!model.ContainsKey(pair.Key))
+                    {
+                        model.Add(pair.Key, pair.Value);
+                    }
+                }
+            }
+        }
+
+        protected override void ToModelInternal(object obj, object result,
+            Type modelType, Type objectType)
+        {
+            base.ToModelInternal(obj, result, modelType, objectType);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
                 dynamic.ModelType = modelType;
                 var data = dynamic.DictionaryData;
                 var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType,
+                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
                     true);
                 foreach (var pair in cache)
                 {
@@ -555,7 +597,7 @@ namespace VitalChoice.DynamicData.Base
                             var value = _typeConverter.ConvertToModel(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue);
                             if (value != null)
                             {
-                                MapperTypeConverter.ThrowIfNotValid(modelType, dynamicType, value, pair.Key, pair.Value,
+                                MapperTypeConverter.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
                                     true);
                                 pair.Value.Set?.Invoke(result, value);
                             }
@@ -565,16 +607,16 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        protected override void FromModelItem(object obj, object model,
-            Type modelType, Type dynamicType)
+        protected override void FromModelInternal(object obj, object model,
+            Type modelType, Type objectType)
         {
-            base.FromModelItem(obj, model, modelType, dynamicType);
+            base.FromModelInternal(obj, model, modelType, objectType);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
                 dynamic.ModelType = modelType;
                 var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
-                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.DynamicTypeMappingCache, dynamicType,
+                var dynamicCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType,
                     true);
                 var data = dynamic.DictionaryData;
                 foreach (var pair in cache)
