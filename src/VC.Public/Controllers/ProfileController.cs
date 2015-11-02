@@ -419,21 +419,25 @@ namespace VC.Public.Controllers
 			var lastOrder = await _orderService.SelectLastOrderAsync(internalId);
 
 			var lines = new List<LastOrderLineModel>();
-			foreach (var skuOrdered in lastOrder.Skus)
-			{
-				var lineModel = new LastOrderLineModel()
-				{
-					ProductUrl = skuOrdered.ProductWithoutSkus.Url,
-					IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail,
-					ProductName = skuOrdered.ProductWithoutSkus.Name,
-					PortionsCount = skuOrdered.Sku.Data.QTY,
-                    Quantity = skuOrdered.Quantity,
-					SelectedPrice = string.Format("{0:0.00}", skuOrdered.Amount),
-					SkuCode = skuOrdered.Sku.Code
-				};
 
-				lines.Add(lineModel);
-            }
+			if (lastOrder != null)
+			{
+				foreach (var skuOrdered in lastOrder.Skus)
+				{
+					var lineModel = new LastOrderLineModel()
+					{
+						ProductUrl = skuOrdered.ProductWithoutSkus.Url,
+						IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail,
+						ProductName = skuOrdered.ProductWithoutSkus.Name,
+						PortionsCount = skuOrdered.Sku.Data.QTY,
+						Quantity = skuOrdered.Quantity,
+						SelectedPrice = string.Format("{0:0.00}", skuOrdered.Amount),
+						SkuCode = skuOrdered.Sku.Code
+					};
+
+					lines.Add(lineModel);
+				}
+			}
 
 			return View(lines);
 		}
