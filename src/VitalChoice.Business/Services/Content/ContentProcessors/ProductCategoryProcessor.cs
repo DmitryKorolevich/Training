@@ -6,6 +6,7 @@ using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Products;
@@ -19,10 +20,10 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class ProductCategoryParameters : ContentFilterModel<ProductCategoryContent>
+    public class ProductCategoryParameters : ProcessorModel<ProductCategoryContent>
     {
-        public IList<RecordStatusCode> TargetStatuses { get; set; }
         public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
+        public bool Preview { get; set; }
     }
 
     public class ProductCategoryProcessor : ContentProcessor<TtlCategoryModel, ProductCategoryParameters>
@@ -51,11 +52,21 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 throw new ApiException("Invalid category");
             }
 
+            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
+            if (model.Model.StatusCode == RecordStatusCode.NotActive)
+            {
+                if (!model.Preview)
+                {
+                    return null;
+                }
+                targetStatuses.Add(RecordStatusCode.NotActive);
+            }
+
             var rootCategory =
                 await
-                    _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryTreeFilter()
+                    _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryTreeFilter
                     {
-                        Statuses = model.TargetStatuses
+                        Statuses = targetStatuses
                     });
 
             var subCategories = FindTargetCategory(rootCategory, model.Model.Id).SubCategories;
@@ -80,18 +91,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             {
                 products =
                     (await _productRepository.GetProductsAsync(new VProductSkuFilter() {IdProducts = productIds})).Items;
-                products = products.Where(x => model.TargetStatuses.Contains(x.StatusCode)).ToList();
+                products = products.Where(x => targetStatuses.Contains(x.StatusCode)).ToList();
             }
 
             var rootNavCategory =
                 await _productCategoryService.GetLiteCategoriesTreeAsync(rootCategory, new ProductCategoryLiteFilter()
                 {
                     Visibility = model.CustomerTypeCodes,
-                    Statuses = model.TargetStatuses
+                    Statuses = targetStatuses
                 });
 
-            return PopulateCategoryTemplateModel(model.Model, subCategoriesContent, products, rootCategory,
-                rootNavCategory);
+            return PopulateCategoryTemplateModel(model.Model, subCategoriesContent, products, rootNavCategory);
         }
 
         private ProductCategory FindTargetCategory(ProductCategory root, int idToFind)
@@ -117,10 +127,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             return null;
         }
 
-        private bool BuildBreadcrumb(ProductCategory rootCategory, string url,
+        private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
             IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems)
         {
-            if (!rootCategory.SubCategories.Any())
+            if (!rootCategory.SubItems.Any())
             {
                 if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
                 {
@@ -133,11 +143,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 }
             }
 
-            foreach (var subItem in rootCategory.SubCategories)
+            foreach (var subItem in rootCategory.SubItems)
             {
                 breadcrumbItems.Add(new TtlCategoryBreadcrumbItemModel()
                 {
-                    Label = subItem.Name,
+                    Label = subItem.NavLabel,
                     Url = subItem.Url
                 });
 
@@ -163,22 +173,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         {
             return productCategoryLites?.Select(x => new TtlSidebarMenuItemModel()
             {
-                Label = x.Label,
-                Url = x.Link,
+                Label = x.NavLabel,
+                Url = x.Url,
                 SubItems = ConvertToSideMenuModelLevel(x.SubItems)
             }).ToList();
         }
 
         private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent,
-            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null,
-            ProductCategory rootCategory = null, ProductNavCategoryLite rootNavCategory = null)
+            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, ProductNavCategoryLite rootNavCategory = null)
         {
-            IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = null;
-            if (rootCategory != null)
-            {
-                breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
-                BuildBreadcrumb(rootCategory, productCategoryContent.Url, breadcrumbItems);
-            }
+            IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
+            BuildBreadcrumb(rootNavCategory, productCategoryContent.Url, breadcrumbItems);
 
             return new TtlCategoryModel()
             {

@@ -1,12 +1,12 @@
 namespace VitalChoice.ContentProcessing.Base
 {
-    public class ContentFilterModel
+    public class ProcessorModel
     {
         public string Url { get; set; }
     }
 
 
-    public class ContentFilterModel<T>: ContentFilterModel
+    public class ProcessorModel<T>: ProcessorModel
     {
         public T Model { get; set; }
     }

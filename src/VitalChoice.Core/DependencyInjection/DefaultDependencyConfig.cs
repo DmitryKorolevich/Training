@@ -76,6 +76,9 @@ using VitalChoice.Domain.Entities.Settings;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Formatters;
 using VitalChoice.Workflow.Base;
+using VitalChoice.ContentProcessing.Helpers;
+using VitalChoice.ContentProcessing.Interfaces;
+using IContentViewService = VitalChoice.Interfaces.Services.Content.IContentViewService;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -395,8 +398,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (EcommerceDynamicService<,,,>))
                 .As(typeof (IEcommerceDynamicService<,,,>));
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
-            builder.RegisterType<ContentProcessorsService>().As<IContentProcessorsService>();
-            builder.RegisterProcessors(typeof (ContentProcessorsService).GetTypeInfo().Assembly);
+            builder.RegisterProcessors(typeof (IContentProcessor).GetTypeInfo().Assembly);
             builder.RegisterType<TaxService>().As<ITaxService>();
             builder.RegisterType<AddressService>().As<IAddressService>();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();

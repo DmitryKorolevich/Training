@@ -27,8 +27,8 @@ namespace VC.Public.Components.Menu
 		{
 			return entities.Select(x => new MainMenuIItemModel()
 			{
-				Label = x.Label,
-				Link = !string.IsNullOrWhiteSpace(x.Link) ? $"/products/{x.Link}" : string.Empty,
+				Label = x.NavLabel,
+				Link = !string.IsNullOrWhiteSpace(x.Url) ? $"/products/{x.Url}" : string.Empty,
 				SubItems = ConvertToModel(x.SubItems)
 			}).ToList();
 		}

@@ -20,7 +20,5 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
         public ICollection<ProductToCategory> ProductToCategories { get; set; }
 
         public int Order { get; set; }
-
-        public string Url { get; set; }
     }
 }

@@ -532,9 +532,9 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Dynamic).ToList();
         }
 
-        protected override void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
+        protected override void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
         {
-            base.FromDictionaryInternal(obj, model, objectType);
+            base.FromDictionaryInternal(obj, model, objectType, caseSense);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {

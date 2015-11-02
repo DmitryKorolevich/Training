@@ -8,7 +8,7 @@ namespace VitalChoice.Domain.Entities.Content
         public ContentItem ContentItem { get; set; }
         public int ContentItemId { get; set; }
 
-        public ContentProcessor ContentProcessor { get; set; }
+        public ContentProcessorEntity ContentProcessor { get; set; }
         public int ContentItemProcessorId { get; set; }
     }
 }

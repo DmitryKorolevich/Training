@@ -60,32 +60,48 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<bool> UpdateCategoriesTreeAsync(ProductCategory category)
+        private static void SetSubCategoriesOrder(ProductNavCategoryLite root)
         {
-            bool toReturn = false;
-            if(category==null)
+            if (root.SubItems != null)
+            {
+                for (int i = 0; i < root.SubItems.Count; i++)
+                {
+                    root.SubItems[i].ProductCategory.Order = i;
+                }
+            }
+
+            if (root.SubItems != null)
+            {
+                foreach (var subCategory in root.SubItems)
+                {
+                    SetSubCategoriesOrder(subCategory);
+                }
+            }
+        }
+
+        public async Task<bool> UpdateCategoriesTreeAsync(ProductNavCategoryLite category)
+        {
+            if (category == null)
             {
                 throw new ArgumentException();
             }
 
             var query = new ProductCategoryQuery().NotDeleted();
             List<ProductCategory> dbCategories = await productCategoryEcommerceRepository.Query(query).SelectAsync();
-            category.SetSubCategoriesOrder();
+            SetSubCategoriesOrder(category);
 
             foreach (var dbCategory in dbCategories)
             {
-                ProductCategory uiCategory = FindUICategory(category,dbCategory.Id);
+                ProductNavCategoryLite uiCategory = FindUICategory(category, dbCategory.Id);
                 if(uiCategory!=null)
                 {
-                    dbCategory.ParentId = uiCategory.ParentId;
-                    dbCategory.Order = uiCategory.Order;
+                    dbCategory.ParentId = uiCategory.ProductCategory.ParentId;
+                    dbCategory.Order = uiCategory.ProductCategory.Order;
                     await productCategoryEcommerceRepository.UpdateAsync(dbCategory);
                 }
             }
-            
-            toReturn = true;
 
-            return toReturn;
+            return true;
         }
 
         public async Task<ProductCategoryContent> GetCategoryAsync(int id)
@@ -275,41 +291,54 @@ namespace VitalChoice.Business.Services.Products
 			return await GetLiteCategoriesTreeAsync(productRootCategory, liteFilter);
         }
 
-		public async Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory, ProductCategoryLiteFilter liteFilter)
-		{
-			var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
-			var contentCategories = await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(false);
+        public async Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory,
+            ProductCategoryLiteFilter liteFilter)
+        {
+            var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
+            var contentCategories =
+                await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(p => new ProductCategoryLite
+                {
+                    Id = p.Id,
+                    NavLabel = p.NavLabel,
+                    Url = p.Url
+                }, false);
 
-			return new ProductNavCategoryLite()
-			{
-				SubItems = ConvertToTransferCategory(productRootCategory.SubCategories, contentCategories)
-			};
-		}
+            return new ProductNavCategoryLite
+            {
+                SubItems =
+                    ConvertToTransferCategory(productRootCategory.SubCategories,
+                        contentCategories.ToDictionary(c => c.Id))
+            };
+        }
 
-		#region Private
+        #region Private
 
-	    private IList<ProductNavCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IList<ProductCategoryContent> contentCategories)
+	    private IList<ProductNavCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IDictionary<int, ProductCategoryLite> contentCategories)
 	    {
-		    return subCategories.Where(x => contentCategories.Select(y=>y.Id).Contains(x.Id)).Select(x => new ProductNavCategoryLite()
+		    return subCategories.Where(x => contentCategories.ContainsKey(x.Id)).Select(x => new ProductNavCategoryLite
 		    {
-				Label = contentCategories.First(y => y.Id == x.Id).NavLabel,
-				Link = x.Url,
+                Id = x.Id,
+                ProductCategory = x,
+				NavLabel = contentCategories[x.Id].NavLabel,
+				Url = contentCategories[x.Id].Url,
 				SubItems = ConvertToTransferCategory(x.SubCategories, contentCategories)
 			}).ToList();
 	    }
 
-	    private ProductCategory FindUICategory(ProductCategory uiRoot, int id)
+        private ProductNavCategoryLite FindUICategory(ProductNavCategoryLite uiRoot, int id)
         {
             if (uiRoot.Id == id)
             {
-                if (uiRoot.ParentId.HasValue)
+                if (uiRoot.ProductCategory.ParentId.HasValue)
                 {
                     return uiRoot;
                 }
             }
             else
             {
-                return uiRoot.SubCategories.Select(subCategory => FindUICategory(subCategory, id)).FirstOrDefault(res => res != null);
+                return
+                    uiRoot.SubItems.Select(subCategory => FindUICategory(subCategory, id))
+                        .FirstOrDefault(res => res != null);
             }
 
             return null;

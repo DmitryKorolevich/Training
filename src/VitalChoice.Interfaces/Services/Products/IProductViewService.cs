@@ -7,6 +7,6 @@ namespace VitalChoice.Interfaces.Services.Products
 {
 	public interface IProductViewService
     {
-        Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypes, Dictionary<string, object> parameters, string categoryUrl = null);
+        Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypes, Dictionary<string, object> parameters);
     }
 }

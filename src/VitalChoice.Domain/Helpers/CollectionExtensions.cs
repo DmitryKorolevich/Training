@@ -111,5 +111,10 @@ namespace VitalChoice.Domain.Helpers
                 }
             }
         }
+
+        public static string FormatDictionary<T1, T2>(this IDictionary<T1, T2> src)
+        {
+            return string.Join("\r\n", src.Select(pair => $"[{pair.Key} = {pair.Value}]"));
+        }
     }
 }

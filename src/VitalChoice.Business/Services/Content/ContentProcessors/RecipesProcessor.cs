@@ -2,42 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class RecipesProcessor : IContentProcessor
+    public class RecipeParameters : ProcessorModel
+    {
+        public int IdCategory { get; set; }
+    }
+
+    public class RecipesProcessor : ContentProcessor<List<Recipe>, RecipeParameters>
     {
         private readonly IReadRepositoryAsync<RecipeToContentCategory> _recipeToContentCategoryRepositoryAsync;
 
-        public RecipesProcessor(IReadRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepositoryAsync)
+        public RecipesProcessor(IObjectMapper<RecipeParameters> mapper,
+            IReadRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepositoryAsync) : base(mapper)
         {
             _recipeToContentCategoryRepositoryAsync = recipeToContentCategoryRepositoryAsync;
         }
 
-
-        public async Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string, object> queryData)
+        public override Task<List<Recipe>> ExecuteAsync(RecipeParameters model)
         {
-            int? categoryId = null;
-            if (queryData.ContainsKey(ContentConstants.CATEGORY_ID) && queryData[ContentConstants.CATEGORY_ID] is int?)
-            {
-                categoryId = (int?) queryData[ContentConstants.CATEGORY_ID];
-            }
-            if (!categoryId.HasValue)
-            {
-                throw new Exception("No query data for RecipesProcessor");
-            }
-            var recipes = await _recipeToContentCategoryRepositoryAsync.Query(p => p.ContentCategoryId == categoryId).
-                Include(p => p.Recipe)
-                .Where(p => p.Recipe.StatusCode == RecordStatusCode.Active)
-                .SelectAsync(item => item.Recipe, false);
-            model.Recipes = recipes;
-            return model;
+            return
+                _recipeToContentCategoryRepositoryAsync.Query(p => p.ContentCategoryId == model.IdCategory)
+                    .Include(p => p.Recipe)
+                    .Where(p => p.Recipe.StatusCode == RecordStatusCode.Active)
+                    .SelectAsync(item => item.Recipe, false);
         }
+
+        public override string ResultName => "Recipes";
     }
 }

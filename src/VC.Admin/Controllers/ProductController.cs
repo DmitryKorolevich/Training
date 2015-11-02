@@ -253,11 +253,20 @@ namespace VC.Admin.Controllers
         #region ProductCategories
 
         [HttpPost]
-        public async Task<Result<ProductCategoryTreeItemModel>> GetCategoriesTree([FromBody]ProductCategoryTreeFilter filter)
+        public async Task<Result<ProductCategoryTreeItemModel>> GetCategoriesTree(
+            [FromBody] ProductCategoryTreeFilter filter)
         {
-            var result = await productCategoryService.GetCategoriesTreeAsync(filter);
+            var productCategory = await productCategoryService.GetCategoriesTreeAsync(filter);
+            var contentCategories =
+                await productCategoryService.GetLiteCategoriesTreeAsync(productCategory, new ProductCategoryLiteFilter
+                {
+                    Statuses = filter.Statuses,
+                    Paging = filter.Paging,
+                    SearchText = filter.SearchText,
+                    Sorting = filter.Sorting
+                });
 
-            return new ProductCategoryTreeItemModel(result);
+            return new ProductCategoryTreeItemModel(contentCategories);
         }
 
         [HttpPost]

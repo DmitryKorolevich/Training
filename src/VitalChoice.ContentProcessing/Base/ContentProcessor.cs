@@ -18,12 +18,12 @@ namespace VitalChoice.ContentProcessing.Base
 
         public async Task<TResult> ExecuteAsync(IDictionary<string, object> queryData)
         {
-            return await ExecuteAsync(_mapper.FromDictionary(queryData));
+            return await ExecuteAsync(_mapper.FromDictionary(queryData, false));
         }
 
         public async Task<object> ExecuteUntypedAsync(IDictionary<string, object> queryData)
         {
-            return await ExecuteAsync(_mapper.FromDictionary(queryData));
+            return await ExecuteAsync(_mapper.FromDictionary(queryData, false));
         }
 
         public abstract string ResultName { get; }

@@ -12,10 +12,10 @@ namespace VitalChoice.Business.Services.Content
     public class GeneralContentService : IGeneralContentService
     {
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
+        private readonly IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository;
         private readonly ILogger _logger;
 
-        public GeneralContentService(IRepositoryAsync<ContentProcessor> contentProcessorRepository,
+        public GeneralContentService(IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
         {
             this.contentTypeRepository = contentTypeRepository;
@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Services.Content
             return await contentTypeRepository.Query().SelectAsync(false);
         }
 
-        public async Task<List<ContentProcessor>> GetContentProcessorsAsync()
+        public async Task<List<ContentProcessorEntity>> GetContentProcessorsAsync()
         {
             return await contentProcessorRepository.Query().SelectAsync(false);
         }

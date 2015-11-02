@@ -41,7 +41,7 @@ namespace VitalChoice.DynamicData.Base
             _converterService = converterService;
         }
 
-        public void UpdateObject(TObject obj, IDictionary<string, object> model)
+        public void UpdateObject(TObject obj, IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
                 return;
@@ -49,7 +49,7 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            FromDictionaryInternal(obj, model, typeof(TObject));
+            FromDictionaryInternal(obj, model, typeof(TObject), caseSense);
         }
 
         public virtual void SecureObject(TObject obj)
@@ -127,14 +127,14 @@ namespace VitalChoice.DynamicData.Base
             converter?.ModelToDynamic(model, obj);
         }
 
-        public TObject FromDictionary(IDictionary<string, object> model)
+        public TObject FromDictionary(IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
                 return null;
 
             var result = new TObject();
 
-            UpdateObject(model, result);
+            UpdateObject(result, model, caseSense);
 
             return result;
         }
@@ -216,36 +216,20 @@ namespace VitalChoice.DynamicData.Base
             }
             if (!property.NotLoggedInfo)
             {
-                //if (!property.PropertyType.GetTypeInfo().IsValueType && property.PropertyType!=typeof(string))
-                if (property.PropertyType == typeof (string))
+                if (property.PropertyType == typeof (string) || IsSystemValueType(property.PropertyType))
                     return;
 
                 Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
                 if (elementType != null)
                 {
-                    //if (!elementType.GetTypeInfo().IsValueType && elementType != typeof(string))
                     if (elementType == typeof (string) || IsSystemValueType(elementType))
                         return;
-                    //BUG: as we work with dynamic (mapped object) it makes no sense to create new cache, 
-                    //BUG: just a waste of memory, so changed to use the same as for dynamics
                     var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, elementType, true);
                     var items = (IEnumerable) property.Get?.Invoke(obj);
                     if (items != null)
                     {
-                        //BUG: We already checked T of IEnumerable<T>, makes no sense to check type of object from IEnumerable, 
-                        //BUG: since all realizations of IEnumerable inside IEnumerable<T> doesn't change type
-                        //var includeItems =
-                        //    items.Cast<object>().Select(item => new { item, type = item.GetType() })
-                        //        .Where(itemType => !itemType.type.GetTypeInfo().IsValueType && itemType.type != typeof(string))
-                        //        .Select(item => item.item);
                         foreach (var item in items)
                         {
-                            //var type = item.GetType();
-                            //if (!type.GetTypeInfo().IsValueType && type != typeof(string))
-                            //if (type != typeof(string))
-                            //{
-                            //    return;
-                            //}
                             _processedObjectsSet.Add(item);
                             foreach (var pair in cache)
                             {
@@ -260,8 +244,6 @@ namespace VitalChoice.DynamicData.Base
                     var item = property.Get?.Invoke(obj);
                     if (item != null)
                     {
-                        //BUG: we should of already checked this object
-                        //if (_removeSerurityInformationVisitedHashSet.Contains(obj))
                         if (IsSystemValueType(item.GetType()))
                         {
                             return;
@@ -304,13 +286,16 @@ namespace VitalChoice.DynamicData.Base
             return false;
         }
 
-        protected virtual void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
+        protected virtual void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
         {
             if (obj == null)
                 return;
             if (model == null)
                 return;
-
+            if (!caseSense)
+            {
+                model = model.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
+            }
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache)
             {

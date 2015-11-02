@@ -11,6 +11,7 @@
     "Autofac.Framework.DependencyInjection": "4.0.0-*",
     "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
     "Microsoft.Framework.Logging": "1.0.0-*",
+    "Microsoft.AspNet.Session": "1.0.0-beta8",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
@@ -19,7 +20,7 @@
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "Microsoft.AspNet.Session": "1.0.0-beta8"
+    "VitalChoice.ContentProcessing" :  ""
   },
 
   "frameworks": {

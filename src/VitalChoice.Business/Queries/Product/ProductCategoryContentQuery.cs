@@ -31,7 +31,6 @@ namespace VitalChoice.Business.Queries.Product
 
 		public ProductCategoryContentQuery WithVisibility(IList<CustomerTypeCode> codes)
 		{
-
 			Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
 
 			return this;

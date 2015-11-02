@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.DynamicData.Interfaces;
 
@@ -11,17 +12,17 @@ namespace VitalChoice.ContentProcessing.Base
 {
     public class GetContentProcessor<TResult, TModel> : ContentProcessor<TResult, TModel>
         where TResult : ContentDataItem
-        where TModel: ContentFilterModel
+        where TModel: ProcessorModel
     {
-        private readonly IRepositoryAsync<TResult> _contentRepository;
+        protected readonly IRepositoryAsync<TResult> ContentRepository;
 
         protected GetContentProcessor(IObjectMapper<TModel> mapper, IRepositoryAsync<TResult> contentRepository) : base(mapper)
         {
-            _contentRepository = contentRepository;
+            ContentRepository = contentRepository;
         }
 
-        protected virtual Expression<Func<TResult, bool>> FilterExpression(TModel model) => 
-            p => p.Url == model.Url;
+        protected virtual Expression<Func<TResult, bool>> FilterExpression(TModel model) =>
+            p => p.Url == model.Url && p.StatusCode != RecordStatusCode.Deleted;
 
         protected virtual IQueryFluent<TResult> BuildQuery(IQueryFluent<TResult> query)
         {
@@ -38,12 +39,12 @@ namespace VitalChoice.ContentProcessing.Base
             if (!string.IsNullOrEmpty(model.Url))
             {
                 return
-                    (await BuildQuery(_contentRepository.Query(FilterExpression(model))).SelectAsync(false))
+                    (await BuildQuery(ContentRepository.Query(FilterExpression(model))).SelectAsync(false))
                         .FirstOrDefault();
             }
             return null;
         }
 
-        public override string ResultName => "model";
+        public override string ResultName => "Model";
     }
 }

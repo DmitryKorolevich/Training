@@ -23,8 +23,8 @@ namespace VitalChoice.DynamicData.Interfaces
         void UpdateModel(TObject obj, IDictionary<string, object> model);
         TObject FromModel<TModel>(TModel model);
         void UpdateObject<TModel>(TModel model, TObject obj);
-        TObject FromDictionary(IDictionary<string, object> model);
-        void UpdateObject(TObject obj, IDictionary<string, object> model);
+        TObject FromDictionary(IDictionary<string, object> model, bool caseSense = true);
+        void UpdateObject(TObject obj, IDictionary<string, object> model, bool caseSense = true);
         void SecureObject(TObject obj);
     }
 }

@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services
         private readonly int expirationTerm;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IRepositoryAsync<ContentProcessor> contentProcessorRepository;
+        private readonly IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository;
         private readonly IOptions<AppOptions> appOptionsAccessor;
         private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
         private readonly IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository;
@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services
         private readonly ILocalizationService _localizationService;
 
         public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<ApplicationRole> roleManager,
-            IRepositoryAsync<ContentProcessor> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
             IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
             IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository,

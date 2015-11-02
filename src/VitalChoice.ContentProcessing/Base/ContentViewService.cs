@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -6,40 +6,40 @@ using System.Threading.Tasks;
 using Microsoft.Framework.Logging;
 using Templates;
 using Templates.Exceptions;
-using VitalChoice.Domain;
+using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.ContentProcessing.Interfaces
+namespace VitalChoice.ContentProcessing.Base
 {
-    public interface IContentService
-    {
-        Task<ContentViewModel> GetContentAsync(IDictionary<string, object> queryData);
-    }
-
-    public abstract class ContentService<TEntity> : IContentService
+    public abstract class ContentViewService<TEntity> : IContentViewService
         where TEntity : ContentDataItem
     {
         private readonly ITtlGlobalCache _templatesCache;
         private readonly IContentProcessor<TEntity> _defaultProcessor;
         private readonly IContentProcessorService _processorService;
-        private readonly ILogger _logger;
+        protected readonly ILogger Logger;
 
-        protected ContentService(
+        protected ContentViewService(
             ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessor<TEntity> defaultProcessor, IContentProcessorService processorService)
         {
             _templatesCache = templatesCache;
             _defaultProcessor = defaultProcessor;
             _processorService = processorService;
-            _logger = loggerProvider.CreateLoggerDefault();
+            Logger = loggerProvider.CreateLoggerDefault();
         }
 
-        public async Task<ContentViewModel> GetContentAsync(IDictionary<string, object> queryData)
+        protected virtual Task<TEntity> GetData(IDictionary<string, object> queryData)
         {
-            var contentEntity = await _defaultProcessor.ExecuteAsync(queryData);
+            return _defaultProcessor.ExecuteAsync(queryData);
+        }
+
+        public virtual async Task<ContentViewModel> GetContentAsync(IDictionary<string, object> queryData)
+        {
+            var contentEntity = await GetData(queryData);
             ITtlTemplate template;
             try
             {
@@ -50,7 +50,7 @@ namespace VitalChoice.ContentProcessing.Interfaces
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message, e);
+                Logger.LogError(e.Message, e);
                 return new ContentViewModel
                 {
                     Body = (e as TemplateCompileException)?.ToString()
