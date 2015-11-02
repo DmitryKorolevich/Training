@@ -5,6 +5,8 @@ namespace VitalChoice.Domain.Entities.Content
 {
     public class Article : ContentDataItem
     {
+        public string FileUrl { get; set; }
+
         public DateTime? PublishedDate { get; set; }
 
         public string SubTitle { get; set; }

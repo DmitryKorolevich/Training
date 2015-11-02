@@ -280,25 +280,17 @@ namespace VitalChoice.Infrastructure.Context
 	        #region Products
 
 	        builder.Entity<ProductCategoryContent>().HasKey(p => p.Id);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Name);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Url);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.ParentId);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.StatusCode);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Assigned);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Order);
 	        builder.Entity<ProductCategoryContent>().ToTable("ProductCategories");
 	        builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
 	            .ForeignKey(p => p.MasterContentItemId)
-	            .
-	            PrincipalKey(p => p.Id);
+	            .PrincipalKey(p => p.Id);
 	        builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
 	            .ForeignKey(p => p.ContentItemId)
-	            .
-	            PrincipalKey(p => p.Id);
+	            .PrincipalKey(p => p.Id);
 
 	        #endregion
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VitalChoice.Business.Services
+namespace VitalChoice.ContentProcessing.Base
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ProcessorNameAttribute : Attribute

@@ -160,7 +160,6 @@ namespace VitalChoice.Business.Services.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
-                dbItem.FileUrl = model.FileUrl;
                 dbItem.UserId = model.UserId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;

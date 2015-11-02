@@ -143,7 +143,7 @@ namespace VitalChoice.Business.Services.Products
 			{
 				Name = productCategoryContent.Name,
 				Url = productCategoryContent.Url,
-				Order = productCategoryContent.Order,
+				Order = productCategoryContent.ProductCategory.Order,
 				FileImageSmallUrl = productCategoryContent.FileImageSmallUrl,
 				FileImageLargeUrl = productCategoryContent.FileImageLargeUrl,
 				LongDescription = productCategoryContent.LongDescription,
@@ -174,10 +174,8 @@ namespace VitalChoice.Business.Services.Products
                 {
                     category = (await productCategoryRepository.Query(p=>p.Id== categoryEcommerce.Id).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-                    if(category!=null)
-                    {
-                        category.Set(categoryEcommerce);
-                    }
+                    if (category != null)
+                        category.ProductCategory = categoryEcommerce;
                 }
             }
             else
@@ -187,7 +185,8 @@ namespace VitalChoice.Business.Services.Products
                 {
                     category = (await productCategoryRepository.Query(p => p.Id == categoryEcommerce.Id).Include(p => p.MasterContentItem).
                         ThenInclude(p => p.MasterContentItemToContentProcessors).ThenInclude(p => p.ContentProcessor).SelectAsync(false)).FirstOrDefault();
-	                category?.Set(categoryEcommerce);
+                    if (category != null)
+                        category.ProductCategory = categoryEcommerce;
                 }
             }
 
@@ -242,15 +241,16 @@ namespace VitalChoice.Business.Services.Products
 			var subCategories = FindTargetCategory(rootCategory, category.Id).SubCategories;
 
 			var subCategoriesContent = new List<ProductCategoryContent>();
-			foreach (var subCategory in subCategories)
-	        {
-				var subCategoryContent = (await productCategoryRepository.Query(p => p.Id == subCategory.Id).OrderBy(x=>x.OrderBy(y=>y.Order)).SelectAsync(false)).Single();
-				subCategoryContent.Set(subCategory);
+            foreach (var subCategory in subCategories)
+            {
+                var subCategoryContent =
+                    (await productCategoryRepository.Query(p => p.Id == subCategory.Id).SelectAsync(false)).Single();
+                subCategoryContent.ProductCategory = subCategory;
 
-				subCategoriesContent.Add(subCategoryContent);
+                subCategoriesContent.Add(subCategoryContent);
             }
 
-	        var productIds =
+            var productIds =
 		        (await _productToCategoryEcommerceRepository.Query(x => x.IdCategory == category.Id).SelectAsync(false))
 			        .Select(x => x.IdProduct).ToList();
 

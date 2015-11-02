@@ -35,6 +35,7 @@ namespace VitalChoice.DynamicData.Helpers
             }
             builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
             builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();
+            builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
             return builder;
         }
 

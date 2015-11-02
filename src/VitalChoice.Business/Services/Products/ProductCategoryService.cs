@@ -99,42 +99,116 @@ namespace VitalChoice.Business.Services.Products
                     SelectAsync(false)).FirstOrDefault();
                 if (toReturn != null)
                 {
-                    toReturn.Set(categoryEcommerce);
+                    toReturn.ProductCategory = categoryEcommerce;
                 }
             }
             return toReturn;
         }
 
-        public async Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent model)
+        private async Task UpdateCategory(ProductCategoryContent categoryContent, ProductCategoryContent model)
         {
-            ProductCategoryContent dbItem = null;
+            var idDbItem = categoryContent.Id;
+            var urlDublicatesExist = await productCategoryRepository.Query(p => p.Url == model.Url && p.Id != idDbItem
+                && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+            if (urlDublicatesExist)
+            {
+                throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
+            }
+            var nameDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Name == model.Name && p.Id != idDbItem
+                && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
+            if (nameDublicatesExist)
+            {
+                throw new AppValidationException("Name", "Category with the same Name already exists, please use a unique Name.");
+            }
+
+            categoryContent.Name = model.Name;
+            categoryContent.Url = model.Url;
+            if (model.StatusCode != RecordStatusCode.Deleted)
+            {
+                categoryContent.StatusCode = model.StatusCode;
+            }
+            categoryContent.ProductCategory.Assigned = model.ProductCategory.Assigned;
+
+
+            //if (model.Id == 0)
+            //{
+            //    var ecommerceProduct = new ProductCategory();
+            //    ecommerceProduct.SetContent(categoryContent);
+            //    await productCategoryEcommerceRepository.InsertAsync(ecommerceProduct);
+            //    categoryContent.Id = ecommerceProduct.Id;
+            //}
+            //else
+            //{
+            //    await productCategoryEcommerceRepository.UpdateAsync(categoryContent.EcommerceCategory);
+            //}
+
+            categoryContent.FileImageSmallUrl = model.FileImageSmallUrl;
+            categoryContent.FileImageLargeUrl = model.FileImageLargeUrl;
+            categoryContent.LongDescription = model.LongDescription;
+            categoryContent.LongDescriptionBottom = model.LongDescriptionBottom;
+            categoryContent.NavLabel = model.NavLabel;
+            categoryContent.NavIdVisible = model.NavIdVisible;
+            if (model.MasterContentItemId != 0)
+            {
+                categoryContent.MasterContentItemId = model.MasterContentItemId;
+            }
+            if (model.ContentItem != null)
+            {
+                categoryContent.ContentItem.Updated = DateTime.Now;
+                categoryContent.ContentItem.Template = model.ContentItem.Template;
+                categoryContent.ContentItem.Description = model.ContentItem.Description;
+                categoryContent.ContentItem.Title = model.ContentItem.Title;
+                categoryContent.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
+                categoryContent.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
+            }
+
             if (model.Id == 0)
             {
-                dbItem = new ProductCategoryContent {ParentId = model.ParentId};
-                if(!dbItem.ParentId.HasValue)
+                await productCategoryRepository.InsertGraphAsync(categoryContent);
+            }
+            else
+            {
+                await productCategoryRepository.UpdateAsync(categoryContent);
+                if (categoryContent.ContentItem != null)
+                {
+                    await contentItemRepository.UpdateAsync(categoryContent.ContentItem);
+                }
+            }
+        }
+
+        public async Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent model)
+        {
+            if (model.Id == 0)
+            {
+                if (model.ProductCategory.ParentId == null)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
-                var parentExist = await productCategoryEcommerceRepository.Query(p => p.Id == model.ParentId && 
-                                                                                      p.StatusCode !=RecordStatusCode.Deleted).SelectAnyAsync();
+                var parentExist =
+                    await
+                        productCategoryEcommerceRepository.Query(
+                            p => p.Id == model.ProductCategory.ParentId && p.StatusCode != RecordStatusCode.Deleted)
+                            .SelectAnyAsync();
                 if(!parentExist)
                 {
                     throw new AppValidationException("The category with the given parent id doesn't exist.");
                 }
 
                 var subCategories =
-                    await productCategoryEcommerceRepository.Query(p => p.ParentId == model.ParentId &&
-                                                                        p.StatusCode != RecordStatusCode.Deleted)
-                        .SelectAsync(false);
-                if (subCategories.Count != 0)
+                    await
+                        productCategoryEcommerceRepository.Query(
+                            p =>
+                                p.ParentId == model.ProductCategory.ParentId &&
+                                p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
+                if (subCategories.Count > 0)
                 {
-                    dbItem.Order = subCategories.Max(p => p.Order)+1;
+                    model.ProductCategory.Order = subCategories.Max(p => p.Order)+1;
                 }
 
-                dbItem.StatusCode = RecordStatusCode.Active;
+                model.StatusCode = RecordStatusCode.Active;
                 if (model.ContentItem != null)
                 {
-                    dbItem.ContentItem = new ContentItem {Created = DateTime.Now};
+                    model.ContentItem = new ContentItem {Created = DateTime.Now};
                 }
 
                 if (model.MasterContentItemId == 0)
@@ -150,83 +224,19 @@ namespace VitalChoice.Business.Services.Products
                         throw new Exception("The default master template isn't confugured. Please contact support.");
                     }
                 }
+                var categoryContent = new ProductCategoryContent();
+                await UpdateCategory(categoryContent, model);
+                return categoryContent;
             }
             else
             {
-                dbItem = await GetCategoryAsync(model.Id);
+                var categoryContent = await GetCategoryAsync(model.Id);
+                if (categoryContent != null && categoryContent.StatusCode != RecordStatusCode.Deleted)
+                {
+                    await UpdateCategory(categoryContent, model);
+                }
+                return categoryContent;
             }
-
-            if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
-            {
-                var idDbItem = dbItem.Id;
-                var urlDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Url == model.Url && p.Id != idDbItem
-                    && p.StatusCode!=RecordStatusCode.Deleted).SelectAnyAsync();
-                if (urlDublicatesExist)
-                {
-                    throw new AppValidationException("Url", "Category with the same URL already exists, please use a unique URL.");
-                }
-                var nameDublicatesExist = await productCategoryEcommerceRepository.Query(p => p.Name == model.Name && p.Id != idDbItem
-                    && p.StatusCode != RecordStatusCode.Deleted).SelectAnyAsync();
-                if (nameDublicatesExist)
-                {
-                    throw new AppValidationException("Name", "Category with the same Name already exists, please use a unique Name.");
-                }
-
-                dbItem.Name = model.Name;
-                dbItem.Url = model.Url;
-                if (model.StatusCode != RecordStatusCode.Deleted)
-                {
-                    dbItem.StatusCode = model.StatusCode;
-                }
-                dbItem.Assigned = model.Assigned;
-
-
-                if (model.Id == 0)
-                {
-                    var ecommerceProduct = new ProductCategory(dbItem);
-                    await productCategoryEcommerceRepository.InsertAsync(ecommerceProduct);
-                    dbItem.Id = ecommerceProduct.Id;
-                }
-                else
-                {
-                    await productCategoryEcommerceRepository.UpdateAsync(new ProductCategory(dbItem));
-                }
-
-                dbItem.FileImageSmallUrl = model.FileImageSmallUrl;
-                dbItem.FileImageLargeUrl = model.FileImageLargeUrl;
-                dbItem.LongDescription = model.LongDescription;
-                dbItem.LongDescriptionBottom = model.LongDescriptionBottom;
-                dbItem.NavLabel = model.NavLabel;
-                dbItem.NavIdVisible = model.NavIdVisible;
-                if (model.MasterContentItemId != 0)
-                {
-                    dbItem.MasterContentItemId = model.MasterContentItemId;
-                }
-                if (model.ContentItem != null)
-                { 
-                    dbItem.ContentItem.Updated = DateTime.Now;
-                    dbItem.ContentItem.Template = model.ContentItem.Template;
-                    dbItem.ContentItem.Description = model.ContentItem.Description;
-                    dbItem.ContentItem.Title = model.ContentItem.Title;
-                    dbItem.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
-                    dbItem.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
-                }
-
-                if (model.Id == 0)
-                {
-                    await productCategoryRepository.InsertGraphAsync(dbItem);
-                }
-                else
-                {
-                    await productCategoryRepository.UpdateAsync(dbItem);
-                    if (dbItem.ContentItem != null)
-                    {
-                        await contentItemRepository.UpdateAsync(dbItem.ContentItem);
-                    }
-                }
-            }
-
-            return dbItem;
         }
         public async Task<bool> DeleteCategoryAsync(int id)
         {
