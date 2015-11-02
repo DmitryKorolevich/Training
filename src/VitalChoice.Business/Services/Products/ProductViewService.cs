@@ -34,9 +34,9 @@ namespace VitalChoice.Business.Services.Products
 	    private readonly IEcommerceRepositoryAsync<ProductCategory> _productCategoryEcommerceRepository;
 
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        IContentProcessor<ProductCategoryContent, ProcessorModel> defaulProcessor,
+	        ProductCategoryDefaultProcessor defaultProcessor,
 	        IContentProcessorService processorService, IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository)
-	        : base(templatesCache, loggerProvider, defaulProcessor, processorService)
+	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
         {
             _productCategoryEcommerceRepository = productCategoryEcommerceRepository;
         }

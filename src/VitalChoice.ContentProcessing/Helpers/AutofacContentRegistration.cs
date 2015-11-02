@@ -27,7 +27,7 @@ namespace VitalChoice.ContentProcessing.Helpers
             {
                 var processorName = processorType.GetTypeInfo().GetCustomAttribute<ProcessorNameAttribute>(false)?.Name ??
                                     processorType.Name;
-                builder.RegisterType(processorType).Keyed<IContentProcessor>(processorName);
+                builder.RegisterType(processorType).Keyed<IContentProcessor>(processorName).AsSelf();
             }
             builder.RegisterGeneric(typeof (GetContentProcessor<,>)).As(typeof (IContentProcessor<,>));
             return builder;
