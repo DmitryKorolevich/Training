@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
@@ -31,7 +32,14 @@ namespace VitalChoice.Business.Queries.Product
 
 		public ProductCategoryContentQuery WithVisibility(IList<CustomerTypeCode> codes)
 		{
-			Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
+            if (codes != null)
+            {
+                Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
+            }
+            else
+            {
+                Add(x => x.NavIdVisible.HasValue);
+            }
 
 			return this;
 		}

@@ -281,7 +281,11 @@ namespace VitalChoice.Infrastructure.Context
 
 	        builder.Entity<ProductCategoryContent>().HasKey(p => p.Id);
 	        builder.Entity<ProductCategoryContent>().ToTable("ProductCategories");
-	        builder.Entity<ProductCategoryContent>()
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.Name);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.UserId);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.User);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.ProductCategory);
+            builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
 	            .ForeignKey(p => p.MasterContentItemId)

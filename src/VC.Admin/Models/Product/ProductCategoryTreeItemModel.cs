@@ -30,10 +30,13 @@ namespace VC.Admin.Models.Product
             if (item != null)
             {
                 Id = item.Id;
-                Name = item.Name;
                 Url = item.Url;
-                StatusCode = item.ProductCategory.StatusCode;
-                Assigned = item.ProductCategory.Assigned;
+                if (item.ProductCategory != null)
+                {
+                    Name = item.ProductCategory.Name;
+                    StatusCode = item.ProductCategory.StatusCode;
+                    Assigned = item.ProductCategory.Assigned;
+                }
                 CreateSubCategories(this, item);
             }
         }
@@ -51,10 +54,10 @@ namespace VC.Admin.Models.Product
 
         public ProductNavCategoryLite Convert(int? parentId)
         {
-            ProductNavCategoryLite toReturn = new ProductNavCategoryLite
+            ProductNavCategoryLite toReturn = new ProductNavCategoryLite()
             {
                 Id = Id,
-                ProductCategory =
+                ProductCategory = new ProductCategory()
                 {
                     ParentId = parentId
                 },
@@ -66,7 +69,7 @@ namespace VC.Admin.Models.Product
             {
                 subItems.AddRange(SubItems.Select(subItem => subItem.Convert(toReturn.Id)));
             }
-            toReturn.ProductCategory.SubCategories = subItems.Select(s => s.ProductCategory).ToList();
+            toReturn.SubItems = subItems.ToList();
             return toReturn;
         }
 	}

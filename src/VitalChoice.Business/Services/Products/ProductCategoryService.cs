@@ -137,26 +137,15 @@ namespace VitalChoice.Business.Services.Products
                 throw new AppValidationException("Name", "Category with the same Name already exists, please use a unique Name.");
             }
 
-            categoryContent.Name = model.Name;
             categoryContent.Url = model.Url;
             if (model.StatusCode != RecordStatusCode.Deleted)
             {
                 categoryContent.StatusCode = model.StatusCode;
+                categoryContent.ProductCategory.StatusCode = model.StatusCode;
             }
+            categoryContent.ProductCategory.ParentId = model.ProductCategory.ParentId;
             categoryContent.ProductCategory.Assigned = model.ProductCategory.Assigned;
-
-
-            //if (model.Id == 0)
-            //{
-            //    var ecommerceProduct = new ProductCategory();
-            //    ecommerceProduct.SetContent(categoryContent);
-            //    await productCategoryEcommerceRepository.InsertAsync(ecommerceProduct);
-            //    categoryContent.Id = ecommerceProduct.Id;
-            //}
-            //else
-            //{
-            //    await productCategoryEcommerceRepository.UpdateAsync(categoryContent.EcommerceCategory);
-            //}
+            categoryContent.ProductCategory.Name = model.ProductCategory.Name;
 
             categoryContent.FileImageSmallUrl = model.FileImageSmallUrl;
             categoryContent.FileImageLargeUrl = model.FileImageLargeUrl;
@@ -170,9 +159,14 @@ namespace VitalChoice.Business.Services.Products
             }
             if (model.ContentItem != null)
             {
+                if(categoryContent.ContentItem==null)
+                {
+                    categoryContent.ContentItem = new ContentItem();
+                    categoryContent.ContentItem.Created = DateTime.Now;
+                }
                 categoryContent.ContentItem.Updated = DateTime.Now;
                 categoryContent.ContentItem.Template = model.ContentItem.Template;
-                categoryContent.ContentItem.Description = model.ContentItem.Description;
+                categoryContent.ContentItem.Description = model.ContentItem.Description ?? String.Empty;
                 categoryContent.ContentItem.Title = model.ContentItem.Title;
                 categoryContent.ContentItem.MetaDescription = model.ContentItem.MetaDescription;
                 categoryContent.ContentItem.MetaKeywords = model.ContentItem.MetaKeywords;
@@ -180,10 +174,13 @@ namespace VitalChoice.Business.Services.Products
 
             if (model.Id == 0)
             {
+                await productCategoryEcommerceRepository.InsertAsync(categoryContent.ProductCategory);
+                categoryContent.Id = categoryContent.ProductCategory.Id;
                 await productCategoryRepository.InsertGraphAsync(categoryContent);
             }
             else
             {
+                await productCategoryEcommerceRepository.UpdateAsync(categoryContent.ProductCategory);
                 await productCategoryRepository.UpdateAsync(categoryContent);
                 if (categoryContent.ContentItem != null)
                 {
@@ -220,13 +217,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     model.ProductCategory.Order = subCategories.Max(p => p.Order)+1;
                 }
-
-                model.StatusCode = RecordStatusCode.Active;
-                if (model.ContentItem != null)
-                {
-                    model.ContentItem = new ContentItem {Created = DateTime.Now};
-                }
-
+                
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
@@ -279,6 +270,11 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.StatusCode = RecordStatusCode.Deleted;
                 await productCategoryEcommerceRepository.UpdateAsync(dbItem);
 
+                var dbContentCategoryPart = (await productCategoryRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+                dbContentCategoryPart.StatusCode = RecordStatusCode.Deleted;
+                await productCategoryRepository.UpdateAsync(dbContentCategoryPart);
+
+
                 toReturn = true;
             }
             return toReturn;
@@ -296,18 +292,23 @@ namespace VitalChoice.Business.Services.Products
         {
             var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
             var contentCategories =
-                await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(p => new ProductCategoryLite
-                {
-                    Id = p.Id,
-                    NavLabel = p.NavLabel,
-                    Url = p.Url
-                }, false);
+                await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(false);
+            var result = contentCategories.Select(p => new ProductCategoryLite
+            {
+                Id = p.Id,
+                NavLabel = p.NavLabel,
+                Url = p.Url
+            }).ToList();
 
             return new ProductNavCategoryLite
             {
+                Id = productRootCategory.Id,
+                ProductCategory = productRootCategory,
+                NavLabel = contentCategories[productRootCategory.Id].NavLabel,
+                Url = contentCategories[productRootCategory.Id].Url,
                 SubItems =
                     ConvertToTransferCategory(productRootCategory.SubCategories,
-                        contentCategories.ToDictionary(c => c.Id))
+                        result.ToDictionary(c => c.Id))
             };
         }
 

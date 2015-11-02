@@ -64,7 +64,7 @@ namespace VC.Admin.Models.Product
         public ProductCategoryManageModel(ProductCategoryContent item)
         {
             Id = item.Id;
-            Name = item.Name;
+            Name = item.ProductCategory.Name;
             Url = item.Url;
             FileImageSmallUrl = item.FileImageSmallUrl;
             FileImageLargeUrl = item.FileImageLargeUrl;
@@ -103,7 +103,12 @@ namespace VC.Admin.Models.Product
                 FileImageSmallUrl = FileImageSmallUrl?.Trim(),
                 FileImageLargeUrl = FileImageLargeUrl?.Trim(),
                 StatusCode = StatusCode,
-                ProductCategory = {Assigned = Assigned},
+                ProductCategory = {
+                    Name = Name?.Trim(),
+                    Assigned = Assigned,
+                    ParentId = ParentId,
+                    StatusCode = StatusCode,
+                },
                 MasterContentItemId = MasterContentItemId ?? 0,
                 LongDescription = LongDescription,
                 LongDescriptionBottom = LongDescriptionBottom,
@@ -118,7 +123,6 @@ namespace VC.Admin.Models.Product
                     MetaDescription = MetaDescription
                 }
             };
-            toReturn.ProductCategory.ParentId = ParentId;
             
             if (ProcessorIds != null)
             {
