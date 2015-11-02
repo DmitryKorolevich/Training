@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
@@ -37,16 +39,19 @@ namespace VC.Public.Controllers
 		private readonly ICustomerService _customerService;
 		private readonly IDynamicMapper<CustomerAddressDynamic> _addressConverter;
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
+		private readonly IOrderService orderService;
+		private readonly IOrderService _orderService;
 
 		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
 			ICustomerService customerService, IDynamicMapper<CustomerAddressDynamic> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter)
+            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter, IOrderService orderService)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
 			_customerService = customerService;
 			_addressConverter = addressConverter;
 			_paymentMethodConverter = paymentMethodConverter;
+			_orderService = orderService;
 		}
 
 		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
@@ -404,6 +409,33 @@ namespace VC.Public.Controllers
 			await _customerService.UpdateAsync(currentCustomer);
 
 			return true;
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> LastOrderPlaced()
+		{
+			var internalId = GetInternalCustomerId();
+
+			var lastOrder = await _orderService.SelectLastOrderAsync(internalId);
+
+			var lines = new List<LastOrderLineModel>();
+			foreach (var skuOrdered in lastOrder.Skus)
+			{
+				var lineModel = new LastOrderLineModel()
+				{
+					ProductUrl = skuOrdered.ProductWithoutSkus.Url,
+					IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail,
+					ProductName = skuOrdered.ProductWithoutSkus.Name,
+					PortionsCount = skuOrdered.Sku.Data.QTY,
+                    Quantity = skuOrdered.Quantity,
+					SelectedPrice = string.Format("{0:0.00}", skuOrdered.Amount),
+					SkuCode = skuOrdered.Sku.Code
+				};
+
+				lines.Add(lineModel);
+            }
+
+			return View(lines);
 		}
 	}
 }

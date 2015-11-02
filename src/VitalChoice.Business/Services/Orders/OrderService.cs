@@ -90,6 +90,7 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
+					.ThenInclude(s => s.OptionValues)
                     .Include(p => p.OptionValues);
         }
 
@@ -161,7 +162,14 @@ namespace VitalChoice.Business.Services.Orders
             return context;
         }
 
-        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
+	    public async Task<OrderDynamic> SelectLastOrderAsync(int customerId)
+	    {
+			var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
+
+		    return Select(orderQuery).OrderByDescending(x => x.DateCreated).FirstOrDefault();
+	    }
+
+	    private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
         {
             order.TaxTotal = dataContext.TaxTotal;
             order.Total = dataContext.Total;

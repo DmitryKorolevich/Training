@@ -1160,3 +1160,51 @@ footer {
 .affiliate-pending .form-buttons-group :first-child {
   margin-left: 0px;
 }
+.last-order-lines {
+  width: 100%;
+}
+.last-order-lines .product-icon {
+  width: 100px;
+  height: 100px;
+}
+.last-order-lines tbody tr {
+  border-bottom: 1px solid #CCC;
+}
+.last-order-lines tbody tr td {
+  padding: 9px 0px 20px 0;
+}
+.last-order-lines .qty-cell {
+  font-size: 25px;
+  font-weight: bold;
+  width: 120px;
+  text-align: center;
+  padding-right: 20px;
+}
+.last-order-lines .icon-container {
+  width: 100px;
+  padding-right: 20px;
+}
+.last-order-lines .product-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 460px;
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 14px;
+}
+.last-order-lines .sku-code {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 10px;
+  max-width: 460px;
+}
+.last-order-lines .selected-price {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.last-order-lines .review-product-link {
+  margin: 10px 0 0 50px;
+}
