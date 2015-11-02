@@ -31,14 +31,11 @@ namespace VitalChoice.Business.Services.Products
 {
 	public class ProductViewService : ContentViewService<ProductCategoryContent>, IProductViewService
 	{
-	    private readonly IEcommerceRepositoryAsync<ProductCategory> _productCategoryEcommerceRepository;
-
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
 	        ProductCategoryDefaultProcessor defaultProcessor,
-	        IContentProcessorService processorService, IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository)
+	        IContentProcessorService processorService)
 	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
         {
-            _productCategoryEcommerceRepository = productCategoryEcommerceRepository;
         }
 
 	    #region Public
