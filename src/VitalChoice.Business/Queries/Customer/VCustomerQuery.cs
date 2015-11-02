@@ -42,7 +42,22 @@ namespace VitalChoice.Business.Queries.Customer
 			return this;
 		}
 
-	    public VCustomerQuery WithCompany(string text)
+        public VCustomerQuery WithIdAffiliate(string textId)
+        {
+            int intValue;
+            if (!int.TryParse(textId, out intValue))
+            {
+                intValue = -1;
+            }
+            if (intValue!=-1)
+            {
+                Add(x => x.IdAffiliate == intValue);
+            }
+
+            return this;
+        }
+
+        public VCustomerQuery WithCompany(string text)
 	    {
 		    if (!string.IsNullOrWhiteSpace(text))
 		    {

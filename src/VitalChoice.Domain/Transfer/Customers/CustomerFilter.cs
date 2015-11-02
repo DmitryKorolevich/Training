@@ -6,6 +6,8 @@ namespace VitalChoice.Domain.Transfer.Customers
     {
         public string IdContains { get; set; }
 
+        public string IdAffiliate { get; set; }
+
         public string Company { get; set; }
 
 		public string FirstName { get; set; }

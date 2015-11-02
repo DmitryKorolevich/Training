@@ -109,3 +109,53 @@ BEGIN
 END
 
 GO
+
+IF OBJECT_ID(N'[dbo].[AffiliatePayments]', N'U') IS NULL
+BEGIN
+
+	CREATE TABLE [dbo].[AffiliatePayments] (
+		[Id] INT NOT NULL
+			CONSTRAINT PK_AffiliatePayments PRIMARY KEY (Id) IDENTITY,
+		[IdAffiliate] INT NOT NULL
+			CONSTRAINT FK_AffiliatePaymentToAffiliate FOREIGN KEY (IdAffiliate) REFERENCES dbo.Affiliates (Id),
+		[DateCreated] [datetime2] NOT NULL,
+		[Amount] MONEY NOT NULL,
+	)
+
+
+	CREATE TABLE [dbo].[AffiliateOrderPayments] (
+		[Id] INT NOT NULL
+			CONSTRAINT PK_AffiliateOrderPayments PRIMARY KEY (Id) IDENTITY,
+		[IdAffiliate] INT NOT NULL
+			CONSTRAINT FK_AffiliateOrderPaymentToAffiliate FOREIGN KEY (IdAffiliate) REFERENCES dbo.Affiliates (Id),
+		[IdOrder] INT NOT NULL
+			CONSTRAINT FK_AffiliateOrderPaymentToOrder FOREIGN KEY (IdOrder) REFERENCES dbo.Orders (Id),
+		[Amount] MONEY NOT NULL,
+		[Status] INT NOT NULL DEFAULT(1),
+		[IdAffiliatePayment] INT NULL		
+			CONSTRAINT FK_AffiliateOrderPaymentToAffiliatePayment FOREIGN KEY (IdAffiliatePayment) REFERENCES dbo.AffiliatePayments (Id),
+	)
+
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdOrder ON AffiliateOrderPayments (IdOrder)
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliate_Status ON AffiliateOrderPayments (IdAffiliate,IdAffiliateOrderPaymentStatus)
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliatePayment ON AffiliateOrderPayments (IdAffiliatePayment)
+
+	CREATE UNIQUE NONCLUSTERED INDEX [UQ_AffiliateOrderPayments] ON [dbo].[AffiliateOrderPayments]
+	(
+		[IdOrder] ASC
+	)
+END
+
+GO
+
+IF OBJECT_ID(N'[dbo].[VCustomersInAffiliates]', N'V') IS NOT NULL
+DROP VIEW [dbo].[VCustomersInAffiliates]
+GO
+
+CREATE VIEW [dbo].[VCustomersInAffiliates]
+AS
+SELECT a.Id, MIN(a.Name) AS Name, count(*) AS Count FROM Affiliates a
+JOIN Customers c ON a.Id=c.IdAffiliate
+GROUP BY a.Id
+
+GO
