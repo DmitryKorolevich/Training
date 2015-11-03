@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNet.Mvc;
+using VitalChoice.Core.Base;
 
 namespace VC.Public.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseMvcController
     {
         public IActionResult Index()
         {

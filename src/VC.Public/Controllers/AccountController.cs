@@ -18,6 +18,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
+using VitalChoice.Interfaces.Services.Affiliates;
 
 namespace VC.Public.Controllers
 {
@@ -27,16 +28,24 @@ namespace VC.Public.Controllers
 		private readonly IStorefrontUserService _userService;
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly ICustomerService _customerService;
-		private readonly IPaymentMethodService _paymentMethodService;
+        private readonly IAffiliateService _affiliateService;
+        private readonly IPaymentMethodService _paymentMethodService;
 		private readonly IDynamicMapper<CustomerDynamic> _customerMapper;
 
-		public AccountController(IStorefrontUserService userService, IHttpContextAccessor contextAccessor, IDynamicMapper<CustomerDynamic> customerMapper, ICustomerService customerService, IPaymentMethodService paymentMethodService)
+		public AccountController(
+            IStorefrontUserService userService,
+            IHttpContextAccessor contextAccessor, 
+            IDynamicMapper<CustomerDynamic> customerMapper, 
+            ICustomerService customerService,
+            IAffiliateService affiliateService,
+            IPaymentMethodService paymentMethodService)
 		{
 			_userService = userService;
 			_contextAccessor = contextAccessor;
 			_customerMapper = customerMapper;
 			_customerService = customerService;
-			_paymentMethodService = paymentMethodService;
+            _affiliateService = affiliateService;
+            _paymentMethodService = paymentMethodService;
 		}
 
         [HttpGet]
@@ -171,8 +180,21 @@ namespace VC.Public.Controllers
 				return View(model);
 
 			var item = _customerMapper.FromModel(model);
+            var cookies = Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
+            if (!String.IsNullOrEmpty(cookies))
+            {
+                int idAffiliate = 0;
+                if (Int32.TryParse(cookies, out idAffiliate))
+                {
+                    var affiliate = await _affiliateService.SelectAsync(idAffiliate);
+                    if(affiliate!=null)
+                    {
+                        item.IdAffiliate = affiliate.Id;
+                    }
+                }
+            }
 
-			item.IdObjectType = (int)CustomerType.Retail;
+            item.IdObjectType = (int)CustomerType.Retail;
 			item.PublicId = Guid.NewGuid();
 			item.StatusCode = (int) CustomerStatus.Active;
 

@@ -79,7 +79,7 @@ namespace VC.Public.Controllers
             var cookies = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)));
             Response.Cookies.Append(VITAL_GREEN_COOKIE_NAME, cookies, new CookieOptions()
             {
-                Expires = DateTime.Now.AddDays(VITAL_GREEN_COOKIE_EXPIRED_HOURS),
+                Expires = DateTime.Now.AddHours(VITAL_GREEN_COOKIE_EXPIRED_HOURS),
             });
 
             return RedirectToAction("ShipTo");
