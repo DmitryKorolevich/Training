@@ -22,10 +22,13 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
@@ -39,12 +42,12 @@ namespace VC.Public.Controllers
 		private readonly ICustomerService _customerService;
 		private readonly IDynamicMapper<CustomerAddressDynamic> _addressConverter;
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
-		private readonly IOrderService orderService;
+		private readonly IProductService _productService;
 		private readonly IOrderService _orderService;
 
 		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
 			ICustomerService customerService, IDynamicMapper<CustomerAddressDynamic> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter, IOrderService orderService)
+            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter, IOrderService orderService, IProductService productService)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
@@ -52,6 +55,7 @@ namespace VC.Public.Controllers
 			_addressConverter = addressConverter;
 			_paymentMethodConverter = paymentMethodConverter;
 			_orderService = orderService;
+			_productService = productService;
 		}
 
 		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
@@ -153,11 +157,6 @@ namespace VC.Public.Controllers
 		public IActionResult ChangePassword()
 		{
 			return View(new ChangePasswordModel());
-		}
-
-		public IActionResult TopFavoriteItems()
-		{
-			return View();
 		}
 
 		[HttpPost]
@@ -440,6 +439,37 @@ namespace VC.Public.Controllers
 			}
 
 			return View(lines);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> TopFavoriteItems(bool all = false)
+		{
+			var internalId = GetInternalCustomerId();
+
+			var favorites = await _productService.GetCustomerFavoritesAsync(new VCustomerFavoritesFilter()
+			{
+				IdCustomer = internalId,
+				Paging = new Paging()
+				{
+					PageIndex = 0,
+					PageItemCount = all ? 10000 : ProductConstants.DEFAULT_FAVORITES_COUNT
+				}
+			});
+
+			var model = new List<FavoriteModel>();
+			foreach (var favorite in favorites.Items)
+			{
+				var favoriteModel = new FavoriteModel()
+				{
+					ProductName = favorite.ProductName,
+					ProductThumbnail = favorite.ProductThumbnail,
+					Url = favorite.Url
+				};
+
+				model.Add(favoriteModel);
+			}
+
+			return View(model);
 		}
 	}
 }

@@ -335,11 +335,14 @@ namespace VitalChoice.Infrastructure.Context
                 .PrincipalKey(p => p.Id)
                 .Required(false);
 
-            #endregion
+			#endregion
 
-            #region Products
+			#region Products
 
-            builder.Entity<ProductCategory>().HasKey(p => p.Id);
+			builder.Entity<VCustomerFavorite>().HasKey(x => x.Id);
+			builder.Entity<VCustomerFavorite>().ToTable("VCustomerFavorites");
+
+			builder.Entity<ProductCategory>().HasKey(p => p.Id);
             builder.Entity<ProductCategory>().ToTable("ProductCategories");
             builder.Entity<ProductCategory>()
                 .HasMany(cat => cat.ProductToCategories)
@@ -485,11 +488,11 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<User>().HasKey(p => p.Id);
             builder.Entity<User>().ToTable("Users");
 
-            #endregion
+			#endregion
 
-            #region Customers
+			#region Customers
 
-            builder.Entity<VCustomer>().HasKey(x => x.Id);
+			builder.Entity<VCustomer>().HasKey(x => x.Id);
             builder.Entity<VCustomer>().ToTable("VCustomers");
 
             builder.Entity<Customer>().HasKey(p => p.Id);

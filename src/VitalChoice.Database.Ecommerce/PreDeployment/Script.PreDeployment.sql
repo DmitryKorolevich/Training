@@ -47,3 +47,5 @@
 :r .\Scripts\ProductsOutOfStock.sql
 
 :r .\Scripts\ObjectHistoryLogItems.sql
+
+:r .\Scripts\CustomerFavoritesView.sql

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
@@ -57,7 +58,9 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<ProductOutOfStockRequest> AddProductOutOfStockRequest(ProductOutOfStockRequest model);
 
         Task<bool> SendProductOutOfStockRequests(ICollection<int> ids);
-        
-        #endregion
-    }
+
+		Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
+
+		#endregion
+	}
 }

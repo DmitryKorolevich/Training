@@ -190,4 +190,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\ObjectHistoryLogItems.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\CustomerFavoritesView.sql" />
+  </ItemGroup>
 </Project>

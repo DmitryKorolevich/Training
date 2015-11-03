@@ -28,6 +28,5 @@ namespace VitalChoice.Business.Queries.Order
 
 			return this;
 		}
-
 	}
 }
