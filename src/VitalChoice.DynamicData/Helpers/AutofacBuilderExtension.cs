@@ -10,6 +10,14 @@ namespace VitalChoice.DynamicData.Helpers
 {
     public static class AutofacBuilderExtension
     {
+        public static ContainerBuilder RegisterDynamicsBase(this ContainerBuilder builder)
+        {
+            builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
+            builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();
+            builder.RegisterGeneric(typeof(DirectMapper<>)).AsSelf();
+            return builder;
+        }
+
         public static ContainerBuilder RegisterMappers(this ContainerBuilder builder, Assembly containingAssembly)
         {
             var mapperTypes = containingAssembly
@@ -33,9 +41,6 @@ namespace VitalChoice.DynamicData.Helpers
                     .AsSelf()
                     .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)));
             }
-            builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
-            builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();
-            builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
             return builder;
         }
 

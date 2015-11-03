@@ -398,7 +398,10 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGeneric(typeof (EcommerceDynamicService<,,,>))
                 .As(typeof (IEcommerceDynamicService<,,,>));
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
+            builder.RegisterContentBase();
+            builder.RegisterDynamicsBase();
             builder.RegisterProcessors(typeof (IContentProcessor).GetTypeInfo().Assembly);
+            builder.RegisterProcessors(typeof(ProductCategoryDefaultProcessor).GetTypeInfo().Assembly);
             builder.RegisterType<TaxService>().As<ITaxService>();
             builder.RegisterType<AddressService>().As<IAddressService>();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>();

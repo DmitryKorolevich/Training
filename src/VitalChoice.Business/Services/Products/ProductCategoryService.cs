@@ -292,13 +292,12 @@ namespace VitalChoice.Business.Services.Products
         {
             var contentCategoryQuery = new ProductCategoryContentQuery().WithVisibility(liteFilter.Visibility);
             var contentCategories =
-                await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(false);
-            var result = contentCategories.Select(p => new ProductCategoryLite
-            {
-                Id = p.Id,
-                NavLabel = p.NavLabel,
-                Url = p.Url
-            }).ToList();
+                (await productCategoryRepository.Query(contentCategoryQuery).SelectAsync(p => new ProductCategoryLite
+                {
+                    Id = p.Id,
+                    NavLabel = p.NavLabel,
+                    Url = p.Url
+                }, false)).ToDictionary(c => c.Id);
 
             return new ProductNavCategoryLite
             {
@@ -307,8 +306,7 @@ namespace VitalChoice.Business.Services.Products
                 NavLabel = contentCategories[productRootCategory.Id].NavLabel,
                 Url = contentCategories[productRootCategory.Id].Url,
                 SubItems =
-                    ConvertToTransferCategory(productRootCategory.SubCategories,
-                        result.ToDictionary(c => c.Id))
+                    ConvertToTransferCategory(productRootCategory.SubCategories, contentCategories)
             };
         }
 

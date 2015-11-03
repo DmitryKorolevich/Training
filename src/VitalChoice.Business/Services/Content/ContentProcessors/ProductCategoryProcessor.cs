@@ -130,6 +130,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
             IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems)
         {
+            if (rootCategory == null)
+                return false;
             if (!rootCategory.SubItems.Any())
             {
                 if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
@@ -195,7 +197,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 LongDescription = productCategoryContent.LongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
                 SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
-                Products = products?.Select(x => new TtlCategoryProductModel()
+                Products = products?.Select(x => new TtlCategoryProductModel
                 {
                     Name = x.Name,
                     Thumbnail = x.Thumbnail,

@@ -15,6 +15,13 @@ namespace VitalChoice.ContentProcessing.Helpers
 {
     public static class AutofacContentRegistration
     {
+        public static ContainerBuilder RegisterContentBase(this ContainerBuilder builder)
+        {
+            builder.RegisterGeneric(typeof(GetContentProcessor<,>)).As(typeof(IContentProcessor<,>));
+            builder.RegisterType<ContentProcessorService>().As<IContentProcessorService>();
+            return builder;
+        }
+
         public static ContainerBuilder RegisterProcessors(this ContainerBuilder builder, Assembly containingAssembly)
         {
             var processors = containingAssembly
@@ -29,7 +36,6 @@ namespace VitalChoice.ContentProcessing.Helpers
                                     processorType.Name;
                 builder.RegisterType(processorType).Keyed<IContentProcessor>(processorName).AsSelf();
             }
-            builder.RegisterGeneric(typeof (GetContentProcessor<,>)).As(typeof (IContentProcessor<,>));
             return builder;
         }
     }
