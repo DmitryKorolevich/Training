@@ -20,6 +20,7 @@ namespace VitalChoice.DynamicData.Entities
             GiftCertificates = new List<GiftCertificateInOrder>();
         }
 
+        public int? IdAddedBy { get; set; }
 
         public OrderStatus OrderStatus { get; set; }
 

@@ -12,6 +12,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
@@ -26,6 +27,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Contexts;
@@ -43,6 +45,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ProductMapper _productMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
+        private readonly IAffiliateService _affiliateService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
@@ -54,7 +57,8 @@ namespace VitalChoice.Business.Services.Orders
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository)
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
+            IAffiliateService affiliateService)
             : base(
                 mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
@@ -66,6 +70,7 @@ namespace VitalChoice.Business.Services.Orders
             _customerService = customerService;
             _treeFactory = treeFactory;
             _skusRepository = skusRepository;
+            _affiliateService = affiliateService;
         }
 
         protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
@@ -218,6 +223,55 @@ namespace VitalChoice.Business.Services.Orders
                     p => p.Id.ToString().Contains(filter.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
                     .OrderBy(sortable);
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+        }
+
+        protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            var entity = await base.InsertAsync(model, uow);
+            await UpdateAffiliateOrderPayment(entity);
+            return entity;
+        }
+
+        protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
+        {
+            var entities = await base.InsertRangeAsync(models, uow);
+            foreach(var entity in entities)
+            {
+                await UpdateAffiliateOrderPayment(entity);
+            }
+            return entities;
+        }
+
+        protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            var entity = await base.UpdateAsync(model, uow);
+            await UpdateAffiliateOrderPayment(entity);
+            return entity;
+        }
+
+        protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
+        {
+            var entities = await base.UpdateRangeAsync(models, uow);
+            foreach (var entity in entities)
+            {
+                await UpdateAffiliateOrderPayment(entity);
+            }
+            return entities;
+        }
+
+        private async Task UpdateAffiliateOrderPayment(Order entity)
+        {
+            if (!entity.IdAddedBy.HasValue)
+            {
+                AffiliateOrderPayment payment = new AffiliateOrderPayment();
+                payment.IdOrder = entity.Id;
+                payment.Status = AffiliateOrderPaymentStatus.NotPaid;
+                //TODO - calculate commission and set is a first order or no the given customer and set IdAffiliate
+                //payment.Amount =
+                //payment.NewCustomerOrder =
+                //payment.IdAffiliate=
+                await _affiliateService.UpdateAffiliateOrderPayment(payment);
+            }
         }
 
         public async Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter)

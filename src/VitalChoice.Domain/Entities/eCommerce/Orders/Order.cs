@@ -14,6 +14,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
 {
     public class Order : DynamicDataEntity<OrderOptionValue, OrderOptionType>
     {
+        public int? IdAddedBy { get; set; }
+
         public OrderStatus OrderStatus { get; set; }
 
         public int IdCustomer { get; set; }

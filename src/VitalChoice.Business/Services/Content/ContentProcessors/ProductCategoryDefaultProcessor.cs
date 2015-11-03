@@ -28,6 +28,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             if (!string.IsNullOrWhiteSpace(model.Url))
             {
                 var productCategory = await base.ExecuteAsync(model);
+                if (productCategory == null)
+                    return null;
                 productCategory.ProductCategory =
                     await
                         _productCategoryEcommerceRepository.Query(c => c.Id == productCategory.Id)
@@ -36,10 +38,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }
             else
             {
-                var categoryEcommerce =
-                    await
+                var categoryEcommerce = await
                         _productCategoryEcommerceRepository.Query(p => !p.ParentId.HasValue)
                             .SelectFirstOrDefaultAsync(false);
+                if (categoryEcommerce == null)
+                    return null;
                 var productCategory =
                     await
                         BuildQuery(ContentRepository.Query(p => p.Id == categoryEcommerce.Id))

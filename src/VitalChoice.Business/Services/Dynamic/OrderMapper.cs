@@ -60,6 +60,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
+                dynamic.IdAddedBy = entity.IdAddedBy;
                 dynamic.DiscountTotal = entity.DiscountTotal;
                 dynamic.OrderStatus = entity.OrderStatus;
                 dynamic.ProductsSubtotal = entity.ProductsSubtotal;
@@ -109,6 +110,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
+                entity.IdAddedBy = entity.IdEditedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;
@@ -146,6 +148,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
+                entity.IdAddedBy = entity.IdAddedBy;
                 entity.DiscountTotal = dynamic.DiscountTotal;
                 entity.OrderStatus = dynamic.OrderStatus;
                 entity.ProductsSubtotal = dynamic.ProductsSubtotal;

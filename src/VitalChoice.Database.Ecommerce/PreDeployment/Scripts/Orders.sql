@@ -236,3 +236,12 @@ BEGIN
 	ADD IdAddress INT NULL
 	CONSTRAINT FK_PaymentMethodToAddress FOREIGN KEY (IdAddress) REFERENCES OrderAddresses (Id)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'Orders') AND Name = N'IdAddedBy')
+BEGIN
+	ALTER TABLE Orders
+	ADD IdAddedBy INT NULL
+		CONSTRAINT FK_OrdersAddedToUser FOREIGN KEY (IdEditedBy) REFERENCES dbo.Users (Id)
+END
