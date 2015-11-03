@@ -137,7 +137,7 @@ BEGIN
 	)
 
 	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdOrder ON AffiliateOrderPayments (IdOrder)
-	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliate_Status ON AffiliateOrderPayments (IdAffiliate,IdAffiliateOrderPaymentStatus)
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliate_Status ON AffiliateOrderPayments (IdAffiliate,Status)
 	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliatePayment ON AffiliateOrderPayments (IdAffiliatePayment)
 
 	CREATE UNIQUE NONCLUSTERED INDEX [UQ_AffiliateOrderPayments] ON [dbo].[AffiliateOrderPayments]
