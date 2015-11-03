@@ -11,7 +11,9 @@ namespace VitalChoice.Domain.Entities.Content
 			RelatedRecipes = new List<RelatedRecipe>();
         }
 
-	    public virtual ICollection<RecipeToContentCategory> RecipesToContentCategories { get; set; }
+        public string FileUrl { get; set; }
+
+        public virtual ICollection<RecipeToContentCategory> RecipesToContentCategories { get; set; }
 
         public virtual ICollection<RecipeToProduct> RecipesToProducts { get; set; }
 

@@ -26,8 +26,6 @@ namespace VC.Admin.Models.ContentManagement
         [Localized(GeneralFieldNames.Description)]
         public string Description { get; set; }
 
-        public string FileUrl { get; set; }
-
         public string Template { get; set; }
 
         public string Title { get; set; }
@@ -59,7 +57,6 @@ namespace VC.Admin.Models.ContentManagement
             Id = item.Id;
             Name = item.Name;
             Url = item.Url;
-            FileUrl = item.FileUrl;
             StatusCode = item.StatusCode;
             Assigned = item.Assigned;
             Template = item.ContentItem.Template;
@@ -70,37 +67,32 @@ namespace VC.Admin.Models.ContentManagement
             Created = item.ContentItem.Created;
             Updated = item.ContentItem.Updated;
             MasterContentItemId = item.MasterContentItemId;
-            if (item.ContentItem.ContentItemToContentProcessors != null)
-            {
-                ProcessorIds = item.ContentItem.ContentItemToContentProcessors.Select(p => p.ContentItemProcessorId).ToList();
-            }
-            else
-            {
-                ProcessorIds = new List<int>();
-            }
-            if (item.ContentPagesToContentCategories != null)
-            {
-                CategoryIds = item.ContentPagesToContentCategories.Select(p => p.ContentCategoryId).ToList();
-            }
+            ProcessorIds =
+                item.ContentItem.ContentItemToContentProcessors?.Select(p => p.ContentItemProcessorId).ToList() ??
+                new List<int>();
+            CategoryIds = item.ContentPagesToContentCategories?.Select(p => p.ContentCategoryId).ToList() ??
+                          new List<int>();
         }
 
         public ContentPage Convert()
         {
-            ContentPage toReturn = new ContentPage();
-            toReturn.Id = Id;
-            toReturn.Name = Name?.Trim();
-            toReturn.Url = Url?.Trim();
-            toReturn.Url = toReturn.Url?.ToLower();
-            toReturn.FileUrl = FileUrl?.Trim();
-            toReturn.StatusCode = StatusCode;
-            toReturn.Assigned = Assigned;
-            toReturn.MasterContentItemId = MasterContentItemId;
-            toReturn.ContentItem = new ContentItem();
-            toReturn.ContentItem.Template = Template;
-            toReturn.ContentItem.Description = Description?.Trim();
-            toReturn.ContentItem.Title = Title;
-            toReturn.ContentItem.MetaKeywords = MetaKeywords;
-            toReturn.ContentItem.MetaDescription = MetaDescription;
+            ContentPage toReturn = new ContentPage
+            {
+                Id = Id,
+                Name = Name?.Trim(),
+                Url = Url?.Trim().ToLower(),
+                StatusCode = StatusCode,
+                Assigned = Assigned,
+                MasterContentItemId = MasterContentItemId,
+                ContentItem = new ContentItem
+                {
+                    Template = Template,
+                    Description = Description?.Trim(),
+                    Title = Title,
+                    MetaKeywords = MetaKeywords,
+                    MetaDescription = MetaDescription
+                }
+            };
             if (ProcessorIds != null)
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()

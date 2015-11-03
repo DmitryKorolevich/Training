@@ -80,21 +80,23 @@ namespace VC.Admin.Models.ContentManagement
 
         public FAQ Convert()
         {
-            FAQ toReturn = new FAQ();
-            toReturn.Id = Id;
-            toReturn.Name = Name?.Trim();
-            toReturn.Url = Url?.Trim();
-            toReturn.Url = toReturn.Url?.ToLower();
-            toReturn.FileUrl = String.Empty;
-            toReturn.ContentItem = new ContentItem();
-            toReturn.ContentItem.Template = Template;
-            toReturn.ContentItem.Description = Description?.Trim();
-            toReturn.ContentItem.Title = Title;
-            toReturn.ContentItem.MetaKeywords = MetaKeywords;
-            toReturn.ContentItem.MetaDescription = MetaDescription;
+            FAQ toReturn = new FAQ
+            {
+                Id = Id,
+                Name = Name?.Trim(),
+                Url = Url?.Trim().ToLower(),
+                ContentItem = new ContentItem
+                {
+                    Template = Template,
+                    Description = Description?.Trim(),
+                    Title = Title,
+                    MetaKeywords = MetaKeywords,
+                    MetaDescription = MetaDescription
+                }
+            };
             if (ProcessorIds != null)
             {
-                toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
+                toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor
                 {
                     ContentItemProcessorId = p,
                 }).ToList();

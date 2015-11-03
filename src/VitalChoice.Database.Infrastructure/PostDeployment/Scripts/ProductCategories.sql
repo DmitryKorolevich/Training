@@ -81,3 +81,26 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'ProductCategories') AND Name = N'Url')
+BEGIN
+	ALTER TABLE ProductCategories ADD Url NVARCHAR(250) CONSTRAINT DV_ProductCategories_Url DEFAULT '' WITH VALUES	
+	ALTER TABLE ProductCategories ADD StatusCode INT CONSTRAINT DV_ProductCategories_StatusCode DEFAULT 2 WITH VALUES	
+	
+	ALTER TABLE ProductCategories DROP CONSTRAINT DV_ProductCategories_Url	
+	ALTER TABLE ProductCategories DROP CONSTRAINT DV_ProductCategories_StatusCode
+END
+
+GO
+
+--update t
+--set t.StatusCode=f.StatusCode,
+--	t.Url=f.Url
+--from [VitalChoice.Infrastructure].[dbo].ProductCategories t
+--inner join [VitalChoice.Ecommerce].[dbo].ProductCategories f on t.Id = f.Id
+
+--DROP INDEX IX_ProductCategories_Url ON [VitalChoice.Ecommerce].dbo.ProductCategories
+--GO
+--ALTER TABLE [VitalChoice.Ecommerce].dbo.ProductCategories
+--	DROP COLUMN Url
+--GO

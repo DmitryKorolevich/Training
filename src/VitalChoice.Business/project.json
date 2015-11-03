@@ -7,16 +7,17 @@
     "Microsoft.AspNet.Mvc": "6.0.0-*",
     "Microsoft.Framework.Logging": "1.0.0-*",
     "Microsoft.Framework.Logging.Console": "1.0.0-*",
-    "VitalChoice.Infrastructure": "1.0.0-*",
-    "VitalChoice.Data": "1.0.0-*",
-    "VitalChoice.Domain": "1.0.0-*",
-    "VitalChoice.Workflow": "1.0.0-*",
-    "VitalChoice.Interfaces": "1.0.0-*",
-    "VitalChoice.DynamicData": "1.0.0-*",
-    "Templates": "2.3.1-beta8",
+    "Templates": "2.3.3-beta8",
     "Autofac.Framework.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "CsvHelper": "2.13.2-*"
+    "CsvHelper": "2.13.2-*",
+    "VitalChoice.Infrastructure": "",
+    "VitalChoice.Data": "",
+    "VitalChoice.Domain": "",
+    "VitalChoice.Workflow": "",
+    "VitalChoice.Interfaces": "",
+    "VitalChoice.DynamicData": "",
+    "VitalChoice.ContentProcessing": ""
   },
 
   "frameworks": {

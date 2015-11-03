@@ -86,8 +86,8 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors");
 	        builder.Entity<MasterContentItemToContentProcessor>().HasKey(p => p.Id);
 	        builder.Entity<MasterContentItemToContentProcessor>().ToTable("MasterContentItemsToContentProcessors");
-	        builder.Entity<ContentProcessor>().HasKey(p => p.Id);
-	        builder.Entity<ContentProcessor>().ToTable("ContentProcessors");
+	        builder.Entity<ContentProcessorEntity>().HasKey(p => p.Id);
+	        builder.Entity<ContentProcessorEntity>().ToTable("ContentProcessors");
 
 	        builder.Entity<MasterContentItem>().HasKey(p => p.Id);
 	        builder.Entity<MasterContentItem>().ToTable("MasterContentItems");
@@ -101,7 +101,7 @@ namespace VitalChoice.Infrastructure.Context
 	            .WithOne(p => p.MasterContentItem)
 	            .ForeignKey(p => p.MasterContentItemId)
 	            .PrincipalKey(p => p.Id);
-	        builder.Entity<ContentProcessor>()
+	        builder.Entity<ContentProcessorEntity>()
 	            .HasMany(p => p.MasterContentItemsToContentProcessors)
 	            .WithOne(p => p.ContentProcessor)
 	            .ForeignKey(p => p.ContentProcessorId)
@@ -119,7 +119,7 @@ namespace VitalChoice.Infrastructure.Context
 	            .WithOne(p => p.ContentItem)
 	            .ForeignKey(p => p.ContentItemId)
 	            .PrincipalKey(p => p.Id);
-	        builder.Entity<ContentProcessor>()
+	        builder.Entity<ContentProcessorEntity>()
 	            .HasMany(p => p.ContentItemsToContentProcessors)
 	            .WithOne(p => p.ContentProcessor)
 	            .ForeignKey(p => p.ContentItemProcessorId)
@@ -280,25 +280,21 @@ namespace VitalChoice.Infrastructure.Context
 	        #region Products
 
 	        builder.Entity<ProductCategoryContent>().HasKey(p => p.Id);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Name);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Url);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.ParentId);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.StatusCode);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Assigned);
-	        builder.Entity<ProductCategoryContent>().Ignore(x => x.Order);
 	        builder.Entity<ProductCategoryContent>().ToTable("ProductCategories");
-	        builder.Entity<ProductCategoryContent>()
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.Name);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.UserId);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.User);
+            builder.Entity<ProductCategoryContent>().Ignore(p => p.ProductCategory);
+            builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
 	            .ForeignKey(p => p.MasterContentItemId)
-	            .
-	            PrincipalKey(p => p.Id);
+	            .PrincipalKey(p => p.Id);
 	        builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
 	            .ForeignKey(p => p.ContentItemId)
-	            .
-	            PrincipalKey(p => p.Id);
+	            .PrincipalKey(p => p.Id);
 
 	        #endregion
 

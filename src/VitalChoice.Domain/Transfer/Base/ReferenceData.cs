@@ -21,7 +21,7 @@ namespace VitalChoice.Domain.Transfer.Base
 
         public IList<LookupItem<int>> ContentTypes { get; set; }
 
-        public IList<ContentProcessor> ContentProcessors { get; set; }
+        public IList<ContentProcessorEntity> ContentProcessors { get; set; }
 
         public IList<LookupItem<string>> Labels { get; set; }
 

@@ -1,44 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {
-    public class RecipeSubCategoriesProcessor : IContentProcessor
+    public class RecipeSubCategoriesProcessor : ContentProcessor<List<ContentCategory>, RecipeParameters>
     {
         private readonly IReadRepositoryAsync<ContentCategory> _contentCategoryRepositoryAsync;
 
-        public RecipeSubCategoriesProcessor(IReadRepositoryAsync<ContentCategory> contentCategoryRepositoryAsync)
+        public RecipeSubCategoriesProcessor(IObjectMapper<RecipeParameters> mapper,
+            IReadRepositoryAsync<ContentCategory> contentCategoryRepositoryAsync) : base(mapper)
         {
             _contentCategoryRepositoryAsync = contentCategoryRepositoryAsync;
         }
 
-        public async Task<dynamic> ExecuteAsync(dynamic model, Dictionary<string, object> queryData)
+        public override Task<List<ContentCategory>> ExecuteAsync(RecipeParameters model)
         {
-            int? categoryId = null;
-            if (queryData.ContainsKey(ContentConstants.CATEGORY_ID) && queryData[ContentConstants.CATEGORY_ID] is int?)
-            {
-                categoryId = (int?) queryData[ContentConstants.CATEGORY_ID];
-            }
-            if (!categoryId.HasValue)
-            {
-                throw new Exception("No query data for RecipeSubCategoriesProcessor");
-            }
-            var subCategories =
-                await
-                    _contentCategoryRepositoryAsync.Query(
-                        p => p.ParentId == categoryId && p.StatusCode == RecordStatusCode.Active)
-                        .OrderBy(query => query.OrderBy(p => p.Order))
-                        .SelectAsync(false);
-            model.Categories = subCategories;
-            return model;
+            return
+                _contentCategoryRepositoryAsync.Query(
+                    p => p.ParentId == model.IdCategory && p.StatusCode == RecordStatusCode.Active)
+                    .OrderBy(query => query.OrderBy(p => p.Order))
+                    .SelectAsync(false);
         }
+
+        public override string ResultName => "Categories";
     }
 }

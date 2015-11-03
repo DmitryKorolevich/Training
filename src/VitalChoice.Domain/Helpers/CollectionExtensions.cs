@@ -100,5 +100,21 @@ namespace VitalChoice.Domain.Helpers
             HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
             return main.Where(m => searchIn.Contains(mainKeySelector(m))).ToList();
         }
+
+        public static void CopyTo<T1, T2>(this IDictionary<T1, T2> src, IDictionary<T1, T2> dest)
+        {
+            foreach (var pair in src)
+            {
+                if (!dest.ContainsKey(pair.Key))
+                {
+                    dest.Add(pair);
+                }
+            }
+        }
+
+        public static string FormatDictionary<T1, T2>(this IDictionary<T1, T2> src)
+        {
+            return string.Join("\r\n", src.Select(pair => $"[{pair.Key} = {pair.Value}]"));
+        }
     }
 }

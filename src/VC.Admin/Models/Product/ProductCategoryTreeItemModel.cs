@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Transfer.Products;
 
 namespace VC.Admin.Models.Product
 {
@@ -24,46 +25,52 @@ namespace VC.Admin.Models.Product
 
         public IEnumerable<ProductCategoryTreeItemModel> SubItems { get; set; }
 
-        public ProductCategoryTreeItemModel(ProductCategory item)
+        public ProductCategoryTreeItemModel(ProductNavCategoryLite item)
         {
             if (item != null)
             {
                 Id = item.Id;
-                Name = item.Name;
                 Url = item.Url;
-                StatusCode = item.StatusCode;
-                Assigned = item.Assigned;
+                if (item.ProductCategory != null)
+                {
+                    Name = item.ProductCategory.Name;
+                    StatusCode = item.ProductCategory.StatusCode;
+                    Assigned = item.ProductCategory.Assigned;
+                }
                 CreateSubCategories(this, item);
             }
         }
 
-        private void CreateSubCategories(ProductCategoryTreeItemModel model, ProductCategory category)
+        private void CreateSubCategories(ProductCategoryTreeItemModel model, ProductNavCategoryLite category)
         {
-            var subModels = category.SubCategories.Select(subCategory => new ProductCategoryTreeItemModel(subCategory)).ToList();
-            model.SubItems = subModels;
+            model.SubItems =
+                category.SubItems.Select(subCategory => new ProductCategoryTreeItemModel(subCategory)).ToList();
         }
 
-        public ProductCategory Convert()
+        public ProductNavCategoryLite Convert()
         {
             return Convert(null);
         }
 
-        public ProductCategory Convert(int? parentId)
+        public ProductNavCategoryLite Convert(int? parentId)
         {
-            ProductCategory toReturn = new ProductCategory
+            ProductNavCategoryLite toReturn = new ProductNavCategoryLite()
             {
                 Id = Id,
-                ParentId = parentId,
+                ProductCategory = new ProductCategory()
+                {
+                    ParentId = parentId
+                },
                 Name = Name,
                 Url = Url
             };
-            var subItems = new List<ProductCategory>();
-            if (SubItems!=null)
+            var subItems = new List<ProductNavCategoryLite>();
+            if (SubItems != null)
             {
                 subItems.AddRange(SubItems.Select(subItem => subItem.Convert(toReturn.Id)));
             }
-            toReturn.SubCategories = subItems;
+            toReturn.SubItems = subItems.ToList();
             return toReturn;
         }
-    }
+	}
 }

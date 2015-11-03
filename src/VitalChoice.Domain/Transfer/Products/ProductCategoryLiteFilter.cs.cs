@@ -7,10 +7,8 @@ using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Domain.Transfer.Products
 {
-    public class ProductCategoryLiteFilter:FilterBase
+    public class ProductCategoryLiteFilter: ProductCategoryTreeFilter
     {
 	    public IList<CustomerTypeCode> Visibility { get; set; }
-
-		public IList<RecordStatusCode> Statuses { get; set; }
 	}
 }

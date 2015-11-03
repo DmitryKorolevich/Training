@@ -34,7 +34,7 @@ namespace VitalChoice.Business.Services.Workflow
             var tree =
                 await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName)).SelectFirstOrDefaultAsync(false);
             if (tree == null)
-                throw new ApiException($"Tree {treeName} not found");
+                throw new ApiException($"Tree <{treeName}> not found");
             return ReflectionHelper.ResolveType(tree.ImplementationType);
         }
 
@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Workflow
                     .SelectAsync(false);
             var tree = result.SingleOrDefault();
             if (tree == null)
-                throw new ApiException($"Tree {treeName} not found");
+                throw new ApiException($"Tree <{treeName}> not found");
 
             return
                 new HashSet<ActionItem>(
@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Services.Workflow
                         .Include(r => r.Executor)
                         .SelectAsync(false);
             if (!actions.Any())
-                throw new ApiException($"Action {actionName} not found");
+                throw new ApiException($"Action <{actionName}> not found");
 
             return actions.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
             {
@@ -83,7 +83,7 @@ namespace VitalChoice.Business.Services.Workflow
                     .SelectAsync(false);
             var action = result.SingleOrDefault();
             if (action == null)
-                throw new ApiException($"Action {actionName} not found");
+                throw new ApiException($"Action <{actionName}> not found");
 
             return
                 new HashSet<ActionItem>(
@@ -102,7 +102,7 @@ namespace VitalChoice.Business.Services.Workflow
                     .SelectAsync(false);
             var action = result.SingleOrDefault();
             if (action == null)
-                throw new ApiException($"Action {actionName} not found");
+                throw new ApiException($"Action <{actionName}> not found");
 
             return
                 new HashSet<ActionItem>(

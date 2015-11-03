@@ -33,13 +33,26 @@ namespace VitalChoice.DynamicData.Base
         private readonly IModelConverterService _converterService;
         private HashSet<object> _processedObjectsSet;
 
+        protected virtual bool UseMapAttribute => true;
+
         public ObjectMapper(ITypeConverter typeConverter, IModelConverterService converterService)
         {
             _typeConverter = typeConverter;
             _converterService = converterService;
         }
 
-        public void SecureObject(TObject obj)
+        public void UpdateObject(TObject obj, IDictionary<string, object> model, bool caseSense = true)
+        {
+            if (model == null)
+                return;
+
+            if (obj == null)
+                return;
+
+            FromDictionaryInternal(obj, model, typeof(TObject), caseSense);
+        }
+
+        public virtual void SecureObject(TObject obj)
         {
             _processedObjectsSet = new HashSet<object>();
             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, typeof(TObject), true);
@@ -58,12 +71,12 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TModel();
 
-            ToModel(obj, result);
+            UpdateModel(result, obj);
 
             return result;
         }
 
-        public void ToModel<TModel>(TObject obj, TModel model)
+        public void UpdateModel<TModel>(TModel model, TObject obj)
         {
             if (obj == null)
                 return;
@@ -71,7 +84,7 @@ namespace VitalChoice.DynamicData.Base
             if (model == null)
                 return;
 
-            ToModelInternal(obj, model, typeof (TModel), typeof (TObject));
+            ToModelInternal(obj, model, typeof(TModel), typeof(TObject));
 
             var converter = _converterService.GetConverter<TModel, TObject>();
             converter?.DynamicToModel(model, obj);
@@ -84,12 +97,12 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new Dictionary<string, object>();
 
-            ToDictionary(obj, result);
+            UpdateModel(obj, result);
 
             return result;
         }
 
-        public void ToDictionary(TObject obj, IDictionary<string, object> model)
+        public void UpdateModel(TObject obj, IDictionary<string, object> model)
         {
             if (obj == null)
                 return;
@@ -100,19 +113,7 @@ namespace VitalChoice.DynamicData.Base
             ToDictionaryInternal(obj, model, typeof(TObject));
         }
 
-        public TObject FromDictionary(IDictionary<string, object> model)
-        {
-            if (model == null)
-                return null;
-
-            var result = new TObject();
-
-            FromDictionary(model, result);
-
-            return result;
-        }
-
-        public void FromDictionary(IDictionary<string, object> model, TObject obj)
+        public void UpdateObject<TModel>(TModel model, TObject obj)
         {
             if (model == null)
                 return;
@@ -120,7 +121,22 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            FromDictionaryInternal(obj, model, typeof(TObject));
+            FromModelInternal(obj, model, typeof(TModel), typeof(TObject));
+
+            var converter = _converterService.GetConverter<TModel, TObject>();
+            converter?.ModelToDynamic(model, obj);
+        }
+
+        public TObject FromDictionary(IDictionary<string, object> model, bool caseSense = true)
+        {
+            if (model == null)
+                return null;
+
+            var result = new TObject();
+
+            UpdateObject(result, model, caseSense);
+
+            return result;
         }
 
         public TObject FromModel<TModel>(TModel model)
@@ -130,29 +146,15 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TObject();
 
-            FromModel(model, result);
+            UpdateObject(model, result);
 
             return result;
-        }
-
-        public void FromModel<TModel>(TModel model, TObject obj)
-        {
-            if (model == null)
-                return;
-
-            if (obj == null)
-                return;
-
-            FromModelInternal(obj, model, typeof (TModel), typeof (TObject));
-
-            var converter = _converterService.GetConverter<TModel, TObject>();
-            converter?.ModelToDynamic(model, obj);
         }
 
         object IObjectMapper.ToModel(object obj, Type modelType)
         {
             var result = CreateInstance(modelType);
-            (this as IObjectMapper).ToModel(obj, modelType, result);
+            (this as IObjectMapper).UpdateModel(obj, modelType, result);
 
             return result;
         }
@@ -167,7 +169,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        void IObjectMapper.ToModel(object obj, Type modelType, object model)
+        void IObjectMapper.UpdateModel(object obj, Type modelType, object model)
         {
             if (obj == null)
                 return;
@@ -187,12 +189,12 @@ namespace VitalChoice.DynamicData.Base
 
             var result = new TObject();
 
-            (this as IObjectMapper).FromModel(modelType, model, result);
+            (this as IObjectMapper).UpdateObject(modelType, model, result);
 
             return result;
         }
 
-        void IObjectMapper.FromModel(Type modelType, object model, object obj)
+        void IObjectMapper.UpdateObject(Type modelType, object model, object obj)
         {
             if (model == null)
                 return;
@@ -214,7 +216,7 @@ namespace VitalChoice.DynamicData.Base
             }
             if (!property.NotLoggedInfo)
             {
-                if (property.PropertyType == typeof (string))
+                if (property.PropertyType == typeof (string) || IsSystemValueType(property.PropertyType))
                     return;
 
                 Type elementType = property.PropertyType.TryGetElementType(typeof (IEnumerable<>));
@@ -222,7 +224,6 @@ namespace VitalChoice.DynamicData.Base
                 {
                     if (elementType == typeof (string) || IsSystemValueType(elementType))
                         return;
-
                     var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, elementType, true);
                     var items = (IEnumerable) property.Get?.Invoke(obj);
                     if (items != null)
@@ -285,13 +286,16 @@ namespace VitalChoice.DynamicData.Base
             return false;
         }
 
-        protected virtual void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType)
+        protected virtual void FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
         {
             if (obj == null)
                 return;
             if (model == null)
                 return;
-
+            if (!caseSense)
+            {
+                model = model.ToDictionary(m => m.Key, m => m.Value, StringComparer.OrdinalIgnoreCase);
+            }
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in objectCache)
             {
@@ -338,7 +342,10 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            var modelCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+            var modelCache = UseMapAttribute
+                ? DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType)
+                : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
+
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {
@@ -364,7 +371,10 @@ namespace VitalChoice.DynamicData.Base
             if (obj == null)
                 return;
 
-            var modelCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType);
+            var modelCache = UseMapAttribute
+                ? DynamicTypeCache.GetTypeCache(DynamicTypeCache.ModelTypeMappingCache, modelType)
+                : DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, modelType, true);
+
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {

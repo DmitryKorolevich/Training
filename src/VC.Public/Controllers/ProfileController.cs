@@ -66,7 +66,7 @@ namespace VC.Public.Controllers
 					currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
 			{
 				var billingInfoModel = _addressConverter.ToModel<BillingInfoModel>(creditCard.Address);
-				_paymentMethodConverter.ToModel(creditCard, billingInfoModel);
+				_paymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
 
 				creditCards.Add(billingInfoModel);
 			}

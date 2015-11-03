@@ -40,7 +40,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters(), url);
+            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

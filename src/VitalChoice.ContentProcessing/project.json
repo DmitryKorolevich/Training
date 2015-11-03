@@ -6,7 +6,12 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "VitalChoice.Domain": ""
+    "VitalChoice.Domain": "",
+    "VitalChoice.DynamicData": "",
+    "VitalChoice.Interfaces": "",
+    "VitalChoice.Infrastructure": "",
+    "VitalChoice.Data": "",
+    "Autofac": "4.0.0-*"
   },
   "frameworks": {
     "dnx451": { },

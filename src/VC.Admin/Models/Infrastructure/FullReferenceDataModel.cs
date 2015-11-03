@@ -12,7 +12,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> CustomerRoles { get; set; }
 	    public IList<LookupItem<byte>> UserStatuses { get; set; }
         public IList<LookupItem<int>> ContentTypes { get; set; }
-        public IList<ContentProcessor> ContentProcessors { get; set; }
+        public IList<ContentProcessorEntity> ContentProcessors { get; set; }
         public IList<LookupItem<int>> Months { get; set; }
         public string PublicHost { get; set; }
         public IList<LookupItem<int?>> VisibleOptions { get; set; }

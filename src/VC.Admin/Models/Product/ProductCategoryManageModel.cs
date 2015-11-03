@@ -64,13 +64,13 @@ namespace VC.Admin.Models.Product
         public ProductCategoryManageModel(ProductCategoryContent item)
         {
             Id = item.Id;
-            Name = item.Name;
+            Name = item.ProductCategory.Name;
             Url = item.Url;
             FileImageSmallUrl = item.FileImageSmallUrl;
             FileImageLargeUrl = item.FileImageLargeUrl;
             StatusCode = item.StatusCode;
-            Assigned = item.Assigned;
-            ParentId = item.ParentId;
+            Assigned = item.ProductCategory.Assigned;
+            ParentId = item.ProductCategory.ParentId;
             MasterContentItemId = item.MasterContentItemId;
             LongDescription = item.LongDescription;
             LongDescriptionBottom = item.LongDescriptionBottom;
@@ -95,31 +95,35 @@ namespace VC.Admin.Models.Product
 
         public ProductCategoryContent Convert()
         {
-            ProductCategoryContent toReturn = new ProductCategoryContent();
-            toReturn.Id = Id;
-            toReturn.Name = Name?.Trim();
-            toReturn.Url = Url?.Trim();
-            toReturn.Url = toReturn.Url?.ToLower();
-            toReturn.FileImageSmallUrl = FileImageSmallUrl?.Trim();
-            toReturn.FileImageLargeUrl = FileImageLargeUrl?.Trim();
-            toReturn.StatusCode = StatusCode;
-            toReturn.Assigned = Assigned;
-            toReturn.MasterContentItemId = MasterContentItemId.HasValue ? MasterContentItemId.Value : 0;
-            toReturn.ParentId = ParentId;
-            toReturn.LongDescription = LongDescription;
-            toReturn.LongDescriptionBottom = LongDescriptionBottom;
-            toReturn.NavLabel = NavLabel;
-            toReturn.NavIdVisible = NavIdVisible;
-            toReturn.ContentItem = new ContentItem();
-            toReturn.ContentItem.Description = Description;
-            if(toReturn.ContentItem.Description==null)
+            ProductCategoryContent toReturn = new ProductCategoryContent
             {
-                toReturn.ContentItem.Description = String.Empty;
-            }
-            toReturn.ContentItem.Template = Template;
-            toReturn.ContentItem.Title = Title;
-            toReturn.ContentItem.MetaKeywords = MetaKeywords;
-            toReturn.ContentItem.MetaDescription = MetaDescription;
+                Id = Id,
+                Name = Name?.Trim(),
+                Url = Url?.Trim().ToLower(),
+                FileImageSmallUrl = FileImageSmallUrl?.Trim(),
+                FileImageLargeUrl = FileImageLargeUrl?.Trim(),
+                StatusCode = StatusCode,
+                ProductCategory = {
+                    Name = Name?.Trim(),
+                    Assigned = Assigned,
+                    ParentId = ParentId,
+                    StatusCode = StatusCode,
+                },
+                MasterContentItemId = MasterContentItemId ?? 0,
+                LongDescription = LongDescription,
+                LongDescriptionBottom = LongDescriptionBottom,
+                NavLabel = NavLabel,
+                NavIdVisible = NavIdVisible,
+                ContentItem = new ContentItem
+                {
+                    Description = Description ?? string.Empty,
+                    Template = Template,
+                    Title = Title,
+                    MetaKeywords = MetaKeywords,
+                    MetaDescription = MetaDescription
+                }
+            };
+            
             if (ProcessorIds != null)
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()

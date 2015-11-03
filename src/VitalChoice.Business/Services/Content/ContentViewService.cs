@@ -27,7 +27,6 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<FAQ> faqRepository;
         private readonly IRepositoryAsync<Article> articleRepository;
         private readonly IRepositoryAsync<ContentPage> contentPageRepository;
-        private readonly IContentProcessorsService contentProcessorsService;
 	    private readonly ITtlGlobalCache _templatesCache;
 	    private readonly ILogger _logger;
 
@@ -36,13 +35,12 @@ namespace VitalChoice.Business.Services.Content
 	        IRepositoryAsync<ContentItem> contentItemRepository, IRepositoryAsync<Recipe> recipeRepository,
 	        IRepositoryAsync<FAQ> faqRepository,
 	        IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentPage> contentPageRepository,
-	        IContentProcessorsService contentProcessorsService, ITtlGlobalCache templatesCache,
+	        ITtlGlobalCache templatesCache,
 	        ILoggerProviderExtended loggerProvider)
 	    {
 	        this.masterContentItemRepository = masterContentItemRepository;
 	        this.contentCategoryRepository = contentCategoryRepository;
 	        this.contentItemRepository = contentItemRepository;
-	        this.contentProcessorsService = contentProcessorsService;
 	        this.recipeRepository = recipeRepository;
 	        this.faqRepository = faqRepository;
 	        this.articleRepository = articleRepository;
@@ -113,16 +111,16 @@ namespace VitalChoice.Business.Services.Content
             dynamic model = new ExpandoObject();
             model.BodyHtml = category.ContentItem.Description;
             parameters.Add(ContentConstants.CATEGORY_ID, category.Id);
-            foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)
-            {
-                var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);
-                model = await processor.ExecuteAsync(model, parameters);
-            }
-            foreach (var contentItemsToContentItemProcessor in category.ContentItem.ContentItemToContentProcessors)
-            {
-                var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentProcessor.Type);
-                model = await processor.ExecuteAsync(model, parameters);
-            }
+            //foreach (var masterContentItemsToContentItemProcessor in category.MasterContentItem.MasterContentItemToContentProcessors)
+            //{
+            //    var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);
+            //    model = await processor.ExecuteAsync(model, parameters);
+            //}
+            //foreach (var contentItemsToContentItemProcessor in category.ContentItem.ContentItemToContentProcessors)
+            //{
+            //    var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentProcessor.Type);
+            //    model = await processor.ExecuteAsync(model, parameters);
+            //}
 
             var generatedHtml = template.Generate(model);
 
@@ -201,16 +199,16 @@ namespace VitalChoice.Business.Services.Content
             }
             dynamic model = new ExpandoObject();
             model.BodyHtml = contentDataItem.ContentItem.Description;
-            foreach (var masterContentItemsToContentItemProcessor in contentDataItem.MasterContentItem.MasterContentItemToContentProcessors)
-            {
-                var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);
-                model = await processor.ExecuteAsync(model, parameters);
-            }
-            foreach (var contentItemsToContentItemProcessor in contentDataItem.ContentItem.ContentItemToContentProcessors)
-            {
-                var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentProcessor.Type);
-                model = await processor.ExecuteAsync(model, parameters);
-            }
+            //foreach (var masterContentItemsToContentItemProcessor in contentDataItem.MasterContentItem.MasterContentItemToContentProcessors)
+            //{
+            //    var processor = contentProcessorsService.GetContentProcessorByName(masterContentItemsToContentItemProcessor.ContentProcessor.Type);
+            //    model = await processor.ExecuteAsync(model, parameters);
+            //}
+            //foreach (var contentItemsToContentItemProcessor in contentDataItem.ContentItem.ContentItemToContentProcessors)
+            //{
+            //    var processor = contentProcessorsService.GetContentProcessorByName(contentItemsToContentItemProcessor.ContentProcessor.Type);
+            //    model = await processor.ExecuteAsync(model, parameters);
+            //}
 
             var generatedHtml = template.Generate(model);
 
