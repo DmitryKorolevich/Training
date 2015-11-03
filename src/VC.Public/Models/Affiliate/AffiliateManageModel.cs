@@ -18,6 +18,7 @@ namespace VC.Public.Models.Affiliate
     [ApiValidator(typeof(AffiliateManageModelValidator))]
     public class AffiliateManageModel : BaseModel
 	{
+        [Display(Name = "Current Email")]
         public string CurrentEmail { get; set; }
 
         [EmailAddress]

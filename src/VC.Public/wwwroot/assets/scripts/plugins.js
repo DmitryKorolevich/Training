@@ -38,6 +38,11 @@
             }
         }
     });
+
+    $(document).ready(function ()
+    {
+        $( ".date-picker" ).datepicker();
+    });
 })(jQuery);
 
 var successMessage;

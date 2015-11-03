@@ -21,5 +21,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
         public AffiliateOrderPaymentStatus Status { get; set; }
 
         public int? IdAffiliatePayment { get; set; }
+
+        public bool NewCustomerOrder { get; set; }
     }
 }

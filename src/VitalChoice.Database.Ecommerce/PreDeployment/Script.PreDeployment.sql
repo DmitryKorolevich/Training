@@ -49,3 +49,5 @@
 :r .\Scripts\ObjectHistoryLogItems.sql
 
 :r .\Scripts\CustomerFavoritesView.sql
+
+:r .\Scripts\DiscountUpdates.sql

@@ -1286,6 +1286,10 @@ footer{
 				&.small-form-control{
 					width:50px;
 				}
+
+                &.date-picker{
+					width:100px;
+				}
 			}
 
             input[type="checkbox"].form-control, input[type="radio"].form-control { height: auto; margin-top: 9px; margin-right: 7px; width: auto;}
@@ -1311,6 +1315,16 @@ footer{
 			}
 		}
 	}
+
+    .filter-row
+    {
+        .form-group { 
+            width: auto;
+            display: inline-block;
+            margin-right: 10px;
+            float: none;
+        }
+    }
 
 	.form-buttons-group{
 		margin-top: 15px;
@@ -1457,3 +1471,33 @@ footer{
 .margin-bottom-medium{
 	margin-bottom:30px;
 }
+
+.margin-top-small{
+	margin-top:10px;
+}
+
+.margin-bottom-small{
+	margin-bottom:10px;
+}
+
+.standard-table { width: 100%;}
+.standard-table > thead > tr > th {
+	background-color: #FFFFCC;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 4px;
+	border-bottom: 1px solid #E1E1E1;
+	text-align: left;
+}
+
+.standard-table > thead > tr > th.align-right { text-align: right; }
+
+.standard-table > tbody > tr > td { padding: 4px;}
+
+.payment-history .total { float: right; }
+
+.align-right { text-align: right; }
+
+.unpaid-orders .total { float: right; }
+
+.note{ color:red;}

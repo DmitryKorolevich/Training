@@ -159,3 +159,24 @@ JOIN Customers c ON a.Id=c.IdAffiliate
 GROUP BY a.Id
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = 'NewCustomerOrder' AND [object_id] = OBJECT_ID(N'[dbo].[AffiliateOrderPayments]', N'U'))
+BEGIN
+
+	ALTER TABLE dbo.AffiliateOrderPayments
+	ADD NewCustomerOrder BIT NOT NULL DEFAULT 0
+END
+
+GO
+
+IF NOT EXISTS (SELECT object_id FROM sys.indexes WHERE name='IX_Customers_IdAffiliate' AND object_id = OBJECT_ID('Customers'))
+BEGIN
+
+CREATE NONCLUSTERED INDEX [IX_Customers_IdAffiliate] ON [dbo].[Customers]
+(
+	[IdAffiliate] ASC
+)WITH (FILLFACTOR = 80)
+
+END
+
+GO

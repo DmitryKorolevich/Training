@@ -193,4 +193,10 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\CustomerFavoritesView.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\DiscountUpdates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VCustomers.sql" />
+  </ItemGroup>
 </Project>

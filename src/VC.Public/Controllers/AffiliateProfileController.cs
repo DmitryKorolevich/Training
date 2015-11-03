@@ -31,6 +31,9 @@ using VC.Public.Models.Affiliate;
 using VitalChoice.Interfaces.Services;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc.Rendering;
+using VitalChoice.Domain.Transfer.Affiliates;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
+using VitalChoice.Domain.Transfer.Base;
 
 namespace VC.Public.Controllers
 {
@@ -80,6 +83,8 @@ namespace VC.Public.Controllers
 
             return affiliate;
         }
+
+        #region Affiliates
 
         [HttpGet]
         public IActionResult Index()
@@ -183,5 +188,75 @@ namespace VC.Public.Controllers
             return View(model);
         }
 
+        #endregion
+
+        #region AffiliatePayments
+
+        [HttpGet]
+        public async Task<IActionResult> PaymentHistory()
+        {
+            var toReturn = (await _affiliateService.GetAffiliatePayments(GetInternalAffiliateId())).Select(p => new PaymentHistoryLineModel()
+            {
+                DateCreated = p.DateCreated,
+                Amount = p.Amount,
+            }).ToList();
+            return View(toReturn);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UnpaidOrders()
+        {
+            AffiliateOrderPaymentFilter filter = new AffiliateOrderPaymentFilter();
+            filter.IdAffiliate = GetInternalAffiliateId();
+            filter.Status = AffiliateOrderPaymentStatus.NotPaid;
+            var result = await _affiliateService.GetAffiliateOrderPayments(filter);
+            var toReturn = result.Items.Select(p => new OrderPaymentLineModel()
+            {
+                DateCreated=p.Order.DateCreated,
+                IdOrder=p.IdOrder,
+                NewCustomerOrder=p.NewCustomerOrder,
+                ProductTotal=p.Order.ProductsSubtotal,
+                OrderTotal=p.Order.Total,
+                Shipping=p.Order.ShippingTotal,
+                Tax=p.Order.TaxTotal,
+                Commission=p.Amount,
+            }).ToList();
+            return View(toReturn);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PaidOrders(DateTime? from=null, DateTime? to=null, int page=1)
+        {
+            AffiliateOrderPaymentFilter filter = new AffiliateOrderPaymentFilter();
+            filter.IdAffiliate = GetInternalAffiliateId();
+            filter.Status = AffiliateOrderPaymentStatus.Paid;
+            filter.From = from;
+            filter.To = to;
+            filter.Paging = new Paging();
+            filter.Paging.PageIndex = page - 1;
+            if(filter.Paging.PageIndex<0)
+            {
+                filter.Paging.PageIndex = 0;
+            }
+            filter.Paging.PageItemCount = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT;
+            var result = await _affiliateService.GetAffiliateOrderPayments(filter);
+            OrderPaymentsModel toReturn = new OrderPaymentsModel();
+            toReturn.From = from;
+            toReturn.To = to;
+            toReturn.Items = result.Items.Select(p => new OrderPaymentLineModel()
+            {
+                DateCreated = p.Order.DateCreated,
+                IdOrder = p.IdOrder,
+                NewCustomerOrder = p.NewCustomerOrder,
+                ProductTotal = p.Order.ProductsSubtotal,
+                OrderTotal = p.Order.Total,
+                Shipping = p.Order.ShippingTotal,
+                Tax = p.Order.TaxTotal,
+                Commission = p.Amount,
+            }).ToList();
+            return View(toReturn);
+        }
+
+        #endregion
     }
 }

@@ -443,6 +443,7 @@ namespace VitalChoice.Business.Services.Affiliates
                 dbItem.IdAffiliate = item.IdAffiliate;
                 dbItem.IdOrder = item.IdOrder;
                 dbItem.Amount = item.Amount;
+                dbItem.NewCustomerOrder = item.NewCustomerOrder;
 
                 await _affiliateOrderPaymentRepository.InsertAsync(dbItem);
             }

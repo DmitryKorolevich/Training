@@ -319,7 +319,7 @@
 
             <div class="form-group">
                 <div class="message-group">
-                    @Html.CheckBoxFor(m => m.IsAllowAgreement, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to Web Affiliate Agreement." })
+                    @Html.CheckBoxFor(m => m.IsAllowAgreement, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to SPAM Agreement." })
                     <strong>I understand that I may not promote these products/services or this Affiliate Program by sending unsolicited mailings (SPAM).</strong><br>
                     <span>International orders: non-perishable orders can be shipped outside the U.S. and Canada for an additional fee, some restrictions apply.</span>
                     @Html.ValidationMessageFor(m => m.IsAllowAgreement)
@@ -327,7 +327,7 @@
             </div>
             <div class="form-group">
                 <div class="message-group">
-                    @Html.CheckBoxFor(m => m.IsNotSpam, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to SPAM Agreement." })
+                    @Html.CheckBoxFor(m => m.IsNotSpam, new { @class = "form-control", @data_val = "true", @data_val_checkboxtrue = "Please agree to Web Affiliate Agreement." })
                     <strong>I certify that the above information is true and that I have read and agree to the terms of the Web Affiliate Agreement. </strong>
                     @Html.ValidationMessageFor(m => m.IsNotSpam)
                 </div>
