@@ -987,6 +987,7 @@ footer {
   padding-right: 15px;
   width: 723px;
   margin-bottom: 50px;
+  min-height: 310px;
 }
 .border-form-left .form-control-important-info {
   width: auto;
