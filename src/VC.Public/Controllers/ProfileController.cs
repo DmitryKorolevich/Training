@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,9 +22,13 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
+using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 
@@ -37,16 +42,20 @@ namespace VC.Public.Controllers
 		private readonly ICustomerService _customerService;
 		private readonly IDynamicMapper<CustomerAddressDynamic> _addressConverter;
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
+		private readonly IProductService _productService;
+		private readonly IOrderService _orderService;
 
 		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
 			ICustomerService customerService, IDynamicMapper<CustomerAddressDynamic> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter)
+            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter, IOrderService orderService, IProductService productService)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
 			_customerService = customerService;
 			_addressConverter = addressConverter;
 			_paymentMethodConverter = paymentMethodConverter;
+			_orderService = orderService;
+			_productService = productService;
 		}
 
 		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
@@ -57,7 +66,7 @@ namespace VC.Public.Controllers
 					currentCustomer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
 			{
 				var billingInfoModel = _addressConverter.ToModel<BillingInfoModel>(creditCard.Address);
-				_paymentMethodConverter.UpdateModel(billingInfoModel, creditCard);
+				_paymentMethodConverter.ToModel(creditCard, billingInfoModel);
 
 				creditCards.Add(billingInfoModel);
 			}
@@ -148,11 +157,6 @@ namespace VC.Public.Controllers
 		public IActionResult ChangePassword()
 		{
 			return View(new ChangePasswordModel());
-		}
-
-		public IActionResult TopFavoriteItems()
-		{
-			return View();
 		}
 
 		[HttpPost]
@@ -404,6 +408,68 @@ namespace VC.Public.Controllers
 			await _customerService.UpdateAsync(currentCustomer);
 
 			return true;
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> LastOrderPlaced()
+		{
+			var internalId = GetInternalCustomerId();
+
+			var lastOrder = await _orderService.SelectLastOrderAsync(internalId);
+
+			var lines = new List<LastOrderLineModel>();
+
+			if (lastOrder != null)
+			{
+				foreach (var skuOrdered in lastOrder.Skus)
+				{
+					var lineModel = new LastOrderLineModel()
+					{
+						ProductUrl = skuOrdered.ProductWithoutSkus.Url,
+						IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail,
+						ProductName = skuOrdered.ProductWithoutSkus.Name,
+						PortionsCount = skuOrdered.Sku.Data.QTY,
+						Quantity = skuOrdered.Quantity,
+						SelectedPrice = string.Format("{0:0.00}", skuOrdered.Amount),
+						SkuCode = skuOrdered.Sku.Code
+					};
+
+					lines.Add(lineModel);
+				}
+			}
+
+			return View(lines);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> TopFavoriteItems(bool all = false)
+		{
+			var internalId = GetInternalCustomerId();
+
+			var favorites = await _productService.GetCustomerFavoritesAsync(new VCustomerFavoritesFilter()
+			{
+				IdCustomer = internalId,
+				Paging = new Paging()
+				{
+					PageIndex = 0,
+					PageItemCount = all ? 10000 : ProductConstants.DEFAULT_FAVORITES_COUNT
+				}
+			});
+
+			var model = new List<FavoriteModel>();
+			foreach (var favorite in favorites.Items)
+			{
+				var favoriteModel = new FavoriteModel()
+				{
+					ProductName = favorite.ProductName,
+					ProductThumbnail = favorite.ProductThumbnail,
+					Url = favorite.Url
+				};
+
+				model.Add(favoriteModel);
+			}
+
+			return View(model);
 		}
 	}
 }

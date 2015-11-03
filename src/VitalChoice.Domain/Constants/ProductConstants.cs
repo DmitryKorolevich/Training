@@ -20,5 +20,7 @@ namespace VitalChoice.Domain.Constants
         public const string FIELD_NAME_QTY_THRESHOLD = "QTYThreshold";
 
         public const string FIELD_NAME_INVENTORY_CATEGORY_ID = "InventoryCategoryId";
-    }
+
+		public const int DEFAULT_FAVORITES_COUNT = 6;
+	}
 }

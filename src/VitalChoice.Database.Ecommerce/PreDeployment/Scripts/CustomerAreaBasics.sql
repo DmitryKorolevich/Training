@@ -608,6 +608,7 @@ CREATE VIEW [dbo].[VCustomers]
 AS
 SELECT
 	cu.[Id],
+	cu.[IdAffiliate],
 	cu.[Email],
 	options.[FirstName],
 	options.[LastName],
@@ -628,7 +629,8 @@ SELECT
 	options.[Zip],
 	ISNULL(st.[StateCode], ad.[County]) AS StateOrCounty,
 	(SELECT count(*) FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3) AS TotalOrders,
-	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated DESC) AS LastOrderPlaced
+	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated DESC) AS LastOrderPlaced,
+	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated ASC) AS FirstOrderPlaced
 FROM [dbo].[Customers] AS cu
 LEFT OUTER JOIN [dbo].[Addresses] AS ad ON cu.Id = ad.IdCustomer AND
 ad.IdObjectType = (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Profile')
@@ -751,3 +753,17 @@ BEGIN
 	ALTER TABLE [dbo].[Customers] 
 	DROP CONSTRAINT [FK_Customers_RecordStatusCode]
 END
+
+GO
+
+IF NOT EXISTS (SELECT object_id FROM sys.indexes WHERE name='IX_Customers_IdAffiliate' AND object_id = OBJECT_ID('Customers'))
+BEGIN
+
+CREATE NONCLUSTERED INDEX [IX_Customers_IdAffiliate] ON [dbo].[Customers]
+(
+	[IdAffiliate] ASC
+)WITH (FILLFACTOR = 80)
+
+END
+
+GO

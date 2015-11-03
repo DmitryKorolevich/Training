@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Mail;
+using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
@@ -16,6 +17,7 @@ using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
@@ -44,6 +46,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
+        private readonly IEcommerceRepositoryAsync<VCustomerFavorite> _vCustomerFavoriteRepository;
         private readonly SkuMapper _skuMapper;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly OrderSkusRepository _orderSkusRepositoryRepository;
@@ -193,7 +196,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
             ISettingService settingService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync)
             : base(
                 mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
@@ -211,6 +214,7 @@ namespace VitalChoice.Business.Services.Products
             _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
             _settingService = settingService;
             _notificationService = notificationService;
+	        _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
         }
 
         #region ProductOptions
@@ -643,6 +647,15 @@ namespace VitalChoice.Business.Services.Products
             return true;
         }
 
-        #endregion
+	    public async Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
+	    {
+		    return
+			    await
+				    _vCustomerFavoriteRepository.Query(new VCustomerFavoriteQuery().WithCustomerId(filter.IdCustomer))
+					    .OrderBy(x => x.OrderByDescending(z => z.Quantity))
+					    .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+	    }
+
+	    #endregion
     }
 }

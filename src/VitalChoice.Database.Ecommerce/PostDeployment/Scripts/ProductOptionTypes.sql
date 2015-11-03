@@ -741,3 +741,9 @@ BEGIN
 END
 
 GO
+
+UPDATE [dbo].[ProductOptionTypes]
+SET [IdFieldType] = 3
+WHERE [Name] = 'QTY'
+
+GO

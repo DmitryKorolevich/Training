@@ -912,7 +912,7 @@ footer{
 	.categories-selection-container{
 		margin-bottom:10px;
 		margin-top:5px;
-			a{
+			a, a:visited{
 				color: #666;
 				text-decoration: none;
 				font-size: 12px;
@@ -1141,20 +1141,19 @@ footer{
 	width:100%;
 }	
 
-.form-regular{
-	
-
-	&.border-form-left{
+.border-form-left{
 		float:left;
 		border-left: 1px solid #DD4E02;
 		padding-left:15px;
-		width:100%;
+		padding-right:15px;
+		width: 723px;
+		margin-bottom:50px;
+		min-height: 310px;
 
 		.form-control-important-info{
 			width:auto;
 		}
 	}
-}
 
 .form-regular.medium{
 	.control-label{
@@ -1357,3 +1356,105 @@ footer{
 .affiliate-registration .form-regular.medium-small .form-buttons-group :first-child { margin-left: 0px;}
 
 .affiliate-pending .form-buttons-group :first-child { margin-left: 0px;}
+
+.last-order-lines{
+	width: 100%;
+
+	.product-icon{
+		width:100px;
+		height:100px;
+	}
+
+	tbody tr{
+		border-bottom: 1px solid #CCC;
+
+		td{
+			padding: 9px 0px 20px 0;
+		}
+	}
+
+	.qty-cell{
+		font-size:25px;
+		font-weight:bold;
+		width:120px;
+		text-align:center;
+		padding-right:20px;
+	}
+
+	.icon-container{
+		width:100px;
+		padding-right:20px;
+	}
+
+	.product-title{
+		text-overflow:ellipsis;
+		overflow:hidden;
+		max-width:460px;
+		display:block;
+		font-size:16px;
+		font-weight: bold;
+		line-height: 14px;
+	}
+
+	.sku-code{
+		display:block;
+		font-size: 14px;
+		margin-bottom: 10px;
+		max-width:460px;
+	}
+
+	.selected-price{
+		display:block;
+		font-size: 15px;
+		font-weight: bold;
+		margin-bottom: 5px;
+	}
+
+	.review-product-link{
+		margin: 10px 0 0 50px;
+	}
+}
+
+.top-favorites{
+
+	.top-favorites-selection-container{
+		margin-bottom:10px;
+		margin-top:5px;
+			a, a:visited{
+				color: #666;
+				text-decoration: none;
+				font-size: 12px;
+				display: inline-block;
+				width:218px;
+				text-align:center;
+				margin: 7px 10px 8px 10px;
+				vertical-align:top;
+
+				img{
+					border: 0px solid #E1E1E1;
+					padding: 6px 0 8px 0;
+				}
+			}
+
+			a:hover{
+				color: #f34d20;
+			}
+	}
+}
+
+.centered-horizontal{
+	text-align:center;
+	display:block;
+}
+
+.bold{
+	font-weight: bold;
+}
+
+.margin-top-medium{
+	margin-top:30px;
+}
+
+.margin-bottom-medium{
+	margin-bottom:30px;
+}

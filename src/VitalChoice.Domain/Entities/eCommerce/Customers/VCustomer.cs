@@ -5,6 +5,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 {
     public class VCustomer: Entity
     {
+        public int? IdAffiliate { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
@@ -44,6 +46,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    public string StateOrCounty { get; set; }
 
         public DateTime? LastOrderPlaced { get; set; }
+
+        public DateTime? FirstOrderPlaced { get; set; }
 
         public int TotalOrders { get; set; }
     }
