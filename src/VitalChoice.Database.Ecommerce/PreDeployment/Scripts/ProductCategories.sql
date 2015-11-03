@@ -6,7 +6,6 @@ CREATE TABLE [dbo].[ProductCategories](
 	[Name] [nvarchar](250) NOT NULL,
 	[ParentId] [int] NULL,
 	[StatusCode] [int] NOT NULL DEFAULT ((1)),
-	[Url] [nvarchar](250) NOT NULL,
 	[Order] [int] NOT NULL,
 	[Assigned][int] NOT NULL DEFAULT ((1)),
 PRIMARY KEY CLUSTERED 
@@ -39,9 +38,9 @@ CREATE NONCLUSTERED INDEX [IX_ProductCategories_Url] ON [dbo].[ProductCategories
 SET IDENTITY_INSERT [dbo].[ProductCategories] ON;
 
 INSERT INTO ProductCategories
-(Id,Name,ParentId,StatusCode,Url, [Order])
+(Id,Name,ParentId,StatusCode, [Order])
 VALUES
-(1,'Products Categories',NULL,2,'root',0)
+(1,'Products Categories',NULL,2,0)
 
 SET IDENTITY_INSERT [dbo].[ProductCategories] OFF;
 
