@@ -980,13 +980,15 @@ footer {
   clear: left;
   width: 100%;
 }
-.form-regular.border-form-left {
+.border-form-left {
   float: left;
   border-left: 1px solid #DD4E02;
   padding-left: 15px;
-  width: 100%;
+  padding-right: 15px;
+  width: 723px;
+  margin-bottom: 50px;
 }
-.form-regular.border-form-left .form-control-important-info {
+.border-form-left .form-control-important-info {
   width: auto;
 }
 .form-regular.medium .control-label {
@@ -1209,9 +1211,6 @@ footer {
 }
 .last-order-lines .review-product-link {
   margin: 10px 0 0 50px;
-}
-.top-favorites {
-  margin-bottom: 30px;
 }
 .top-favorites .top-favorites-selection-container {
   margin-bottom: 10px;

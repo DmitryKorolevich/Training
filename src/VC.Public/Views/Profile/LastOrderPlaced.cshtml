@@ -5,15 +5,16 @@
 }
 
 <div class="working-area-holder">
-	<div class="left-pane">
+	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-	<div class="right-pane">
-		<h4>Items On Your Last Order</h4>
-		@if (Model.Any())
-		{
-			<table class="last-order-lines">
-				<thead>
+	<div class="right-pane clean-indent">
+		<div class="border-form-left">
+			<h4>Items On Your Last Order</h4>
+			@if (Model.Any())
+			{
+				<table class="last-order-lines">
+					<thead>
 					<tr>
 						<th>
 							QTY Ordered
@@ -21,27 +22,27 @@
 						<th></th>
 						<th></th>
 					</tr>
-				</thead>
-				<tbody>
+					</thead>
+					<tbody>
 					@foreach (var item in Model)
 					{
 						<tr>
 							<td class="qty-cell">@item.Quantity</td>
 							<td class="icon-container">
 								<a href="@item.ProductUrl">
-									<img class="product-icon" title="@item.ProductName" src="@item.IconLink	" />
+									<img class="product-icon" title="@item.ProductName" src="@item.IconLink	"/>
 								</a>
 							</td>
 							<td>
 								<a href="@item.ProductUrl">
 									<span class="product-title">
-										@($"{item.ProductName} ({item.PortionsCount})")
-									</span>
+											@($"{item.ProductName} ({item.PortionsCount})")
+										</span>
 								</a>
 								<span class="sku-code">Product @item.SkuCode</span>
 								<span class="selected-price">Selected Price $@item.SelectedPrice</span>
 								<a href="#">
-									<img src="/assets/images/addtocartorange.jpg" />
+									<img src="/assets/images/addtocartorange.jpg"/>
 								</a>
 								<a class="review-product-link" href="@item.ProductUrl">
 									Review this product
@@ -49,8 +50,9 @@
 							</td>
 						</tr>
 					}
-				</tbody>
-			</table>
-		}
-	</div>
+					</tbody>
+				</table>
+			}
+		</div>
+		</div>
 </div>
