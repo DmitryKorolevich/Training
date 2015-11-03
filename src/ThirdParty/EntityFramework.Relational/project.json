@@ -37,13 +37,6 @@
                 "System.Text.RegularExpressions": "4.0.11-beta-23409",
                 "Microsoft.CSharp": "4.0.1-beta-23409"
             }
-        },
-        "dotnet": {
-            "dependencies": {
-                "Microsoft.CSharp": "4.0.1-beta-23409",
-                "System.Data.Common": "4.0.1-beta-23409",
-                "System.Dynamic.Runtime": "4.0.11-beta-23409"
-            }
         }
     }
 }
