@@ -221,15 +221,16 @@ namespace VitalChoice.Business.Services.Products
 
         #region ProductOptions
 
-        public async Task<List<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names)
+        public async Task<List<ProductOptionType>> GetProductOptionTypesAsync(HashSet<string> names)
         {
-            return await _productOptionTypeRepository.Query(p => names.Contains(p.Name)).SelectAsync();
+            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
+            return optionTypes.Where(o => names.Contains(o.Name)).ToList();
         }
 
         public async Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync()
         {
             Dictionary<int, Dictionary<string, string>> toReturn = new Dictionary<int, Dictionary<string, string>>();
-            List<string> names = new List<string>();
+            HashSet<string> names = new HashSet<string>();
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
             {
                 names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i);

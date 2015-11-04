@@ -104,7 +104,7 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
         {
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
-            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType};
+            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
             return await Mapper.FromEntityAsync(entity, true);
         }
 
@@ -187,15 +187,13 @@ namespace VitalChoice.DynamicData.Base
 
         public TDynamic CreatePrototype(int idObjectType)
         {
-            var task = CreatePrototypeAsync(idObjectType);
-            return task.Result;
+            return CreatePrototypeAsync(idObjectType).Result;
         }
 
         public TModel CreatePrototypeFor<TModel>(int idObjectType)
             where TModel : class, new()
         {
-            var task = CreatePrototypeForAsync<TModel>(idObjectType);
-            return task.Result;
+            return CreatePrototypeForAsync<TModel>(idObjectType).Result;
         }
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query = null,

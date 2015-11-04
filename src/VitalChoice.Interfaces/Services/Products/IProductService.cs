@@ -17,7 +17,7 @@ namespace VitalChoice.Interfaces.Services.Products
 	{
         #region Products
 
-        Task<List<ProductOptionType>> GetProductOptionTypesAsync(ICollection<string> names);
+        Task<List<ProductOptionType>> GetProductOptionTypesAsync(HashSet<string> names);
 
         Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync();
 

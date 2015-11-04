@@ -415,17 +415,10 @@ namespace VitalChoice.DynamicData.Base
 
             if (entity.OptionTypes == null)
             {
-                try
-                {
-                    entity.OptionTypes =
-                        await
-                            _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType))
-                                .SelectAsync(false);
-                }
-                catch
-                {
-                    return null;
-                }
+                entity.OptionTypes =
+                    await
+                        _optionTypeRepositoryAsync.Query(GetOptionTypeQuery().WithObjectType(entity.IdObjectType))
+                            .SelectAsync(false);
             }
 
             var result = FromEntityItem(entity, withDefaults);
