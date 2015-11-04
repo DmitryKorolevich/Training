@@ -9,10 +9,12 @@ using VitalChoice.Domain.Transfer.Base;
 
 namespace VitalChoice.Data.Helpers
 {
-    public interface IQueryFluent<TEntity> where TEntity : Entity
+
+    public interface IQueryFluent<TEntity>
+        where TEntity : Entity
     {
-        IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         IIncludableQueryFluent<TEntity, TProperty> Include<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        IQueryFluent<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         Task<bool> SelectAnyAsync();
         Task<int> SelectCountAsync();
         List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);

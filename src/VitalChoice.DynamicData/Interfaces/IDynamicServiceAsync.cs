@@ -4,7 +4,7 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IDynamicServiceAsync<T, TEntity> : IDynamicReadServiceAsync<T, TEntity>, IObjectServiceAsync<T, TEntity> 
+    public interface IDynamicServiceAsync<T, TEntity> : IDynamicReadServiceAsync<T, TEntity>, IObjectServiceAsync<T>
         where TEntity : Entity
         where T: MappedObject
     {

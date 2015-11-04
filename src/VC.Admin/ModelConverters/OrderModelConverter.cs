@@ -108,7 +108,7 @@ namespace VC.Admin.ModelConverters
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {
                 dynamic.Discount =
-                    _discountService.Select(new DiscountQuery().WithCode(model.DiscountCode).NotDeleted(), true)
+                    _discountService.Select(queryObject: new DiscountQuery().WithCode(model.DiscountCode).NotDeleted(), withDefaults: true)
                         .FirstOrDefault();
             }
 

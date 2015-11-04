@@ -16,6 +16,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Helpers;
 using System.Collections;
+using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -126,7 +127,7 @@ namespace VitalChoice.DynamicData.Base
 
         public IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType)
         {
-            var filterFunc = GetOptionTypeQuery().WithObjectType(objectType).Query()?.Compile();
+            var filterFunc = GetOptionTypeQuery().WithObjectType(objectType).Query()?.CacheCompile();
             if (filterFunc != null)
                 return collection.Where(filterFunc);
             return collection;
@@ -313,6 +314,10 @@ namespace VitalChoice.DynamicData.Base
         {
             if (dynamic == null)
                 return null;
+            if (optionTypes == null)
+            {
+                throw new ApiException($"ToEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
+            }
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
             var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
             FillEntityOptions(dynamic, optionTypesCache, entity);
@@ -329,20 +334,25 @@ namespace VitalChoice.DynamicData.Base
         {
             if (entity == null)
                 return null;
+            if (entity.OptionValues == null)
+            {
+                throw new ApiException($"FromEntityItem<{typeof(TEntity)}> have no OptionValues, are you forgot to include them in query?");
+            }
+            if (entity.OptionTypes == null)
+            {
+                throw new ApiException($"FromEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
+            }
             var result = new TDynamic();
             var data = result.DictionaryData;
-            var optionTypes = entity.OptionTypes?.ToDictionary(o => o.Id, o => o);
-            if (entity.OptionValues != null && optionTypes != null)
+            var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+            foreach (var value in entity.OptionValues)
             {
-                foreach (var value in entity.OptionValues)
+                TOptionType optionType;
+                if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
                 {
-                    TOptionType optionType;
-                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
-                    {
-                        data.Add(optionType.Name,
-                            MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
-                                (FieldType)optionType.IdFieldType));
-                    }
+                    data.Add(optionType.Name,
+                        MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
+                            (FieldType) optionType.IdFieldType));
                 }
             }
             result.Id = entity.Id;

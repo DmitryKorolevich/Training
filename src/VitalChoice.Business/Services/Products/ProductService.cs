@@ -22,12 +22,14 @@ using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Mail;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -54,7 +56,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly ISettingService _settingService;
         private readonly INotificationService _notificationService;
 
-        protected override async Task AfterSelect(List<Product> entities)
+        protected override async Task AfterSelect(ICollection<Product> entities)
         {
             foreach (var entity in entities)
             {
@@ -370,7 +372,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
                 sku.Product.OptionTypes = sku.OptionTypes;
             }
 
@@ -403,7 +405,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
                 sku.Product.OptionTypes = sku.OptionTypes;
             }
 
@@ -479,7 +481,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var sku = skusKeyed[info.Id];
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery((int?)info.IdProductType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery((int?)info.IdProductType).Query().CacheCompile()).ToList();
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -501,7 +503,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().Compile()).ToList();
+                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -575,7 +577,7 @@ namespace VitalChoice.Business.Services.Products
                 if (product != null)
                 {
                     sku.OptionTypes =
-                        optionTypes.Where(GetOptionTypeQuery((int?)product.IdObjectType).Query().Compile()).ToList();
+                        optionTypes.Where(GetOptionTypeQuery((int?)product.IdObjectType).Query().CacheCompile()).ToList();
                 }
             }
             var skuDynamics = await _skuMapper.FromEntityRangeAsync(skus, true);

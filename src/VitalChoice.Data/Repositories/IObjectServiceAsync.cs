@@ -4,8 +4,7 @@ using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Repositories
 {
-    public interface IObjectServiceAsync<T, TEntity> : IReadObjectServiceAsync<T, TEntity>
-        where TEntity : Entity
+    public interface IObjectServiceAsync<T>
     {
         Task<T> InsertAsync(T model);
         Task<T> UpdateAsync(T model);

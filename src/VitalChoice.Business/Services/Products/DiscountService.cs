@@ -70,7 +70,7 @@ namespace VitalChoice.Business.Services.Products
             return new List<MessageInfo>();
         }
 
-        protected override IQueryFluent<Discount> BuildQuery(IQueryFluent<Discount> query)
+        protected override IQueryLite<Discount> BuildQuery(IQueryLite<Discount> query)
         {
             return query.Include(p => p.DiscountTiers)
                 .Include(p => p.DiscountsToSelectedSkus)
@@ -79,7 +79,7 @@ namespace VitalChoice.Business.Services.Products
                 .Include(p => p.DiscountsToSelectedCategories);
         }
 
-        protected override async Task AfterSelect(List<Discount> entities)
+        protected override async Task AfterSelect(ICollection<Discount> entities)
         {
             foreach (var entity in entities)
             {

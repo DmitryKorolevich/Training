@@ -187,11 +187,12 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<AffiliateDynamic> InsertAsync(AffiliateDynamic model, string password)
         {
+            //TODO: lock writing DB until we read result
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await InsertAsync(model, uow, password);
-
-                entity = await SelectEntityAsync(entity.Id);
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
                 await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
                 return await Mapper.FromEntityAsync(entity);
             }
@@ -199,11 +200,12 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<AffiliateDynamic> UpdateAsync(AffiliateDynamic model, string password)
         {
+            //TODO: lock writing DB until we read result
             using (var uow = CreateUnitOfWork())
             {
                 var entity = await UpdateAsync(model, uow, password);
-
-                entity = await SelectEntityAsync(entity.Id);
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
                 await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
                 return await Mapper.FromEntityAsync(entity);
             }

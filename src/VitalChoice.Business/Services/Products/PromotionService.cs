@@ -69,14 +69,14 @@ namespace VitalChoice.Business.Services.Products
             return Task.FromResult(errors);
         }
 
-        protected override IQueryFluent<Promotion> BuildQuery(IQueryFluent<Promotion> query)
+        protected override IQueryLite<Promotion> BuildQuery(IQueryLite<Promotion> query)
         {
             return query.Include(p => p.PromotionsToBuySkus)
                         .Include(p => p.PromotionsToGetSkus)
                         .Include(p => p.PromotionsToSelectedCategories);
         }
 
-        protected override async Task AfterSelect(List<Promotion> entities)
+        protected override async Task AfterSelect(ICollection<Promotion> entities)
         {
             foreach (var entity in entities)
             {

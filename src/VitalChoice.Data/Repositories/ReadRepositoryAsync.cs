@@ -9,6 +9,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -84,7 +85,7 @@ namespace VitalChoice.Data.Repositories
 					earlyRead = orderBy(earlyRead.AsQueryable());
 
 				if (filter != null)
-					earlyRead = earlyRead.Where(filter.Compile());
+					earlyRead = earlyRead.Where(filter.CacheCompile());
 
 				if (page != null && pageSize != null)
 					earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);

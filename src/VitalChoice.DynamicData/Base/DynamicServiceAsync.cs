@@ -21,7 +21,8 @@ using VitalChoice.DynamicData.Validation;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract class DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IDynamicServiceAsync<TDynamic, TEntity>
+    public abstract class DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> :
+        DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IDynamicServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
@@ -33,7 +34,9 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILogger logger)
-            : base(mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync, objectLogItemExternalService, logger)
+            : base(
+                mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync,
+                objectLogItemExternalService, logger)
         {
         }
 
@@ -88,9 +91,10 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
+                //TODO: lock writing DB until we read result
                 var entity = await InsertAsync(model, uow);
-
-                entity = await SelectEntityAsync(entity.Id);
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
                 await LogItemChanges(new[] {await Mapper.FromEntityAsync(entity)});
                 return await Mapper.FromEntityAsync(entity);
             }
@@ -100,10 +104,11 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
+                //TODO: lock writing DB until we read result
                 var entity = await UpdateAsync(model, uow);
-
-                entity = await SelectEntityAsync(entity.Id);
-                await LogItemChanges(new [] {await Mapper.FromEntityAsync(entity)});
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
+                await LogItemChanges(new[] {await Mapper.FromEntityAsync(entity)});
                 return await Mapper.FromEntityAsync(entity);
             }
         }
@@ -112,8 +117,9 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
+                //TODO: lock writing DB until we read result
                 var entityIds = (await InsertRangeAsync(models, uow)).Select(e => e.Id).ToList();
-                var entities = await SelectEntityListAsync(entityIds);
+                var entities = await SelectEntitiesAsync(o => entityIds.Contains(o.Id));
                 await LogItemChanges(await Mapper.FromEntityRangeAsync(entities));
                 return await Mapper.FromEntityRangeAsync(entities);
             }
@@ -123,8 +129,10 @@ namespace VitalChoice.DynamicData.Base
         {
             using (var uow = CreateUnitOfWork())
             {
+                //TODO: lock writing DB until we read result
                 var entities = await UpdateRangeAsync(models, uow);
-                entities = await SelectEntityListAsync(entities.Select(e => e.Id).ToList());
+                var entityIds = entities.Select(e => e.Id).ToArray();
+                entities = await SelectEntitiesAsync(o => entityIds.Contains(o.Id));
 
                 await LogItemChanges(await Mapper.FromEntityRangeAsync(entities));
                 return await Mapper.FromEntityRangeAsync(entities);
@@ -230,12 +238,13 @@ namespace VitalChoice.DynamicData.Base
                     {
                         Mapper.SecureObject(model);
                     }
-                    await ObjectLogItemExternalService.LogItems(models.Select(p=>(object)p).ToList(), LogObjectFullData);
+                    await
+                        ObjectLogItemExternalService.LogItems(models.Select(p => (object) p).ToList(), LogObjectFullData);
                 }
             }
             catch (Exception e)
             {
-                Logger.LogError("[Object log error]",e);
+                Logger.LogError("[Object log error]", e);
             }
         }
 
@@ -251,7 +260,7 @@ namespace VitalChoice.DynamicData.Base
                         new GenericPair<TDynamic, ICollection<TOptionType>>(d,
                             Mapper.FilterByType(optionTypes, d.IdObjectType).ToList())).ToList();
             var mappedList = await Mapper.ToEntityRangeAsync(toInsert);
-            foreach (var entity in mappedList.Select(p=>p.Entity).ToList())
+            foreach (var entity in mappedList.Select(p => p.Entity).ToList())
             {
                 if (entity == null)
                     continue;
@@ -277,7 +286,8 @@ namespace VitalChoice.DynamicData.Base
         protected virtual async Task<TEntity> InsertAsync(TDynamic model, IUnitOfWorkAsync uow)
         {
             (await Validate(model)).Raise();
-            var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
+            var optionTypes =
+                await OptionTypesRepository.Query(GetOptionTypeQuery(model.IdObjectType)).SelectAsync(false);
             var entity = await Mapper.ToEntityAsync(model, optionTypes);
             if (entity == null)
                 return null;
@@ -300,25 +310,29 @@ namespace VitalChoice.DynamicData.Base
 
             var ids = models.Select(m => m.Id).ToList();
             IQueryFluent<TEntity> query =
-                mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != (int)RecordStatusCode.Deleted)
+                mainRepository.Query(o => ids.Contains(o.Id) && o.StatusCode != (int) RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues);
             query = BuildQuery(query);
-            var entities = (await query.SelectAsync());
-            if (!entities.Any())
-                return new List<TEntity>();
-            var items = entities.Join(models, entity => entity.Id, model => model.Id,
-                (entity, model) => new DynamicEntityPair<TDynamic, TEntity>(model, entity)).ToList();
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            foreach (var item in items)
+            if (query != null)
             {
-                item.Entity.OptionTypes = Mapper.FilterByType(optionTypes, item.Dynamic.IdObjectType).ToList();
-            }
-            await UpdateItems(uow, items, bigValueRepository, valueRepository);
-            await mainRepository.UpdateRangeAsync(entities);
-            await uow.SaveChangesAsync(CancellationToken.None);
-            await AfterSelect(entities);
+                var entities = await query.SelectAsync();
+                if (!entities.Any())
+                    return new List<TEntity>();
+                var items = entities.Join(models, entity => entity.Id, model => model.Id,
+                    (entity, model) => new DynamicEntityPair<TDynamic, TEntity>(model, entity)).ToList();
+                var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+                foreach (var item in items)
+                {
+                    item.Entity.OptionTypes = Mapper.FilterByType(optionTypes, item.Dynamic.IdObjectType).ToList();
+                }
+                await UpdateItems(uow, items, bigValueRepository, valueRepository);
+                await mainRepository.UpdateRangeAsync(entities);
+                await uow.SaveChangesAsync(CancellationToken.None);
+                await AfterSelect(entities);
 
-            return entities;
+                return entities;
+            }
+            throw new ApiException($"BuildQuery failed UpdateRangeAsync<{GetType()}>");
         }
 
         protected virtual async Task<TEntity> UpdateAsync(TDynamic model, IUnitOfWorkAsync uow)
@@ -328,7 +342,7 @@ namespace VitalChoice.DynamicData.Base
             var valueRepository = uow.RepositoryAsync<TOptionValue>();
             var bigValueRepository = uow.RepositoryAsync<BigStringValue>();
             IQueryFluent<TEntity> query =
-                mainRepository.Query(o => o.Id == model.Id && o.StatusCode != (int)RecordStatusCode.Deleted)
+                mainRepository.Query(o => o.Id == model.Id && o.StatusCode != (int) RecordStatusCode.Deleted)
                     .Include(p => p.OptionValues);
             query = BuildQuery(query);
             var entity = await query.SelectFirstOrDefaultAsync();
@@ -380,7 +394,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
             }
-            
+
 
             await
                 bigValueRepository.DeleteAllAsync(
@@ -430,7 +444,8 @@ namespace VitalChoice.DynamicData.Base
             return await DeleteAsync(model.Id, uow, physically);
         }
 
-        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities, IRepositoryAsync<TEntity> mainRepository, IRepositoryAsync<TOptionValue> valueRepository, bool physically)
+        private static async Task<bool> DeleteAllAsync(ICollection<TEntity> entities,
+            IRepositoryAsync<TEntity> mainRepository, IRepositoryAsync<TOptionValue> valueRepository, bool physically)
         {
             if (physically)
             {
@@ -439,19 +454,20 @@ namespace VitalChoice.DynamicData.Base
             }
             foreach (var entity in entities)
             {
-                entity.StatusCode = (int)RecordStatusCode.Deleted;
+                entity.StatusCode = (int) RecordStatusCode.Deleted;
             }
             return await mainRepository.UpdateRangeAsync(entities);
         }
 
-        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository, IRepositoryAsync<TOptionValue> valueRepository, bool physically)
+        private static async Task<bool> DeleteAsync(TEntity entity, IRepositoryAsync<TEntity> repository,
+            IRepositoryAsync<TOptionValue> valueRepository, bool physically)
         {
             if (physically)
             {
                 await valueRepository.DeleteAllAsync(entity.OptionValues);
                 return await repository.DeleteAsync(entity);
             }
-            entity.StatusCode = (int)RecordStatusCode.Deleted;
+            entity.StatusCode = (int) RecordStatusCode.Deleted;
             return await repository.UpdateAsync(entity);
         }
     }

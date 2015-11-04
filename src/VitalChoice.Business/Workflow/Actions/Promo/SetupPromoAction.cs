@@ -24,10 +24,10 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
             var promoService = executionContext.Resolve<IPromotionService>();
             context.Promotions =
                 await
-                    promoService.SelectAsync(
+                    promoService.SelectAsync(queryObject:
                         new PromotionQuery().IsActive()
                             .WithExpiredType(ExpiredType.NotExpired)
-                            .AllowCustomerType((CustomerType) context.Order.Customer.IdObjectType), true);
+                            .AllowCustomerType((CustomerType) context.Order.Customer.IdObjectType), withDefaults: true);
 
             return 0;
         }

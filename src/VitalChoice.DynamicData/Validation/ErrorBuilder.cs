@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Validation.Abstractions;
 
 namespace VitalChoice.DynamicData.Validation
@@ -35,7 +36,7 @@ namespace VitalChoice.DynamicData.Validation
             if (collectionSelector.NodeType == ExpressionType.MemberAccess)
             {
                 MemberExpression member = (MemberExpression) collectionSelector;
-                var innerCollectionValue = collectionExpression.Compile().Invoke(Data);
+                var innerCollectionValue = collectionExpression.CacheCompile().Invoke(Data);
                 var itemIndexes = indexes.ToArray();
                 TResultProperty innerItem = innerCollectionValue.Skip(itemIndexes.FirstOrDefault()).FirstOrDefault();
                 return new ErrorBuilder<TResultProperty>(innerItem, member.Member.Name, itemIndexes);
@@ -58,7 +59,7 @@ namespace VitalChoice.DynamicData.Validation
             if (collectionSelector.NodeType == ExpressionType.MemberAccess)
             {
                 MemberExpression member = (MemberExpression) collectionSelector;
-                var innerCollectionValue = collectionExpression.Compile().Invoke(Data);
+                var innerCollectionValue = collectionExpression.CacheCompile().Invoke(Data);
                 return new CollectionErrorBuilder<ICollection<TResultProperty>, TResultProperty>(innerCollectionValue, member.Member.Name);
             }
             throw new ArgumentException("collectionExpression should contain member access expression");

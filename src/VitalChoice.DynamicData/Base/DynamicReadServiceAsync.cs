@@ -12,12 +12,15 @@ using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.History;
+using VitalChoice.Domain.Helpers;
+using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public abstract partial class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicReadServiceAsync<TDynamic, TEntity>
+    public abstract /*partial*/ class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> :
+        IDynamicReadServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
@@ -34,7 +37,8 @@ namespace VitalChoice.DynamicData.Base
         protected DynamicReadServiceAsync(
             IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
-            IReadRepositoryAsync<BigStringValue> bigStringRepository, IReadRepositoryAsync<TOptionValue> optionValuesRepository,
+            IReadRepositoryAsync<BigStringValue> bigStringRepository,
+            IReadRepositoryAsync<TOptionValue> optionValuesRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILogger logger)
         {
@@ -48,15 +52,51 @@ namespace VitalChoice.DynamicData.Base
         }
 
         #region Extension Points
-        
-        protected virtual Task AfterSelect(List<TEntity> entity)
+
+        protected virtual Task AfterSelect(ICollection<TEntity> entity)
         {
             return Task.Delay(0);
         }
 
-        protected virtual IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        protected virtual IQueryLite<TEntity> BuildQuery(IQueryLite<TEntity> query)
         {
             return query;
+        }
+
+        protected async Task<List<TEntity>> SelectEntitiesAsync(Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+        {
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+            var queryFluent = await BuildQueryFluent(query, values, includesOverride, null, optionTypes);
+            var entities = await queryFluent.SelectAsync(false);
+            await ProcessEntities(entities, optionTypes);
+            return entities;
+        }
+
+        protected async Task<TEntity> SelectEntityFirstAsync(Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+        {
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+            var queryFluent = await BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
+            await ProcessEntities(new[] {entity}, optionTypes);
+            return entity;
+        }
+
+        protected async Task<PagedList<TEntity>> SelectEntityPageAsync(int page, int pageSize,
+            Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+        {
+            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
+            var queryFluent = await BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var entities = await queryFluent.SelectPageAsync(page, pageSize, false);
+            await ProcessEntities(entities.Items, optionTypes);
+            return entities;
         }
 
         #endregion
@@ -64,114 +104,86 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
         {
             var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
-            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType };
+            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType};
             return await Mapper.FromEntityAsync(entity, true);
         }
 
-        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType) 
+        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
             where TModel : class, new()
         {
             return Mapper.ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
         }
 
-        public async Task<TDynamic> SelectAsync(int id, bool withDefaults)
+        public async Task<TDynamic> SelectAsync(int id, bool withDefaults = false,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
-            return await Mapper.FromEntityAsync(await SelectEntityAsync(id), withDefaults);
+            return
+                await
+                    Mapper.FromEntityAsync(
+                        await
+                            SelectEntityFirstAsync(o => o.Id == id && o.StatusCode != (int) RecordStatusCode.Deleted,
+                                includesOverride: includesOverride), withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults)
+        public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults = false,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
-            return await Mapper.FromEntityRangeAsync(await SelectEntityListAsync(ids), withDefaults);
+            return
+                await
+                    Mapper.FromEntityRangeAsync(
+                        await
+                            SelectEntitiesAsync(o => ids.Contains(o.Id) && o.StatusCode != (int) RecordStatusCode.Deleted,
+                                includesOverride: includesOverride), withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(bool withDefaults)
+        public Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values = null, IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
         {
-            var res = CreateQuery(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted);
-            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+            return SelectAsync(queryObject?.Query(), values, includesOverride, withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject, bool withDefaults)
+        public async Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            bool withDefaults = false)
         {
-            if (queryObject == null)
-                throw new ArgumentNullException(nameof(queryObject));
-            var res = CreateQuery(BuildQuery, queryObject.Query());
-            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+            return await Mapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, values, includesOverride), withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(Expression<Func<TEntity, bool>> query, bool withDefaults)
+        public Task<TDynamic> SelectFirstAsync(IDictionary<string, object> values = null, IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var res = CreateQuery(BuildQuery, query);
-            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+            return SelectFirstAsync(queryObject?.Query(), values, includesOverride, orderBy, withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values, bool withDefaults)
+        public async Task<TDynamic> SelectFirstAsync(Expression<Func<TEntity, bool>> query = null, IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var searchValues = BuildSearchValues(values, optionTypes);
-            var valuesSelector = CreateValuesSelector(searchValues);
-            var optionValues =
-                (await
-                    OptionValuesRepository.Query(valuesSelector)
-                        .SelectAsync(Mapper.ObjectIdSelector)).Distinct().ToList();
-            var res = CreateQuery(BuildQuery, p => p.StatusCode != (int)RecordStatusCode.Deleted && optionValues.Contains(p.Id));
-            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+            return await Mapper.FromEntityAsync(await SelectEntityFirstAsync(query, values, includesOverride, orderBy), withDefaults);
         }
 
-        public async Task<List<TDynamic>> SelectAsync(IDictionary<string, object> values,
-            Expression<Func<TEntity, bool>> query,
-            bool withDefaults)
+        public Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize, IDictionary<string, object> values = null,
+            IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var searchValues = BuildSearchValues(values, optionTypes);
-            var valuesSelector = CreateValuesSelector(searchValues);
-            var optionValues =
-                (await
-                    OptionValuesRepository.Query(valuesSelector)
-                        .SelectAsync(Mapper.ObjectIdSelector))
-                    .Distinct().ToList();
-            var res = CreateQuery(BuildQuery,
-                query.And(p => p.StatusCode != (int) RecordStatusCode.Deleted).And(p => optionValues.Contains(p.Id)));
-            return await Mapper.FromEntityRangeAsync(await SelectListAsync(res), withDefaults);
+            return SelectPageAsync(page, pageSize, queryObject?.Query(), values, includesOverride, orderBy, withDefaults);
         }
 
-        protected virtual async Task<List<TEntity>> SelectListAsync(IQueryFluent<TEntity> query)
+        public async Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize, Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var entities = await query.SelectAsync(false);
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            foreach (var entity in entities)
-            {
-                entity.OptionTypes = optionTypes.Where(GetOptionTypeQuery(entity).Query().Compile()).ToList();
-            }
-            await SetBigValuesAsync(entities);
-            await AfterSelect(entities);
-            return entities;
+            var entities = await SelectEntityPageAsync(page, pageSize, query, values, includesOverride, orderBy);
+            return new PagedList<TDynamic>(await Mapper.FromEntityRangeAsync(entities.Items, withDefaults), entities.Count);
         }
 
-        protected virtual async Task<TEntity> SelectItemAsync(IQueryFluent<TEntity> query)
-        {
-            var entity = (await query.SelectAsync(false)).FirstOrDefault();
-
-            if (entity != null)
-            {
-                await SetBigValuesAsync(entity);
-                entity.OptionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(entity)).SelectAsync(false);
-                await AfterSelect(new List<TEntity> {entity});
-                return entity;
-            }
-            return null;
-        }
-
-        protected async Task<TEntity> SelectEntityAsync(int id)
-        {
-            var res = CreateQuery(BuildQuery, p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted);
-            return await SelectItemAsync(res);
-        }
-
-        protected async Task<List<TEntity>> SelectEntityListAsync(ICollection<int> ids)
-        {
-            var res = CreateQuery(BuildQuery, p => ids.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted);
-            return await SelectListAsync(res);
-        }
+        #region Synchronous Operations
 
         public TDynamic CreatePrototype(int idObjectType)
         {
@@ -186,53 +198,71 @@ namespace VitalChoice.DynamicData.Base
             return task.Result;
         }
 
-        #region Synchronous Operations
-
-        public TDynamic Select(int id, bool withDefaults)
+        public List<TDynamic> Select(Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
         {
-            var task = SelectAsync(id, withDefaults);
-            return task.Result;
+            return SelectAsync(query, values, includesOverride, withDefaults).Result;
         }
 
-        public List<TDynamic> Select(ICollection<int> ids, bool withDefaults)
+        public TDynamic SelectFirst(IDictionary<string, object> values = null, IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var task = SelectAsync(ids, withDefaults);
-            return task.Result;
+            return SelectFirstAsync(values, queryObject, includesOverride, orderBy, withDefaults).Result;
         }
 
-        public List<TDynamic> Select(bool withDefaults)
+        public TDynamic SelectFirst(Expression<Func<TEntity, bool>> query = null, IDictionary<string, object> values = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var task = SelectAsync(withDefaults);
-            return task.Result;
+            return SelectFirstAsync(query, values, includesOverride, orderBy, withDefaults).Result;
         }
 
-        public List<TDynamic> Select(IQueryObject<TEntity> queryObject, bool withDefaults)
+        public PagedList<TDynamic> SelectPage(int page, int pageSize, Expression<Func<TEntity, bool>> query = null,
+            IDictionary<string, object> values = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var task = SelectAsync(queryObject, withDefaults);
-            return task.Result;
+            return SelectPageAsync(page, pageSize, query, values, includesOverride, orderBy, withDefaults).Result;
         }
 
-        public List<TDynamic> Select(Expression<Func<TEntity, bool>> query, bool withDefaults)
+        public PagedList<TDynamic> SelectPage(int page, int pageSize, IDictionary<string, object> values = null,
+            IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool withDefaults = false)
         {
-            var task = SelectAsync(query, withDefaults);
-            return task.Result;
+            return SelectPageAsync(page, pageSize, values, queryObject, includesOverride, orderBy, withDefaults).Result;
         }
 
-        public List<TDynamic> Select(IDictionary<string, object> values, bool withDefaults)
+        public TDynamic Select(int id, bool withDefaults = false, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
-            var task = SelectAsync(values, withDefaults);
-            return task.Result;
+            return SelectAsync(id, withDefaults, includesOverride).Result;
         }
 
-        public List<TDynamic> Select(IDictionary<string, object> values, Expression<Func<TEntity, bool>> query, bool withDefaults)
+        public List<TDynamic> Select(ICollection<int> ids, bool withDefaults = false,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
-            var task = SelectAsync(values, query, withDefaults);
-            return task.Result;
+            return SelectAsync(ids, withDefaults, includesOverride).Result;
+        }
+
+        public List<TDynamic> Select(IDictionary<string, object> values = null, IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            bool withDefaults = false)
+        {
+            return SelectAsync(queryObject?.Query(), values, includesOverride, withDefaults).Result;
         }
 
         #endregion
 
         #region Helpers
+
+        protected IQueryFluent<TEntity> BuildQuery(IQueryFluent<TEntity> query)
+        {
+            return (BuildQuery(new QueryLite<TEntity>(query)) as QueryLite<TEntity>)?.Query;
+        }
 
         public IQueryOptionType<TOptionType> GetOptionTypeQuery(TEntity entity)
         {
@@ -244,11 +274,56 @@ namespace VitalChoice.DynamicData.Base
             return Mapper.GetOptionTypeQuery().WithObjectType(idObjectType);
         }
 
+        private async Task ProcessEntities(ICollection<TEntity> entities, List<TOptionType> optionTypes)
+        {
+            foreach (var entity in entities)
+            {
+                entity.OptionTypes = optionTypes.Where(GetOptionTypeQuery(entity).Query().CacheCompile()).ToList();
+            }
+            await SetBigValuesAsync(entities);
+            await AfterSelect(entities);
+        }
+
+        private async Task<IQueryFluent<TEntity>> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
+            IDictionary<string, object> values, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy, List<TOptionType> optionTypes)
+        {
+            IQueryFluent<TEntity> queryFluent;
+            if (values != null)
+            {
+                var searchValues = BuildSearchValues(values, optionTypes);
+                var valuesSelector = CreateValuesSelector(searchValues);
+                var optionValues =
+                    (await
+                        OptionValuesRepository.Query(valuesSelector)
+                            .SelectAsync(Mapper.ObjectIdSelector))
+                        .Distinct().ToList();
+                if (query != null)
+                {
+                    queryFluent = CreateQuery(includesOverride ?? BuildQuery,
+                        query.And(p => optionValues.Contains(p.Id)));
+                }
+                else
+                {
+                    queryFluent = CreateQuery(includesOverride ?? BuildQuery,
+                        p => p.StatusCode != (int) RecordStatusCode.Deleted && optionValues.Contains(p.Id));
+                }
+            }
+            else
+            {
+                queryFluent = CreateQuery(includesOverride ?? BuildQuery,
+                    query ?? (p => p.StatusCode != (int) RecordStatusCode.Deleted));
+            }
+            if (orderBy != null)
+                queryFluent = queryFluent.OrderBy(orderBy);
+            return queryFluent;
+        }
+
         private Dictionary<int, GenericPair<string, TOptionType>> BuildSearchValues(IDictionary<string, object> values,
             List<TOptionType> optionTypes)
         {
             var optionTypesToSearch =
-                optionTypes.Where(Mapper.GetOptionTypeQuery().WithNames(values.Keys).Query().Compile());
+                optionTypes.Where(Mapper.GetOptionTypeQuery().WithNames(values.Keys).Query().CacheCompile());
             Dictionary<int, GenericPair<string, TOptionType>> searchValues = optionTypesToSearch.ToDictionary(t => t.Id,
                 t =>
                     new GenericPair<string, TOptionType>(
@@ -256,13 +331,16 @@ namespace VitalChoice.DynamicData.Base
             return searchValues;
         }
 
-        private IQueryFluent<TEntity> CreateQuery(Func<IQueryFluent<TEntity>, IQueryFluent<TEntity>> queryBuilder, Expression<Func<TEntity, bool>> condition = null)
+        private IQueryFluent<TEntity> CreateQuery(Func<IQueryLite<TEntity>, IQueryLite<TEntity>> queryBuilder,
+            Expression<Func<TEntity, bool>> condition = null)
         {
             if (condition == null)
-                return queryBuilder(ObjectRepository.Query().Include(p => p.OptionValues));
+                return
+                    (queryBuilder(new QueryLite<TEntity>(ObjectRepository.Query().Include(p => p.OptionValues))) as
+                        QueryLite<TEntity>)?.Query;
 
             IQueryFluent<TEntity> res = ObjectRepository.Query(condition).Include(p => p.OptionValues);
-            res = queryBuilder(res);
+            res = (queryBuilder(new QueryLite<TEntity>(res)) as QueryLite<TEntity>)?.Query;
             return res;
         }
 

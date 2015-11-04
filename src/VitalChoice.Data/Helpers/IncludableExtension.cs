@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Helpers
@@ -26,6 +27,24 @@ namespace VitalChoice.Data.Helpers
             return new IncludableQueryFluent<TEntity, TProperty>(previous,
                 ((IncludableQueryFluent<TEntity, ICollection<TPreviousProperty>>) previous).IncludableQuery.ThenInclude(
                     expression));
+        }
+
+        public static IIncludableQueryLite<TEntity, TProperty> ThenInclude<TProperty, TEntity, TPreviousProperty>(
+            this IIncludableQueryLite<TEntity, TPreviousProperty> previous,
+            Expression<Func<TPreviousProperty, TProperty>> expression)
+            where TEntity : Entity
+        {
+            var includablePrevious = (IncludableQueryLite<TEntity, TPreviousProperty>) previous;
+            return new IncludableQueryLite<TEntity, TProperty>(includablePrevious.IncludableQuery.ThenInclude(expression));
+        }
+
+        public static IIncludableQueryLite<TEntity, TProperty> ThenInclude<TProperty, TEntity, TPreviousProperty>(
+            this IIncludableQueryLite<TEntity, ICollection<TPreviousProperty>> previous,
+            Expression<Func<TPreviousProperty, TProperty>> expression)
+            where TEntity : Entity
+        {
+            var includablePrevious = (IncludableQueryLite<TEntity, ICollection<TPreviousProperty>>)previous;
+            return new IncludableQueryLite<TEntity, TProperty>(includablePrevious.IncludableQuery.ThenInclude(expression));
         }
     }
 }

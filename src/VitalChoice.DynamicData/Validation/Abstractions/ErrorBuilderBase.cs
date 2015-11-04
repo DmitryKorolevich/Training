@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using VitalChoice.Domain.Exceptions;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Services;
 
@@ -40,8 +41,8 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
             Expression<Func<T, TPropertyResult>> propertySelector, ICollection<TEntity> values,
             Expression<Func<TEntity, TPropertyResult>> valueSelector)
         {
-            var getter = propertySelector.Compile();
-            var entityGetter = valueSelector.Compile();
+            var getter = propertySelector.CacheCompile();
+            var entityGetter = valueSelector.CacheCompile();
             int index = 0;
             List<int> indexes = new List<int>();
             foreach (var item in collection)

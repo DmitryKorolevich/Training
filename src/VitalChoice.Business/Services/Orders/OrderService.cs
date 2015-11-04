@@ -26,6 +26,7 @@ using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
@@ -73,7 +74,7 @@ namespace VitalChoice.Business.Services.Orders
             _affiliateService = affiliateService;
         }
 
-        protected override IQueryFluent<Order> BuildQuery(IQueryFluent<Order> query)
+        protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
         {
             return
                 query.Include(o => o.Discount)
@@ -100,7 +101,7 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         //TODO: lambda caching
-        protected override async Task AfterSelect(List<Order> entities)
+        protected override async Task AfterSelect(ICollection<Order> entities)
         {
             var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
             foreach (
@@ -110,7 +111,7 @@ namespace VitalChoice.Business.Services.Orders
                 var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
                     .WithObjectType(orderToSku.Sku.Product.IdObjectType)
                     .Query()
-                    .Compile()).ToList();
+                    .CacheCompile()).ToList();
                 orderToSku.Sku.OptionTypes = optionTypes;
                 orderToSku.Sku.Product.OptionTypes = optionTypes;
             }
@@ -132,7 +133,7 @@ namespace VitalChoice.Business.Services.Orders
                     var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
                         .WithObjectType(sku.Product.IdObjectType)
                         .Query()
-                        .Compile()).ToList();
+                        .CacheCompile()).ToList();
                     orderToSku.Sku = sku;
                     orderToSku.Sku.Product = sku.Product;
                     orderToSku.Sku.OptionTypes = optionTypes;
@@ -167,14 +168,14 @@ namespace VitalChoice.Business.Services.Orders
             return context;
         }
 
-	    public async Task<OrderDynamic> SelectLastOrderAsync(int customerId)
-	    {
-			var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
+        public async Task<OrderDynamic> SelectLastOrderAsync(int customerId)
+        {
+            var orderQuery = new OrderQuery().WithActualStatusOnly().WithCustomerId(customerId);
 
-		    return Select(orderQuery).OrderByDescending(x => x.DateCreated).FirstOrDefault();
-	    }
+            return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
+        }
 
-	    private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
+        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
         {
             order.TaxTotal = dataContext.TaxTotal;
             order.Total = dataContext.Total;
@@ -208,11 +209,6 @@ namespace VitalChoice.Business.Services.Orders
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
             }
             return base.Validate(dynamic);
-        }
-
-        protected override Task<List<MessageInfo>> ValidateDelete(int id)
-        {
-            return base.ValidateDelete(id);
         }
 
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
