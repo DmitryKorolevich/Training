@@ -224,16 +224,18 @@ namespace VitalChoice.Business.Services.Orders
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             var entity = await base.InsertAsync(model, uow);
-            await UpdateAffiliateOrderPayment(entity);
+            model.IdAddedBy = model.IdEditedBy;
+            await UpdateAffiliateOrderPayment(model);
             return entity;
         }
 
         protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
             var entities = await base.InsertRangeAsync(models, uow);
-            foreach(var entity in entities)
+            foreach(var model in models)
             {
-                await UpdateAffiliateOrderPayment(entity);
+                model.IdAddedBy = model.IdEditedBy;
+                await UpdateAffiliateOrderPayment(model);
             }
             return entities;
         }
@@ -241,32 +243,38 @@ namespace VitalChoice.Business.Services.Orders
         protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             var entity = await base.UpdateAsync(model, uow);
-            await UpdateAffiliateOrderPayment(entity);
+            model.IdAddedBy = entity.IdAddedBy;
+            await UpdateAffiliateOrderPayment(model);
             return entity;
         }
 
         protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
             var entities = await base.UpdateRangeAsync(models, uow);
-            foreach (var entity in entities)
+            foreach (var model in models)
             {
-                await UpdateAffiliateOrderPayment(entity);
+                var entity = entities.FirstOrDefault(p => p.Id == model.Id);
+                if(entity!=null)
+                {
+                    model.IdAddedBy = entity.IdAddedBy;
+                }
+                await UpdateAffiliateOrderPayment(model);
             }
             return entities;
         }
 
-        private async Task UpdateAffiliateOrderPayment(Order entity)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic model)
         {
-            if (!entity.IdAddedBy.HasValue)
+            if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment();
-                payment.IdOrder = entity.Id;
+                payment.IdOrder = model.Id;
                 payment.Status = AffiliateOrderPaymentStatus.NotPaid;
-                //TODO - calculate commission and set is a first order or no the given customer and set IdAffiliate
+                payment.IdAffiliate = model.Customer.IdAffiliate.Value;
+                //TODO - calculate commission and set is a first order or no the given customer
                 //payment.Amount =
                 //payment.NewCustomerOrder =
-                //payment.IdAffiliate=
-                await _affiliateService.UpdateAffiliateOrderPayment(payment);
+                //await _affiliateService.UpdateAffiliateOrderPayment(payment);
             }
         }
 

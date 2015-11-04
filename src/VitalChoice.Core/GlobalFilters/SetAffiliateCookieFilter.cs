@@ -16,21 +16,20 @@ namespace VitalChoice.Core.GlobalFilters
     {
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            var param = context.HttpContext.Request.Query[AffiliateConstants.AffiliatePublicIdParam];
-            if (!String.IsNullOrEmpty(param))
+            var cookies = context.HttpContext.Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
+            if (String.IsNullOrEmpty(cookies))
             {
-                int idAffiliate = 0;
-                if (Int32.TryParse(param, out idAffiliate))
+                var param = context.HttpContext.Request.Query[AffiliateConstants.AffiliatePublicIdParam];
+                if (!String.IsNullOrEmpty(param))
                 {
-                    var cookies = context.HttpContext.Request.Cookies[AffiliateConstants.AffiliatePublicIdParam];
-                    if (!String.IsNullOrEmpty(cookies))
+                    int idAffiliate = 0;
+                    if (Int32.TryParse(param, out idAffiliate))
                     {
-                        context.HttpContext.Response.Cookies.Delete(AffiliateConstants.AffiliatePublicIdParam);
+                        context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(), new CookieOptions()
+                        {
+                            Expires = DateTime.Now.AddDays(AffiliateConstants.AffiliatePublicIdParamExpiredDays),
+                        });
                     }
-                    context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(), new CookieOptions()
-                    {
-                        Expires = DateTime.Now.AddDays(AffiliateConstants.AffiliatePublicIdParamExpiredDays),
-                    });
                 }
             }
 

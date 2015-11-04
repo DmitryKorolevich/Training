@@ -10,6 +10,6 @@ namespace VitalChoice.Domain.Constants
         public const int DefaultTier = 1;
         
         public const string AffiliatePublicIdParam = "idaffiliate";
-        public const int AffiliatePublicIdParamExpiredDays = 180;
+        public const int AffiliatePublicIdParamExpiredDays = 30;
     }
 }

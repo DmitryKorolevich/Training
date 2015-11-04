@@ -462,7 +462,7 @@ namespace VitalChoice.Business.Services.Customers
 				new VCustomerQuery().NotDeleted()
                     .WithIdContains(filter.IdContains)
                     .WithId(filter.SearchText)
-                    .WithIdAffiliate(filter.IdAffiliate)
+                    .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
                     .WithEmail(filter.Email)
 					.WithAddress1(filter.Address1)
 					.WithAddress2(filter.Address2)
@@ -564,6 +564,7 @@ namespace VitalChoice.Business.Services.Customers
 					StateOrCounty = x.StateOrCounty,
 					StatusCode = x.StatusCode,
                     LastOrderPlaced = x.LastOrderPlaced,
+                    FirstOrderPlaced = x.FirstOrderPlaced,
                     TotalOrders = x.TotalOrders,
                 }).ToList(),
 				Count = customers.Count

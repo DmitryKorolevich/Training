@@ -43,6 +43,7 @@ using Microsoft.Framework.OptionsModel;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
 using Microsoft.Framework.DependencyInjection;
+using VitalChoice.Business.ExportMaps;
 
 namespace VC.Admin.Controllers
 {
@@ -58,6 +59,7 @@ namespace VC.Admin.Controllers
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
+        private readonly IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _exportCustomersForAffiliatesService;
 
         private readonly IEcommerceDynamicService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
@@ -65,6 +67,7 @@ namespace VC.Admin.Controllers
             _notesService;
 
 		private readonly ILogger logger;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public CustomerController(ICustomerService customerService,
             IDynamicMapper<CustomerDynamic> customerMapper,
@@ -77,7 +80,8 @@ namespace VC.Admin.Controllers
             IDynamicMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
-            IObjectHistoryLogService objectHistoryLogService)
+            IObjectHistoryLogService objectHistoryLogService,
+            IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> exportCustomersForAffiliatesService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -91,6 +95,8 @@ namespace VC.Admin.Controllers
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
+            _exportCustomersForAffiliatesService = exportCustomersForAffiliatesService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
 	    [HttpGet]
@@ -300,6 +306,9 @@ namespace VC.Admin.Controllers
                 {
                     Id = p.Id,
                     Name = $"{p.LastName}, {p.FirstName}",
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Email = p.Email,
                     City = p.City,
                     Country = p.CountryCode,
                     State = p.StateOrCounty,
@@ -307,6 +316,7 @@ namespace VC.Admin.Controllers
                     EditedBy = p.AdminProfile?.AgentId,
                     StatusCode = p.StatusCode,
                     LastOrderPlaced = p.LastOrderPlaced,
+                    FirstOrderPlaced = p.FirstOrderPlaced,
                     TotalOrders = p.TotalOrders,
                 }).ToList(),
                 Count = result.Count,
@@ -314,6 +324,40 @@ namespace VC.Admin.Controllers
 
             return toReturn;
         }
+
+#if DNX451
+        [HttpGet]
+        public async Task<FileResult> GetCustomersForAffiliates([FromQuery]int idaffiliate)
+        {
+            IList<ExtendedVCustomer> items = new List<ExtendedVCustomer>();
+            if (idaffiliate != 0)
+            {
+                CustomerFilter filter = new CustomerFilter();
+                filter.IdAffiliate = idaffiliate.ToString();
+                filter.Paging = new Paging() { PageIndex = 1, PageItemCount = 1000000 };
+                var result = await _customerService.GetCustomersAsync(filter);
+                items = result.Items;
+            }
+            foreach(var item in items)
+            {
+                if (item.FirstOrderPlaced.HasValue)
+                {
+                    item.FirstOrderPlaced=TimeZoneInfo.ConvertTime(item.FirstOrderPlaced.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                }
+            }
+
+            var data = _exportCustomersForAffiliatesService.ExportToCSV(items);
+
+            var contentDisposition = new ContentDisposition()
+            {
+                FileName = String.Format(FileConstants.AFFILIATE_CUSTOMERS_REPORT, DateTime.Now.ToString("MM_dd_yyyy_hh_mm_ss")),
+                Inline = false
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+#endif
 
         [HttpGet]
         public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
