@@ -51,5 +51,9 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
 	    },
+	    getCustomerInAffiliateReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetCustomerInAffiliateReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

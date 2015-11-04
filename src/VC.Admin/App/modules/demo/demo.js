@@ -31,48 +31,6 @@ angular.module('app.modules.demo',
 					templateUrl: 'app/modules/demo/partials/addNewOrder.html',
 					controller: 'orderDetailController'
 				})
-				/*reports*/
-				/*reports main*/
-				.state('index.twoCols.salesOrders', {
-					abstract: true,
-					url: '/reports/:name',
-					views:
-					{
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				})
-				.state('index.twoCols.wholesale', {
-					abstract: true,
-					url: '/reports/:name',
-					views:
-					{
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				})
-				.state('index.oneCol.affiliates', {
-					url: '/report/:name',
-					template: '<h2>Affiliates</h2>'
-				}).state('index.twoCols.operations', {
-					abstract: true,
-					url: '/report/:name',
-					views:
-					{
-						'left': {
-							templateUrl: 'app/shared/menu/partials/sidebar.html',
-							controller: 'sidebarController'
-						}
-					}
-				})
-				.state('index.oneCol.listProcessingAnalysis', {
-					url: '/report/:name',
-					template: '<h2>List Processing, Analysis</h2>'
-				})
 
 				/*reports sidebar*/
 				/*1*/

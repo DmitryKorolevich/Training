@@ -42,7 +42,7 @@ namespace VitalChoice.Business.Queries.Customer
 			return this;
 		}
 
-        public VCustomerQuery WithIdAffiliate(string textId)
+        public VCustomerQuery WithIdAffiliate(string textId, bool required)
         {
             int intValue;
             if (!int.TryParse(textId, out intValue))
@@ -52,6 +52,13 @@ namespace VitalChoice.Business.Queries.Customer
             if (intValue!=-1)
             {
                 Add(x => x.IdAffiliate == intValue);
+            }
+            else
+            {
+                if(required)
+                {
+                    Add(x => x.IdAffiliate == intValue);
+                }
             }
 
             return this;

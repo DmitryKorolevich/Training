@@ -38,6 +38,7 @@ using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 
 namespace VC.Admin.Controllers
 {
@@ -65,6 +66,20 @@ namespace VC.Admin.Controllers
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             logger = loggerProvider.CreateLoggerDefault();
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<VCustomerInAffiliate>>> GetCustomerInAffiliateReport([FromBody]FilterBase filter)
+        {
+            var result = await _affiliateService.GetCustomerInAffiliateReport(filter);
+
+            var toReturn = new PagedList<VCustomerInAffiliate>
+            {
+                Items = result.Items,
+                Count = result.Count,
+            };
+
+            return toReturn;
         }
 
         [HttpPost]
