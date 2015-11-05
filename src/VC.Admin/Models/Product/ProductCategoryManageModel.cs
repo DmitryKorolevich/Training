@@ -98,7 +98,6 @@ namespace VC.Admin.Models.Product
             ProductCategoryContent toReturn = new ProductCategoryContent
             {
                 Id = Id,
-                Name = Name?.Trim(),
                 Url = Url?.Trim().ToLower(),
                 FileImageSmallUrl = FileImageSmallUrl?.Trim(),
                 FileImageLargeUrl = FileImageLargeUrl?.Trim(),

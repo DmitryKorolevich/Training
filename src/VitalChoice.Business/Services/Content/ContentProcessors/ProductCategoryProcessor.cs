@@ -186,10 +186,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         {
             IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
             BuildBreadcrumb(rootNavCategory, productCategoryContent.Url, breadcrumbItems);
-
-            return new TtlCategoryModel()
+            return new TtlCategoryModel
             {
-                Name = productCategoryContent.Name,
+                Name = productCategoryContent.ProductCategory.Name,
                 Url = productCategoryContent.Url,
                 Order = productCategoryContent.ProductCategory.Order,
                 FileImageSmallUrl = productCategoryContent.FileImageSmallUrl,
