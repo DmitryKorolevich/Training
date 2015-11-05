@@ -12,8 +12,8 @@ namespace VitalChoice.DynamicData.Helpers
     {
         public static ContainerBuilder RegisterDynamicsBase(this ContainerBuilder builder)
         {
-            builder.RegisterType<TypeConverter>().As<ITypeConverter>().SingleInstance();
-            builder.RegisterType<ModelConverterService>().As<IModelConverterService>().SingleInstance();
+            builder.RegisterType<TypeConverter>().As<ITypeConverter>();
+            builder.RegisterType<ModelConverterService>().As<IModelConverterService>();
             builder.RegisterGeneric(typeof(DirectMapper<>)).AsSelf();
             return builder;
         }
