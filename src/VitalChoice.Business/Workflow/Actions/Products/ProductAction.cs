@@ -15,8 +15,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            //TODO: check if skus is unique
-            dataContext.SkuOrdereds = dataContext.Order.Skus.ToList();
+            dataContext.SkuOrdereds = dataContext.Order.Skus.Where(s => s.Quantity > 0).ToList();
             return Task.FromResult(dataContext.SkuOrdereds.Sum(s => s.Amount * s.Quantity));
         }
     }
