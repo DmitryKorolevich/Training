@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Products
             toReturn = categories.FirstOrDefault(p => !p.ParentId.HasValue);
             if (toReturn == null)
             {
-                throw new Exception("The root category for the given content type isn't configurated. Please contact support.");
+                throw new Exception("The root category for the given content type isn't configured. Please contact support.");
             }
 
             categories.RemoveAll(p => !p.ParentId.HasValue);

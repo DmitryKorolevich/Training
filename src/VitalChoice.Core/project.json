@@ -3,6 +3,7 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.AspNet.Mvc": "6.0.0-*",
+     "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*",
     "Microsoft.AspNet.Http": "1.0.0-*",
     "Microsoft.AspNet.Identity": "3.0.0-*",
     "Microsoft.Framework.OptionsModel": "1.0.0-*",
@@ -12,6 +13,8 @@
     "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
     "Microsoft.Framework.Logging": "1.0.0-*",
     "Microsoft.AspNet.Session": "1.0.0-beta8",
+     "Microsoft.AspNet.Tooling.Razor": "1.0.0-*",
+    "cloudscribe.Web.Pagination": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",

@@ -287,7 +287,7 @@ namespace VitalChoice.Core.DependencyInjection
             //return null;
         }
 
-        public static IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
+        public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
             builder.Register<IDataContextAsync>(x => x.Resolve<VitalChoiceContext>());
             builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
@@ -408,10 +408,19 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
+
+			FinishCustomRegistrations(builder);
+
             var container = builder.Build();
             return container;
         }
 
-	    protected abstract void BeginCustomRegistrations(IServiceCollection builder);
+	    protected virtual void BeginCustomRegistrations(IServiceCollection builder)
+	    {
+	    }
+
+	    protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
+	    {
+	    }
     }
 }

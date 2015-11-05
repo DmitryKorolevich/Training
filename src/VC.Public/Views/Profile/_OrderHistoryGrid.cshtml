@@ -1,0 +1,60 @@
+﻿@using System.Threading.Tasks
+@using VitalChoice.Interfaces.Services
+@model  VitalChoice.Domain.Transfer.Base.PagedList<VC.Public.Models.Profile.OrderHistoryItemModel>
+@inject IAppInfrastructureService appInfrastructureService;
+
+@{
+	var infrastructure = appInfrastructureService.Get();
+}
+
+<table class="standard-table">
+	<thead>
+		<tr>
+			<th>
+				Order #
+			</th>
+			<th>
+				Status
+			</th>
+			<th>
+				Order Total
+			</th>
+			<th>
+				Order Date
+			</th>
+			<th>
+				Healthwise
+			</th>
+			<th>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model.Items.Any())
+		{
+			foreach (var item in Model.Items)
+			{
+				<tr>
+					<td><a href="#">@item.Id</a></td>
+					<td>@infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus).Text</td>
+					<td>@item.Total.ToString("C2")</td>
+					<td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
+					<td>No</td>
+					<td><a href="#">Help Desk</a></td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr><td colspan="6">No Orders Found</td></tr>
+		}
+	</tbody>
+</table>
+<div>
+	<cs-pager cs-paging-pagesize="100"
+			  cs-paging-totalitems="@Model.Count"
+			  cs-pagenumber-param="Paging.PageIndex"
+			  cs-ajax-target="#gridcontainer"
+			  asp-controller="Profile"
+			  asp-action="RefreshOrderHistory"></cs-pager>
+</div>

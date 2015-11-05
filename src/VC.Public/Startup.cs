@@ -37,6 +37,7 @@ namespace VC.Public
             Configuration = configuration.Build();
 
             var reg = new StorefrontDependencyConfig();
+
             return reg.RegisterInfrastructure(Configuration, services, null, typeof(Startup).GetTypeInfo().Assembly);
         }
 

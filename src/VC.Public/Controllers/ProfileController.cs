@@ -23,6 +23,7 @@ using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
@@ -56,6 +57,29 @@ namespace VC.Public.Controllers
 			_paymentMethodConverter = paymentMethodConverter;
 			_orderService = orderService;
 			_productService = productService;
+		}
+
+		private async Task<PagedList<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
+		{
+			var internalId = GetInternalCustomerId();
+
+			filter.IdCustomer = internalId;
+
+			var orders = await _orderService.GetOrdersAsync(filter);
+
+			var ordersModel = new PagedList<OrderHistoryItemModel>
+			{
+				Items = orders.Items.Select(p => new OrderHistoryItemModel()
+				{
+					DateCreated = p.DateCreated,
+					Total = p.Total,
+					Id = p.Id,
+					OrderStatus = p.OrderStatus
+				}).ToList(),
+				Count = orders.Count,
+			};
+
+			return ordersModel;
 		}
 
 		private BillingInfoModel PopulateCreditCard(CustomerDynamic currentCustomer, int selectedId = 0)
@@ -430,7 +454,7 @@ namespace VC.Public.Controllers
 						ProductName = skuOrdered.ProductWithoutSkus.Name,
 						PortionsCount = skuOrdered.Sku.Data.QTY,
 						Quantity = skuOrdered.Quantity,
-						SelectedPrice = string.Format("{0:0.00}", skuOrdered.Amount),
+						SelectedPrice = skuOrdered.Amount.ToString("C2"),
 						SkuCode = skuOrdered.Sku.Code
 					};
 
@@ -470,6 +494,19 @@ namespace VC.Public.Controllers
 			}
 
 			return View(model);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> OrderHistory()
+		{
+			var filter = new VOrderFilter();
+
+			return View(await PopulateHistoryModel(filter));
+		}
+
+		public async Task<IActionResult> RefreshOrderHistory(VOrderFilter filter)
+		{
+			return PartialView(await PopulateHistoryModel(filter));
 		}
 	}
 }

@@ -17,9 +17,11 @@
     "**.vspscc"
   ],
   "dependencies": {
+     "cloudscribe.Web.Pagination": "1.0.0-*",
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-*",
     "Microsoft.AspNet.Mvc": "6.0.0-*",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*",
     "Microsoft.AspNet.Diagnostics": "1.0.0-*",
     "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
@@ -32,6 +34,7 @@
     "Newtonsoft.Json": "7.0.1",
     "EntityFramework.Core": "7.0.0-*",
     "EntityFramework.Commands": "7.0.0-*",
+    "Microsoft.AspNet.Tooling.Razor": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",

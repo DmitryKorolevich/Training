@@ -11,6 +11,8 @@
     "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
     "assets/scripts/vendor/jquery.maskedinput.js",
     "assets/scripts/vendor/toast/jquery.toast.min.js",
+    "assets/scripts/vendor/jquery.unobtrusive-ajax.min.js",
+    "assets/scripts/vendor/bootstrap.min.js",
     "assets/scripts/plugins.js"
   ]
 }

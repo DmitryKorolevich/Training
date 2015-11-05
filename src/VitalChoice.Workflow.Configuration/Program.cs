@@ -104,7 +104,7 @@ namespace VitalChoice.Workflow.Configuration
                     configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
 
-            var container = DefaultDependencyConfig.BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
+            var container = new AdminDependencyConfig().BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
             return container;
         }
     }
