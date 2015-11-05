@@ -34,7 +34,7 @@ namespace VitalChoice.Business.Workflow.Actions.Products
                 products.Any(
                     s =>
                         s.ProductWithoutSkus.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType &&
-                        s.Sku.Data.QTYThreshold >= s.Quantity);
+                        s.Quantity > s.Sku.Data.QTYThreshold);
             dataContext.SplitInfo.SpecialSkuAdded = products.Any(s => s.Sku.Code.ToLowerInvariant() == "emp");
 
             //TODO: move NonPerishableOrphanCount threshold to global admin config
