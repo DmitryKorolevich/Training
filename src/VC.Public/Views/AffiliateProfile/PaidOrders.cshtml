@@ -85,6 +85,14 @@
                     }
                 </tbody>
             </table>
+            <div>
+                <cs-pager cs-paging-info="@Model.Paging"
+                          cs-pagenumber-param="page"
+                          asp-controller="AffiliateProfile"
+                          asp-action="PaidOrders"
+                          asp-route-from="@(Model.From.HasValue ? Model.From.Value.ToString("MM/dd/yyyy",CultureInfo.InvariantCulture) : String.Empty)"
+                          asp-route-to="@(Model.To.HasValue ? Model.To.Value.ToString("MM/dd/yyyy",CultureInfo.InvariantCulture) : String.Empty)"></cs-pager>
+            </div>
         </div>
     </div>
 </div>
