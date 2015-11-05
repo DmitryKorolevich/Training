@@ -69,6 +69,10 @@ namespace VC.Admin.ModelConverters
                     model.GCs.Add(new GCListItemModel(item.GiftCertificate));
                 }
             }
+            else
+            {
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+            }
 
             if (dynamic.Skus != null)
             {

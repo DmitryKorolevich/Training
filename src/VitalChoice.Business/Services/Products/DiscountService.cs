@@ -222,6 +222,11 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            foreach(var item in result.Items)
+            {
+                item.OptionValues = new List<DiscountOptionValue>();
+                item.OptionTypes = new List<DiscountOptionType>();
+            }
             PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => _mapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Any())
             {
