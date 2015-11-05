@@ -12,6 +12,8 @@ using Microsoft.Framework.Logging;
 using VC.Public.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
+using cloudscribe.Web.Pagination;
+using Microsoft.Framework.DependencyInjection.Extensions;
 
 namespace VC.Public
 {

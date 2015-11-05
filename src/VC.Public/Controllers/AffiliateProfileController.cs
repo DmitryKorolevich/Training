@@ -34,6 +34,7 @@ using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Transfer.Base;
+using cloudscribe.Web.Pagination;
 
 namespace VC.Public.Controllers
 {
@@ -233,8 +234,8 @@ namespace VC.Public.Controllers
             filter.From = from;
             filter.To = to;
             filter.Paging = new Paging();
-            filter.Paging.PageIndex = page - 1;
-            if(filter.Paging.PageIndex<0)
+            filter.Paging.PageIndex = page;
+            if(filter.Paging.PageIndex<1)
             {
                 filter.Paging.PageIndex = 0;
             }
@@ -243,6 +244,13 @@ namespace VC.Public.Controllers
             OrderPaymentsModel toReturn = new OrderPaymentsModel();
             toReturn.From = from;
             toReturn.To = to;
+            toReturn.Count = result.Count;
+            toReturn.Paging = new PaginationSettings()
+            {
+                CurrentPage = page,
+                ItemsPerPage= BaseAppConstants.DEFAULT_LIST_TAKE_COUNT,
+                TotalItems = result.Count,
+            };
             toReturn.Items = result.Items.Select(p => new OrderPaymentLineModel()
             {
                 DateCreated = p.Order.DateCreated,
