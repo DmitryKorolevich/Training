@@ -1199,7 +1199,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 return;
             }
-            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.Index != index || $scope.skuFilter.ExactDescriptionName != ''))
+            if (product && product.Code)
             {
                 $scope.skuFilter.ExactCode = product.Code;
                 $scope.skuFilter.Index = index;
