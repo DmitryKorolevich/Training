@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Threading;
+using Microsoft.Framework.Caching.Memory;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Domain.Helpers
 {
@@ -15,10 +18,14 @@ namespace VitalChoice.Domain.Helpers
                 Interlocked.CompareExchange(ref _lambdaCache, new Dictionary<string, T>(), null);
             }
             T result;
-            string expressionBody = expression.Body.ToString();
+
+            var cachableExpression = Evaluator.PartialEval(expression);
+            cachableExpression = LocalCollectionExpander.Rewrite(cachableExpression);
+            string key = cachableExpression.ToString();
+
             lock (_lambdaCache)
             {
-                if (_lambdaCache.TryGetValue(expressionBody, out result))
+                if (_lambdaCache.TryGetValue(key, out result))
                 {
                     return result;
                 }
@@ -26,17 +33,16 @@ namespace VitalChoice.Domain.Helpers
             T newCompiled = expression.Compile();
             lock (_lambdaCache)
             {
-                if (_lambdaCache.TryGetValue(expressionBody, out result))
+                if (_lambdaCache.TryGetValue(key, out result))
                 {
                     return result;
                 }
-                _lambdaCache.Add(expressionBody, newCompiled);
+                _lambdaCache.Add(key, newCompiled);
                 return newCompiled;
             }
 
         }
     }
-
     public static class LambdaCompiler
     {
         public static T CacheCompile<T>(this Expression<T> expression)

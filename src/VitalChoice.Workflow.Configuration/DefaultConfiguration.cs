@@ -24,6 +24,8 @@ namespace VitalChoice.Workflow.Configuration
         {
             setup.Action<TotalAction>("Total", action =>
             {
+                action.Dependency<PerishableProductsAction>();
+
                 action.Aggregate<OrderSubTotalAction>();
                 action.Aggregate<GiftCertificatesPaymentAction>();
                 action.Aggregate<GetTaxAction>();
@@ -114,13 +116,13 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.Action<StandardShippingUsWholesaleAction>("StandardWholesaleShipping", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ProductsWithPromoAction>();
                 action.Dependency<DeliveredProductsAction>();
             });
 
             setup.Action<StandardShippingUsCaRetailAction>("StandardRetailShipping", action =>
             {
-                action.Dependency<DiscountTypeActionResolver>();
+                action.Dependency<ProductsWithPromoAction>();
                 action.Dependency<DeliveredProductsAction>();
             });
 
@@ -172,6 +174,7 @@ namespace VitalChoice.Workflow.Configuration
 
             setup.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
             {
+                action.Dependency<DiscountTypeActionResolver>();
                 action.Dependency<CountriesSetUpAction>();
                 action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
                 action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
@@ -15,11 +16,17 @@ namespace VitalChoice.Business.Workflow.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
+        public override async Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, IWorkflowExecutionContext executionContext)
         {
-            return Task.FromResult(
-                dataContext.SkuOrdereds.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable)
-                    .Sum(s => s.Amount*s.Quantity));
+            var perishableAmount = dataContext.SkuOrdereds.Where(s => s.ProductWithoutSkus.IdObjectType == (int) ProductType.Perishable)
+                .Sum(s => s.Amount*s.Quantity);
+            var settingsService = executionContext.Resolve<ISettingService>();
+            var settings = await settingsService.GetAppSettingsAsync();
+            if (perishableAmount < settings.GlobalPerishableThreshold)
+            {
+                dataContext.ProductsPerishableThresholdIssue = true;
+            }
+            return perishableAmount;
         }
     }
 }

@@ -344,15 +344,26 @@ namespace VitalChoice.DynamicData.Base
             }
             var result = new TDynamic();
             var data = result.DictionaryData;
-            var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
-            foreach (var value in entity.OptionValues)
+            if (entity.OptionValues.Any())
             {
-                TOptionType optionType;
-                if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
+                var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
+                foreach (var value in entity.OptionValues)
+                {
+                    TOptionType optionType;
+                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
+                    {
+                        data.Add(optionType.Name,
+                            MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
+                                (FieldType) optionType.IdFieldType));
+                    }
+                }
+            }
+            if (withDefaults)
+            {
+                foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
                 {
                     data.Add(optionType.Name,
-                        MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
-                            (FieldType) optionType.IdFieldType));
+                        MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
                 }
             }
             result.Id = entity.Id;
@@ -361,13 +372,6 @@ namespace VitalChoice.DynamicData.Base
             result.StatusCode = entity.StatusCode;
             result.IdEditedBy = entity.IdEditedBy;
             result.IdObjectType = entity.IdObjectType;
-            if (!withDefaults || entity.OptionTypes == null)
-                return result;
-            foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
-            {
-                data.Add(optionType.Name,
-                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType)optionType.IdFieldType));
-            }
             return result;
         }
 
