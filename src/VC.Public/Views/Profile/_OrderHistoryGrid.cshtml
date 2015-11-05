@@ -1,6 +1,7 @@
 ﻿@using System.Threading.Tasks
+@using VitalChoice.Domain.Constants
 @using VitalChoice.Interfaces.Services
-@model  VitalChoice.Domain.Transfer.Base.PagedList<VC.Public.Models.Profile.OrderHistoryItemModel>
+@model  VitalChoice.Domain.Transfer.Base.PagedListEx<VC.Public.Models.Profile.OrderHistoryItemModel>
 @inject IAppInfrastructureService appInfrastructureService;
 
 @{
@@ -51,7 +52,8 @@
 	</tbody>
 </table>
 <div>
-	<cs-pager cs-paging-pagesize="100"
+	<cs-pager cs-paging-pagenumber="@Model.Index"
+			  cs-paging-pagesize="@BaseAppConstants.DEFAULT_LIST_TAKE_COUNT"
 			  cs-paging-totalitems="@Model.Count"
 			  cs-pagenumber-param="Paging.PageIndex"
 			  cs-ajax-target="#gridcontainer"

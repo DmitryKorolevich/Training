@@ -28,5 +28,21 @@ namespace VitalChoice.Business.Queries.Order
 
 			return this;
 		}
+
+		public OrderQuery FilterById(string id)
+		{
+			if (!string.IsNullOrWhiteSpace(id))
+			{
+				Add(p => p.Id.ToString().Contains(id));
+			}
+			return this;
+		}
+
+		public OrderQuery NotDeleted()
+		{
+			Add(x => x.StatusCode != (int)RecordStatusCode.Deleted);
+
+			return this;
+		}
 	}
 }

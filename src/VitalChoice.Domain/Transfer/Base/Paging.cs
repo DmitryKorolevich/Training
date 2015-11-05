@@ -7,7 +7,7 @@ namespace VitalChoice.Domain.Transfer.Base
 	    public Paging()
 	    {
 		    PageIndex = 1;
-		    PageItemCount = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT;
+		    PageItemCount =  BaseAppConstants.DEFAULT_LIST_TAKE_COUNT;
 	    }
 
         public int PageIndex { get; set; }

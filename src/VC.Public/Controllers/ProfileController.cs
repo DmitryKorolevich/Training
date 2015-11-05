@@ -59,15 +59,18 @@ namespace VC.Public.Controllers
 			_productService = productService;
 		}
 
-		private async Task<PagedList<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
+		private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(ShortOrderFilter filter)
 		{
 			var internalId = GetInternalCustomerId();
 
 			filter.IdCustomer = internalId;
+			filter.Sorting.SortOrder = SortOrder.Desc;
+			filter.Sorting.Path = OrderSortPath.OrderDate;
 
-			var orders = await _orderService.GetOrdersAsync(filter);
 
-			var ordersModel = new PagedList<OrderHistoryItemModel>
+			var orders = await _orderService.GetShortOrdersAsync(filter);
+
+			var ordersModel = new PagedListEx<OrderHistoryItemModel>
 			{
 				Items = orders.Items.Select(p => new OrderHistoryItemModel()
 				{
@@ -77,6 +80,7 @@ namespace VC.Public.Controllers
 					OrderStatus = p.OrderStatus
 				}).ToList(),
 				Count = orders.Count,
+				Index = filter.Paging.PageIndex
 			};
 
 			return ordersModel;
@@ -499,14 +503,16 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public async Task<IActionResult> OrderHistory()
 		{
-			var filter = new VOrderFilter();
+			var filter = new ShortOrderFilter();
 
 			return View(await PopulateHistoryModel(filter));
 		}
 
-		public async Task<IActionResult> RefreshOrderHistory(VOrderFilter filter)
+		public async Task<IActionResult> RefreshOrderHistory(ShortOrderFilter filter)
 		{
-			return PartialView(await PopulateHistoryModel(filter));
+			var model = await PopulateHistoryModel(filter);
+
+			return PartialView("_OrderHistoryGrid", model);
 		}
 	}
 }

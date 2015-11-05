@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Domain.Transfer.Base
 {
-    public struct SortFilter
+    public class SortFilter
     {
 		public string Path { get; set; }
 

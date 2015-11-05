@@ -2,12 +2,17 @@
 
 namespace VitalChoice.Domain.Transfer.Base
 {
-    public struct PagedList<T>
+    public class PagedList<T>
     {
         public IList<T> Items { get; set; }
         public int Count { get; set; }
 
-        public PagedList(IList<T> items, int count)
+	    public PagedList()
+	    {
+			Items = new List<T>();
+        }
+
+	    public PagedList(IList<T> items, int count)
         {
             Count = count;
             Items = items;

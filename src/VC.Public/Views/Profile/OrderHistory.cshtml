@@ -1,4 +1,4 @@
-﻿@model  VitalChoice.Domain.Transfer.Base.PagedList<VC.Public.Models.Profile.OrderHistoryItemModel>
+﻿@model  VitalChoice.Domain.Transfer.Base.PagedListEx<VC.Public.Models.Profile.OrderHistoryItemModel>
 
 @section Meta {
 	<title>Vital Choice | Full Order History</title>
@@ -11,7 +11,7 @@
 	<div class="right-pane clean-indent">
 		<div class="border-form-left">
 		<h4>Full Order History</h4>
-			<div id="ordersGrid">@Html.Partial("_OrderHistoryGrid", Model)</div>
+			<div id="gridcontainer">@Html.Partial("_OrderHistoryGrid", Model)</div>
 		</div>
 	</div>
 </div>
