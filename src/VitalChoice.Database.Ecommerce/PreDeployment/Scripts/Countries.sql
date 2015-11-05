@@ -42,4 +42,12 @@ ON UPDATE CASCADE
 
 ALTER TABLE [dbo].[States] CHECK CONSTRAINT [FK_States_Countries]
 
+INSERT INTO Countries
+([CountryCode]
+           ,[CountryName]
+           ,[StatusCode]
+           ,[Order])
+VALUES
+('US','USA',2,1)
+
 END
