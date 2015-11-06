@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
@@ -47,5 +48,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Orders
         public decimal ShippingTotal { get; set; }
 
         public decimal DiscountTotal { get; set; }
+
+        public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
     }
 }

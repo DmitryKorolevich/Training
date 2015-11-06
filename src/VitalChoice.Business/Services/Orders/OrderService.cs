@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
@@ -23,6 +25,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
+using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities;
@@ -47,6 +50,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
         private readonly IAffiliateService _affiliateService;
+        private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
+        private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<Order> orderRepository,
@@ -58,7 +63,9 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<ProductOptionType> productOptionTypesRepository, ProductMapper productMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
-            IAffiliateService affiliateService)
+            IAffiliateService affiliateService,
+            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
@@ -71,6 +78,8 @@ namespace VitalChoice.Business.Services.Orders
             _treeFactory = treeFactory;
             _skusRepository = skusRepository;
             _affiliateService = affiliateService;
+            _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
+            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -103,40 +112,48 @@ namespace VitalChoice.Business.Services.Orders
         protected override async Task AfterSelect(ICollection<Order> entities)
         {
             var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
-            foreach (
-                var orderToSku in
-                    entities.SelectMany(o => o.Skus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
+            bool skuLoaded = true;
+            foreach(var entity in entities)
             {
-                var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                    .WithObjectType(orderToSku.Sku.Product.IdObjectType)
-                    .Query()
-                    .CacheCompile()).ToList();
-                orderToSku.Sku.OptionTypes = optionTypes;
-                orderToSku.Sku.Product.OptionTypes = optionTypes;
+                skuLoaded = skuLoaded && entity.Skus != null;
             }
-            var invalidSkuOrdered =
-                entities.SelectMany(o => o.Skus)
-                    .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                    .ToList();
-            var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-            var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                .Include(p => p.Product)
-                .ThenInclude(s => s.OptionValues)
-                .Include(p => p.OptionValues)
-                .SelectAsync(false)).ToDictionary(s => s.Id);
-            foreach (var orderToSku in invalidSkuOrdered)
+            if (skuLoaded)
             {
-                Sku sku;
-                if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                foreach (
+                    var orderToSku in
+                        entities.SelectMany(o => o.Skus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
                 {
                     var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                        .WithObjectType(sku.Product.IdObjectType)
+                        .WithObjectType(orderToSku.Sku.Product.IdObjectType)
                         .Query()
                         .CacheCompile()).ToList();
-                    orderToSku.Sku = sku;
-                    orderToSku.Sku.Product = sku.Product;
                     orderToSku.Sku.OptionTypes = optionTypes;
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
+                }
+                var invalidSkuOrdered =
+                    entities.SelectMany(o => o.Skus)
+                        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
+                        .ToList();
+                var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
+                var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
+                    .Include(p => p.Product)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.OptionValues)
+                    .SelectAsync(false)).ToDictionary(s => s.Id);
+                foreach (var orderToSku in invalidSkuOrdered)
+                {
+                    Sku sku;
+                    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
+                    {
+                        var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
+                            .WithObjectType(sku.Product.IdObjectType)
+                            .Query()
+                            .CacheCompile()).ToList();
+                        orderToSku.Sku = sku;
+                        orderToSku.Sku.Product = sku.Product;
+                        orderToSku.Sku.OptionTypes = optionTypes;
+                        orderToSku.Sku.Product.OptionTypes = optionTypes;
+                    }
                 }
             }
         }
@@ -294,7 +311,7 @@ namespace VitalChoice.Business.Services.Orders
             if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment();
-                payment.IdOrder = model.Id;
+                payment.Id = model.Id;
                 payment.Status = AffiliateOrderPaymentStatus.NotPaid;
                 payment.IdAffiliate = model.Customer.IdAffiliate.Value;
                 //TODO - calculate commission and set is a first order or no the given customer
@@ -436,5 +453,83 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        #region AffiliatesOrders
+
+        public async Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter)
+        {
+            PagedList<AffiliateOrderListItemModel> toReturn = new PagedList<AffiliateOrderListItemModel>();
+
+            OrderQuery conditions = new OrderQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
+                WithAffiliateOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
+            Func<IQueryLite<Order>, IQueryLite<Order>> includes = (p => p.Include(o => o.PaymentMethod)
+                                                                         .ThenInclude(o => o.BillingAddress)
+                                                                         .ThenInclude(o => o.OptionValues)
+                                                                         .Include(o => o.PaymentMethod)
+                                                                         .ThenInclude(o => o.OptionValues)
+                                                                         .Include(o => o.PaymentMethod)
+                                                                         .ThenInclude(o => o.PaymentMethod)
+                                                                         .Include(o=>o.AffiliateOrderPayment));
+
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
+                queryObject: conditions, orderBy: sortable, includesOverride: includes);
+
+            var customerOrders = await _affiliateOrderPaymentRepository.GetAffiliateOrdersInCustomers(filter.IdAffiliate, result.Items.Select(p => p.Customer.Id).Distinct().ToList());
+
+            List<int> customerIds = new List<int>();
+            toReturn.Count = result.Count;
+            toReturn.Items = new List<AffiliateOrderListItemModel>();
+            string customerFirstName = null;
+            string customerLastName = null;
+            int customerOrdersCount = 0;
+            foreach (var order in result.Items)
+            {
+                customerFirstName = null;
+                customerLastName = null;
+                customerOrdersCount = 0;
+                if(order.PaymentMethod!=null && order.PaymentMethod.Address!=null && 
+                    order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") &&
+                    order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
+                {
+                    customerFirstName = order.PaymentMethod.Address.Data.FirstName;
+                    customerLastName = order.PaymentMethod.Address.Data.LastName;
+                }
+                else
+                {
+                    customerIds.Add(order.Customer.Id);
+                }
+                if (customerOrders.ContainsKey(order.Customer.Id))
+                {
+                    customerOrdersCount = customerOrders[order.Customer.Id];
+                }
+                
+                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName,
+                    customerOrdersCount);
+                toReturn.Items.Add(item);
+            }
+
+            if(customerIds.Count>0)
+            {
+                var customerConditions = new VCustomerQuery().NotDeleted().WithIds(customerIds.Distinct().ToList());
+                var customers = (await _vCustomerRepositoryAsync.Query(customerConditions).SelectAsync(false));
+                
+                foreach (var item in toReturn.Items)
+                {
+                    if(String.IsNullOrEmpty(item.CustomerName))
+                    {
+                        var customer = customers.FirstOrDefault(p => p.Id == item.IdCustomer);
+                        if (customer != null)
+                        {
+                            item.CustomerName = customer.FirstName + " " + customer.LastName;
+                        }
+                    }
+                }
+            }
+
+            return toReturn;
+        }
+
+        #endregion
     }
 }

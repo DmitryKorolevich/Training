@@ -9,6 +9,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities.Transfer;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 
 namespace VitalChoice.DynamicData.Entities
 {
@@ -47,5 +48,7 @@ namespace VitalChoice.DynamicData.Entities
         public decimal ShippingTotal { get; set; }
 
         public decimal DiscountTotal { get; set; }
+
+        public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
     }
 }

@@ -45,7 +45,7 @@ namespace VitalChoice.Domain.Transfer.Affiliates
             if(affiliatePayment!=null)
             {
                 DateCreated = affiliatePayment.Order.DateCreated;
-                IdOrder = affiliatePayment.IdOrder;
+                IdOrder = affiliatePayment.Id;
                 OrderStatus = affiliatePayment.Order.OrderStatus;
                 PaymentStatus = affiliatePayment.Status;
                 IdCustomer = affiliatePayment.Order.IdCustomer;
@@ -55,7 +55,10 @@ namespace VitalChoice.Domain.Transfer.Affiliates
                 ShippingTotal = affiliatePayment.Order.ShippingTotal;
                 TaxTotal = affiliatePayment.Order.TaxTotal;
                 Commission = affiliatePayment.Amount;
-                CustomerName = customerFirstName+" "+ customerLastName;
+                if (!String.IsNullOrEmpty(customerFirstName) || !String.IsNullOrEmpty(customerLastName))
+                {
+                    CustomerName = customerFirstName + " " + customerLastName;
+                }
                 RepeatInCustomer = repeatInCustomer;
             }
         }

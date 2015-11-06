@@ -160,15 +160,6 @@ GROUP BY a.Id
 
 GO
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = 'NewCustomerOrder' AND [object_id] = OBJECT_ID(N'[dbo].[AffiliateOrderPayments]', N'U'))
-BEGIN
-
-	ALTER TABLE dbo.AffiliateOrderPayments
-	ADD NewCustomerOrder BIT NOT NULL DEFAULT 0
-END
-
-GO
-
 IF NOT EXISTS (SELECT object_id FROM sys.indexes WHERE name='IX_Customers_IdAffiliate' AND object_id = OBJECT_ID('Customers'))
 BEGIN
 
@@ -177,6 +168,45 @@ CREATE NONCLUSTERED INDEX [IX_Customers_IdAffiliate] ON [dbo].[Customers]
 	[IdAffiliate] ASC
 )WITH (FILLFACTOR = 80)
 
+END
+
+GO
+
+IF EXISTS(SELECT * FROM sys.columns WHERE name = 'IdOrder' AND [object_id] = OBJECT_ID(N'[dbo].[AffiliateOrderPayments]', N'U'))
+BEGIN
+	DROP TABLE [dbo].[AffiliateOrderPayments]
+
+	CREATE TABLE [dbo].[AffiliateOrderPayments] (
+		[Id] INT NOT NULL
+			CONSTRAINT PK_AffiliateOrderPayments PRIMARY KEY (Id),
+		[IdAffiliate] INT NOT NULL
+			CONSTRAINT FK_AffiliateOrderPaymentToAffiliate FOREIGN KEY (IdAffiliate) REFERENCES dbo.Affiliates (Id),
+		[Amount] MONEY NOT NULL,
+		[Status] INT NOT NULL DEFAULT(1),
+		[IdAffiliatePayment] INT NULL		
+			CONSTRAINT FK_AffiliateOrderPaymentToAffiliatePayment FOREIGN KEY (IdAffiliatePayment) REFERENCES dbo.AffiliatePayments (Id),
+	)
+
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliate_Status ON AffiliateOrderPayments (IdAffiliate,Status)
+	CREATE NONCLUSTERED INDEX IX_AffiliateOrderPayments_IdAffiliatePayment ON AffiliateOrderPayments (IdAffiliatePayment)
+
+	ALTER TABLE dbo.AffiliateOrderPayments ADD CONSTRAINT
+	FK_AffiliateOrderPayments_Orders FOREIGN KEY
+	(
+	Id
+	) REFERENCES dbo.Orders
+	(
+	Id
+	)
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE name = 'NewCustomerOrder' AND [object_id] = OBJECT_ID(N'[dbo].[AffiliateOrderPayments]', N'U'))
+BEGIN
+
+	ALTER TABLE dbo.AffiliateOrderPayments
+	ADD NewCustomerOrder BIT NOT NULL DEFAULT 0
 END
 
 GO

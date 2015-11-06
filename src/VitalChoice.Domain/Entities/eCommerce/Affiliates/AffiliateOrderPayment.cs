@@ -12,8 +12,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
 	{
         public int IdAffiliate { get; set; }
 
-        public int IdOrder { get; set; }
-
         public Order Order { get; set; }
 
 	    public decimal Amount { get; set; }

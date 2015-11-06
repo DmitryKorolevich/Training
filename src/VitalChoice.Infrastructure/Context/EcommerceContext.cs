@@ -1111,9 +1111,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("AffiliateOrderPayments");
                 entity.HasOne(p => p.Order)
-                    .WithMany()
-                    .ForeignKey(o => o.IdOrder)
-                    .PrincipalKey(p => p.Id)
+                    .WithOne(p => p.AffiliateOrderPayment)
+                    .ForeignKey<AffiliateOrderPayment>(p=>p.Id)
+                    .PrincipalKey<Order>(p => p.Id)
                     .Required();
             });
 

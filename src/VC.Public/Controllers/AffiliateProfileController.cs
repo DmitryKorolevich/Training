@@ -214,7 +214,7 @@ namespace VC.Public.Controllers
             var toReturn = result.Items.Select(p => new OrderPaymentLineModel()
             {
                 DateCreated=p.Order.DateCreated,
-                IdOrder=p.IdOrder,
+                IdOrder=p.Id,
                 NewCustomerOrder=p.NewCustomerOrder,
                 ProductTotal=p.Order.ProductsSubtotal,
                 OrderTotal=p.Order.Total,
@@ -254,7 +254,7 @@ namespace VC.Public.Controllers
             toReturn.Items = result.Items.Select(p => new OrderPaymentLineModel()
             {
                 DateCreated = p.Order.DateCreated,
-                IdOrder = p.IdOrder,
+                IdOrder = p.Id,
                 NewCustomerOrder = p.NewCustomerOrder,
                 ProductTotal = p.Order.ProductsSubtotal,
                 OrderTotal = p.Order.Total,
