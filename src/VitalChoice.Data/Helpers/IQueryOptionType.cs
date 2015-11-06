@@ -8,6 +8,6 @@ namespace VitalChoice.Data.Helpers
         where TOptionType : OptionType
     {
         IQueryOptionType<TOptionType> WithObjectType(int? objectType);
-        IQueryOptionType<TOptionType> WithNames(ICollection<string> names);
+        IQueryOptionType<TOptionType> WithNames(HashSet<string> names);
     }
 }

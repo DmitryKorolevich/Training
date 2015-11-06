@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
@@ -32,7 +33,7 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
         protected readonly ILogger Logger;
-        protected readonly ICollection<TOptionType> OptionTypes;
+        protected static ICollection<TOptionType> OptionTypes;
 
         protected DynamicReadServiceAsync(
             IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
@@ -48,7 +49,10 @@ namespace VitalChoice.DynamicData.Base
             OptionValuesRepository = optionValuesRepository;
             ObjectLogItemExternalService = objectLogItemExternalService;
             Logger = logger;
-            OptionTypes = optionTypesRepository.Query().Select(false);
+            if (OptionTypes == null)
+            {
+                Interlocked.CompareExchange(ref OptionTypes, optionTypesRepository.Query().Select(false), null);
+            }
         }
 
         #region Extension Points
@@ -305,7 +309,7 @@ namespace VitalChoice.DynamicData.Base
             ICollection<TOptionType> optionTypes)
         {
             var optionTypesToSearch =
-                optionTypes.Where(Mapper.GetOptionTypeQuery().WithNames(values.Keys).Query().CacheCompile());
+                optionTypes.Where(Mapper.GetOptionTypeQuery().WithNames(new HashSet<string>(values.Keys)).Query().CacheCompile());
             Dictionary<int, GenericPair<string, TOptionType>> searchValues = optionTypesToSearch.ToDictionary(t => t.Id,
                 t =>
                     new GenericPair<string, TOptionType>(
