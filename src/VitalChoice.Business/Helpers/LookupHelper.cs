@@ -6,6 +6,7 @@ using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Discounts;
 using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
@@ -292,6 +293,36 @@ namespace VitalChoice.Business.Helpers
                 new LookupItem<int?>() {Key = (int?) ExpiredType.NotExpired, Text="Not Expired" },
                 new LookupItem<int?>() {Key = (int?) ExpiredType.Expired, Text="Expired" },
             };
+            return toReturn;
+        }
+
+        public static string GetOrderStatusName(OrderStatus type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case OrderStatus.Incomplete:
+                    toReturn = "Incomplete";
+                    break;
+                case OrderStatus.Processed:
+                    toReturn = "Processed";
+                    break;
+                case OrderStatus.Shipped:
+                    toReturn = "Shipped";
+                    break;
+                case OrderStatus.Cancelled:
+                    toReturn = "Cancelled";
+                    break;
+                case OrderStatus.Exported:
+                    toReturn = "Exported";
+                    break;
+                case OrderStatus.ShipDelayed:
+                    toReturn = "Ship Delayed";
+                    break;
+                case OrderStatus.OnHold:
+                    toReturn = "On Hold";
+                    break;
+            }
             return toReturn;
         }
     }

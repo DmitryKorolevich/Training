@@ -44,7 +44,7 @@
                                                 <label for="active" class="col-md-3 control-label">Suspend</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4"/></label>
+                                                        <label><input type="checkbox" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4" /></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -81,7 +81,7 @@
                                                 <label for="active" class="col-md-3 control-label">Brick and Mortar</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="BrickAndMortar" data-ng-model="affiliate.BrickAndMortar"/></label>
+                                                        <label><input type="checkbox" name="BrickAndMortar" data-ng-model="affiliate.BrickAndMortar" /></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -201,7 +201,7 @@
                                                         <label>
                                                             <input type="checkbox" name="PromoteByVerticalResponseEmail" data-ng-model="affiliate.PromoteByVerticalResponseEmail" />
                                                             <strong>Vertical Response Email</strong>
-                                                        </label>                                                        
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -348,7 +348,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-9" data-ng-if="!(statesByCountryId(affiliate.IdCountry) && statesByCountryId(affiliate.IdCountry).length > 0)">
-                                                    <input type="text" name="County" class="form-control" data-ng-model="affiliate.County" placeholder="State"/>
+                                                    <input type="text" name="County" class="form-control" data-ng-model="affiliate.County" placeholder="State" />
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.County.$invalid">
                                                         <small class="error" ng-show="forms.mainForm.County.$error.server">{{serverMessages.GetMessage('County')}}</small>
                                                     </div>
@@ -478,6 +478,130 @@
                                         </fieldset>
                                     </form>
                                 </spinner-overlay>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Customers" active="customersTab.active">
+                        <div class="container-fluid">
+                            <div class="well row">
+                                <div class="row form-group" data-ng-if="customersTotalItems>0">
+                                    <div class="col-md-6 btn-line">
+                                        <div class="margin-top-10px">Affiliate Customers Count: <strong>{{customers.length}}</strong></div>
+                                        </div>
+                                    <div class="col-md-6 btn-line">
+                                        <a target="_self" class="btn btn-primary pull-right" data-ng-if="options.customersExportUrl" data-ng-href={{options.customersExportUrl}}>Export</a>
+                                    </div>
+                                </div>
+                                <spinner-overlay data-loading="refreshCustomersTracker.active()">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer Id</th>
+                                                <th>Email</th>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>First Order Placed</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="item in customers">
+                                                <td>{{::item.Id}}</td>
+                                                <td>{{::item.Email}}</td>
+                                                <td>{{::item.FirstName}}</td>
+                                                <td>{{::item.LastName}}</td>
+                                                <td>{{::item.FirstOrderPlaced | date:"MM/dd/yy"}}<br />{{::item.FirstOrderPlaced | date:"h:mm a"}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </spinner-overlay>
+                                <pagination boundary-links="true"
+                                            total-items="customersTotalItems"
+                                            items-per-page="customerFilter.Paging.PageItemCount"
+                                            data-ng-model="customerFilter.Paging.PageIndex"
+                                            previous-text="&lsaquo;"
+                                            next-text="&rsaquo;"
+                                            first-text="&laquo;"
+                                            last-text="&raquo;"
+                                            data-ng-change="customersPageChanged()">
+                                </pagination>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="Orders" active="ordersTab.active">
+                        <div class="container-fluid">
+                            <div class="well row">
+                                <div class="row form-group" data-ng-if="affiliate.Id">
+                                    <div class="col-md-3">
+                                        <p class="input-group">
+                                            <input type="text" name="test" class="form-control" placeholder="From" datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.From" is-open="fromOpened" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p class="input-group">
+                                            <input type="text" name="test" class="form-control" placeholder="To" datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.To" is-open="toOpened" />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-info" data-ng-click="filterOrders();" type="button">Filter</button>
+                                    </div>
+                                </div>
+                                <spinner-overlay data-loading="refreshOrdersTracker.active()">
+                                    <table class="table table-striped order-statuses">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Order Date</th>
+                                                <th>Customer Name</th>
+                                                <th>Cust ID</th>
+                                                <th>Net Product Total</th>
+                                                <th>Repeat</th>
+                                                <th>Order Status</th>
+                                                <th>Commission</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="item in orders">
+                                                <td>
+                                                    <a ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{::item.IdOrder}}</a>
+                                                </td>
+                                                <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                                                <td>{{::item.CustomerName}}</td>
+                                                <td>
+                                                    <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.IdCustomer}}</a>
+                                                </td>
+                                                <td>{{::item.ProductsSubtotal | currency}}</td>
+                                                <td>{{::item.RepeatInCustomer}}</td>
+                                                <td data-ng-class="{'ban': item.OrderStatus==1, 'exclamation-triangle': item.OrderStatus==2, 'truck': item.OrderStatus==3, 'minus-circle': item.OrderStatus==4, 'check-circle': item.OrderStatus==5, 'calendar': item.OrderStatus==6, 'pause': item.OrderStatus==7}">
+                                                    <i data-ng-if="item.OrderStatus==1" class="fa fa-ban"></i>
+                                                    <i data-ng-if="item.OrderStatus==2" class="fa fa-exclamation-triangle"></i>
+                                                    <i data-ng-if="item.OrderStatus==3" class="fa fa-truck"></i>
+                                                    <i data-ng-if="item.OrderStatus==4" class="fa fa-minus-circle"></i>
+                                                    <i data-ng-if="item.OrderStatus==5" class="fa fa-check-circle"></i>
+                                                    <i data-ng-if="item.OrderStatus==6" class="fa fa-calendar"></i>
+                                                    <i data-ng-if="item.OrderStatus==7" class="fa fa-pause"></i>
+                                                    <span>{{getReferenceItem(ReferenceData.OrderStatuses, item.OrderStatus).Text}}</span>
+                                                </td>
+                                                <td>{{::item.Commission | currency}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </spinner-overlay>
+                                <pagination boundary-links="true"
+                                            total-items="ordersTotalItems"
+                                            items-per-page="orderFilter.Paging.PageItemCount"
+                                            data-ng-model="orderFilter.Paging.PageIndex"
+                                            previous-text="&lsaquo;"
+                                            next-text="&rsaquo;"
+                                            first-text="&laquo;"
+                                            last-text="&raquo;"
+                                            data-ng-change="ordersPageChanged()">
+                                </pagination>
                             </div>
                         </div>
                     </tab>

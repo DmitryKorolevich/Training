@@ -1187,7 +1187,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
     $scope.skuChanged = function (index)
     {
-        //resolving issue with additional load after lost focus from the input if time of selecting a new element
+        //resolving issue with additional load after lost focus from the input in time of selecting a new element
         if (skuChangedRequest)
         {
             $timeout.cancel(skuChangedRequest);
@@ -1195,11 +1195,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         skuChangedRequest = $timeout(function ()
         {
             var product = $scope.order.SkuOrdereds[index];
-            if (product.RequestedCode == product.Code)
+            if (product == null || product.RequestedCode == product.Code)
             {
                 return;
             }
-            if (product && product.Code && ($scope.skuFilter.ExactCode != product.Code || $scope.skuFilter.Index != index || $scope.skuFilter.ExactDescriptionName != ''))
+            if (product.Code)
             {
                 $scope.skuFilter.ExactCode = product.Code;
                 $scope.skuFilter.Index = index;
@@ -1248,6 +1248,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         errorHandler(result);
                     });
                 skuChangedRequest = null;
+            }
+            else
+            {
+                if(product.RequestedCode)
+                {
+                    product.RequestedCode='';
+                    $scope.requestRecalculate();
+                }
             }
         }, 100);
     };

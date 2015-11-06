@@ -34,6 +34,8 @@ namespace VitalChoice.Interfaces.Services.Affiliates
 
         Task<PagedList<AffiliateOrderPayment>> GetAffiliateOrderPayments(AffiliateOrderPaymentFilter filter);
 
+        Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);
+
         Task<bool> DeleteAffiliateOrderPayment(int idOrder);
 
         Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item);

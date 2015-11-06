@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services;
 using Microsoft.Framework.DependencyInjection;
 using System.Linq;
 using Microsoft.AspNet.Mvc.Rendering;
+using VitalChoice.Core.Infrastructure;
 
 namespace VC.Public.Controllers
 {
@@ -50,8 +51,13 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string alreadyTakenEmail = null, bool forgot=false)
+        public async Task<IActionResult> Login(string alreadyTakenEmail = null, bool forgot=false)
         {
+            if(await AffiliateAuthorizeAttribute.IsAuthenticated(Request.HttpContext))
+            {
+                return RedirectToAction("Index", "AffiliateProfile");
+            }
+
             if (!string.IsNullOrWhiteSpace(alreadyTakenEmail))
             {
                 ViewBag.AlreadyTakenEmail = alreadyTakenEmail;

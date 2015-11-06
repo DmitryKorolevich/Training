@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
@@ -41,6 +42,16 @@ namespace VitalChoice.Business.Queries.Customer
 
 			return this;
 		}
+
+        public VCustomerQuery WithIds(ICollection<int> ids)
+        {
+            if (ids!=null && ids.Count>0)
+            {
+                Add(x => ids.Contains(x.Id));
+            }
+
+            return this;
+        }
 
         public VCustomerQuery WithIdAffiliate(string textId, bool required)
         {

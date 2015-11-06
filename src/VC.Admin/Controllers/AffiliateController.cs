@@ -39,6 +39,7 @@ using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Business.ExportMaps;
 
 namespace VC.Admin.Controllers
 {
@@ -50,6 +51,7 @@ namespace VC.Admin.Controllers
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
+        private readonly IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _exportAffiliateOrderListItemService;
         private readonly ILogger logger;
 
         public AffiliateController(
@@ -58,6 +60,7 @@ namespace VC.Admin.Controllers
             ILoggerProviderExtended loggerProvider,
             IDynamicMapper<AffiliateDynamic> mapper,
             IAppInfrastructureService appInfrastructureService,
+            IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> exportAffiliateOrderListItemService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _affiliateService = affiliateService;
@@ -65,6 +68,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
+            _exportAffiliateOrderListItemService = exportAffiliateOrderListItemService;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -264,6 +268,12 @@ namespace VC.Admin.Controllers
             }
 
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<AffiliateOrderListItemModel>>> GetAffiliateOrderPaymentsWithCustomerInfo([FromBody]AffiliateOrderPaymentFilter filter)
+        {
+            return await _affiliateService.GetAffiliateOrderPaymentsWithCustomerInfo(filter);
         }
     }
 }

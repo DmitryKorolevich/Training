@@ -12,21 +12,21 @@
                 <input type="text" class="form-control" placeholder="First Name" data-ng-model="filter.FirstName">
             </div>
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Customer #" data-ng-model="filter.SearchText">
+                <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address1">
             </div>
         </div>
         <div class="row form-group">
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Phone">
-            </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address1">
+                <input type="text" class="form-control" placeholder="Customer #" data-ng-model="filter.SearchText">
             </div>
             <div class="col-md-3">
                 <input type="text" class="form-control" placeholder="City" data-ng-model="filter.City">
             </div>
             <div class="col-md-3">
                 <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Zip">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Phone">
             </div>
         </div>
         <div class="row form-group">
@@ -56,9 +56,9 @@
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
                     </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Country')">
-                        <span>Country</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Country'">
+                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Email')">
+                        <span>Email</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Email'">
                             <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                         </span>
@@ -100,7 +100,7 @@
                 <tr data-ng-repeat="customer in customers">
                     <td>{{::customer.Id}}</td>
                     <td>{{::customer.Name}}</td>
-                    <td>{{::customer.Country}}</td>
+                    <td>{{::customer.Email}}</td>
                     <td>{{::customer.State}}</td>
                     <td>{{::customer.City}}</td>
                     <td>{{::customer.LastOrderPlaced | date:"MM/dd/yy"}}<br />{{::customer.LastOrderPlaced | date:"h:mm a"}}</td>

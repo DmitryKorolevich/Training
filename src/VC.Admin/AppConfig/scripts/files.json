@@ -181,7 +181,6 @@
     "app/modules/affiliate/controllers/affiliatesController.js",
 		"app/modules/affiliate/controllers/affiliateManageController.js",
 		"app/modules/affiliate/controllers/affiliateSendEmailController.js",
-		"app/modules/affiliate/controllers/customersInAffiliatesListController.js",
 		"app/modules/affiliate/controllers/customersInAffiliatesReportController.js",
 		"app/modules/affiliate/affiliate.js",
 		"app/modules/file/controllers/filesController.js",

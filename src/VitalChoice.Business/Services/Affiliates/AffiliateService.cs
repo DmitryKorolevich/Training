@@ -41,6 +41,7 @@ using VitalChoice.Domain.Entities.Options;
 using Microsoft.Framework.OptionsModel;
 using System.Collections;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Business.Queries.Customer;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -49,10 +50,11 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<VCustomerInAffiliate> _vCustomerInAffiliateRepository;
-        private readonly IEcommerceRepositoryAsync<AffiliateOrderPayment> _affiliateOrderPaymentRepository;
+        private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
         private readonly IEcommerceRepositoryAsync<AffiliatePayment> _affiliatePaymentRepository;
         private readonly INotificationService _notificationService;
         private readonly IAffiliateUserService _affiliateUserService;
+        private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
@@ -61,8 +63,9 @@ namespace VitalChoice.Business.Services.Affiliates
             IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IEcommerceRepositoryAsync<VCustomerInAffiliate> vCustomerInAffiliateRepository,
-            IEcommerceRepositoryAsync<AffiliateOrderPayment> affiliateOrderPaymentRepository,
+            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
             IEcommerceRepositoryAsync<AffiliatePayment> affiliatePaymentRepository,
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             AffiliateMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
@@ -83,6 +86,7 @@ namespace VitalChoice.Business.Services.Affiliates
             _adminProfileRepository = adminProfileRepository;
             _notificationService = notificationService;
             _affiliateUserService = affiliateUserService;
+            _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _appOptions = appOptions;
         }
 
@@ -156,6 +160,13 @@ namespace VitalChoice.Business.Services.Affiliates
                             sortOrder == SortOrder.Asc
                                 ? x.OrderBy(y => y.Tier)
                                 : x.OrderByDescending(y => y.Tier);
+                    break;
+                case VAffiliateSortPath.CustomersCount:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.CustomersCount)
+                                : x.OrderByDescending(y => y.CustomersCount);
                     break;
             }
 
@@ -416,6 +427,63 @@ namespace VitalChoice.Business.Services.Affiliates
                     Items = items,
                     Count = items.Count
                 };
+            }
+            return toReturn;
+        }
+
+        public async Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter)
+        {
+            PagedList<AffiliateOrderListItemModel> toReturn=new PagedList<AffiliateOrderListItemModel>();
+            AffiliateOrderPaymentQuery conditions = new AffiliateOrderPaymentQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
+                WithOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
+
+            Func<IQueryable<AffiliateOrderPayment>, IOrderedQueryable<AffiliateOrderPayment>> sortable = x => x.OrderByDescending(y => y.Order.DateCreated);
+            var query = _affiliateOrderPaymentRepository.Query(conditions).Include(p => p.Order).OrderBy(sortable);
+
+            PagedList<AffiliateOrderPayment> result;
+            if (filter.Paging != null)
+            {
+                result = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = (await query.SelectAsync(false)).ToList();
+                result = new PagedList<AffiliateOrderPayment>()
+                {
+                    Items = items,
+                    Count = items.Count
+                };
+            }
+
+            var customerOrders = await _affiliateOrderPaymentRepository.GetAffiliateOrdersInCustomers(filter.IdAffiliate, result.Items.Select(p => p.Order.IdCustomer).Distinct().ToList());
+
+            var customerConditions = new VCustomerQuery().NotDeleted().WithIds(result.Items.Select(p => p.Order.IdCustomer).Distinct().ToList());
+            var customers = (await _vCustomerRepositoryAsync.Query(customerConditions).SelectAsync(false));
+
+            toReturn.Count = result.Count;
+            toReturn.Items = new List<AffiliateOrderListItemModel>();
+            string customerFirstName = null;
+            string customerLastName = null;
+            int customerOrdersCount = 0;
+            foreach (var affiliatePayment in result.Items)
+            {
+                customerFirstName = null;
+                customerLastName = null;
+                customerOrdersCount = 0;
+                if(customerOrders.ContainsKey(affiliatePayment.Order.IdCustomer))
+                {
+                    customerOrdersCount = customerOrders[affiliatePayment.Order.IdCustomer];
+                }
+
+                var customer = customers.FirstOrDefault(p => p.Id == affiliatePayment.Order.IdCustomer);
+                if(customer!=null)
+                {
+                    customerFirstName = customer.FirstName;
+                    customerLastName = customer.LastName;
+                }
+                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(affiliatePayment,customerFirstName,customerLastName,
+                    customerOrdersCount);
+                toReturn.Items.Add(item);
             }
             return toReturn;
         }

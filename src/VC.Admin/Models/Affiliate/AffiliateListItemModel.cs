@@ -32,6 +32,8 @@ namespace VC.Admin.Models.Affiliate
 
         public string Tier { get; set; }
 
+        public int CustomersCount { get; set; }
+
         public DateTime DateEdited { get; set; }
 
         public string EditedByAgentId { get; set; }
@@ -48,6 +50,7 @@ namespace VC.Admin.Models.Affiliate
                 CommissionFirst = item.CommissionFirst;
                 CommissionAll = item.CommissionAll;
                 Tier = item.Tier;
+                CustomersCount = item.CustomersCount;
                 DateEdited = item.DateEdited;
                 EditedByAgentId = item.EditedByAgentId;
             }

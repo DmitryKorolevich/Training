@@ -13,6 +13,8 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
 
 	    public string Name{ get; set; }
 
+        public int CustomersCount { get; set; }
+
         public string Company { get; set; }
 
         public string WebSite { get; set; }

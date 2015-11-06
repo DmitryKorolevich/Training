@@ -55,5 +55,9 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.post(baseUrl + 'GetCustomerInAffiliateReport', filter, getConfig(tracker));
 	    },
+	    getAffiliateOrderPaymentsWithCustomerInfo: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetAffiliateOrderPaymentsWithCustomerInfo', filter, getConfig(tracker));
+	    },
 	};
 }]);

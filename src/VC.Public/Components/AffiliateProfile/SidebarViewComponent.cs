@@ -36,6 +36,7 @@ namespace VC.Public.Components.AffiliateProfile
 			
 			return View("Sidebar", new SidebarModel()
 			{
+                Id = user.Id,
 				FirstName = user.FirstName,
 				LastName = user.LastName
 			});

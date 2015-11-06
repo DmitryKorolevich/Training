@@ -8,6 +8,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         $scope.refreshTracker = promiseTracker("get");
         $scope.resetTracker = promiseTracker("reset");
         $scope.resendTracker = promiseTracker("resend");
+        $scope.refreshCustomersTracker = promiseTracker("refreshCustomersTracker");
+        $scope.refreshOrdersTracker = promiseTracker("refreshOrdersTracker");
 
         function refreshHistory()
         {
@@ -28,6 +30,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.affiliate.Id = result.Data.Id;
+                $scope.orderFilter.IdAffiliate = result.Data.Id;
+                $scope.customerFilter.IdAffiliate = result.Data.Id;
                 $scope.affiliate.DateEdited = result.Data.DateEdited;
                 $scope.affiliate.Email = result.Data.Email;
                 $scope.affiliate.StatusCode = result.Data.StatusCode;
@@ -93,7 +97,28 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 active: true
             };
 
+            $scope.options = {};
+            if ($scope.id)
+            {
+                $scope.options.customersExportUrl = customerService.getCustomersForAffiliatesReportFileUrl($scope.id, $rootScope.buildNumber);
+            }
+
+            $scope.customerFilter = {
+                IdAffiliate: $scope.id,
+                IdAffiliateRequired: true,
+                Paging: { PageIndex: 1, PageItemCount: 100 },
+            };
+
+            $scope.orderFilter = {
+                From: null,
+                To: null,
+                IdAffiliate: $scope.id,
+                Paging: { PageIndex: 1, PageItemCount: 100 },
+            };
+
             loadCountries();
+            refreshCustomers();
+            refreshOrders();
         };
 
         function loadCountries()
@@ -267,6 +292,78 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 {
                     toaster.pop('error', "Error!", "Server error occured");
                 });
+        };
+
+        function refreshCustomers()
+        {
+            if ($scope.customerFilter.IdAffiliate)
+            {
+                customerService.getCustomers($scope.customerFilter, $scope.refreshCustomersTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.customers = result.Data.Items;
+                            $scope.customersTotalItems = result.Data.Count;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
+        };
+
+        $scope.customersPageChanged = function ()
+        {
+            refreshCustomers();
+        };
+
+        function refreshOrders()
+        {
+            if ($scope.orderFilter.IdAffiliate)
+            {
+                var data = {};
+                angular.copy($scope.orderFilter, data);
+                if (data.From)
+                {
+                    data.From = data.From.toServerDateTime();
+                }
+                if (data.To)
+                {
+                    data.To = data.To.toServerDateTime();
+                }
+                affiliateService.getAffiliateOrderPaymentsWithCustomerInfo(data, $scope.refreshOrdersTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.orders = result.Data.Items;
+                            $scope.ordersTotalItems = result.Data.Count;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
+        };
+
+        $scope.filterOrders = function ()
+        {
+            $scope.orderFilter.Paging.PageIndex = 1;
+            refreshOrders();
+        };
+
+        $scope.ordersPageChanged = function ()
+        {
+            refreshOrders();
         };
 
         initialize();

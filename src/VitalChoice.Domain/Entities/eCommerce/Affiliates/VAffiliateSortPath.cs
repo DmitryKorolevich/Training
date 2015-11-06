@@ -4,6 +4,7 @@
     {
 		public const string Id = "Id";
         public const string Name = "Name";
+        public const string CustomersCount = "CustomersCount";
         public const string Company = "Company";
         public const string WebSite = "WebSite";
         public const string StatusCode = "StatusCode";

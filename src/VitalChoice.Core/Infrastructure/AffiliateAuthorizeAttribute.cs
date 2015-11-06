@@ -12,27 +12,28 @@ using VitalChoice.Interfaces.Services;
 using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
 using Microsoft.AspNet.Mvc.Filters;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using Microsoft.AspNet.Http;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public class AffiliateAuthorizeAttribute : AuthorizationFilterAttribute
-	{
-		public AffiliateAuthorizeAttribute()
-		{
-		}
+    public class AffiliateAuthorizeAttribute : AuthorizationFilterAttribute
+    {
+        public AffiliateAuthorizeAttribute()
+        {
+        }
 
-		protected override void Fail(AuthorizationContext context)
-		{
+        protected override void Fail(AuthorizationContext context)
+        {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("returnUrl", context.HttpContext.Request.Path);
             context.Result = new RedirectToActionResult("Login", "AffiliateAccount", parameters);
         }
 
-		public override async Task OnAuthorizationAsync(AuthorizationContext context)
-		{
-			var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
+        public override async Task OnAuthorizationAsync(AuthorizationContext context)
+        {
+            var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
 
-			var claimUser = context.HttpContext.User;
+            var claimUser = context.HttpContext.User;
             if (context.HttpContext.User.Identity.IsAuthenticated)
             {
                 var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
@@ -53,7 +54,26 @@ namespace VitalChoice.Core.Infrastructure
                 }
             }
 
-			Fail(context);
-		}
-	}
+            Fail(context);
+        }
+
+        public static async Task<bool> IsAuthenticated(HttpContext context)
+        {
+            bool toReturn = false;
+            if (context.User.Identity.IsAuthenticated)
+            {
+                var claimUser = context.User;
+                var authorizationService = context.ApplicationServices.GetService<IAuthorizationService>();
+                var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
+                if (result)
+                {
+                    if (claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
+                    {
+                        toReturn = true;
+                    }
+                }
+            }
+            return toReturn;
+        }
+    }
 }

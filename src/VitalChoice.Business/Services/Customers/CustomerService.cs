@@ -493,7 +493,14 @@ namespace VitalChoice.Business.Services.Customers
 								? x.OrderBy(y => y.LastName).ThenBy(y => y.FirstName)
 								: x.OrderByDescending(y => y.LastName).ThenByDescending(y => y.FirstName);
                     break;
-				case VCustomerSortPath.Updated:
+                case VCustomerSortPath.Email:
+                    sortable =
+                        (x) =>
+                            sortOrder == SortOrder.Asc
+                                ? x.OrderBy(y => y.Email)
+                                : x.OrderByDescending(y => y.Email);
+                    break;
+                case VCustomerSortPath.Updated:
 					sortable =
 						(x) =>
 							sortOrder == SortOrder.Asc

@@ -77,6 +77,13 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('CustomersCount')">
+                            <span>Customers</span>
+                            <span data-ng-if="filter.Sorting.Path == 'CustomersCount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
                             <span>Last Updated</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
@@ -89,19 +96,20 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="item in items">
-                        <td>{{item.Id}}</td>
-                        <td>{{item.Name}}</td>
-                        <td>{{item.Company}}</td>
-                        <td>{{item.WebSite}}</td>
-                        <td>{{item.CommissionFirst | number:2}}% / {{item.CommissionAll | number:2}}%</td>                        <td>
+                        <td>{{::item.Id}}</td>
+                        <td>{{::item.Name}}</td>
+                        <td>{{::item.Company}}</td>
+                        <td>{{::item.WebSite}}</td>
+                        <td>{{::item.CommissionFirst | number:2}}% / {{::item.CommissionAll | number:2}}%</td>                        <td>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 4" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 5" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                         </td>
-                        <td>{{item.Tier}}</td>
-                        <td>{{item.DateEdited | date:"MM/dd/yy"}}<br />{{item.DateEdited | date:"h:mm a"}}<br />{{item.EditedByAgentId}}</td>
+                        <td>{{::item.Tier}}</td>
+                        <td>{{::item.CustomersCount}}</td>
+                        <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
                                 <i class="glyphicon glyphicon-edit"></i>
