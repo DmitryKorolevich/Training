@@ -45,7 +45,8 @@ using VitalChoice.Business.Queries.Customer;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
-    public class AffiliateService : EcommerceDynamicService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>, IAffiliateService
+    public class AffiliateService : EcommerceDynamicService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>,
+        IAffiliateService
     {
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -431,66 +432,9 @@ namespace VitalChoice.Business.Services.Affiliates
             return toReturn;
         }
 
-        public async Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter)
-        {
-            PagedList<AffiliateOrderListItemModel> toReturn=new PagedList<AffiliateOrderListItemModel>();
-            AffiliateOrderPaymentQuery conditions = new AffiliateOrderPaymentQuery().WithIdAffiliate(filter.IdAffiliate).WithPaymentStatus(filter.Status).
-                WithOrderStatus().WithFromDate(filter.From).WithToDate(filter.To);
-
-            Func<IQueryable<AffiliateOrderPayment>, IOrderedQueryable<AffiliateOrderPayment>> sortable = x => x.OrderByDescending(y => y.Order.DateCreated);
-            var query = _affiliateOrderPaymentRepository.Query(conditions).Include(p => p.Order).OrderBy(sortable);
-
-            PagedList<AffiliateOrderPayment> result;
-            if (filter.Paging != null)
-            {
-                result = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            }
-            else
-            {
-                var items = (await query.SelectAsync(false)).ToList();
-                result = new PagedList<AffiliateOrderPayment>()
-                {
-                    Items = items,
-                    Count = items.Count
-                };
-            }
-
-            var customerOrders = await _affiliateOrderPaymentRepository.GetAffiliateOrdersInCustomers(filter.IdAffiliate, result.Items.Select(p => p.Order.IdCustomer).Distinct().ToList());
-
-            var customerConditions = new VCustomerQuery().NotDeleted().WithIds(result.Items.Select(p => p.Order.IdCustomer).Distinct().ToList());
-            var customers = (await _vCustomerRepositoryAsync.Query(customerConditions).SelectAsync(false));
-
-            toReturn.Count = result.Count;
-            toReturn.Items = new List<AffiliateOrderListItemModel>();
-            string customerFirstName = null;
-            string customerLastName = null;
-            int customerOrdersCount = 0;
-            foreach (var affiliatePayment in result.Items)
-            {
-                customerFirstName = null;
-                customerLastName = null;
-                customerOrdersCount = 0;
-                if(customerOrders.ContainsKey(affiliatePayment.Order.IdCustomer))
-                {
-                    customerOrdersCount = customerOrders[affiliatePayment.Order.IdCustomer];
-                }
-
-                var customer = customers.FirstOrDefault(p => p.Id == affiliatePayment.Order.IdCustomer);
-                if(customer!=null)
-                {
-                    customerFirstName = customer.FirstName;
-                    customerLastName = customer.LastName;
-                }
-                AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(affiliatePayment,customerFirstName,customerLastName,
-                    customerOrdersCount);
-                toReturn.Items.Add(item);
-            }
-            return toReturn;
-        }
-
         public async Task<bool> DeleteAffiliateOrderPayment(int idOrder)
         {
-            var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.IdOrder == idOrder).SelectAsync()).FirstOrDefault();
+            var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.Id == idOrder).SelectAsync()).FirstOrDefault();
             if (dbItem != null)
             {
                 if(dbItem.Status==AffiliateOrderPaymentStatus.Paid)
@@ -505,13 +449,13 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item)
         {
-            var dbItem = (await _affiliateOrderPaymentRepository.Query(p=>p.IdOrder==item.IdOrder).SelectAsync()).FirstOrDefault();
+            var dbItem = (await _affiliateOrderPaymentRepository.Query(p=>p.Id==item.Id).SelectAsync()).FirstOrDefault();
             if(dbItem==null)
             {
                 dbItem = new AffiliateOrderPayment();
                 dbItem.Status = AffiliateOrderPaymentStatus.NotPaid;
                 dbItem.IdAffiliate = item.IdAffiliate;
-                dbItem.IdOrder = item.IdOrder;
+                dbItem.Id = item.Id;
                 dbItem.Amount = item.Amount;
                 dbItem.NewCustomerOrder = item.NewCustomerOrder;
 

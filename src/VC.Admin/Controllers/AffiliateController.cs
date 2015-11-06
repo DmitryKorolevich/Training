@@ -52,6 +52,7 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
         private readonly IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _exportAffiliateOrderListItemService;
+        private readonly IOrderService _orderService;
         private readonly ILogger logger;
 
         public AffiliateController(
@@ -61,6 +62,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<AffiliateDynamic> mapper,
             IAppInfrastructureService appInfrastructureService,
             IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> exportAffiliateOrderListItemService,
+            IOrderService orderService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _affiliateService = affiliateService;
@@ -69,6 +71,7 @@ namespace VC.Admin.Controllers
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             _exportAffiliateOrderListItemService = exportAffiliateOrderListItemService;
+            _orderService = orderService;
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -273,7 +276,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<AffiliateOrderListItemModel>>> GetAffiliateOrderPaymentsWithCustomerInfo([FromBody]AffiliateOrderPaymentFilter filter)
         {
-            return await _affiliateService.GetAffiliateOrderPaymentsWithCustomerInfo(filter);
+            return await _orderService.GetAffiliateOrderPaymentsWithCustomerInfo(filter);
         }
     }
 }

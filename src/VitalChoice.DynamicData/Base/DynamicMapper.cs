@@ -95,10 +95,10 @@ namespace VitalChoice.DynamicData.Base
                         return new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity);
                     }).ToList();
                 await UpdateEntityRangeAsync(itemsToUpdate);
-                foreach (var item in itemsToUpdate)
-                {
-                    item.Entity.StatusCode = (int)RecordStatusCode.Active;
-                }
+                //foreach (var item in itemsToUpdate)
+                //{
+                //    item.Entity.StatusCode = (int)RecordStatusCode.Active;
+                //}
 
                 //Delete
                 var toDelete = entities.Where(e => dynamics.All(s => s.Id != e.Id));

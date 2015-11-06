@@ -100,6 +100,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults)
                     }));
                 }
+
+                dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
             });
         }
 
