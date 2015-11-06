@@ -106,7 +106,7 @@ namespace VitalChoice.Business.Services.Content
 						        : x.OrderByDescending(y => y.Url);
 			        break;
 		        case ArticleSortPath.Updated:
-			        _articleRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+			        //_articleRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
 
 			        sortable =
 				        (x) =>

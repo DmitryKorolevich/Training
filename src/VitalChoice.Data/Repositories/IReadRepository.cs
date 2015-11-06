@@ -11,7 +11,7 @@ namespace VitalChoice.Data.Repositories
 {
     public interface IReadRepository<TEntity> where TEntity : Entity
     {
-		bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
+		//bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
 
 		IQueryFluent<TEntity> Query(IQueryObject<TEntity> queryObject);
         IQueryFluent<TEntity> Query(Expression<Func<TEntity, bool>> query);

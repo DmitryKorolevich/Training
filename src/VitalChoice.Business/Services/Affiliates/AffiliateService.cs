@@ -58,7 +58,6 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
-            IEcommerceRepositoryAsync<AffiliateOptionType> affiliateOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
@@ -75,7 +74,7 @@ namespace VitalChoice.Business.Services.Affiliates
             IOptions<AppOptions> appOptions,
             ILoggerProviderExtended loggerProvider)
             : base(
-                mapper, affiliateRepository, affiliateOptionTypeRepository, affiliateValueRepositoryAsync,
+                mapper, affiliateRepository, affiliateValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vAffiliateRepository = vAffiliateRepository;

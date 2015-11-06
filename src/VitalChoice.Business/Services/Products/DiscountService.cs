@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly DiscountMapper _mapper;
 
-        public DiscountService(IEcommerceRepositoryAsync<DiscountOptionType> discountOptionTypeRepository,
+        public DiscountService(
             IEcommerceRepositoryAsync<DiscountOptionValue> discountOptionValueRepository,
             IEcommerceRepositoryAsync<Discount> discountRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider)
-            : base(mapper, discountRepository, discountOptionTypeRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
+            : base(mapper, discountRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
                   loggerProvider)
         {
             _discountRepository = discountRepository;

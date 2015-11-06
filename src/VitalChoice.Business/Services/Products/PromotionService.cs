@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly PromotionMapper _mapper;
 
-        public PromotionService(IEcommerceRepositoryAsync<PromotionOptionType> promotionOptionTypeRepository,
+        public PromotionService(
             IEcommerceRepositoryAsync<PromotionOptionValue> promotionOptionValueRepository,
             IEcommerceRepositoryAsync<Promotion> promotionRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended loggerProvider)
-            : base(mapper, promotionRepository, promotionOptionTypeRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService,
+            : base(mapper, promotionRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService,
                 loggerProvider)
         {
             _promotionRepository = promotionRepository;

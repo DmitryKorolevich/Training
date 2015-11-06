@@ -49,7 +49,6 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IAffiliateService _affiliateService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
-            IEcommerceRepositoryAsync<OrderOptionType> orderOptionTypeRepository,
             IEcommerceRepositoryAsync<Order> orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             OrderMapper mapper,
@@ -61,7 +60,7 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IAffiliateService affiliateService)
             : base(
-                mapper, orderRepository, orderOptionTypeRepository, orderValueRepositoryAsync,
+                mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vOrderRepository = vOrderRepository;

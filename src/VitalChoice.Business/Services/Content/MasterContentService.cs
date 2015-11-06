@@ -68,7 +68,7 @@ namespace VitalChoice.Business.Services.Content
 								: x.OrderByDescending(y => y.Name);
 					break;
 				case MasterContentSortPath.Type:
-					masterContentItemRepository.EarlyRead = true;
+					//masterContentItemRepository.EarlyRead = true;
 
 					sortable =
 						(x) =>

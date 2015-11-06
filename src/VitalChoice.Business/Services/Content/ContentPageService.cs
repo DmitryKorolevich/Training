@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Content
 								: x.OrderByDescending(y => y.StatusCode);
 					break;
 				case ContentPageSortPath.Updated:
-					contentPageRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+					//contentPageRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
 
 					sortable =
 						(x) =>

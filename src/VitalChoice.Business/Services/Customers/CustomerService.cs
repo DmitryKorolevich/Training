@@ -59,7 +59,6 @@ namespace VitalChoice.Business.Services.Customers
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
-            IEcommerceRepositoryAsync<CustomerOptionType> customerOptionTypeRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
@@ -71,7 +70,7 @@ namespace VitalChoice.Business.Services.Customers
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
             ILoggerProviderExtended loggerProvider)
             : base(
-                customerMapper, customerRepositoryAsync, customerOptionTypeRepositoryAsync,
+                customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;

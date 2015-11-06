@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Products
                                 : x.OrderByDescending(y => y.Title);
                     break;
                 case ProductReviewSortPath.ProductName:
-                    _productReviewRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+                    //_productReviewRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
 
                     sortable =
                         (x) =>

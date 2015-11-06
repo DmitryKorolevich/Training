@@ -30,13 +30,13 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
-            IReadRepositoryAsync<TEntity> objectRepository, IReadRepositoryAsync<TOptionType> optionTypesRepository,
+            IReadRepositoryAsync<TEntity> objectRepository,
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILogger logger)
             : base(
-                mapper, objectRepository, optionTypesRepository, bigStringRepository, optionValueRepositoryAsync,
+                mapper, objectRepository, bigStringRepository, optionValueRepositoryAsync,
                 objectLogItemExternalService, logger)
         {
         }
@@ -258,14 +258,14 @@ namespace VitalChoice.DynamicData.Base
                 models.Select(
                     d =>
                         new GenericPair<TDynamic, ICollection<TOptionType>>(d,
-                            Mapper.FilterByType(OptionTypes, d.IdObjectType).ToList())).ToList();
+                            Mapper.FilterByType(Mapper.OptionTypes, d.IdObjectType).ToList())).ToList();
             var mappedList = await Mapper.ToEntityRangeAsync(toInsert);
             foreach (var entity in mappedList.Select(p => p.Entity).ToList())
             {
                 if (entity == null)
                     continue;
                 entity.OptionTypes = new List<TOptionType>();
-                entities.Add(new GenericPair<TEntity, ICollection<TOptionType>>(entity, OptionTypes));
+                entities.Add(new GenericPair<TEntity, ICollection<TOptionType>>(entity, Mapper.OptionTypes));
             }
             var toInsertList = entities.Select(e => e.Value1).ToList();
             await productRepository.InsertGraphRangeAsync(toInsertList);
@@ -287,7 +287,7 @@ namespace VitalChoice.DynamicData.Base
         {
             (await Validate(model)).Raise();
             var optionTypes =
-                OptionTypes.Where(GetOptionTypeQuery(model.IdObjectType).Query().CacheCompile()).ToList();
+                Mapper.OptionTypes.Where(GetOptionTypeQuery(model.IdObjectType).Query().CacheCompile()).ToList();
             var entity = await Mapper.ToEntityAsync(model, optionTypes);
             if (entity == null)
                 return null;
@@ -322,7 +322,7 @@ namespace VitalChoice.DynamicData.Base
                     (entity, model) => new DynamicEntityPair<TDynamic, TEntity>(model, entity)).ToList();
                 foreach (var item in items)
                 {
-                    item.Entity.OptionTypes = Mapper.FilterByType(OptionTypes, item.Dynamic.IdObjectType).ToList();
+                    item.Entity.OptionTypes = Mapper.FilterByType(Mapper.OptionTypes, item.Dynamic.IdObjectType).ToList();
                 }
                 await UpdateItems(uow, items, bigValueRepository, valueRepository);
                 await mainRepository.UpdateRangeAsync(entities);
@@ -348,7 +348,7 @@ namespace VitalChoice.DynamicData.Base
             if (entity == null)
                 return null;
 
-            entity.OptionTypes = OptionTypes.Where(GetOptionTypeQuery(model.IdObjectType).Query().CacheCompile()).ToList();
+            entity.OptionTypes = Mapper.OptionTypes.Where(GetOptionTypeQuery(model.IdObjectType).Query().CacheCompile()).ToList();
             await
                 UpdateItems(uow,
                     new List<DynamicEntityPair<TDynamic, TEntity>>

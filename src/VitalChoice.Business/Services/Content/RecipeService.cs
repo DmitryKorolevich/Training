@@ -111,7 +111,7 @@ namespace VitalChoice.Business.Services.Content
                                 : x.OrderByDescending(y => y.Url);
                     break;
                 case RecipeSortPath.Updated:
-                    recipeRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
+                    //recipeRepository.EarlyRead = true; //added temporarly till ef 7 becomes stable
 
                     sortable =
                         (x) =>

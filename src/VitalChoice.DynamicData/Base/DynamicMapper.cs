@@ -16,6 +16,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Helpers;
 using System.Collections;
+using System.Threading;
 using VitalChoice.Domain.Exceptions;
 
 namespace VitalChoice.DynamicData.Base
@@ -34,13 +35,19 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         public abstract Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
         private Action<TOptionValue, int> _valueSetter;
+        private static ICollection<TOptionType> _optionTypes;
 
         protected DynamicMapper(ITypeConverter typeConverter,
-            IModelConverterService converterService, 
+            IModelConverterService converterService,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync) : base(typeConverter, converterService)
         {
             _optionTypeRepositoryAsync = optionTypeRepositoryAsync;
             _typeConverter = typeConverter;
+            if (OptionTypes == null)
+            {
+                Interlocked.CompareExchange(ref _optionTypes,
+                    optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false), null);
+            }
         }
 
         public Action<TOptionValue, int> GetValueObjectIdSetter()
@@ -124,6 +131,8 @@ namespace VitalChoice.DynamicData.Base
         {
             return new OptionTypeQuery<TOptionType>();
         }
+
+        public ICollection<TOptionType> OptionTypes => _optionTypes;
 
         public IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType)
         {

@@ -43,10 +43,10 @@ namespace VitalChoice.Business.Services.Products
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
-        private readonly IEcommerceRepositoryAsync<ProductOptionType> _productOptionTypeRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
+        private readonly ProductMapper _mapper;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
         private readonly IEcommerceRepositoryAsync<VCustomerFavorite> _vCustomerFavoriteRepository;
         private readonly SkuMapper _skuMapper;
@@ -185,7 +185,6 @@ namespace VitalChoice.Business.Services.Products
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
-            IEcommerceRepositoryAsync<ProductOptionType> productOptionTypeRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository, IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
@@ -200,15 +199,15 @@ namespace VitalChoice.Business.Services.Products
             INotificationService notificationService,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync)
             : base(
-                mapper, productRepository, productOptionTypeRepository, productValueRepositoryAsync,
+                mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;
-            _productOptionTypeRepository = productOptionTypeRepository;
             _lookupRepository = lookupRepository;
             _productRepository = productRepository;
             _skuRepository = skuRepository;
+            _mapper = mapper;
             _productToCategoriesRepository = productToCategoriesRepository;
             _adminProfileRepository = adminProfileRepository;
             _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
@@ -221,13 +220,12 @@ namespace VitalChoice.Business.Services.Products
 
         #region ProductOptions
 
-        public async Task<List<ProductOptionType>> GetProductOptionTypesAsync(HashSet<string> names)
+        public List<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
         {
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
-            return optionTypes.Where(o => names.Contains(o.Name)).ToList();
+            return _mapper.OptionTypes.Where(o => names.Contains(o.Name)).ToList();
         }
 
-        public async Task<Dictionary<int, Dictionary<string, string>>> GetProductEditDefaultSettingsAsync()
+        public Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync()
         {
             Dictionary<int, Dictionary<string, string>> toReturn = new Dictionary<int, Dictionary<string, string>>();
             HashSet<string> names = new HashSet<string>();
@@ -247,7 +245,7 @@ namespace VitalChoice.Business.Services.Products
             names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
             names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
             names.Add(ProductConstants.FIELD_NAME_QTY_THRESHOLD);
-            var items = await GetProductOptionTypesAsync(names);
+            var items = GetProductOptionTypes(names);
             foreach (var item in items.Where(p => p.IdObjectType.HasValue))
             {
                 Dictionary<string, string> productTypeDefaultValues = null;
@@ -270,30 +268,9 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<List<ProductOptionType>> GetProductLookupsAsync()
+        public List<ProductOptionType> GetProductLookupsAsync()
         {
-            var toReturn = await _productOptionTypeRepository.Query(p => p.IdLookup.HasValue).SelectAsync();
-            var lookups =
-                await
-                    _lookupRepository.Query(p => toReturn.Select(pp => pp.IdLookup).Contains(p.Id))
-                        .Include(p => p.LookupVariants)
-                        .SelectAsync();
-            foreach (var lookup in lookups)
-            {
-                lookup.LookupVariants = lookup.LookupVariants.OrderBy(p => p.Id).ToList();
-            }
-            foreach (var item in toReturn)
-            {
-                foreach (var lookup in lookups)
-                {
-                    if (item.IdLookup == lookup.Id)
-                    {
-                        item.Lookup = lookup;
-                    }
-                }
-            }
-
-            return toReturn;
+            return _mapper.OptionTypes.ToList();
         }
 
         #endregion
@@ -322,7 +299,7 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
             sku.OptionTypes =
-                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+                _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             sku.Product.OptionTypes = sku.OptionTypes;
             return new SkuOrdered
             {
@@ -342,7 +319,7 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectFirstOrDefaultAsync(false);
             sku.OptionTypes =
-                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+                _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             sku.Product.OptionTypes = sku.OptionTypes;
             return new SkuOrdered
             {
@@ -368,12 +345,10 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
-
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
+                    _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
                 sku.Product.OptionTypes = sku.OptionTypes;
             }
 
@@ -401,12 +376,10 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
-
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
+                    _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
                 sku.Product.OptionTypes = sku.OptionTypes;
             }
 
@@ -431,7 +404,7 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
             sku.OptionTypes =
-                await _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+                _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
@@ -443,8 +416,7 @@ namespace VitalChoice.Business.Services.Products
                     .Include(s => s.Product)
                     .SelectFirstOrDefaultAsync(false);
             sku.OptionTypes =
-                await
-                    _productOptionTypeRepository.Query(GetOptionTypeQuery(sku.Product.IdObjectType)).SelectAsync(false);
+                _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
@@ -472,7 +444,6 @@ namespace VitalChoice.Business.Services.Products
             if (!skuInfos.Any())
                 return new List<SkuDynamic>();
 
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
             var skus =
                 await _skuRepository.Query(new SkuQuery().ByIds(skuInfos.Select(i => i.Id).ToList()))
                     .Include(s => s.OptionValues)
@@ -482,7 +453,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var sku = skusKeyed[info.Id];
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery((int?)info.IdProductType).Query().CacheCompile()).ToList();
+                    _mapper.OptionTypes.Where(GetOptionTypeQuery((int?)info.IdProductType).Query().CacheCompile()).ToList();
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -494,8 +465,6 @@ namespace VitalChoice.Business.Services.Products
 
             if (!codes.Any())
                 return new List<SkuDynamic>();
-
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
             var skus =
                 await _skuRepository.Query(new SkuQuery().Including(codes).NotDeleted())
                     .Include(s => s.OptionValues)
@@ -504,7 +473,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                    optionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
+                     _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -565,9 +534,6 @@ namespace VitalChoice.Business.Services.Products
 
                 container.Requests.Add(item);
             }
-
-            //Set InStock field
-            var optionTypes = await _productOptionTypeRepository.Query().SelectAsync(false);
             var skus =
                 await _skuRepository.Query(new SkuQuery().ByProductIds(products.Select(i => i.Id).ToList()).NotDeleted())
                     .Include(s => s.OptionValues)
@@ -578,7 +544,7 @@ namespace VitalChoice.Business.Services.Products
                 if (product != null)
                 {
                     sku.OptionTypes =
-                        optionTypes.Where(GetOptionTypeQuery((int?)product.IdObjectType).Query().CacheCompile()).ToList();
+                         _mapper.OptionTypes.Where(GetOptionTypeQuery((int?)product.IdObjectType).Query().CacheCompile()).ToList();
                 }
             }
             var skuDynamics = await _skuMapper.FromEntityRangeAsync(skus, true);

@@ -29,17 +29,25 @@ namespace VitalChoice.DynamicData.Helpers
             builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>));
             foreach (var mapperType in mapperTypes)
             {
-                builder.RegisterType(mapperType)
-                    .As(
-                        typeof (IDynamicMapper<,,,>).MakeGenericType(
-                            mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,,,>))))
-                    .As(
-                        typeof (IDynamicMapper<>).MakeGenericType(
+                var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,>));
+
+                if (types != null && types.Length == 2)
+                {
+                    builder.RegisterType(mapperType)
+                        .As(
+                            typeof (IDynamicMapper<,,,>).MakeGenericType(
+                                mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,,,>))))
+                        .As(
+                            typeof (IDynamicMapper<>).MakeGenericType(
+                                mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
+                        .As(typeof (IObjectMapper<>).MakeGenericType(
                             mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
-                    .As(typeof(IObjectMapper<>).MakeGenericType(
-                            mapperType.TryGetElementType(typeof(IDynamicMapper<>))))
-                    .AsSelf()
-                    .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)));
+                        .As(typeof (IOptionTypeQueryProvider<,>).MakeGenericType(
+                            mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,>))))
+                        .AsSelf()
+                        .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)))
+                        .Keyed<IOptionTypeQueryProvider>(new GenericTypePair(types[0], types[1]));
+                }
             }
             return builder;
         }

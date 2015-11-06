@@ -61,18 +61,17 @@ namespace VC.Admin.Controllers
         #region Products
 
         [HttpGet]
-        public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
+        public Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
-            var lookups = (await productService.GetProductLookupsAsync()).Select(
+            var lookups = productService.GetProductLookupsAsync().Select(
                         p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList();
-            var defaultValues = await productService.GetProductEditDefaultSettingsAsync();
+            var defaultValues = productService.GetProductEditDefaultSettingsAsync();
             ProductEditSettingsModel toReturn = new ProductEditSettingsModel()
             {
                 Lookups = lookups,
                 DefaultValues = defaultValues
             };
-            return toReturn;
-
+            return Task.FromResult<Result<ProductEditSettingsModel>>(toReturn);
         }
 
         [HttpPost]

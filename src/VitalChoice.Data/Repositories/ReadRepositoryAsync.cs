@@ -15,7 +15,7 @@ namespace VitalChoice.Data.Repositories
 {
 	public class ReadRepositoryAsync<TEntity> :IReadRepositoryAsync<TEntity> where TEntity : Entity
 	{
-		public bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
+		//public bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
 
 		protected IDataContextAsync Context { get; }
 		internal DbSet<TEntity> DbSet { get; }
@@ -78,20 +78,20 @@ namespace VitalChoice.Data.Repositories
             bool tracking = true)
 		{
 		    //TODO: added temporarly till ef 7 becomes stable, remove when it arrives
-			if (EarlyRead) 
-			{
-				IEnumerable<TEntity> earlyRead = query.ToArray();
-				if (orderBy != null)
-					earlyRead = orderBy(earlyRead.AsQueryable());
+			//if (EarlyRead) 
+			//{
+			//	IEnumerable<TEntity> earlyRead = query.ToArray();
+			//	if (orderBy != null)
+			//		earlyRead = orderBy(earlyRead.AsQueryable());
 
-				if (filter != null)
-					earlyRead = earlyRead.Where(filter.CacheCompile());
+			//	if (filter != null)
+			//		earlyRead = earlyRead.Where(filter.CacheCompile());
 
-				if (page != null && pageSize != null)
-					earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+			//	if (page != null && pageSize != null)
+			//		earlyRead = earlyRead.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
-				return earlyRead.ToList();
-			}
+			//	return earlyRead.ToList();
+			//}
 		    return await Select(query, filter, orderBy, page, pageSize, tracking).ToListAsync();
 		}
 	}
