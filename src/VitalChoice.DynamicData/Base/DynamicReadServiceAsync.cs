@@ -28,11 +28,11 @@ namespace VitalChoice.DynamicData.Base
     {
         protected readonly IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> Mapper;
         protected readonly IReadRepositoryAsync<TEntity> ObjectRepository;
-        protected readonly IReadRepositoryAsync<TOptionType> OptionTypesRepository;
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
         protected readonly ILogger Logger;
+        protected readonly ICollection<TOptionType> OptionTypes;
 
         protected DynamicReadServiceAsync(
             IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
@@ -44,11 +44,11 @@ namespace VitalChoice.DynamicData.Base
         {
             Mapper = mapper;
             ObjectRepository = objectRepository;
-            OptionTypesRepository = optionTypesRepository;
             BigStringRepository = bigStringRepository;
             OptionValuesRepository = optionValuesRepository;
             ObjectLogItemExternalService = objectLogItemExternalService;
             Logger = logger;
+            OptionTypes = optionTypesRepository.Query().Select(false);
         }
 
         #region Extension Points
@@ -67,10 +67,9 @@ namespace VitalChoice.DynamicData.Base
             IDictionary<string, object> values = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = BuildQueryFluent(query, values, includesOverride, null, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, null, OptionTypes);
             var entities = await queryFluent.SelectAsync(false);
-            await ProcessEntities(entities, optionTypes);
+            await ProcessEntities(entities, OptionTypes);
             return entities;
         }
 
@@ -79,10 +78,9 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
         {
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, OptionTypes);
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
-            await ProcessEntities(new[] {entity}, optionTypes);
+            await ProcessEntities(new[] {entity}, OptionTypes);
             return entity;
         }
 
@@ -92,10 +90,9 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
         {
-            var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, OptionTypes);
             var entities = await queryFluent.SelectPageAsync(page, pageSize, false);
-            await ProcessEntities(entities.Items, optionTypes);
+            await ProcessEntities(entities.Items, OptionTypes);
             return entities;
         }
 
@@ -103,7 +100,7 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
         {
-            var optionTypes = await OptionTypesRepository.Query(GetOptionTypeQuery(idObjectType)).SelectAsync(false);
+            var optionTypes = OptionTypes.Where(GetOptionTypeQuery(idObjectType).Query().CacheCompile()).ToList();
             var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
             return await Mapper.FromEntityAsync(entity, true);
         }
@@ -272,7 +269,7 @@ namespace VitalChoice.DynamicData.Base
             return Mapper.GetOptionTypeQuery().WithObjectType(idObjectType);
         }
 
-        private async Task ProcessEntities(ICollection<TEntity> entities, List<TOptionType> optionTypes)
+        private async Task ProcessEntities(ICollection<TEntity> entities, ICollection<TOptionType> optionTypes)
         {
             foreach (var entity in entities)
             {
@@ -284,22 +281,15 @@ namespace VitalChoice.DynamicData.Base
 
         private IQueryFluent<TEntity> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
             IDictionary<string, object> values, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy, List<TOptionType> optionTypes)
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy, ICollection<TOptionType> optionTypes)
         {
             IQueryFluent<TEntity> queryFluent;
             if (values != null)
             {
                 var searchValues = BuildSearchValues(values, optionTypes);
                 var valuesSelector = CreateValuesSelector(searchValues);
-                if (query != null)
-                {
-                    queryFluent = CreateQuery(includesOverride ?? BuildQuery, query.And(valuesSelector));
-                }
-                else
-                {
-                    queryFluent = CreateQuery(includesOverride ?? BuildQuery,
-                        valuesSelector.And(p => p.StatusCode != (int) RecordStatusCode.Deleted));
-                }
+                queryFluent = CreateQuery(includesOverride ?? BuildQuery,
+                    query?.And(valuesSelector) ?? valuesSelector.And(p => p.StatusCode != (int) RecordStatusCode.Deleted));
             }
             else
             {
@@ -312,7 +302,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         private Dictionary<int, GenericPair<string, TOptionType>> BuildSearchValues(IDictionary<string, object> values,
-            List<TOptionType> optionTypes)
+            ICollection<TOptionType> optionTypes)
         {
             var optionTypesToSearch =
                 optionTypes.Where(Mapper.GetOptionTypeQuery().WithNames(values.Keys).Query().CacheCompile());
