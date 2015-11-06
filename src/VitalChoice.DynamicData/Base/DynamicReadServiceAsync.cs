@@ -68,7 +68,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
             var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = await BuildQueryFluent(query, values, includesOverride, null, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, null, optionTypes);
             var entities = await queryFluent.SelectAsync(false);
             await ProcessEntities(entities, optionTypes);
             return entities;
@@ -80,7 +80,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
         {
             var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = await BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
             await ProcessEntities(new[] {entity}, optionTypes);
             return entity;
@@ -93,7 +93,7 @@ namespace VitalChoice.DynamicData.Base
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
         {
             var optionTypes = await OptionTypesRepository.Query().SelectAsync(false);
-            var queryFluent = await BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
+            var queryFluent = BuildQueryFluent(query, values, includesOverride, orderBy, optionTypes);
             var entities = await queryFluent.SelectPageAsync(page, pageSize, false);
             await ProcessEntities(entities.Items, optionTypes);
             return entities;
@@ -282,7 +282,7 @@ namespace VitalChoice.DynamicData.Base
             await AfterSelect(entities);
         }
 
-        private async Task<IQueryFluent<TEntity>> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
+        private IQueryFluent<TEntity> BuildQueryFluent(Expression<Func<TEntity, bool>> query,
             IDictionary<string, object> values, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy, List<TOptionType> optionTypes)
         {
@@ -291,20 +291,14 @@ namespace VitalChoice.DynamicData.Base
             {
                 var searchValues = BuildSearchValues(values, optionTypes);
                 var valuesSelector = CreateValuesSelector(searchValues);
-                var optionValues =
-                    (await
-                        OptionValuesRepository.Query(valuesSelector)
-                            .SelectAsync(Mapper.ObjectIdSelector))
-                        .Distinct().ToList();
                 if (query != null)
                 {
-                    queryFluent = CreateQuery(includesOverride ?? BuildQuery,
-                        query.And(p => optionValues.Contains(p.Id)));
+                    queryFluent = CreateQuery(includesOverride ?? BuildQuery, query.And(valuesSelector));
                 }
                 else
                 {
                     queryFluent = CreateQuery(includesOverride ?? BuildQuery,
-                        p => p.StatusCode != (int) RecordStatusCode.Deleted && optionValues.Contains(p.Id));
+                        valuesSelector.And(p => p.StatusCode != (int) RecordStatusCode.Deleted));
                 }
             }
             else
@@ -342,38 +336,38 @@ namespace VitalChoice.DynamicData.Base
             return res;
         }
 
-        private static Expression<Func<TOptionValue, bool>> CreateValuesSelector(
+        private static Expression<Func<TEntity, bool>> CreateValuesSelector(
             Dictionary<int, GenericPair<string, TOptionType>> searchValues)
         {
-            Expression<Func<TOptionValue, bool>> valuesSelector = null;
+            Expression<Func<TEntity, bool>> valuesSelector = null;
             foreach (var searchPair in searchValues)
             {
                 if (valuesSelector == null)
                 {
-                    if ((FieldType) searchPair.Value.Value2.IdFieldType == FieldType.String)
+                    if (searchPair.Value.Value2.IdFieldType == (int) FieldType.String)
                     {
                         valuesSelector =
-                            v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1);
+                            e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1));
                     }
                     else
                     {
                         valuesSelector =
-                            v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1;
+                            e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1);
                     }
                 }
                 else
                 {
-                    if ((FieldType) searchPair.Value.Value2.IdFieldType == FieldType.String)
+                    if (searchPair.Value.Value2.IdFieldType == (int) FieldType.String)
                     {
                         valuesSelector =
-                            valuesSelector.Or(
-                                v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1));
+                            valuesSelector.And(
+                                e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1)));
                     }
                     else
                     {
                         valuesSelector =
                             valuesSelector.Or(
-                                v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1);
+                                e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1));
                     }
                 }
             }
