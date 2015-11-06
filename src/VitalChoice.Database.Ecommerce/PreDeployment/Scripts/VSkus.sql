@@ -24,7 +24,9 @@ SELECT
 	CONVERT(bit,ISNULL(aval1.Value, 0)) AS AutoShipFrequency1,
 	CONVERT(bit,ISNULL(aval2.Value, 0)) AS AutoShipFrequency2,
 	CONVERT(bit,ISNULL(aval3.Value, 0)) AS AutoShipFrequency3,
-	CONVERT(bit,ISNULL(aval6.Value, 0)) AS AutoShipFrequency6
+	CONVERT(bit,ISNULL(aval6.Value, 0)) AS AutoShipFrequency6,
+	CONVERT(bit,ISNULL(dsval.Value, 1)) AS DisregardStock,
+	CONVERT(int,ISNULL(stval.Value, 0)) AS Stock
 	FROM Skus AS s
 	JOIN Products AS p ON p.Id = s.IdProduct	
 	LEFT JOIN ProductOptionTypes AS popt ON popt.Name = N'SubProductGroupName' AND popt.IdObjectType = p.IdObjectType
@@ -41,6 +43,10 @@ SELECT
 	LEFT JOIN ProductOptionValues AS aval3 ON aval3.IdSku = s.Id AND aval3.IdOptionType = aopt3.Id
 	LEFT JOIN ProductOptionTypes AS aopt6 ON aopt6.Name = N'AutoShipFrequency6' AND aopt6.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS aval6 ON aval6.IdSku = s.Id AND aval6.IdOptionType = aopt6.Id
+	LEFT JOIN ProductOptionTypes AS dsopt ON dsopt.Name = N'DisregardStock' AND dsopt.IdObjectType = p.IdObjectType
+	LEFT JOIN ProductOptionValues AS dsval ON dsval.IdSku = s.Id AND dsval.IdOptionType = dsopt.Id
+	LEFT JOIN ProductOptionTypes AS stopt ON stopt.Name = N'Stock' AND stopt.IdObjectType = p.IdObjectType
+	LEFT JOIN ProductOptionValues AS stval ON stval.IdSku = s.Id AND stval.IdOptionType = stopt.Id
 
 GO
 

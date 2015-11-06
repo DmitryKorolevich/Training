@@ -41,5 +41,9 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
         public bool AutoShipFrequency3 { get; set; }
 
         public bool AutoShipFrequency6 { get; set; }
+
+        public bool DisregardStock { get; set; }
+
+        public int Stock { get; set; }
     }
 }

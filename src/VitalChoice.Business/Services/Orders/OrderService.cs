@@ -213,10 +213,37 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
-            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderBy(y => y.Id);
+	        Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
+
+			var sortOrder = filter.Sorting.SortOrder;
+	        switch (filter.Sorting.Path)
+	        {
+		        case OrderSortPath.OrderDate:
+			        if (sortOrder == SortOrder.Desc)
+			        {
+				        sortable = x => x.OrderByDescending(y => y.DateCreated);
+			        }
+			        else
+			        {
+				        sortable = x => x.OrderBy(y => y.DateCreated);
+			        }
+			        break;
+		        default:
+			        if (sortOrder == SortOrder.Desc)
+			        {
+				        sortable = x => x.OrderByDescending(y => y.Id);
+			        }
+			        else
+			        {
+						sortable = x => x.OrderBy(y => y.Id);
+					}
+			        break;
+	        }
+
+	        var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted();
+
             var query =
-                this.ObjectRepository.Query(
-                    p => p.Id.ToString().Contains(filter.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
+                this.ObjectRepository.Query(orderQuery)
                     .OrderBy(sortable);
             return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
         }

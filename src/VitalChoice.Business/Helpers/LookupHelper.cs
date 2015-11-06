@@ -121,6 +121,18 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static Dictionary<int, string> GetShortProductTypes()
+        {
+            Dictionary<int, string> toReturn = new Dictionary<int, string>
+            {
+                {(int) ProductType.Perishable, "P"},
+                {(int) ProductType.NonPerishable, "NP"},
+                {(int) ProductType.Gc, "GIFT"},
+                {(int) ProductType.EGс, "EGIFT"}
+            };
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetDiscountTypes()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>

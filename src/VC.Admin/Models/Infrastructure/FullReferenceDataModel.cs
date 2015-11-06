@@ -23,6 +23,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> CustomerStatuses { get; set; }
         public IList<LookupItem<int>> AffiliateStatuses { get; set; }
         public IList<LookupItem<int>> ProductTypes { get; set; }
+        public IList<LookupItem<int>> ShortProductTypes { get; set; }
         public IList<LookupItem<int>> DiscountTypes { get; set; }
         public IList<LookupItem<int>> AssignedCustomerTypes { get; set; }
         public IList<LookupItem<int?>> ActiveFilterOptions { get; set; }

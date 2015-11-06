@@ -54,6 +54,7 @@ namespace VC.Admin.Controllers
                     CustomerStatuses = referenceData.CustomerStatuses,
                     AffiliateStatuses = referenceData.AffiliateStatuses,
                     ProductTypes = referenceData.ProductTypes,
+                    ShortProductTypes = referenceData.ShortProductTypes,
                     DiscountTypes = referenceData.DiscountTypes,
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,
                     ActiveFilterOptions = referenceData.ActiveFilterOptions,

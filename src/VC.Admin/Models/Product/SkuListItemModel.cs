@@ -40,6 +40,8 @@ namespace VC.Admin.Models.Product
 
         public bool AutoShipFrequency6 { get; set; }
 
+        public bool InStock { get; set; }
+
         public SkuListItemModel(VSku item)
         {
             if(item!=null)
@@ -57,6 +59,7 @@ namespace VC.Admin.Models.Product
                 AutoShipFrequency2 = item.AutoShipFrequency2;
                 AutoShipFrequency3 = item.AutoShipFrequency3;
                 AutoShipFrequency6 = item.AutoShipFrequency6;
+                InStock = item.DisregardStock || item.Stock > 0;
             }
         }
     }

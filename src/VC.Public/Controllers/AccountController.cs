@@ -7,9 +7,11 @@ using Microsoft.AspNet.Mvc;
 using VC.Public.ModelConverters;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
+using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Entities;
@@ -272,5 +274,20 @@ namespace VC.Public.Controllers
 
             return RedirectToAction("Login",new { forgot = true });
         }
-    }
+
+		[HttpGet]
+		[AdminAuthorize(PermissionType.Customers)]
+		public async Task<IActionResult> LoginAsCustomer(int id)
+		{
+			var user = await _userService.GetAsync(id);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+			}
+
+			await _userService.SignInAsync(user);
+
+			return RedirectToAction("ChangeProfile", "Profile");
+		}
+	}
 }

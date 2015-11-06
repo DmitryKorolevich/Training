@@ -25,16 +25,17 @@
                                         <fieldset>
                                             <div data-ng-if="currentCustomer.Id && options.DBStatusCode != 4" class="form-group">
                                                 <label for="" class="col-md-3 control-label"></label>
-                                                <div class="col-md-9">
-                                                    <button class="btn btn-primary width-160px" ui-sref="index.oneCol.orderAdd({idcustomer:currentCustomer.Id})">Place Order</button>
-                                                </div>
+	                                            <div class="col-md-9">
+		                                            <button class="btn btn-primary width-160px margin-right-25px" ui-sref="index.oneCol.orderAdd({idcustomer:currentCustomer.Id})">Place Order</button>
+													<a class="btn btn-primary-orange width-160px" data-ng-if="currentCustomer.Id && currentCustomer.StatusCode == 2" target="_blank" data-ng-href="{{ReferenceData.PublicHost}}Account/LoginAsCustomer/{{currentCustomer.Id}}">Log In As Customer</a>
+	                                            </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="" class="col-md-3 control-label">Customer ID</label>
-                                                <div class="col-md-9 form-control-static" data-ng-if="currentCustomer.Id">
-                                                    <span>{{currentCustomer.Id}}</span>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+	                                        <label for="" class="col-md-3 control-label">Customer ID</label>
+	                                        <div class="col-md-9 form-control-static" data-ng-if="currentCustomer.Id">
+		                                        <span>{{currentCustomer.Id}}</span>
+	                                        </div>
+                                        </div>
                                             <span class="legend">Customer Type</span>
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
