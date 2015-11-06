@@ -22,7 +22,7 @@ namespace VitalChoice.Business.Workflow.Actions.Discounts
             var discountableSubtotal = dataContext.Data.DiscountableSubtotal;
             foreach (var tier in dataContext.Order.Discount.DiscountTiers)
             {
-                if (discountableSubtotal >= tier.From && discountableSubtotal <= tier.To)
+                if (discountableSubtotal >= tier.From && tier.To == null || discountableSubtotal <= tier.To)
                 {
                     switch (tier.IdDiscountType)
                     {
