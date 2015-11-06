@@ -113,18 +113,18 @@
                                                     </tr>
                                                     <tr class="warning" data-ng-if="item.Messages.length>0">
                                                         <td colspan="7">
-                                                            <span class="message" data-ng-repeat="message in item.Messages">{{message}}</span>
+                                                            <strong class="message" data-ng-repeat="message in item.Messages">{{message}}</strong>
                                                         </td>
                                                     </tr>
                                                     <tr data-ng-repeat-end class="warning" data-ng-if="item.ClientMessages && item.ClientMessages.length>0">
                                                         <td colspan="7">
-                                                            <span class="message" data-ng-repeat="message in item.ClientMessages">{{message}}</span>
+                                                            <strong class="message" data-ng-repeat="message in item.ClientMessages">{{message}}</strong>
                                                         </td>
                                                     </tr>
                                                     <tr class="warning" data-ng-if="productsPerishableThresholdIssue && !ignoneMinimumPerishableThreshold">
                                                         <td colspan="7">
                                                             <label class="perishable-threshold-message">
-                                                                <span>{{minimumPerishableThreshold | currency}} minimum perishable threshold not met. Override</span>
+                                                                <strong>{{minimumPerishableThreshold | currency}} minimum perishable threshold not met. Override</strong>
                                                                 <input type="checkbox" data-ng-model="ignoneMinimumPerishableThreshold">
                                                             </label>
                                                         </td>
