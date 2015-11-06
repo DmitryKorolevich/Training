@@ -17,7 +17,7 @@ namespace VitalChoice.DynamicData.Base
             return this;
         }
 
-        public virtual IQueryOptionType<TOptionType> WithNames(ICollection<string> names)
+        public virtual IQueryOptionType<TOptionType> WithNames(HashSet<string> names)
         {
             Add(t => names.Contains(t.Name));
             return this;
