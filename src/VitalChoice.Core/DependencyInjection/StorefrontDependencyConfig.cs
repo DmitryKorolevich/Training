@@ -20,6 +20,7 @@ namespace VitalChoice.Core.DependencyInjection
 				x.AccessDeniedPath = "/Shared/AccessDenied";
 				x.LoginPath = "/Account/Login";
 				x.ReturnUrlParameter = "returnUrl";
+				x.CookieName = "VitalChoice.Public";
 			});
 		}
 

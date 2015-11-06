@@ -272,5 +272,18 @@ namespace VC.Public.Controllers
 
             return RedirectToAction("Login",new { forgot = true });
         }
-    }
+
+		public async Task<IActionResult> LoginAsCustomer(int id)
+		{
+			var user = await _userService.GetAsync(id);
+			if (user == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+			}
+
+			await _userService.SignInAsync(user);
+
+			return RedirectToAction("ChangeProfile", "Profile");
+		}
+	}
 }

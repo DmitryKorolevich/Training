@@ -19,7 +19,8 @@ namespace VitalChoice.Core.DependencyInjection
                 x.AccessDeniedPath = PathString.Empty;
                 x.LoginPath = PathString.Empty;
                 x.ReturnUrlParameter = null;
-            });
+				x.CookieName = "VitalChoice.Admin";
+			});
 		}
     }
 }
