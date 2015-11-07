@@ -17,6 +17,7 @@ using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 
@@ -34,10 +35,11 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
+            DynamicFilterCallExpressionVisitor queryVisitor,
             ILogger logger)
             : base(
                 mapper, objectRepository, bigStringRepository, optionValueRepositoryAsync,
-                objectLogItemExternalService, logger)
+                objectLogItemExternalService, logger, queryVisitor)
         {
         }
 
@@ -257,7 +259,7 @@ namespace VitalChoice.DynamicData.Base
             var toInsert =
                 models.Select(
                     d =>
-                        new GenericPair<TDynamic, ICollection<TOptionType>>(d,
+                        new GenericObjectPair<TDynamic, ICollection<TOptionType>>(d,
                             Mapper.FilterByType(Mapper.OptionTypes, d.IdObjectType).ToList())).ToList();
             var mappedList = await Mapper.ToEntityRangeAsync(toInsert);
             foreach (var entity in mappedList.Select(p => p.Entity).ToList())

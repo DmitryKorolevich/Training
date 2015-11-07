@@ -4,9 +4,7 @@ using VitalChoice.Domain.Entities.eCommerce.Users;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
-    public abstract class DynamicDataEntity<TOptionValue, TOptionType> : Entity
-        where TOptionValue: OptionValue<TOptionType>
-        where TOptionType : OptionType
+    public abstract class DynamicDataEntity : Entity
     {
         public int StatusCode { get; set; }
 
@@ -14,12 +12,17 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
 
         public DateTime DateEdited { get; set; }
 
-		public int? IdEditedBy { get; set; }
+        public int? IdEditedBy { get; set; }
 
         public int IdObjectType { get; set; }
 
         public User EditedBy { get; set; }
+    }
 
+    public abstract class DynamicDataEntity<TOptionValue, TOptionType> : DynamicDataEntity
+        where TOptionValue: OptionValue<TOptionType>
+        where TOptionType : OptionType
+    {
         public ICollection<TOptionValue> OptionValues { get; set; }
 
         public ICollection<TOptionType> OptionTypes { get; set; }

@@ -26,7 +26,7 @@ namespace VitalChoice.DynamicData.Base
         }
     }
 
-    public class ObjectMapper<TObject> : IObjectMapper<TObject>, IObjectMapper
+    public class ObjectMapper<TObject> : IObjectMapper<TObject>
         where TObject : class, new()
     {
         private readonly ITypeConverter _typeConverter;
@@ -41,7 +41,7 @@ namespace VitalChoice.DynamicData.Base
             _converterService = converterService;
         }
 
-        public void UpdateObject(TObject obj, IDictionary<string, object> model, bool caseSense = true)
+        public void UpdateObject(object obj, IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
                 return;
@@ -52,7 +52,7 @@ namespace VitalChoice.DynamicData.Base
             FromDictionaryInternal(obj, model, typeof(TObject), caseSense);
         }
 
-        public virtual void SecureObject(TObject obj)
+        public virtual void SecureObject(object obj)
         {
             _processedObjectsSet = new HashSet<object>();
             var cache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, typeof(TObject), true);
@@ -90,7 +90,7 @@ namespace VitalChoice.DynamicData.Base
             converter?.DynamicToModel(model, obj);
         }
 
-        public IDictionary<string, object> ToDictionary(TObject obj)
+        public IDictionary<string, object> ToDictionary(object obj)
         {
             if (obj == null)
                 return null;
@@ -102,7 +102,7 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        public void UpdateModel(TObject obj, IDictionary<string, object> model)
+        public void UpdateModel(object obj, IDictionary<string, object> model)
         {
             if (obj == null)
                 return;
@@ -127,7 +127,7 @@ namespace VitalChoice.DynamicData.Base
             converter?.ModelToDynamic(model, obj);
         }
 
-        public TObject FromDictionary(IDictionary<string, object> model, bool caseSense = true)
+        public object FromDictionary(IDictionary<string, object> model, bool caseSense = true)
         {
             if (model == null)
                 return null;

@@ -78,6 +78,7 @@ using Microsoft.AspNet.Mvc.Formatters;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
+using VitalChoice.DynamicData.Extensions;
 using IContentViewService = VitalChoice.Interfaces.Services.Content.IContentViewService;
 
 namespace VitalChoice.Core.DependencyInjection

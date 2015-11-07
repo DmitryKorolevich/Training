@@ -11,7 +11,7 @@ namespace VitalChoice.Domain.Helpers
     /// From http://msdn.microsoft.com/en-us/library/bb546158.aspx
     /// Copyright notice http://msdn.microsoft.com/en-gb/cc300389.aspx#O
     /// </remarks>
-    internal static class Evaluator
+    public static class Evaluator
     {
         /// <summary>
         /// Performs evaluation & replacement of independent sub-trees

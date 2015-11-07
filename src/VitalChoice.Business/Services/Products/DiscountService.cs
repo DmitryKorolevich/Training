@@ -26,6 +26,8 @@ using System.ServiceModel;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -43,9 +45,9 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
             : base(mapper, discountRepository, discountOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService, 
-                  loggerProvider)
+                  loggerProvider, queryVisitor)
         {
             _discountRepository = discountRepository;
             _skuRepository = skuRepository;

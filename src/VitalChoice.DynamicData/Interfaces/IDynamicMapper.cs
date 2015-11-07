@@ -15,28 +15,33 @@ namespace VitalChoice.DynamicData.Interfaces
     {
     }
 
-    public class DynamicEntityPair<TDynamic, TEntity> : GenericPair<TDynamic, TEntity>
+    public class DynamicEntityPair<TDynamic, TEntity>
         where TEntity : Entity
         where TDynamic : MappedObject
     {
-        public DynamicEntityPair(TDynamic dynamic, TEntity entity) : base(dynamic, entity)
+        public DynamicEntityPair(TDynamic dynamic, TEntity entity)
         {
+            Dynamic = dynamic;
+            Entity = entity;
         }
 
-        public TEntity Entity
-        {
-            get { return Value2; }
-            set { Value2 = value; }
-        }
-
-        public TDynamic Dynamic
-        {
-            get { return Value1; }
-            set { Value1 = value; }
-        }
+        public TEntity Entity { get; set; }
+        public TDynamic Dynamic { get; set; }
     }
 
-    public class GenericPair<T1, T2>
+    public class GenericObjectPair<T1, T2>
+    {
+        public GenericObjectPair(T1 value1, T2 value2)
+        {
+            Value1 = value1;
+            Value2 = value2;
+        }
+
+        public T1 Value1 { get; set; }
+        public T2 Value2 { get; set; }
+    }
+
+    public struct GenericPair<T1, T2>
     {
         public GenericPair(T1 value1, T2 value2)
         {
@@ -90,7 +95,7 @@ namespace VitalChoice.DynamicData.Interfaces
 
         void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null);
-        List<TEntity> ToEntityRange(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items);
+        List<TEntity> ToEntityRange(ICollection<GenericObjectPair<TDynamic, ICollection<TOptionType>>> items);
         List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false);
 
         Task UpdateEntityAsync(TDynamic dynamic, TEntity entity);
@@ -99,7 +104,7 @@ namespace VitalChoice.DynamicData.Interfaces
 
         Task UpdateEntityRangeAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         Task<List<TEntity>> ToEntityRangeAsync(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null);
-        Task<ICollection<DynamicEntityPair<TDynamic, TEntity>>> ToEntityRangeAsync(ICollection<GenericPair<TDynamic, ICollection<TOptionType>>> items);
+        Task<ICollection<DynamicEntityPair<TDynamic, TEntity>>> ToEntityRangeAsync(ICollection<GenericObjectPair<TDynamic, ICollection<TOptionType>>> items);
         Task<List<TDynamic>> FromEntityRangeAsync(ICollection<TEntity> items, bool withDefaults = false);
     }
 }

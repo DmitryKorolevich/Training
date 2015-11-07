@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 #if DNX451
 using System.Transactions;
@@ -39,6 +40,10 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
+using VitalChoice.Domain.Entities.eCommerce.Affiliates;
+using VitalChoice.DynamicData.Extensions;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -46,7 +51,8 @@ namespace VitalChoice.Business.Services.Customers
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
+        private readonly DynamicFilterCallExpressionVisitor _queryVisitor;
+        private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -68,10 +74,10 @@ namespace VitalChoice.Business.Services.Customers
 			IOptions<AppOptions> appOptions,
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
             : base(
                 customerMapper, customerRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, queryVisitor)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -83,6 +89,7 @@ namespace VitalChoice.Business.Services.Customers
 		    _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
+	        _queryVisitor = queryVisitor;
         }
 
 		private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
@@ -456,8 +463,8 @@ namespace VitalChoice.Business.Services.Customers
 		}
 
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
-		{
-			var condition =
+        {
+            var condition =
 				new VCustomerQuery().NotDeleted()
                     .WithIdContains(filter.IdContains)
                     .WithId(filter.SearchText)

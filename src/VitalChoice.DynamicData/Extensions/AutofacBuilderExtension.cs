@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using Autofac;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Helpers;
+using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 
-namespace VitalChoice.DynamicData.Helpers
+namespace VitalChoice.DynamicData.Extensions
 {
     public static class AutofacBuilderExtension
     {
@@ -14,7 +14,8 @@ namespace VitalChoice.DynamicData.Helpers
         {
             builder.RegisterType<TypeConverter>().As<ITypeConverter>();
             builder.RegisterType<ModelConverterService>().As<IModelConverterService>();
-            builder.RegisterGeneric(typeof(DirectMapper<>)).AsSelf();
+            builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
+            builder.RegisterType<DynamicFilterCallExpressionVisitor>().AsSelf();
             return builder;
         }
 

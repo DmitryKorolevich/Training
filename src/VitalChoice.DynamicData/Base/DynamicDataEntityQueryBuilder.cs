@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
@@ -13,8 +12,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Base
 {
-    public class DynamicDataEntityQueryBuilder<TEntity, TOptionType, TOptionValue> :
-        IDynamicDataEntityQueryBuilder<TEntity, TOptionType, TOptionValue>
+    public sealed class DynamicDataEntityQueryBuilder<TEntity, TOptionValue, TOptionType> : IDynamicDataEntityQueryBuilder
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>
         where TOptionType : OptionType
         where TOptionValue : OptionValue<TOptionType>
@@ -31,107 +29,73 @@ namespace VitalChoice.DynamicData.Base
             _optionTypeQueryProviderIndex = optionTypeQueryProviderIndex;
         }
 
-        public Expression<Func<TEntity, bool>> Filter<TModel>(Expression<Func<TEntity, bool>> query, TModel model)
-            where TModel : class, new()
+        public Expression Filter(object model, Type modelType, Expression parameter, int? idObjectType)
         {
-            return query.And(BuildExpressionFromModel(model));
-        }
+            IDictionary<string, object> filterDictionary;
+            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 
-        public Expression<Func<TEntity, bool>> Filter<TInner, TInnerOptionType, TInnerOptionValue, TModel>(
-            Expression<Func<TEntity, bool>> query, Expression<Func<TEntity, TInner>> innerSelector, TModel model)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
-            where TModel : class, new()
-        {
-            return query.And(BuildExpressionFromModel<TInner, TInnerOptionType, TInnerOptionValue, TModel>(innerSelector, model));
-        }
-
-        public Expression<Func<TEntity, bool>> Filter<TInner, TInnerOptionType, TInnerOptionValue, TModel>(
-            Expression<Func<TEntity, bool>> query, Expression<Func<TEntity, ICollection<TInner>>> innerSelector, TModel model,
-            bool all = false)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
-            where TModel : class, new()
-        {
-            return query.And(BuildExpressionFromModel<TInner, TInnerOptionType, TInnerOptionValue, TModel>(innerSelector, model, all));
-        }
-
-        private Expression<Func<TEntity, bool>> BuildExpressionFromModel<TModel>(TModel filterModel)
-            where TModel : class, new()
-        {
-            IObjectMapper<TModel> mapper = new ObjectMapper<TModel>(_typeConverter, _converterService);
-            return BuildSeachExpression(mapper.ToDictionary(filterModel),
-                (IOptionTypeQueryProvider<TEntity, TOptionType>)
-                    _optionTypeQueryProviderIndex[new GenericTypePair(typeof (TEntity), typeof (TOptionType))]);
-        }
-
-        private Expression<Func<TEntity, bool>> BuildExpressionFromModel<TInner, TInnerOptionType, TInnerOptionValue, TModel>(
-            Expression<Func<TEntity, TInner>> innerSelector, TModel filterModel)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
-            where TModel : class, new()
-        {
-            IObjectMapper<TModel> mapper = new ObjectMapper<TModel>(_typeConverter, _converterService);
-            return BuildSeachExpression<TInner, TInnerOptionType, TInnerOptionValue>(innerSelector, mapper.ToDictionary(filterModel),
-                (IOptionTypeQueryProvider<TInner, TInnerOptionType>)
-                    _optionTypeQueryProviderIndex[new GenericTypePair(typeof (TInner), typeof (TInnerOptionType))]);
-        }
-
-        private Expression<Func<TEntity, bool>> BuildExpressionFromModel<TInner, TInnerOptionType, TInnerOptionValue, TModel>(
-            Expression<Func<TEntity, ICollection<TInner>>> innerSelector, TModel filterModel, bool all)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
-            where TModel : class, new()
-        {
-            IObjectMapper<TModel> mapper = new ObjectMapper<TModel>(_typeConverter, _converterService);
-            return BuildSeachExpression<TInner, TInnerOptionType, TInnerOptionValue>(innerSelector, mapper.ToDictionary(filterModel),
-                (IOptionTypeQueryProvider<TInner, TInnerOptionType>)
-                    _optionTypeQueryProviderIndex[new GenericTypePair(typeof (TInner), typeof (TInnerOptionType))], all);
-        }
-
-        private static Expression<Func<TEntity, bool>> BuildSeachExpression(
-            IDictionary<string, object> values, IOptionTypeQueryProvider<TEntity, TOptionType> optionTypesProvider)
-        {
-            return
-                CreateValuesSelector<TEntity, TOptionValue, TOptionType>(BuildSearchValues(values, optionTypesProvider.OptionTypes,
-                    optionTypesProvider.GetOptionTypeQuery()));
-
-        }
-
-        private static Expression<Func<TEntity, bool>> BuildSeachExpression<TInner, TInnerOptionType, TInnerOptionValue>(
-            Expression<Func<TEntity, TInner>> innerSelector,
-            IDictionary<string, object> values, IOptionTypeQueryProvider<TInner, TInnerOptionType> optionTypesProvider)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
-        {
             var conditionExpression =
-                CreateValuesSelector<TInner, TInnerOptionValue, TInnerOptionType>(BuildSearchValues(values, optionTypesProvider.OptionTypes,
-                    optionTypesProvider.GetOptionTypeQuery()));
+                CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, true)));
 
-            return
-                Expression.Lambda<Func<TEntity, bool>>(
-                    Expression.Invoke(conditionExpression, Expression.Invoke(innerSelector, innerSelector.Parameters)),
-                    innerSelector.Parameters);
+            if (conditionExpression == null)
+                return Expression.Constant(true);
+
+            return Expression.Invoke(conditionExpression, parameter);
         }
 
-        private static Expression<Func<TEntity, bool>> BuildSeachExpression<TInner, TInnerOptionType, TInnerOptionValue>(
-            Expression<Func<TEntity, ICollection<TInner>>> innerSelector,
-            IDictionary<string, object> values, IOptionTypeQueryProvider<TInner, TInnerOptionType> optionTypesProvider,
-            bool all)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
+        public Expression Filter(object model, Type modelType, Expression parameter)
         {
-            var conditionExpression =
-                CreateValuesSelector<TInner, TInnerOptionValue, TInnerOptionType>(BuildSearchValues(values, optionTypesProvider.OptionTypes,
-                    optionTypesProvider.GetOptionTypeQuery()));
+            IDictionary<string, object> filterDictionary;
+            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 
-            Expression<Func<ICollection<TInner>, Func<TInner, bool>, bool>> filterExpression;
+            var conditionExpression =
+                CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        null, false)));
+
+            if (conditionExpression == null)
+                return Expression.Constant(true);
+
+            return Expression.Invoke(conditionExpression, parameter);
+        }
+
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all, int? idObjectType)
+        {
+            IDictionary<string, object> filterDictionary;
+            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
+
+            var conditionExpression =
+                CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, true)));
+
+            if (conditionExpression == null)
+                return Expression.Constant(true);
+
+            return BuildCollectionExpression(parameter, all, conditionExpression);
+        }
+
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all)
+        {
+            IDictionary<string, object> filterDictionary;
+            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
+
+            var conditionExpression =
+                CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        null, false)));
+
+            if (conditionExpression == null)
+                return Expression.Constant(true);
+
+            return BuildCollectionExpression(parameter, all, conditionExpression);
+        }
+
+        private static Expression BuildCollectionExpression(Expression parameter, bool all, Expression<Func<TEntity, bool>> conditionExpression)
+        {
+            Expression<Func<ICollection<TEntity>, Func<TEntity, bool>, bool>> filterExpression;
             if (all)
             {
                 filterExpression = (x, f) => x.All(f);
@@ -141,65 +105,134 @@ namespace VitalChoice.DynamicData.Base
                 filterExpression = (x, f) => x.Any(f);
             }
 
-            return
-                Expression.Lambda<Func<TEntity, bool>>(
-                    Expression.Invoke(filterExpression, Expression.Invoke(innerSelector, innerSelector.Parameters), conditionExpression),
-                    innerSelector.Parameters);
+            return Expression.Invoke(filterExpression, parameter, conditionExpression);
         }
 
-        private static Dictionary<int, GenericPair<string, TInnerOptionType>> BuildSearchValues<TInnerOptionType>(
+        private IOptionTypeQueryProvider<TEntity, TOptionType> GetValues(object model, Type modelType, out IDictionary<string, object> filterDictionary)
+        {
+            IObjectMapper mapper =
+                (IObjectMapper)
+                    Activator.CreateInstance(typeof(ObjectMapper<>).MakeGenericType(modelType), _typeConverter, _converterService);
+
+            var optionTypesProvider = (IOptionTypeQueryProvider<TEntity, TOptionType>)
+                _optionTypeQueryProviderIndex[new GenericTypePair(typeof(TEntity), typeof(TOptionType))];
+
+            filterDictionary = mapper.ToDictionary(model);
+            return optionTypesProvider;
+        }
+
+        private IEnumerable<TOptionType> FilterOptionTypes(IEnumerable<TOptionType> optionTypes, IDictionary<string, object> values,
+            IQueryOptionType<TOptionType> optionTypeQuery, int? idObjectType, bool lookForObjectType)
+        {
+            var valueNames = new HashSet<string>(values.Keys);
+            if (lookForObjectType)
+                return optionTypes.Where(optionTypeQuery.WithNames(valueNames).WithObjectType(idObjectType).Query().CacheCompile());
+
+            return optionTypes.Where(optionTypeQuery.WithNames(valueNames).Query().CacheCompile());
+        }
+
+        private static List<OptionGroup<TOptionType>> BuildSearchValues(
             IDictionary<string, object> values,
-            ICollection<TInnerOptionType> optionTypes, IQueryOptionType<TInnerOptionType> optionTypeQuery)
-            where TInnerOptionType : OptionType
+            IEnumerable<TOptionType> optionTypes)
         {
+
             var optionTypesToSearch =
-                optionTypes.Where(optionTypeQuery.WithNames(new HashSet<string>(values.Keys)).Query().CacheCompile());
-            Dictionary<int, GenericPair<string, TInnerOptionType>> searchValues = optionTypesToSearch.ToDictionary(t => t.Id,
-                t =>
-                    new GenericPair<string, TInnerOptionType>(
-                        MapperTypeConverter.ConvertToOptionValue(values[t.Name], (FieldType) t.IdFieldType), t));
-            return searchValues;
+                optionTypes
+                    .GroupBy(t => t.IdObjectType, t => t, (id, types) => new {id, types});
+            List<OptionGroup<TOptionType>> result = new List<OptionGroup<TOptionType>>();
+            foreach (var optionTypeGroup in optionTypesToSearch)
+            {
+                List<OptionValueItem<TOptionType>> items = new List<OptionValueItem<TOptionType>>();
+                foreach (var t in optionTypeGroup.types)
+                {
+                    object value;
+                    if (values.TryGetValue(t.Name, out value))
+                    {
+                        items.Add(new OptionValueItem<TOptionType>
+                        {
+                            IdType = t.Id,
+                            Value = MapperTypeConverter.ConvertToOptionValue(value, (FieldType) t.IdFieldType),
+                            OptionType = t
+                        });
+                    }
+                }
+                result.Add(new OptionGroup<TOptionType>
+                {
+                    IdObjectType = optionTypeGroup.id,
+                    Values = items
+                });
+            }
+            return result;
         }
 
-        private static Expression<Func<TInner, bool>> CreateValuesSelector<TInner, TInnerOptionValue, TInnerOptionType>(
-            Dictionary<int, GenericPair<string, TInnerOptionType>> searchValues)
-            where TInner : DynamicDataEntity<TInnerOptionValue, TInnerOptionType>
-            where TInnerOptionType : OptionType
-            where TInnerOptionValue : OptionValue<TInnerOptionType>
+        private static Expression<Func<TEntity, bool>> CreateValuesSelector(
+            List<OptionGroup<TOptionType>> optionGroups)
         {
-            Expression<Func<TInner, bool>> valuesSelector = null;
-            foreach (var searchPair in searchValues)
+            Expression<Func<TEntity, bool>> result = null;
+            foreach (var optionGroup in optionGroups)
             {
-                if (valuesSelector == null)
+                Expression<Func<TEntity, bool>> valuesSelector = null;
+                foreach (
+                    var value in
+                        optionGroup.Values.Where(
+                            value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int) FieldType.LargeString))
                 {
-                    if (searchPair.Value.Value2.IdFieldType == (int) FieldType.String)
+                    if (valuesSelector == null)
                     {
-                        valuesSelector =
-                            e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1));
+                        if (value.OptionType.IdFieldType == (int) FieldType.String)
+                        {
+                            valuesSelector =
+                                e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value));
+                        }
+                        else
+                        {
+                            valuesSelector =
+                                e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value == value.Value);
+                        }
                     }
                     else
                     {
-                        valuesSelector =
-                            e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1);
+                        if (value.OptionType.IdFieldType == (int) FieldType.String)
+                        {
+                            valuesSelector =
+                                valuesSelector.And(
+                                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value)));
+                        }
+                        else
+                        {
+                            valuesSelector =
+                                valuesSelector.And(
+                                    e => e.OptionValues.Any(v => v.IdOptionType == value.IdType && v.Value == value.Value));
+                        }
                     }
+                }
+                if (optionGroup.IdObjectType == null)
+                {
+                    result = result == null ? valuesSelector : result.And(valuesSelector);
                 }
                 else
                 {
-                    if (searchPair.Value.Value2.IdFieldType == (int) FieldType.String)
-                    {
-                        valuesSelector =
-                            valuesSelector.And(
-                                e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value.Contains(searchPair.Value.Value1)));
-                    }
-                    else
-                    {
-                        valuesSelector =
-                            valuesSelector.Or(
-                                e => e.OptionValues.Any(v => v.IdOptionType == searchPair.Key && v.Value == searchPair.Value.Value1));
-                    }
+                    result = result == null ? valuesSelector : result.Or(valuesSelector);
                 }
             }
-            return valuesSelector;
+
+            return result;
+        }
+
+        private struct OptionValueItem<T>
+        {
+            public int IdType { get; set; }
+
+            public string Value { get; set; }
+
+            public T OptionType { get; set; }
+        }
+
+        private struct OptionGroup<T>
+        {
+            public IEnumerable<OptionValueItem<T>> Values { get; set; }
+
+            public int? IdObjectType { get; set; }
         }
     }
 }

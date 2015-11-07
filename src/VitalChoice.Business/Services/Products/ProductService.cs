@@ -197,10 +197,10 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
             ISettingService settingService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync)
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync, DynamicFilterCallExpressionVisitor queryVisitor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;

@@ -9,11 +9,7 @@ namespace VitalChoice.DynamicData.Base
     {
         public virtual IQueryOptionType<TOptionType> WithObjectType(int? objectType)
         {
-            Add(t => t.IdObjectType == objectType);
-            if (objectType.HasValue)
-            {
-                Or(t => t.IdObjectType == null);
-            }
+            Add(t => t.IdObjectType == objectType || objectType != null && t.IdObjectType == null);
             return this;
         }
 

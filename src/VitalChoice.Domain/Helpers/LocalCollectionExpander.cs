@@ -22,7 +22,7 @@ namespace VitalChoice.Domain.Helpers
     /// <summary>
     /// Enables cache key support for local collection values.
     /// </summary>
-    internal class LocalCollectionExpander : ExpressionVisitor
+    public class LocalCollectionExpander : ExpressionVisitor
     {
         public static Expression Rewrite(Expression expression)
         {
@@ -41,9 +41,9 @@ namespace VitalChoice.Domain.Helpers
             // for any local collection parameters in the method, make a
             // replacement argument which will print its elements
             var replacements = (from x in map
-                where x.Value1 != null && x.Value1.IsImplementGeneric(typeof(IEnumerable<>))
+                where x.Value1 != null && x.Value1.IsImplementGeneric(typeof(ICollection<>))
                 where x.Value2.NodeType == ExpressionType.Constant
-                let elementType = x.Value1.TryGetElementType(typeof(IEnumerable<>))
+                let elementType = x.Value1.TryGetElementType(typeof(ICollection<>))
                 let printer = MakePrinter((ConstantExpression)x.Value2, elementType)
                 select new ItemPair<Expression, ConstantExpression>(x.Value2, printer)).ToArray();
 
@@ -62,10 +62,23 @@ namespace VitalChoice.Domain.Helpers
         ConstantExpression MakePrinter(ConstantExpression enumerable, Type elementType)
         {
             var value = (IEnumerable)enumerable.Value;
-            var printerType = typeof(Printer<>).MakeGenericType(elementType);
-            var printer = Activator.CreateInstance(printerType, value);
+            if (value != null)
+            {
+                object printer;
+                if (!value.GetType().IsImplementGeneric(typeof (HashSet<>)))
+                {
+                    var printerType = typeof (CollectionPrinter<>).MakeGenericType(elementType);
+                    printer = Activator.CreateInstance(printerType, value);
+                }
+                else
+                {
+                    var printerType = typeof (HashSetPrinter<>).MakeGenericType(elementType);
+                    printer = Activator.CreateInstance(printerType, value);
+                }
 
-            return Expression.Constant(printer);
+                return Expression.Constant(printer);
+            }
+            return enumerable;
         }
 
         /// <summary>
@@ -75,11 +88,22 @@ namespace VitalChoice.Domain.Helpers
         /// Inherits List in order to support List.Contains instance method as well
         /// as standard Enumerable.Contains/Any extension methods.
         /// </remarks>
-        class Printer<T> : List<T>
+        class CollectionPrinter<T> : List<T>
         {
-            public Printer(IEnumerable collection)
+            public CollectionPrinter(IEnumerable collection) : base(collection.Cast<T>())
             {
-                AddRange(collection.Cast<T>());
+            }
+
+            public override string ToString()
+            {
+                return $"{{{this.ToConcatenatedString(t => t.ToString(), "|")}}}";
+            }
+        }
+
+        class HashSetPrinter<T> : HashSet<T>
+        {
+            public HashSetPrinter(IEnumerable collection) : base(collection.Cast<T>())
+            {
             }
 
             public override string ToString()

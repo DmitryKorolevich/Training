@@ -30,6 +30,7 @@ using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Customers;
@@ -65,10 +66,10 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IAffiliateService affiliateService,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync)
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DynamicFilterCallExpressionVisitor queryVisitor)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;

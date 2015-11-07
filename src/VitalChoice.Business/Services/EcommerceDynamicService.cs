@@ -8,6 +8,7 @@ using VitalChoice.Domain.Entities.eCommerce;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
@@ -27,8 +28,10 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider)
-            : base(mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, loggerProvider.CreateLoggerDefault())
+            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
+            : base(
+                mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
+                loggerProvider.CreateLoggerDefault())
         {
         }
 

@@ -42,6 +42,7 @@ using Microsoft.Framework.OptionsModel;
 using System.Collections;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Business.Queries.Customer;
+using VitalChoice.DynamicData.Helpers;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -73,10 +74,10 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _vCustomerInAffiliateRepository = vCustomerInAffiliateRepository;

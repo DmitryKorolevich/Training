@@ -32,6 +32,7 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<TOptionValue> OptionValuesRepository;
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
+        protected readonly DynamicFilterCallExpressionVisitor QueryVisitor;
         protected readonly ILogger Logger;
 
         protected DynamicReadServiceAsync(
@@ -40,7 +41,7 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IReadRepositoryAsync<TOptionValue> optionValuesRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILogger logger)
+            ILogger logger, DynamicFilterCallExpressionVisitor queryVisitor)
         {
             Mapper = mapper;
             ObjectRepository = objectRepository;
@@ -48,6 +49,7 @@ namespace VitalChoice.DynamicData.Base
             OptionValuesRepository = optionValuesRepository;
             ObjectLogItemExternalService = objectLogItemExternalService;
             Logger = logger;
+            QueryVisitor = queryVisitor;
         }
 
         #region Extension Points
