@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IAffiliateService affiliateService,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DynamicFilterCallExpressionVisitor queryVisitor)
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)

@@ -13,13 +13,13 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Helpers
 {
-    public class DynamicFilterCallExpressionVisitor : ExpressionVisitor
+    public class DynamicExpressionVisitor : ExpressionVisitor
     {
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
 
-        public DynamicFilterCallExpressionVisitor(IModelConverterService converterService, ITypeConverter typeConverter,
+        public DynamicExpressionVisitor(IModelConverterService converterService, ITypeConverter typeConverter,
             IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex)
         {
             _converterService = converterService;
@@ -57,7 +57,7 @@ namespace VitalChoice.DynamicData.Helpers
                 Expression resultExpression;
                 switch (m.Method.Name)
                 {
-                    case "When":
+                    case "WhenValues":
                         if (collectionMethods)
                             throw new ApiException("You cannot use When with collection properties, see Any/All");
 
@@ -68,7 +68,7 @@ namespace VitalChoice.DynamicData.Helpers
                         if (resultExpression == null)
                             return Expression.Constant(true);
                         return resultExpression;
-                    case "WhenAny":
+                    case "WhenValuesAny":
                         if (!collectionMethods)
                             throw new ApiException("You cannot use WhenAny with non-collection properties, see When");
 
@@ -77,7 +77,7 @@ namespace VitalChoice.DynamicData.Helpers
                             : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], false);
 
                         return resultExpression;
-                    case "WhenAll":
+                    case "WhenValuesAll":
                         if (!collectionMethods)
                             throw new ApiException("You cannot use WhenAll with non-collection properties, see When");
 

@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
                 loggerProvider.CreateLoggerDefault())

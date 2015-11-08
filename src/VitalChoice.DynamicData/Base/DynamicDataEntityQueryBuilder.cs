@@ -108,14 +108,20 @@ namespace VitalChoice.DynamicData.Base
             return Expression.Invoke(filterExpression, parameter, conditionExpression);
         }
 
-        private IOptionTypeQueryProvider<TEntity, TOptionType> GetValues(object model, Type modelType, out IDictionary<string, object> filterDictionary)
+        private IOptionTypeQueryProvider<TEntity, TOptionType> GetValues(object model, Type modelType,
+            out IDictionary<string, object> filterDictionary)
         {
+            var optionTypesProvider = (IOptionTypeQueryProvider<TEntity, TOptionType>)
+                _optionTypeQueryProviderIndex[new GenericTypePair(typeof (TEntity), typeof (TOptionType))];
+
+            if (modelType.IsImplement(typeof (IDictionary<string, object>)))
+            {
+                filterDictionary = (IDictionary<string, object>) model;
+                return optionTypesProvider;
+            }
             IObjectMapper mapper =
                 (IObjectMapper)
-                    Activator.CreateInstance(typeof(ObjectMapper<>).MakeGenericType(modelType), _typeConverter, _converterService);
-
-            var optionTypesProvider = (IOptionTypeQueryProvider<TEntity, TOptionType>)
-                _optionTypeQueryProviderIndex[new GenericTypePair(typeof(TEntity), typeof(TOptionType))];
+                    Activator.CreateInstance(typeof (ObjectMapper<>).MakeGenericType(modelType), _typeConverter, _converterService);
 
             filterDictionary = mapper.ToDictionary(model);
             return optionTypesProvider;

@@ -20,6 +20,7 @@ using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
+using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -35,7 +36,7 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            DynamicFilterCallExpressionVisitor queryVisitor,
+            DynamicExpressionVisitor queryVisitor,
             ILogger logger)
             : base(
                 mapper, objectRepository, bigStringRepository, optionValueRepositoryAsync,

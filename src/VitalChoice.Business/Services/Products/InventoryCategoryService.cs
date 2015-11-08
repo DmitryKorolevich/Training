@@ -16,6 +16,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Domain.Constants;
 using VitalChoice.DynamicData.Entities;
+using VitalChoice.DynamicData.Extensions;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -190,9 +191,8 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<IList<ProductDynamic>> GetProductsAssignedToInvenotyCategory(int id)
         {
-            Dictionary<string, object> filter = new Dictionary<string, object>();
-            filter.Add(ProductConstants.FIELD_NAME_INVENTORY_CATEGORY_ID, id);
-            var products = await productService.SelectAsync(filter);
+            Dictionary<string, object> filter = new Dictionary<string, object> {{ProductConstants.FIELD_NAME_INVENTORY_CATEGORY_ID, id}};
+            var products = await productService.SelectAsync(p => p.WhenValues(filter));
             return products;
         }
 
