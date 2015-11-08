@@ -144,6 +144,7 @@ namespace VitalChoice.Business.Services.Customers
 			if (!string.IsNullOrWhiteSpace(password))
 			{
 				appUser.IsConfirmed = true;
+				appUser.ConfirmationToken = Guid.Empty;
 			}
 
 			appUser.Email = model.Email;

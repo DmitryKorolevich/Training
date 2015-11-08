@@ -359,6 +359,7 @@ namespace VitalChoice.Business.Services.Affiliates
             if (!string.IsNullOrWhiteSpace(password))
             {
                 appUser.IsConfirmed = true;
+				appUser.ConfirmationToken = Guid.Empty;
             }
 
             appUser.Email = model.Email;

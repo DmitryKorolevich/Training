@@ -195,9 +195,7 @@ namespace VitalChoice.Business.Services.Users
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
 			}
 
-			//stupid ef
-			var temp = await UserManager.Users.ToListAsync();
-			var notConfirmed = temp.Any(x => !x.IsConfirmed && x.Email.Equals(login));
+			var notConfirmed = await UserManager.Users.AnyAsync(x => !x.IsConfirmed && x.Email.Equals(login));
 
 			if (notConfirmed)
 			{
@@ -322,21 +320,15 @@ namespace VitalChoice.Business.Services.Users
 		{
 			if (token == Guid.Empty)
 			{
-				throw new ArgumentException("token can't be null or empty");
+				throw new ArgumentException("Token can't be null or empty");
 			}
 
-			//var user = await UserManager.Users.Include(x => x.Profile).Include(x => x.Roles).SingleOrDefaultAsync(x => !x.DeletedDate.HasValue && x.Profile.ConfirmationToken == token);
-			var temp = await UserManager.Users.ToListAsync();
-			var user = temp.SingleOrDefault(x => x.ConfirmationToken == token);
+			var user = await UserManager.Users.SingleOrDefaultAsync(x => x.ConfirmationToken == token);
 
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
 			}
-			//if (user.IsConfirmed)
-			//{
-			//	throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
-			//}
 			if (user.TokenExpirationDate.Subtract(DateTime.Now).Days < 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ActivationTokenExpired]);
@@ -467,11 +459,11 @@ namespace VitalChoice.Business.Services.Users
 				var keyword = filter.SearchText.ToLower();
 				query = query.And(x => x.FirstName.ToLower().Contains(keyword) ||
 										x.LastName.ToLower().Contains(keyword) ||
-									   //(x.FirstName + " " + x.LastName).ToLower().Contains(keyword) || uncomment when stupid ef becomes stable
+									   (x.FirstName + " " + x.LastName).ToLower().Contains(keyword) ||
 									   x.Email.ToLower().Contains(keyword));
 			}
 
-			IEnumerable<ApplicationUser> queryable = await UserManager.Users.AsNoTracking().Where(query).ToListAsync();// remove this bullshit when stupid ef starts working
+			var queryable = UserManager.Users.AsNoTracking().Where(query);
 			var overallCount = queryable.Count();
 
 			var sortOrder = filter.Sorting.SortOrder;
@@ -510,7 +502,7 @@ namespace VitalChoice.Business.Services.Users
 			var pageIndex = filter.Paging.PageIndex;
 			var pageItemCount = filter.Paging.PageItemCount;
 
-			var items = queryable.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToList();
+			var items = await queryable.Skip((pageIndex - 1)*pageItemCount).Take(pageItemCount).ToListAsync();
 
 			return new PagedList<ApplicationUser>(items, overallCount);
 		}
@@ -535,6 +527,7 @@ namespace VitalChoice.Business.Services.Users
 			}
 			else
 			{
+				user.ConfirmationToken = Guid.Empty;
 				user.IsConfirmed = true;
 				await UpdateAsync(user);
 			}

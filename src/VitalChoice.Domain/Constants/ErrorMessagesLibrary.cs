@@ -39,7 +39,7 @@ namespace VitalChoice.Domain.Constants
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
 		    {Keys.UpdateUserGeneral, "Error occurred while updating user"},
-		    {Keys.CantFindUserByActivationToken, "Unable to find user by activation token"},
+		    {Keys.CantFindUserByActivationToken, "Invalid authentication token used to identify user in the database"},
 		    {Keys.UserAlreadyConfirmed, "User already activated or deleted"},
 		    {Keys.ActivationTokenExpired, "Activation token has expired"},
 		    {Keys.UserLockedOut, "User is locked out"},

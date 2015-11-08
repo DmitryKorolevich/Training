@@ -121,8 +121,12 @@ namespace VC.Public.Controllers
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
             }
+			if (result.IsConfirmed)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+			}
 
-            return View(new CreateAccountModel()
+			return View(new CreateAccountModel()
             {
                 Email = result.Email,
                 PublicId = result.PublicId

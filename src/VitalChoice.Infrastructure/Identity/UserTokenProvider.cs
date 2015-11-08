@@ -41,7 +41,15 @@ namespace VitalChoice.Infrastructure.Identity
 
 	    public Task<bool> ValidateAsync(string purpose, string token, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
-		    return Task.FromResult(user.ConfirmationToken.Equals(Guid.Parse(token)) && !user.IsConfirmed && user.TokenExpirationDate.Subtract(DateTime.Now).Days > 0);
+		    var valid = user.ConfirmationToken.Equals(Guid.Parse(token)) &&
+		                user.TokenExpirationDate.Subtract(DateTime.Now).Days > 0;
+
+		    if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.PasswordResetPurpose && purpose != IdentityConstants.CustomerLoginPurpose)
+		    {
+				valid = valid && !user.IsConfirmed;
+		    }
+
+			return Task.FromResult(valid);
 		}
 
 	    public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<ApplicationUser> manager, ApplicationUser user)
