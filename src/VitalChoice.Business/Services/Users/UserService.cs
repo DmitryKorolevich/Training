@@ -320,6 +320,11 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task<ApplicationUser> GetByTokenAsync(Guid token)
 		{
+			if (token == Guid.Empty)
+			{
+				throw new ArgumentException("token can't be null or empty");
+			}
+
 			//var user = await UserManager.Users.Include(x => x.Profile).Include(x => x.Roles).SingleOrDefaultAsync(x => !x.DeletedDate.HasValue && x.Profile.ConfirmationToken == token);
 			var temp = await UserManager.Users.ToListAsync();
 			var user = temp.SingleOrDefault(x => x.ConfirmationToken == token);
@@ -328,10 +333,10 @@ namespace VitalChoice.Business.Services.Users
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
 			}
-			if (user.IsConfirmed)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
-			}
+			//if (user.IsConfirmed)
+			//{
+			//	throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+			//}
 			if (user.TokenExpirationDate.Subtract(DateTime.Now).Days < 0)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ActivationTokenExpired]);

@@ -440,6 +440,14 @@ namespace VC.Admin.Controllers
 			return true;
 		}
 
+		[HttpPost]
+		public async Task<Result<string>> LoginAsCustomer(Guid id, [FromBody] object model)
+		{
+			var token = await _storefrontUserService.GenerateLoginTokenAsync(id);
+
+			return token;
+		}
+
 #if DNX451
 		[HttpGet]
 		public async Task<FileResult> GetFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)

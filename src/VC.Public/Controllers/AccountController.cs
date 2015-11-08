@@ -275,16 +275,22 @@ namespace VC.Public.Controllers
         }
 
 		[HttpGet]
-		[AdminAuthorize(PermissionType.Customers)]
-		public async Task<IActionResult> LoginAsCustomer(int id)
+		public async Task<IActionResult> LoginAsCustomer(Guid id)
 		{
-			var user = await _userService.GetAsync(id);
-			if (user == null)
+			var result = await _userService.GetByTokenAsync(id);
+			if (result == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
 			}
 
-			await _userService.SignInAsync(user);
+			result.ConfirmationToken = Guid.Empty;
+			await _userService.UpdateAsync(result);
+
+			result = await _userService.SignInAsync(result);
+			if (result == null)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+			}
 
 			return RedirectToAction("ChangeProfile", "Profile");
 		}

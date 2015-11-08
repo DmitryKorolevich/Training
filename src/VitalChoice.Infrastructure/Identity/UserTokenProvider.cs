@@ -24,12 +24,11 @@ namespace VitalChoice.Infrastructure.Identity
 	    public async Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser> manager, ApplicationUser user)
 	    {
 		    user.TokenExpirationDate = DateTime.Now.AddDays(appOptions.Value.ActivationTokenExpirationTermDays);
-            //if (purpose != IdentityConstants.ForgotPasswordResetPurpose)
-            //{
-            //    user.IsConfirmed = false;
-            //}
-            user.IsConfirmed = false;
-            user.ConfirmationToken = Guid.NewGuid();
+			if (purpose != IdentityConstants.ForgotPasswordResetPurpose && purpose != IdentityConstants.CustomerLoginPurpose)
+			{
+				user.IsConfirmed = false;
+			}
+			user.ConfirmationToken = Guid.NewGuid();
 
 		    var result = await manager.UpdateAsync(user);
 		    if (!result.Succeeded)
