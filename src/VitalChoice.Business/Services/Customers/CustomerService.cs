@@ -44,6 +44,7 @@ using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -51,7 +52,7 @@ namespace VitalChoice.Business.Services.Customers
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
-        private readonly DynamicFilterCallExpressionVisitor _queryVisitor;
+        private readonly DynamicExpressionVisitor _queryVisitor;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
@@ -74,7 +75,7 @@ namespace VitalChoice.Business.Services.Customers
 			IOptions<AppOptions> appOptions,
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, queryVisitor)

@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
             : base(mapper, promotionRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService,
                 loggerProvider, queryVisitor)
         {

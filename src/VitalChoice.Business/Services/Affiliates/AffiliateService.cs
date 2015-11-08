@@ -74,7 +74,7 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, DynamicFilterCallExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)

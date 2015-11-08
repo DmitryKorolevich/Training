@@ -10,37 +10,37 @@ namespace VitalChoice.DynamicData.Extensions
 {
     public static class DynamicEntityFilterExtension
     {
-        public static bool When<TEntity, T>(this TEntity entity, T filter)
+        public static bool WhenValues<TEntity, T>(this TEntity entity, T filter)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool When<TEntity, T>(this TEntity entity, T filter, int? idObjectType)
+        public static bool WhenValues<TEntity, T>(this TEntity entity, T filter, int? idObjectType)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenAny<TEntity, T>(this ICollection<TEntity> entity, T filter)
+        public static bool WhenValuesAny<TEntity, T>(this ICollection<TEntity> entity, T filter)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenAny<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
+        public static bool WhenValuesAny<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenAll<TEntity, T>(this ICollection<TEntity> entity, T filter)
+        public static bool WhenValuesAll<TEntity, T>(this ICollection<TEntity> entity, T filter)
             where TEntity : DynamicDataEntity
         {
             return true;
         }
 
-        public static bool WhenAll<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
+        public static bool WhenValuesAll<TEntity, T>(this ICollection<TEntity> entity, T filter, int? idObjectType)
             where TEntity : DynamicDataEntity
         {
             return true;
