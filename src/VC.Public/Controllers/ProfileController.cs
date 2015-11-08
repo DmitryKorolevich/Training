@@ -474,28 +474,24 @@ namespace VC.Public.Controllers
 		{
 			var internalId = GetInternalCustomerId();
 
-			var favorites = await _productService.GetCustomerFavoritesAsync(new VCustomerFavoritesFilter()
+			var filter = new VCustomerFavoritesFilter()
 			{
 				IdCustomer = internalId,
 				Paging = new Paging()
 				{
 					PageIndex = 0,
-					PageItemCount = all ? 10000 : ProductConstants.DEFAULT_FAVORITES_COUNT
+					PageItemCount = all ? ProductConstants.MAX_FAVORITES_COUNT : ProductConstants.DEFAULT_FAVORITES_COUNT
 				}
-			});
+			};
 
-			var model = new List<FavoriteModel>();
-			foreach (var favorite in favorites.Items)
+			var favorites = await _productService.GetCustomerFavoritesAsync(filter);
+
+			var model = favorites.Items.Select(favorite => new FavoriteModel()
 			{
-				var favoriteModel = new FavoriteModel()
-				{
-					ProductName = favorite.ProductName,
-					ProductThumbnail = favorite.ProductThumbnail,
-					Url = favorite.Url
-				};
+				ProductName = favorite.ProductName, ProductThumbnail = favorite.ProductThumbnail, Url = favorite.Url
+			}).ToList();
 
-				model.Add(favoriteModel);
-			}
+			ViewBag.MoreExist = !all && favorites.Count > filter.Paging.PageItemCount;
 
 			return View(model);
 		}

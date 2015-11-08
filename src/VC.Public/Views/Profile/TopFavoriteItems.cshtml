@@ -11,19 +11,22 @@
 	<div class="right-pane clean-indent">
 		<div class="border-form-left">
 		<h4>Top Favorite Items</h4>
-		<section class="top-favorites">
-			<div class="top-favorites-selection-container">
-				@foreach (var item in Model)
-				{
+			<section class="top-favorites">
+				<div class="top-favorites-selection-container">
+					@foreach (var item in Model)
 					{
-						<a href="@item.Url" title="@item.ProductName">
-							<img src="@item.ProductThumbnail" alt="@item.ProductName">@item.ProductName
-						</a>
+						{
+							<a href="@item.Url" title="@item.ProductName">
+								<img src="@item.ProductThumbnail" alt="@item.ProductName">@item.ProductName
+							</a>
+						}
 					}
-				}
-			</div>
-		</section>
-		@Html.ActionLink("View All Purchases", "TopFavoriteItems", new {all = true}, new {@class = "centered-horizontal bold margin-top-medium"})
+				</div>
+			</section>
+			@if (ViewBag.MoreExist)
+			{
+				@Html.ActionLink("View All Purchases", "TopFavoriteItems", new { all = true }, new { @class = "button yellow favorites-centered-button margin-top-medium" })
+			}
 		</div>
 	</div>
 </div>
