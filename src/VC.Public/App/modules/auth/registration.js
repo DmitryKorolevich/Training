@@ -43,6 +43,8 @@ function populateStates(result) {
 		var idState = $("#hdState").val();
 		if (idState) {
 			$("#ddState").val(idState);
+		} else {
+			$("#ddState").prepend($('<option disabled="disabled" selected="selected"></option>').html(""));
 		}
 	} else {
 		$("#txtState").closest(".form-group").show();

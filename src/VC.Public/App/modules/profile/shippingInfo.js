@@ -89,6 +89,9 @@ $(function () {
 					});
 
 					populateAddressesSelection(shippingAddresses, true);
+					if ($("#ddShippingAddressesSelection").val() != "") {
+						changeSelection($("#ddShippingAddressesSelection").val());
+					}
 
 					notifySuccess("Successfully deleted");
 				} else {

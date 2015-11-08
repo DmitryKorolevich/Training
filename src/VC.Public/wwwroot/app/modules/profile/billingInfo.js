@@ -79,6 +79,8 @@ $(function () {
 
 					if (!creditCards || creditCards.length < 1) {
 						$("#addNew").trigger("click");
+					} else if ($("#ddCreditCardsSelection").val() != "") {
+						changeSelection($("#ddCreditCardsSelection").val());
 					}
 
 					notifySuccess("Successfully deleted");
