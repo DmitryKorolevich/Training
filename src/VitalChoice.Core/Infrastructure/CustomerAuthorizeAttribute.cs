@@ -43,22 +43,12 @@ namespace VitalChoice.Core.Infrastructure
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)
 		{
-			//if (HasAllowAnonymous(context))
-			//{
-			//	return;
-			//}
-
 			var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
 
 			var claimUser = context.HttpContext.User;
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
 			if (result)
 			{
-				//if (_roles == null || !_roles.Any())
-				//{
-				//	return;
-				//}
-
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
 				{
 					var customerRoles =
