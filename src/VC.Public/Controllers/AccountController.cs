@@ -141,15 +141,14 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
 			}
 
-			customer.Email = model.Email;
 			customer.StatusCode = (int) CustomerStatus.Active;
 			customer.IdEditedBy = null;
 
 			await _customerService.UpdateAsync(customer, model.Password);
 
-			await _userService.SendSuccessfulRegistration(model.Email, user.FirstName, user.LastName);
+			await _userService.SendSuccessfulRegistration(customer.Email, user.FirstName, user.LastName);
 
-			return await Login(new LoginModel() {Email = model.Email, Password = model.Password}, string.Empty);
+			return await Login(new LoginModel() {Email = customer.Email, Password = model.Password}, string.Empty);
 		}
 
 		[HttpGet]

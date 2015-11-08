@@ -72,7 +72,6 @@ namespace VC.Admin.Controllers
 
 			user.FirstName = model.FirstName;
 			user.LastName = model.LastName;
-			user.Email = model.Email;
 			user.IsConfirmed = true;
 			user.Status = UserStatus.Active;
 

@@ -1,4 +1,5 @@
 ﻿@using System.Threading.Tasks
+@using VC.Public.Helpers
 @using VC.Public.Models.Auth
 @model CreateAccountModel
 
@@ -10,6 +11,7 @@
 	@using (Html.BeginForm("Activate", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
 	{
 		@Html.HiddenFor(m => m.PublicId)
+		@Html.HiddenFor(x => x.Email)
 		@Html.AntiForgeryToken()
 		<h4>Create Password For Online Account Access</h4>
 		<span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character and 1 special character.<br />Example: Dontuse!#1</span>
@@ -17,8 +19,7 @@
 		<div class="form-group">
 			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
 			<div class="input-group">
-				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.Email, "")
+				<label class="form-control-static">@Html.DisplayForEx(m => m.Email)</label>
 			</div>
 		</div>
 		<div class="form-group">

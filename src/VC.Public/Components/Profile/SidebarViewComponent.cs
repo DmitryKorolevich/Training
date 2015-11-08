@@ -37,7 +37,8 @@ namespace VC.Public.Components.Profile
 			return View("Sidebar", new SidebarModel()
 			{
 				FirstName = user.FirstName,
-				LastName = user.LastName
+				LastName = user.LastName,
+				Id = user.Id
 			});
 		}
 	}
