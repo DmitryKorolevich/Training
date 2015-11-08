@@ -29,7 +29,14 @@ namespace VitalChoice.Business.Services.Users
 {
 	public class StorefrontUserService : UserService, IStorefrontUserService
 	{
-		public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IDataContextAsync context, SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService, INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync, IUserValidator<ApplicationUser> userValidator) : base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator)
+		public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
+			IDataContextAsync context, SignInManager<ApplicationUser> signInManager,
+			IAppInfrastructureService appInfrastructureService, INotificationService notificationService,
+			IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
+			IUserValidator<ApplicationUser> userValidator)
+			: base(
+				userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options,
+				ecommerceRepositoryAsync, userValidator)
 		{
 		}
 
@@ -45,32 +52,36 @@ namespace VitalChoice.Business.Services.Users
 
 		protected override async Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
 		{
-			await NotificationService.SendAdminPasswordResetAsync(dbUser.Email, new PasswordReset() //for now email template is the same as for admin
-			{
-				FirstName = dbUser.FirstName,
-				LastName = dbUser.LastName,
-				Link = $"{Options.PublicHost}account/resetpassword/{token}"
-			});
+			await
+				NotificationService.SendAdminPasswordResetAsync(dbUser.Email,
+					new PasswordReset() //for now email template is the same as for admin
+					{
+						FirstName = dbUser.FirstName,
+						LastName = dbUser.LastName,
+						Link = $"{Options.PublicHost}account/resetpassword/{token}"
+					});
 		}
 
-        protected override async Task SendForgotPasswordInternalAsync(ApplicationUser dbUser, string token)
-        {
-            await NotificationService.SendUserPasswordForgotAsync(dbUser.Email, new PasswordReset() //for now email template is the same as for admin
-            {
-                FirstName = dbUser.FirstName,
-                LastName = dbUser.LastName,
-                Link = $"{Options.PublicHost}account/resetpassword/{token}"
-            });
-        }
+		protected override async Task SendForgotPasswordInternalAsync(ApplicationUser dbUser, string token)
+		{
+			await
+				NotificationService.SendUserPasswordForgotAsync(dbUser.Email,
+					new PasswordReset() //for now email template is the same as for admin
+					{
+						FirstName = dbUser.FirstName,
+						LastName = dbUser.LastName,
+						Link = $"{Options.PublicHost}account/resetpassword/{token}"
+					});
+		}
 
-        protected override void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles)
+		protected override void ValidateRoleAssignments(ApplicationUser dbUser, IList<RoleType> roles)
 		{
 			if (roles == null || !roles.Any())
 			{
 				return;
 			}
 
-			var ids = roles.Select(x => (int)x).ToList();
+			var ids = roles.Select(x => (int) x).ToList();
 			if (RoleManager.Roles.Any(x => x.IdUserType != UserType.Customer && ids.Contains(x.Id)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToAssignWrongRole]);
@@ -79,9 +90,10 @@ namespace VitalChoice.Business.Services.Users
 
 		protected override Task ValidateUserInternalAsync(ApplicationUser user)
 		{
-			if (user.IdUserType!= UserType.Customer)
+			if (user.IdUserType != UserType.Customer)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToUpdateUsingWrongService]);
+				throw new AppValidationException(
+					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToUpdateUsingWrongService]);
 			}
 
 			return base.ValidateUserInternalAsync(user);
@@ -95,6 +107,18 @@ namespace VitalChoice.Business.Services.Users
 				LastName = lastName,
 				ProfileLink = $"{Options.PublicHost}profile/index"
 			});
+		}
+
+		public async Task<string> GenerateLoginTokenAsync(Guid publicId)
+		{
+			var user = await GetAsync(publicId);
+
+			var token =
+				await
+					UserManager.GenerateUserTokenAsync(user, IdentityConstants.TokenProviderName,
+						IdentityConstants.CustomerLoginPurpose);
+
+			return token;
 		}
 	}
 }

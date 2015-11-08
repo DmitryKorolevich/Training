@@ -3,11 +3,12 @@
 angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 	.controller('addEditCustomerController', [
 		'$scope', '$injector', '$filter', 'customerService', 'toaster', 'promiseTracker', '$rootScope', '$q',
-		'$state', '$stateParams', 'customerEditService',
-		function ($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService) {
+		'$state', '$stateParams', 'customerEditService', '$window',
+		function($scope, $injector, $filter, customerService, toaster, promiseTracker, $rootScope, $q, $state, $stateParams, customerEditService, $window) {
 			$scope.addEditTracker = promiseTracker("addEdit");
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
+			$scope.loginAsCustomerTracker = promiseTracker("loginAsCustomer");
 
 			function refreshHistory()
 			{
@@ -404,6 +405,28 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					}).error(function () {
 						toaster.pop('error', "Error!", "Server error occured");
 					});
+			};
+
+			$scope.loginAsCustomer = function() {
+				customerService.loginAsCustomer($scope.currentCustomer.PublicUserId, $scope.loginAsCustomerTracker)
+					.success(function (result) {
+						if (result.Success) {
+							$window.open($rootScope.ReferenceData.PublicHost + "Account/LoginAsCustomer/" + result.Data);
+							return;
+						} else {
+							var messages = "";
+							if (result.Messages) {
+								$.each(result.Messages, function (index, value) {
+									messages += value.Message + "<br />";
+								});
+							}
+							toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+						}
+					}).error(function () {
+						toaster.pop('error', "Error!", "Server error occured");
+					});
+
+				return;
 			};
 
 			initialize();

@@ -47,6 +47,10 @@ namespace VC.Admin.Controllers
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
 			}
+			if (result.IsConfirmed)
+			{
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserAlreadyConfirmed]);
+			}
 
 			return new ActivateUserModel()
 			{
@@ -74,6 +78,7 @@ namespace VC.Admin.Controllers
 			user.LastName = model.LastName;
 			user.IsConfirmed = true;
 			user.Status = UserStatus.Active;
+			user.ConfirmationToken = Guid.Empty;
 
 			await userService.UpdateAsync(user, null, model.Password);
 

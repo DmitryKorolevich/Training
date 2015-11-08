@@ -940,7 +940,8 @@ footer {
   color: #086bfc;
 }
 .working-area-holder input[type=submit],
-.working-area-holder input[type=button] {
+.working-area-holder input[type=button],
+.working-area-holder a.button {
   border-radius: 3px;
   font-size: 13px;
   background-color: #F7F7F7;
@@ -954,21 +955,26 @@ footer {
   padding: 7px 12px;
   color: #000;
   margin-right: 10px;
+  text-decoration: none;
 }
 .working-area-holder input[type=submit]:hover,
-.working-area-holder input[type=button]:hover {
+.working-area-holder input[type=button]:hover,
+.working-area-holder a.button:hover {
   background-color: #E8E8E8;
 }
 .working-area-holder input[type=submit].yellow,
-.working-area-holder input[type=button].yellow {
+.working-area-holder input[type=button].yellow,
+.working-area-holder a.button.yellow {
   background-color: #FFFF99;
 }
 .working-area-holder input[type=submit].yellow:hover,
-.working-area-holder input[type=button].yellow:hover {
+.working-area-holder input[type=button].yellow:hover,
+.working-area-holder a.button.yellow:hover {
   background-color: #FFE03C;
 }
 .working-area-holder input[type=submit].red:hover,
-.working-area-holder input[type=button].red:hover {
+.working-area-holder input[type=button].red:hover,
+.working-area-holder a.button.red:hover {
   background-color: #FFBFBF;
 }
 .working-area-holder input[type=submit].inline-button,
@@ -989,7 +995,7 @@ footer {
   padding-right: 15px;
   width: 723px;
   margin-bottom: 50px;
-  min-height: 310px;
+  min-height: 360px;
 }
 .border-form-left .form-control-important-info {
   width: auto;
@@ -1205,13 +1211,13 @@ footer {
   overflow: hidden;
   max-width: 460px;
   display: block;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
-  line-height: 14px;
+  line-height: 13px;
 }
 .last-order-lines .sku-code {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 10px;
   max-width: 460px;
 }
@@ -1250,6 +1256,9 @@ footer {
 .centered-horizontal {
   text-align: center;
   display: block;
+}
+.favorites-centered-button {
+  margin-left: 292px;
 }
 .bold {
   font-weight: bold;

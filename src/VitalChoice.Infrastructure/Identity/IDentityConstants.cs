@@ -18,6 +18,10 @@ namespace VitalChoice.Infrastructure.Identity
 
         public const string ForgotPasswordResetPurpose = "ForgotPasswordReset";
 
+        public const string PasswordResetPurpose = "PasswordReset";
+
+        public const string CustomerLoginPurpose = "CustomerLoginPurpose";
+
         public const string TokenProviderName = "Default";
     }
 }

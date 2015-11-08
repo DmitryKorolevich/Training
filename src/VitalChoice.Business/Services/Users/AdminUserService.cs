@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Services.Users
 				.Text.Normalize());
 		}
 
-		protected async override Task SendActivationInternalAsync(ApplicationUser dbUser)
+		protected override async Task SendActivationInternalAsync(ApplicationUser dbUser)
 		{
 			await NotificationService.SendAdminUserActivationAsync(dbUser.Email, new UserActivation()
 			{
@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Users
 			});
 		}
 
-		protected async override Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
+		protected override async Task SendResetPasswordInternalAsync(ApplicationUser dbUser, string token)
 		{
 			await NotificationService.SendAdminPasswordResetAsync(dbUser.Email, new PasswordReset()
 			{
@@ -60,7 +60,7 @@ namespace VitalChoice.Business.Services.Users
 			});
 		}
 
-        protected async override Task SendForgotPasswordInternalAsync(ApplicationUser dbUser, string token)
+        protected override async Task SendForgotPasswordInternalAsync(ApplicationUser dbUser, string token)
         {
             await NotificationService.SendAdminPasswordResetAsync(dbUser.Email, new PasswordReset()
             {
