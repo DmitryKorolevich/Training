@@ -31,10 +31,10 @@ namespace VitalChoice.Business.Services.Dynamic
             get { return c => c.IdSku; }
         }
 
-        public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
-        {
-            throw new ApiException("Cannot get sku option types as they inherited from product, please provide types with entity or as parameter");
-        }
+        //public override IQueryOptionType<ProductOptionType> GetOptionTypeQuery()
+        //{
+        //    throw new ApiException("Cannot get sku option types as they inherited from product, please provide types with entity or as parameter");
+        //}
 
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items, bool withDefaults = false)
         {

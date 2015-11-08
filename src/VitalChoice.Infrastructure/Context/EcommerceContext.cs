@@ -377,6 +377,8 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<ProductOptionValue>().HasKey(o => o.Id);
             builder.Entity<ProductOptionValue>().ToTable("ProductOptionValues");
+            builder.Entity<ProductOptionValue>().Property(v => v.IdProduct).IsRequired(false);
+            builder.Entity<ProductOptionValue>().Property(v => v.IdSku).IsRequired(false);
             builder.Entity<ProductOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
@@ -400,9 +402,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Sku>()
                 .HasMany(s => s.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdSku)
-                .PrincipalKey(s => s.Id)
-                .Required(false);
+                .ForeignKey(o => o.IdSku).Required(false)
+                .PrincipalKey(s => s.Id);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
             builder.Entity<Sku>().Ignore(p => p.EditedBy);
             builder.Entity<Sku>().Ignore(p => p.IdEditedBy);
@@ -422,9 +423,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Product>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdProduct)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .ForeignKey(o => o.IdProduct).Required(false)
+                .PrincipalKey(p => p.Id);
             builder.Entity<Product>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()

@@ -6,9 +6,11 @@ using Autofac.Features.Indexed;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -42,6 +44,12 @@ namespace VitalChoice.DynamicData.Base
             if (conditionExpression == null)
                 return Expression.Constant(true);
 
+            if (parameter is ParameterExpression)
+            {
+                var parameterRewriter = new SwapVisitor(conditionExpression.Parameters[0], parameter);
+                var result = parameterRewriter.Visit(conditionExpression);
+                return Expression.Invoke(result, parameter);
+            }
             return Expression.Invoke(conditionExpression, parameter);
         }
 
@@ -58,6 +66,12 @@ namespace VitalChoice.DynamicData.Base
             if (conditionExpression == null)
                 return Expression.Constant(true);
 
+            if (parameter is ParameterExpression)
+            {
+                var parameterRewriter = new SwapVisitor(conditionExpression.Parameters[0], parameter);
+                var result = parameterRewriter.Visit(conditionExpression);
+                return Expression.Invoke(result, parameter);
+            }
             return Expression.Invoke(conditionExpression, parameter);
         }
 
@@ -93,7 +107,8 @@ namespace VitalChoice.DynamicData.Base
             return BuildCollectionExpression(parameter, all, conditionExpression);
         }
 
-        private static Expression BuildCollectionExpression(Expression parameter, bool all, Expression<Func<TEntity, bool>> conditionExpression)
+        private static Expression BuildCollectionExpression(Expression parameter, bool all,
+            Expression<Func<TEntity, bool>> conditionExpression)
         {
             Expression<Func<ICollection<TEntity>, Func<TEntity, bool>, bool>> filterExpression;
             if (all)
@@ -105,6 +120,12 @@ namespace VitalChoice.DynamicData.Base
                 filterExpression = (x, f) => x.Any(f);
             }
 
+            if (parameter is ParameterExpression)
+            {
+                var filterRewriter = new SwapVisitor(filterExpression.Parameters[0], parameter);
+                var filter = filterRewriter.Visit(filterExpression);
+                return Expression.Invoke(filter, parameter, conditionExpression);
+            }
             return Expression.Invoke(filterExpression, parameter, conditionExpression);
         }
 
@@ -223,6 +244,20 @@ namespace VitalChoice.DynamicData.Base
             }
 
             return result;
+        }
+
+        private class SwapVisitor : ExpressionVisitor
+        {
+            private readonly Expression _from, _to;
+            public SwapVisitor(Expression from, Expression to)
+            {
+                _from = from;
+                _to = to;
+            }
+            public override Expression Visit(Expression node)
+            {
+                return node == _from ? _to : base.Visit(node);
+            }
         }
 
         private struct OptionValueItem<T>
