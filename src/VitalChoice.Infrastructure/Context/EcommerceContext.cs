@@ -68,6 +68,8 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Base
 
+            builder.Entity<CountModel>().HasKey(f => f.Count);
+
             builder.Entity<FieldTypeEntity>().HasKey(f => f.Id);
             builder.Entity<FieldTypeEntity>().ToTable("FieldTypes");
 
@@ -1115,6 +1117,11 @@ namespace VitalChoice.Infrastructure.Context
                     .ForeignKey<AffiliateOrderPayment>(p=>p.Id)
                     .PrincipalKey<Order>(p => p.Id)
                     .Required();
+                entity.HasOne(p => p.Affiliate)
+                    .WithMany()
+                    .ForeignKey(p => p.IdAffiliate)
+                    .PrincipalKey(p => p.Id)
+                    .Required();
             });
 
             builder.Entity<AffiliatePayment>(entity =>
@@ -1133,6 +1140,8 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VCustomersInAffiliates");
             });
+
+            builder.Entity<AffiliateSummaryReportModel>().HasKey(f => f.IdType);
 
             #endregion
 

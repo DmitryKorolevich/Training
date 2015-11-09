@@ -20,3 +20,5 @@ Post-Deployment Script Template
 :r .\Scripts\VHelpTickets.sql
 :r .\Scripts\PromotionData.sql
 :r .\Scripts\VCustomers.sql
+:r .\Scripts\SPGetEngangedAffiliatesCount.sql
+:r .\Scripts\SPGetAffiliatesSummaryReport.sql

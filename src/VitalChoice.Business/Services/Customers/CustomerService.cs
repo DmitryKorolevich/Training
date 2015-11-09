@@ -45,6 +45,7 @@ using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
+using VitalChoice.Business.Queries.Affiliate;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -59,7 +60,8 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
 	    private readonly IStorefrontUserService _storefrontUserService;
-	    private readonly IOptions<AppOptions> _appOptions;
+        private readonly IEcommerceRepositoryAsync<Affiliate> _affiliateRepositoryAsync;
+        private readonly IOptions<AppOptions> _appOptions;
 
 		private static string _customerContainerName;
 
@@ -75,6 +77,7 @@ namespace VitalChoice.Business.Services.Customers
 			IOptions<AppOptions> appOptions,
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
+            IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
             ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
             : base(
                 customerMapper, customerRepositoryAsync,
@@ -90,7 +93,8 @@ namespace VitalChoice.Business.Services.Customers
 		    _customerContainerName = appOptions.Value.AzureStorage.CustomerContainerName;
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
-	        _queryVisitor = queryVisitor;
+            _affiliateRepositoryAsync = affiliateRepositoryAsync;
+            _queryVisitor = queryVisitor;
         }
 
 		private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
@@ -267,6 +271,16 @@ namespace VitalChoice.Business.Services.Customers
 				throw new AppValidationException(
 					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
 			}
+
+            if(model.IdAffiliate.HasValue)
+            {
+                AffiliateQuery conditions = new AffiliateQuery().NotDeleted().WithDirectId(model.IdAffiliate.Value);
+                var exist = await _affiliateRepositoryAsync.Query(conditions).SelectAnyAsync();
+                if(!exist)
+                {
+                    throw new AppValidationException("IdAffiliate",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
+                }
+            }
 
 			return errors;
 		}

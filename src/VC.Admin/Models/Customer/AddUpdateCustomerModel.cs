@@ -28,7 +28,10 @@ namespace VC.Admin.Models.Customer
 
 		public Guid PublicUserId { get; set; }
 
-		[Map]
+        [Map]
+        public int? IdAffiliate { get; set; }
+
+        [Map]
 		public int StatusCode { get; set; }
 
 		[Map]
@@ -57,9 +60,6 @@ namespace VC.Admin.Models.Customer
 
 		[Map]
 		public DateTime? InceptionDate { get; set; }
-
-		[Map]
-		public string LinkedToAffiliate { get; set; }
 
 		[Map]
 		public string Email { get; set; }

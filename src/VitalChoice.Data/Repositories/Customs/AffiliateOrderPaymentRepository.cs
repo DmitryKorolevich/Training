@@ -18,7 +18,8 @@ namespace VitalChoice.Data.Repositories.Customs
 {
     public class AffiliateOrderPaymentRepository : EcommerceRepositoryAsync<AffiliateOrderPayment>
     {
-        public AffiliateOrderPaymentRepository(IDataContextAsync context) : base(context)
+        public AffiliateOrderPaymentRepository(
+            IDataContextAsync context) : base(context)
 		{
         }
 
@@ -47,6 +48,18 @@ namespace VitalChoice.Data.Repositories.Customs
             });
             var toReturn = groups.ToDictionary(p => p.IdCustomer, x => x.Count);
 
+            return toReturn;
+        }
+
+        public async Task<int> GetEngangedAffiliates()
+        {
+            var result = (Context as DbContext).Set<CountModel>().FromSql("[dbo].[SPGetEngangedAffiliatesCount]").FirstOrDefault();
+            return result.Count;
+        }
+
+        public async Task<ICollection<AffiliateSummaryReportModel>> GetAffiliatesSummaryReport(DateTime from,DateTime to)
+        {
+            var toReturn = (Context as DbContext).Set<AffiliateSummaryReportModel>().FromSql("[dbo].[SPGetAffiliatesSummaryReport]").ToList();
             return toReturn;
         }
     }

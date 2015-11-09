@@ -74,6 +74,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.Email = dynamic.Email;
 				entity.PublicId = dynamic.PublicId;
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
+                entity.IdAffiliate = dynamic.IdAffiliate;
 
                 entity.PaymentMethods.Merge(dynamic.ApprovedPaymentMethods, (method, i) => method.IdPaymentMethod != i,
                     c => new CustomerToPaymentMethod

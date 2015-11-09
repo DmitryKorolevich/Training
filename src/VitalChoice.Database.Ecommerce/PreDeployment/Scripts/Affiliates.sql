@@ -210,3 +210,19 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS (SELECT object_id FROM sys.foreign_keys WHERE name='FK_Customers_Affiliates' AND parent_object_id = object_id('Customers'))
+BEGIN
+
+ALTER TABLE dbo.Customers ADD CONSTRAINT
+	FK_Customers_Affiliates FOREIGN KEY
+	(
+	IdAffiliate
+	) REFERENCES dbo.Affiliates
+	(
+	Id
+	)
+
+END
+
+GO
