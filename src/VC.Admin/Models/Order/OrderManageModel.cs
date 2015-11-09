@@ -234,6 +234,9 @@ namespace VC.Admin.Models.Order
         public decimal Total { get; set; }
 
         [Map]
+        public bool IgnoneMinimumPerishableThreshold { get; set; }
+
+        [Map]
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
         [Map]

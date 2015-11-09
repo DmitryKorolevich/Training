@@ -1,4 +1,5 @@
 ﻿@using System.Threading.Tasks
+@using VC.Public.Helpers
 @using VC.Public.Models.Auth
 @using VitalChoice.Interfaces.Services.Settings
 @model RegisterAccountModel
@@ -16,6 +17,8 @@
 <div class="working-area-holder">
 	@using (Html.BeginForm("RegisterAccount", "Account", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
 	{
+		<input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
+		<input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
 		@Html.HiddenFor(m => m.Email)
 		@Html.AntiForgeryToken()
 		<h4>Register a New Account</h4>

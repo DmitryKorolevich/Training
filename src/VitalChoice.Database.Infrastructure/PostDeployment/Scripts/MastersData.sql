@@ -460,3 +460,213 @@ BEGIN
 WHERE [Name] = 'Product sub categories'
 
 END
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<layout> -> (ProductCategory)%' AND [Name] = 'Product sub categories')
+BEGIN
+	IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name] = 'Product sub categories')
+	BEGIN
+		SET IDENTITY_INSERT [dbo].[MasterContentItems] ON
+
+		INSERT [dbo].[MasterContentItems] ([Id], [Name], [TypeId], [Template], [Created], [Updated], [StatusCode], [UserId])
+		VALUES
+	(14, 'Product sub categories', 9, N'@using() {{VitalChoice.Domain.Transfer.TemplateModels}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<menu_sidebar>
+{{
+	<ul class="category-sidebar">
+	    @list(SideMenuItems)
+        {{
+            <li>
+			     @if(@model.SubItems.Count > 0):param() {{
+			        <a href="#" title="@(Label)">
+				        @(Label)
+			        </a>
+		            <ul>
+		                    @list(SubItems)
+                            {{
+                                <li>
+                                    <a href="@(Url)" title="@(Label)">
+                                        @(Label)
+                                    </a>
+                                </li>
+                            }}
+		            </ul>
+		        }}
+		        @if(@model.SubItems.Count == 0):param(){{
+		            <a href="@(Url)" title="@(Label)">
+				        @(Label)
+			        </a>
+		        }}
+			</li>
+        }}
+		<li><a href="#">Top Sellers</a></li>
+		<li><a href="#">Special Offers</a></li>
+		<li><a href="#">New Products</a></li>
+	</ul>
+}}
+
+<category_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
+        {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            @if(@model != chained.Last()){{
+                <img src="/assets/images/breadarrow2.jpg">
+            }}
+        }}
+	</div>
+}}
+
+<category_top>
+{{
+	@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)):param() {{
+	    <img src="@(FileImageLargeUrl)">
+	    <br>
+	}}
+	@(LongDescription)
+}}
+
+<category_article>
+{{
+    @(LongDescriptionBottom)
+}}
+
+<layout> -> (ProductCategory)
+{{
+<aside id="menuSidebar" class="category-aside">
+    @menu_sidebar()
+</aside>
+<section class="category-main">
+	@category_breadcrumb()
+	<div class="category-top">
+	    @category_top()
+	</div>
+	<div class="categories-selection-container">
+	    @list(SubCategories)
+        {{
+			<a href="@(Url)" title="@(Name)">
+				<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+			</a>
+        }}
+        @list(Products)
+        {{
+			<a href="/product/@(Url)" title="@(Name)">
+				<img src="@(Thumbnail)" alt="@(Name)">@(Name)
+			</a>
+        }}
+	</div>
+	<article class="category-article">
+	    @category_article()
+	</article>
+</section>
+}}:: TtlCategoryModel 
+%>', GETDATE(), GETDATE(),2, NULL)
+
+		SET IDENTITY_INSERT [dbo].[MasterContentItems] OFF
+	END
+	ELSE
+	BEGIN
+		UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<menu_sidebar>
+{{
+	<ul class="category-sidebar">
+	    @list(SideMenuItems)
+        {{
+            <li>
+			     @if(@model.SubItems.Count > 0):param() {{
+			        <a href="#" title="@(Label)">
+				        @(Label)
+			        </a>
+		            <ul>
+		                    @list(SubItems)
+                            {{
+                                <li>
+                                    <a href="@(Url)" title="@(Label)">
+                                        @(Label)
+                                    </a>
+                                </li>
+                            }}
+		            </ul>
+		        }}
+		        @if(@model.SubItems.Count == 0):param(){{
+		            <a href="@(Url)" title="@(Label)">
+				        @(Label)
+			        </a>
+		        }}
+			</li>
+        }}
+		<li><a href="#">Top Sellers</a></li>
+		<li><a href="#">Special Offers</a></li>
+		<li><a href="#">New Products</a></li>
+	</ul>
+}}
+
+<category_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
+        {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            @if(@model != chained.Last()){{
+                <img src="/assets/images/breadarrow2.jpg">
+            }}
+        }}
+	</div>
+}}
+
+<category_top>
+{{
+	@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)):param() {{
+	    <img src="@(FileImageLargeUrl)">
+	    <br>
+	}}
+	@(LongDescription)
+}}
+
+<category_article>
+{{
+    @(LongDescriptionBottom)
+}}
+
+<layout> -> (ProductCategory)
+{{
+<aside id="menuSidebar" class="category-aside">
+    @menu_sidebar()
+</aside>
+<section class="category-main">
+	@category_breadcrumb()
+	<div class="category-top">
+	    @category_top()
+	</div>
+	<div class="categories-selection-container">
+	    @list(SubCategories)
+        {{
+			<a href="@(Url)" title="@(Name)">
+				<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+			</a>
+        }}
+        @list(Products)
+        {{
+			<a href="/product/@(Url)" title="@(Name)">
+				<img src="@(Thumbnail)" alt="@(Name)">@(Name)
+			</a>
+        }}
+	</div>
+	<article class="category-article">
+	    @category_article()
+	</article>
+</section>
+}}:: TtlCategoryModel 
+%>'
+WHERE [Name] = 'Product sub categories'
+	END
+END

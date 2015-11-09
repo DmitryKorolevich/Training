@@ -32,5 +32,13 @@ namespace VitalChoice.Infrastructure.Identity
 
 			return result;
 		}
+
+	    public override IdentityError InvalidToken()
+	    {
+			var result = base.InvalidToken();
+			result.Description = ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidToken];
+
+			return result;
+		}
     }
 }

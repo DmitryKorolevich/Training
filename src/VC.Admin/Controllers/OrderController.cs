@@ -211,44 +211,47 @@ namespace VC.Admin.Controllers
 
             await _customerService.UpdateAsync(item.Customer);
 
-            var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
-            if (model.Id > 0)
+            if (item.OrderStatus != OrderStatus.Cancelled && item.OrderStatus != OrderStatus.Exported && item.OrderStatus != OrderStatus.Shipped)
             {
-                var dbItem = (await _orderService.SelectAsync(item.Id));
-                if(dbItem!=null && dbItem.DictionaryData.ContainsKey("OrderType"))
+                var orderType = item.Data.MailOrder ? (int?)SourceOrderType.MailOrder : null;
+                if (model.Id > 0)
                 {
-                    if (dbItem.Data.OrderType == (int?)SourceOrderType.MailOrder)
+                    var dbItem = (await _orderService.SelectAsync(item.Id));
+                    if (dbItem != null && dbItem.DictionaryData.ContainsKey("OrderType"))
                     {
-                        if (!orderType.HasValue)
+                        if (dbItem.Data.OrderType == (int?)SourceOrderType.MailOrder)
                         {
-                            orderType = (int)SourceOrderType.Phone;
+                            if (!orderType.HasValue)
+                            {
+                                orderType = (int)SourceOrderType.Phone;
+                            }
+                            item.Data.OrderType = orderType.Value;
                         }
-                        item.Data.OrderType = orderType.Value;
+                        else
+                        {
+                            item.Data.OrderType = orderType ?? dbItem.Data.OrderType;
+                        }
                     }
                     else
                     {
-                        item.Data.OrderType = orderType ?? dbItem.Data.OrderType;
+                        item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
+                    await _orderService.CalculateOrder(item);
+                    item = await _orderService.UpdateAsync(item);
                 }
                 else
                 {
-                    item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
+                    if (!orderType.HasValue)
+                    {
+                        orderType = (int)SourceOrderType.Phone;
+                    }
+                    item.Data.OrderType = orderType.Value;
+                    item.ShippingAddress.Id = 0;
+                    item.PaymentMethod.Address.Id = 0;
+                    item.PaymentMethod.Id = 0;
+                    await _orderService.CalculateOrder(item);
+                    item = await _orderService.InsertAsync(item);
                 }
-                await _orderService.CalculateOrder(item);
-                item = await _orderService.UpdateAsync(item);
-            }
-            else
-            {
-                if (!orderType.HasValue)
-                {
-                    orderType = (int)SourceOrderType.Phone;
-                }
-                item.Data.OrderType = orderType.Value;
-                item.ShippingAddress.Id = 0;
-                item.PaymentMethod.Address.Id = 0;
-                item.PaymentMethod.Id = 0;
-                await _orderService.CalculateOrder(item);
-                item = await _orderService.InsertAsync(item);
             }
 
             OrderManageModel toReturn = _mapper.ToModel<OrderManageModel>(item);

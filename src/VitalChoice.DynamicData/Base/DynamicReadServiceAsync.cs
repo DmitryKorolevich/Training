@@ -80,7 +80,10 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, orderBy);
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
-            await ProcessEntities(new[] {entity}, Mapper.OptionTypes);
+			if (entity != null)
+			{
+				await ProcessEntities(new[] { entity }, Mapper.OptionTypes);
+			}
             return entity;
         }
 

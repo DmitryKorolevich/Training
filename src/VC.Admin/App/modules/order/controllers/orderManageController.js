@@ -175,7 +175,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.autoShipOrderFrequencies = [];
 
         $scope.minimumPerishableThreshold = $rootScope.ReferenceData.AppSettings.GlobalPerishableThreshold;
-        $scope.ignoneMinimumPerishableThreshold = $scope.id ? true : false;//only for a new order
+        $scope.options = {};
+        $scope.options.ignoneMinimumPerishableThreshold = false;
         $scope.orderSources = $rootScope.ReferenceData.OrderSources;
         $scope.orderSourcesCelebrityHealthAdvocate = $rootScope.ReferenceData.OrderSourcesCelebrityHealthAdvocate;
         $scope.orderPreferredShipMethod = $rootScope.ReferenceData.OrderPreferredShipMethod;
@@ -264,6 +265,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     if ($scope.order.ShipDelayDateNP)
                     {
                         $scope.order.ShipDelayDateNP = Date.parseDateTime($scope.order.ShipDelayDateNP);
+                    }
+                    if ($scope.order.IgnoneMinimumPerishableThreshold)
+                    {
+                        $scope.options.ignoneMinimumPerishableThreshold = $scope.order.IgnoneMinimumPerishableThreshold;
                     }
 
                     customerEditService.initBase($scope);
@@ -488,7 +493,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 initOrdersList();
 
-                if ($scope.id || $scope.idOrderSource)
+                if (($scope.id || $scope.idOrderSource) && !$scope.orderEditDisabled)
                 {
                     $scope.requestRecalculate();
                 }
@@ -542,6 +547,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.order.OrderStatus = $scope.oldOrderStatus;
             }
         });
+        $scope.orderEditDisabled = $scope.order.OrderStatus == 3 || $scope.order.OrderStatus == 4
+            || $scope.order.OrderStatus == 5;
 
         $scope.legend.CustomerName = $scope.currentCustomer.ProfileAddress.FirstName + " " + $scope.currentCustomer.ProfileAddress.LastName;
         if ($scope.id)
@@ -877,10 +884,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             {
                 productErrorsExist = true;
             }
-            if ($scope.productsPerishableThresholdIssue && !$scope.ignoneMinimumPerishableThreshold)
+            if ($scope.productsPerishableThresholdIssue && !$scope.options.ignoneMinimumPerishableThreshold)
             {
                 productErrorsExist = true;
             }
+            $scope.order.IgnoneMinimumPerishableThreshold = $scope.productsPerishableThresholdIssue && $scope.options.ignoneMinimumPerishableThreshold;
             angular.forEach($scope.order.SkuOrdereds, function (skuOrdered, index)
             {
                 if (skuOrdered.Messages && skuOrdered.Messages.length != 0)

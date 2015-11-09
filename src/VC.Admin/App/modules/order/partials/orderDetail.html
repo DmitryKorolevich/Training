@@ -37,17 +37,17 @@
                                         <div class="col-md-12">
                                             <div class="options-row form-horizontal">
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" data-ng-model="order.OnHold">Hold Order
+                                                    <input type="checkbox" data-ng-model="order.OnHold" data-ng-disabled="orderEditDisabled">Hold Order
                                                     <i class="fa fa-pause"></i>
                                                 </label>
                                                 <div class="inline-block">
                                                     <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
                                                         <label data-ng-if="autoShipOrderOptionShow" class="checkbox-inline">
-                                                            <input type="checkbox" data-ng-model="order.AutoShip">Auto-Ship Order
+                                                            <input type="checkbox" data-ng-model="order.AutoShip" data-ng-disabled="orderEditDisabled">Auto-Ship Order
                                                             <i class="fa fa-history"></i>
                                                         </label>
                                                         <div data-ng-if="autoShipOrderOptionShow" class="auto-ship-frequency">
-                                                            <select data-ng-if="order.AutoShip" class="form-control" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies" required>
+                                                            <select data-ng-if="order.AutoShip" class="form-control" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies" required data-ng-disabled="orderEditDisabled">
                                                                 <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.AutoShipFrequency.$invalid">
@@ -57,18 +57,18 @@
                                                     </form>
                                                 </div>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" data-ng-model="order.GiftOrder">Gift Order
+                                                    <input type="checkbox" data-ng-model="order.GiftOrder" data-ng-disabled="orderEditDisabled">Gift Order
                                                     <i class="fa fa-gift"></i>
                                                 </label>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" data-ng-model="order.MailOrder">Mail Order
+                                                    <input type="checkbox" data-ng-model="order.MailOrder" data-ng-disabled="orderEditDisabled">Mail Order
                                                     <i class="fa fa-envelope"></i>
                                                 </label>
                                             </div>
                                         </div>
                                         <div class="col-md-12 products-buttons">
-                                            <button data-ng-click="productAdd()" class="btn btn-primary-orange width-160px">Add Product</button>
-                                            <button data-ng-click="topPurchasedProducts()" class="btn btn-info btn-right width-200px">Top Purchased Products</button>
+                                            <button data-ng-click="productAdd()" class="btn btn-primary-orange width-160px" data-ng-if="!orderEditDisabled">Add Product</button>
+                                            <button data-ng-click="topPurchasedProducts()" class="btn btn-info btn-right width-200px" data-ng-if="!orderEditDisabled">Top Purchased Products</button>
                                         </div>
                                         <div class="col-md-12 form-horizontal products">
                                             <table class="table table-striped">
@@ -79,7 +79,7 @@
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
                                                                        typeahead-min-length="1" typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
                                                                        typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
-                                                                       typeahead-wait-ms="100">
+                                                                       typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                         </td>
                                                         <td class="type">
@@ -87,20 +87,20 @@
                                                             <span data-ng-if="item.IdProductType==1" class="not-perishable">NP</span>
                                                         </td>
                                                         <td class="qty">
-                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()">
+                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
                                                         </td>
                                                         <td class="product-name">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
                                                                        typeahead-min-length="1" typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
-                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100">
+                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                         </td>
                                                         <td class="price">
                                                             <div class="col-md-12 padding-0px">
                                                                 <div class="input-group">
                                                                     <span class="input-group-addon">$</span>
-                                                                    <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money min="0.00" max="100000" data-ng-model="item.Price" data-ng-blur="requestRecalculate()">
+                                                                    <input type="text" name="Price{{$index}}" class="form-control" placeholder="Price" money min="0.00" max="100000" data-ng-model="item.Price" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -108,7 +108,7 @@
                                                             <div class="amount">{{item.Amount | currency}}</div>
                                                         </td>
                                                         <td class="del">
-                                                            <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);"><i class="glyphicon glyphicon-remove"></i></a>
+                                                            <a class="btn btn-danger btn-xs" title="Delete" data-ng-click="productDelete($index);" data-ng-disabled="orderEditDisabled" data-ng-if="!orderEditDisabled"><i class="glyphicon glyphicon-remove"></i></a>
                                                         </td>
                                                     </tr>
                                                     <tr class="warning" data-ng-if="item.Messages.length>0">
@@ -121,11 +121,11 @@
                                                             <strong class="message" data-ng-repeat="message in item.ClientMessages">{{message}}</strong>
                                                         </td>
                                                     </tr>
-                                                    <tr class="warning" data-ng-if="productsPerishableThresholdIssue && !ignoneMinimumPerishableThreshold">
+                                                    <tr class="warning" data-ng-if="productsPerishableThresholdIssue && !options.ignoneMinimumPerishableThreshold">
                                                         <td colspan="7">
                                                             <label class="perishable-threshold-message">
                                                                 <strong>{{minimumPerishableThreshold | currency}} minimum perishable threshold not met. Override</strong>
-                                                                <input type="checkbox" data-ng-model="ignoneMinimumPerishableThreshold">
+                                                                <input type="checkbox" data-ng-model="options.ignoneMinimumPerishableThreshold" data-ng-disabled="orderEditDisabled">
                                                             </label>
                                                         </td>
                                                     </tr>
@@ -166,7 +166,7 @@
                                                             <div class="amount">{{item.Amount | currency}}</div>
                                                         </td>
                                                         <td class="enabled">
-                                                            <input type="checkbox" data-ng-model="item.IsEnabled" data-ng-disabled="!item.IsAllowDisable">
+                                                            <input type="checkbox" data-ng-model="item.IsEnabled" data-ng-disabled="!item.IsAllowDisable || orderEditDisabled">
                                                         </td>
                                                     </tr>
                                                     <tr data-ng-repeat-end class="warning" data-ng-if="item.Messages.length>0">
@@ -186,7 +186,7 @@
                                                             <span>{{currentCustomer.SourceValue}}</span>
                                                         </div>
                                                         <div data-ng-if="!currentCustomer.SourceValue" class="col-md-9">
-                                                            <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" data-ng-required="!order.OnHold">
+                                                            <select class="form-control" name="Source" data-ng-model="currentCustomer.Source" ng-options="source.Key as source.Text for source in orderSources" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                                 <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Source.$invalid">
@@ -197,11 +197,11 @@
                                                     <div data-ng-if="!currentCustomer.SourceValue && currentCustomer.Source && (currentCustomer.Source==4 || currentCustomer.Source==10)" class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Details</label>
                                                         <div class="col-md-9">
-                                                            <input data-ng-if="currentCustomer.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="currentCustomer.SourceDetails" data-ng-required="!order.OnHold">
+                                                            <input data-ng-if="currentCustomer.Source==10" name="SourceDetailsText" class="form-control" placeholder="Details" data-ng-model="currentCustomer.SourceDetails" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsText.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.SourceDetailsText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Details")}}</small>
                                                             </div>
-                                                            <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" data-ng-required="!order.OnHold">
+                                                            <select data-ng-if="currentCustomer.Source==4" class="form-control" name="SourceDetailsCelebrity" data-ng-model="currentCustomer.SourceDetails" ng-options="sourceCelebrity.Text as sourceCelebrity.Text for sourceCelebrity in orderSourcesCelebrityHealthAdvocate" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                                 <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.SourceDetailsCelebrity.$invalid">
@@ -212,7 +212,7 @@
                                                     <div data-ng-if="currentCustomer.CustomerType == 2" class="form-group">
                                                         <label for="type" class="col-md-3 control-label">PO#</label>
                                                         <div class="col-md-9">
-                                                            <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold">
+                                                            <input name="PoNumber" class="form-control" placeholder="PO#" data-ng-model="order.PoNumber" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PoNumber.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.PoNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","#PO")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.PoNumber.$error.server">{{serverMessages.GetMessage('PoNumber')}}</small>
@@ -222,7 +222,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Key Code</label>
                                                         <div class="col-md-9">
-                                                            <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" data-ng-required="!order.OnHold">
+                                                            <input name="KeyCode" class="form-control" placeholder="Key Code" data-ng-model="order.KeyCode" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.KeyCode.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Key Code")}}</small>
                                                                 <small class="error" ng-show="forms.mainForm.KeyCode.$error.server">{{serverMessages.GetMessage('KeyCode')}}</small>
@@ -234,16 +234,16 @@
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Ship Delay Order?</label>
                                                         <div class="col-md-12">
-                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio">None</label>
-                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio">Entire Order</label>
-                                                            <label data-ng-if="order.ShouldSplit" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio">Perishable & Non-Perishable</label>
+                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="0" type="radio" data-ng-disabled="orderEditDisabled">None</label>
+                                                            <label class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="1" type="radio" data-ng-disabled="orderEditDisabled">Entire Order</label>
+                                                            <label data-ng-if="order.ShouldSplit" class="radio-inline"><input data-ng-model="order.ShipDelayType" name="ShipDelayType" value="2" type="radio" data-ng-disabled="orderEditDisabled">Perishable & Non-Perishable</label>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.ShipDelayType==1" class="form-group">
                                                         <label for="date" class="col-md-6 control-label">Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required />
+                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -258,7 +258,7 @@
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" />
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -273,7 +273,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" />
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -289,19 +289,19 @@
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Order Specific Notes (*Will appear on invoice)</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Order Specific Notes" rows="5" data-ng-model="order.OrderNotes"></textarea>
+                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Order Specific Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled"></textarea>
                                                         </div>
                                                     </div>
                                                     <div data-ng-if="order.GiftOrder" class="form-group">
                                                         <label class="col-md-12 control-label left">Gift Message (*Will appear on invoice)</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage"></textarea>
+                                                            <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage" data-ng-disabled="orderEditDisabled"></textarea>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions"></textarea>
+                                                            <textarea type="text" name="DeliveryInstructions" class="form-control" placeholder="Delivery Instructions" rows="5" data-ng-model="order.DeliveryInstructions" data-ng-disabled="orderEditDisabled"></textarea>
                                                         </div>
                                                     </div>
 
@@ -310,7 +310,7 @@
                                                         <div class="col-md-12">
                                                             <div class="checkbox">
                                                                 <label>
-                                                                    <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
+                                                                    <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" data-ng-disabled="orderEditDisabled"/> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
                                                                 </label>
                                                             </div>
                                                         </div>
@@ -342,7 +342,7 @@
                                                     <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
                                                         <div class="col-md-5">
-                                                            <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
+                                                            <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
                                                                 <option value="">None</option>
                                                             </select>
                                                         </div>
@@ -350,7 +350,7 @@
                                                     <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
                                                         <div class="col-md-5">
-                                                            <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
+                                                            <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
                                                                 <option value="">None</option>
                                                             </select>
                                                         </div>
@@ -361,7 +361,7 @@
                                                         <div class="col-md-5">
                                                             <div class="input-group">
                                                                 <span class="input-group-addon">$</span>
-                                                                <input type="text" name="SurchargeOverride" class="form-control" placeholder="Surcharge" money min="0.00" max="100000" data-ng-model="order.SurchargeOverride" data-ng-blur="requestRecalculate()">
+                                                                <input type="text" name="SurchargeOverride" class="form-control" placeholder="Surcharge" money min="0.00" max="100000" data-ng-model="order.SurchargeOverride" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.SurchargeOverride.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm2.SurchargeOverride.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
@@ -375,7 +375,7 @@
                                                         <div class="col-md-5">
                                                             <div class="input-group">
                                                                 <span class="input-group-addon">$</span>
-                                                                <input type="text" name="ShippingOverride" class="form-control" placeholder="Shipping" money min="0.00" max="100000" data-ng-model="order.ShippingOverride" data-ng-blur="requestRecalculate()">
+                                                                <input type="text" name="ShippingOverride" class="form-control" placeholder="Shipping" money min="0.00" max="100000" data-ng-model="order.ShippingOverride" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.ShippingOverride.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm2.ShippingOverride.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
@@ -394,7 +394,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Preferred Ship Method</label>
                                                         <div class="col-md-5">
-                                                            <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required>
+                                                            <select class="form-control" name="PreferredShipMethod" data-ng-model="order.PreferredShipMethod" ng-options="item.Key as item.Text for item in orderPreferredShipMethod" required data-ng-disabled="orderEditDisabled">
                                                                 <option value="" selected hidden />
                                                             </select>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.PreferredShipMethod.$invalid">
@@ -417,7 +417,7 @@
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="order.DiscountCode"
                                                                        typeahead-min-length="1" typeahead="code for code in getDiscounts($viewValue)" typeahead-loading="loadingDiscounts" data-ng-blur="requestRecalculate()"
-                                                                       typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100">
+                                                                       typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.DiscountCode.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm2.DiscountCode.$error.server">{{calculateServerMessages.GetMessage('DiscountCode')}}</small>
@@ -438,7 +438,7 @@
                                                                         <div class="input-group autocomplete code">
                                                                             <input type="text" name="Code" class="form-control" placeholder="Gift Certificate" data-ng-model="gc.Code"
                                                                                    typeahead-min-length="1" typeahead="code for code in getGCs($viewValue)" typeahead-loading="loadingGCs" data-ng-blur="gcLostFocus($index, gc.Code)"
-                                                                                   typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100">
+                                                                                   typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                                         </div>
                                                                         <div class="error-container small-block" ng-show="forms.GCs.skussubmitted && forms.GCs.i{{$index}}.Code.$invalid">
                                                                             <small class="error" ng-show="forms.GCs.i{{$index}}.Code.$error.server">{{calculateServerMessages.GetMessage('Code','GCs',$index)}}</small>
@@ -516,14 +516,14 @@
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes" data-ng-change="requestRecalculate()"></select>
+                                                    <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes" data-ng-change="requestRecalculate()" data-ng-disabled="orderEditDisabled"></select>
                                                 </div>
                                             </div>
                                             <div data-ng-if="currentCustomer.CustomerType == 2">
                                                 <div class="form-group">
                                                     <label for="taxExempt" class="col-md-3 control-label">Tax Exempt</label>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" name="TaxExempt" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts" required></select>
+                                                        <select class="form-control" name="TaxExempt" id="taxExempt" data-ng-model="currentCustomer.TaxExempt" data-ng-options="taxExempt.Key as taxExempt.Text for taxExempt in ReferenceData.TaxExempts" required data-ng-disabled="orderEditDisabled"></select>
                                                         <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.TaxExempt.$invalid">
                                                             <small class="error" ng-show="forms.profile.TaxExempt.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tax Exempt")}}</small>
                                                             <small class="error" ng-show="forms.profile.TaxExempt.$error.server">{{serverMessages.GetMessage('TaxExempt')}}</small>
@@ -533,7 +533,7 @@
                                                 <div class="form-group">
                                                     <label for="website" class="col-md-3 control-label">Website</label>
                                                     <div class="col-md-9">
-                                                        <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off">
+                                                        <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                         <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Website.$invalid">
                                                             <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
                                                             <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
@@ -544,7 +544,7 @@
                                                 <div class="form-group">
                                                     <label for="promoting" class="col-md-3 control-label">Promoting Websites</label>
                                                     <div class="col-md-9">
-                                                        <textarea type="text" name="PromotingWebsites" class="form-control" data-ng-model="currentCustomer.PromotingWebsites" id="promoting" placeholder="Promoting Websites" rows="10" required data-ng-maxlength="1000"></textarea>
+                                                        <textarea type="text" name="PromotingWebsites" class="form-control" data-ng-model="currentCustomer.PromotingWebsites" id="promoting" placeholder="Promoting Websites" rows="10" required data-ng-maxlength="1000" data-ng-disabled="orderEditDisabled"></textarea>
                                                         <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.PromotingWebsites.$invalid">
                                                             <small class="error" ng-show="forms.profile.PromotingWebsites.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Promoting Websites")}}</small>
                                                             <small class="error" ng-show="forms.profile.PromotingWebsites.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Promoting Websites", "1000"])}}</small>
@@ -555,7 +555,7 @@
                                                 <div class="form-group">
                                                     <label for="tier" class="col-md-3 control-label">Tier</label>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" id="tier" name="Tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers" required></select>
+                                                        <select class="form-control" id="tier" name="Tier" data-ng-model="currentCustomer.Tier" data-ng-options="tier.Key as tier.Text for tier in ReferenceData.Tiers" required data-ng-disabled="orderEditDisabled"></select>
                                                         <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Tier.$invalid">
                                                             <small class="error" ng-show="forms.profile.Tier.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Tier")}}</small>
                                                             <small class="error" ng-show="forms.profile.Tier.$error.server">{{serverMessages.GetMessage('Tier')}}</small>
@@ -565,7 +565,7 @@
                                                 <div class="form-group">
                                                     <label for="tradeClass" class="col-md-3 control-label">Trade Class</label>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" name="TradeClass" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses" required></select>
+                                                        <select class="form-control" name="TradeClass" id="tradeClass" data-ng-model="currentCustomer.TradeClass" data-ng-options="tradeClass.Key as tradeClass.Text for tradeClass in ReferenceData.TradeClasses" required data-ng-disabled="orderEditDisabled"></select>
                                                         <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.TradeClass.$invalid">
                                                             <small class="error" ng-show="forms.profile.TradeClass.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Trade Class")}}</small>
                                                             <small class="error" ng-show="forms.profile.TradeClass.$error.server">{{serverMessages.GetMessage('TradeClass')}}</small>
@@ -576,7 +576,7 @@
                                                     <label class="col-md-3 control-label">Inception Date</label>
                                                     <div class="col-md-9">
                                                         <p class="input-group">
-                                                            <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" />
+                                                            <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" data-ng-disabled="orderEditDisabled"/>
                                                             <span class="input-group-btn">
                                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                             </span>
@@ -592,7 +592,7 @@
                                             <div class="form-group">
                                                 <label for="linked" class="col-md-3 control-label">Linked to Affiliate</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off">
+                                                    <input type="text" name="LinkedToAffiliate" class="form-control" id="linked" data-ng-model="currentCustomer.LinkedToAffiliate" placeholder="Linked to Affiliate" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.LinkedToAffiliate.$invalid">
                                                         <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Linked to Affiliate", "100"])}}</small>
                                                         <small class="error" ng-show="forms.profile.LinkedToAffiliate.$error.server">{{serverMessages.GetMessage('LinkedToAffiliate')}}</small>
@@ -609,7 +609,7 @@
                                             <div class="form-group">
                                                 <label for="enterEmail" class="col-md-3 control-label">Enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-maxlength="100" autocomplete="off">
+                                                    <input type="email" name="Email" class="form-control" id="enterEmail" data-ng-model="currentCustomer.newEmail" placeholder="Enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Email.$invalid">
                                                         <small class="error" ng-show="forms.profile.Email.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Email")}}</small>
                                                         <small class="error" ng-show="forms.profile.Email.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","GeneralFieldNames.Email")}}</small>
@@ -621,7 +621,7 @@
                                             <div class="form-group">
                                                 <label for="reEnterEmail" class="col-md-3 control-label">Re-enter Email</label>
                                                 <div class="col-md-9">
-                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-maxlength="100" autocomplete="off">
+                                                    <input type="email" name="EmailConfirm" class="form-control" id="reEnterEmail" data-ng-model="currentCustomer.emailConfirm" placeholder="Re-enter Email" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.EmailConfirm.$invalid">
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Email Confirmation")}}</small>
                                                         <small class="error" ng-show="forms.profile.EmailConfirm.$error.email">{{getValidationMessage("ValidationMessages.EmailFormat","Email Confirmation")}}</small>
@@ -642,7 +642,7 @@
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="paymentMethod in paymentMethods">
-                                                        <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1" autocomplete="off">
+                                                        <input type="checkbox" data-ng-click="togglePaymentMethodSelection(paymentMethod)" data-ng-checked="currentCustomer.ApprovedPaymentMethods.indexOf(paymentMethod.Id) > -1" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                         {{paymentMethod.Name}}
                                                     </label>
                                                 </div>
@@ -650,7 +650,7 @@
                                             <div class="form-group">
                                                 <label for="state" class="col-md-3 control-label">Default Payment Method</label>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" name="DefaultPaymentMethod" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods" required>
+                                                    <select class="form-control" name="DefaultPaymentMethod" data-ng-model="currentCustomer.DefaultPaymentMethod" data-ng-options="paymentMethod.Id as paymentMethod.Name for paymentMethod in selectedPaymentMethods" required data-ng-disabled="orderEditDisabled">
                                                         <option value="">Select Default Payment Method</option>
                                                     </select>
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.DefaultPaymentMethod.$invalid">
@@ -664,7 +664,7 @@
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <label class="checkbox-inline margin-left-zero margin-right-25px" data-ng-repeat="orderNote in orderNotes">
-                                                        <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1" autocomplete="off">
+                                                        <input type="checkbox" data-ng-click="toggleOrderNoteSelection(orderNote.Id)" data-ng-checked="currentCustomer.OrderNotes.indexOf(orderNote.Id) > -1" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                         {{orderNote.Name}}
                                                     </label>
                                                 </div>
@@ -674,11 +674,11 @@
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
                                                     <label class="checkbox-inline col-md-3">
-                                                        <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off">
+                                                        <input type="checkbox" id="doNotMail" data-ng-model="currentCustomer.DoNotMail" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                         Do Not Mail
                                                     </label>
                                                     <label class="checkbox-inline col-md-3">
-                                                        <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off">
+                                                        <input type="checkbox" id="doNotRent" data-ng-model="currentCustomer.DoNotRent" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                         Do Not Rent
                                                     </label>
                                                 </div>
@@ -689,7 +689,7 @@
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="suspendUserAccount" data-ng-click="toggleSuspended()" data-ng-checked="currentCustomer.StatusCode == 4">
+                                                            <input type="checkbox" id="suspendUserAccount" data-ng-click="toggleSuspended()" data-ng-checked="currentCustomer.StatusCode == 4" data-ng-disabled="orderEditDisabled">
                                                         </label>
                                                     </div>
                                                 </div>
@@ -697,7 +697,7 @@
                                             <div class="form-group" data-ng-if="currentCustomer.StatusCode == 4">
                                                 <label for="reason" class="col-md-3 control-label">Reason</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000"></textarea>
+                                                    <textarea type="text" name="Reason" class="form-control" id="reason" placeholder="Reason" rows="10" data-ng-model="currentCustomer.Reason" required data-ng-maxlength="1000" data-ng-disabled="orderEditDisabled"></textarea>
                                                     <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Reason.$invalid">
                                                         <small class="error" ng-show="forms.profile.Reason.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Reason")}}</small>
                                                         <small class="error" ng-show="forms.profile.Reason.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Reason", "1000"])}}</small>
@@ -722,7 +722,7 @@
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="updateShippingAddressForCustomer" data-ng-model="order.UpdateShippingAddressForCustomer">
+                                                            <input type="checkbox" id="updateShippingAddressForCustomer" data-ng-model="order.UpdateShippingAddressForCustomer" data-ng-disabled="orderEditDisabled">
                                                             <strong>Permanently update this address</strong>
                                                         </label>
                                                     </div>
@@ -755,12 +755,12 @@
                                             <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(1) >= 0">
                                                 <div class="radio col-md-3">
                                                     <label class="control-label">
-                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard" data-ng-disabled="orderEditDisabled">
                                                         Credit Card
                                                     </label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCardIndex"
+                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0 || orderEditDisabled" data-ng-model="paymentInfoTab.CreditCardIndex"
                                                             data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for (idx, creditCard) in currentCustomer.CreditCards"></select>
                                                 </div>
                                                 <div class="col-md-3">
@@ -771,7 +771,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac" data-ng-disabled="orderEditDisabled">
                                                             On Approved Credit
                                                         </label>
                                                     </div>
@@ -789,7 +789,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check" data-ng-disabled="orderEditDisabled">
                                                             Check
                                                         </label>
                                                     </div>
@@ -807,7 +807,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="4" id="noCharge">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="4" id="noCharge" data-ng-disabled="orderEditDisabled">
                                                             No Charge
                                                         </label>
                                                     </div>
@@ -817,7 +817,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="5" id="prepaid">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="5" id="prepaid" data-ng-disabled="orderEditDisabled">
                                                             Prepaid
                                                         </label>
                                                     </div>
@@ -832,7 +832,7 @@
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
-                                                                        <input type="checkbox" id="updateCardForCustomer" data-ng-model="order.UpdateCardForCustomer">
+                                                                        <input type="checkbox" id="updateCardForCustomer" data-ng-model="order.UpdateCardForCustomer" data-ng-disabled="orderEditDisabled">
                                                                         <strong>Permanently update credit card information</strong>
                                                                     </label>
                                                                 </div>
@@ -841,7 +841,7 @@
                                                         <div class="form-group">
                                                             <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
@@ -852,7 +852,7 @@
                                                         <div class="form-group">
                                                             <label for="CardType" class="col-md-3 control-label">Card Type</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off"></select>
+                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType', "CreditCards", paymentInfoTab.CreditCardIndex, "card")}}</small>
@@ -862,7 +862,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CardNumber" placeholder="Card Number" data-ng-maxlength="{{currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -873,7 +873,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-2">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -881,7 +881,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold || order.UpdateCardForCustomer" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
@@ -909,7 +909,7 @@
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
-                                                                        <input type="checkbox" id="updateOACForCustomer" data-ng-model="order.UpdateOACForCustomer">
+                                                                        <input type="checkbox" id="updateOACForCustomer" data-ng-model="order.UpdateOACForCustomer" data-ng-disabled="orderEditDisabled">
                                                                         <strong>Permanently update oac information</strong>
                                                                     </label>
                                                                 </div>
@@ -918,7 +918,7 @@
                                                         <div class="form-group">
                                                             <label for="terms" class="col-md-3 control-label">Terms:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold || order.updateOACForCustomer"></select>
+                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="currentCustomer.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold || order.updateOACForCustomer" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Terms.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Terms")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.server">{{serverMessages.GetMessage('Terms', undefined, undefined, "oac")}}</small>
@@ -928,7 +928,7 @@
                                                         <div class="form-group">
                                                             <label class="col-md-3 control-label" for="Fob">FOB:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold || order.updateOACForCustomer"></select>
+                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="currentCustomer.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold || order.updateOACForCustomer" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Fob.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Fob")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "oac")}}</small>
@@ -955,7 +955,7 @@
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
-                                                                        <input type="checkbox" id="updateCheckForCustomer" data-ng-model="order.UpdateCheckForCustomer">
+                                                                        <input type="checkbox" id="updateCheckForCustomer" data-ng-model="order.UpdateCheckForCustomer" data-ng-disabled="orderEditDisabled">
                                                                         <strong>Permanently update check information</strong>
                                                                     </label>
                                                                 </div>
@@ -964,7 +964,7 @@
                                                         <div class="form-group">
                                                             <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold || order.UpdateCheckForCustomer">
+                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="currentCustomer.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold || order.UpdateCheckForCustomer" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['check'] && forms.check.CheckNumber.$invalid">
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Check Number")}}</small>
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Check Number", "100"])}}</small>
@@ -977,7 +977,7 @@
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
-                                                                        <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched">
+                                                                        <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched" data-ng-disabled="orderEditDisabled">
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -1002,7 +1002,7 @@
                                                     <div class="col-md-9">
                                                         <div class="checkbox">
                                                             <label>
-                                                                <input type="checkbox" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1" id="creditCardCustomerSaved" data-ng-model="creditCardCustomerSaved">
+                                                                <input type="checkbox" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || orderEditDisabled" id="creditCardCustomerSaved" data-ng-model="creditCardCustomerSaved">
                                                                 <strong>Customer Saved Credit Card</strong>
                                                             </label>
                                                         </div>
@@ -1020,12 +1020,12 @@
                                                 <div class="form-group">
                                                     <div class="radio col-md-3">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="1" id="creditCard" data-ng-disabled="orderEditDisabled">
                                                             Credit Card
                                                         </label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <select class="form-control" id="selectPaymentMethod" data-ng-disabled="!creditCardCustomerSaved || paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0" data-ng-model="paymentInfoTab.CreditCardIndex"
+                                                        <select class="form-control" id="selectPaymentMethod" data-ng-disabled="!creditCardCustomerSaved || paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0 || orderEditDisabled" data-ng-model="paymentInfoTab.CreditCardIndex"
                                                                 data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber)) for (idx, creditCard) in currentCustomer.CreditCards"></select>
                                                     </div>
                                                     <div class="col-md-3">
@@ -1037,7 +1037,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="2" id="oac" data-ng-disabled="orderEditDisabled">
                                                             On Approved Credit
                                                         </label>
                                                     </div>
@@ -1052,7 +1052,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="3" id="check" data-ng-disabled="orderEditDisabled">
                                                             Check
                                                         </label>
                                                     </div>
@@ -1067,7 +1067,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="4" id="noCharge">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="4" id="noCharge" data-ng-disabled="orderEditDisabled">
                                                             No Charge
                                                         </label>
                                                     </div>
@@ -1077,7 +1077,7 @@
                                                 <div class="col-md-3">
                                                     <div class="radio">
                                                         <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="5" id="prepaid">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="5" id="prepaid" data-ng-disabled="orderEditDisabled">
                                                             Prepaid
                                                         </label>
                                                     </div>
@@ -1090,7 +1090,7 @@
                                                         <div class="form-group">
                                                             <label for="NameOnCard" class="col-md-3 control-label">Name on Card</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="order.CreditCard.NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control" name="NameOnCard" id="NameOnCard" data-ng-model="order.CreditCard.NameOnCard" placeholder="Name on Card" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.NameOnCard.$invalid">
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.NameOnCard")}}</small>
                                                                     <small class="error" ng-show="forms.card.NameOnCard.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.NameOnCard", "100"])}}</small>
@@ -1101,7 +1101,7 @@
                                                         <div class="form-group">
                                                             <label for="CardType" class="col-md-3 control-label">Card Type</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="order.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold" autocomplete="off"></select>
+                                                                <select class="form-control" id="CardType" name="CardType" data-ng-model="order.CreditCard.CardType" ng-options="creditCardType.Key as creditCardType.Text for creditCardType in creditCardTypes" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardType.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardType")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardType.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "card")}}</small>
@@ -1111,7 +1111,7 @@
                                                         <div class="form-group">
                                                             <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
                                                                     <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
@@ -1122,7 +1122,7 @@
                                                         <div class="form-group">
                                                             <label for="ExpirationDateMonth" class="col-md-3 control-label">Expiration Date</label>
                                                             <div class="col-md-2">
-                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control number" id="ExpirationDateMonth" numbers-only data-max-characters="2" name="ExpirationDateMonth" data-ng-model="order.CreditCard.ExpirationDateMonth" min="1" max="12" ng-pattern="/^\d{1,2}?$/" placeholder="Month" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateMonth.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.pattern">{{getValidationMessage("ValidationMessages.MonthFormat","GeneralFieldNames.ExpirationDateMonth")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateMonth.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateMonth")}}</small>
@@ -1130,7 +1130,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
-                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold" autocomplete="off">
+                                                                <input type="text" class="form-control" id="ExpirationDateYear" numbers-only data-max-characters="2" name="ExpirationDateYear" data-ng-model="order.CreditCard.ExpirationDateYear" min="1" max="99" ng-pattern="/^\d{1,2}?$/" placeholder="Year" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['card'] && forms.card.ExpirationDateYear.$invalid">
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.pattern">{{getValidationMessage("ValidationMessages.YearFormat","GeneralFieldNames.ExpirationDateYear")}}</small>
                                                                     <small class="error" ng-show="forms.card.ExpirationDateYear.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.ExpirationDateYear")}}</small>
@@ -1156,7 +1156,7 @@
                                                         <div class="form-group">
                                                             <label for="terms" class="col-md-3 control-label">Terms:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="order.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold"></select>
+                                                                <select class="form-control" id="terms" name="Terms" data-ng-model="order.Oac.Terms" data-ng-options="term.Key as term.Text for term in ReferenceData.OacTerms" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Terms.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Terms")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Terms.$error.server">{{serverMessages.GetMessage('Terms', undefined, undefined, "oac")}}</small>
@@ -1166,7 +1166,7 @@
                                                         <div class="form-group">
                                                             <label class="col-md-3 control-label" for="Fob">FOB:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="order.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold"></select>
+                                                                <select class="form-control" id="Fob" name="Fob" data-ng-model="order.Oac.Fob" data-ng-options="fob.Key as fob.Text for fob in ReferenceData.OacFob" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled"></select>
                                                                 <div class="error-container" ng-show="forms.submitted['oac'] && forms.oac.Fob.$invalid">
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Fob")}}</small>
                                                                     <small class="error" ng-show="forms.oac.Fob.$error.server">{{serverMessages.GetMessage('CardType', undefined, undefined, "oac")}}</small>
@@ -1185,7 +1185,7 @@
                                                         <div class="form-group">
                                                             <label for="checkNumber" class="col-md-3 control-label">Check #</label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="order.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold">
+                                                                <input type="text" class="form-control" name="CheckNumber" id="checkNumber" data-ng-model="order.Check.CheckNumber" placeholder="Check #" data-ng-required="!order.OnHold" data-ng-disabled="orderEditDisabled">
                                                                 <div class="error-container" ng-show="forms.submitted['check'] && forms.check.CheckNumber.$invalid">
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Check Number")}}</small>
                                                                     <small class="error" ng-show="forms.check.CheckNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Check Number", "100"])}}</small>
@@ -1198,7 +1198,7 @@
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
-                                                                        <input type="checkbox" id="PaidInFull" data-ng-model="order.Check.PaidInFull">
+                                                                        <input type="checkbox" id="PaidInFull" data-ng-model="order.Check.PaidInFull" data-ng-disabled="orderEditDisabled">
                                                                     </label>
                                                                 </div>
                                                             </div>
