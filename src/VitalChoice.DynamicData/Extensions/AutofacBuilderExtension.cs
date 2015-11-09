@@ -15,7 +15,6 @@ namespace VitalChoice.DynamicData.Extensions
             builder.RegisterType<TypeConverter>().As<ITypeConverter>();
             builder.RegisterType<ModelConverterService>().As<IModelConverterService>();
             builder.RegisterGeneric(typeof (DirectMapper<>)).AsSelf();
-            builder.RegisterType<DynamicExpressionVisitor>().AsSelf();
             return builder;
         }
 
@@ -30,9 +29,9 @@ namespace VitalChoice.DynamicData.Extensions
             builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>));
             foreach (var mapperType in mapperTypes)
             {
-                var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,>));
+                var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>));
 
-                if (types != null && types.Length == 2)
+                if (types != null)
                 {
                     builder.RegisterType(mapperType)
                         .As(
@@ -43,8 +42,8 @@ namespace VitalChoice.DynamicData.Extensions
                                 mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
                         .As(typeof (IObjectMapper<>).MakeGenericType(
                             mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
-                        .As(typeof (IOptionTypeQueryProvider<,>).MakeGenericType(
-                            mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,>))))
+                        .As(typeof (IOptionTypeQueryProvider<,,>).MakeGenericType(
+                            mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>))))
                         .AsSelf()
                         .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)))
                         .Keyed<IOptionTypeQueryProvider>(new GenericTypePair(types[0], types[1]));

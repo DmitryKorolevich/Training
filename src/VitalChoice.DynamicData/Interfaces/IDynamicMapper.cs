@@ -71,21 +71,23 @@ namespace VitalChoice.DynamicData.Interfaces
         
     }
 
-    public interface IOptionTypeQueryProvider<TEntity, TOptionType> : IOptionTypeQueryProvider
+    public interface IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> : IOptionTypeQueryProvider
+        where TEntity: DynamicDataEntity<TOptionValue, TOptionType>
         where TOptionType : OptionType
+        where TOptionValue: OptionValue<TOptionType>
     {
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
         ICollection<TOptionType> OptionTypes { get; }
         IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
+        Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
     }
 
-    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IObjectMapper, IDynamicMapper<TDynamic>, IOptionTypeQueryProvider<TEntity, TOptionType>
+    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject
     {
-        Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
         Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);
         void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities, ICollection<TOptionType> optionTypes = null);
 
