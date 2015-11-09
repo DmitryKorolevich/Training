@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-#if DNX451
-using System.Net.Mime;
-#endif
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
@@ -325,7 +322,6 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-#if DNX451
         [HttpGet]
         public async Task<FileResult> GetCustomersForAffiliates([FromQuery]int idaffiliate)
         {
@@ -348,16 +344,14 @@ namespace VC.Admin.Controllers
 
             var data = _exportCustomersForAffiliatesService.ExportToCSV(items);
 
-            var contentDisposition = new ContentDisposition()
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileName = String.Format(FileConstants.AFFILIATE_CUSTOMERS_REPORT, DateTime.Now.ToString("MM_dd_yyyy_hh_mm_ss")),
-                Inline = false
+                FileName = String.Format(FileConstants.AFFILIATE_CUSTOMERS_REPORT, DateTime.Now.ToString("MM_dd_yyyy_hh_mm_ss"))
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(data, "text/csv");
         }
-#endif
 
         [HttpGet]
         public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
@@ -448,22 +442,19 @@ namespace VC.Admin.Controllers
 			return token;
 		}
 
-#if DNX451
 		[HttpGet]
 		public async Task<FileResult> GetFile([FromQuery]string publicId, [FromQuery]string fileName, [FromQuery]bool viewMode)
 	    {
 			var blob = await _customerService.DownloadFileAsync(fileName, publicId);
 
-			var contentDisposition = new ContentDisposition()
-		    {
-				FileName = fileName,
-				Inline = viewMode
-			};
+			var contentDisposition = new ContentDispositionHeaderValue(viewMode ? "inline" : "attachment")
+            {
+                FileName = fileName
+            };
 
-			Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+            Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
 			return File(blob.File, blob.ContentType);
 		}
-#endif
 
         [HttpPost]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
