@@ -5,8 +5,10 @@ using System.Linq.Expressions;
 using Autofac.Features.Indexed;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
+using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -22,47 +24,84 @@ namespace VitalChoice.DynamicData.Base
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
+        private readonly IReadRepositoryAsync<TOptionValue> _optionValuesRepository;
 
         public DynamicDataEntityQueryBuilder(IModelConverterService converterService, ITypeConverter typeConverter,
-            IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex)
+            IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex, IReadRepositoryAsync<TOptionValue> optionValuesRepository)
         {
             _converterService = converterService;
             _typeConverter = typeConverter;
             _optionTypeQueryProviderIndex = optionTypeQueryProviderIndex;
+            _optionValuesRepository = optionValuesRepository;
         }
 
         public Expression Filter(object model, Type modelType, Expression parameter, int? idObjectType)
         {
-            IDictionary<string, object> filterDictionary;
-            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
-
-            var conditionExpression =
-                CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, true)));
-
-            if (conditionExpression == null)
-                return Expression.Constant(true);
-
-            if (parameter is ParameterExpression)
-            {
-                var parameterRewriter = new SwapVisitor(conditionExpression.Parameters[0], parameter);
-                var result = parameterRewriter.Visit(conditionExpression);
-                return Expression.Invoke(result, parameter);
-            }
-            return Expression.Invoke(conditionExpression, parameter);
+            return FilterInternal(model, modelType, parameter, idObjectType, true);
         }
 
         public Expression Filter(object model, Type modelType, Expression parameter)
         {
+            return FilterInternal(model, modelType, parameter, null, false);
+        }
+
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all, int? idObjectType)
+        {
+            return FilterCollectionInternal(model, modelType, parameter, all, idObjectType, true);
+        }
+
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all)
+        {
+            return FilterCollectionInternal(model, modelType, parameter, all, null, false);
+        }
+
+        private Expression FilterCollectionInternal(object model, Type modelType, Expression parameter, bool all, int? idObjectType, bool lookObjectId)
+        {
             IDictionary<string, object> filterDictionary;
             var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 
-            var conditionExpression =
-                CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        null, false)));
+            Expression<Func<TEntity, bool>> conditionExpression;
 
+            if (typeof (TOptionValue) == typeof (ProductOptionValue))
+            {
+                var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
+                conditionExpression = e => values.Contains(e.Id);
+            }
+            else
+            {
+                conditionExpression =
+                    CreateValuesSelector(BuildSearchValues(filterDictionary,
+                        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                            idObjectType, lookObjectId)));
+            }
+            if (conditionExpression == null)
+                return Expression.Constant(true);
+
+            return BuildCollectionExpression(parameter, all, conditionExpression);
+        }
+
+        private Expression FilterInternal(object model, Type modelType, Expression parameter, int? idObjectType, bool lookObjectId)
+        {
+            IDictionary<string, object> filterDictionary;
+            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
+
+            Expression<Func<TEntity, bool>> conditionExpression;
+
+            if (typeof(TOptionValue) == typeof(ProductOptionValue))
+            {
+                var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
+                conditionExpression = e => values.Contains(e.Id);
+            }
+            else
+            {
+                conditionExpression = CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, true)));
+            }
             if (conditionExpression == null)
                 return Expression.Constant(true);
 
@@ -73,38 +112,6 @@ namespace VitalChoice.DynamicData.Base
                 return Expression.Invoke(result, parameter);
             }
             return Expression.Invoke(conditionExpression, parameter);
-        }
-
-        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all, int? idObjectType)
-        {
-            IDictionary<string, object> filterDictionary;
-            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
-
-            var conditionExpression =
-                CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, true)));
-
-            if (conditionExpression == null)
-                return Expression.Constant(true);
-
-            return BuildCollectionExpression(parameter, all, conditionExpression);
-        }
-
-        public Expression FilterCollection(object model, Type modelType, Expression parameter, bool all)
-        {
-            IDictionary<string, object> filterDictionary;
-            var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
-
-            var conditionExpression =
-                CreateValuesSelector(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        null, false)));
-
-            if (conditionExpression == null)
-                return Expression.Constant(true);
-
-            return BuildCollectionExpression(parameter, all, conditionExpression);
         }
 
         private static Expression BuildCollectionExpression(Expression parameter, bool all,
@@ -129,10 +136,10 @@ namespace VitalChoice.DynamicData.Base
             return Expression.Invoke(filterExpression, parameter, conditionExpression);
         }
 
-        private IOptionTypeQueryProvider<TEntity, TOptionType> GetValues(object model, Type modelType,
+        private IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> GetValues(object model, Type modelType,
             out IDictionary<string, object> filterDictionary)
         {
-            var optionTypesProvider = (IOptionTypeQueryProvider<TEntity, TOptionType>)
+            var optionTypesProvider = (IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>)
                 _optionTypeQueryProviderIndex[new GenericTypePair(typeof (TEntity), typeof (TOptionType))];
 
             if (modelType.IsImplement(typeof (IDictionary<string, object>)))
@@ -189,6 +196,60 @@ namespace VitalChoice.DynamicData.Base
                     Values = items
                 });
             }
+            return result;
+        }
+
+        private static Expression<Func<TOptionValue, bool>> CreateValuesSelectorWorkaround(
+            List<OptionGroup<TOptionType>> optionGroups)
+        {
+            Expression<Func<TOptionValue, bool>> result = null;
+            foreach (var optionGroup in optionGroups)
+            {
+                Expression<Func<TOptionValue, bool>> valuesSelector = null;
+                foreach (
+                    var value in
+                        optionGroup.Values.Where(
+                            value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int)FieldType.LargeString))
+                {
+                    if (valuesSelector == null)
+                    {
+                        if (value.OptionType.IdFieldType == (int)FieldType.String)
+                        {
+                            valuesSelector =
+                                v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value);
+                        }
+                        else
+                        {
+                            valuesSelector =
+                                v => v.IdOptionType == value.IdType && v.Value == value.Value;
+                        }
+                    }
+                    else
+                    {
+                        if (value.OptionType.IdFieldType == (int)FieldType.String)
+                        {
+                            valuesSelector =
+                                valuesSelector.And(
+                                    v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value));
+                        }
+                        else
+                        {
+                            valuesSelector =
+                                valuesSelector.And(
+                                    v => v.IdOptionType == value.IdType && v.Value == value.Value);
+                        }
+                    }
+                }
+                if (optionGroup.IdObjectType == null)
+                {
+                    result = result == null ? valuesSelector : result.And(valuesSelector);
+                }
+                else
+                {
+                    result = result == null ? valuesSelector : result.Or(valuesSelector);
+                }
+            }
+
             return result;
         }
 

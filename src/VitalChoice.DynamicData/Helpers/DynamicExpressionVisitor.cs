@@ -4,6 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Helpers;
@@ -18,13 +20,15 @@ namespace VitalChoice.DynamicData.Helpers
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
+        private readonly IDataContext _dataContext;
 
         public DynamicExpressionVisitor(IModelConverterService converterService, ITypeConverter typeConverter,
-            IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex)
+            IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex, IDataContextAsync context)
         {
             _converterService = converterService;
             _typeConverter = typeConverter;
             _optionTypeQueryProviderIndex = optionTypeQueryProviderIndex;
+            _dataContext = context;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -49,11 +53,14 @@ namespace VitalChoice.DynamicData.Helpers
                     collectionMethods = true;
                 }
                 var entityTypeParameters = entityType.TryGetTypeArguments(typeof (DynamicDataEntity<,>));
+
                 IDynamicDataEntityQueryBuilder queryBuilder =
                     (IDynamicDataEntityQueryBuilder)
                         Activator.CreateInstance(typeof (DynamicDataEntityQueryBuilder<,,>).MakeGenericType(entityType,
                             entityTypeParameters[0], entityTypeParameters[1]), _converterService, _typeConverter,
-                            _optionTypeQueryProviderIndex);
+                            _optionTypeQueryProviderIndex,
+                            Activator.CreateInstance(typeof (ReadRepositoryAsync<>).MakeGenericType(entityTypeParameters[0]), _dataContext));
+
                 Expression resultExpression;
                 switch (m.Method.Name)
                 {
