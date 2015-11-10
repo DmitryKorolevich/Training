@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Domain.Entities
 {
-    public class CountModel
+    public class CountModel : Entity
     {
         public int Count { get; set; }
     }

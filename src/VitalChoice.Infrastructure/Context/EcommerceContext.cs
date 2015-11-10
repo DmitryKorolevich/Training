@@ -68,7 +68,7 @@ namespace VitalChoice.Infrastructure.Context
 
             #region Base
 
-            builder.Entity<CountModel>().HasKey(f => f.Count);
+            builder.Entity<CountModel>().HasKey(f => f.Id);
 
             builder.Entity<FieldTypeEntity>().HasKey(f => f.Id);
             builder.Entity<FieldTypeEntity>().ToTable("FieldTypes");
@@ -1141,7 +1141,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("VCustomersInAffiliates");
             });
 
-            builder.Entity<AffiliateSummaryReportModel>().HasKey(f => f.IdType);
+            builder.Entity<AffiliateSummaryReportModel>().HasKey(p => new { p.From, p.IdType});
 
             #endregion
 

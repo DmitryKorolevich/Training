@@ -30,17 +30,20 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
     {
         private readonly IProductCategoryService _productCategoryService;
         private readonly IRepositoryAsync<ProductCategoryContent> _productCategoryRepository;
+        private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
         private readonly VProductSkuRepository _productRepository;
 
         public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
             IProductCategoryService productCategoryService,
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
+            IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
             VProductSkuRepository productRepository) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productCategoryRepository = productCategoryRepository;
+            _productContentRepository = productContentRepository;
             _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
             _productRepository = productRepository;
         }
@@ -87,11 +90,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     .Select(x => x.IdProduct).ToList();
 
             IList<VProductSku> products = null;
+            IList<ProductContent> productContents = null;
             if (productIds.Any())
             {
                 products =
                     (await _productRepository.GetProductsAsync(new VProductSkuFilter() {IdProducts = productIds})).Items;
                 products = products.Where(x => targetStatuses.Contains(x.StatusCode)).ToList();
+
+                 productContents = (await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false)).ToList();
             }
 
             var rootNavCategory =
@@ -101,7 +107,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     Statuses = targetStatuses
                 });
 
-            return PopulateCategoryTemplateModel(model.Model, subCategoriesContent, products, rootNavCategory);
+            return PopulateCategoryTemplateModel(model.Model, subCategoriesContent, products, productContents, rootNavCategory);
         }
 
         private ProductCategory FindTargetCategory(ProductCategory root, int idToFind)
@@ -182,11 +188,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         }
 
         private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent,
-            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, ProductNavCategoryLite rootNavCategory = null)
+            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, IList<ProductContent> productContents=null,
+            ProductNavCategoryLite rootNavCategory = null)
         {
             IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
             BuildBreadcrumb(rootNavCategory, productCategoryContent.Url, breadcrumbItems);
-            return new TtlCategoryModel
+            var toReturn = new TtlCategoryModel
             {
                 Name = productCategoryContent.ProductCategory.Name,
                 Url = productCategoryContent.Url,
@@ -198,13 +205,25 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
                 Products = products?.Select(x => new TtlCategoryProductModel
                 {
+                    Id = x.IdProduct,
                     Name = x.Name,
-                    Thumbnail = x.Thumbnail,
-                    Url = x.Url
+                    Thumbnail = x.Thumbnail
                 }).ToList(),
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems
             };
+            if (toReturn.Products != null && productContents != null)
+            {
+                foreach (var product in toReturn.Products)
+                {
+                    var productContent = productContents.FirstOrDefault(p => p.Id == product.Id);
+                    if(productContent!=null)
+                    {
+                        product.Url = productContent.Url;
+                    }
+                }
+            }
+            return toReturn;
         }
 
         public override string ResultName => "ProductCategory";

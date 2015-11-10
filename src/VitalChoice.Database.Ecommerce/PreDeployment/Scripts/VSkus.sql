@@ -18,7 +18,6 @@ SELECT
 	p.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,
-	p.Url,
 	p.Name +ISNULL(' - '+pval.Value, '')+ISNULL(' ('+sval.Value+')', '') AS DescriptionName,
 	CONVERT(bit,ISNULL(aval.Value, 0)) AS AutoShipProduct,
 	CONVERT(bit,ISNULL(aval1.Value, 0)) AS AutoShipFrequency1,

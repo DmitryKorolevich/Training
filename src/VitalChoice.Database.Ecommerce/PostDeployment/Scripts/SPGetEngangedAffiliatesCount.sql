@@ -10,7 +10,7 @@ GO
 CREATE PROCEDURE SPGetEngangedAffiliatesCount
 AS
 BEGIN
-	SELECT COUNT(DISTINCT aff.idAffiliate) As Count FROM
+	SELECT 1 as Id,COUNT(DISTINCT aff.idAffiliate) As Count FROM
 	(
 		SELECT op.IdAffiliate
 		FROM AffiliateOrderPayments AS op

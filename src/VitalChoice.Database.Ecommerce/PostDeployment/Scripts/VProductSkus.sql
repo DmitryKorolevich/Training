@@ -17,7 +17,6 @@ SELECT
 	p.Hidden,
 	p.IdObjectType AS IdProductType,
 	p.Name,
-	p.Url,
 	ISNULL(val.Value, opt.DefaultValue) AS Thumbnail,	
 	ISNULL(tval.Value, topt.DefaultValue) AS TaxCode
 	FROM Products AS p

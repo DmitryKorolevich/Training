@@ -16,6 +16,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.History;
@@ -33,6 +34,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Interfaces.Entities;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
@@ -56,6 +58,8 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<ProductOutOfStockRequest> _productOutOfStockRequestRepository;
         private readonly ISettingService _settingService;
         private readonly INotificationService _notificationService;
+        private readonly IRepositoryAsync<ProductContent> _productContentRepository;
+        private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
 
         protected override async Task AfterSelect(ICollection<Product> entities)
         {
@@ -127,22 +131,6 @@ namespace VitalChoice.Business.Services.Products
                         .Build());
             }
 
-            var productSameUrl =
-                await
-                    _productRepository.Query(
-                        new ProductQuery().NotDeleted().Excluding(model.Id).WithUrl(model.Url))
-                        .SelectAsync(false);
-
-
-            if (productSameUrl.Any())
-            {
-                errors.AddRange(
-                    model.CreateError()
-                        .Property(p => p.Url)
-                        .Error("Product url should be unique in the database")
-                        .Build());
-            }
-
             var newSet = model.Skus.Select(s => s.Code).ToArray();
             List<int> existSkus = null;
             if (model.Id > 0)
@@ -198,6 +186,8 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
             ISettingService settingService,
             INotificationService notificationService,
+            IRepositoryAsync<ProductContent> productContentRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
@@ -216,7 +206,9 @@ namespace VitalChoice.Business.Services.Products
             _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
             _settingService = settingService;
             _notificationService = notificationService;
-	        _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
+            _productContentRepository = productContentRepository;
+            _contentTypeRepository = contentTypeRepository;
+            _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
         }
 
         #region ProductOptions
@@ -626,6 +618,178 @@ namespace VitalChoice.Business.Services.Products
 					    .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
 	    }
 
-	    #endregion
+        #endregion
+
+        #region ProductContent
+
+        public async Task<ProductDynamic> InsertAsync(ProductContentTransferEntity model)
+        {
+            //TODO: lock writing DB until we read result
+            using (var uow = CreateUnitOfWork())
+            {
+                var entity = await InsertAsync(model.ProductDynamic, uow, model.ProductContent);
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
+            }
+        }
+
+        public async Task<ProductDynamic> UpdateAsync(ProductContentTransferEntity model)
+        {
+            //TODO: lock writing DB until we read result
+            using (var uow = CreateUnitOfWork())
+            {
+                var entity = await UpdateAsync(model.ProductDynamic, uow, model.ProductContent);
+                int id = entity.Id;
+                entity = await SelectEntityFirstAsync(o => o.Id == id);
+                await LogItemChanges(new[] { await Mapper.FromEntityAsync(entity) });
+                return await Mapper.FromEntityAsync(entity);
+            }
+        }
+
+        protected override async Task<Product> InsertAsync(ProductDynamic model, IUnitOfWorkAsync uow)
+        {
+            return await InsertAsync(model, uow, null);
+        }
+
+        protected override async Task<Product> UpdateAsync(ProductDynamic model, IUnitOfWorkAsync uow)
+        {
+            return await UpdateAsync(model, uow, null);
+        }
+
+        private async Task<Product> InsertAsync(ProductDynamic model, IUnitOfWorkAsync uow, ProductContent productContent)
+        {
+            if(productContent==null)
+            {
+                throw new AppValidationException("Product without content info cannot be created");
+            }
+
+            await Validate(productContent);
+
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    var product = await base.InsertAsync(model, uow);
+                    
+                    productContent.Id = product.Id;
+                    productContent.StatusCode = (RecordStatusCode)model.StatusCode;
+                    productContent.UserId = model.IdEditedBy;
+                    productContent.ContentItem.Created = DateTime.Now;
+                    productContent.ContentItem.Updated = productContent.ContentItem.Created;
+
+                    if(productContent.MasterContentItemId==0)
+                    {
+                        //set predefined master
+                        var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Product).SelectAsync(false)).FirstOrDefault();
+                        if (contentType?.DefaultMasterContentItemId != null)
+                        {
+                            productContent.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
+                        }
+                        else
+                        {
+                            throw new AppValidationException("The default master template isn't confugured. Please contact support.");
+                        }
+                    }
+
+                    await _productContentRepository.InsertGraphAsync(productContent);
+
+                    transaction.Commit();
+
+                    return product;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        private async Task<Product> UpdateAsync(ProductDynamic model, IUnitOfWorkAsync uow, ProductContent productContent)
+        {
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //    try
+            //    {
+
+                    ProductContent dbProductContent = null;
+                    if (productContent != null)
+                    {
+                        dbProductContent = (await _productContentRepository.Query(p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.ContentItem).
+                            SelectAsync()).FirstOrDefault();
+                        if (dbProductContent == null)
+                        {
+                            throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ObjectNotFound]);
+                        }
+
+                        await Validate(productContent);
+                    }
+
+                    var product = await base.UpdateAsync(model, uow);
+
+                    if (productContent != null)
+                    {
+                        dbProductContent.Url = productContent.Url;
+                        dbProductContent.StatusCode = (RecordStatusCode)model.StatusCode;
+                        dbProductContent.ContentItem.Updated = DateTime.Now;
+                        dbProductContent.ContentItem.Template = productContent.ContentItem.Template;
+                        dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
+
+                        await _productContentRepository.UpdateAsync(dbProductContent);
+                    }
+
+                    //transaction.Commit();
+
+                    return product;
+                //}
+                //catch (Exception ex)
+                //{
+                //    transaction.Rollback();
+                //    throw;
+                //}
+            //}
+        }
+
+        protected async Task Validate(ProductContent model)
+        {
+            List<MessageInfo> errors = new List<MessageInfo>();
+
+            var productSameUrl =
+                await
+                    _productContentRepository.Query(
+                        new ProductContentQuery().NotDeleted().Excluding(model.Id).WithUrl(model.Url))
+                        .SelectAsync(false);
+
+
+            if (productSameUrl.Any())
+            {
+                errors.AddRange(
+                    model.CreateBasicError()
+                        .Property(p => p.Url)
+                        .Error("Product url should be unique in the database")
+                        .Build());
+            }
+
+            errors.Raise();
+        }
+
+        public async Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false)
+        {
+            ProductContentTransferEntity toReturn = new ProductContentTransferEntity();
+            toReturn.ProductDynamic = await this.SelectAsync(id, withDefaults);
+            if(toReturn.ProductDynamic!=null)
+            {
+                toReturn.ProductContent = (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+                if(toReturn.ProductContent==null)
+                {
+                    throw new AppValidationException("Content info doesn't exist for the given product");
+                }
+            }
+            return toReturn;
+        }
+
+        #endregion
     }
 }

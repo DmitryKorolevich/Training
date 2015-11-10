@@ -24,6 +24,8 @@ namespace VitalChoice.Interfaces.Services.Affiliates
 
         Task<AffiliateDynamic> UpdateAsync(AffiliateDynamic model, string password);
 
+        Task<bool> SelectAnyAsync(int id);
+
         #endregion
 
         #region AffiliatePayments
@@ -38,6 +40,10 @@ namespace VitalChoice.Interfaces.Services.Affiliates
 
         Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item);
 
+        Task<AffiliatesSummaryModel> GetAffiliatesSummary();
+
+        Task<ICollection<AffiliatesSummaryReportItemModel>> GetAffiliatesSummaryReportItemsForMonths(DateTime lastMonthStartDay, int monthCount);
+        
         #endregion
     }
 }

@@ -39,5 +39,12 @@ namespace VitalChoice.Business.Queries.Customer
 			}
 			return this;
 		}
-	}
+
+        public CustomerQuery WithAffiliate()
+        {
+            Add(x => x.IdAffiliate.HasValue);
+
+            return this;
+        }
+    }
 }

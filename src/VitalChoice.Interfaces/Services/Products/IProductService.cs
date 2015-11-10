@@ -10,6 +10,7 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Interfaces.Entities;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
@@ -61,6 +62,16 @@ namespace VitalChoice.Interfaces.Services.Products
 
 		Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
 
-		#endregion
-	}
+        #endregion
+
+        #region ProductContent
+
+        Task<ProductDynamic> InsertAsync(ProductContentTransferEntity model);
+
+        Task<ProductDynamic> UpdateAsync(ProductContentTransferEntity model);
+
+        Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false);
+
+        #endregion
+    }
 }

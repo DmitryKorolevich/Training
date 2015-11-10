@@ -11,7 +11,7 @@ CREATE PROCEDURE SPGetAffiliatesSummaryReport
 	@from datetime, @to datetime
 AS
 BEGIN
-	SELECT temp.TypeId, COUNT(*) As [Count], SUM(temp.Amount) [Sum] FROM
+	SELECT @from As [From],temp.IdType, COUNT(*) As [Count], SUM(temp.Amount) [Sum] FROM
 	(SELECT
 	(CASE WHEN op.Id <=
 			ALL(
@@ -24,7 +24,7 @@ BEGIN
 			AND afIn.StatusCode!=3
 			AND oIn.StatusCode!=3
 			AND (oIn.OrderStatus=2 OR oIn.OrderStatus=3 OR oIn.OrderStatus=5)
-			) THEN 1 ELSE 0 END) As TypeId,
+			) THEN 1 ELSE 2 END) As IdType,
 	op.Amount As Amount
 	FROM AffiliateOrderPayments AS op
 	INNER JOIN Orders AS o ON o.Id = op.Id
@@ -34,7 +34,7 @@ BEGIN
 	AND (o.OrderStatus=2 OR o.OrderStatus=3 OR o.OrderStatus=5)
 	AND @from<=o.DateCreated
 	AND @to>o.DateCreated) temp
-	GROUP BY temp.TypeId
+	GROUP BY temp.IdType
 END
 
 GO

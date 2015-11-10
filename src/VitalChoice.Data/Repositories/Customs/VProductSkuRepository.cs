@@ -74,8 +74,7 @@ namespace VitalChoice.Data.Repositories.Customs
                 Hidden = g.Min(p => p.Hidden),
                 DateEdited= g.Min(p => p.DateEdited),
                 IdEditedBy = g.Min(p => p.IdEditedBy),
-                IdProductType = g.Min(p => p.IdProductType),
-				Url = g.Min(p => p.Url)
+                IdProductType = g.Min(p => p.IdProductType)
             });
             var count = await query.CountAsync();
             query = sortable(query);
