@@ -13,13 +13,13 @@ namespace VC.Admin.ModelConverters
 {
     public class CustomerModelConverter : BaseModelConverter<AddUpdateCustomerModel, CustomerDynamic>
     {
-	    private readonly IDynamicMapper<CustomerNoteDynamic> _customerNoteMapper;
-        private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodMapper;
-        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
+	    private readonly IDynamicMapper<CustomerNoteDynamic, CustomerNote> _customerNoteMapper;
+        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodMapper;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
 
-        public CustomerModelConverter(IDynamicMapper<CustomerNoteDynamic> customerNoteMapper,
-            IDynamicMapper<CustomerAddressDynamic> addressMapper,
-            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodMapper)
+        public CustomerModelConverter(IDynamicMapper<CustomerNoteDynamic, CustomerNote> customerNoteMapper,
+            IDynamicMapper<AddressDynamic, Address> addressMapper,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodMapper)
         {
             _customerNoteMapper = customerNoteMapper;
             _addressMapper = addressMapper;
@@ -36,9 +36,9 @@ namespace VC.Admin.ModelConverters
                 }
 		    }
 
-		    if (dynamic.Addresses.Any())
+		    if (dynamic.ShippingAddresses.Any())
 		    {
-			    foreach (var address in dynamic.Addresses)
+			    foreach (var address in dynamic.ShippingAddresses)
 			    {
 				    switch (address.IdObjectType)
 				    {
@@ -98,14 +98,14 @@ namespace VC.Admin.ModelConverters
 				var addressDynamic = _addressMapper.FromModel(model.ProfileAddress);
 				addressDynamic.IdObjectType = (int)AddressType.Profile;
 				addressDynamic.Data.Email = model.Email;
-				dynamic.Addresses.Add(addressDynamic);
+				dynamic.ShippingAddresses.Add(addressDynamic);
 			}
 			if (model.Shipping.Any())
 			{
 				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping)))
 				{
 					addressDynamic.IdObjectType = (int)AddressType.Shipping;
-					dynamic.Addresses.Add(addressDynamic);
+					dynamic.ShippingAddresses.Add(addressDynamic);
 				}
 			}
 	        foreach (var creditCard in model.CreditCards)

@@ -14,7 +14,7 @@ namespace VitalChoice.DynamicData.Entities
 	    {
 			ApprovedPaymentMethods = new List<int>();
 			OrderNotes = new List<int>();
-			Addresses = new List<CustomerAddressDynamic>();
+			ShippingAddresses = new List<AddressDynamic>();
 			CustomerNotes = new List<CustomerNoteDynamic>();
             CustomerPaymentMethods = new List<CustomerPaymentMethodDynamic>();
 			Files = new List<CustomerFile>();
@@ -34,7 +34,9 @@ namespace VitalChoice.DynamicData.Entities
 
 		public ICollection<int> OrderNotes { get; set; }
 
-		public ICollection<CustomerAddressDynamic> Addresses { get; set; }
+        public AddressDynamic ProfileAddress { get; set; }
+
+        public ICollection<AddressDynamic> ShippingAddresses { get; set; }
 
 		public ICollection<CustomerNoteDynamic> CustomerNotes { get; set; }
 

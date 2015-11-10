@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity.Storage;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.UnitOfWork;

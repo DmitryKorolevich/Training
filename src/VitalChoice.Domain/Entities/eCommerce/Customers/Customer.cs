@@ -14,7 +14,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 	    {
 			PaymentMethods = new List<CustomerToPaymentMethod>();
 			OrderNotes = new List<CustomerToOrderNote>();
-			Addresses = new List<Address>();
+			ShippingAddresses = new List<CustomerToShippingAddress>();
 			CustomerNotes = new List<CustomerNote>();
 			CustomerPaymentMethods = new List<CustomerPaymentMethod>();
         }
@@ -33,11 +33,15 @@ namespace VitalChoice.Domain.Entities.eCommerce.Customers
 
         public int? IdAffiliate { get; set; }
 
+        public int IdProfileAddress { get; set; }
+
+        public Address ProfileAddress { get; set; }
+
         public ICollection<CustomerToPaymentMethod> PaymentMethods { get; set; }
 
 	    public ICollection<CustomerToOrderNote> OrderNotes { get; set; }
 
-	    public ICollection<Address> Addresses { get; set; }
+	    public ICollection<CustomerToShippingAddress> ShippingAddresses { get; set; }
 
 	    public ICollection<CustomerNote> CustomerNotes { get; set; }
 

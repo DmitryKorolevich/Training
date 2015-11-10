@@ -21,6 +21,7 @@ using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Affiliates;
+using Microsoft.AspNet.Authorization;
 
 namespace VC.Public.Controllers
 {
@@ -32,12 +33,12 @@ namespace VC.Public.Controllers
 		private readonly ICustomerService _customerService;
         private readonly IAffiliateService _affiliateService;
         private readonly IPaymentMethodService _paymentMethodService;
-		private readonly IDynamicMapper<CustomerDynamic> _customerMapper;
+		private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
 
 		public AccountController(
             IStorefrontUserService userService,
             IHttpContextAccessor contextAccessor, 
-            IDynamicMapper<CustomerDynamic> customerMapper, 
+            IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
             ICustomerService customerService,
             IAffiliateService affiliateService,
             IPaymentMethodService paymentMethodService)

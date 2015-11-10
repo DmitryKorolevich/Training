@@ -1,10 +1,10 @@
-﻿#if !DNXCORE50
+﻿#if !DOTNET5_4
 using System.Net;
 using System.Net.Mail;
 #endif
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Domain.Entities.Options;
 using System;
 
@@ -72,7 +72,7 @@ namespace VitalChoice.Business.Mail
             {
                 if (disposing)
                 {
-#if !DNXCORE50
+#if !DOTNET5_4
                     _client.Dispose();
 #endif
                 }

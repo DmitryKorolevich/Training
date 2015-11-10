@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using JetBrains.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Query.Internal;
 
 namespace VitalChoice.Data.Extensions
 {

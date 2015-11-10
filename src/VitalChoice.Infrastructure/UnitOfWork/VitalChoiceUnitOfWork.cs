@@ -1,5 +1,5 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.OptionsModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Infrastructure.Context;

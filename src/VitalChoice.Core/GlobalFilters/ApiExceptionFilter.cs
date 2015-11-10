@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Core.Services;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;

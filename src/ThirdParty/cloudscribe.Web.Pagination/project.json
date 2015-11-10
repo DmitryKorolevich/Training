@@ -1,0 +1,34 @@
+﻿{
+  "version": "1.0.0-rc1",
+  "title": "cloudscribe.Web.Pagination",
+  "description": "an ASP.NET 5 TagHelper for pagination",
+  "authors": [ "Joe Audette" ],
+  "owners": [ "Source Tree Solutions" ],
+  "tags": [ "cloudscribe","mvc6","pagination","navigation","bootstrap" ],
+  "projectUrl": "https://github.com/joeaudette/cloudscribe.Web.Pagination",
+  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+  "copyright": "2015 Source Tree Solutions",
+  "iconUrl": "https://raw.githubusercontent.com/joeaudette/cloudscribe.Web.Pagination/master/cloudscribe-icon-32.png",
+  "requireLicenseAcceptance": false,
+  "releaseNotes": "",
+
+  "dependencies": {
+    "Microsoft.AspNet.Mvc": "6.0.0-*",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*"
+
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-*",
+        "System.Collections": "4.0.11-*",
+        "System.Linq": "4.0.1-*",
+        "System.Linq.Queryable": "4.0.1-*",
+        "System.Runtime": "4.0.21-*",
+        "System.Threading": "4.0.11-*"
+      }
+    }
+  }
+}

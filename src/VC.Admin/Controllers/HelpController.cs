@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Services;
@@ -37,7 +37,7 @@ using VC.Admin.Models.Help;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain.Entities.Help;
-using Microsoft.Framework.Primitives;
+using Microsoft.Extensions.Primitives;
 #if DNX451
 using System.Net.Mime;
 #endif

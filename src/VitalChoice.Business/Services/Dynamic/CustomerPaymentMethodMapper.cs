@@ -57,25 +57,18 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = pair.Dynamic;
 
                 entity.BillingAddress = await _customerAddressMapper.ToEntityAsync(dynamic.Address);
-                entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
                 entity.IdCustomer = dynamic.IdCustomer;
             });
         }
 
-        protected override async Task UpdateEntityRangeInternalAsync(
+        protected override Task UpdateEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerPaymentMethodDynamic, CustomerPaymentMethod>> items)
         {
-            await
+            return
                 _customerAddressMapper.UpdateEntityRangeAsync(
                     items.Select(
-                        i => new DynamicEntityPair<CustomerAddressDynamic, Address>(i.Dynamic.Address, i.Entity.BillingAddress))
+                        i => new DynamicEntityPair<AddressDynamic, Address>(i.Dynamic.Address, i.Entity.BillingAddress))
                         .ToList());
-            items.ForEach(pair =>
-            {
-                var entity = pair.Entity;
-                var dynamic = pair.Dynamic;
-                entity.BillingAddress.IdCustomer = dynamic.IdCustomer;
-            });
         }
     }
 }

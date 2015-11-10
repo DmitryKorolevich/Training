@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;
@@ -17,7 +17,6 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
-using Microsoft.Dnx.Runtime.Infrastructure;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Entities.eCommerce;
@@ -25,7 +24,7 @@ using System;
 using VitalChoice.DynamicData.Entities;
 using VC.Admin.Models.Order;
 using Autofac;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VC.Admin.Controllers
 {

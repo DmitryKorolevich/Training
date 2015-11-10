@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Settings;
 using VitalChoice.Interfaces.Services;

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Users;

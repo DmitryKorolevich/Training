@@ -15,7 +15,7 @@ namespace VitalChoice.Core.GlobalFilters
             if (!context.ModelState.IsValid)
             {
                 var result = new Result<object>(false);
-                foreach (KeyValuePair<string, ModelState> keyValue in context.ModelState)
+                foreach (var keyValue in context.ModelState)
                 {
                     if (keyValue.Value.Errors != null && keyValue.Value.Errors.Count > 0)
                         result.AddMessage(keyValue.Key,

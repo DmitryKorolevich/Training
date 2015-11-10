@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 #if DNX451
 using System.Transactions;
 #endif
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Order;
 using VitalChoice.Business.Queries.Payment;
 using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -150,7 +151,7 @@ namespace VitalChoice.Business.Services.Customers
 			appUser.Email = model.Email;
             appUser.UserName = model.Email;
 
-            var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+            var profileAddress = model.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
 			appUser.FirstName = profileAddress.Data.FirstName;
 			appUser.LastName = profileAddress.Data.LastName;
 
@@ -181,7 +182,7 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    var roles = MapCustomerTypeToRole(model);
 
-			var profileAddress = model.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
+			var profileAddress = model.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
             var appUser = new ApplicationUser()
             {
                 FirstName = profileAddress.Data.FirstName,
@@ -260,7 +261,7 @@ namespace VitalChoice.Business.Services.Customers
             }
 
 			if (
-				model.Addresses.Where(
+				model.ShippingAddresses.Where(
 					x => x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != (int)RecordStatusCode.Deleted)
 					.All(x => !x.Data.Default))
 			{
@@ -271,7 +272,7 @@ namespace VitalChoice.Business.Services.Customers
 			return errors;
 		}
 
-		protected async override Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+		protected override async Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
 		{
 			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
@@ -286,10 +287,7 @@ namespace VitalChoice.Business.Services.Customers
 			await
 				customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes.WhereAll(model.OrderNotes,
 					(n, dn) => n.IdOrderNote != dn));
-			foreach (var address in entity.Addresses)
-			{
-				await addressOptionValuesRepositoryAsync.DeleteAllAsync(address.OptionValues);
-			}
+		    await addressOptionValuesRepositoryAsync.DeleteAllAsync(entity.ShippingAddresses.SelectMany(s => s.ShippingAddress.OptionValues));
 			foreach (var note in entity.CustomerNotes)
 			{
 				await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
@@ -322,26 +320,25 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		protected async override Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+		protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
 		{
 			var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
 			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
 			var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
-			var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
+            var customerToShippingAddressRep = uow.RepositoryAsync<CustomerToShippingAddress>();
+            var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
 
-			await
-				addressesRepositoryAsync.DeleteAllAsync(
-					entity.Addresses.Where(a => a.StatusCode == (int)RecordStatusCode.Deleted));
+		    await
+		        addressesRepositoryAsync.DeleteAllAsync(
+		            entity.ShippingAddresses.Select(s => s.ShippingAddress).Where(a => a.StatusCode == (int) RecordStatusCode.Deleted));
 			await
 				customerNoteRepository.DeleteAllAsync(
 					entity.CustomerNotes.Where(n => n.StatusCode == (int)RecordStatusCode.Deleted));
 
-			await
-				addressesRepositoryAsync.InsertGraphRangeAsync(
-					entity.Addresses.Where(
-						a =>
-							a.Id == 0 && a.IdObjectType != (int?)AddressType.Billing &&
-							a.StatusCode != (int)RecordStatusCode.Deleted));
+		    await
+		        customerToShippingAddressRep.InsertGraphRangeAsync(
+		            entity.ShippingAddresses.Where(
+		                a => a.ShippingAddress.Id == 0 && a.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted));
 			await
 				customerNoteRepository.InsertGraphRangeAsync(
 					entity.CustomerNotes.Where(n => n.StatusCode != (int)RecordStatusCode.Deleted && n.Id == 0));
@@ -398,8 +395,9 @@ namespace VitalChoice.Business.Services.Customers
 				.Include(p => p.DefaultPaymentMethod)
 				.Include(p => p.User)
 				.ThenInclude(p => p.Customer)
-				.Include(a => a.Addresses)
-				.ThenInclude(a => a.OptionValues)
+				.Include(a => a.ShippingAddresses)
+				.ThenInclude(a => a.ShippingAddress)
+                .ThenInclude(a => a.OptionValues)
 				.Include(p => p.CustomerNotes)
 				.ThenInclude(n => n.OptionValues)
 				.Include(p => p.OrderNotes)
@@ -466,24 +464,25 @@ namespace VitalChoice.Business.Services.Customers
 
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
         {
-            var condition =
-				new VCustomerQuery().NotDeleted()
-                    .WithIdContains(filter.IdContains)
-                    .WithId(filter.SearchText)
-                    .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
-                    .WithEmail(filter.Email)
-					.WithAddress1(filter.Address1)
-					.WithAddress2(filter.Address2)
-					.WithCity(filter.City)
-					.WithCompany(filter.Company)
-					.WithCountry(filter.Country)
-					.WithFirstName(filter.FirstName)
-					.WithLastName(filter.LastName)
-					.WithPhone(filter.Phone)
-					.WithState(filter.State)
-					.WithZip(filter.Zip);
 
-			Func<IQueryable<VCustomer>, IOrderedQueryable<VCustomer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
+
+    //        var condition =
+				//new VCustomerQuery().NotDeleted()
+    //                .WithIdContains(filter.IdContains)
+    //                .WithId(filter.SearchText)
+    //                .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
+    //                .WithEmail(filter.Email)
+    //                .WithAddress1(filter.Address1)
+    //                .WithAddress2(filter.Address2)
+    //                .WithCity(filter.City)
+    //                .WithCompany(filter.Company)
+    //                .WithCountry(filter.Country)
+    //                .WithFirstName(filter.FirstName)
+    //                .WithLastName(filter.LastName)
+    //                .WithPhone(filter.Phone)
+    //                .WithState(filter.State)
+    //                .WithZip(filter.Zip);
+            Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
 			var sortOrder = filter.Sorting.SortOrder;
 			switch (filter.Sorting.Path)
 			{
@@ -494,13 +493,13 @@ namespace VitalChoice.Business.Services.Customers
                                 ? x.OrderBy(y => y.Id)
                                 : x.OrderByDescending(y => y.Id);
                     break;
-                case VCustomerSortPath.Name:
-					sortable =
-						(x) =>
-							sortOrder == SortOrder.Asc
-								? x.OrderBy(y => y.LastName).ThenBy(y => y.FirstName)
-								: x.OrderByDescending(y => y.LastName).ThenByDescending(y => y.FirstName);
-                    break;
+     //           case VCustomerSortPath.Name:
+					//sortable =
+					//	(x) =>
+					//		sortOrder == SortOrder.Asc
+					//			? x.OrderBy(y => y.LastName).ThenBy(y => y.FirstName)
+					//			: x.OrderByDescending(y => y.LastName).ThenByDescending(y => y.FirstName);
+     //               break;
                 case VCustomerSortPath.Email:
                     sortable =
                         (x) =>
@@ -515,27 +514,27 @@ namespace VitalChoice.Business.Services.Customers
 								? x.OrderBy(y => y.DateEdited)
 								: x.OrderByDescending(y => y.DateEdited);
 					break;
-				case VCustomerSortPath.Country:
-					sortable =
-						(x) =>
-							sortOrder == SortOrder.Asc
-								? x.OrderBy(y => y.CountryCode)
-								: x.OrderByDescending(y => y.CountryCode);
-					break;
-				case VCustomerSortPath.City:
-					sortable =
-						(x) =>
-							sortOrder == SortOrder.Asc
-								? x.OrderBy(y => y.City)
-								: x.OrderByDescending(y => y.City);
-					break;
-				case VCustomerSortPath.State:
-					sortable =
-						(x) =>
-							sortOrder == SortOrder.Asc
-								? x.OrderBy(y => y.StateOrCounty)
-								: x.OrderByDescending(y => y.StateOrCounty);
-					break;
+				//case VCustomerSortPath.Country:
+				//	sortable =
+				//		(x) =>
+				//			sortOrder == SortOrder.Asc
+				//				? x.OrderBy(y => y.CountryCode)
+				//				: x.OrderByDescending(y => y.CountryCode);
+				//	break;
+				//case VCustomerSortPath.City:
+				//	sortable =
+				//		(x) =>
+				//			sortOrder == SortOrder.Asc
+				//				? x.OrderBy(y => y.City)
+				//				: x.OrderByDescending(y => y.City);
+				//	break;
+				//case VCustomerSortPath.State:
+				//	sortable =
+				//		(x) =>
+				//			sortOrder == SortOrder.Asc
+				//				? x.OrderBy(y => y.StateOrCounty)
+				//				: x.OrderByDescending(y => y.StateOrCounty);
+				//	break;
 				case VCustomerSortPath.Status:
 					sortable =
 						(x) =>
@@ -545,48 +544,61 @@ namespace VitalChoice.Business.Services.Customers
 					break;
 			}
 
-			var customers = await _vCustomerRepositoryAsync.Query(condition).OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            var customers =
+                await
+                    SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
+                        new CustomerQuery().WithIdContains(filter.IdContains)
+                            .WithEmailContains(filter.Email)
+                            .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
+                            .FilterAddress(filter.Address),
+                        includes =>
+                            includes.Include(c => c.ProfileAddress)
+                                .ThenInclude(c => c.OptionValues)
+                                .Include(c => c.ProfileAddress)
+                                .ThenInclude(a => a.Country)
+                                .Include(c => c.ProfileAddress)
+                                .ThenInclude(a => a.State), orderBy: sortable, withDefaults: true);
 
-			var adminProfileCondition =
-				new AdminProfileQuery().IdInRange(
-					customers.Items.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
+            var adminProfileCondition =
+                new AdminProfileQuery().IdInRange(
+                    customers.Items.Where(x => x.IdEditedBy.HasValue).Select(x => x.IdEditedBy.Value).ToList());
 
 			var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
 
-			var result = new PagedList<ExtendedVCustomer>
-			{
-				Items = customers.Items.Select(x => new ExtendedVCustomer()
-				{
-					AdminProfile = adminProfiles.SingleOrDefault(y => y.Id == x.IdEditedBy),
-					IdEditedBy = x.IdEditedBy,
-					FirstName = x.FirstName,
-					LastName = x.LastName,
-					DateEdited = x.DateEdited,
-					IdObjectType = x.IdObjectType,
-					CountryCode = x.CountryCode,
-					StateCode = x.StateCode,
-					StateName = x.StateName,
-					CountryName = x.CountryName,
-					City = x.City,
-					Company = x.Company,
-					Id = x.Id,
-					Address1 = x.Address1,
-					Address2 = x.Address2,
-					Email = x.Email,
-					Phone = x.Phone,
-					Zip = x.Zip,
-					County = x.County,
-					StateOrCounty = x.StateOrCounty,
-					StatusCode = x.StatusCode,
-                    LastOrderPlaced = x.LastOrderPlaced,
-                    FirstOrderPlaced = x.FirstOrderPlaced,
-                    TotalOrders = x.TotalOrders,
+            var result = new PagedList<ExtendedVCustomer>
+            {
+                Items = customers.Items.Select(x => new ExtendedVCustomer()
+                {
+                    AdminProfile = adminProfiles.SingleOrDefault(y => y.Id == x.IdEditedBy),
+                    IdEditedBy = x.IdEditedBy,
+                    FirstName = x.ProfileAddress.Data.FirstName,
+                    LastName = x.ProfileAddress.Data.LastName,
+                    DateEdited = x.DateEdited,
+                    IdObjectType = (CustomerType)x.IdObjectType,
+                    CountryCode = x.ProfileAddress.Country.CountryCode,
+                    StateCode = x.ProfileAddress.State?.StateCode,
+                    StateName = x.ProfileAddress.State?.StateName,
+                    CountryName = x.ProfileAddress.Country.CountryCode,
+                    City = x.ProfileAddress.Data.City,
+                    Company = x.ProfileAddress.Data.Company,
+                    Id = x.Id,
+                    Address1 = x.ProfileAddress.Data.Address1,
+                    Address2 = x.ProfileAddress.Data.Address2,
+                    Email = x.Email,
+                    Phone = x.ProfileAddress.Data.Phone,
+                    Zip = x.ProfileAddress.Data.Zip,
+                    County = x.ProfileAddress.County,
+                    StateOrCounty = x.ProfileAddress.County ?? x.ProfileAddress.State?.StateCode,
+                    StatusCode = x.StatusCode,
+                    //LastOrderPlaced = x.LastOrderPlaced,
+                    //FirstOrderPlaced = x.FirstOrderPlaced,
+                    //TotalOrders = x.TotalOrders,
                 }).ToList(),
-				Count = customers.Count
-			};
+                Count = customers.Count
+            };
 
-			return result;
-		}
+            return result;
+        }
 
 	    public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null)
 	    {

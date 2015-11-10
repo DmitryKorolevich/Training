@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Services;
@@ -47,7 +47,7 @@ namespace VC.Admin.Controllers
     public class AffiliateController : BaseApiController
     {
         private readonly IAffiliateService _affiliateService;
-        private readonly IDynamicMapper<AffiliateDynamic> _mapper;
+        private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _mapper;
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
@@ -59,7 +59,7 @@ namespace VC.Admin.Controllers
             IAffiliateService affiliateService,
             IAffiliateUserService affiliateUserService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<AffiliateDynamic> mapper,
+            IDynamicMapper<AffiliateDynamic, Affiliate> mapper,
             IAppInfrastructureService appInfrastructureService,
             IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> exportAffiliateOrderListItemService,
             IOrderService orderService,

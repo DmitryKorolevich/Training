@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;

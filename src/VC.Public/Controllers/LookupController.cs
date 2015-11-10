@@ -19,6 +19,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using System.Linq;
+using Microsoft.AspNet.Authorization;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Country;

@@ -41,14 +41,14 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IStorefrontUserService _storefrontUserService;
 		private readonly ICustomerService _customerService;
-		private readonly IDynamicMapper<CustomerAddressDynamic> _addressConverter;
-		private readonly IDynamicMapper<CustomerPaymentMethodDynamic> _paymentMethodConverter;
+		private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
 		private readonly IProductService _productService;
 		private readonly IOrderService _orderService;
 
 		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-			ICustomerService customerService, IDynamicMapper<CustomerAddressDynamic> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic> paymentMethodConverter, IOrderService orderService, IProductService productService)
+			ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
@@ -120,7 +120,7 @@ namespace VC.Public.Controllers
 			var shippingAddresses = new List<ShippingInfoModel>();
 			foreach (
 				var shipping in
-					currentCustomer.Addresses.Where(p => p.IdObjectType == (int)AddressType.Shipping))
+					currentCustomer.ShippingAddresses.Where(p => p.IdObjectType == (int)AddressType.Shipping))
 			{
 				var shippingModel = _addressConverter.ToModel<ShippingInfoModel>(shipping);
 
@@ -172,8 +172,8 @@ namespace VC.Public.Controllers
 		private void CleanProfileEmailFields(ChangeProfileModel model)
 		{
 			model.ConfirmEmail = model.NewEmail = string.Empty;
-			ModelState["NewEmail"] = new ModelState();
-			ModelState["ConfirmEmail"] = new ModelState();
+			ModelState["NewEmail"] = new ModelStateEntry();
+			ModelState["ConfirmEmail"] = new ModelStateEntry();
 		}
 
 		public IActionResult Index()
@@ -218,7 +218,7 @@ namespace VC.Public.Controllers
 
 			var model =
 				_addressConverter.ToModel<ChangeProfileModel>(
-					currentCustomer.Addresses.Single(x => x.IdObjectType == (int) AddressType.Profile));
+					currentCustomer.ShippingAddresses.Single(x => x.IdObjectType == (int) AddressType.Profile));
 
 			return View(model);
 		}
@@ -237,10 +237,10 @@ namespace VC.Public.Controllers
 
 			var oldEmail = customer.Email;
 
-			customer.Addresses = customer.Addresses.Where(x => x.IdObjectType != (int)AddressType.Profile).ToList();
+			customer.ShippingAddresses = customer.ShippingAddresses.Where(x => x.IdObjectType != (int)AddressType.Profile).ToList();
 			var newProfileAddress = _addressConverter.FromModel(model);
 			newProfileAddress.IdObjectType = (int) AddressType.Profile;
-			customer.Addresses.Add(newProfileAddress);
+			customer.ShippingAddresses.Add(newProfileAddress);
 			customer.Email =
 				newProfileAddress.Data.Email =
 					!string.IsNullOrWhiteSpace(model.NewEmail) && !string.IsNullOrWhiteSpace(model.ConfirmEmail)
@@ -264,7 +264,7 @@ namespace VC.Public.Controllers
 
 			model =
 				_addressConverter.ToModel<ChangeProfileModel>(
-					customer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Profile && x.StatusCode != (int)RecordStatusCode.Deleted));
+					customer.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Profile && x.StatusCode != (int)RecordStatusCode.Deleted));
 
 			return View(model);
 		}
@@ -328,7 +328,7 @@ namespace VC.Public.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			currentCustomer.Addresses = currentCustomer.Addresses.Where(x=>x.Id != creditCardToDelete.Address.Id).ToList();
+			currentCustomer.ShippingAddresses = currentCustomer.ShippingAddresses.Where(x=>x.Id != creditCardToDelete.Address.Id).ToList();
 			currentCustomer.CustomerPaymentMethods.Remove(creditCardToDelete);
 
 			await _customerService.UpdateAsync(currentCustomer);
@@ -358,13 +358,13 @@ namespace VC.Public.Controllers
 
 			if (model.Id > 0)
 			{
-				var shippingAddressToUpdate = currentCustomer.Addresses.Single(x => x.IdObjectType == (int)AddressType.Shipping && x.Id == model.Id);
-				currentCustomer.Addresses.Remove(shippingAddressToUpdate);
+				var shippingAddressToUpdate = currentCustomer.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Shipping && x.Id == model.Id);
+				currentCustomer.ShippingAddresses.Remove(shippingAddressToUpdate);
 			}
 
 			if (model.Default)
 			{
-				var otherAddresses = currentCustomer.Addresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
+				var otherAddresses = currentCustomer.ShippingAddresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
 				foreach (var otherAddress in otherAddresses)
 				{
 					otherAddress.Data.Default = false;
@@ -374,7 +374,7 @@ namespace VC.Public.Controllers
 			var newAddress = _addressConverter.FromModel(model);
 			newAddress.IdObjectType = (int)AddressType.Shipping;
 
-			currentCustomer.Addresses.Add(newAddress);
+			currentCustomer.ShippingAddresses.Add(newAddress);
 
 			currentCustomer = await _customerService.UpdateAsync(currentCustomer);
 
@@ -384,7 +384,7 @@ namespace VC.Public.Controllers
 
 			if (model.Id == 0 )
 			{
-				ModelState["Id"].RawValue = model.Id = currentCustomer.Addresses.Last(x => x.IdObjectType == (int) AddressType.Shipping).Id;
+				ModelState["Id"].RawValue = model.Id = currentCustomer.ShippingAddresses.Last(x => x.IdObjectType == (int) AddressType.Shipping).Id;
 			}
 
 			return View(PopulateShippingAddress(currentCustomer, model.Id));
@@ -395,13 +395,13 @@ namespace VC.Public.Controllers
 		{
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
-			var shippingAddressToDelete = currentCustomer.Addresses.FirstOrDefault(x => x.IdObjectType == (int)AddressType.Shipping && x.Id == id);
+			var shippingAddressToDelete = currentCustomer.ShippingAddresses.FirstOrDefault(x => x.IdObjectType == (int)AddressType.Shipping && x.Id == id);
 			if (shippingAddressToDelete == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			currentCustomer.Addresses.Remove(shippingAddressToDelete);
+			currentCustomer.ShippingAddresses.Remove(shippingAddressToDelete);
 
 			await _customerService.UpdateAsync(currentCustomer);
 
@@ -414,7 +414,7 @@ namespace VC.Public.Controllers
 			var currentCustomer = await GetCurrentCustomerDynamic();
 
 			var found = false;
-			var addresses = currentCustomer.Addresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
+			var addresses = currentCustomer.ShippingAddresses.Where(x => x.IdObjectType == (int)AddressType.Shipping);
 			foreach (var address in addresses)
 			{
 				if (address.Id == id)

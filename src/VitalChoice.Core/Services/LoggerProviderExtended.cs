@@ -5,18 +5,18 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Extensions;
-#if !DNXCORE50
+#if !DOTNET5_4
 using NLog;
 #endif
 using VitalChoice.Interfaces.Services;
-using ILogger = Microsoft.Framework.Logging.ILogger;
-using LogLevel = Microsoft.Framework.Logging.LogLevel;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace VitalChoice.Core.Services
 {
-#if !DNXCORE50
+#if !DOTNET5_4
     public static class NLogLoggerFactoryExtensions
     {
         public static ILoggerFactory AddNLog(
@@ -117,7 +117,7 @@ namespace VitalChoice.Core.Services
         internal LoggerProviderExtended(string basePath, string logPath)
         {
             _factory = new LoggerFactory();
-#if !DNXCORE50
+#if !DOTNET5_4
             int backLevelCount = 0;
             var searchPath = basePath;
             while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)
@@ -162,7 +162,7 @@ namespace VitalChoice.Core.Services
 
         public ILogger CreateLoggerDefault()
         {
-#if !DNXCORE50
+#if !DOTNET5_4
             return CreateLogger(new StackFrame(1, false).GetMethod().DeclaringType);
 #else
             return CreateLogger(string.Empty);

@@ -5,9 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Services;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Domain.Avatax;
+using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Options;
@@ -19,13 +20,14 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Workflow.Contexts;
+using Address = VitalChoice.Domain.Avatax.Address;
 
 namespace VitalChoice.Business.Services.Avatax
 {
     public class AvalaraTax : IAvalaraTax
     {
         private readonly ITaxService _taxService;
-        private readonly IDynamicMapper<OrderAddressDynamic> _mapper;
+        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _mapper;
         private readonly ILogger _logger;
         private readonly string _accountName;
         private readonly string _profileName;
@@ -35,7 +37,7 @@ namespace VitalChoice.Business.Services.Avatax
         internal const string ShippingTaxCode = "FR020100";
 
         public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<OrderAddressDynamic> mapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> mapper)
         {
             _taxService = taxService;
             _mapper = mapper;

@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-#if DNX451 || DNXCORE50
-using Microsoft.Dnx.Runtime;
-using Microsoft.Dnx.Runtime.Infrastructure;
-#endif
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace VitalChoice.Domain.Helpers
 {
     public static class NativeHelper {
-#if DNXCORE50
         private static readonly IAssemblyLoadContextAccessor LoadContextAccessor =
             (IAssemblyLoadContextAccessor)
                 CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IAssemblyLoadContextAccessor));
 
         private static readonly Func<object> GetCurrentDomain;
         private static readonly Func<object, Assembly[]> AssembliesGetter;
-#endif
 
         static NativeHelper() {
-#if DNXCORE50
+#if DOTNET5_4
             var type = typeof(object).GetTypeInfo().Assembly.GetType("System.AppDomain");
             if (type == null) {
                 throw new InvalidOperationException("Cannot find System.AppDomain class in system library, investigate to issue and rewrite assembly list acquire");
@@ -34,7 +29,7 @@ namespace VitalChoice.Domain.Helpers
 #endif
         }
 
-#if DNXCORE50
+#if DOTNET5_4
         internal static Assembly[] GetAssemblies() {
             var domain = GetCurrentDomain();
             return AssembliesGetter(domain);

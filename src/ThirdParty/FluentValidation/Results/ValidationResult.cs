@@ -21,8 +21,8 @@ namespace FluentValidation.Results {
 	using System.Collections.Generic;
 	using System.Linq;
 
-#if !SILVERLIGHT && !PORTABLE && !PORTABLE40 && !DNXCORE50
-	[Serializable]
+#if !SILVERLIGHT && !PORTABLE && !PORTABLE40 && !DOTNET5_4
+    [Serializable]
 #endif
 	public class ValidationResult {
 		private readonly List<ValidationFailure> errors = new List<ValidationFailure>();

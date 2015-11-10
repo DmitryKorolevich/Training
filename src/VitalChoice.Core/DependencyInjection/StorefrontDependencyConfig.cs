@@ -5,25 +5,12 @@ using System.Threading.Tasks;
 using Autofac;
 using cloudscribe.Web.Pagination;
 using Microsoft.AspNet.Identity;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VitalChoice.Core.DependencyInjection
 {
     public class StorefrontDependencyConfig:DefaultDependencyConfig
     {
-	    protected override void BeginCustomRegistrations(IServiceCollection builder)
-	    {
-			builder.AddCookieAuthentication(x =>
-			{
-				x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
-				x.LogoutPath = "/Account/Logout";
-				x.AccessDeniedPath = "/Shared/AccessDenied";
-				x.LoginPath = "/Account/Login";
-				x.ReturnUrlParameter = "returnUrl";
-				x.CookieName = "VitalChoice.Public";
-			});
-		}
-
 	    protected override void FinishCustomRegistrations(ContainerBuilder builder)
 	    {
             builder.RegisterType<PaginationLinkBuilder>().As<IBuildPaginationLinks>();

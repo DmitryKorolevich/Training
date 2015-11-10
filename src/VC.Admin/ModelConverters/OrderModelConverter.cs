@@ -27,15 +27,15 @@ namespace VC.Admin.ModelConverters
 {
     public class OrderModelConverter : BaseModelConverter<OrderManageModel, OrderDynamic>
     {
-        private readonly IDynamicMapper<OrderPaymentMethodDynamic> _paymentMethodMapper;
-        private readonly IDynamicMapper<OrderAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMethodMapper;
+        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
         private readonly IGcService _gcService;
         private readonly IProductService _productService;
 
-        public OrderModelConverter(IDynamicMapper<OrderAddressDynamic> addressMapper,
-            IDynamicMapper<OrderPaymentMethodDynamic> paymentMethodMapper, ICustomerService customerService,
+        public OrderModelConverter(IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMethodMapper, ICustomerService customerService,
             IDiscountService discountService, IGcService gcService, IProductService productService)
         {
             _addressMapper = addressMapper;
@@ -175,31 +175,31 @@ namespace VC.Admin.ModelConverters
                         dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
 
                         var profileAddress =
-                            dbCustomer.Addresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
+                            dbCustomer.ShippingAddresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
                         if (profileAddress != null)
                         {
-                            dbCustomer.Addresses.Remove(profileAddress);
+                            dbCustomer.ShippingAddresses.Remove(profileAddress);
                         }
                         profileAddress =
-                            dynamic.Customer.Addresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
+                            dynamic.Customer.ShippingAddresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
                         if (profileAddress != null)
                         {
-                            dbCustomer.Addresses.Add(profileAddress);
+                            dbCustomer.ShippingAddresses.Add(profileAddress);
                         }
 
                         if (model.UpdateShippingAddressForCustomer)
                         {
                             var shippingAddresses =
-                                dbCustomer.Addresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
+                                dbCustomer.ShippingAddresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
                             foreach (var address in shippingAddresses)
                             {
-                                dbCustomer.Addresses.Remove(address);
+                                dbCustomer.ShippingAddresses.Remove(address);
                             }
                             shippingAddresses =
-                                dynamic.Customer.Addresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
+                                dynamic.Customer.ShippingAddresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
                             foreach (var address in shippingAddresses)
                             {
-                                dbCustomer.Addresses.Add(address);
+                                dbCustomer.ShippingAddresses.Add(address);
                             }
                         }
 

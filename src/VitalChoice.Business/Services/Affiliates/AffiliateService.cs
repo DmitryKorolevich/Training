@@ -38,7 +38,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.Options;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using System.Collections;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Business.Queries.Customer;

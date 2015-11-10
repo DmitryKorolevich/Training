@@ -2,6 +2,8 @@
 using VitalChoice.Data.Helpers;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Addresses;
+using VitalChoice.Domain.Transfer.Customers;
+using VitalChoice.DynamicData.Extensions;
 
 namespace VitalChoice.Business.Queries.Customer
 {
@@ -30,7 +32,32 @@ namespace VitalChoice.Business.Queries.Customer
 			return this;
 		}
 
-		public CustomerQuery WithId(string text)
+        public CustomerQuery WithEmailContains(string email)
+        {
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                Add(p => p.Email.Contains(email));
+            }
+            return this;
+        }
+
+        public CustomerQuery WithIdAffiliate(int? idAffiliate, bool required)
+        {
+            if (required)
+            {
+                Add(c => c.IdAffiliate == idAffiliate);
+            }
+            else
+            {
+                if (idAffiliate != null)
+                {
+                    Add(c => c.IdAffiliate == idAffiliate);
+                }
+            }
+            return this;
+        }
+
+        public CustomerQuery WithId(string text)
 		{
 			int intValue;
 			if (int.TryParse(text, out intValue))
@@ -39,5 +66,18 @@ namespace VitalChoice.Business.Queries.Customer
 			}
 			return this;
 		}
-	}
+
+        public CustomerQuery WithIdContains(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+                Add(x => x.Id.ToString().Contains(text));
+            return this;
+        }
+
+        public CustomerQuery FilterAddress(CustomerAddressFilter filter)
+        {
+            Add(c => c.ProfileAddress.WhenValues(filter, (int) AddressType.Profile));
+            return this;
+        }
+    }
 }

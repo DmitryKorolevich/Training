@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Services;
@@ -46,8 +46,8 @@ namespace VC.Admin.Controllers
     public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
-        private readonly IDynamicMapper<OrderDynamic> _mapper;
-        private readonly IDynamicMapper<OrderAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<OrderDynamic, Order> _mapper;
+        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger logger;
@@ -55,8 +55,8 @@ namespace VC.Admin.Controllers
         public OrderController(
             IOrderService orderService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<OrderDynamic> mapper, ICustomerService customerService,
-            IDynamicMapper<OrderAddressDynamic> addressMapper,
+            IDynamicMapper<OrderDynamic, Order> mapper, ICustomerService customerService,
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _orderService = orderService;
@@ -200,7 +200,7 @@ namespace VC.Admin.Controllers
                 item.IdEditedBy = userId;
             }
             item.Customer.IdEditedBy = userId;
-            foreach (var address in item.Customer.Addresses)
+            foreach (var address in item.Customer.ShippingAddresses)
             {
                 address.IdEditedBy = userId;
             }

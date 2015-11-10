@@ -7,11 +7,14 @@ using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Dnx.Runtime;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using VC.Admin.AppConfig;
 using VitalChoice.Business.Services;
@@ -74,6 +77,16 @@ namespace VC.Admin
 			app.UseCookieAuthentication();
 
 			app.UseMvc(RouteConfig.RegisterRoutes);
+
+		    app.UseCookieAuthentication(x =>
+		    {
+		        x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+		        x.LogoutPath = PathString.Empty;
+		        x.AccessDeniedPath = PathString.Empty;
+		        x.LoginPath = PathString.Empty;
+		        x.ReturnUrlParameter = null;
+		        x.CookieName = "VitalChoice.Admin";
+		    });
 		}
 	}
 }

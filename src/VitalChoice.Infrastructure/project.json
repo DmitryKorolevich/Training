@@ -3,24 +3,23 @@
   "version": "1.0.0-*",
   "dependencies": {
     "EntityFramework.Core": "7.0.0-*",
+    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-    "Microsoft.Framework.OptionsModel": "1.0.0-*",
+    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
-    "WindowsAzure.Storage": "5.0.1-*",
-    "Templates": "2.3.3-beta8"
+    "WindowsAzure.Storage": "6.0.1-*",
+    "Templates": "2.3.3-rc1"
   },
 
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] },
       "dependencies": {
         "NLog": "4.0.1"
       }
     },
-    "dnxcore50": {
-      "compilationOptions": { "define": [ "DNXCORE50" ] },
+    "dotnet5.4": {
       "dependencies": {
         "System.Runtime": "4.0.21-*"
       }

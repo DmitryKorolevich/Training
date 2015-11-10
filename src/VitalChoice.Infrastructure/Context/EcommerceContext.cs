@@ -3,7 +3,7 @@ using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using System.Data.SqlClient;
 using System.IO;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
@@ -64,7 +64,7 @@ namespace VitalChoice.Infrastructure.Context
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.UseSqlServerIdentityColumns();
+            builder.ForSqlServerUseIdentityColumns();
 
             #region Base
 
@@ -85,39 +85,39 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WorkflowExecutor>()
                 .HasMany(e => e.ResolverPaths)
                 .WithOne(r => r.Resolver)
-                .ForeignKey(r => r.IdResolver)
-                .PrincipalKey(e => e.Id);
+                .HasForeignKey(r => r.IdResolver)
+                .HasPrincipalKey(e => e.Id);
             builder.Entity<WorkflowExecutor>()
                 .HasMany(e => e.ResolverPaths)
                 .WithOne(r => r.Resolver)
-                .ForeignKey(r => r.IdResolver)
-                .PrincipalKey(e => e.Id);
+                .HasForeignKey(r => r.IdResolver)
+                .HasPrincipalKey(e => e.Id);
             builder.Entity<WorkflowExecutor>()
                 .HasMany(e => e.Dependencies)
                 .WithOne(d => d.Parent)
-                .ForeignKey(d => d.IdParent)
-                .PrincipalKey(e => e.Id);
+                .HasForeignKey(d => d.IdParent)
+                .HasPrincipalKey(e => e.Id);
 
             builder.Entity<WorkflowResolverPath>().HasKey(w => w.Id);
             builder.Entity<WorkflowResolverPath>().ToTable("WorkflowResolverPaths");
             builder.Entity<WorkflowResolverPath>()
                 .HasOne(resolverPath => resolverPath.Executor)
                 .WithMany()
-                .ForeignKey(resolverPath => resolverPath.IdExecutor)
-                .PrincipalKey(executor => executor.Id);
+                .HasForeignKey(resolverPath => resolverPath.IdExecutor)
+                .HasPrincipalKey(executor => executor.Id);
             builder.Entity<WorkflowResolverPath>()
                 .HasOne(w => w.Resolver)
                 .WithMany(r => r.ResolverPaths)
-                .ForeignKey(w => w.IdResolver)
-                .PrincipalKey(w => w.Id);
+                .HasForeignKey(w => w.IdResolver)
+                .HasPrincipalKey(w => w.Id);
 
             builder.Entity<WorkflowTree>().HasKey(w => w.Id);
             builder.Entity<WorkflowTree>().ToTable("WorkflowTrees");
             builder.Entity<WorkflowTree>()
                 .HasMany(tree => tree.Actions)
                 .WithOne(action => action.Tree)
-                .ForeignKey(action => action.IdTree)
-                .PrincipalKey(tree => tree.Id);
+                .HasForeignKey(action => action.IdTree)
+                .HasPrincipalKey(tree => tree.Id);
 
             builder.Entity<WorkflowTreeAction>().HasKey(a => new { a.IdExecutor, a.IdTree });
             builder.Entity<WorkflowTreeAction>().Ignore(a => a.Id);
@@ -125,13 +125,13 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<WorkflowTreeAction>()
                 .HasOne(treeAction => treeAction.Executor)
                 .WithOne()
-                .ForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
-                .PrincipalKey<WorkflowExecutor>(executor => executor.Id);
+                .HasForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
+                .HasPrincipalKey<WorkflowExecutor>(executor => executor.Id);
             builder.Entity<WorkflowTreeAction>()
                 .HasOne(action => action.Tree)
                 .WithMany(tree => tree.Actions)
-                .ForeignKey(action => action.IdTree)
-                .PrincipalKey(tree => tree.Id);
+                .HasForeignKey(action => action.IdTree)
+                .HasPrincipalKey(tree => tree.Id);
 
             builder.Entity<WorkflowActionDependency>(entity =>
             {
@@ -140,12 +140,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(d => d.Id);
                 entity.HasOne(d => d.Parent)
                     .WithMany(e => e.Dependencies)
-                    .ForeignKey(d => d.IdParent)
-                    .PrincipalKey(e => e.Id);
+                    .HasForeignKey(d => d.IdParent)
+                    .HasPrincipalKey(e => e.Id);
                 entity.HasOne(d => d.Dependent)
                     .WithMany()
-                    .ForeignKey(d => d.IdDependent)
-                    .PrincipalKey(e => e.Id);
+                    .HasForeignKey(d => d.IdDependent)
+                    .HasPrincipalKey(e => e.Id);
             });
 
             builder.Entity<WorkflowActionAggregation>(entity =>
@@ -155,12 +155,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(d => d.Id);
                 entity.HasOne(d => d.Parent)
                     .WithMany(e => e.Aggreagations)
-                    .ForeignKey(d => d.IdParent)
-                    .PrincipalKey(e => e.Id);
+                    .HasForeignKey(d => d.IdParent)
+                    .HasPrincipalKey(e => e.Id);
                 entity.HasOne(d => d.ToAggregate)
                     .WithMany()
-                    .ForeignKey(d => d.IdAggregate)
-                    .PrincipalKey(e => e.Id);
+                    .HasForeignKey(d => d.IdAggregate)
+                    .HasPrincipalKey(e => e.Id);
             });
 
             #endregion
@@ -180,17 +180,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<DiscountOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<DiscountOptionValue>().HasKey(o => o.Id);
             builder.Entity<DiscountOptionValue>().ToTable("DiscountOptionValues");
             builder.Entity<DiscountOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id);
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id);
 
             builder.Entity<DiscountOptionValue>().Ignore(d => d.BigValue);
             builder.Entity<DiscountOptionValue>().Ignore(d => d.IdBigString);
@@ -217,48 +217,48 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Discount>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(o => o.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<Discount>().Ignore(p => p.OptionTypes);
 
             builder.Entity<Discount>()
                 .HasMany(p => p.DiscountsToCategories)
                 .WithOne()
-                .ForeignKey(t => t.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Discount>()
                 .HasMany(p => p.DiscountsToSelectedCategories)
                 .WithOne()
-                .ForeignKey(t => t.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Discount>()
                 .HasMany(p => p.DiscountsToSkus)
                 .WithOne()
-                .ForeignKey(t => t.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Discount>()
                 .HasMany(p => p.DiscountsToSelectedSkus)
                 .WithOne()
-                .ForeignKey(t => t.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Discount>()
                 .HasMany(p => p.DiscountTiers)
                 .WithOne()
-                .ForeignKey(t => t.IdDiscount)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdDiscount)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Discount>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(o => o.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(o => o.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             #endregion
 
@@ -273,17 +273,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<PromotionOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<PromotionOptionValue>().HasKey(o => o.Id);
             builder.Entity<PromotionOptionValue>().ToTable("PromotionOptionValues");
             builder.Entity<PromotionOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id);
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id);
 
             builder.Entity<PromotionOptionValue>().Ignore(d => d.BigValue);
             builder.Entity<PromotionOptionValue>().Ignore(d => d.IdBigString);
@@ -304,36 +304,36 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Promotion>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdPromotion)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(o => o.IdPromotion)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<Promotion>().Ignore(p => p.OptionTypes);
 
             builder.Entity<Promotion>()
                 .HasMany(p => p.PromotionsToBuySkus)
                 .WithOne()
-                .ForeignKey(t => t.IdPromotion)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdPromotion)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Promotion>()
                 .HasMany(p => p.PromotionsToGetSkus)
                 .WithOne()
-                .ForeignKey(t => t.IdPromotion)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdPromotion)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Promotion>()
                 .HasMany(p => p.PromotionsToSelectedCategories)
                 .WithOne()
-                .ForeignKey(t => t.IdPromotion)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdPromotion)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Promotion>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(o => o.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(o => o.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
 			#endregion
 
@@ -347,8 +347,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductCategory>()
                 .HasMany(cat => cat.ProductToCategories)
                 .WithOne()
-                .ForeignKey(c => c.IdCategory)
-                .PrincipalKey(cat => cat.Id);
+                .HasForeignKey(c => c.IdCategory)
+                .HasPrincipalKey(cat => cat.Id);
 
             builder.Entity<InventoryCategory>().HasKey(p => p.Id);
             builder.Entity<InventoryCategory>().ToTable("InventoryCategories");
@@ -371,9 +371,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<ProductOptionValue>().HasKey(o => o.Id);
             builder.Entity<ProductOptionValue>().ToTable("ProductOptionValues");
@@ -382,15 +382,15 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(v => v.IdOptionType)
-                .PrincipalKey(t => t.Id)
-                .Required();
+                .HasForeignKey(v => v.IdOptionType)
+                .HasPrincipalKey(t => t.Id)
+                .IsRequired();
             builder.Entity<ProductOptionValue>()
                 .HasOne(v => v.BigValue)
                 .WithMany()
-                .ForeignKey(v => v.IdBigString)
-                .PrincipalKey(b => b.IdBigString)
-                .Required(false);
+                .HasForeignKey(v => v.IdBigString)
+                .HasPrincipalKey(b => b.IdBigString)
+                .IsRequired(false);
             builder.Entity<ProductOptionValue>().Property(v => v.IdBigString).IsRequired(false);
 
             builder.Entity<ProductTypeEntity>().HasKey(t => t.Id);
@@ -402,8 +402,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Sku>()
                 .HasMany(s => s.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdSku).Required(false)
-                .PrincipalKey(s => s.Id);
+                .HasForeignKey(o => o.IdSku).IsRequired(false)
+                .HasPrincipalKey(s => s.Id);
             builder.Entity<Sku>().Ignore(p => p.OptionTypes);
             builder.Entity<Sku>().Ignore(p => p.EditedBy);
             builder.Entity<Sku>().Ignore(p => p.IdEditedBy);
@@ -417,29 +417,29 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Product>()
                 .HasMany(p => p.Skus)
                 .WithOne(p => p.Product)
-                .ForeignKey(s => s.IdProduct)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(s => s.IdProduct)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Product>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdProduct).Required(false)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(o => o.IdProduct).IsRequired(false)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<Product>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(o => o.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(o => o.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
 
             builder.Entity<Product>().Ignore(p => p.OptionTypes);
 
             builder.Entity<Product>()
                 .HasMany(p => p.ProductsToCategories)
                 .WithOne()
-                .ForeignKey(t => t.IdProduct)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(t => t.IdProduct)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
 
             builder.Entity<ProductReview>().HasKey(p => p.Id);
             builder.Entity<ProductReview>().ToTable("ProductReviews");
@@ -447,9 +447,9 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductReview>()
                 .HasOne(p => p.Product)
                 .WithMany()
-                .ForeignKey(s => s.IdProduct)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(s => s.IdProduct)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
 
             builder.Entity<ProductOutOfStockRequest>().HasKey(p => p.Id);
             builder.Entity<ProductOutOfStockRequest>().ToTable("ProductOutOfStockRequests");
@@ -466,8 +466,8 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Lookup>()
                 .HasMany(p => p.LookupVariants)
                 .WithOne(p => p.Lookup)
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id);
 
             #endregion
 
@@ -500,88 +500,104 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Customer>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<Customer>()
                 .HasOne(p => p.User)
                 .WithOne(u => u.Customer)
-                .ForeignKey<Customer>(p => p.Id)
-                .PrincipalKey<User>(p => p.Id)
-                .Required();
+                .HasForeignKey<Customer>(p => p.Id)
+                .HasPrincipalKey<User>(p => p.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdCustomer)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(o => o.IdCustomer)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasOne(p => p.CustomerType)
                 .WithMany(p => p.Customers)
-                .ForeignKey(p => p.IdObjectType)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(p => p.IdObjectType)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.PaymentMethods)
                 .WithOne(p => p.Customer)
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasOne(p => p.DefaultPaymentMethod)
                 .WithOne()
-                .ForeignKey<Customer>(p => p.IdDefaultPaymentMethod)
-                .PrincipalKey<PaymentMethod>(p => p.Id)
-                .Required();
+                .HasForeignKey<Customer>(p => p.IdDefaultPaymentMethod)
+                .HasPrincipalKey<PaymentMethod>(p => p.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.OrderNotes)
                 .WithOne(p => p.Customer)
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Customer>()
-                .HasMany(p => p.Addresses)
+                .HasOne(p => p.ProfileAddress)
                 .WithOne()
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey<Customer>(p => p.IdProfileAddress)
+                .HasPrincipalKey<Address>(c => c.Id)
+                .IsRequired();
+            builder.Entity<Customer>()
+                .HasMany(p => p.ShippingAddresses)
+                .WithOne()
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.CustomerPaymentMethods)
                 .WithOne()
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.CustomerNotes)
                 .WithOne()
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Customer>()
                 .HasMany(p => p.Files)
                 .WithOne()
-                .ForeignKey(p => p.IdCustomer)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCustomer)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
 
             builder.Entity<Customer>().Ignore(p => p.OptionTypes);
+
+            builder.Entity<CustomerToShippingAddress>(entity =>
+            {
+                entity.HasKey(c => new {c.IdCustomer, c.IdAddress});
+                entity.HasOne(c => c.Customer).WithMany(c => c.ShippingAddresses).HasForeignKey(c => c.IdCustomer).HasPrincipalKey(c => c.Id);
+                entity.HasOne(c => c.ShippingAddress)
+                    .WithOne()
+                    .HasForeignKey<CustomerToShippingAddress>(c => c.IdAddress)
+                    .HasPrincipalKey<Address>(c => c.Id);
+            });
 
             builder.Entity<CustomerOptionType>().HasKey(p => p.Id);
             builder.Entity<CustomerOptionType>().ToTable("CustomerOptionTypes");
             builder.Entity<CustomerOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerOptionValue>().HasKey(o => o.Id);
             builder.Entity<CustomerOptionValue>().ToTable("CustomerOptionValues");
             builder.Entity<CustomerOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id)
-                .Required();
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id)
+                .IsRequired();
 
             builder.Entity<CustomerFile>().HasKey(p => p.Id);
             builder.Entity<CustomerFile>().ToTable("CustomerFiles");
@@ -592,15 +608,15 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerNote>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerNote>()
                 .HasMany(n => n.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdCustomerNote)
-                .PrincipalKey(n => n.Id)
-                .Required();
+                .HasForeignKey(o => o.IdCustomerNote)
+                .HasPrincipalKey(n => n.Id)
+                .IsRequired();
 
             builder.Entity<CustomerNote>().Ignore(n => n.OptionTypes);
 
@@ -610,17 +626,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerNoteOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerNoteOptionValue>().HasKey(o => o.Id);
             builder.Entity<CustomerNoteOptionValue>().ToTable("CustomerNoteOptionValues");
             builder.Entity<CustomerNoteOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id)
-                .Required();
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id)
+                .IsRequired();
 
             builder.Entity<CustomerNoteOptionValue>().Ignore(c => c.BigValue);
             builder.Entity<CustomerNoteOptionValue>().Ignore(c => c.IdBigString);
@@ -630,17 +646,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerTypeEntity>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerTypeEntity>().HasMany(p => p.PaymentMethods)
                 .WithOne(p => p.CustomerType)
-                .ForeignKey(p => p.IdCustomerType)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdCustomerType)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<CustomerTypeEntity>().HasMany(p => p.OrderNotes)
                 .WithOne(p => p.CustomerType)
-                .ForeignKey(p => p.IdCustomerType)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdCustomerType)
+                .HasPrincipalKey(p => p.Id);
 
             builder.Entity<CustomerToOrderNote>().Ignore(p => p.Id);
             builder.Entity<CustomerToOrderNote>().HasKey(p => new { p.IdCustomer, p.IdOrderNote });
@@ -657,29 +673,29 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<Address>().HasKey(p => p.Id);
             builder.Entity<Address>().ToTable("Addresses");
             builder.Entity<Address>()
-                .HasOne(p => p.Сountry)
+                .HasOne(p => p.Country)
                 .WithMany()
-                .ForeignKey(p => p.IdCountry)
-                .PrincipalKey(c => c.Id)
-                .Required();
+                .HasForeignKey(p => p.IdCountry)
+                .HasPrincipalKey(c => c.Id)
+                .IsRequired();
             builder.Entity<Address>()
                 .HasOne(p => p.State)
                 .WithMany()
-                .ForeignKey(p => p.IdState)
-                .PrincipalKey(s => s.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdState)
+                .HasPrincipalKey(s => s.Id)
+                .IsRequired(false);
             builder.Entity<Address>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<Address>()
                 .HasMany(a => a.OptionValues)
                 .WithOne()
-                .ForeignKey(o => o.IdAddress)
-                .PrincipalKey(a => a.Id)
-                .Required();
+                .HasForeignKey(o => o.IdAddress)
+                .HasPrincipalKey(a => a.Id)
+                .IsRequired();
 
             builder.Entity<Address>().Ignore(a => a.OptionTypes);
 
@@ -688,17 +704,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<AddressOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<AddressOptionValue>().HasKey(o => o.Id);
             builder.Entity<AddressOptionValue>().ToTable("AddressOptionValues");
             builder.Entity<AddressOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id)
-                .Required();
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id)
+                .IsRequired();
 
             builder.Entity<AddressOptionValue>().Ignore(c => c.BigValue);
             builder.Entity<AddressOptionValue>().Ignore(c => c.IdBigString);
@@ -716,27 +732,27 @@ namespace VitalChoice.Infrastructure.Context
             //builder.Entity<OrderNoteToCustomerType>()
             //    .HasOne(n => n.CustomerType)
             //    .WithMany()
-            //    .ForeignKey(n => n.IdCustomerType)
-            //    .PrincipalKey(t => t.Id)
-            //    .Required();
+            //    .HasForeignKey(n => n.IdCustomerType)
+            //    .HasPrincipalKey(t => t.Id)
+            //    .IsRequired();
 
             builder.Entity<OrderNote>().HasKey(p => p.Id);
             builder.Entity<OrderNote>().ToTable("OrderNotes");
             builder.Entity<OrderNote>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<OrderNote>()
                 .HasMany(p => p.Customers)
                 .WithOne(p => p.OrderNote)
-                .ForeignKey(p => p.IdOrderNote)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdOrderNote)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<OrderNote>()
                 .HasMany(p => p.CustomerTypes)
                 .WithOne(p => p.OrderNote)
-                .ForeignKey(p => p.IdOrderNote)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdOrderNote)
+                .HasPrincipalKey(p => p.Id);
 
             #endregion
 
@@ -747,45 +763,45 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<PaymentMethod>().HasKey(p => p.Id);
             builder.Entity<PaymentMethod>().ToTable("PaymentMethods");
-            builder.Entity<PaymentMethod>().HasOne(p => p.EditedBy).WithMany().ForeignKey(p => p.IdEditedBy).PrincipalKey(p => p.Id)
-                .Required(false);
+            builder.Entity<PaymentMethod>().HasOne(p => p.EditedBy).WithMany().HasForeignKey(p => p.IdEditedBy).HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<PaymentMethod>()
                 .HasMany(p => p.Customers)
                 .WithOne(p => p.PaymentMethod)
-                .ForeignKey(p => p.IdPaymentMethod)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdPaymentMethod)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<PaymentMethod>()
                 .HasMany(p => p.CustomerTypes)
                 .WithOne(p => p.PaymentMethod)
-                .ForeignKey(p => p.IdPaymentMethod)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.IdPaymentMethod)
+                .HasPrincipalKey(p => p.Id);
 
             builder.Entity<CustomerPaymentMethod>().HasKey(p => p.Id);
             builder.Entity<CustomerPaymentMethod>().ToTable("CustomerPaymentMethods");
             builder.Entity<CustomerPaymentMethod>()
                 .HasOne(p => p.EditedBy)
                 .WithMany()
-                .ForeignKey(p => p.IdEditedBy)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdEditedBy)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerPaymentMethod>()
                 .HasOne(p => p.PaymentMethod)
                 .WithMany()
-                .ForeignKey(p => p.IdObjectType)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(p => p.IdObjectType)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
             builder.Entity<CustomerPaymentMethod>()
                 .HasOne(p => p.BillingAddress)
                 .WithOne()
-                .ForeignKey<CustomerPaymentMethod>(p => p.IdAddress)
-                .PrincipalKey<Address>(p => p.Id)
-                .Required(false);
+                .HasForeignKey<CustomerPaymentMethod>(p => p.IdAddress)
+                .HasPrincipalKey<Address>(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerPaymentMethod>()
                 .HasMany(p => p.OptionValues)
                 .WithOne()
-                .ForeignKey(v => v.IdCustomerPaymentMethod)
-                .PrincipalKey(p => p.Id)
-                .Required();
+                .HasForeignKey(v => v.IdCustomerPaymentMethod)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
 
             builder.Entity<CustomerPaymentMethod>().Ignore(a => a.OptionTypes);
 
@@ -794,17 +810,17 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CustomerPaymentMethodOptionType>()
                 .HasOne(p => p.Lookup)
                 .WithMany()
-                .ForeignKey(p => p.IdLookup)
-                .PrincipalKey(p => p.Id)
-                .Required(false);
+                .HasForeignKey(p => p.IdLookup)
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired(false);
             builder.Entity<CustomerPaymentMethodOptionValue>().HasKey(o => o.Id);
             builder.Entity<CustomerPaymentMethodOptionValue>().ToTable("CustomerPaymentMethodValues");
             builder.Entity<CustomerPaymentMethodOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()
-                .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id)
-                .Required();
+                .HasForeignKey(t => t.IdOptionType)
+                .HasPrincipalKey(v => v.Id)
+                .IsRequired();
             builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.BigValue);
             builder.Entity<CustomerPaymentMethodOptionValue>().Ignore(v => v.IdBigString);
 
@@ -831,44 +847,44 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Orders");
                 entity.HasOne(o => o.Customer)
                     .WithMany()
-                    .ForeignKey(o => o.IdCustomer)
-                    .PrincipalKey(c => c.Id)
-                    .Required();
+                    .HasForeignKey(o => o.IdCustomer)
+                    .HasPrincipalKey(c => c.Id)
+                    .IsRequired();
                 entity.HasMany(o => o.Skus)
                     .WithOne(a => a.Order)
-                    .ForeignKey(s => s.IdOrder)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(s => s.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasMany(o => o.GiftCertificates)
                     .WithOne(a => a.Order)
-                    .ForeignKey(g => g.IdOrder)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(g => g.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasOne(o => o.Discount)
                     .WithMany()
-                    .ForeignKey(o => o.IdDiscount)
-                    .PrincipalKey(d => d.Id)
-                    .Required(false);
+                    .HasForeignKey(o => o.IdDiscount)
+                    .HasPrincipalKey(d => d.Id)
+                    .IsRequired(false);
                 entity.HasOne(o => o.PaymentMethod)
                     .WithOne()
-                    .ForeignKey<Order>(o => o.IdPaymentMethod)
-                    .PrincipalKey<OrderPaymentMethod>(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey<Order>(o => o.IdPaymentMethod)
+                    .HasPrincipalKey<OrderPaymentMethod>(p => p.Id)
+                    .IsRequired(false);
                 entity.HasMany(o => o.OptionValues)
                     .WithOne()
-                    .ForeignKey(v => v.IdOrder)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(v => v.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasOne(o => o.ShippingAddress)
                     .WithOne()
-                    .ForeignKey<Order>(o => o.IdShippingAddress)
-                    .PrincipalKey<OrderAddress>(a => a.Id)
-                    .Required(false);
+                    .HasForeignKey<Order>(o => o.IdShippingAddress)
+                    .HasPrincipalKey<OrderAddress>(a => a.Id)
+                    .IsRequired(false);
                 entity.HasOne(p => p.EditedBy)
                     .WithMany()
-                    .ForeignKey(p => p.IdEditedBy)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -878,9 +894,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderOptionValues");
                 entity.HasOne(v => v.OptionType)
                     .WithOne()
-                    .ForeignKey<OrderOptionValue>(v => v.IdOptionType)
-                    .PrincipalKey<OrderOptionType>(t => t.Id)
-                    .Required();
+                    .HasForeignKey<OrderOptionValue>(v => v.IdOptionType)
+                    .HasPrincipalKey<OrderOptionType>(t => t.Id)
+                    .IsRequired();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
             });
@@ -891,9 +907,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderOptionTypes");
                 entity.HasOne(t => t.Lookup)
                     .WithOne()
-                    .ForeignKey<OrderOptionType>(t => t.IdLookup)
-                    .PrincipalKey<Lookup>(l => l.Id)
-                    .Required(false);
+                    .HasForeignKey<OrderOptionType>(t => t.IdLookup)
+                    .HasPrincipalKey<Lookup>(l => l.Id)
+                    .IsRequired(false);
             });
 
             builder.Entity<OrderToGiftCertificate>(entity =>
@@ -903,12 +919,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderToGiftCertificates");
                 entity.HasOne(g => g.GiftCertificate)
                     .WithOne()
-                    .ForeignKey<OrderToGiftCertificate>(g => g.IdGiftCertificate)
-                    .PrincipalKey<GiftCertificate>(g => g.Id);
+                    .HasForeignKey<OrderToGiftCertificate>(g => g.IdGiftCertificate)
+                    .HasPrincipalKey<GiftCertificate>(g => g.Id);
                 entity.HasOne(g => g.Order)
                     .WithMany(o => o.GiftCertificates)
-                    .ForeignKey(g => g.IdOrder)
-                    .PrincipalKey(o => o.Id);
+                    .HasForeignKey(g => g.IdOrder)
+                    .HasPrincipalKey(o => o.Id);
             });
 
             builder.Entity<OrderToSku>(entity =>
@@ -918,12 +934,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderToSkus");
                 entity.HasOne(s => s.Order)
                     .WithMany(o => o.Skus)
-                    .ForeignKey(s => s.IdOrder)
-                    .PrincipalKey(o => o.Id);
+                    .HasForeignKey(s => s.IdOrder)
+                    .HasPrincipalKey(o => o.Id);
                 entity.HasOne(s => s.Sku)
                     .WithOne()
-                    .ForeignKey<OrderToSku>(s => s.IdSku)
-                    .PrincipalKey<Sku>(s => s.Id);
+                    .HasForeignKey<OrderToSku>(s => s.IdSku)
+                    .HasPrincipalKey<Sku>(s => s.Id);
             });
 
             builder.Entity<OrderStatusEntity>(entity =>
@@ -938,24 +954,24 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderPaymentMethods");
                 entity.HasOne(o => o.BillingAddress)
                     .WithMany()
-                    .ForeignKey(o => o.IdAddress)
-                    .PrincipalKey(c => c.Id)
-                    .Required(false);
+                    .HasForeignKey(o => o.IdAddress)
+                    .HasPrincipalKey(c => c.Id)
+                    .IsRequired(false);
                 entity.HasOne(o => o.PaymentMethod)
                     .WithOne()
-                    .ForeignKey<OrderPaymentMethod>(s => s.IdObjectType)
-                    .PrincipalKey<PaymentMethod>(o => o.Id)
-                    .Required();
+                    .HasForeignKey<OrderPaymentMethod>(s => s.IdObjectType)
+                    .HasPrincipalKey<PaymentMethod>(o => o.Id)
+                    .IsRequired();
                 entity.HasMany(o => o.OptionValues)
                     .WithOne()
-                    .ForeignKey(g => g.IdOrderPaymentMethod)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(g => g.IdOrderPaymentMethod)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasOne(p => p.EditedBy)
                     .WithMany()
-                    .ForeignKey(p => p.IdEditedBy)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -965,9 +981,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderPaymentMethodOptionValues");
                 entity.HasOne(v => v.OptionType)
                     .WithOne()
-                    .ForeignKey<OrderPaymentMethodOptionValue>(v => v.IdOptionType)
-                    .PrincipalKey<CustomerPaymentMethodOptionType>(t => t.Id)
-                    .Required();
+                    .HasForeignKey<OrderPaymentMethodOptionValue>(v => v.IdOptionType)
+                    .HasPrincipalKey<CustomerPaymentMethodOptionType>(t => t.Id)
+                    .IsRequired();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
             });
@@ -978,24 +994,24 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderAddresses");
                 entity.HasOne(p => p.Сountry)
                     .WithMany()
-                    .ForeignKey(p => p.IdCountry)
-                    .PrincipalKey(c => c.Id)
-                    .Required();
+                    .HasForeignKey(p => p.IdCountry)
+                    .HasPrincipalKey(c => c.Id)
+                    .IsRequired();
                 entity.HasOne(p => p.State)
                     .WithMany()
-                    .ForeignKey(p => p.IdState)
-                    .PrincipalKey(s => s.Id)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdState)
+                    .HasPrincipalKey(s => s.Id)
+                    .IsRequired(false);
                 entity.HasOne(p => p.EditedBy)
                     .WithMany()
-                    .ForeignKey(p => p.IdEditedBy)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
                 entity.HasMany(a => a.OptionValues)
                     .WithOne()
-                    .ForeignKey(o => o.IdOrderAddress)
-                    .PrincipalKey(a => a.Id)
-                    .Required();
+                    .HasForeignKey(o => o.IdOrderAddress)
+                    .HasPrincipalKey(a => a.Id)
+                    .IsRequired();
                 entity.Ignore(a => a.OptionTypes);
             });
 
@@ -1005,9 +1021,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OrderAddressOptionValues");
                 entity.HasOne(v => v.OptionType)
                     .WithMany()
-                    .ForeignKey(t => t.IdOptionType)
-                    .PrincipalKey(v => v.Id)
-                    .Required();
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id)
+                    .IsRequired();
                 entity.Ignore(v => v.BigValue);
                 entity.Ignore(v => v.IdBigString);
             });
@@ -1018,14 +1034,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("RefundSkus");
                 entity.HasOne(r => r.Order)
                     .WithMany()
-                    .ForeignKey(r => r.IdOrder)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(r => r.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasOne(r => r.Sku)
                     .WithMany()
-                    .ForeignKey(r => r.IdSku)
-                    .PrincipalKey(s => s.Id)
-                    .Required();
+                    .HasForeignKey(r => r.IdSku)
+                    .HasPrincipalKey(s => s.Id)
+                    .IsRequired();
             });
 
             builder.Entity<ReshipProblemSku>(entity =>
@@ -1034,14 +1050,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("ReshipProblemSkus");
                 entity.HasOne(r => r.Order)
                     .WithMany()
-                    .ForeignKey(r => r.IdOrder)
-                    .PrincipalKey(o => o.Id)
-                    .Required();
+                    .HasForeignKey(r => r.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.HasOne(r => r.Sku)
                     .WithMany()
-                    .ForeignKey(r => r.IdSku)
-                    .PrincipalKey(s => s.Id)
-                    .Required();
+                    .HasForeignKey(r => r.IdSku)
+                    .HasPrincipalKey(s => s.Id)
+                    .IsRequired();
             });
 
             #endregion
@@ -1061,14 +1077,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("AffiliateOptionValues");
                 entity.HasOne(v => v.OptionType)
                     .WithMany()
-                    .ForeignKey(t => t.IdOptionType)
-                    .PrincipalKey(v => v.Id)
-                    .Required();
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id)
+                    .IsRequired();
                 entity.HasOne(v => v.BigValue)
                     .WithMany()
-                    .ForeignKey(v => v.IdBigString)
-                    .PrincipalKey(b => b.IdBigString)
-                    .Required(false);
+                    .HasForeignKey(v => v.IdBigString)
+                    .HasPrincipalKey(b => b.IdBigString)
+                    .IsRequired(false);
                 entity.Property(v => v.IdBigString).IsRequired(false);
             });
 
@@ -1078,9 +1094,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("AffiliateOptionTypes");
                 entity.HasOne(p => p.Lookup)
                     .WithMany()
-                    .ForeignKey(p => p.IdLookup)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
             });
 
             builder.Entity<Affiliate>(entity =>
@@ -1089,20 +1105,20 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Affiliates");
                 entity.HasOne(p => p.User)
                     .WithMany()
-                    .ForeignKey(p => p.Id)
-                    .PrincipalKey(p => p.Id)
-                    .Required();
+                    .HasForeignKey(p => p.Id)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.HasMany(p => p.OptionValues)
                     .WithOne()
-                    .ForeignKey(o => o.IdAffiliate)
-                    .PrincipalKey(p => p.Id)
-                    .Required();
+                    .HasForeignKey(o => o.IdAffiliate)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.Ignore(p => p.OptionTypes);
                 entity.HasOne(p => p.EditedBy)
                     .WithMany()
-                    .ForeignKey(o => o.IdEditedBy)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(o => o.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
                 entity.Ignore(p => p.IdObjectType);
             });
 
@@ -1112,9 +1128,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("AffiliateOrderPayments");
                 entity.HasOne(p => p.Order)
                     .WithOne(p => p.AffiliateOrderPayment)
-                    .ForeignKey<AffiliateOrderPayment>(p=>p.Id)
-                    .PrincipalKey<Order>(p => p.Id)
-                    .Required();
+                    .HasForeignKey<AffiliateOrderPayment>(p=>p.Id)
+                    .HasPrincipalKey<Order>(p => p.Id)
+                    .IsRequired();
             });
 
             builder.Entity<AffiliatePayment>(entity =>
@@ -1123,9 +1139,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("AffiliatePayments");
                 entity.HasMany(p => p.OrderPayments)
                     .WithOne()
-                    .ForeignKey(o => o.IdAffiliatePayment)
-                    .PrincipalKey(p => p.Id)
-                    .Required(false);
+                    .HasForeignKey(o => o.IdAffiliatePayment)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
             });
 
             builder.Entity<VCustomerInAffiliate>(entity =>
@@ -1144,14 +1160,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("HelpTickets");
                 entity.HasOne(p => p.Order)
                     .WithMany()
-                    .ForeignKey(p => p.IdOrder)
-                    .PrincipalKey(p => p.Id)
-                    .Required();
+                    .HasForeignKey(p => p.IdOrder)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.HasMany(p => p.Comments)
                     .WithOne(p => p.HelpTicket)
-                    .ForeignKey(p => p.IdHelpTicket)
-                    .PrincipalKey(p => p.Id)
-                    .Required();
+                    .HasForeignKey(p => p.IdHelpTicket)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.Ignore(p => p.IdCustomer);
                 entity.Ignore(p => p.Customer);
                 entity.Ignore(p => p.CustomerEmail);
@@ -1189,9 +1205,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(p => p.EditedBy);
                 entity.HasOne(p => p.DataItem)
                     .WithMany()
-                    .ForeignKey(p => p.IdObjectHistoryLogDataItem)
-                    .PrincipalKey(p => p.IdObjectHistoryLogDataItem)
-                    .Required(false);
+                    .HasForeignKey(p => p.IdObjectHistoryLogDataItem)
+                    .HasPrincipalKey(p => p.IdObjectHistoryLogDataItem)
+                    .IsRequired(false);
             });
 
             #endregion

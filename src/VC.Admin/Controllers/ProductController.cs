@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Services;
@@ -38,14 +38,14 @@ namespace VC.Admin.Controllers
         private readonly IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService;
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
-        private readonly IDynamicMapper<ProductDynamic> _mapper;
+        private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
             IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
             IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
-            ILoggerProviderExtended loggerProvider, IDynamicMapper<ProductDynamic> mapper,
+            ILoggerProviderExtended loggerProvider, IDynamicMapper<ProductDynamic, Product> mapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             this.productCategoryService = productCategoryService;

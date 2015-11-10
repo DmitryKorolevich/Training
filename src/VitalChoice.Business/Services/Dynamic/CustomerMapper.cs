@@ -42,7 +42,8 @@ namespace VitalChoice.Business.Services.Dynamic
             get { return c => c.IdCustomer; }
         }
 
-        protected async override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items,
+            bool withDefaults = false)
         {
             await items.ForEachAsync(async item =>
             {
@@ -53,18 +54,22 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.PublicId = entity.PublicId;
                 dynamic.IdDefaultPaymentMethod = entity.IdDefaultPaymentMethod;
                 dynamic.IdAffiliate = entity.IdAffiliate;
-
+                dynamic.ProfileAddress = await _customerAddressMapper.FromEntityAsync(entity.ProfileAddress, withDefaults);
                 dynamic.ApprovedPaymentMethods = entity.PaymentMethods?.Select(p => p.IdPaymentMethod).ToList();
                 dynamic.OrderNotes = entity.OrderNotes?.Select(p => p.IdOrderNote).ToList();
-            
-                dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes, withDefaults));                
-                dynamic.Addresses.AddRange(await _customerAddressMapper.FromEntityRangeAsync(entity.Addresses, withDefaults));
-                dynamic.CustomerPaymentMethods.AddRange(await _paymentMethodMapper.FromEntityRangeAsync(entity.CustomerPaymentMethods, withDefaults));
-	            dynamic.Files = entity.Files;
+
+                dynamic.CustomerNotes.AddRange(await _customerNoteMapper.FromEntityRangeAsync(entity.CustomerNotes, withDefaults));
+                dynamic.ShippingAddresses.AddRange(
+                    await
+                        _customerAddressMapper.FromEntityRangeAsync(entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList(),
+                            withDefaults));
+                dynamic.CustomerPaymentMethods.AddRange(
+                    await _paymentMethodMapper.FromEntityRangeAsync(entity.CustomerPaymentMethods, withDefaults));
+                dynamic.Files = entity.Files;
             });
         }
 
-        protected async override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
+        protected override async Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
         {
             await items.ForEachAsync(async pair =>
             {
@@ -88,11 +93,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdCustomer = dynamic.Id,
                         IdOrderNote = c
                     });
-
-                foreach (var address in dynamic.Addresses)
-                {
-                    address.IdCustomer = dynamic.Id;
-                }
+                
                 foreach (var note in dynamic.CustomerNotes)
                 {
                     note.IdCustomer = dynamic.Id;
@@ -101,15 +102,17 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
-                await _customerAddressMapper.SyncCollectionsAsync(dynamic.Addresses, entity.Addresses);
+                var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
+                await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
                         entity.CustomerPaymentMethods);
-			});
+                await _customerAddressMapper.UpdateEntityAsync(dynamic.ProfileAddress, entity.ProfileAddress);
+            });
         }
 
-        protected async override Task ToEntityRangeInternalAsync(
+        protected override async Task ToEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
         {
             await items.ForEachAsync(async item =>
@@ -139,7 +142,16 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdOrderNote = c
                 }).ToList();
 
-                entity.Addresses = await _customerAddressMapper.ToEntityRangeAsync(dynamic.Addresses);
+                var addresses = await _customerAddressMapper.ToEntityRangeAsync(dynamic.ShippingAddresses);
+                foreach (var address in addresses)
+                {
+                    entity.ShippingAddresses.Add(new CustomerToShippingAddress
+                    {
+                        IdCustomer = dynamic.Id,
+                        ShippingAddress = address
+                    });
+                }
+                entity.ProfileAddress = await _customerAddressMapper.ToEntityAsync(dynamic.ProfileAddress);
                 entity.CustomerNotes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes);
 				entity.Files = dynamic.Files;
 			});

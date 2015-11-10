@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
   "dependencies": {
-    "Microsoft.Framework.OptionsModel": "1.0.0-*",
+    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "System.Net.Http": "4.0.1-*",
     "Newtonsoft.Json": "7.0.1",
@@ -15,7 +15,7 @@
   "frameworks": {
     "dnx451": {
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
         "System.Collections": "4.0.11-*",

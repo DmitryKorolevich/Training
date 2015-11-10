@@ -57,6 +57,8 @@ namespace VitalChoice.DynamicData.Base
 
         private Expression FilterCollectionInternal(object model, Type modelType, Expression parameter, bool all, int? idObjectType, bool lookObjectId)
         {
+            if (model == null)
+                return Expression.Constant(true);
             IDictionary<string, object> filterDictionary;
             var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 
@@ -84,6 +86,8 @@ namespace VitalChoice.DynamicData.Base
 
         private Expression FilterInternal(object model, Type modelType, Expression parameter, int? idObjectType, bool lookObjectId)
         {
+            if (model == null)
+                return Expression.Constant(true);
             IDictionary<string, object> filterDictionary;
             var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 

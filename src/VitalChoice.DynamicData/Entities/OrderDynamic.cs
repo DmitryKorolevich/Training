@@ -37,7 +37,7 @@ namespace VitalChoice.DynamicData.Entities
         [NotLoggedInfo]
         public OrderPaymentMethodDynamic PaymentMethod { get; set; }
 
-        public OrderAddressDynamic ShippingAddress { get; set; }
+        public AddressDynamic ShippingAddress { get; set; }
 
         public decimal Total { get; set; }
 

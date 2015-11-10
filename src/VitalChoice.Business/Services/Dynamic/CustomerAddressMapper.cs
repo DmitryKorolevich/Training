@@ -15,7 +15,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class CustomerAddressMapper : DynamicMapper<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+    public class CustomerAddressMapper : DynamicMapper<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
     {
         public CustomerAddressMapper(ITypeConverter converter,
             IModelConverterService converterService,
@@ -30,30 +30,30 @@ namespace VitalChoice.Business.Services.Dynamic
         }
 
         protected override Task FromEntityRangeInternalAsync(
-            ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items, bool withDefaults = false)
+            ICollection<DynamicEntityPair<AddressDynamic, Address>> items, bool withDefaults = false)
         {
             items.ForEach(item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                dynamic.IdCustomer = entity.IdCustomer;
                 dynamic.IdCountry = entity.IdCountry;
                 dynamic.County = entity.County;
                 dynamic.IdState = entity.IdState;
+                dynamic.State = entity.State;
+                dynamic.Country = entity.Country;
             });
             return Task.Delay(0);
         }
 
         protected override Task UpdateEntityRangeInternalAsync(
-            ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items)
+            ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
         {
             items.ForEach(item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.IdCustomer = dynamic.IdCustomer;
                 entity.IdCountry = dynamic.IdCountry;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
@@ -62,14 +62,13 @@ namespace VitalChoice.Business.Services.Dynamic
             return Task.Delay(0);
         }
 
-        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<CustomerAddressDynamic, Address>> items)
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, Address>> items)
         {
             items.ForEach(item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.IdCustomer = dynamic.IdCustomer;
                 entity.IdCountry = dynamic.IdCountry;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;

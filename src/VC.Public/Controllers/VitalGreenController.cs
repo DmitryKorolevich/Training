@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.ModelConverters;
@@ -23,7 +24,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Domain.Transfer.Country;
 using Microsoft.AspNet.Mvc.Rendering;
 using Newtonsoft.Json;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Interfaces.Services;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Domain.Entities.VitalGreen;

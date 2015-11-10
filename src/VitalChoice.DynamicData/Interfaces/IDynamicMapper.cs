@@ -10,8 +10,9 @@ using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {
-    public interface IDynamicMapper<TDynamic> : IObjectMapper<TDynamic> 
+    public interface IDynamicMapper<TDynamic, TEntity> : IObjectMapper<TDynamic> 
         where TDynamic : MappedObject
+        where TEntity: DynamicDataEntity
     {
     }
 
@@ -82,7 +83,7 @@ namespace VitalChoice.DynamicData.Interfaces
         Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
     }
 
-    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>
+    public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic, TEntity>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

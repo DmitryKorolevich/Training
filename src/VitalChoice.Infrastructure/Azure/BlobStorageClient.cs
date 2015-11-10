@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using VitalChoice.Domain.Entities.Options;
@@ -22,8 +22,8 @@ namespace VitalChoice.Infrastructure.Azure
 	    private async Task<CloudBlockBlob> ResolveBlob(string containerName, string blobName)
 	    {
 			var container = _blobClient.GetContainerReference(containerName);
-
-			var result = await container.CreateIfNotExistsAsync();
+#if !DOTNET5_4
+            var result = await container.CreateIfNotExistsAsync();
 
 		    if (result)
 		    {
@@ -34,7 +34,7 @@ namespace VitalChoice.Infrastructure.Azure
 						BlobContainerPublicAccessType.Off
 				});
 			}
-
+#endif
 		    return container.GetBlockBlobReference(blobName);
 	    }
 

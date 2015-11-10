@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
@@ -21,6 +21,7 @@ using VitalChoice.DynamicData.Entities;
 using System;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
+using VitalChoice.Domain.Entities.eCommerce.Promotion;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VC.Admin.Controllers
@@ -30,7 +31,7 @@ namespace VC.Admin.Controllers
     {
         private readonly IPromotionService _promotionService;
         private readonly IProductService _productService;
-        private readonly IDynamicMapper<PromotionDynamic> _mapper;
+        private readonly IDynamicMapper<PromotionDynamic, Promotion> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -39,7 +40,7 @@ namespace VC.Admin.Controllers
             IPromotionService promotionService, 
             IProductService productService, 
             ILoggerProviderExtended loggerProvider, 
-            IDynamicMapper<PromotionDynamic> mapper,
+            IDynamicMapper<PromotionDynamic, Promotion> mapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _promotionService = promotionService;

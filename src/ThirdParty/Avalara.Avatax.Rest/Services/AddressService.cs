@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Avalara.Avatax.Rest.Utility;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
 using VitalChoice.Domain.Avatax;
 using VitalChoice.Domain.Entities.Options;

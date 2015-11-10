@@ -1,4 +1,4 @@
-﻿#if DNXCORE50 || DNX451
+﻿#if DOTNET5_4 || DNX451
 #endif
 using System;
 using System.Collections.Generic;

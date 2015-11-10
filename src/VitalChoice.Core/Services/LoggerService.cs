@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Core.Services
 {
@@ -10,7 +10,7 @@ namespace VitalChoice.Core.Services
 
         public static ILogger GetDefault()
         {
-#if !DNXCORE50
+#if !DOTNET5_4
             return _loggerProviderExtended?.CreateLogger(new StackFrame(1, false).GetMethod().DeclaringType);
 #else
             return _loggerProviderExtended?.CreateLogger(string.Empty);

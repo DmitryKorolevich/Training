@@ -22,10 +22,11 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VC.Public.Models.Affiliate;
 using VitalChoice.Interfaces.Services;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Core.Infrastructure;
+using Microsoft.AspNet.Authorization;
 
 namespace VC.Public.Controllers
 {
@@ -36,12 +37,12 @@ namespace VC.Public.Controllers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly IPaymentMethodService _paymentMethodService;
-        private readonly IDynamicMapper<AffiliateDynamic> _affiliateMapper;
+        private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(
             IAffiliateUserService userService,
             IHttpContextAccessor contextAccessor,
-            IDynamicMapper<AffiliateDynamic> affiliateMapper,
+            IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IAffiliateService affiliateService)
         {
             _userService = userService;

@@ -38,10 +38,9 @@ namespace VitalChoice.DynamicData.Extensions
                             typeof (IDynamicMapper<,,,>).MakeGenericType(
                                 mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,,,>))))
                         .As(
-                            typeof (IDynamicMapper<>).MakeGenericType(
-                                mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
+                            typeof (IDynamicMapper<,>).MakeGenericType(mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,>))))
                         .As(typeof (IObjectMapper<>).MakeGenericType(
-                            mapperType.TryGetElementType(typeof (IDynamicMapper<>))))
+                            mapperType.TryGetElementType(typeof (IDynamicMapper<,>))))
                         .As(typeof (IOptionTypeQueryProvider<,,>).MakeGenericType(
                             mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>))))
                         .AsSelf()

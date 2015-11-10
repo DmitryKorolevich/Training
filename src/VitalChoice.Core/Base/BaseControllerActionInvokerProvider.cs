@@ -5,8 +5,8 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Models.Interfaces;
 using Microsoft.AspNet.Mvc.Abstractions;
@@ -16,6 +16,7 @@ using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.AspNet.Mvc.Infrastructure;
 using System.Diagnostics.Tracing;
 using System;
+using System.Diagnostics;
 
 namespace VitalChoice.Core.Base
 {
@@ -33,7 +34,7 @@ namespace VitalChoice.Core.Base
         private readonly IActionBindingContextAccessor _actionBindingContextAccessor;
         private readonly int _maxModelValidationErrors;
         private readonly ILogger _logger;
-        private readonly TelemetrySource _telemetry;
+        private readonly DiagnosticSource _telemetry;
 
         public ValidationActionInvokerProvider(
             IControllerFactory controllerFactory,
@@ -42,7 +43,7 @@ namespace VitalChoice.Core.Base
             IOptions<MvcOptions> optionsAccessor,
             IActionBindingContextAccessor actionBindingContextAccessor,
             ILoggerFactory loggerFactory,
-            TelemetrySource telemetry)
+            DiagnosticSource telemetry)
         {
             _controllerFactory = controllerFactory;
             _filterProviders = filterProviders.OrderBy(item => item.Order).ToArray();

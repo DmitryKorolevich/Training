@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using VitalChoice.Domain;
 
 namespace VitalChoice.Data.DataContext
 {

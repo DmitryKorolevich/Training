@@ -1,5 +1,5 @@
-﻿using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -18,7 +18,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 #endif
-#if !NET_2_0 && !NET_3_5 && !PCL && !DNXCORE50
+#if !NET_2_0 && !NET_3_5 && !PCL && !DOTNET5_4
 using System.Dynamic;
 #endif
 
@@ -1269,7 +1269,7 @@ namespace CsvHelper
 		/// <returns>The created record.</returns>
 		protected virtual T CreateRecord<T>() 
 		{
-#if !NET_3_5 && !PCL && !DNXCORE50
+#if !NET_3_5 && !PCL && !DOTNET5_4
             // If the type is an object, a dynamic
             // object will be created. That is the
             // only way we can dynamically add properties
@@ -1290,7 +1290,7 @@ namespace CsvHelper
 		/// <returns>The created record.</returns>
 		protected virtual object CreateRecord( Type type )
 		{
-#if !NET_3_5 && !PCL && !DNXCORE50
+#if !NET_3_5 && !PCL && !DOTNET5_4
             // If the type is an object, a dynamic
             // object will be created. That is the
             // only way we can dynamically add properties
@@ -1579,7 +1579,7 @@ namespace CsvHelper
 		}
 #endif
 
-#if !NET_2_0 && !NET_3_5 && !PCL && !DNXCORE50
+#if !NET_2_0 && !NET_3_5 && !PCL && !DOTNET5_4
         /// <summary>
         /// Creates a dynamic object from the current record.
         /// </summary>

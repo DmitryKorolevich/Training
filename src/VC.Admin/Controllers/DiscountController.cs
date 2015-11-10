@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Domain.Transfer.Base;
@@ -30,7 +30,7 @@ namespace VC.Admin.Controllers
     {
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
-        private readonly IDynamicMapper<DiscountDynamic> _mapper;
+        private readonly IDynamicMapper<DiscountDynamic, Discount> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -39,7 +39,7 @@ namespace VC.Admin.Controllers
             IDiscountService discountService, 
             IProductService productService,
             ILoggerProviderExtended loggerProvider,
-            IDynamicMapper<DiscountDynamic> mapper,
+            IDynamicMapper<DiscountDynamic, Discount> mapper,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _discountService = discountService;

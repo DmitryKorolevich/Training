@@ -5,10 +5,10 @@
     "EntityFramework.Core": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.AspNet.Mvc": "6.0.0-*",
-    "Microsoft.Framework.Logging": "1.0.0-*",
-    "Microsoft.Framework.Logging.Console": "1.0.0-*",
-    "Templates": "2.3.3-beta8",
-    "Autofac.Framework.DependencyInjection": "4.0.0-*",
+    "Microsoft.Extensions.Logging": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Templates": "2.3.3-rc1",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "CsvHelper": "2.13.2-*",
     "VitalChoice.Infrastructure": "",
@@ -26,14 +26,17 @@
             "System.ServiceModel": "4.0.0.0"
         }
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Runtime": "4.0.21-*",
         "System.IO.FileSystem": "4.0.1-*",
         "System.IO": "4.0.11-*",
         "System.ServiceModel.Http": "4.0.11-*",
-        "System.Private.ServiceModel": "4.0.1-*",
-        "System.ServiceModel.Primitives": "4.0.1-*"
+        "System.ServiceModel.Security": "4.0.1-*",
+        "System.ServiceModel.Primitives": "4.0.1-*",
+        "System.Xml.XPath": "4.0.1-*",
+        "System.Xml.XmlDocument": "4.0.1-*",
+        "System.Xml.XmlSerializer": "4.0.11-*"
       }
     }
   }

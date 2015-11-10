@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Data.Repositories;

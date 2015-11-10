@@ -29,7 +29,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VC.Public.Models.Affiliate;
 using VitalChoice.Interfaces.Services;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
@@ -44,13 +44,13 @@ namespace VC.Public.Controllers
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IAffiliateUserService _affiliateUserService;
 		private readonly IAffiliateService _affiliateService;
-        private readonly IDynamicMapper<AffiliateDynamic> _affiliateMapper;
+        private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
 		public AffiliateProfileController(
             IHttpContextAccessor contextAccessor,
             IAffiliateUserService affiliateUserService,
 			IAffiliateService affiliateService,
-            IDynamicMapper<AffiliateDynamic> affiliateMapper)
+            IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper)
 		{
 			_contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;
@@ -138,8 +138,8 @@ namespace VC.Public.Controllers
         private void CleanProfileEmailFields(AffiliateManageModel model)
         {
             model.ConfirmEmail = model.Email = string.Empty;
-            ModelState["Email"] = new ModelState();
-            ModelState["ConfirmEmail"] = new ModelState();
+            ModelState["Email"] = new ModelStateEntry();
+            ModelState["ConfirmEmail"] = new ModelStateEntry();
         }
 
         [HttpPost]

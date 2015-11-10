@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Setting;
@@ -39,10 +39,10 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Workflow.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Entities.Settings;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Business.ExportMaps;
 
 namespace VC.Admin.Controllers
@@ -52,16 +52,16 @@ namespace VC.Admin.Controllers
     {
         private readonly ICountryService _countryService;
         private readonly IGenericService<AdminProfile> _adminProfileService;
-	    private readonly IDynamicMapper<CustomerDynamic> _customerMapper;
-        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
-        private readonly IDynamicMapper<CustomerNoteDynamic> _noteMapper;
+	    private readonly IDynamicMapper<CustomerDynamic, Customer> _customerMapper;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
+        private readonly IDynamicMapper<CustomerNoteDynamic, CustomerNote> _noteMapper;
         private readonly ICustomerService _customerService;
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
         private readonly IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _exportCustomersForAffiliatesService;
 
-        private readonly IEcommerceDynamicService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+        private readonly IEcommerceDynamicService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
             _addressService;
         private readonly IEcommerceDynamicService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
             _notesService;
@@ -70,14 +70,14 @@ namespace VC.Admin.Controllers
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public CustomerController(ICustomerService customerService,
-            IDynamicMapper<CustomerDynamic> customerMapper,
-            IDynamicMapper<CustomerAddressDynamic> addressMapper, ICountryService countryService,
+            IDynamicMapper<CustomerDynamic, Customer> customerMapper,
+            IDynamicMapper<AddressDynamic, Address> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
-            IEcommerceDynamicService<CustomerAddressDynamic, Address, AddressOptionType, AddressOptionValue>
+            IEcommerceDynamicService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
                 addressService,
             IEcommerceDynamicService
                 <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
-            IDynamicMapper<CustomerNoteDynamic> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
+            IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
@@ -242,7 +242,6 @@ namespace VC.Admin.Controllers
             if (int.TryParse(sUserId, out userId))
             {
                 address.IdEditedBy = userId;
-                address.IdCustomer = idCustomer;
             }
             address = await _addressService.InsertAsync(address);
             var toReturn = _addressMapper.ToModel<AddressModel>(address);
@@ -269,7 +268,7 @@ namespace VC.Admin.Controllers
             if (int.TryParse(sUserId, out userId))
             {
                 item.IdEditedBy = userId;
-                foreach (var address in item.Addresses)
+                foreach (var address in item.ShippingAddresses)
                 {
                     address.IdEditedBy = userId;
                 }
@@ -332,8 +331,10 @@ namespace VC.Admin.Controllers
             IList<ExtendedVCustomer> items = new List<ExtendedVCustomer>();
             if (idaffiliate != 0)
             {
-                CustomerFilter filter = new CustomerFilter();
-                filter.IdAffiliate = idaffiliate.ToString();
+                CustomerFilter filter = new CustomerFilter()
+                {
+                    IdAffiliate = idaffiliate
+                };
                 filter.Paging = new Paging() { PageIndex = 1, PageItemCount = 1000000 };
                 var result = await _customerService.GetCustomersAsync(filter);
                 items = result.Items;

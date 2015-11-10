@@ -10,9 +10,9 @@ namespace VC.Public.ModelConverters.Customer
 {
     public class CustomerRegisterModelConverter : BaseModelConverter<RegisterAccountModel, CustomerDynamic>
     {
-        private readonly IDynamicMapper<CustomerAddressDynamic> _addressMapper;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
 
-        public CustomerRegisterModelConverter(IDynamicMapper<CustomerAddressDynamic> addressMapper)
+        public CustomerRegisterModelConverter(IDynamicMapper<AddressDynamic, Address> addressMapper)
         {
             _addressMapper = addressMapper;
         }
@@ -27,12 +27,12 @@ namespace VC.Public.ModelConverters.Customer
 			var addressDynamic = _addressMapper.FromModel(model);
 				
 			addressDynamic.IdObjectType = (int)AddressType.Profile;
-			dynamic.Addresses.Add(addressDynamic);
+			dynamic.ShippingAddresses.Add(addressDynamic);
 
 		    var shippngAddress = _addressMapper.FromModel(model);
             shippngAddress.IdObjectType = (int)AddressType.Shipping;
 		    shippngAddress.Data.Default = true;
-			dynamic.Addresses.Add(shippngAddress);
+			dynamic.ShippingAddresses.Add(shippngAddress);
 
 			dynamic.StatusCode = (int)RecordStatusCode.Active;
 	    }

@@ -25,7 +25,8 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 				$scope.filter = {
 					SearchText: "",
 					Paging: { PageIndex: 1, PageItemCount: 100 },
-					Sorting: gridSorterUtil.resolve(refreshCustomers, 'Updated', 'Desc')
+					Sorting: gridSorterUtil.resolve(refreshCustomers, 'Updated', 'Desc'),
+                    Address: {}
 				};
 
 				refreshCustomers();

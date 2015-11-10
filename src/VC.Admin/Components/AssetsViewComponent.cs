@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Domain.Entities.Options;

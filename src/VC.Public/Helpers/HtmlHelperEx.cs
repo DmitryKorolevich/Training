@@ -34,7 +34,7 @@ namespace VC.Public.Helpers
 						memberExpression = expressionBody as MemberExpression;
 					}
 
-					ModelState modelState;
+					ModelStateEntry modelState;
 					if (memberExpression != null && (modelState = htmlHelper.ViewContext.ModelState[memberExpression.Member.Name]) != null)
 					{
 						value = modelState.RawValue;

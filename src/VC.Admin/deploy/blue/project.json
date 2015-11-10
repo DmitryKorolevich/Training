@@ -24,8 +24,8 @@
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
     "Microsoft.AspNet.StaticFiles": "1.0.0-*",
-    "Microsoft.Framework.Configuration.Json": "1.0.0-*",
-    "Microsoft.Framework.Logging.Console": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
     "EntityFramework.Core": "7.0.0-*",
     "EntityFramework.Commands": "7.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
@@ -39,7 +39,7 @@
   "frameworks": {
     "dnx451": {
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Runtime": "4.0.21-*"
       }
@@ -48,7 +48,7 @@
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel",
     "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5004",
-    "gen": "Microsoft.Framework.CodeGeneration",
+    "gen": "Microsoft.Extensions.CodeGeneration",
     "ef": "EntityFramework.Commands"
   }
 }

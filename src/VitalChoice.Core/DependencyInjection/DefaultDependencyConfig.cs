@@ -6,10 +6,10 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc.Core;
-using Microsoft.Framework.Caching.Memory;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.OptionsModel;
 using Templates;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services;
@@ -47,10 +47,9 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using VitalChoice.Data.Repositories.Specifics;
-using Autofac.Framework.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
 using Microsoft.Dnx.Runtime;
-using Microsoft.Framework.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -75,11 +74,13 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.Settings;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Formatters;
+using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using IContentViewService = VitalChoice.Interfaces.Services.Content.IContentViewService;
+using Autofac.Extensions.DependencyInjection;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -94,7 +95,6 @@ namespace VitalChoice.Core.DependencyInjection
             //{
             //    _called = true;
 
-            BeginCustomRegistrations(services);
             // Add EF services to the services container.
             services.AddEntityFramework() //.AddMigrations()
                 .AddSqlServer()
@@ -420,10 +420,6 @@ namespace VitalChoice.Core.DependencyInjection
             var container = builder.Build();
             return container;
         }
-
-	    protected virtual void BeginCustomRegistrations(IServiceCollection builder)
-	    {
-	    }
 
 	    protected virtual void FinishCustomRegistrations(ContainerBuilder builder)
 	    {

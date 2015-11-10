@@ -2,7 +2,7 @@
 using Microsoft.Data.Entity.Metadata;
 using System.Data.SqlClient;
 using System.IO;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
@@ -69,9 +69,8 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<LocalizationItem>()
 	            .HasMany(p => p.LocalizationItemDatas)
 	            .WithOne(p => p.LocalizationItem)
-	            .ForeignKey(p => new {p.GroupId, p.ItemId})
-	            .
-	            PrincipalKey(p => new {p.GroupId, p.ItemId});
+	            .HasForeignKey(p => new {p.GroupId, p.ItemId})
+	            .HasPrincipalKey(p => new {p.GroupId, p.ItemId});
 	        builder.Entity<LocalizationItem>().Ignore(x => x.Id);
 	        builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
 
@@ -94,47 +93,45 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<MasterContentItem>()
 	            .HasOne(p => p.Type)
 	            .WithMany()
-	            .ForeignKey(p => p.TypeId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.TypeId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<MasterContentItem>()
 	            .HasMany(p => p.MasterContentItemToContentProcessors)
 	            .WithOne(p => p.MasterContentItem)
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<ContentProcessorEntity>()
 	            .HasMany(p => p.MasterContentItemsToContentProcessors)
 	            .WithOne(p => p.ContentProcessor)
-	            .ForeignKey(p => p.ContentProcessorId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentProcessorId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<MasterContentItem>()
 	            .HasOne(p => p.User)
 	            .WithMany()
-	            .ForeignKey(p => p.UserId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.UserId)
+	            .HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<ContentItem>().HasKey(p => p.Id);
 	        builder.Entity<ContentItem>().ToTable("ContentItems");
 	        builder.Entity<ContentItem>()
 	            .HasMany(p => p.ContentItemToContentProcessors)
 	            .WithOne(p => p.ContentItem)
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<ContentProcessorEntity>()
 	            .HasMany(p => p.ContentItemsToContentProcessors)
 	            .WithOne(p => p.ContentProcessor)
-	            .ForeignKey(p => p.ContentItemProcessorId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemProcessorId)
+	            .HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<ContentCategory>().HasKey(p => p.Id);
 	        builder.Entity<ContentCategory>().ToTable("ContentCategories");
 	        builder.Entity<ContentCategory>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .
-	            PrincipalKey(p => p.Id);
-	        builder.Entity<ContentCategory>().HasOne(p => p.ContentItem).WithMany().ForeignKey(p => p.ContentItemId).
-	            PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
+	        builder.Entity<ContentCategory>().HasOne(p => p.ContentItem).WithMany().HasForeignKey(p => p.ContentItemId).HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<RecipeToProduct>().HasKey(p => p.Id);
 	        builder.Entity<RecipeToProduct>().ToTable("RecipesToProducts");
@@ -153,35 +150,35 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<Recipe>()
 	            .HasMany(p => p.RecipesToContentCategories)
 	            .WithOne(p => p.Recipe)
-	            .ForeignKey(p => p.RecipeId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.RecipeId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Recipe>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Recipe>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
-	        builder.Entity<Recipe>().HasOne(p => p.User).WithMany().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
+	        builder.Entity<Recipe>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
 	        builder.Entity<Recipe>()
 	            .HasMany(p => p.RelatedRecipes)
 	            .WithOne()
-	            .ForeignKey(p => p.IdRecipe)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.IdRecipe)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Recipe>()
 	            .HasMany(p => p.CrossSells)
 	            .WithOne()
-	            .ForeignKey(p => p.IdRecipe)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.IdRecipe)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Recipe>()
 	            .HasMany(p => p.RecipesToProducts)
 	            .WithOne()
-	            .ForeignKey(t => t.IdRecipe)
-	            .PrincipalKey(p => p.Id)
-	            .Required();
+	            .HasForeignKey(t => t.IdRecipe)
+	            .HasPrincipalKey(p => p.Id)
+	            .IsRequired();
 
 	        builder.Entity<RecipeDefaultSetting>().HasKey(p => p.Id);
 	        builder.Entity<RecipeDefaultSetting>().ToTable("RecipeDefaultSettings");
@@ -193,19 +190,19 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<FAQ>()
 	            .HasMany(p => p.FAQsToContentCategories)
 	            .WithOne(p => p.FAQ)
-	            .ForeignKey(p => p.FAQId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.FAQId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<FAQ>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<FAQ>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
-	        builder.Entity<FAQ>().HasOne(p => p.User).WithMany().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
+	        builder.Entity<FAQ>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<ArticleToProduct>().HasKey(p => p.Id);
 	        builder.Entity<ArticleToProduct>().ToTable("ArticlesToProducts");
@@ -218,25 +215,25 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<Article>()
 	            .HasMany(p => p.ArticlesToContentCategories)
 	            .WithOne(p => p.Article)
-	            .ForeignKey(p => p.ArticleId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ArticleId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Article>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<Article>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
-	        builder.Entity<Article>().HasOne(p => p.User).WithMany().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
+	        builder.Entity<Article>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
 	        builder.Entity<Article>()
 	            .HasMany(p => p.ArticlesToProducts)
 	            .WithOne()
-	            .ForeignKey(t => t.IdArticle)
-	            .PrincipalKey(p => p.Id)
-	            .Required();
+	            .HasForeignKey(t => t.IdArticle)
+	            .HasPrincipalKey(p => p.Id)
+	            .IsRequired();
 
 	        builder.Entity<ContentPage>().HasKey(p => p.Id);
 	        builder.Entity<ContentPage>().ToTable("ContentPages");
@@ -245,35 +242,35 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<ContentPage>()
 	            .HasMany(p => p.ContentPagesToContentCategories)
 	            .WithOne(p => p.ContentPage)
-	            .ForeignKey(p => p.ContentPageId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentPageId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<ContentPage>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<ContentPage>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
-	        builder.Entity<ContentPage>().HasOne(p => p.User).WithMany().ForeignKey(p => p.UserId).PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
+	        builder.Entity<ContentPage>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<ContentArea>().HasKey(p => p.Id);
 	        builder.Entity<ContentArea>().ToTable("ContentAreas");
 	        builder.Entity<ContentArea>()
 	            .HasOne(p => p.User)
 	            .WithMany()
-	            .ForeignKey(p => p.IdEditedBy)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.IdEditedBy)
+	            .HasPrincipalKey(p => p.Id);
 
 	        builder.Entity<CustomPublicStyle>().HasKey(p => p.Id);
 	        builder.Entity<CustomPublicStyle>().ToTable("CustomPublicStyles");
 	        builder.Entity<CustomPublicStyle>()
 	            .HasOne(p => p.User)
 	            .WithMany()
-	            .ForeignKey(p => p.IdEditedBy)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.IdEditedBy)
+	            .HasPrincipalKey(p => p.Id);
 
 	        #endregion
 
@@ -288,13 +285,13 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.MasterContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.MasterContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.MasterContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 	        builder.Entity<ProductCategoryContent>()
 	            .HasOne(p => p.ContentItem)
 	            .WithMany()
-	            .ForeignKey(p => p.ContentItemId)
-	            .PrincipalKey(p => p.Id);
+	            .HasForeignKey(p => p.ContentItemId)
+	            .HasPrincipalKey(p => p.Id);
 
 	        #endregion
 
@@ -305,8 +302,8 @@ namespace VitalChoice.Infrastructure.Context
 	        builder.Entity<AdminProfile>()
 	            .HasOne(x => x.User)
 	            .WithOne(x => x.Profile)
-	            .ForeignKey<AdminProfile>(a => a.Id)
-	            .PrincipalKey<ApplicationUser>(x => x.Id);
+	            .HasForeignKey<AdminProfile>(a => a.Id)
+	            .HasPrincipalKey<ApplicationUser>(x => x.Id);
 
 	        #endregion
 
@@ -332,14 +329,14 @@ namespace VitalChoice.Infrastructure.Context
 	            entity.ToTable("BugTickets");
 	            entity.HasMany(p => p.Comments)
 	                .WithOne(p => p.BugTicket)
-	                .ForeignKey(p => p.IdBugTicket)
-	                .PrincipalKey(p => p.Id)
-	                .Required();
+	                .HasForeignKey(p => p.IdBugTicket)
+	                .HasPrincipalKey(p => p.Id)
+	                .IsRequired();
 	            entity.HasMany(p => p.Files)
 	                .WithOne()
-	                .ForeignKey(p => p.IdBugTicket)
-	                .PrincipalKey(p => p.Id)
-	                .Required(false);
+	                .HasForeignKey(p => p.IdBugTicket)
+	                .HasPrincipalKey(p => p.Id)
+	                .IsRequired(false);
 	            entity.Ignore(p => p.AddedBy);
 	            entity.Ignore(p => p.AddedByEmail);
 	            entity.Ignore(p => p.AddedByAgent);
@@ -351,9 +348,9 @@ namespace VitalChoice.Infrastructure.Context
 	            entity.ToTable("BugTicketComments");
 	            entity.HasMany(p => p.Files)
 	                .WithOne()
-	                .ForeignKey(p => p.IdBugTicketComment)
-	                .PrincipalKey(p => p.Id)
-	                .Required(false);
+	                .HasForeignKey(p => p.IdBugTicketComment)
+	                .HasPrincipalKey(p => p.Id)
+	                .IsRequired(false);
 	            entity.Ignore(p => p.EditedBy);
 	            entity.Ignore(p => p.EditedByAgent);
 	        });
@@ -380,9 +377,9 @@ namespace VitalChoice.Infrastructure.Context
 	            entity.ToTable("VitalGreenRequests");
 	            entity.HasOne(p => p.Zone)
 	                .WithMany()
-	                .ForeignKey(p => p.ZoneId)
-	                .PrincipalKey(p => p.Id)
-	                .Required(false);
+	                .HasForeignKey(p => p.ZoneId)
+	                .HasPrincipalKey(p => p.Id)
+	                .IsRequired(false);
 	        });
 
 	        #endregion

@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "VitalChoice.Workflow.Configuration Console Application",
   "authors": [ "multi_000" ],
@@ -7,14 +7,14 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Autofac.Framework.DependencyInjection": "4.0.0-*",
-    "Microsoft.Framework.Configuration.Json": "1.0.0-*",
-    "Microsoft.Framework.Configuration.Abstractions" : "1.0.0-*",
-    "Microsoft.Framework.Logging.Console": "1.0.0-*",
-    "Microsoft.Dnx.Runtime": "1.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-16110"
   },
 
   "commands": {
@@ -23,7 +23,7 @@
 
   "frameworks": {
     "dnx451": { },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
         "System.Collections": "4.0.11-*",

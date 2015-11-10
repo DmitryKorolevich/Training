@@ -27,13 +27,12 @@
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
     "Microsoft.AspNet.StaticFiles": "1.0.0-*",
-    "Microsoft.Framework.Configuration.Json": "1.0.0-*",
-    "Microsoft.Framework.Logging": "1.0.0-*",
-    "Microsoft.Framework.Logging.Console": "1.0.0-*",
-    "Microsoft.Framework.WebEncoders": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.Extensions.Logging": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Microsoft.Extensions.WebEncoders": "1.0.0-*",
     "Newtonsoft.Json": "7.0.1",
     "EntityFramework.Core": "7.0.0-*",
-    "EntityFramework.Commands": "7.0.0-*",
     "Microsoft.AspNet.Tooling.Razor": "1.0.0-*",
     "VitalChoice.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
@@ -43,10 +42,9 @@
   },
   "frameworks": {
     "dnx451": {
-      "compilationOptions": { "define": [ "DNX451" ] }
+      "dependencies": {"EntityFramework.Commands": "7.0.0-*"}
     },
-    "dnxcore50": {
-      "compilationOptions": { "define": [ "DNXCORE50" ] },
+    "dotnet5.4": {
       "dependencies": {
         "System.Runtime": "4.0.21-*"
       }
@@ -55,7 +53,7 @@
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel",
     "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5010",
-    "gen": "Microsoft.Framework.CodeGeneration",
+    "gen": "Microsoft.Extensions.CodeGeneration",
     "ef": "EntityFramework.Commands"
   }
 }

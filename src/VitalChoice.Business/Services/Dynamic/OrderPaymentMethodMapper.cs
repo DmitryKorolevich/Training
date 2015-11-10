@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 _orderAddressMapper.UpdateEntityRangeAsync(
                     items.Select(
                         i =>
-                            new DynamicEntityPair<OrderAddressDynamic, OrderAddress>(i.Dynamic.Address,
+                            new DynamicEntityPair<AddressDynamic, OrderAddress>(i.Dynamic.Address,
                                 i.Entity.BillingAddress))
                         .ToList());
         }

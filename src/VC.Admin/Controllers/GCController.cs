@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using VC.Admin.Models.Product;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Transfer.Base;

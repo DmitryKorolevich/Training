@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Threading;
-using Microsoft.Framework.Caching.Memory;
 using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Domain.Helpers

@@ -2,13 +2,11 @@
 using System.Globalization;
 using System.IO;
 using Autofac;
-using Microsoft.Dnx.Runtime;
-using Microsoft.Dnx.Runtime.Infrastructure;
-using Microsoft.Framework.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc.Core;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Services;
@@ -16,12 +14,13 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Core;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Infrastructure.Context;
-using Autofac.Framework.DependencyInjection;
 using Microsoft.AspNet.Identity.EntityFramework;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Workflow.Contexts;
+using Microsoft.Extensions.PlatformAbstractions;
+using Autofac.Extensions.DependencyInjection;
 
 namespace VitalChoice.Workflow.Configuration
 {

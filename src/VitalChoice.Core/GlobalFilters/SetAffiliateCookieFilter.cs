@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Filters;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.OptionsModel;
-using Microsoft.Framework.Primitives;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Primitives;
 using System;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Interfaces.Services.Affiliates;
-using Microsoft.Framework.Internal;
+using Microsoft.Extensions.Internal;
 using Microsoft.AspNet.Http;
 
 namespace VitalChoice.Core.GlobalFilters

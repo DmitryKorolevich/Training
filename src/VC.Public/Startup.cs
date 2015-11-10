@@ -6,14 +6,16 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Dnx.Runtime;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using VC.Public.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
 using cloudscribe.Web.Pagination;
-using Microsoft.Framework.DependencyInjection.Extensions;
+using Microsoft.AspNet.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace VC.Public
 {
@@ -70,7 +72,15 @@ namespace VC.Public
 
 			app.UseCookieAuthentication();
 
-			app.UseMvc(RouteConfig.RegisterRoutes);
+			app.UseMvc(RouteConfig.RegisterRoutes).UseCookieAuthentication(x =>
+            {
+                x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
+                x.LogoutPath = "/Account/Logout";
+                x.AccessDeniedPath = "/Shared/AccessDenied";
+                x.LoginPath = "/Account/Login";
+                x.ReturnUrlParameter = "returnUrl";
+                x.CookieName = "VitalChoice.Public";
+            });
         }
     }
 }

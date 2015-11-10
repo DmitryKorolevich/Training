@@ -1,14 +1,9 @@
-﻿#if DNXCORE50
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using VitalChoice.Domain.Exceptions;
-#if DNXCORE50
-using System.Runtime.Loader;
-#endif
 
 namespace VitalChoice.Domain.Helpers {
     /// <summary>

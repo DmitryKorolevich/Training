@@ -8,7 +8,7 @@ namespace VitalChoice.DynamicData.Entities
 {
     public class CustomerPaymentMethodDynamic : MappedObject
     {
-        public CustomerAddressDynamic Address { get; set; }
+        public AddressDynamic Address { get; set; }
 
         public int IdCustomer { get; set; }
     }

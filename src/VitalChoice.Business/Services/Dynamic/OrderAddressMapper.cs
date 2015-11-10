@@ -15,7 +15,7 @@ using VitalChoice.Data.Repositories.Specifics;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class OrderAddressMapper : DynamicMapper<OrderAddressDynamic, OrderAddress, AddressOptionType, OrderAddressOptionValue>
+    public class OrderAddressMapper : DynamicMapper<AddressDynamic, OrderAddress, AddressOptionType, OrderAddressOptionValue>
     {
         public OrderAddressMapper(ITypeConverter converter,
             IModelConverterService converterService,
@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items, bool withDefaults = false)
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, OrderAddress>> items, bool withDefaults = false)
         {
             items.ForEach(item =>
             {
@@ -34,11 +34,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.IdCountry = entity.IdCountry;
                 dynamic.County = entity.County;
                 dynamic.IdState = entity.IdState;
+                dynamic.State = entity.State;
+                dynamic.Country = entity.Сountry;
             });
             return Task.Delay(0);
         }
 
-        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, OrderAddress>> items)
         {
             items.ForEach(item =>
             {
@@ -53,7 +55,7 @@ namespace VitalChoice.Business.Services.Dynamic
             return Task.Delay(0);
         }
 
-        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<OrderAddressDynamic, OrderAddress>> items)
+        protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, OrderAddress>> items)
         {
             items.ForEach(item =>
             {
