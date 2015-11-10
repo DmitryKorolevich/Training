@@ -775,6 +775,21 @@ namespace VitalChoice.Business.Services.Products
             errors.Raise();
         }
 
+        protected override async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
+        {
+            var result = await base.DeleteAsync(id, uow, physically);
+            if(result)
+            {
+                var productContent = (await _productContentRepository.Query(p=>p.Id==id).SelectAsync()).FirstOrDefault();
+                if(productContent!=null && productContent.StatusCode!=RecordStatusCode.Deleted)
+                {
+                    productContent.StatusCode = RecordStatusCode.Deleted;
+                    result = await _productContentRepository.UpdateAsync(productContent);
+                }
+            }
+            return result;
+        }
+
         public async Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false)
         {
             ProductContentTransferEntity toReturn = new ProductContentTransferEntity();
