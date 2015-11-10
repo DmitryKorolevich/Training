@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.Users;
 
@@ -20,6 +21,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.GiftCertificates
 
         public int? UserId { get; set; }
 
+        [NotMapped]
         public ApplicationUser User { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }

@@ -505,7 +505,7 @@ namespace VitalChoice.Infrastructure.Context
                 .IsRequired(false);
             builder.Entity<Customer>()
                 .HasOne(p => p.User)
-                .WithOne(u => u.Customer)
+                .WithOne()
                 .HasForeignKey<Customer>(p => p.Id)
                 .HasPrincipalKey<User>(p => p.Id)
                 .IsRequired();

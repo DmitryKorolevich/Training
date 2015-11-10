@@ -24,6 +24,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities;
+using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Business.Services.Users
 {

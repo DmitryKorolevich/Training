@@ -394,7 +394,6 @@ namespace VitalChoice.Business.Services.Customers
 				.Include(p => p.Files)
 				.Include(p => p.DefaultPaymentMethod)
 				.Include(p => p.User)
-				.ThenInclude(p => p.Customer)
 				.Include(a => a.ShippingAddresses)
 				.ThenInclude(a => a.ShippingAddress)
                 .ThenInclude(a => a.OptionValues)
