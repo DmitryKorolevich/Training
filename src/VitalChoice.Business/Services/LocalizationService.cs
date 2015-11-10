@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.OptionsModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Domain.Entities.Localization;
+using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Utils;
 
 namespace VitalChoice.Business.Services
@@ -13,10 +16,13 @@ namespace VitalChoice.Business.Services
     {
         public static LocalizationService Current { get; private set; }
 
-        public LocalizationService(IRepositoryAsync<LocalizationItemData> repository, string defaultCultureId)
+        public LocalizationService(IOptions<AppOptions> options, string defaultCultureId)
         {
             _defaultCultureId = defaultCultureId;
-            CreateLocalizationData(repository);
+            using (VitalChoiceContext context = new VitalChoiceContext(options))
+            {
+                CreateLocalizationData(new RepositoryAsync<LocalizationItemData>(context));
+            }
             Current = this;
         }
 

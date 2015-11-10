@@ -55,7 +55,7 @@ namespace VitalChoice.Data.Repositories
 				query = orderBy(query);
 
 			if (filter != null)
-				query = query.AsExpandable().Where(filter);
+				query = query/*.AsExpandable()*/.Where(filter);
 
 		    if (!tracking)
 		        query = query.AsNoTracking();

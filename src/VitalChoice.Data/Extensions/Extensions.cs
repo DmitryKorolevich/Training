@@ -10,21 +10,21 @@ namespace VitalChoice.Data.Extensions
     /// http://tomasp.net/blog/linq-expand.aspx for more information.</summary>
     public static class Extensions
     {
-        public static IQueryable<T> AsExpandable<T>(this IQueryable<T> query)
-        {
-            if (query is ExpandableQuery<T>) return (ExpandableQuery<T>)query;
-            return new ExpandableQuery<T>(query);
-        }
+        //public static IQueryable<T> AsExpandable<T>(this IQueryable<T> query)
+        //{
+        //    if (query is ExpandableQuery<T>) return (ExpandableQuery<T>)query;
+        //    return new ExpandableQuery<T>(query);
+        //}
 
-        public static Expression<TDelegate> Expand<TDelegate>(this Expression<TDelegate> expr)
-        {
-            return (Expression<TDelegate>)new ExpressionExpander().Visit(expr);
-        }
+        //public static Expression<TDelegate> Expand<TDelegate>(this Expression<TDelegate> expr)
+        //{
+        //    return (Expression<TDelegate>)new ExpressionExpander().Visit(expr);
+        //}
 
-        public static Expression Expand(this Expression expr)
-        {
-            return new ExpressionExpander().Visit(expr);
-        }
+        //public static Expression Expand(this Expression expr)
+        //{
+        //    return new ExpressionExpander().Visit(expr);
+        //}
 
         //public static TResult Invoke<TResult>(this Expression<Func<TResult>> expr)
         //{

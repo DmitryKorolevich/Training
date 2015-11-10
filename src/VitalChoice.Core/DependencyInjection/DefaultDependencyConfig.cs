@@ -97,9 +97,7 @@ namespace VitalChoice.Core.DependencyInjection
 
             // Add EF services to the services container.
             services.AddEntityFramework() //.AddMigrations()
-                .AddSqlServer()
-                .AddDbContext<VitalChoiceContext>();
-
+                .AddSqlServer();
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, ApplicationRole>(x =>
             {
@@ -266,9 +264,6 @@ namespace VitalChoice.Core.DependencyInjection
                 .As<ILocalizationService>()
                 .WithParameters(new List<Parameter>
                 {
-                    new ResolvedParameter((p, c) => p.Name == "repository",
-                        (p, c) =>
-                            c.Resolve<IRepositoryAsync<LocalizationItemData>>()),
                     new NamedParameter("defaultCultureId", configuration.GetSection("App:DefaultCultureId").Value)
                 })
                 .SingleInstance();
@@ -276,10 +271,10 @@ namespace VitalChoice.Core.DependencyInjection
             var container = BuildContainer(projectAssembly, builder);
             AutofacExecutionContext.Configure(container);
 
-            if (!string.IsNullOrEmpty(appPath))
-            {
-                FileService.Init(appPath);
-            }
+            //if (!string.IsNullOrEmpty(appPath))
+            //{
+            //    FileService.Init(appPath);
+            //}
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
 
@@ -290,7 +285,7 @@ namespace VitalChoice.Core.DependencyInjection
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
-            builder.Register<IDataContextAsync>(x => x.Resolve<VitalChoiceContext>());
+            builder.RegisterType<VitalChoiceContext>().As<IDataContextAsync>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
             builder.RegisterGeneric(typeof (RepositoryAsync<>))

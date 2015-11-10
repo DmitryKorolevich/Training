@@ -11,7 +11,7 @@ using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.Identity.UserStores
 {
-    public class ExtendedUserStore : UserStore<ApplicationUser, ApplicationRole, VitalChoiceContext,int>
+    public class ExtendedUserStore : UserStore<ApplicationUser, ApplicationRole, VitalChoiceContext, int>
     {
 	    public ExtendedUserStore(VitalChoiceContext context, IdentityErrorDescriber describer = null) : base(context, describer)
 	    {

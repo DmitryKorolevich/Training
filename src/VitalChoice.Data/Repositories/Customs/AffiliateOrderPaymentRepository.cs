@@ -31,7 +31,7 @@ namespace VitalChoice.Data.Repositories.Customs
             {
                 filter = filter.And((p => p.Order.IdCustomer == id));
             }
-            var query = this.DbSet.Include(p => p.Order).AsExpandable().Where(filter);
+            var query = this.DbSet.Include(p => p.Order)/*.AsExpandable()*/.Where(filter);
 
             //var groups = await query.GroupBy(p => p.Order.IdCustomer).Select(g => new
             //{

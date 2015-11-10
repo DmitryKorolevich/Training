@@ -15,17 +15,17 @@ namespace VitalChoice.Data.Helpers
 
         protected void Add(Expression<Func<TEntity, bool>> predicate)
         {
-            _query = (_query == null) ? predicate : _query.And(predicate.Expand());
+            _query = (_query == null) ? predicate : _query.And(predicate/*.Expand()*/);
         }
         
         public Expression<Func<TEntity, bool>> And(Expression<Func<TEntity, bool>> query)
         {
-            return _query = _query == null ? query : _query.And(query.Expand());
+            return _query = _query == null ? query : _query.And(query/*.Expand()*/);
         }
 
         public Expression<Func<TEntity, bool>> Or(Expression<Func<TEntity, bool>> query)
         {
-            return _query = _query == null ? query : _query.Or(query.Expand());
+            return _query = _query == null ? query : _query.Or(query/*.Expand()*/);
         }
 
         public Expression<Func<TEntity, bool>> And(IQueryObject<TEntity> queryObject)

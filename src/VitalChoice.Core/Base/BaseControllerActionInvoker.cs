@@ -30,21 +30,21 @@ namespace VitalChoice.Core.Base
             IReadOnlyList<IValueProviderFactory> valueProviderFactories,
             IActionBindingContextAccessor actionBindingContextAccessor,
             ILogger logger,
-            DiagnosticSource telemetry,
+            DiagnosticSource diagnosticSource,
             int maxModelValidationErrors)
             : base(
                 actionContext, filterProviders, controllerFactory, descriptor, inputFormatters, outputFormatters,
                 controllerActionArgumentBinder, modelBinders, modelValidatorProviders, valueProviderFactories,
-                actionBindingContextAccessor, logger, telemetry, maxModelValidationErrors)
+                actionBindingContextAccessor, logger, diagnosticSource, maxModelValidationErrors)
         {
 
         }
 
-        protected override async Task<IActionResult> InvokeActionAsync(ActionExecutingContext actionExecutingContext)
+        protected override Task<IActionResult> InvokeActionAsync(ActionExecutingContext actionExecutingContext)
         {
             var baseController = actionExecutingContext.Controller as BaseController;
             baseController?.Configure();
-            return await base.InvokeActionAsync(actionExecutingContext);
+            return base.InvokeActionAsync(actionExecutingContext);
         }
     }
 }

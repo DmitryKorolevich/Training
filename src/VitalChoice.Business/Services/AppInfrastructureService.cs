@@ -93,16 +93,16 @@ namespace VitalChoice.Business.Services
 
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
-	        referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType== UserType.Admin).Select(x => new LookupItem<int>
-	        {
-		        Key = x.Id,
-		        Text = x.Name
-	        }).ToList();
-			referenceData.CustomerRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
-			{
-				Key = x.Id,
-				Text = x.Name
-			}).ToList();
+            referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).Select(x => new LookupItem<int>
+            {
+                Key = x.Id,
+                Text = x.Name
+            }).ToList();
+            referenceData.CustomerRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
+            {
+                Key = x.Id,
+                Text = x.Name
+            }).ToList();
             referenceData.AffiliateRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
