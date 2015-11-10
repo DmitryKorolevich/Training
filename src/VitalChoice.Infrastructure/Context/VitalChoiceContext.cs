@@ -315,15 +315,14 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductContent>()
                 .HasOne(p => p.MasterContentItem)
                 .WithMany()
-                .ForeignKey(p => p.MasterContentItemId)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.MasterContentItemId)
+                .HasPrincipalKey(p => p.Id);
             builder.Entity<ProductContent>()
                 .HasOne(p => p.ContentItem)
                 .WithMany()
-                .ForeignKey(p => p.ContentItemId)
-                .PrincipalKey(p => p.Id);
+                .HasForeignKey(p => p.ContentItemId)
+                .HasPrincipalKey(p => p.Id);
 
-            #endregion
             builder.Entity<AdminProfile>().HasKey(x => x.Id);
             builder.Entity<AdminProfile>().ToTable("AdminProfiles");
             builder.Entity<AdminProfile>()

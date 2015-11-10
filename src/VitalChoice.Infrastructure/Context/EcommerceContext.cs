@@ -576,6 +576,8 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<CustomerToShippingAddress>(entity =>
             {
+                entity.ToTable("CustomerToShippingAddresses");
+                entity.Ignore(c => c.Id);
                 entity.HasKey(c => new {c.IdCustomer, c.IdAddress});
                 entity.HasOne(c => c.Customer).WithMany(c => c.ShippingAddresses).HasForeignKey(c => c.IdCustomer).HasPrincipalKey(c => c.Id);
                 entity.HasOne(c => c.ShippingAddress)
@@ -1135,9 +1137,9 @@ namespace VitalChoice.Infrastructure.Context
                     .IsRequired();
                 entity.HasOne(p => p.Affiliate)
                     .WithMany()
-                    .ForeignKey(p => p.IdAffiliate)
-                    .PrincipalKey(p => p.Id)
-                    .Required();
+                    .HasForeignKey(p => p.IdAffiliate)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
             });
 
             builder.Entity<AffiliatePayment>(entity =>

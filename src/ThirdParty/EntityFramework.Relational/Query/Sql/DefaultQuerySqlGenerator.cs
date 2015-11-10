@@ -722,7 +722,7 @@ namespace Microsoft.Data.Entity.Query.Sql
                 }
 
                 if (binaryExpression.IsLogicalOperation()
-                    && binaryExpression.Left.IsSimpleExpression())
+                    && (binaryExpression.Left.IsSimpleExpression() || binaryExpression.RemoveConvert() is SelectExpression))
                 {
                     _sql.Append(" = ");
                     _sql.Append(TrueLiteral);
@@ -760,7 +760,7 @@ namespace Microsoft.Data.Entity.Query.Sql
                 }
 
                 if (binaryExpression.IsLogicalOperation()
-                    && binaryExpression.Right.IsSimpleExpression())
+                    && (binaryExpression.Right.IsSimpleExpression() || binaryExpression.RemoveConvert() is SelectExpression))
                 {
                     _sql.Append(" = ");
                     _sql.Append(TrueLiteral);

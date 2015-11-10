@@ -2,14 +2,8 @@
 BEGIN
 	ALTER TABLE Customers
 	ADD IdProfileAddress INT NULL
-
-	UPDATE Customers
-	SET IdProfileAddress = 0
-
-	ALTER TABLE Customers
-	ALTER COLUMN IdProfileAddress INT NOT NULL
 END
-
+GO
 IF OBJECT_ID(N'CustomerToShippingAddresses') IS NULL
 BEGIN
 	CREATE TABLE CustomerToShippingAddresses
@@ -21,3 +15,4 @@ BEGIN
 		CONSTRAINT PK_CustomerToShippingAddresses PRIMARY KEY (IdCustomer, IdAddress)
 	)
 END
+GO

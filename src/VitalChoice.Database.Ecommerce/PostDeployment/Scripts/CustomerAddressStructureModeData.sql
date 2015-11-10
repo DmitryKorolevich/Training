@@ -1,4 +1,13 @@
-﻿IF EXISTS(SELECT * FROM Customers WHERE IdProfileAddress = 0)
+﻿IF EXISTS(SELECT TOP 1 * FROM Customers WHERE IdProfileAddress IS NULL)
+BEGIN
+	UPDATE Customers
+	SET IdProfileAddress = 0
+
+	ALTER TABLE Customers
+	ALTER COLUMN IdProfileAddress INT NOT NULL
+END
+GO
+IF EXISTS(SELECT TOP 1 * FROM Customers WHERE IdProfileAddress = 0)
 BEGIN
 	UPDATE Customers
 	SET IdProfileAddress = a.Id

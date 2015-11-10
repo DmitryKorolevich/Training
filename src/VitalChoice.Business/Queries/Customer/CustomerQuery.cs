@@ -41,6 +41,12 @@ namespace VitalChoice.Business.Queries.Customer
             return this;
         }
 
+        public CustomerQuery WithAffiliate()
+        {
+            Add(c => c.IdAffiliate != null);
+            return this;
+        }
+
         public CustomerQuery WithIdAffiliate(int? idAffiliate, bool required)
         {
             if (required)
