@@ -13,6 +13,6 @@ FROM            dbo.OrderToSkus AS ots INNER JOIN
                          dbo.Products AS p ON s.IdProduct = p.Id AND p.Hidden = 0 LEFT OUTER JOIN
                          dbo.ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdObjectType = p.IdObjectType LEFT OUTER JOIN
                          dbo.ProductOptionValues AS val ON val.IdProduct = p.Id AND val.IdOptionType = opt.Id
-GROUP BY p.Id, p.Name, p.Url, o.IdCustomer, val.Value, opt.DefaultValue
+GROUP BY p.Id, p.Name, o.IdCustomer, val.Value, opt.DefaultValue
 
 GO
