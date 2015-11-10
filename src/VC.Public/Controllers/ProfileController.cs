@@ -488,7 +488,7 @@ namespace VC.Public.Controllers
 
 			var model = favorites.Items.Select(favorite => new FavoriteModel()
 			{
-				ProductName = favorite.ProductName, ProductThumbnail = favorite.ProductThumbnail, Url = favorite.Url
+				ProductName = favorite.ProductName, ProductThumbnail = favorite.ProductThumbnail, Url = String.Empty//TODO
 			}).ToList();
 
 			ViewBag.MoreExist = !all && favorites.Count > filter.Paging.PageItemCount;

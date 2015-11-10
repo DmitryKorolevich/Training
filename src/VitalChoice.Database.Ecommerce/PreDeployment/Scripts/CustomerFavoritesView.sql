@@ -4,7 +4,7 @@ GO
 
 CREATE VIEW [dbo].[VCustomerFavorites]
 AS
-SELECT        p.Id, p.Name AS ProductName, p.Url, o.IdCustomer, ISNULL(val.Value, opt.DefaultValue) AS ProductThumbnail, SUM(ots.Quantity) AS Quantity
+SELECT        p.Id, p.Name AS ProductName, o.IdCustomer, ISNULL(val.Value, opt.DefaultValue) AS ProductThumbnail, SUM(ots.Quantity) AS Quantity
 FROM            dbo.OrderToSkus AS ots INNER JOIN
                          dbo.Orders AS o ON ots.IdOrder = o.Id AND (o.OrderStatus = 2 OR
                          o.OrderStatus = 3 OR
