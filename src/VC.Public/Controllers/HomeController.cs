@@ -10,12 +10,7 @@ namespace VC.Public.Controllers
             return View();
         }
 
-		public IActionResult Category()
-		{
-			return View();
-		}
-
-		public IActionResult Category1()
+		public IActionResult Product()
 		{
 			return View();
 		}

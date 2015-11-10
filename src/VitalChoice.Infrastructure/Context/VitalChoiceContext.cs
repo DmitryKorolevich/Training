@@ -306,7 +306,31 @@ namespace VitalChoice.Infrastructure.Context
 
             #endregion
 
-            #region Users
+	        #region Users
+            builder.Entity<ProductContent>().HasKey(p => p.Id);
+            builder.Entity<ProductContent>().ToTable("Products");
+            builder.Entity<ProductContent>().Ignore(p => p.Name);
+            builder.Entity<ProductContent>().Ignore(p => p.UserId);
+            builder.Entity<ProductContent>().Ignore(p => p.User);
+            builder.Entity<ProductContent>()
+                .HasOne(p => p.MasterContentItem)
+                .WithMany()
+                .ForeignKey(p => p.MasterContentItemId)
+                .PrincipalKey(p => p.Id);
+            builder.Entity<ProductContent>()
+                .HasOne(p => p.ContentItem)
+                .WithMany()
+                .ForeignKey(p => p.ContentItemId)
+                .PrincipalKey(p => p.Id);
+
+            #endregion
+            builder.Entity<AdminProfile>().HasKey(x => x.Id);
+            builder.Entity<AdminProfile>().ToTable("AdminProfiles");
+            builder.Entity<AdminProfile>()
+                .HasOne(x => x.User)
+                .WithOne(x => x.Profile)
+                .HasForeignKey<AdminProfile>(a => a.Id)
+                .HasPrincipalKey<ApplicationUser>(x => x.Id);
 
             builder.Entity<AdminProfile>().HasKey(x => x.Id);
             builder.Entity<AdminProfile>().ToTable("AdminProfiles");

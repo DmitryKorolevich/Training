@@ -39,5 +39,14 @@ namespace VitalChoice.Business.Queries.Affiliate
 			}
 			return this;
 		}
-	}
+
+        public AffiliateQuery WithDirectId(int? id)
+        {
+            if (id.HasValue)
+            {
+                Add(x => x.Id == id.Value);
+            }
+            return this;
+        }
+    }
 }

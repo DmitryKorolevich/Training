@@ -5,6 +5,7 @@ angular.module('app.modules.affiliate', [
 	'app.modules.affiliate.controllers.affiliateManageController',
 	'app.modules.affiliate.controllers.affiliateSendEmailController',
 	'app.modules.affiliate.controllers.customersInAffiliatesReportController',
+	'app.modules.affiliate.controllers.affiliatesSummaryReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -31,6 +32,11 @@ angular.module('app.modules.affiliate', [
             	    url: '/report/affiliates-customers',
             	    templateUrl: 'app/modules/affiliate/partials/customersInAffiliatesReport.html',
             	    controller: 'customersInAffiliatesReportController'
+            	})
+            	.state('index.oneCol.affiliatesSummaryReport', {
+            	    url: '/report/affiliates-summary',
+            	    templateUrl: 'app/modules/affiliate/partials/affiliatesSummaryReport.html',
+            	    controller: 'affiliatesSummaryReportController'
             	});
 		}
 ]);

@@ -27,11 +27,5 @@ namespace VitalChoice.Business.Queries.Product
             Add(p => p.Name == name);
             return this;
         }
-
-        public ProductQuery WithUrl(string url)
-        {
-            Add(p => p.Url == url);
-            return this;
-        }
     }
 }

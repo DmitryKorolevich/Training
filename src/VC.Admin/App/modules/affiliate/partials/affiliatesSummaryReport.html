@@ -1,0 +1,92 @@
+﻿<div class="container-fluid affiliates-summary">
+    <div class="well">
+        <span class="legend">Affiliate Summary Information</span>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <div class="summary">
+                <div class="form-group">
+                    <div class="info-label text-right">All Affiliates</div>
+                    <strong class="ng-binding">{{summary.AllAffiliates}}</strong>
+                </div>
+                <div class="form-group">
+                    <div class="info-label text-right">Engaged Affiliates</div>
+                    <strong class="ng-binding">{{summary.EngagedAffiliates}}</strong>
+                </div>
+                <div class="form-group">
+                    <div class="info-label text-right">% Engaged</div>
+                    <strong class="ng-binding">{{summary.EngagedPercent}}%</strong>
+                </div>
+                <div class="form-group">
+                    <div class="info-label text-right">Tagged Customer Accounts</div>
+                    <strong class="ng-binding">{{summary.AffiliateCustomers}}</strong>
+                </div>
+            </div>
+        </spinner-overlay>
+        <hr />
+        <div class="form-group inline-form-group">
+            <label for="" class="control-label">Monthly Affiliate Sales Last</label>
+            <select class="form-control" data-ng-model="options.count" data-ng-options="item as item for item in months"></select>
+            <label for="" class="control-label">Months.</label>
+            <label for="include" class="control-label">Include current</label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="include" data-ng-model="options.include">&nbsp;
+            </label>
+            <button class="btn btn-info" data-ng-click="refresh();" type="button">Refresh</button>
+        </div>
+        <hr />
+        <spinner-overlay data-loading="refreshItemsTracker.active()">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="name"></th>
+                        <th class="month text-center" data-ng-repeat="item in items | orderBy:'$index':true">{{item.Month}}</th>
+                        <th></th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-right">New Transactions</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.NewTransactions}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">Repeat Transactions</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.RepeatTransactions}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">Total Transactions</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.TotalTransactions}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">% New Transactions</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.NewTransactionsPercent}}%</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="{{items.length+2}}">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">New Sales</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.NewSales | currency}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">Repeat Sales</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.RepeatSales | currency}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">Total Sales</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.TotalSales | currency}}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">% New Sales</td>
+                        <td class="text-right" data-ng-repeat="item in items | orderBy:'$index':true">{{item.NewTransactionsPercent}}%</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+    </div>
+</div>

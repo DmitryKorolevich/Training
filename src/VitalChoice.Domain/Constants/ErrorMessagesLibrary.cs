@@ -35,7 +35,9 @@ namespace VitalChoice.Domain.Constants
 		    public const string SuspendedCustomer = "SuspendedCustomer";
 		    public const string PasswordRequiresSpecialCharacter = "PasswordRequiresSpecialCharacter";
 		    public const string InvalidToken = "InvalidToken";
-		}
+            public const string InvalidIdAffiliate = "InvalidIdAffiliate";
+            public const string ObjectNotFound = "ObjectNotFound";
+        }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
@@ -66,7 +68,9 @@ namespace VitalChoice.Domain.Constants
 			{Keys.EmailIsTakenPleaseLogon, "Email '{0}' is already registered"},
 			{Keys.SuspendedCustomer, "Operation can not be completed since associated customer is suspended"},
 			{Keys.PasswordRequiresSpecialCharacter, "Passwords must contain at least 1 special character."},
-			{Keys.InvalidToken, "Authentication token that has been sent to your email either is expired or regenerated already"}
-		};
+			{Keys.InvalidToken, "Authentication token that has been sent to your email either is expired or regenerated already"},
+            {Keys.InvalidIdAffiliate, "Affiliate with the given Id cannot be found"},
+            {Keys.ObjectNotFound, "Object cannot be found"}
+        };
     }
 }

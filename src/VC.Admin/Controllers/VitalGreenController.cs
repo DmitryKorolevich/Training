@@ -23,9 +23,7 @@ using VitalChoice.Domain.Transfer.VitalGreen;
 using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities.VitalGreen;
 using VitalChoice.Business.ExportMaps;
-#if DNX451
-using System.Net.Mime;
-#endif
+using Microsoft.Net.Http.Headers;
 
 namespace VC.Admin.Controllers
 {
@@ -60,8 +58,6 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
-
-#if DNX451
         [HttpGet]
         public async Task<FileResult> GetVitalGreenReportFile([FromQuery]string year, [FromQuery]string month)
         {
@@ -76,15 +72,13 @@ namespace VC.Admin.Controllers
             }
             var data = _exportVitalGreenRequestService.ExportToCSV(requests);
 
-            var contentDisposition = new ContentDisposition()
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.VITAL_GREEN_REPORT_FILE_NAME_FORMAT, month, year),
-                Inline = false
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(data, "text/csv");
         }
-#endif
     }
 }

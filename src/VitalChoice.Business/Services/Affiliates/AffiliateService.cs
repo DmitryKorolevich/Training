@@ -43,6 +43,7 @@ using System.Collections;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
+using System.Globalization;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
@@ -57,6 +58,7 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly INotificationService _notificationService;
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
@@ -67,6 +69,7 @@ namespace VitalChoice.Business.Services.Affiliates
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
             IEcommerceRepositoryAsync<AffiliatePayment> affiliatePaymentRepository,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
+            IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             AffiliateMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<AffiliateOptionValue> affiliateValueRepositoryAsync,
@@ -88,6 +91,7 @@ namespace VitalChoice.Business.Services.Affiliates
             _notificationService = notificationService;
             _affiliateUserService = affiliateUserService;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+            _customerRepositoryAsync = customerRepositoryAsync;
             _appOptions = appOptions;
         }
 
@@ -391,6 +395,11 @@ namespace VitalChoice.Business.Services.Affiliates
             //}
         }
 
+        public async Task<bool> SelectAnyAsync(int id)
+        {
+            return await this.ObjectRepository.Query(p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted).SelectAnyAsync();
+        }
+
         #endregion
 
         #region AffiliatePayments
@@ -473,6 +482,58 @@ namespace VitalChoice.Business.Services.Affiliates
             }
 
             return dbItem;
+        }
+
+        public async Task<AffiliatesSummaryModel> GetAffiliatesSummary()
+        {
+            AffiliatesSummaryModel toReturn = new AffiliatesSummaryModel();
+            AffiliateQuery conditions = new AffiliateQuery().NotDeleted();
+            toReturn.AllAffiliates = await ObjectRepository.Query(conditions).SelectCountAsync();
+            toReturn.EngagedAffiliates = await _affiliateOrderPaymentRepository.GetEngangedAffiliatesCount();
+            CustomerQuery customerCoditions = new CustomerQuery().NotDeleted().WithAffiliate();
+            toReturn.AffiliateCustomers = await _customerRepositoryAsync.Query(customerCoditions).SelectCountAsync();
+
+            return toReturn;
+        }
+
+        public async Task<ICollection<AffiliatesSummaryReportItemModel>> GetAffiliatesSummaryReportItemsForMonths(DateTime lastMonthStartDay, int monthCount)
+        {
+            List<AffiliatesSummaryReportItemModel> toReturn = new List<AffiliatesSummaryReportItemModel>();
+            while(monthCount>0)
+            {
+                var spItems = await _affiliateOrderPaymentRepository.GetAffiliatesSummaryReport(lastMonthStartDay, lastMonthStartDay.AddMonths(1));
+
+                var newStatistic = spItems.FirstOrDefault(p => p.IdType == 1);
+                var repeatStatistic = spItems.FirstOrDefault(p => p.IdType == 2);
+                AffiliatesSummaryReportItemModel item = new AffiliatesSummaryReportItemModel();
+                item.Month = lastMonthStartDay.ToString("MMMM",CultureInfo.InvariantCulture);
+                if(newStatistic!=null)
+                {
+                    item.NewTransactions = newStatistic.Count;
+                    item.NewSales = newStatistic.Sum;
+                }
+                if (repeatStatistic != null)
+                {
+                    item.RepeatTransactions = repeatStatistic.Count;
+                    item.RepeatSales = repeatStatistic.Sum;
+                    item.TotalTransactions = item.NewTransactions + item.RepeatTransactions;
+                    item.TotalSales = item.NewSales + item.RepeatSales;
+                    if (item.TotalTransactions != 0)
+                    {
+                        item.NewTransactionsPercent =Math.Round((((decimal)item.NewTransactions) / item.TotalTransactions)*100,2);
+                    }
+                    if (item.TotalSales != 0)
+                    {
+                        item.NewSalesPercent = Math.Round((((decimal)item.NewSales) / item.TotalSales)*100,2);
+                    }
+                }
+                toReturn.Add(item);
+
+                lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
+                monthCount--;
+            }
+
+            return toReturn;
         }
 
         #endregion

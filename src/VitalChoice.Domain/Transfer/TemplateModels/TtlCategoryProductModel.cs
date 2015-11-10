@@ -7,7 +7,9 @@ namespace VitalChoice.Domain.Transfer.TemplateModels
 {
     public class TtlCategoryProductModel
     {
-		public string Name { get; set; }
+        public int Id { get; set; }
+
+        public string Name { get; set; }
 
 		public string Url { get; set; }
 

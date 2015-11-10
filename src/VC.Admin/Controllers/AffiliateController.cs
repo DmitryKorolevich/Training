@@ -53,6 +53,7 @@ namespace VC.Admin.Controllers
         private readonly Country _defaultCountry;
         private readonly IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _exportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public AffiliateController(
@@ -72,6 +73,7 @@ namespace VC.Admin.Controllers
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             _exportAffiliateOrderListItemService = exportAffiliateOrderListItemService;
             _orderService = orderService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -277,6 +279,31 @@ namespace VC.Admin.Controllers
         public async Task<Result<PagedList<AffiliateOrderListItemModel>>> GetAffiliateOrderPaymentsWithCustomerInfo([FromBody]AffiliateOrderPaymentFilter filter)
         {
             return await _orderService.GetAffiliateOrderPaymentsWithCustomerInfo(filter);
+        }
+
+        [HttpGet]
+        public async Task<Result<AffiliatesSummaryModel>> GetAffiliatesSummary()
+        {
+            return await _affiliateService.GetAffiliatesSummary();
+        }
+        
+        [HttpGet]
+        public async Task<Result<ICollection<AffiliatesSummaryReportItemModel>>> GetAffiliatesSummaryReportItemsForMonths(int count=3,bool include=true)
+        {
+            if (count > 12)
+                count = 12;
+            if (count < 3)
+                count = 3;
+            if (include)
+                count++;
+            DateTime lastMonthStartDay = DateTime.Now;
+            lastMonthStartDay = new DateTime(lastMonthStartDay.Year, lastMonthStartDay.Month, 1);
+            if(!include)
+            {
+                lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
+            }
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            return (await _affiliateService.GetAffiliatesSummaryReportItemsForMonths(lastMonthStartDay, count)).ToList();
         }
     }
 }

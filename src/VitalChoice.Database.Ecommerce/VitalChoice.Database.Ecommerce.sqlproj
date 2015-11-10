@@ -201,4 +201,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VCustomers.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetEngangedAffiliatesCount.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetAffiliatesSummaryReport.sql" />
+  </ItemGroup>
 </Project>

@@ -43,3 +43,5 @@ Post-Deployment Script Template
 :r .\Scripts\FedEx.sql
 
 :r .\Scripts\UpdateIdentityWithStorefront.sql
+
+:r .\Scripts\Products.sql

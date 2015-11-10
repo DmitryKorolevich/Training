@@ -92,10 +92,6 @@ namespace VC.Admin.Validators.Customer
 					.When(model => model.CustomerType == CustomerType.Wholesale)
 					.WithMessage(model => model.TradeClass, ValidationMessages.FieldRequired);
 
-				RuleFor(model => model.LinkedToAffiliate)
-					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-					.WithMessage(model => model.LinkedToAffiliate, ValidationMessages.FieldLength,
-						BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
 				RuleFor(model => model.Email)
 					.NotEmpty()

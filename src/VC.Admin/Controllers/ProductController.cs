@@ -27,6 +27,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
+using VitalChoice.Interfaces.Entities;
 
 namespace VC.Admin.Controllers
 {
@@ -181,9 +182,14 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await productService.SelectAsync(id);
+            var item = await productService.SelectTransferAsync(id);
             
-            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
+            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item!=null ? item.ProductDynamic : null);
+            if (item.ProductContent != null)
+            {
+                toReturn.Url = item.ProductContent.Url;
+                toReturn.MasterContentItemId = item.ProductContent.MasterContentItemId;
+            }
             if (toReturn.CrossSellProducts != null)
             {
                 foreach (var product in toReturn.CrossSellProducts)
@@ -214,10 +220,21 @@ namespace VC.Admin.Controllers
             {
                 item.IdEditedBy = userId;
             }
+
+            ProductContentTransferEntity transferEntity = new ProductContentTransferEntity();
+            ProductContent content = new ProductContent();
+            content.Id = model.Id;
+            content.Url = model.Url;
+            content.ContentItem = new ContentItem();
+            content.ContentItem.Template = String.Empty;
+            content.ContentItem.Description = String.Empty;
+            transferEntity.ProductContent = content;
+            transferEntity.ProductDynamic = item;
+
             if (model.Id > 0)
-                item = (await productService.UpdateAsync(item));
+                item = (await productService.UpdateAsync(transferEntity));
             else
-                item = (await productService.InsertAsync(item));
+                item = (await productService.InsertAsync(transferEntity));
 
             ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;

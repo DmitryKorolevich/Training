@@ -157,4 +157,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\UpdateIdentityWithStorefront.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Products.sql" />
+  </ItemGroup>
 </Project>

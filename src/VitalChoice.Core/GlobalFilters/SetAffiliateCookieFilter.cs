@@ -25,10 +25,15 @@ namespace VitalChoice.Core.GlobalFilters
                     int idAffiliate = 0;
                     if (Int32.TryParse(param, out idAffiliate))
                     {
-                        context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(), new CookieOptions()
-                        {
-                            Expires = DateTime.Now.AddDays(AffiliateConstants.AffiliatePublicIdParamExpiredDays),
-                        });
+                        //var affiliateService = context.HttpContext.ApplicationServices.GetService<IAffiliateService>();
+                        //var any = affiliateService.SelectAnyAsync(idAffiliate).Result;
+                        //if (any)
+                        //{
+                            context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(), new CookieOptions()
+                            {
+                                Expires = DateTime.Now.AddDays(AffiliateConstants.AffiliatePublicIdParamExpiredDays),
+                            });
+                        //}
                     }
                 }
             }

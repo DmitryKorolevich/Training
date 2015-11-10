@@ -5,7 +5,7 @@
 		});
 
 		var idCountry = $("#hdCountry").val();
-		if (idCountry) {
+		if (idCountry && idCountry != 0) {
 			$("#ddCountry").val(idCountry);
 		} else {
 			$("#ddCountry").val(appSettings.DefaultCountryId);

@@ -182,6 +182,7 @@
 		"app/modules/affiliate/controllers/affiliateManageController.js",
 		"app/modules/affiliate/controllers/affiliateSendEmailController.js",
 		"app/modules/affiliate/controllers/customersInAffiliatesReportController.js",
+		"app/modules/affiliate/controllers/affiliatesSummaryReportController.js",
 		"app/modules/affiliate/affiliate.js",
 		"app/modules/file/controllers/filesController.js",
 		"app/modules/file/controllers/addFolderController.js",

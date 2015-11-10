@@ -144,3 +144,15 @@ END
 
 GO
 
+IF EXISTS(SELECT * FROM AffiliateOptionTypes WHERE Name='AffiliateLinkId')
+BEGIN
+
+DELETE AffiliateOptionValues
+WHERE IdOptionType IN
+(SELECT Id FROM AffiliateOptionTypes WHERE Name='AffiliateLinkId')
+
+DELETE AffiliateOptionTypes WHERE Name='AffiliateLinkId'
+
+END
+
+GO

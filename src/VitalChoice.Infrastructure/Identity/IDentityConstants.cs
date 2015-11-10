@@ -18,7 +18,7 @@ namespace VitalChoice.Infrastructure.Identity
 
         public const string ForgotPasswordResetPurpose = "ForgotPasswordReset";
 
-        public const string PasswordResetPurpose = "PasswordReset";
+        public const string PasswordResetPurpose = "ResetPassword";
 
         public const string CustomerLoginPurpose = "CustomerLoginPurpose";
 

@@ -13,5 +13,6 @@ namespace VitalChoice.Domain.Entities.Content
         ContentPageCategory = 7,
         ContentPage = 8,
         ProductCategory = 9,
+        Product = 10,
     }
 }

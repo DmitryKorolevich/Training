@@ -84,7 +84,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Affiliates',
 				    subMenu: [
                         { name: 'affiliatePayComissions', stateName: 'index.oneCol.affiliatePayComissions', stateLabel: 'Affiliate Pay Comissions', access: 3 },
-                        { name: 'affiliateSummaryInformation', stateName: 'index.oneCol.affiliateSummaryInformation', stateLabel: 'Affiliate Summary Information', access: 3 },
+                        { name: 'affiliateSummaryInformation', stateName: 'index.oneCol.affiliatesSummaryReport', stateLabel: 'Affiliate Summary Information', access: 3 },
 				    ]
 				},
 				{
