@@ -17,7 +17,9 @@ Post-Deployment Script Template
 :r .\Scripts\VProductSkus.sql
 :r .\Scripts\OrdersData.sql
 :r .\Scripts\AffiliatesData.sql
-:r .\Scripts\VHelpTickets.sql
 :r .\Scripts\PromotionData.sql
 :r .\Scripts\CustomerAddressStructureModeData.sql
+:r .\Scripts\VCustomers.sql
+:r .\Scripts\VOrders.sql
+:r .\Scripts\VHelpTickets.sql
 :r .\Scripts\SPGetEngangedAffiliatesCount.sql

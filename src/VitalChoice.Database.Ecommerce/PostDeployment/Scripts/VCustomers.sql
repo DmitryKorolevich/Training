@@ -33,8 +33,7 @@ SELECT
 	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated DESC) AS LastOrderPlaced,
 	(SELECT TOP 1 o.DateCreated FROM Orders o WHERE cu.Id=o.IdCustomer AND o.StatusCode!=3 ORDER BY o.DateCreated ASC) AS FirstOrderPlaced
 FROM [dbo].[Customers] AS cu
-LEFT OUTER JOIN [dbo].[Addresses] AS ad ON cu.Id = ad.IdCustomer AND
-ad.IdObjectType = (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Profile')
+LEFT OUTER JOIN [dbo].[Addresses] AS ad ON cu.IdProfileAddress = ad.Id
 LEFT OUTER JOIN (SELECT
 	[IdAddress],
 	[FirstName],

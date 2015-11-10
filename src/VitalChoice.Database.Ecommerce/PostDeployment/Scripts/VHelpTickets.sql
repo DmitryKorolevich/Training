@@ -19,7 +19,7 @@ SELECT
 	FROM HelpTickets AS h
 	JOIN Orders AS o ON h.IdOrder=o.Id
 	JOIN Customers AS c ON c.Id = o.[IdCustomer]
-	JOIN Addresses AS ad ON ad.IdCustomer = c.Id AND ad.IdObjectType = (SELECT [Id] FROM [dbo].[AddressTypes] WHERE [Name] = N'Profile')
+	JOIN Addresses AS ad ON ad.Id = c.IdProfileAddress
 	LEFT JOIN (SELECT [IdAddress], [FirstName], [LastName]
 	FROM (SELECT [IdAddress], [Name], [Value] FROM [dbo].[AddressOptionTypes] AS adt
 	INNER JOIN [dbo].[AddressOptionValues] AS adv on adt.Id = adv.IdOptionType ) AS source
