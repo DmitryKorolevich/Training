@@ -64,20 +64,20 @@ namespace VitalChoice.DynamicData.Base
 
             Expression<Func<TEntity, bool>> conditionExpression;
 
-            if (typeof (TOptionValue) == typeof (ProductOptionValue))
-            {
-                var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
-                conditionExpression = e => values.Contains(e.Id);
-            }
-            else
-            {
+            //if (typeof (TOptionValue) == typeof (ProductOptionValue))
+            //{
+            //    var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+            //        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+            //            idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
+            //    conditionExpression = e => values.Contains(e.Id);
+            //}
+            //else
+            //{
                 conditionExpression =
                     CreateValuesSelector(BuildSearchValues(filterDictionary,
                         FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
                             idObjectType, lookObjectId)));
-            }
+            //}
             if (conditionExpression == null)
                 return Expression.Constant(true);
 
@@ -93,19 +93,19 @@ namespace VitalChoice.DynamicData.Base
 
             Expression<Func<TEntity, bool>> conditionExpression;
 
-            if (typeof(TOptionValue) == typeof(ProductOptionValue))
-            {
-                var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
-                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
-                conditionExpression = e => values.Contains(e.Id);
-            }
-            else
-            {
+            //if (typeof(TOptionValue) == typeof(ProductOptionValue))
+            //{
+            //    var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+            //        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+            //            idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
+            //    conditionExpression = e => values.Contains(e.Id);
+            //}
+            //else
+            //{
                 conditionExpression = CreateValuesSelector(BuildSearchValues(filterDictionary,
                     FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                        idObjectType, true)));
-            }
+                        idObjectType, lookObjectId)));
+            //}
             if (conditionExpression == null)
                 return Expression.Constant(true);
 

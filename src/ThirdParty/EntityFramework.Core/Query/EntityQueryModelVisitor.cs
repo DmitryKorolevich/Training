@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Extensions.Internal;
@@ -628,39 +629,43 @@ namespace Microsoft.Data.Entity.Query
                 = Expression.Parameter(
                     innerSequenceExpression.Type.GetSequenceType(), joinClause.ItemName);
 
-            if (!_queryCompilationContext.QuerySourceMapping.ContainsMapping(joinClause))
-            {
-                _queryCompilationContext.QuerySourceMapping
-                    .AddMapping(joinClause, innerItemParameter);
-            }
-
-            var innerKeySelectorExpression
-                = ReplaceClauseReferences(joinClause.InnerKeySelector, joinClause);
-
             var transparentIdentifierType
                 = typeof(TransparentIdentifier<,>)
                     .MakeGenericType(CurrentParameter.Type, innerItemParameter.Type);
 
-            _expression
-                = Expression.Call(
-                    LinqOperatorProvider.Join
-                        .MakeGenericMethod(
-                            CurrentParameter.Type,
-                            innerItemParameter.Type,
-                            outerKeySelectorExpression.Type,
-                            transparentIdentifierType),
-                    _expression,
-                    innerSequenceExpression,
-                    Expression.Lambda(outerKeySelectorExpression, CurrentParameter),
-                    Expression.Lambda(innerKeySelectorExpression, innerItemParameter),
-                    Expression.Lambda(
-                        CallCreateTransparentIdentifier(
-                            transparentIdentifierType,
-                            CurrentParameter,
-                            innerItemParameter),
-                        CurrentParameter,
-                        innerItemParameter));
+            if (!_queryCompilationContext.QuerySourceMapping.ContainsMapping(joinClause))
+            {
+                _queryCompilationContext.QuerySourceMapping
+                    .AddMapping(joinClause, innerItemParameter);
 
+                var innerKeySelectorExpression = ReplaceClauseReferences(joinClause.InnerKeySelector, joinClause);
+
+                _expression
+                    = Expression.Call(
+                        LinqOperatorProvider.Join
+                            .MakeGenericMethod(
+                                CurrentParameter.Type,
+                                innerItemParameter.Type,
+                                outerKeySelectorExpression.Type,
+                                transparentIdentifierType),
+                        _expression,
+                        innerSequenceExpression,
+                        Expression.Lambda(outerKeySelectorExpression, CurrentParameter),
+                        Expression.Lambda(innerKeySelectorExpression, innerItemParameter),
+                        Expression.Lambda(
+                            CallCreateTransparentIdentifier(
+                                transparentIdentifierType,
+                                CurrentParameter,
+                                innerItemParameter),
+                            CurrentParameter,
+                            innerItemParameter));
+
+                _queryCompilationContext.JoinExpressions.Add(joinClause, _expression);
+            }
+            else
+            {
+                _expression = _queryCompilationContext.JoinExpressions[joinClause];
+            }
             IntroduceTransparentScope(joinClause, queryModel, index, transparentIdentifierType);
         }
 
@@ -690,41 +695,48 @@ namespace Microsoft.Data.Entity.Query
                     innerSequenceExpression.Type.GetSequenceType(),
                     groupJoinClause.JoinClause.ItemName);
 
-            _queryCompilationContext.QuerySourceMapping
-                .AddMapping(groupJoinClause.JoinClause, innerItemParameter);
-
-            var innerKeySelectorExpression
-                = ReplaceClauseReferences(groupJoinClause.JoinClause.InnerKeySelector, groupJoinClause);
-
             var innerItemsParameter
                 = Expression.Parameter(
                     LinqOperatorProvider.MakeSequenceType(innerItemParameter.Type),
                     groupJoinClause.ItemName);
 
             var transparentIdentifierType
-                = typeof(TransparentIdentifier<,>)
+                = typeof (TransparentIdentifier<,>)
                     .MakeGenericType(CurrentParameter.Type, innerItemsParameter.Type);
 
-            _expression
-                = Expression.Call(
-                    LinqOperatorProvider.GroupJoin
-                        .MakeGenericMethod(
-                            CurrentParameter.Type,
-                            innerItemParameter.Type,
-                            outerKeySelectorExpression.Type,
-                            transparentIdentifierType),
-                    _expression,
-                    innerSequenceExpression,
-                    Expression.Lambda(outerKeySelectorExpression, CurrentParameter),
-                    Expression.Lambda(innerKeySelectorExpression, innerItemParameter),
-                    Expression.Lambda(
-                        CallCreateTransparentIdentifier(
-                            transparentIdentifierType,
-                            CurrentParameter,
-                            innerItemsParameter),
-                        CurrentParameter,
-                        innerItemsParameter));
+            if (!_queryCompilationContext.QuerySourceMapping.ContainsMapping(groupJoinClause.JoinClause))
+            {
+                _queryCompilationContext.QuerySourceMapping
+                    .AddMapping(groupJoinClause.JoinClause, innerItemParameter);
 
+                var innerKeySelectorExpression = ReplaceClauseReferences(groupJoinClause.JoinClause.InnerKeySelector, groupJoinClause);
+
+                _expression
+                    = Expression.Call(
+                        LinqOperatorProvider.GroupJoin
+                            .MakeGenericMethod(
+                                CurrentParameter.Type,
+                                innerItemParameter.Type,
+                                outerKeySelectorExpression.Type,
+                                transparentIdentifierType),
+                        _expression,
+                        innerSequenceExpression,
+                        Expression.Lambda(outerKeySelectorExpression, CurrentParameter),
+                        Expression.Lambda(innerKeySelectorExpression, innerItemParameter),
+                        Expression.Lambda(
+                            CallCreateTransparentIdentifier(
+                                transparentIdentifierType,
+                                CurrentParameter,
+                                innerItemsParameter),
+                            CurrentParameter,
+                            innerItemsParameter));
+
+                _queryCompilationContext.JoinExpressions.Add(groupJoinClause.JoinClause, _expression);
+            }
+            else
+            {
+                _expression = _queryCompilationContext.JoinExpressions[groupJoinClause.JoinClause];
+            }
             IntroduceTransparentScope(groupJoinClause, queryModel, index, transparentIdentifierType);
         }
 

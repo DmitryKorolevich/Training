@@ -59,6 +59,8 @@ namespace Microsoft.Data.Entity.Query
 
         public virtual QuerySourceMapping QuerySourceMapping { get; } = new QuerySourceMapping();
 
+        public IDictionary<IQuerySource, Expression> JoinExpressions { get; } = new Dictionary<IQuerySource, Expression>();
+
         public virtual IReadOnlyCollection<QueryAnnotationBase> QueryAnnotations
         {
             get { return _queryAnnotations; }

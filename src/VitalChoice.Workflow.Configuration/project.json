@@ -14,7 +14,7 @@
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Interfaces": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-16110"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
   },
 
   "commands": {
