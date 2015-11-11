@@ -70,7 +70,7 @@ namespace VitalChoice.Business.Services.Dynamic
             return Task.Delay(0);
         }
 
-        public override Expression<Func<OrderAddressOptionValue, int?>> ObjectIdSelector
+        protected override Expression<Func<OrderAddressOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return a => a.IdOrderAddress; }
         }

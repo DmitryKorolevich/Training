@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        public override Expression<Func<ProductOptionValue, int?>> ObjectIdSelector
+        protected override Expression<Func<ProductOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return c => c.IdSku; }
         }

@@ -10,7 +10,8 @@ namespace VitalChoice.Data.DataContext
     {
         int SaveChanges();
 
-        //void SyncObjectState(object entity);
+        DbSet<T> Set<T>() 
+            where T : class;
 
         void TrackGraphForAdd(object entity);
 

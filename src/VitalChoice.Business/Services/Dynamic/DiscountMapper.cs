@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _productService = productService;
         }
 
-        public override Expression<Func<DiscountOptionValue, int?>> ObjectIdSelector
+        protected override Expression<Func<DiscountOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return c => c.IdDiscount; }
         }

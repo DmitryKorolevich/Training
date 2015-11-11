@@ -52,3 +52,5 @@
 :r .\Scripts\DiscountUpdates.sql
 
 :r .\Scripts\CustomerAddressStructureUpdate.sql
+
+:r .\Scripts\AllValueTablesStructureOptimize.sql

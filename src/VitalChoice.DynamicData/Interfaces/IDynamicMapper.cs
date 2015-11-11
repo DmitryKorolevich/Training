@@ -79,8 +79,8 @@ namespace VitalChoice.DynamicData.Interfaces
     {
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
         ICollection<TOptionType> OptionTypes { get; }
-        IEnumerable<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
-        Expression<Func<TOptionValue, int?>> ObjectIdSelector { get; }
+        ICollection<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
+        Action<TOptionValue, int> SetObjectReferenceId { get; }
     }
 
     public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic, TEntity>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>
@@ -98,7 +98,7 @@ namespace VitalChoice.DynamicData.Interfaces
 
         void UpdateEntityRange(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         List<TEntity> ToEntityRange(ICollection<TDynamic> items, ICollection<TOptionType> optionTypes = null);
-        List<TEntity> ToEntityRange(ICollection<GenericObjectPair<TDynamic, ICollection<TOptionType>>> items);
+        ICollection<DynamicEntityPair<TDynamic, TEntity>> ToEntityRange(ICollection<GenericObjectPair<TDynamic, ICollection<TOptionType>>> items);
         List<TDynamic> FromEntityRange(ICollection<TEntity> items, bool withDefaults = false);
 
         Task UpdateEntityAsync(TDynamic dynamic, TEntity entity);

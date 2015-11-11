@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        public override Expression<Func<AffiliateOptionValue, int?>> ObjectIdSelector
+        protected override Expression<Func<AffiliateOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return a => a.IdAffiliate; }
         }

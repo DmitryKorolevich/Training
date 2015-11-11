@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -12,9 +13,8 @@ namespace VitalChoice.Domain.Helpers
             if (!(typeof (TDelegate).GetTypeInfo().IsSubclassOf(typeof (Delegate))))
                 throw new ArgumentException("TDelegate should be a delegate");
             var delegateMethod = typeof (TDelegate).GetMethod("Invoke");
-            var dynamic = EmitDynamic(method.ReturnType, method,
+            return method.GetOrCompile(method.ReturnType, typeof (TDelegate),
                 delegateMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-            return dynamic.CreateDelegate(typeof (TDelegate));
         }
 
         /// <summary>
@@ -26,38 +26,38 @@ namespace VitalChoice.Domain.Helpers
         /// <returns>Delegate to invoke method</returns>
         public static Func<TResult> CompileStaticAccessor<TResult>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic<TResult>(method);
-            return (Func<TResult>) dynamic.CreateDelegate(typeof (Func<TResult>));
+            return (Func<TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<TResult>));
         }
 
         public static Action<T> CompileVoidAccessor<T>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic(typeof(void), method, typeof(T));
-            return (Action<T>)dynamic.CreateDelegate(typeof(Action<T>));
+            return (Action<T>) method.GetOrCompile(typeof (void), typeof (Action<T>), typeof (T));
         }
 
         public static Action<T1, T2> CompileVoidAccessor<T1, T2>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2));
-            return (Action<T1, T2>)dynamic.CreateDelegate(typeof(Action<T1, T2>));
+            return (Action<T1, T2>) method.GetOrCompile(typeof (void), typeof (Action<T1, T2>), typeof (T1), typeof (T2));
         }
 
         public static Action<T1, T2, T3> CompileVoidAccessor<T1, T2, T3>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3));
-            return (Action<T1, T2, T3>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3>));
+            return
+                (Action<T1, T2, T3>) method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3>), typeof (T1), typeof (T2), typeof (T3));
         }
 
         public static Action<T1, T2, T3, T4> CompileVoidAccessor<T1, T2, T3, T4>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3), typeof(T4));
-            return (Action<T1, T2, T3, T4>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3, T4>));
+            return
+                (Action<T1, T2, T3, T4>)
+                    method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3, T4>), typeof (T1), typeof (T2), typeof (T3), typeof (T4));
         }
 
         public static Action<T1, T2, T3, T4, T5> CompileVoidAccessor<T1, T2, T3, T4, T5>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic(typeof(void), method, typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
-            return (Action<T1, T2, T3, T4, T5>)dynamic.CreateDelegate(typeof(Action<T1, T2, T3, T4, T5>));
+            return
+                (Action<T1, T2, T3, T4, T5>)
+                    method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3, T4, T5>), typeof (T1), typeof (T2), typeof (T3),
+                        typeof (T4), typeof (T5));
         }
 
         /// <summary>
@@ -69,8 +69,7 @@ namespace VitalChoice.Domain.Helpers
         /// <returns>Delegate to invoke method</returns>
         public static Func<T, TResult> CompileAccessor<T, TResult>(this MethodInfo method)
         {
-            var dynamic = EmitDynamic<TResult>(method, typeof (T));
-            return (Func<T, TResult>) dynamic.CreateDelegate(typeof (Func<T, TResult>));
+            return (Func<T, TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<T, TResult>), typeof (T));
         }
 
         /// <summary>
@@ -80,12 +79,9 @@ namespace VitalChoice.Domain.Helpers
         /// <typeparam name="TResult">The result of calee</typeparam>
         /// <param name="method">MethodInfo to compile accessor to</param>
         /// <returns>Delegate to invoke method</returns>
-#pragma warning disable 1712
         public static Func<T1, T2, TResult> CompileAccessor<T1, T2, TResult>(this MethodInfo method)
         {
-#pragma warning restore 1712
-            var dynamic = EmitDynamic<TResult>(method, typeof (T1), typeof (T2));
-            return (Func<T1, T2, TResult>) dynamic.CreateDelegate(typeof (Func<T1, T2, TResult>));
+            return (Func<T1, T2, TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, TResult>), typeof (T1), typeof (T2));
         }
 
         /// <summary>
@@ -95,12 +91,11 @@ namespace VitalChoice.Domain.Helpers
         /// <typeparam name="TResult">The result of calee</typeparam>
         /// <param name="method">MethodInfo to compile accessor to</param>
         /// <returns>Delegate to invoke method</returns>
-#pragma warning disable 1712
         public static Func<T1, T2, T3, TResult> CompileAccessor<T1, T2, T3, TResult>(this MethodInfo method)
         {
-#pragma warning restore 1712
-            var dynamic = EmitDynamic<TResult>(method, typeof (T1), typeof (T2), typeof (T3));
-            return (Func<T1, T2, T3, TResult>) dynamic.CreateDelegate(typeof (Func<T1, T2, T3, TResult>));
+            return
+                (Func<T1, T2, T3, TResult>)
+                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, TResult>), typeof (T1), typeof (T2), typeof (T3));
         }
 
         /// <summary>
@@ -110,12 +105,12 @@ namespace VitalChoice.Domain.Helpers
         /// <typeparam name="TResult">The result of calee</typeparam>
         /// <param name="method">MethodInfo to compile accessor to</param>
         /// <returns>Delegate to invoke method</returns>
-#pragma warning disable 1712
         public static Func<T1, T2, T3, T4, TResult> CompileAccessor<T1, T2, T3, T4, TResult>(this MethodInfo method)
         {
-#pragma warning restore 1712
-            var dynamic = EmitDynamic<TResult>(method, typeof (T1), typeof (T2), typeof (T3), typeof (T4));
-            return (Func<T1, T2, T3, T4, TResult>) dynamic.CreateDelegate(typeof (Func<T1, T2, T3, T4, TResult>));
+            return
+                (Func<T1, T2, T3, T4, TResult>)
+                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, T4, TResult>), typeof (T1), typeof (T2), typeof (T3),
+                        typeof (T4));
         }
 
         /// <summary>
@@ -125,23 +120,29 @@ namespace VitalChoice.Domain.Helpers
         /// <typeparam name="TResult">The result of calee</typeparam>
         /// <param name="method">MethodInfo to compile accessor to</param>
         /// <returns>Delegate to invoke method</returns>
-#pragma warning disable 1712
         public static Func<T1, T2, T3, T4, T5, TResult> CompileAccessor<T1, T2, T3, T4, T5, TResult>(
             this MethodInfo method)
         {
-#pragma warning restore 1712
-            var dynamic = EmitDynamic<TResult>(method, typeof (T1), typeof (T2), typeof (T3), typeof (T4), typeof (T5));
             return
-                (Func<T1, T2, T3, T4, T5, TResult>) dynamic.CreateDelegate(typeof (Func<T1, T2, T3, T4, T5, TResult>));
+                (Func<T1, T2, T3, T4, T5, TResult>)
+                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, T4, T5, TResult>), typeof (T1), typeof (T2), typeof (T3),
+                        typeof (T4), typeof (T5));
         }
 
-        private static DynamicMethod EmitDynamic(Type returnType, MethodInfo method, params Type[] typeParameters)
+        // ReSharper disable UnusedParameter.Local
+        private static void ValidateParameters(MethodInfo method, Type[] typeParameters)
         {
             if (method.IsStatic && method.GetParameters().Length != typeParameters.Length ||
                 !method.IsStatic && method.GetParameters().Length + 1 != typeParameters.Length)
                 throw new ArgumentException("Method has different number of arguments");
+        }
+        // ReSharper enable UnusedParameter.Local
+
+        private static DynamicMethod EmitDynamic(Type returnType, MethodInfo method, params Type[] typeParameters)
+        {
+            ValidateParameters(method, typeParameters);
             var dynamic = new DynamicMethod(method.Name, returnType, typeParameters,
-                typeof (MethodInfoHelper), true);
+                typeof(MethodInfoHelper), true);
             ILGenerator il = dynamic.GetILGenerator();
             il.EmitParameters(method, typeParameters);
             if (method.IsVirtual || method.IsAbstract)
@@ -153,28 +154,6 @@ namespace VitalChoice.Domain.Helpers
                 il.Emit(OpCodes.Call, method);
             }
             il.EmitCastIfNeeded(method.ReturnType, returnType);
-            il.Emit(OpCodes.Ret);
-            return dynamic;
-        }
-
-        private static DynamicMethod EmitDynamic<TResult>(MethodInfo method, params Type[] typeParameters)
-        {
-            if (method.IsStatic && method.GetParameters().Length != typeParameters.Length ||
-                !method.IsStatic && method.GetParameters().Length + 1 != typeParameters.Length)
-                throw new ArgumentException("Method has different number of arguments");
-            var dynamic = new DynamicMethod(method.Name, typeof (TResult), typeParameters,
-                typeof (MethodInfoHelper), true);
-            ILGenerator il = dynamic.GetILGenerator();
-            il.EmitParameters(method, typeParameters);
-            if (method.IsVirtual || method.IsAbstract)
-            {
-                il.Emit(OpCodes.Callvirt, method);
-            }
-            else
-            {
-                il.Emit(OpCodes.Call, method);
-            }
-            il.EmitCastIfNeeded(method.ReturnType, typeof (TResult));
             il.Emit(OpCodes.Ret);
             return dynamic;
         }
@@ -253,6 +232,110 @@ namespace VitalChoice.Domain.Helpers
                     il.Emit(OpCodes.Ldarg, i);
                     il.EmitCastIfNeeded(parameterTypes[i], methodParameterTypes[i - seed]);
                 }
+            }
+        }
+
+        private struct CacheItem : IEquatable<CacheItem>
+        {
+            public CacheItem(MethodInfo methodInfo, Type resultType, Type[] parameters)
+            {
+                if (methodInfo == null)
+                    throw new ArgumentNullException(nameof(methodInfo));
+                if (resultType == null)
+                    throw new ArgumentNullException(nameof(resultType));
+
+                _methodInfo = methodInfo;
+                _resultType = resultType;
+                _parameters = parameters;
+            }
+
+            private readonly MethodInfo _methodInfo;
+            private readonly Type _resultType;
+            private readonly Type[] _parameters;
+
+            public override int GetHashCode()
+            {
+                return ItemComparer.GetHashCode(this);
+            }
+
+            public bool Equals(CacheItem other)
+            {
+                return ItemComparer.Equals(this, other);
+            }
+
+            private sealed class CacheItemEqualityComparer : IEqualityComparer<CacheItem>
+            {
+                public bool Equals(CacheItem x, CacheItem y)
+                {
+                    var result = x._resultType == y._resultType && x._methodInfo == y._methodInfo;
+
+                    if (x._parameters == null ^ y._parameters == null)
+                        return false;
+
+                    if (!result || x._parameters == null)
+                        return result;
+
+                    if (x._parameters.Length != y._parameters.Length)
+                        return false;
+
+                    for (var i = 0; i < x._parameters.Length; i++)
+                    {
+                        result = result && x._parameters[i] == y._parameters[i];
+                    }
+
+                    return result;
+                }
+
+                public int GetHashCode(CacheItem obj)
+                {
+                    unchecked
+                    {
+                        var hashCode = obj._methodInfo.Name.GetHashCode()*397 ^
+                                       (obj._methodInfo.DeclaringType?.GetHashCode() ?? obj._methodInfo.ReturnType.GetHashCode());
+
+                        hashCode = (hashCode * 397) ^ obj._resultType.GetHashCode();
+                        // ReSharper disable once ForCanBeConvertedToForeach
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        if (obj._parameters != null)
+                        {
+                            for (int i = 0; i < obj._parameters.Length; i++)
+                            {
+                                var type = obj._parameters[i];
+                                hashCode = (hashCode * 397) ^ type.GetHashCode();
+                            }
+                        }
+                        return hashCode;
+                    }
+                }
+            }
+
+            private static readonly IEqualityComparer<CacheItem> ItemComparer = new CacheItemEqualityComparer();
+        }
+
+        private static readonly Dictionary<CacheItem, Delegate> CompiledCache = new Dictionary<CacheItem, Delegate>();
+
+        private static Delegate GetOrCompile(this MethodInfo method, Type returnType, Type delegateType, params Type[] typeParameters)
+        {
+            CacheItem cacheKey = new CacheItem(method, returnType, typeParameters);
+            Delegate result;
+            lock (CompiledCache)
+            {
+                if (CompiledCache.TryGetValue(cacheKey, out result))
+                {
+                    return result;
+                }
+            }
+            var dynamic = EmitDynamic(returnType, method, typeParameters);
+            result = dynamic.CreateDelegate(delegateType);
+            lock (CompiledCache)
+            {
+                Delegate perminarilyResult;
+                if (CompiledCache.TryGetValue(cacheKey, out perminarilyResult))
+                {
+                    return perminarilyResult;
+                }
+                CompiledCache.Add(cacheKey, result);
+                return result;
             }
         }
 

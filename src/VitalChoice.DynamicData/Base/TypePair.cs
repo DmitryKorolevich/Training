@@ -37,12 +37,13 @@ namespace VitalChoice.DynamicData.Base
         public static IEqualityComparer<TypePair> PairComparer { get; } =
             new ModelTypeDynamicTypeEqualityComparer();
 
-        public Type ModelType { get; }
-        public Type DynamicType { get; }
         public bool Equals(TypePair other)
         {
             return other.ModelType == ModelType && other.DynamicType == DynamicType;
         }
+
+        public Type ModelType { get; }
+        public Type DynamicType { get; }
     }
 
     public struct GenericTypePair : IEquatable<GenericTypePair>

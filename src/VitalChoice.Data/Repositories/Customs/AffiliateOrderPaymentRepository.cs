@@ -53,13 +53,13 @@ namespace VitalChoice.Data.Repositories.Customs
 
         public async Task<int> GetEngangedAffiliatesCount()
         {
-            var result = (Context as DbContext).Set<CountModel>().FromSql("[dbo].[SPGetEngangedAffiliatesCount]").FirstOrDefault();
+            var result = await Context.Set<CountModel>().FromSql("[dbo].[SPGetEngangedAffiliatesCount]").FirstOrDefaultAsync();
             return result.Count;
         }
 
         public async Task<ICollection<AffiliateSummaryReportModel>> GetAffiliatesSummaryReport(DateTime from,DateTime to)
         {
-            var toReturn = (Context as DbContext).Set<AffiliateSummaryReportModel>().FromSql("[dbo].[SPGetAffiliatesSummaryReport] @from={0}, @to={1}",from,to).ToList();
+            var toReturn = await Context.Set<AffiliateSummaryReportModel>().FromSql("[dbo].[SPGetAffiliatesSummaryReport] @from={0}, @to={1}",from,to).ToListAsync();
             return toReturn;
         }
     }

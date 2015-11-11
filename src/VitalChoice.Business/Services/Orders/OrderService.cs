@@ -112,7 +112,7 @@ namespace VitalChoice.Business.Services.Orders
         //TODO: lambda caching
         protected override async Task AfterSelect(ICollection<Order> entities)
         {
-            var productOptionTypes = await _productOptionTypesRepository.Query().SelectAsync(false);
+            var productOptionTypes = _productMapper.OptionTypes;
             bool skuLoaded = true;
             foreach(var entity in entities)
             {

@@ -30,12 +30,12 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
-        public override Expression<Func<ProductOptionValue, int?>> ObjectIdSelector
+        protected override Expression<Func<ProductOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return c => c.IdProduct; }
         }
 
-        protected async override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)
+        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items, bool withDefaults = false)
         {
             await items.ForEachAsync(async pair =>
             {
@@ -69,7 +69,7 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected async override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
+        protected override async Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
         {
             await items.ForEachAsync(async pair =>
             {
