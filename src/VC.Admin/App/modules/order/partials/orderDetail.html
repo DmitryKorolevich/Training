@@ -1066,7 +1066,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateWireTransferForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold || order.UpdateWireTransferForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['wiretransfer'] && forms.wiretransfer.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
@@ -1115,7 +1115,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.Marketing.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
@@ -1152,7 +1152,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.VCWellness.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateVCWellnessForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.VCWellness.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold || order.UpdateVCWellnessForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['vcwellness'] && forms.vcwellness.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
@@ -1438,7 +1438,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['wiretransfer'] && forms.wiretransfer.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
@@ -1476,7 +1476,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
@@ -1502,7 +1502,7 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.VCWellness.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.VCWellness.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['vcwellness'] && forms.vcwellness.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                                                                     <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>

@@ -121,7 +121,8 @@ namespace VitalChoice.Business.Services.Payment
 							if (paymentMethod.CustomerTypes != null && paymentMethod.CustomerTypes.Any())
 							{
 								await _paymentMethodToCustomerTypeRepository.DeleteAllAsync(paymentMethod.CustomerTypes);
-								needToUpdate = true;
+                                paymentMethod.CustomerTypes.Clear();
+                                needToUpdate = true;
 							}
 						}
 

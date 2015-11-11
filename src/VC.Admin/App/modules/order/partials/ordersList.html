@@ -174,8 +174,9 @@
                             <i data-ng-if="item.IdPaymentMethod==4" class="fa fa-money"></i>
                             <i data-ng-if="item.IdPaymentMethod==5" class="fa fa-money"></i>
                             <i data-ng-if="item.IdPaymentMethod==6" class="fa fa-university"></i>
-                            <span data-ng-if="item.IdPaymentMethod!=6">{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
-                            <span data-ng-if="item.IdPaymentMethod==6">WT</span>
+                            <i data-ng-if="item.IdPaymentMethod==7" class="fa fa-gift"></i>
+                            <i data-ng-if="item.IdPaymentMethod==8" class="fa fa-users"></i>
+                            <span>{{getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>{{::item.DateShipped | date:"MM/dd/yy"}}<br />{{::item.DateShipped | date:"h:mm a"}}</td>
