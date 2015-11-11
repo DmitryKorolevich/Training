@@ -122,6 +122,15 @@ namespace VC.Admin.Models.Order
         //Only for adding a new one 
         public bool UpdateCheckForCustomer { get; set; }
 
+        //Only for adding a new one 
+        public bool UpdateWireTransferForCustomer { get; set; }
+
+        //Only for adding a new one 
+        public bool UpdateMarketingForCustomer { get; set; }
+
+        //Only for adding a new one 
+        public bool UpdateVCWellnessForCustomer { get; set; }
+
         //Only for edit
         [DirectLocalized("Shipping")]
         public AddressModel Shipping { get; set; }
@@ -137,7 +146,19 @@ namespace VC.Admin.Models.Order
         //Only for edit
         [DirectLocalized("On Approved Credit")]
         public OacPaymentModel Oac { get; set; }
-        
+
+        //Only for edit
+        [DirectLocalized("Wire Transfer")]
+        public WireTransferPaymentModel WireTransfer { get; set; }
+
+        //Only for edit
+        [DirectLocalized("Marketing")]
+        public MarketingPaymentModel Marketing { get; set; }
+
+        //Only for edit
+        [DirectLocalized("VC Wellness Employee Program")]
+        public VCWellnessEmployeeProgramPaymentModel VCWellness { get; set; }
+
         [DirectLocalized("Payment Method")]
         public int? IdPaymentMethodType { get; set; }
 

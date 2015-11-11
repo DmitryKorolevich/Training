@@ -100,6 +100,24 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         address = uiScope.currentCustomer.Check.Address;
                     }
                     break;
+                case "6":
+                    if (uiScope.currentCustomer.WireTransfer)
+                    {
+                        address = uiScope.currentCustomer.WireTransfer.Address;
+                    }
+                    break;
+                case "7":
+                    if (uiScope.currentCustomer.Marketing)
+                    {
+                        address = uiScope.currentCustomer.Marketing.Address;
+                    }
+                    break;
+                case "8":
+                    if (uiScope.currentCustomer.VCWellness)
+                    {
+                        address = uiScope.currentCustomer.VCWellness.Address;
+                    }
+                    break;
             }
             if (address)
             {
@@ -431,7 +449,110 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
             return false;
         };
-    };
+
+        uiScope.setNewWireTransfer = function (callback)
+        {
+            if (uiScope.forms.wiretransfer.$valid)
+            {
+                customerService.createWireTransferPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.currentCustomer.WireTransfer = result.Data;
+                            uiScope.currentCustomer.WireTransfer.formName = 'wiretransfer';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['wiretransfer'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['wiretransfer'] = true;
+            }
+            return false;
+        };
+
+
+        uiScope.setNewMarketing = function (callback)
+        {
+            if (uiScope.forms.marketing.$valid)
+            {
+                customerService.createMarketingPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.currentCustomer.Marketing = result.Data;
+                            uiScope.currentCustomer.Marketing.formName = 'marketing';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['marketing'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['marketing'] = true;
+            }
+            return false;
+        };
+
+        uiScope.setNewVCWellness = function (callback)
+        {
+            if (uiScope.forms.vcwellness.$valid)
+            {
+                customerService.createVCWellnessPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.currentCustomer.VCWellness = result.Data;
+                            uiScope.currentCustomer.VCWellness.formName = 'vcwellness';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['vcwellness'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['vcwellness'] = true;
+            }
+            return false;
+        };
+    }; 
 
     var initOrderEditCustomerParts = function (uiScope)
     {
@@ -524,8 +645,110 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
             return false;
         };
-    };
 
+        uiScope.setNewWireTransfer = function (callback)
+        {
+            if (uiScope.forms.wiretransfer.$valid)
+            {
+                customerService.createWireTransferPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.order.WireTransfer = result.Data;
+                            uiScope.order.WireTransfer.formName = 'wiretransfer';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['wiretransfer'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['wiretransfer'] = true;
+            }
+            return false;
+        };
+
+        uiScope.setNewMarketing = function (callback)
+        {
+            if (uiScope.forms.marketing.$valid)
+            {
+                customerService.createMarketingPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.order.Marketing = result.Data;
+                            uiScope.order.Marketing.formName = 'marketing';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['marketing'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['marketing'] = true;
+            }
+            return false;
+        };
+
+        uiScope.setNewVCWellness = function (callback)
+        {
+            if (uiScope.forms.vcwellness.$valid)
+            {
+                customerService.createVCWellnessPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.order.VCWellness = result.Data;
+                            uiScope.order.VCWellness.formName = 'vcwellness';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['vcwellness'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['vcwellness'] = true;
+            }
+            return false;
+        };
+    };
+  
     var syncCountry = function (uiScope, addressItem)
     {
         if (addressItem && addressItem.Country)
@@ -546,10 +769,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
             return;
         }
 
-        if (!uiScope.selectedPaymentMethods)
-        {
-            uiScope.selectedPaymentMethods = [];
-        }
+        uiScope.selectedPaymentMethods = [];
 
         angular.forEach(uiScope.currentCustomer.ApprovedPaymentMethods, function (approvedPM)
         {

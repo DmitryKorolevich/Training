@@ -391,3 +391,53 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Wire Transfer')
+BEGIN
+	SET IDENTITY_INSERT [dbo].[PaymentMethods] ON
+
+	INSERT INTO [dbo].[PaymentMethods]
+	([Id], [Name], [StatusCode], [DateCreated], [DateEdited], [Order])
+	VALUES
+	(6, N'Wire Transfer', 2, GETDATE(), GETDATE(), 60),
+	(7, N'Marketing', 2, GETDATE(), GETDATE(), 70),
+	(8, N'VC Wellness Employee Program', 2, GETDATE(), GETDATE(), 80)
+
+	INSERT INTO [dbo].[PaymentMethodsToCustomerTypes]
+	SELECT pm.[Id], ct.[Id]
+	FROM [dbo].[PaymentMethods] pm
+	CROSS JOIN [dbo].[CustomerTypes] ct
+	WHERE pm.Id IN (6,7,8)
+
+	SET IDENTITY_INSERT [dbo].[PaymentMethods] OFF
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
+	VALUES
+	(N'PaymentComment', 4, NULL, 6, NULL),
+	(N'PaymentComment', 4, NULL, 7, NULL),
+	(N'PaymentComment', 4, NULL, 8, NULL)
+
+	DECLARE @IdLookup INT
+
+	INSERT INTO [dbo].[Lookups]
+	([LookupValueType], [Name])
+	VALUES
+	(N'string', N'MarketingPromotionType')
+
+	SET @IdLookup = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[LookupVariants]
+	([Id], [IdLookup], [ValueVariant])
+	VALUES
+	(1, @IdLookup,	N'Promotion'),
+	(2, @IdLookup,	N'Donation')
+
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name],[IdFieldType], [IdLookup], [IdObjectType],[DefaultValue])
+	VALUES
+	(N'MarketingPromotionType', 3, @IdLookup, 7, NULL)
+
+END
+
+GO

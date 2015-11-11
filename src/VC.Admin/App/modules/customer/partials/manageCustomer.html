@@ -310,6 +310,60 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(6) >= 0">
+                                            <div class="col-md-3">
+                                                <div class="radio">
+                                                    <label class="control-label">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="6" id="wiretransfer">
+                                                        Wire Transfer
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.WireTransfer">
+                                                    <button class="btn btn-info" data-ng-click="setNewWireTransfer();">Add New Wire Transfer</button>
+                                                </div>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.WireTransfer">
+                                                    <button class="btn btn-danger" data-ng-click="currentCustomer.WireTransfer = undefined;">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(7) >= 0">
+                                            <div class="col-md-3">
+                                                <div class="radio">
+                                                    <label class="control-label">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="7" id="marketing">
+                                                        Marketing
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Marketing">
+                                                    <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New Marketing</button>
+                                                </div>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Marketing">
+                                                    <button class="btn btn-danger" data-ng-click="currentCustomer.Marketing = undefined;">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(8) >= 0">
+                                            <div class="col-md-3">
+                                                <div class="radio">
+                                                    <label class="">
+                                                        <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="8" id="vcwellness">
+                                                        VC Wellness Employee Program
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.VCWellness">
+                                                    <button class="btn btn-info" data-ng-click="setNewVCWellness();">Add New VC Wellness Employee Program</button>
+                                                </div>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.VCWellness">
+                                                    <button class="btn btn-danger" data-ng-click="currentCustomer.VCWellness = undefined;">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <hr />
                                         <form class="form-horizontal" name="forms.card" data-ng-class="{submitted: forms.submitted['card']}" novalidate unsaved-warning-form>
                                             <fieldset>
@@ -407,16 +461,6 @@
                                         <form class="form-horizontal" name="forms.check" data-ng-class="{submitted: forms.submitted['check']}" novalidate unsaved-warning-form>
                                             <fieldset>
                                                 <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
-                                                        <div class="col-md-9">
-                                                            <div class="checkbox">
-                                                                <label>
-                                                                    <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched">
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                     <span class="legend">Billing Address</span>
                                                     <div class="form-group">
                                                         <div class="col-md-3">
@@ -426,6 +470,51 @@
                                                         </div>
                                                     </div>
                                                     <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Check]"></div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                        <form class="form-horizontal" name="forms.wiretransfer" data-ng-class="{submitted: forms.submitted['wiretransfer']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.WireTransfer">
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.WireTransfer]"></div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                        <form class="form-horizontal" name="forms.marketing" data-ng-class="{submitted: forms.submitted['marketing']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Marketing">
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.Marketing]"></div>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                        <form class="form-horizontal" name="forms.vcwellness" data-ng-class="{submitted: forms.submitted['vcwellness']}" novalidate unsaved-warning-form>
+                                            <fieldset>
+                                                <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.VCWellness">
+                                                    <span class="legend">Billing Address</span>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                        </div>
+                                                    </div>
+                                                    <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [currentCustomer.VCWellness]"></div>
                                                 </div>
                                             </fieldset>
                                         </form>

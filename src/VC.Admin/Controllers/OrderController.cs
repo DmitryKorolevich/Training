@@ -146,6 +146,9 @@ namespace VC.Admin.Controllers
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
                 model.UpdateOACForCustomer = true;
+                model.UpdateWireTransferForCustomer = true;
+                model.UpdateMarketingForCustomer = true;
+                model.UpdateVCWellnessForCustomer = true;
                 return model;
             }
 

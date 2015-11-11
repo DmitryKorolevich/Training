@@ -106,6 +106,15 @@ namespace VC.Admin.Models.Customer
         [DirectLocalized("On Approved Credit")]
         public OacPaymentModel Oac { get; set; }
 
-		public IList<CustomerFileModel> Files { get; set; }
+        [DirectLocalized("Wire Transfer")]
+        public WireTransferPaymentModel WireTransfer { get; set; }
+
+        [DirectLocalized("Marketing")]
+        public MarketingPaymentModel Marketing { get; set; }
+
+        [DirectLocalized("VC Wellness Employee Program")]
+        public VCWellnessEmployeeProgramPaymentModel VCWellness { get; set; }
+
+        public IList<CustomerFileModel> Files { get; set; }
 	}
 }

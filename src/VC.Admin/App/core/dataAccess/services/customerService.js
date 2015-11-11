@@ -49,6 +49,18 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		createCheckPrototype: function (tracker) {
 		    return $http.post(baseUrl + 'CreateCheckPrototype', getConfig(tracker));
 		},
+		createWireTransferPrototype: function (tracker)
+		{
+		    return $http.post(baseUrl + 'CreateWireTransferPrototype', getConfig(tracker));
+		},
+		createMarketingPrototype: function (tracker)
+		{
+		    return $http.post(baseUrl + 'CreateMarketingPrototype', getConfig(tracker));
+		},
+		createVCWellnessPrototype: function (tracker)
+		{
+		    return $http.post(baseUrl + 'CreateVCWellnessPrototype', getConfig(tracker));
+		},
 		resendActivation: function (publicId, tracker) {
 			return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
 		},

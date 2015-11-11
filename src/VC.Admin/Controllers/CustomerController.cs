@@ -172,7 +172,34 @@ namespace VC.Admin.Controllers
                 Address = new AddressModel {AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
             };
         }
-            
+
+        [HttpPost]
+        public Result<CheckPaymentModel> CreateWireTransferPrototype([FromBody] object model)
+        {
+            return new CheckPaymentModel
+            {
+                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+            };
+        }
+
+        [HttpPost]
+        public Result<CheckPaymentModel> CreateMarketingPrototype([FromBody] object model)
+        {
+            return new CheckPaymentModel
+            {
+                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+            };
+        }
+
+        [HttpPost]
+        public Result<CheckPaymentModel> CreateVCWellnessPrototype([FromBody] object model)
+        {
+            return new CheckPaymentModel
+            {
+                Address = new AddressModel { AddressType = AddressType.Billing, Country = new CountryListItemModel(_defaultCountry) }
+            };
+        }
+
         [HttpPost]
         public Result<AddressModel> CreateAddressPrototype([FromBody] object model)
         {

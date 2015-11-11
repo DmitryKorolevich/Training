@@ -11,7 +11,7 @@
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrders">Manage All</button>
             </div>
             <div class="margin-top-10px">
-                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();" >Manage Customer</button>
+                <button class="btn btn-info width-160px" data-ng-click="goToCustomer();">Manage Customer</button>
             </div>
         </div>
         <div ng-controller="objectHistorySectionController" onload="name = 'History'" data-ng-include="'app/modules/order/partials/orderObjectHistorySection.html'"></div>
@@ -243,7 +243,7 @@
                                                         <label for="date" class="col-md-6 control-label">Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled"/>
+                                                                <input type="text" name="ShipDelayDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -258,7 +258,7 @@
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled"/>
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -273,7 +273,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled"/>
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -310,7 +310,7 @@
                                                         <div class="col-md-12">
                                                             <div class="checkbox">
                                                                 <label>
-                                                                    <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" data-ng-disabled="orderEditDisabled"/> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
+                                                                    <input type="checkbox" name="SignUpNewsletter" data-ng-model="order.SignUpNewsletter" data-ng-disabled="orderEditDisabled" /> Sign up for e-newsletter and receive Bonus Offers, Sale Alerts, Recipes, and Health News
                                                                 </label>
                                                             </div>
                                                         </div>
@@ -576,7 +576,7 @@
                                                     <label class="col-md-3 control-label">Inception Date</label>
                                                     <div class="col-md-9">
                                                         <p class="input-group">
-                                                            <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" data-ng-disabled="orderEditDisabled"/>
+                                                            <input type="text" name="InceptionDate" class="form-control" datepicker-popup="dd-MMM-yyyy" ng-model="currentCustomer.InceptionDate" is-open="inceptionDateOpened" required autocomplete="off" data-ng-disabled="orderEditDisabled" />
                                                             <span class="input-group-btn">
                                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); inceptionDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                             </span>
@@ -630,13 +630,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-											<div class="form-group">
-												<div class="col-md-3"></div>
-												<div class="col-md-9">
-													<button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
-													<button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
-												</div>
-											</div>
+                                            <div class="form-group">
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-9">
+                                                    <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+                                                    <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
+                                                </div>
+                                            </div>
                                             <span class="legend">Approved Payment Methods</span>
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
@@ -800,6 +800,60 @@
                                                     </div>
                                                     <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Check">
                                                         <button class="btn btn-danger" data-ng-click="currentCustomer.Check = undefined;">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(6) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="6" id="wiretransfer" data-ng-disabled="orderEditDisabled">
+                                                            Wire Transfer
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.WireTransfer">
+                                                        <button class="btn btn-info" data-ng-click="setNewWireTransfer();">Add New Wire Transfer</button>
+                                                    </div>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.WireTransfer">
+                                                        <button class="btn btn-danger" data-ng-click="currentCustomer.WireTransfer = undefined;">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(7) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="7" id="marketing" data-ng-disabled="orderEditDisabled">
+                                                            Marketing
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.Marketing">
+                                                        <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New Marketing</button>
+                                                    </div>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Marketing">
+                                                        <button class="btn btn-danger" data-ng-click="currentCustomer.Marketing = undefined;">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(8) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="8" id="vcwellness" data-ng-disabled="orderEditDisabled">
+                                                            VC Wellness Employee Program
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && !currentCustomer.VCWellness">
+                                                        <button class="btn btn-info" data-ng-click="setNewVCWellness();">Add New VC Wellness Employee Program</button>
+                                                    </div>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.VCWellness">
+                                                        <button class="btn btn-danger" data-ng-click="currentCustomer.VCWellness = undefined;">Delete</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -973,11 +1027,12 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
+                                                            <label class="col-md-3 control-label"></label>
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
                                                                         <input type="checkbox" id="PaidInFull" data-ng-model="currentCustomer.Check.PaidInFull" class="ng-pristine ng-valid ng-touched" data-ng-disabled="orderEditDisabled">
+                                                                        <strong>Paid In Full - Taxes Included</strong>
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -991,6 +1046,129 @@
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Check, order.OnHold && !order.UpdateCheckForCustomer)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                            <form class="form-horizontal" name="forms.wiretransfer" data-ng-class="{submitted: forms.submitted['wiretransfer']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.WireTransfer">
+                                                        <div class="form-group">
+                                                            <label for="updateWireTransferForCustomer" class="col-md-3 control-label"></label>
+                                                            <div class="col-md-9">
+                                                                <div class="checkbox">
+                                                                    <label>
+                                                                        <input type="checkbox" id="updateWireTransferForCustomer" data-ng-model="order.UpdateWireTransferForCustomer" data-ng-disabled="orderEditDisabled">
+                                                                        <strong>Permanently update wire transfer information</strong>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateWireTransferForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['wiretransfer'] && forms.wiretransfer.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.WireTransfer, order.OnHold && !order.UpdateWireTransferForCustomer)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                            <form class="form-horizontal" name="forms.marketing" data-ng-class="{submitted: forms.submitted['marketing']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.Marketing">
+                                                        <div class="form-group">
+                                                            <label for="updateMarketingForCustomer" class="col-md-3 control-label"></label>
+                                                            <div class="col-md-9">
+                                                                <div class="checkbox">
+                                                                    <label>
+                                                                        <input type="checkbox" id="updateMarketingForCustomer" data-ng-model="order.UpdateMarketingForCustomer" data-ng-disabled="orderEditDisabled">
+                                                                        <strong>Permanently update marketing information</strong>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="marketingPromotionType" class="col-md-3 control-label">Type:</label>
+                                                            <div class="col-md-9">
+                                                                <select class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="currentCustomer.Marketing.MarketingPromotionType" data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypes" data-ng-disabled="orderEditDisabled" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer">
+                                                                    <option value="" selected hidden />
+                                                                </select>
+                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.MarketingPromotionType.$invalid">
+                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Type")}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.server">{{serverMessages.GetMessage('MarketingPromotionType')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.Marketing.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Marketing, order.OnHold && !order.UpdateMarketingForCustomer)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                            <form class="form-horizontal" name="forms.vcwellness" data-ng-class="{submitted: forms.submitted['vcwellness']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && currentCustomer.VCWellness">
+                                                        <div class="form-group">
+                                                            <label for="updateVCWellnessForCustomer" class="col-md-3 control-label"></label>
+                                                            <div class="col-md-9">
+                                                                <div class="checkbox">
+                                                                    <label>
+                                                                        <input type="checkbox" id="updateVCWellnessForCustomer" data-ng-model="order.UpdateVCWellnessForCustomer" data-ng-disabled="orderEditDisabled">
+                                                                        <strong>Permanently update VC wellness employee program information</strong>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.VCWellness.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold || order.UpdateVCWellnessForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['vcwellness'] && forms.vcwellness.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.VCWellness, order.OnHold && !order.UpdateVCWellnessForCustomer)]"></div>
                                                     </div>
                                                 </fieldset>
                                             </form>
@@ -1060,6 +1238,51 @@
                                                 <div class="col-md-6">
                                                     <div data-ng-if="paymentInfoTab.PaymentMethodType == 3 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.Check">
                                                         <button class="btn btn-info" data-ng-click="setNewCheck();">Add New Check</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(6) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="6" id="wiretransfer" data-ng-disabled="orderEditDisabled">
+                                                            Wire Transfer
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.WireTransfer">
+                                                        <button class="btn btn-info" data-ng-click="setNewWireTransfer();">Add New Wire Transfer</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(7) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="control-label">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="7" id="marketing" data-ng-disabled="orderEditDisabled">
+                                                            Marketing
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.Marketing">
+                                                        <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New Marketing</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="currentCustomer.ApprovedPaymentMethods.indexOf(8) >= 0">
+                                                <div class="col-md-3">
+                                                    <div class="radio">
+                                                        <label class="">
+                                                            <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="8" id="vcwellness" data-ng-disabled="orderEditDisabled">
+                                                            VC Wellness Employee Program
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.VCWellness">
+                                                        <button class="btn btn-info" data-ng-click="setNewVCWellness();">Add New VC Wellness Employee Program</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1194,11 +1417,12 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-md-3 control-label" for="PaidInFull">Paid In Full - Taxes Included</label>
+                                                            <label class="col-md-3 control-label"></label>
                                                             <div class="col-md-9">
                                                                 <div class="checkbox">
                                                                     <label>
                                                                         <input type="checkbox" id="PaidInFull" data-ng-model="order.Check.PaidInFull" data-ng-disabled="orderEditDisabled">
+                                                                        <strong>Paid In Full - Taxes Included</strong>
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -1208,8 +1432,99 @@
                                                     </div>
                                                 </fieldset>
                                             </form>
+                                            <form class="form-horizontal" name="forms.wiretransfer" data-ng-class="{submitted: forms.submitted['wiretransfer']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 6 && currentCustomer.ApprovedPaymentMethods.length > 0 && order.WireTransfer">
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.WireTransfer.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['wiretransfer'] && forms.wiretransfer.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.WireTransfer, order.OnHold)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                            <form class="form-horizontal" name="forms.marketing" data-ng-class="{submitted: forms.submitted['marketing']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && order.Marketing">
+                                                        <div class="form-group">
+                                                            <label for="marketingPromotionType" class="col-md-3 control-label">Type:</label>
+                                                            <div class="col-md-9">
+                                                                <select class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="order.Marketing.MarketingPromotionType" data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypes" data-ng-disabled="orderEditDisabled" data-ng-required="!order.OnHold">
+                                                                    <option value="" selected hidden />
+                                                                </select>
+                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.MarketingPromotionType.$invalid">
+                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Type")}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.server">{{serverMessages.GetMessage('MarketingPromotionType')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.Marketing, order.OnHold)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                            <form class="form-horizontal" name="forms.vcwellness" data-ng-class="{submitted: forms.submitted['vcwellness']}" novalidate unsaved-warning-form>
+                                                <fieldset>
+                                                    <div data-ng-if="paymentInfoTab.PaymentMethodType == 8 && currentCustomer.ApprovedPaymentMethods.length > 0 && order.VCWellness">
+                                                        <div class="form-group">
+                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                                                            <div class="col-md-9">
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.VCWellness.PaymentComment" placeholder="Payment Comment" rows="10" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <div class="error-container" ng-show="forms.submitted['vcwellness'] && forms.vcwellness.PaymentComment.$invalid">
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span class="legend">Billing Address</span>
+                                                        <div class="form-group">
+                                                            <div class="col-md-3">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                            </div>
+                                                        </div>
+                                                        <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.VCWellness, order.OnHold)]"></div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
                                         </div>
                                     </div>
+                                </spinner-overlay>
                             </div>
                         </div>
                     </tab>

@@ -87,4 +87,67 @@ namespace VC.Admin.Models.Customer
 
         public bool IsSelected { get; set; }
     }
+
+    public class WireTransferPaymentModel : BaseModel
+    {
+        public WireTransferPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.WireTransfer;
+        }
+
+        [Map]
+        public int Id { get; set; }
+
+        [Map]
+        public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
+
+        [Map]
+        public string PaymentComment { get; set; }
+    }
+
+    public class MarketingPaymentModel : BaseModel
+    {
+        public MarketingPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.Marketing;
+        }
+
+        [Map]
+        public int Id { get; set; }
+
+        [Map]
+        public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
+
+        [Map]
+        public string PaymentComment { get; set; }
+
+        [Map]
+        public int? MarketingPromotionType { get; set; }
+    }
+
+    public class VCWellnessEmployeeProgramPaymentModel : BaseModel
+    {
+        public VCWellnessEmployeeProgramPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.VCWellnessEmployeeProgram;
+        }
+
+        [Map]
+        public int Id { get; set; }
+
+        [Map]
+        public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
+
+        [Map]
+        public string PaymentComment { get; set; }
+    }
 }

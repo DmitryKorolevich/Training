@@ -69,6 +69,7 @@ namespace VC.Admin.Controllers
                     CreditCardTypes = referenceData.CreditCardTypes,
                     OacFob = referenceData.OacFob,
                     OacTerms = referenceData.OacTerms,
+                    MarketingPromotionTypes = referenceData.MarketingPromotionTypes,
                     OrderSources = referenceData.OrderSources,
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
                     OrderPreferredShipMethod = referenceData.OrderPreferredShipMethod,

@@ -44,7 +44,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				};
 				$scope.paymentInfoTab = {
 					active: false,
-					formNames: ['card', 'oac', 'check'],
+					formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
 					AddressEditModels: {}
 				};
 				$scope.customerFilesTab = {
@@ -126,6 +126,21 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 										if ($scope.currentCustomer.Check) {
 											$scope.currentCustomer.Check.formName = 'check';
 											customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
+										}
+										if ($scope.currentCustomer.WireTransfer)
+										{
+										    $scope.currentCustomer.WireTransfer.formName = 'wiretransfer';
+										    customerEditService.syncCountry($scope, $scope.currentCustomer.WireTransfer.Address);
+										}
+										if ($scope.currentCustomer.Marketing)
+										{
+										    $scope.currentCustomer.Marketing.formName = 'marketing';
+										    customerEditService.syncCountry($scope, $scope.currentCustomer.Marketing.Address);
+										}
+										if ($scope.currentCustomer.VCWellness)
+										{
+										    $scope.currentCustomer.VCWellness.formName = 'vcwellness';
+										    customerEditService.syncCountry($scope, $scope.currentCustomer.VCWellness.Address);
 										}
 
 										customerEditService.syncDefaultPaymentMethod($scope);
@@ -233,6 +248,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						$scope.forms.submitted['card'] = true;
 						$scope.forms.submitted['oac'] = true;
 						$scope.forms.submitted['check'] = true;
+						$scope.forms.submitted['wiretransfer'] = true;
+						$scope.forms.submitted['marketing'] = true;
+						$scope.forms.submitted['vcwellness'] = true;
 						$scope.serverMessages = new ServerMessages(result.Messages);
 						var formForShowing = null;
 						var form;
@@ -364,6 +382,9 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					$scope.forms.submitted['card'] = true;
 					$scope.forms.submitted['oac'] = true;
 					$scope.forms.submitted['check'] = true;
+					$scope.forms.submitted['wiretransfer'] = true;
+					$scope.forms.submitted['marketing'] = true;
+					$scope.forms.submitted['vcwellness'] = true;
 					toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
 				}
 			};
