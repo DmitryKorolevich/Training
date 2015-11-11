@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
-    public class Sku : DynamicDataEntity<ProductOptionValue, ProductOptionType>
+    public class Sku : DynamicDataEntity<SkuOptionValue, ProductOptionType>
     {
         public int IdProduct { get; set; }
 

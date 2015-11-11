@@ -76,11 +76,11 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected override async Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
-            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
+            var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
             entity.Skus =
                     await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != (int)RecordStatusCode.Deleted)
                         .Include(p => p.OptionValues)
@@ -88,7 +88,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in entity.Skus)
             {
                 sku.OptionTypes = entity.OptionTypes;
-                await productOptionValueRepository.DeleteAllAsync(sku.OptionValues);
+                await skuOptionValueRepository.DeleteAllAsync(sku.OptionValues);
             }
             entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
             await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
@@ -96,7 +96,7 @@ namespace VitalChoice.Business.Services.Products
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
-            var productOptionValueRepository = uow.RepositoryAsync<ProductOptionValue>();
+            var skuOptionValuesRepository = uow.RepositoryAsync<SkuOptionValue>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
             foreach (var sku in entity.Skus)
             {
@@ -107,7 +107,7 @@ namespace VitalChoice.Business.Services.Products
                         value.Id = 0;
                     }
                 }
-                await productOptionValueRepository.InsertRangeAsync(sku.OptionValues);
+                await skuOptionValuesRepository.InsertRangeAsync(sku.OptionValues);
             }
             await categoriesRepository.InsertRangeAsync(entity.ProductsToCategories);
         }

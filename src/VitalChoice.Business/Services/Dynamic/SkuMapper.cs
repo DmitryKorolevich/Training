@@ -16,7 +16,7 @@ using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class SkuMapper : DynamicMapper<SkuDynamic, Sku, ProductOptionType, ProductOptionValue>
+    public class SkuMapper : DynamicMapper<SkuDynamic, Sku, ProductOptionType, SkuOptionValue>
     {
         public SkuMapper(ITypeConverter converter,
             IModelConverterService converterService,
@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         }
 
-        protected override Expression<Func<ProductOptionValue, int?>> ObjectIdReferenceSelector
+        protected override Expression<Func<SkuOptionValue, int?>> ObjectIdReferenceSelector
         {
             get { return c => c.IdSku; }
         }

@@ -380,7 +380,6 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ProductOptionValue>().HasKey(o => o.Id);
             builder.Entity<ProductOptionValue>().ToTable("ProductOptionValues");
             builder.Entity<ProductOptionValue>().Property(v => v.IdProduct).IsRequired(false);
-            builder.Entity<ProductOptionValue>().Property(v => v.IdSku).IsRequired(false);
             builder.Entity<ProductOptionValue>()
                 .HasOne(v => v.OptionType)
                 .WithMany()

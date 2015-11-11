@@ -4,8 +4,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Products
 {
     public class ProductOptionValue : OptionValue<ProductOptionType>
     {
-        public int? IdProduct { get; set; }
-
-        public int? IdSku { get; set; }
+        public int IdProduct { get; set; }
     }
 }

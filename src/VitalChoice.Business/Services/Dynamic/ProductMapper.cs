@@ -50,17 +50,17 @@ namespace VitalChoice.Business.Services.Dynamic
                     foreach (var sku in entity.Skus)
                     {
                         sku.OptionTypes = entity.OptionTypes;
-                        if (withDefaults)
-                        {
+                        //if (withDefaults)
+                        //{
                             //combine product part in skus
-                            foreach (var productValue in entity.OptionValues)
-                            {
-                                if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
-                                {
-                                    sku.OptionValues.Add(productValue);
-                                }
-                            }
-                        }
+                            //foreach (var productValue in entity.OptionValues)
+                            //{
+                            //    if (sku.OptionValues.All(p => p.IdOptionType != productValue.IdOptionType))
+                            //    {
+                            //        sku.OptionValues.Add(productValue);
+                            //    }
+                            //}
+                        //}
                     }
                     if (dynamic.Skus == null)
                         dynamic.Skus = new List<SkuDynamic>();
