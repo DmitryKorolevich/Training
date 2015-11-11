@@ -48,6 +48,21 @@ namespace VC.Admin.Validators.Customer
                 ParseResults(oacPaymentModelValidator.Validate(value.Oac), "oac");
                 ParseResults(profileAddressValidator.Validate(value.Oac.Address), "oac");
             }
+
+            if (value.WireTransfer != null)
+            {
+                ParseResults(profileAddressValidator.Validate(value.WireTransfer.Address), "wiretransfer");
+            }
+
+            if (value.Marketing != null)
+            {
+                ParseResults(profileAddressValidator.Validate(value.Marketing.Address), "marketing");
+            }
+
+            if (value.VCWellness != null)
+            {
+                ParseResults(profileAddressValidator.Validate(value.VCWellness.Address), "vcwellness");
+            }
         }
 
 	    public class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>

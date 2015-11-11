@@ -38,6 +38,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['card'] = true;
                 $scope.forms.submitted['oac'] = true;
                 $scope.forms.submitted['check'] = true;
+                $scope.forms.submitted['wiretransfer'] = true;
+                $scope.forms.submitted['marketing'] = true;
+                $scope.forms.submitted['vcwellness'] = true;
                 $scope.serverMessages = new ServerMessages(result.Messages);
                 $scope.calculateServerMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
@@ -222,7 +225,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         };
         $scope.paymentInfoTab = {
             active: false,
-            formNames: ['card', 'oac', 'check'],
+            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
             AddressEditModels: {}
         };
         $scope.customerNotesTab = {
@@ -428,6 +431,21 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     $scope.currentCustomer.Check.formName = "check";
                     customerEditService.syncCountry($scope, $scope.currentCustomer.Check.Address);
                 }
+                if ($scope.currentCustomer.WireTransfer)
+                {
+                    $scope.currentCustomer.WireTransfer.formName = "wiretransfer";
+                    customerEditService.syncCountry($scope, $scope.currentCustomer.WireTransfer.Address);
+                }
+                if ($scope.currentCustomer.Marketing)
+                {
+                    $scope.currentCustomer.Marketing.formName = "marketing";
+                    customerEditService.syncCountry($scope, $scope.currentCustomer.Marketing.Address);
+                }
+                if ($scope.currentCustomer.VCWellness)
+                {
+                    $scope.currentCustomer.VCWellness.formName = "vcwellness";
+                    customerEditService.syncCountry($scope, $scope.currentCustomer.VCWellness.Address);
+                }
 
                 if ($scope.order.CreditCard)
                 {
@@ -443,6 +461,21 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 {
                     $scope.order.Check.formName = "check";
                     customerEditService.syncCountry($scope, $scope.order.Check.Address);
+                }
+                if ($scope.order.WireTransfer)
+                {
+                    $scope.order.WireTransfer.formName = "wiretransfer";
+                    customerEditService.syncCountry($scope, $scope.order.WireTransfer.Address);
+                }
+                if ($scope.order.Marketing)
+                {
+                    $scope.order.Marketing.formName = "marketing";
+                    customerEditService.syncCountry($scope, $scope.order.Marketing.Address);
+                }
+                if ($scope.order.VCWellness)
+                {
+                    $scope.order.VCWellness.formName = "vcwellness";
+                    customerEditService.syncCountry($scope, $scope.order.VCWellness.Address);
                 }
 
                 if ($scope.id)
@@ -472,6 +505,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     if (!$scope.order.Check)
                     {
                         $scope.order.Check = $scope.currentCustomer.Check;
+                    }
+                    if (!$scope.order.WireTransfer)
+                    {
+                        $scope.order.WireTransfer = $scope.currentCustomer.WireTransfer;
+                    }
+                    if (!$scope.order.Marketing)
+                    {
+                        $scope.order.Marketing = $scope.currentCustomer.Marketing;
+                    }
+                    if (!$scope.order.VCWellness)
+                    {
+                        $scope.order.VCWellness = $scope.currentCustomer.VCWellness;
                     }
 
                     if ($scope.paymentInfoTab.PaymentMethodType == 1)
@@ -958,6 +1003,27 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             billingErrorMessages += "Check is required. ";
                         }
                     }
+                    if ($scope.order.IdPaymentMethodType == 6)
+                    {
+                        if ($scope.currentCustomer.WireTransfer == null)
+                        {
+                            billingErrorMessages += "Wire Transfer is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 7)
+                    {
+                        if ($scope.currentCustomer.Marketing == null)
+                        {
+                            billingErrorMessages += "Marketing payment info is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 8)
+                    {
+                        if ($scope.currentCustomer.VCWellness == null)
+                        {
+                            billingErrorMessages += "VC Wellness Employee Program is required. ";
+                        }
+                    }
                 }
                 else
                 {
@@ -980,6 +1046,27 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         if ($scope.order.Check == null)
                         {
                             billingErrorMessages += "Check is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 6)
+                    {
+                        if ($scope.order.WireTransfer == null)
+                        {
+                            billingErrorMessages += "Wire Transfer is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 7)
+                    {
+                        if ($scope.order.Marketing == null)
+                        {
+                            billingErrorMessages += "Marketing payment info is required. ";
+                        }
+                    }
+                    if ($scope.order.IdPaymentMethodType == 8)
+                    {
+                        if ($scope.order.VCWellness == null)
+                        {
+                            billingErrorMessages += "VC Wellness Employee Program is required. ";
                         }
                     }
                 }
@@ -1051,6 +1138,9 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             $scope.forms.submitted['card'] = true;
             $scope.forms.submitted['oac'] = true;
             $scope.forms.submitted['check'] = true;
+            $scope.forms.submitted['wiretransfer'] = true;
+            $scope.forms.submitted['marketing'] = true;
+            $scope.forms.submitted['vcwellness'] = true;
             toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
         }
     };

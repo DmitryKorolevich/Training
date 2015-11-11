@@ -55,7 +55,13 @@ namespace VC.Admin.ModelConverters
 	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Oac);
 	        var checkType =
 	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Check);
-	        if (oacPaymentType != null)
+            var wireTransferType =
+                dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.WireTransfer);
+            var marketingType =
+                dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.Marketing);
+            var VCWellnessType =
+                dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram);
+            if (oacPaymentType != null)
 	        {
 	            model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(oacPaymentType);
 	        }
@@ -67,8 +73,20 @@ namespace VC.Admin.ModelConverters
 	        {
 	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
 	        }
+            if (wireTransferType != null)
+            {
+                model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(wireTransferType);
+            }
+            if (marketingType != null)
+            {
+                model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(marketingType);
+            }
+            if (VCWellnessType != null)
+            {
+                model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(VCWellnessType);
+            }
 
-			if (dynamic.Files!=null && dynamic.Files.Any())
+            if (dynamic.Files!=null && dynamic.Files.Any())
 			{
 				foreach (var fileDynamic in dynamic.Files.Select(x => new CustomerFileModel()
 				{
@@ -123,8 +141,23 @@ namespace VC.Admin.ModelConverters
                 model.Check.PaymentMethodType = PaymentMethodType.Check;
                 dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Check));
             }
+            if (model.WireTransfer?.Address != null)
+            {
+                model.WireTransfer.PaymentMethodType = PaymentMethodType.WireTransfer;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.WireTransfer));
+            }
+            if (model.Marketing?.Address != null)
+            {
+                model.Marketing.PaymentMethodType = PaymentMethodType.Marketing;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.Marketing));
+            }
+            if (model.VCWellness?.Address != null)
+            {
+                model.VCWellness.PaymentMethodType = PaymentMethodType.VCWellnessEmployeeProgram;
+                dynamic.CustomerPaymentMethods.Add(_paymentMethodMapper.FromModel(model.VCWellness));
+            }
 
-			if (model.Files.Any())
+            if (model.Files.Any())
 			{
 				foreach (var fileModel in model.Files.Select(x => new CustomerFile()
 				{

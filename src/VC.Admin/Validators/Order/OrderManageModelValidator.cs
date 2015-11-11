@@ -26,6 +26,9 @@ namespace VC.Admin.Validators.Order
             var checkPaymentModelValidator = ValidatorsFactory.GetValidator<CheckPaymentModelRules>();
             var oacPaymentModelValidator = ValidatorsFactory.GetValidator<OacPaymentModelRules>();
             var customerValidator = ValidatorsFactory.GetValidator<CustomerAddUpdateModelValidator.CustomerModelRules>();
+            var wireTransferPaymentModelValidator = ValidatorsFactory.GetValidator<WireTransferModelRules>();
+            var marketingPaymentModelValidator = ValidatorsFactory.GetValidator<MarketingModelRules>();
+            var VCWellnessPaymentModelValidator = ValidatorsFactory.GetValidator<VCWellnessModelRules>();
             ParseResults(ValidatorsFactory.GetValidator<OrderModelValidator>().Validate(value, ruleSet: "Main"));
             if (value.Id == 0)
             {
@@ -67,6 +70,24 @@ namespace VC.Admin.Validators.Order
                         ParseResults(checkPaymentModelValidator.Validate(value.Customer.Check), "check");
                         ParseResults(addressValidator.Validate(value.Customer.Check.Address), "check");
                     }
+                    if (value.IdPaymentMethodType.Value == 6 && value.Customer.WireTransfer != null &&
+                        (value.UpdateWireTransferForCustomer || value.OrderStatus != OrderStatus.OnHold))//wiretransfer
+                    {
+                        ParseResults(wireTransferPaymentModelValidator.Validate(value.Customer.WireTransfer), "wiretransfer");
+                        ParseResults(addressValidator.Validate(value.Customer.WireTransfer.Address), "wiretransfer");
+                    }
+                    if (value.IdPaymentMethodType.Value == 7 && value.Customer.Marketing != null &&
+                        (value.UpdateMarketingForCustomer || value.OrderStatus != OrderStatus.OnHold))//marketing
+                    {
+                        ParseResults(marketingPaymentModelValidator.Validate(value.Customer.Marketing), "marketing");
+                        ParseResults(addressValidator.Validate(value.Customer.Marketing.Address), "marketing");
+                    }
+                    if (value.IdPaymentMethodType.Value == 8 && value.Customer.VCWellness != null &&
+                        (value.UpdateWireTransferForCustomer || value.OrderStatus != OrderStatus.OnHold))//vcwellness
+                    {
+                        ParseResults(VCWellnessPaymentModelValidator.Validate(value.Customer.VCWellness), "vcwellness");
+                        ParseResults(addressValidator.Validate(value.Customer.VCWellness.Address), "vcwellness");
+                    }
                 }
             }
             else
@@ -89,6 +110,21 @@ namespace VC.Admin.Validators.Order
                     {
                         ParseResults(checkPaymentModelValidator.Validate(value.Check), "check");
                         ParseResults(addressValidator.Validate(value.Check.Address), "check");
+                    }
+                    if (value.IdPaymentMethodType.Value == 6 && value.WireTransfer != null)//wiretransfer
+                    {
+                        ParseResults(wireTransferPaymentModelValidator.Validate(value.WireTransfer), "wiretransfer");
+                        ParseResults(addressValidator.Validate(value.WireTransfer.Address), "wiretransfer");
+                    }
+                    if (value.IdPaymentMethodType.Value == 7 && value.Marketing != null)//marketing
+                    {
+                        ParseResults(marketingPaymentModelValidator.Validate(value.Marketing), "marketing");
+                        ParseResults(addressValidator.Validate(value.Marketing.Address), "marketing");
+                    }
+                    if (value.IdPaymentMethodType.Value == 8 && value.VCWellness != null)//vcwellness
+                    {
+                        ParseResults(VCWellnessPaymentModelValidator.Validate(value.VCWellness), "vcwellness");
+                        ParseResults(addressValidator.Validate(value.VCWellness.Address), "vcwellness");
                     }
                 }
             }

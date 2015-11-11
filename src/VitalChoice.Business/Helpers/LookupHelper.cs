@@ -243,6 +243,12 @@ namespace VitalChoice.Business.Helpers
                     case 5:
                         paymentMethod.Text = "PP";
                         break;
+                    case 6:
+                        paymentMethod.Text = "WT";
+                        break;
+                    case 8:
+                        paymentMethod.Text = "Employee";
+                        break;
                 }
             }
             return paymentMethods;
