@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
-        protected override Expression<Func<AddressOptionValue, int?>> ObjectIdReferenceSelector
+        protected override Expression<Func<AddressOptionValue, int>> ObjectIdReferenceSelector
         {
             get { return a => a.IdAddress; }
         }

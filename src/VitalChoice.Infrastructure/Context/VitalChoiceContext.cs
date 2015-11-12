@@ -71,287 +71,443 @@ namespace VitalChoice.Infrastructure.Context
 
             #region LocalizationItems
 
-            builder.Entity<LocalizationItem>().HasKey(p => new {p.GroupId, p.ItemId});
-            builder.Entity<LocalizationItemData>().HasKey(p => new {p.GroupId, p.ItemId, p.CultureId});
-            builder.Entity<LocalizationItem>()
-                .HasMany(p => p.LocalizationItemDatas)
-                .WithOne(p => p.LocalizationItem)
-                .HasForeignKey(p => new {p.GroupId, p.ItemId})
-                .HasPrincipalKey(p => new {p.GroupId, p.ItemId});
-            builder.Entity<LocalizationItem>().Ignore(x => x.Id);
-            builder.Entity<LocalizationItemData>().Ignore(x => x.Id);
+            builder.Entity<LocalizationItem>(entity =>
+            {
+                entity.HasKey(p => new {p.GroupId, p.ItemId});
+            });
+
+            builder.Entity<LocalizationItemData>(entity =>
+            {
+                entity.HasKey(p => new {p.GroupId, p.ItemId, p.CultureId});
+            });
+
+            builder.Entity<LocalizationItem>(entity =>
+            {
+                entity
+                    .HasMany(p => p.LocalizationItemDatas)
+                    .WithOne(p => p.LocalizationItem)
+                    .HasForeignKey(p => new {p.GroupId, p.ItemId})
+                    .HasPrincipalKey(p => new {p.GroupId, p.ItemId});
+                entity.Ignore(x => x.Id);
+            });
+
+            builder.Entity<LocalizationItemData>(entity =>
+            {
+                entity.Ignore(x => x.Id);
+            });
+
 
             #endregion
 
             #region Contents
 
-            builder.Entity<ContentTypeEntity>().HasKey(p => p.Id);
-            builder.Entity<ContentTypeEntity>().ToTable("ContentTypes");
+            builder.Entity<ContentTypeEntity>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentTypes");
+            });
 
-            builder.Entity<ContentItemToContentProcessor>().HasKey(p => p.Id);
-            builder.Entity<ContentItemToContentProcessor>().ToTable("ContentItemsToContentProcessors");
-            builder.Entity<MasterContentItemToContentProcessor>().HasKey(p => p.Id);
-            builder.Entity<MasterContentItemToContentProcessor>().ToTable("MasterContentItemsToContentProcessors");
-            builder.Entity<ContentProcessorEntity>().HasKey(p => p.Id);
-            builder.Entity<ContentProcessorEntity>().ToTable("ContentProcessors");
 
-            builder.Entity<MasterContentItem>().HasKey(p => p.Id);
-            builder.Entity<MasterContentItem>().ToTable("MasterContentItems");
-            builder.Entity<MasterContentItem>()
-                .HasOne(p => p.Type)
-                .WithMany()
-                .HasForeignKey(p => p.TypeId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<MasterContentItem>()
-                .HasMany(p => p.MasterContentItemToContentProcessors)
-                .WithOne(p => p.MasterContentItem)
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentProcessorEntity>()
-                .HasMany(p => p.MasterContentItemsToContentProcessors)
-                .WithOne(p => p.ContentProcessor)
-                .HasForeignKey(p => p.ContentProcessorId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<MasterContentItem>()
-                .HasOne(p => p.User)
-                .WithMany()
-                .HasForeignKey(p => p.UserId)
-                .HasPrincipalKey(p => p.Id);
+            builder.Entity<ContentItemToContentProcessor>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentItemsToContentProcessors");
+            });
 
-            builder.Entity<ContentItem>().HasKey(p => p.Id);
-            builder.Entity<ContentItem>().ToTable("ContentItems");
-            builder.Entity<ContentItem>()
-                .HasMany(p => p.ContentItemToContentProcessors)
-                .WithOne(p => p.ContentItem)
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentProcessorEntity>()
-                .HasMany(p => p.ContentItemsToContentProcessors)
-                .WithOne(p => p.ContentProcessor)
-                .HasForeignKey(p => p.ContentItemProcessorId)
-                .HasPrincipalKey(p => p.Id);
+            builder.Entity<MasterContentItemToContentProcessor>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("MasterContentItemsToContentProcessors");
+            });
 
-            builder.Entity<ContentCategory>().HasKey(p => p.Id);
-            builder.Entity<ContentCategory>().ToTable("ContentCategories");
-            builder.Entity<ContentCategory>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentCategory>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
+            builder.Entity<ContentProcessorEntity>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentProcessors");
+            });
 
-            builder.Entity<RecipeToProduct>().HasKey(p => p.Id);
-            builder.Entity<RecipeToProduct>().ToTable("RecipesToProducts");
-            builder.Entity<RecipeToProduct>().Ignore(p => p.ShortProductInfo);
 
-            builder.Entity<RelatedRecipe>().HasKey(p => p.Id);
-            builder.Entity<RelatedRecipe>().ToTable("RelatedRecipes");
+            builder.Entity<MasterContentItem>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("MasterContentItems");
+                entity
+                    .HasOne(p => p.Type)
+                    .WithMany()
+                    .HasForeignKey(p => p.TypeId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasMany(p => p.MasterContentItemToContentProcessors)
+                    .WithOne(p => p.MasterContentItem)
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<RecipeCrossSell>().HasKey(p => p.Id);
-            builder.Entity<RecipeCrossSell>().ToTable("RecipeCrossSells");
+            builder.Entity<ContentProcessorEntity>(entity =>
+            {
+                entity
+                    .HasMany(p => p.MasterContentItemsToContentProcessors)
+                    .WithOne(p => p.ContentProcessor)
+                    .HasForeignKey(p => p.ContentProcessorId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<Recipe>().HasKey(p => p.Id);
-            builder.Entity<Recipe>().ToTable("Recipes");
-            builder.Entity<RecipeToContentCategory>().HasKey(p => p.Id);
-            builder.Entity<RecipeToContentCategory>().ToTable("RecipesToContentCategories");
-            builder.Entity<Recipe>()
-                .HasMany(p => p.RecipesToContentCategories)
-                .WithOne(p => p.Recipe)
-                .HasForeignKey(p => p.RecipeId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
-                .HasMany(p => p.RelatedRecipes)
-                .WithOne()
-                .HasForeignKey(p => p.IdRecipe)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
-                .HasMany(p => p.CrossSells)
-                .WithOne()
-                .HasForeignKey(p => p.IdRecipe)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Recipe>()
-                .HasMany(p => p.RecipesToProducts)
-                .WithOne()
-                .HasForeignKey(t => t.IdRecipe)
-                .HasPrincipalKey(p => p.Id)
-                .IsRequired();
+            builder.Entity<MasterContentItem>(entity =>
+            {
+                entity
+                    .HasOne(p => p.User)
+                    .WithMany()
+                    .HasForeignKey(p => p.UserId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<RecipeDefaultSetting>().HasKey(p => p.Id);
-            builder.Entity<RecipeDefaultSetting>().ToTable("RecipeDefaultSettings");
 
-            builder.Entity<FAQ>().HasKey(p => p.Id);
-            builder.Entity<FAQ>().ToTable("FAQs");
-            builder.Entity<FAQToContentCategory>().HasKey(p => p.Id);
-            builder.Entity<FAQToContentCategory>().ToTable("FAQsToContentCategories");
-            builder.Entity<FAQ>()
-                .HasMany(p => p.FAQsToContentCategories)
-                .WithOne(p => p.FAQ)
-                .HasForeignKey(p => p.FAQId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<FAQ>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<FAQ>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<FAQ>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+            builder.Entity<ContentItem>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentItems");
+                entity
+                    .HasMany(p => p.ContentItemToContentProcessors)
+                    .WithOne(p => p.ContentItem)
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<ArticleToProduct>().HasKey(p => p.Id);
-            builder.Entity<ArticleToProduct>().ToTable("ArticlesToProducts");
-            builder.Entity<ArticleToProduct>().Ignore(p => p.ShortProductInfo);
+            builder.Entity<ContentProcessorEntity>(entity =>
+            {
+                entity
+                    .HasMany(p => p.ContentItemsToContentProcessors)
+                    .WithOne(p => p.ContentProcessor)
+                    .HasForeignKey(p => p.ContentItemProcessorId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<Article>().HasKey(p => p.Id);
-            builder.Entity<Article>().ToTable("Articles");
-            builder.Entity<ArticleToContentCategory>().HasKey(p => p.Id);
-            builder.Entity<ArticleToContentCategory>().ToTable("ArticlesToContentCategories");
-            builder.Entity<Article>()
-                .HasMany(p => p.ArticlesToContentCategories)
-                .WithOne(p => p.Article)
-                .HasForeignKey(p => p.ArticleId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Article>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Article>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<Article>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
-            builder.Entity<Article>()
-                .HasMany(p => p.ArticlesToProducts)
-                .WithOne()
-                .HasForeignKey(t => t.IdArticle)
-                .HasPrincipalKey(p => p.Id)
-                .IsRequired();
 
-            builder.Entity<ContentPage>().HasKey(p => p.Id);
-            builder.Entity<ContentPage>().ToTable("ContentPages");
-            builder.Entity<ContentPageToContentCategory>().HasKey(p => p.Id);
-            builder.Entity<ContentPageToContentCategory>().ToTable("ContentPagesToContentCategories");
-            builder.Entity<ContentPage>()
-                .HasMany(p => p.ContentPagesToContentCategories)
-                .WithOne(p => p.ContentPage)
-                .HasForeignKey(p => p.ContentPageId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentPage>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentPage>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ContentPage>().HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+            builder.Entity<ContentCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentCategories");
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<ContentArea>().HasKey(p => p.Id);
-            builder.Entity<ContentArea>().ToTable("ContentAreas");
-            builder.Entity<ContentArea>()
-                .HasOne(p => p.User)
-                .WithMany()
-                .HasForeignKey(p => p.IdEditedBy)
-                .HasPrincipalKey(p => p.Id);
 
-            builder.Entity<CustomPublicStyle>().HasKey(p => p.Id);
-            builder.Entity<CustomPublicStyle>().ToTable("CustomPublicStyles");
-            builder.Entity<CustomPublicStyle>()
-                .HasOne(p => p.User)
-                .WithMany()
-                .HasForeignKey(p => p.IdEditedBy)
-                .HasPrincipalKey(p => p.Id);
+            builder.Entity<RecipeToProduct>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("RecipesToProducts");
+                entity.Ignore(p => p.ShortProductInfo);
+            });
+
+
+            builder.Entity<RelatedRecipe>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("RelatedRecipes");
+            });
+
+
+            builder.Entity<RecipeCrossSell>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("RecipeCrossSells");
+            });
+
+
+            builder.Entity<Recipe>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Recipes");
+            });
+
+            builder.Entity<RecipeToContentCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("RecipesToContentCategories");
+            });
+
+            builder.Entity<Recipe>(entity =>
+            {
+                entity
+                    .HasMany(p => p.RecipesToContentCategories)
+                    .WithOne(p => p.Recipe)
+                    .HasForeignKey(p => p.RecipeId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+                entity
+                    .HasMany(p => p.RelatedRecipes)
+                    .WithOne()
+                    .HasForeignKey(p => p.IdRecipe)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasMany(p => p.CrossSells)
+                    .WithOne()
+                    .HasForeignKey(p => p.IdRecipe)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasMany(p => p.RecipesToProducts)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdRecipe)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+            });
+
+
+            builder.Entity<RecipeDefaultSetting>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("RecipeDefaultSettings");
+            });
+
+
+            builder.Entity<FAQ>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("FAQs");
+            });
+
+            builder.Entity<FAQToContentCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("FAQsToContentCategories");
+            });
+
+            builder.Entity<FAQ>(entity =>
+            {
+                entity
+                    .HasMany(p => p.FAQsToContentCategories)
+                    .WithOne(p => p.FAQ)
+                    .HasForeignKey(p => p.FAQId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+            });
+
+
+            builder.Entity<ArticleToProduct>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ArticlesToProducts");
+                entity.Ignore(p => p.ShortProductInfo);
+            });
+
+
+            builder.Entity<Article>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Articles");
+            });
+
+            builder.Entity<ArticleToContentCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ArticlesToContentCategories");
+            });
+
+            builder.Entity<Article>(entity =>
+            {
+                entity
+                    .HasMany(p => p.ArticlesToContentCategories)
+                    .WithOne(p => p.Article)
+                    .HasForeignKey(p => p.ArticleId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+                entity
+                    .HasMany(p => p.ArticlesToProducts)
+                    .WithOne()
+                    .HasForeignKey(t => t.IdArticle)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+            });
+
+
+            builder.Entity<ContentPage>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentPages");
+            });
+
+            builder.Entity<ContentPageToContentCategory>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentPagesToContentCategories");
+            });
+
+            builder.Entity<ContentPage>(entity =>
+            {
+                entity
+                    .HasMany(p => p.ContentPagesToContentCategories)
+                    .WithOne(p => p.ContentPage)
+                    .HasForeignKey(p => p.ContentPageId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).HasPrincipalKey(p => p.Id);
+            });
+
+
+            builder.Entity<ContentArea>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ContentAreas");
+                entity
+                    .HasOne(p => p.User)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id);
+            });
+
+
+            builder.Entity<CustomPublicStyle>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("CustomPublicStyles");
+                entity
+                    .HasOne(p => p.User)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id);
+            });
+
 
             #endregion
 
             #region Products
 
-            builder.Entity<ProductCategoryContent>().HasKey(p => p.Id);
-            builder.Entity<ProductCategoryContent>().ToTable("ProductCategories");
-            builder.Entity<ProductCategoryContent>().Ignore(p => p.Name);
-            builder.Entity<ProductCategoryContent>().Ignore(p => p.UserId);
-            builder.Entity<ProductCategoryContent>().Ignore(p => p.User);
-            builder.Entity<ProductCategoryContent>().Ignore(p => p.ProductCategory);
-            builder.Entity<ProductCategoryContent>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ProductCategoryContent>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
+            builder.Entity<ProductCategoryContent>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("ProductCategories");
+                entity.Ignore(p => p.Name);
+                entity.Ignore(p => p.UserId);
+                entity.Ignore(p => p.User);
+                entity.Ignore(p => p.ProductCategory);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+            });
+
 
             #endregion
 
-	        #region Users
-            builder.Entity<ProductContent>().HasKey(p => p.Id);
-            builder.Entity<ProductContent>().ToTable("Products");
-            builder.Entity<ProductContent>().Ignore(p => p.Name);
-            builder.Entity<ProductContent>().Ignore(p => p.UserId);
-            builder.Entity<ProductContent>().Ignore(p => p.User);
-            builder.Entity<ProductContent>()
-                .HasOne(p => p.MasterContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.MasterContentItemId)
-                .HasPrincipalKey(p => p.Id);
-            builder.Entity<ProductContent>()
-                .HasOne(p => p.ContentItem)
-                .WithMany()
-                .HasForeignKey(p => p.ContentItemId)
-                .HasPrincipalKey(p => p.Id);
+            #region Users
 
-            builder.Entity<AdminProfile>().HasKey(x => x.Id);
-            builder.Entity<AdminProfile>().ToTable("AdminProfiles");
-            builder.Entity<AdminProfile>()
-                .HasOne(x => x.User)
-                .WithOne(x => x.Profile)
-                .HasForeignKey<AdminProfile>(a => a.Id)
-                .HasPrincipalKey<ApplicationUser>(x => x.Id);
+            builder.Entity<ProductContent>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Products");
+                entity.Ignore(p => p.Name);
+                entity.Ignore(p => p.UserId);
+                entity.Ignore(p => p.User);
+                entity
+                    .HasOne(p => p.MasterContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.MasterContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+                entity
+                    .HasOne(p => p.ContentItem)
+                    .WithMany()
+                    .HasForeignKey(p => p.ContentItemId)
+                    .HasPrincipalKey(p => p.Id);
+            });
 
-            builder.Entity<AdminProfile>().HasKey(x => x.Id);
-            builder.Entity<AdminProfile>().ToTable("AdminProfiles");
-            builder.Entity<AdminProfile>()
-                .HasOne(x => x.User)
-                .WithOne(x => x.Profile)
-                .HasForeignKey<AdminProfile>(a => a.Id)
-                .HasPrincipalKey<ApplicationUser>(x => x.Id);
+
+            builder.Entity<AdminProfile>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.ToTable("AdminProfiles");
+                entity
+                    .HasOne(x => x.User)
+                    .WithOne(x => x.Profile)
+                    .HasForeignKey<AdminProfile>(a => a.Id)
+                    .HasPrincipalKey<ApplicationUser>(x => x.Id);
+                entity.HasKey(x => x.Id);
+                entity.ToTable("AdminProfiles");
+                entity
+                    .HasOne(x => x.User)
+                    .WithOne(x => x.Profile)
+                    .HasForeignKey<AdminProfile>(a => a.Id)
+                    .HasPrincipalKey<ApplicationUser>(x => x.Id);
+            });
+
 
             #endregion
 
             #region Settings
 
-            builder.Entity<Country>().HasKey(p => p.Id);
-            builder.Entity<Country>().ToTable("Countries");
-            builder.Entity<Country>().Ignore(p => p.States);
+            builder.Entity<Country>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("Countries");
+                entity.Ignore(p => p.States);
+            });
 
-            builder.Entity<State>().HasKey(p => p.Id);
-            builder.Entity<State>().ToTable("States");
 
-            builder.Entity<AppSettingItem>().HasKey(p => p.Id);
-            builder.Entity<AppSettingItem>().ToTable("AppSettings");
+            builder.Entity<State>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("States");
+            });
+
+
+            builder.Entity<AppSettingItem>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("AppSettings");
+            });
+
 
             #endregion
 

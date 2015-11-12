@@ -66,17 +66,19 @@ namespace VitalChoice.DynamicData.Base
 
             //if (typeof (TOptionValue) == typeof (ProductOptionValue))
             //{
-            //    var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
-            //        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-            //            idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
-            //    conditionExpression = e => values.Contains(e.Id);
+            /*var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+                FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                    idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectReferenceExpression).Distinct().ToList();
+            conditionExpression = e => values.Contains(e.Id);
+            if (values.Count == 0)
+                return Expression.Constant(true);*/
             //}
             //else
             //{
-                conditionExpression =
-                    CreateValuesSelector(BuildSearchValues(filterDictionary,
-                        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-                            idObjectType, lookObjectId)));
+            conditionExpression =
+                CreateValuesSelector(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, lookObjectId)));
             //}
             if (conditionExpression == null)
                 return Expression.Constant(true);
@@ -95,10 +97,12 @@ namespace VitalChoice.DynamicData.Base
 
             //if (typeof(TOptionValue) == typeof(ProductOptionValue))
             //{
-            //    var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
-            //        FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
-            //            idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectIdSelector).Distinct().ToList();
-            //    conditionExpression = e => values.Contains(e.Id);
+                /*var values = _optionValuesRepository.Query(CreateValuesSelectorWorkaround(BuildSearchValues(filterDictionary,
+                    FilterOptionTypes(optionTypesProvider.OptionTypes, filterDictionary, optionTypesProvider.GetOptionTypeQuery(),
+                        idObjectType, lookObjectId)))).Select(optionTypesProvider.ObjectReferenceExpression).Distinct().ToList();
+                conditionExpression = e => values.Contains(e.Id);
+                if (values.Count == 0)
+                    return Expression.Constant(true);*/
             //}
             //else
             //{

@@ -211,11 +211,12 @@ BEGIN
 	ON SkuOptionValues (Value, IdOptionType) 
 	INCLUDE (IdSku)
 
-	INSERT INTO SkuOptionValues
+	EXECUTE sp_executesql
+	N'INSERT INTO SkuOptionValues
 	(IdSku, IdOptionType, Value)
 	SELECT DISTINCT IdSku, IdOptionType, Value 
 	FROM ProductOptionValues 
-	WHERE IdSku IS NOT NULL
+	WHERE IdSku IS NOT NULL'
 END
 
 IF EXISTS(SELECT * FROM sys.columns WHERE name = N'Id' AND object_id = OBJECT_ID(N'ProductOptionValues'))

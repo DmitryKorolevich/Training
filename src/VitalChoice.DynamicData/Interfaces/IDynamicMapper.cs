@@ -81,6 +81,8 @@ namespace VitalChoice.DynamicData.Interfaces
         ICollection<TOptionType> OptionTypes { get; }
         ICollection<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
         Action<TOptionValue, int> SetObjectReferenceId { get; }
+        Func<TOptionValue, int> GetObjectReferenceId { get; }
+        Expression<Func<TOptionValue, int>> ObjectReferenceExpression { get; }
     }
 
     public interface IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> : IDynamicMapper<TDynamic, TEntity>, IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>

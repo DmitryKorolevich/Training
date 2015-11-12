@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _productMapper = productMapper;
         }
 
-        protected override Expression<Func<OrderOptionValue, int?>> ObjectIdReferenceSelector
+        protected override Expression<Func<OrderOptionValue, int>> ObjectIdReferenceSelector
         {
             get { return v => v.IdOrder; }
         }

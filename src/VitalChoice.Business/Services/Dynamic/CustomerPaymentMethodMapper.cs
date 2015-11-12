@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _customerAddressMapper = customerAddressMapper;
         }
 
-        protected override Expression<Func<CustomerPaymentMethodOptionValue, int?>> ObjectIdReferenceSelector
+        protected override Expression<Func<CustomerPaymentMethodOptionValue, int>> ObjectIdReferenceSelector
         {
             get { return v => v.IdCustomerPaymentMethod; }
         }

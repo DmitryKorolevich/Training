@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _paymentMethodMapper = paymentMethodMapper;
         }
 
-        protected override Expression<Func<CustomerOptionValue, int?>> ObjectIdReferenceSelector
+        protected override Expression<Func<CustomerOptionValue, int>> ObjectIdReferenceSelector
         {
             get { return c => c.IdCustomer; }
         }

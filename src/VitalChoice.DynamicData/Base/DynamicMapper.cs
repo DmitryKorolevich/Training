@@ -32,8 +32,9 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items, bool withDefaults = false);
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
-        protected abstract Expression<Func<TOptionValue, int?>> ObjectIdReferenceSelector { get; }
+        protected abstract Expression<Func<TOptionValue, int>> ObjectIdReferenceSelector { get; }
         private Action<TOptionValue, int> _valueSetter;
+        private Func<TOptionValue, int> _valueGetter;
         private static ICollection<TOptionType> _optionTypes;
 
         protected DynamicMapper(ITypeConverter typeConverter,
@@ -109,6 +110,20 @@ namespace VitalChoice.DynamicData.Base
                 return _valueSetter;
             }
         }
+
+        public Func<TOptionValue, int> GetObjectReferenceId
+        {
+            get
+            {
+                if (_valueGetter == null)
+                {
+                    Interlocked.CompareExchange(ref _valueGetter, ObjectIdReferenceSelector.CacheCompile(), null);
+                }
+                return _valueGetter;
+            }
+        }
+
+        public Expression<Func<TOptionValue, int>> ObjectReferenceExpression => ObjectIdReferenceSelector;
 
         public ICollection<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType)
         {
@@ -510,7 +525,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private static Action<TOptionValue, int> GetValueObjectIdSetter(Expression<Func<TOptionValue, int?>> selector)
+        private static Action<TOptionValue, int> GetValueObjectIdSetter(Expression<Func<TOptionValue, int>> selector)
         {
             MemberExpression memberExpression;
             var expressionBody = selector.Body;
