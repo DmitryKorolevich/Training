@@ -2,12 +2,12 @@
   "minifiedFileName": "styles",
 
   "files": [
-    "assets/scripts/vendor/jquery-ui/jquery-ui.min.css",
     "lib/normalize.css/normalize.css",
     "lib/nivoslider/nivo-slider.css",
     "lib/nivoslider/themes/default/default.css",
     "assets/scripts/vendor/toast/jquery.toast.min.css",
     "assets/styles/main.css",
+    "assets/scripts/vendor/jquery-ui/jquery-ui.min.css",
     "assets/styles/site.css"
   ]
 }
