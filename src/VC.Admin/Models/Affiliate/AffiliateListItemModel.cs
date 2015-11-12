@@ -38,6 +38,10 @@ namespace VC.Admin.Models.Affiliate
 
         public string EditedByAgentId { get; set; }
 
+        public decimal? NotPaidCommissionsAmount { get; set; }
+
+        public long? NotPaidCommissionsCount { get; set; }
+
         public AffiliateListItemModel(VAffiliate item)
         {
             if(item!=null)
@@ -53,6 +57,11 @@ namespace VC.Admin.Models.Affiliate
                 CustomersCount = item.CustomersCount;
                 DateEdited = item.DateEdited;
                 EditedByAgentId = item.EditedByAgentId;
+                if(item.NotPaidCommission!=null)
+                {
+                    NotPaidCommissionsAmount = item.NotPaidCommission.Amount;
+                    NotPaidCommissionsCount = item.NotPaidCommission.Count;
+                }
             }
         }
     }

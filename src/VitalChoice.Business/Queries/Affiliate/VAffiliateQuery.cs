@@ -56,5 +56,14 @@ namespace VitalChoice.Business.Queries.Affiliate
             And(x => x.StatusCode != RecordStatusCode.Deleted);
             return this;
         }
+
+        public VAffiliateQuery WithAvailablePayCommision(bool value)
+        {
+            if (value)
+            {
+                And(x => x.NotPaidCommission.Amount>=AffiliateConstants.AffiliateMinPayCommisionsAmount);
+            }
+            return this;
+        }
     }
 }

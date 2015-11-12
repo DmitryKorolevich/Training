@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Base;
+using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Domain.Entities.Settings;
@@ -30,5 +31,7 @@ namespace VitalChoice.Domain.Entities.eCommerce.Affiliates
         public int? IdEditedBy { get; set; }
 
         public string EditedByAgentId { get; set; }
+
+        public VAffiliateNotPaidCommission NotPaidCommission { get; set; }
     }
 }

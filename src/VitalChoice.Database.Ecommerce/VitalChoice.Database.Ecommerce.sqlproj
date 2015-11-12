@@ -164,7 +164,7 @@
     <None Include="PreDeployment\Scripts\VOrders.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\Affiliates.sql" />
+    <None Include="PreDeployment\Scripts\AppOptions.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PreDeployment\Scripts\VAffiliates.sql" />
@@ -204,5 +204,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetAffiliatesSummaryReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Affiliates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VAffiliateNotPaidCommissions.sql" />
   </ItemGroup>
 </Project>

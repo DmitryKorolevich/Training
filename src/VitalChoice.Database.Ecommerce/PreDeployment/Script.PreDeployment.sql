@@ -51,3 +51,5 @@
 :r .\Scripts\CustomerFavoritesView.sql
 
 :r .\Scripts\DiscountUpdates.sql
+
+:r .\Scripts\AppOptions.sql

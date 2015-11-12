@@ -10,6 +10,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         $scope.resendTracker = promiseTracker("resend");
         $scope.refreshCustomersTracker = promiseTracker("refreshCustomersTracker");
         $scope.refreshOrdersTracker = promiseTracker("refreshOrdersTracker");
+        $scope.refreshPaymentHistoryTracker = promiseTracker("refreshPaymentHistoryTracker");
 
         function refreshHistory()
         {
@@ -119,6 +120,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             loadCountries();
             refreshCustomers();
             refreshOrders();
+            refreshPaymentHistory();
         };
 
         function loadCountries()
@@ -364,6 +366,28 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
         $scope.ordersPageChanged = function ()
         {
             refreshOrders();
+        };
+
+        function refreshPaymentHistory()
+        {
+            if ($scope.orderFilter.IdAffiliate)
+            {
+                affiliateService.getAffiliatePaymentHistory($scope.orderFilter.IdAffiliate, $scope.refreshPaymentHistoryTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.paymentHistoryItems = result.Data;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
         };
 
         initialize();

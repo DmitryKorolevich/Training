@@ -22,3 +22,4 @@ Post-Deployment Script Template
 :r .\Scripts\VCustomers.sql
 :r .\Scripts\SPGetEngangedAffiliatesCount.sql
 :r .\Scripts\SPGetAffiliatesSummaryReport.sql
+:r .\Scripts\VAffiliateNotPaidCommissions.sql
