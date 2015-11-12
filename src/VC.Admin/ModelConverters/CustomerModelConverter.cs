@@ -35,23 +35,15 @@ namespace VC.Admin.ModelConverters
 					model.CustomerNotes.Add(_customerNoteMapper.ToModel<CustomerNoteModel>(customerNote));
                 }
 		    }
-
-		    if (dynamic.ShippingAddresses.Any())
-		    {
-			    foreach (var address in dynamic.ShippingAddresses)
-			    {
-				    switch (address.IdObjectType)
-				    {
-					    case (int)AddressType.Shipping:
-						    model.Shipping.Add(_addressMapper.ToModel<AddressModel>(address));
-						    break;
-					    case (int)AddressType.Profile:
-						    model.ProfileAddress = _addressMapper.ToModel<AddressModel>(address);
-						    break;
-				    }
-			    }
-		    }
-	        var oacPaymentType =
+            model.ProfileAddress = _addressMapper.ToModel<AddressModel>(dynamic.ProfileAddress);
+            if (dynamic.ShippingAddresses.Any())
+            {
+                foreach (var address in dynamic.ShippingAddresses)
+                {
+                    model.Shipping.Add(_addressMapper.ToModel<AddressModel>(address));
+                }
+            }
+            var oacPaymentType =
 	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Oac);
 	        var checkType =
 	            dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int) PaymentMethodType.Check);
@@ -59,32 +51,17 @@ namespace VC.Admin.ModelConverters
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.WireTransfer);
             var marketingType =
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.Marketing);
-            var VCWellnessType =
+            var vcWellnessType =
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram);
-            if (oacPaymentType != null)
-	        {
-	            model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(oacPaymentType);
-	        }
-	        if (checkType != null)
-	        {
-	            model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(checkType);
-	        }
+	        model.Oac = _paymentMethodMapper.ToModel<OacPaymentModel>(oacPaymentType);
+	        model.Check = _paymentMethodMapper.ToModel<CheckPaymentModel>(checkType);
 	        foreach (var creditCard in dynamic.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
 	        {
 	            model.CreditCards.Add(_paymentMethodMapper.ToModel<CreditCardModel>(creditCard));
 	        }
-            if (wireTransferType != null)
-            {
-                model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(wireTransferType);
-            }
-            if (marketingType != null)
-            {
-                model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(marketingType);
-            }
-            if (VCWellnessType != null)
-            {
-                model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(VCWellnessType);
-            }
+            model.WireTransfer = _paymentMethodMapper.ToModel<WireTransferPaymentModel>(wireTransferType);
+            model.Marketing = _paymentMethodMapper.ToModel<MarketingPaymentModel>(marketingType);
+            model.VCWellness = _paymentMethodMapper.ToModel<VCWellnessEmployeeProgramPaymentModel>(vcWellnessType);
 
             if (dynamic.Files!=null && dynamic.Files.Any())
 			{
@@ -111,14 +88,13 @@ namespace VC.Admin.ModelConverters
 				}
 			}
 
-			if (model.ProfileAddress != null)
-			{
-				var addressDynamic = _addressMapper.FromModel(model.ProfileAddress);
-				addressDynamic.IdObjectType = (int)AddressType.Profile;
-				addressDynamic.Data.Email = model.Email;
-				dynamic.ShippingAddresses.Add(addressDynamic);
-			}
-			if (model.Shipping.Any())
+	        if (model.ProfileAddress != null)
+	        {
+	            dynamic.ProfileAddress = _addressMapper.FromModel(model.ProfileAddress);
+	            dynamic.ProfileAddress.IdObjectType = (int) AddressType.Profile;
+	            dynamic.ProfileAddress.Data.Email = model.Email;
+	        }
+	        if (model.Shipping.Any())
 			{
 				foreach (var addressDynamic in model.Shipping.Select(shipping => _addressMapper.FromModel(shipping)))
 				{

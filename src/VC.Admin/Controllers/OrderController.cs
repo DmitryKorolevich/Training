@@ -211,6 +211,7 @@ namespace VC.Admin.Controllers
             {
                 customerNote.IdEditedBy = userId;
             }
+            item.Customer.ProfileAddress.IdEditedBy = userId;
 
             await _customerService.UpdateAsync(item.Customer);
 

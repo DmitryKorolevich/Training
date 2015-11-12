@@ -28,10 +28,10 @@ namespace VitalChoice.Business.Services
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<TEntity> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
-                loggerProvider.CreateLoggerDefault())
+                directMapper, loggerProvider.CreateLoggerDefault())
         {
         }
 

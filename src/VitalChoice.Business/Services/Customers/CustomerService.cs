@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Autofac.Features.Indexed;
 #if DNX451
 using System.Transactions;
 #endif
@@ -47,6 +48,7 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
+using VitalChoice.DynamicData.Base;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -54,7 +56,6 @@ namespace VitalChoice.Business.Services.Customers
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
-        private readonly DynamicExpressionVisitor _queryVisitor;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
@@ -64,7 +65,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<Affiliate> _affiliateRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
 
-		private static string _customerContainerName;
+        private static string _customerContainerName;
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
@@ -79,10 +80,10 @@ namespace VitalChoice.Business.Services.Customers
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
                 customerMapper, customerRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, queryVisitor)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -95,160 +96,31 @@ namespace VitalChoice.Business.Services.Customers
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
-            _queryVisitor = queryVisitor;
         }
 
-		private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
-		{
-			return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
-		}
-
-		private IList<RoleType> MapCustomerTypeToRole(CustomerDynamic model)
-	    {
-			var roles = new List<RoleType>();
-			switch (model.IdObjectType)
-			{
-				case (int)CustomerType.Retail:
-					roles.Add(RoleType.Retail);
-					break;
-				case (int)CustomerType.Wholesale:
-					roles.Add(RoleType.Wholesale);
-					break;
-				default:
-					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
-			}
-
-		    return roles;
-	    }
-
-		private async Task<Customer> UpdateAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
-		{
-			var appUser = await _storefrontUserService.GetAsync(model.Id);
-			if (appUser == null)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
-			}
-
-			switch (model.StatusCode)
-			{
-				case (int)CustomerStatus.Active:
-					appUser.Status = UserStatus.Active;
-					break;
-				case (int)CustomerStatus.NotActive:
-					appUser.Status = UserStatus.NotActive;
-					break;
-				case (int)CustomerStatus.Suspended:
-					appUser.Status = UserStatus.Disabled;
-					break;
-				case (int)CustomerStatus.Deleted:
-					appUser.Status = UserStatus.NotActive;
-					appUser.DeletedDate = DateTime.Now;
-					break;
-			}
-
-			if (!string.IsNullOrWhiteSpace(password))
-			{
-				appUser.IsConfirmed = true;
-				appUser.ConfirmationToken = Guid.Empty;
-			}
-
-			appUser.Email = model.Email;
-            appUser.UserName = model.Email;
-
-            var profileAddress = model.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
-			appUser.FirstName = profileAddress.Data.FirstName;
-			appUser.LastName = profileAddress.Data.LastName;
-
-            //TODO: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
-			//using (var transaction = uow.BeginTransaction())
-			//{
-				//try
-				//{
-					var customer = await base.UpdateAsync(model, uow);
-
-					//transaction.Commit();
-
-					var roles = MapCustomerTypeToRole(model);
-
-					await _storefrontUserService.UpdateAsync(appUser, roles, password);
-
-					return customer;
-				//}
-				//catch (Exception ex)
-				//{
-				//	transaction.Rollback();
-				//	throw;
-				//}
-			//}
-		}
-
-		private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
-	    {
-		    var roles = MapCustomerTypeToRole(model);
-
-			var profileAddress = model.ShippingAddresses.Single(x => x.IdObjectType == (int)AddressType.Profile);
-            var appUser = new ApplicationUser()
-            {
-                FirstName = profileAddress.Data.FirstName,
-                LastName = profileAddress.Data.LastName,
-                Email = model.Email,
-				UserName = model.Email,
-                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
-                IsConfirmed = false,
-                ConfirmationToken = Guid.NewGuid(),
-                IdUserType = UserType.Customer,
-                Profile = null,
-				Status = UserStatus.NotActive
-            };
-
-			var suspendedCustomer = (int) CustomerStatus.Suspended;
-
-			using (var transaction = uow.BeginTransaction())
-            {
-                try
-                {
-	                if (!string.IsNullOrWhiteSpace(password))
-	                {
-		                appUser.IsConfirmed = true;
-		                appUser.Status = model.StatusCode == suspendedCustomer
-							? UserStatus.Disabled
-			                : UserStatus.Active;
-	                }
-	                else
-	                {
-						appUser.Status = model.StatusCode == suspendedCustomer ? UserStatus.Disabled : UserStatus.NotActive;
-	                }
-
-	                appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
-
-                    model.Id = appUser.Id;
-                    //model.User.Id = appUser.Id;
-
-					var customer = await base.InsertAsync(model, uow);
-
-                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
-                    {
-						await _storefrontUserService.SendActivationAsync(model.Email);
-					}
-
-                    transaction.Commit();
-
-                    return customer;
-                }
-                catch
-                {
-                    if (appUser.Id > 0)
-                    {
-                        await _storefrontUserService.DeleteAsync(appUser);
-                    }
-
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+        protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
+        {
+            return query
+                .Include(p => p.Files)
+                .Include(p => p.DefaultPaymentMethod)
+                .Include(p => p.User)
+                .Include(p => p.ProfileAddress)
+                .ThenInclude(p => p.OptionValues)
+                .Include(a => a.ShippingAddresses)
+                .ThenInclude(a => a.ShippingAddress)
+                .ThenInclude(a => a.OptionValues)
+                .Include(p => p.CustomerNotes)
+                .ThenInclude(n => n.OptionValues)
+                .Include(p => p.OrderNotes)
+                .Include(p => p.PaymentMethods)
+                .Include(p => p.CustomerPaymentMethods)
+                .ThenInclude(p => p.OptionValues)
+                .Include(p => p.CustomerPaymentMethods)
+                .ThenInclude(p => p.BillingAddress)
+                .ThenInclude(p => p.OptionValues);
         }
 
-		protected override async Task<List<MessageInfo>> Validate(CustomerDynamic model)
+        protected override async Task<List<MessageInfo>> ValidateAsync(CustomerDynamic model)
 		{
 			var errors = new List<MessageInfo>();
 
@@ -264,14 +136,11 @@ namespace VitalChoice.Business.Services.Customers
 					string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
             }
 
-			if (
-				model.ShippingAddresses.Where(
-					x => x.IdObjectType == (int)AddressType.Shipping && x.StatusCode != (int)RecordStatusCode.Deleted)
-					.All(x => !x.Data.Default))
-			{
-				throw new AppValidationException(
-					ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
-			}
+            if (model.ShippingAddresses.Where(x => x.StatusCode != (int) RecordStatusCode.Deleted).All(x => !x.Data.Default))
+            {
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
+            }
 
             if(model.IdAffiliate.HasValue)
             {
@@ -288,28 +157,22 @@ namespace VitalChoice.Business.Services.Customers
 
 		protected override async Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
 		{
-			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
 			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
 			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
-			var addressOptionValuesRepositoryAsync = uow.RepositoryAsync<AddressOptionValue>();
-			var customerNoteOptionValuesRepositoryAsync = uow.RepositoryAsync<CustomerNoteOptionValue>();
 			var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
 
-			await
-				customerToPaymentMethodRepository.DeleteAllAsync(
-					entity.PaymentMethods.WhereAll(model.ApprovedPaymentMethods, (p, dp) => p.IdPaymentMethod != dp));
-			await
-				customerToOrderNoteRepository.DeleteAllAsync(entity.OrderNotes.WhereAll(model.OrderNotes,
-					(n, dn) => n.IdOrderNote != dn));
-		    await addressOptionValuesRepositoryAsync.DeleteAllAsync(entity.ShippingAddresses.SelectMany(s => s.ShippingAddress.OptionValues));
-			foreach (var note in entity.CustomerNotes)
-			{
-				await customerNoteOptionValuesRepositoryAsync.DeleteAllAsync(note.OptionValues);
-			}
-			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods)
-			{
-				await customerPaymentMethodOptionValuesRepository.DeleteAllAsync(customerPaymentMethod.OptionValues);
-			}
+		    await
+		        customerToPaymentMethodRepository.DeleteAllAsync(
+		            entity.PaymentMethods.ExceptKeyedWith(
+		                model.ApprovedPaymentMethods,
+		                left => left.IdPaymentMethod,
+		                right => right));
+		    await
+		        customerToOrderNoteRepository.DeleteAllAsync(
+		            entity.OrderNotes.ExceptKeyedWith(
+		                model.OrderNotes,
+		                left => left.IdOrderNote,
+		                right => right));
 
 			if (model.Files != null && model.Files.Any() && entity.Files != null)
 			{
@@ -334,45 +197,30 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+		protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer updated, Customer initial, IUnitOfWorkAsync uow)
 		{
-			var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
-			var customerPaymentMethodOptionValuesRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
-			var addressesRepositoryAsync = uow.RepositoryAsync<Address>();
-            var customerToShippingAddressRep = uow.RepositoryAsync<CustomerToShippingAddress>();
-            var customerNoteRepository = uow.RepositoryAsync<CustomerNote>();
+            var customerToShippingRepository = uow.RepositoryAsync<CustomerToShippingAddress>();
 
 		    await
-		        addressesRepositoryAsync.DeleteAllAsync(
-		            entity.ShippingAddresses.Select(s => s.ShippingAddress).Where(a => a.StatusCode == (int) RecordStatusCode.Deleted));
-			await
-				customerNoteRepository.DeleteAllAsync(
-					entity.CustomerNotes.Where(n => n.StatusCode == (int)RecordStatusCode.Deleted));
+		        SyncDbCollections<Address, AddressOptionValue, AddressOptionType>(uow, initial.ShippingAddresses.Select(s => s.ShippingAddress),
+		            updated.ShippingAddresses.Select(s => s.ShippingAddress));
+
+            await customerToShippingRepository.DeleteAllAsync(
+                updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode == (int)RecordStatusCode.Deleted));
+
+            await
+		        SyncDbCollections<CustomerNote, CustomerNoteOptionValue, CustomerNoteOptionType>(uow, initial.CustomerNotes, updated.CustomerNotes);
 
 		    await
-		        customerToShippingAddressRep.InsertGraphRangeAsync(
-		            entity.ShippingAddresses.Where(
-		                a => a.ShippingAddress.Id == 0 && a.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted));
-			await
-				customerNoteRepository.InsertGraphRangeAsync(
-					entity.CustomerNotes.Where(n => n.StatusCode != (int)RecordStatusCode.Deleted && n.Id == 0));
+		        SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue, CustomerPaymentMethodOptionType>(uow,
+		            initial.CustomerPaymentMethods, updated.CustomerPaymentMethods);
 
-			foreach (var customerPaymentMethod in entity.CustomerPaymentMethods.Where(m => m.StatusCode != (int)RecordStatusCode.Deleted))
-			{
-				await customerPaymentMethodOptionValuesRepository.InsertRangeAsync(customerPaymentMethod.OptionValues);
-				if (customerPaymentMethod.BillingAddress.Id == 0)
-				{
-					customerPaymentMethod.IdAddress = 0;
-					await addressesRepositoryAsync.InsertGraphAsync(customerPaymentMethod.BillingAddress);
-				}
-			}
-			var paymentsToDelete =
-				entity.CustomerPaymentMethods.Where(a => a.StatusCode == (int)RecordStatusCode.Deleted).ToList();
-			await customerPaymentMethodRepository.DeleteAllAsync(paymentsToDelete);
-			await addressesRepositoryAsync.DeleteAllAsync(paymentsToDelete.Where(p => p.BillingAddress != null).Select(p => p.BillingAddress));
+            await
+                SyncDbCollections<Address, AddressOptionValue, AddressOptionType>(uow, initial.CustomerPaymentMethods.Select(p => p.BillingAddress),
+                    updated.CustomerPaymentMethods.Select(p => p.BillingAddress));
 
-			List<string> fileNamesForDelete = new List<string>();
-			foreach (var dbFile in entity.Files)
+            List<string> fileNamesForDelete = new List<string>();
+			foreach (var dbFile in updated.Files)
 			{
 				bool delete = true;
 				foreach (var file in model.Files)
@@ -390,7 +238,7 @@ namespace VitalChoice.Business.Services.Customers
 
 			if (fileNamesForDelete.Count != 0)
 			{
-				var publicId = entity.PublicId;
+				var publicId = updated.PublicId;
 				Task deleteFilesTask = new Task(() =>
 				{
 					foreach (var fileName in fileNamesForDelete)
@@ -402,27 +250,7 @@ namespace VitalChoice.Business.Services.Customers
 			}
 		}
 
-		protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
-		{
-			return query
-				.Include(p => p.Files)
-				.Include(p => p.DefaultPaymentMethod)
-				.Include(p => p.User)
-				.Include(a => a.ShippingAddresses)
-				.ThenInclude(a => a.ShippingAddress)
-                .ThenInclude(a => a.OptionValues)
-				.Include(p => p.CustomerNotes)
-				.ThenInclude(n => n.OptionValues)
-				.Include(p => p.OrderNotes)
-				.Include(p => p.PaymentMethods)
-				.Include(p => p.CustomerPaymentMethods)
-				.ThenInclude(p => p.OptionValues)
-				.Include(p => p.CustomerPaymentMethods)
-				.ThenInclude(p => p.BillingAddress)
-				.ThenInclude(p => p.OptionValues);
-		}
-
-		protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
+        protected override async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow)
         {
             return await InsertAsync(model, uow, null);
 	    }
@@ -637,5 +465,155 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
+
+        private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
+        {
+            return await _storageClient.DeleteBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
+        }
+
+        private IList<RoleType> MapCustomerTypeToRole(CustomerDynamic model)
+        {
+            var roles = new List<RoleType>();
+            switch (model.IdObjectType)
+            {
+                case (int)CustomerType.Retail:
+                    roles.Add(RoleType.Retail);
+                    break;
+                case (int)CustomerType.Wholesale:
+                    roles.Add(RoleType.Wholesale);
+                    break;
+                default:
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
+            }
+
+            return roles;
+        }
+
+        private async Task<Customer> UpdateAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
+        {
+            var appUser = await _storefrontUserService.GetAsync(model.Id);
+            if (appUser == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
+            }
+
+            switch (model.StatusCode)
+            {
+                case (int)CustomerStatus.Active:
+                    appUser.Status = UserStatus.Active;
+                    break;
+                case (int)CustomerStatus.NotActive:
+                    appUser.Status = UserStatus.NotActive;
+                    break;
+                case (int)CustomerStatus.Suspended:
+                    appUser.Status = UserStatus.Disabled;
+                    break;
+                case (int)CustomerStatus.Deleted:
+                    appUser.Status = UserStatus.NotActive;
+                    appUser.DeletedDate = DateTime.Now;
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                appUser.IsConfirmed = true;
+                appUser.ConfirmationToken = Guid.Empty;
+            }
+
+            appUser.Email = model.Email;
+            appUser.UserName = model.Email;
+
+            var profileAddress = model.ProfileAddress;
+            appUser.FirstName = profileAddress.Data.FirstName;
+            appUser.LastName = profileAddress.Data.LastName;
+
+            //TODO: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //try
+            //{
+            var customer = await base.UpdateAsync(model, uow);
+
+            //transaction.Commit();
+
+            var roles = MapCustomerTypeToRole(model);
+
+            await _storefrontUserService.UpdateAsync(appUser, roles, password);
+
+            return customer;
+            //}
+            //catch (Exception ex)
+            //{
+            //	transaction.Rollback();
+            //	throw;
+            //}
+            //}
+        }
+
+        private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)
+        {
+            var roles = MapCustomerTypeToRole(model);
+
+            var profileAddress = model.ProfileAddress;
+            var appUser = new ApplicationUser()
+            {
+                FirstName = profileAddress.Data.FirstName,
+                LastName = profileAddress.Data.LastName,
+                Email = model.Email,
+                UserName = model.Email,
+                TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
+                IsConfirmed = false,
+                ConfirmationToken = Guid.NewGuid(),
+                IdUserType = UserType.Customer,
+                Profile = null,
+                Status = UserStatus.NotActive
+            };
+
+            var suspendedCustomer = (int)CustomerStatus.Suspended;
+
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(password))
+                    {
+                        appUser.IsConfirmed = true;
+                        appUser.Status = model.StatusCode == suspendedCustomer
+                            ? UserStatus.Disabled
+                            : UserStatus.Active;
+                    }
+                    else
+                    {
+                        appUser.Status = model.StatusCode == suspendedCustomer ? UserStatus.Disabled : UserStatus.NotActive;
+                    }
+
+                    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
+
+                    model.Id = appUser.Id;
+                    //model.User.Id = appUser.Id;
+
+                    var customer = await base.InsertAsync(model, uow);
+
+                    if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
+                    {
+                        await _storefrontUserService.SendActivationAsync(model.Email);
+                    }
+
+                    transaction.Commit();
+
+                    return customer;
+                }
+                catch
+                {
+                    if (appUser.Id > 0)
+                    {
+                        await _storefrontUserService.DeleteAsync(appUser);
+                    }
+
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
     }
 }

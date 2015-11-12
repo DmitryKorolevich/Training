@@ -125,12 +125,12 @@ namespace VitalChoice.DynamicData.Base
 
         public Expression<Func<TOptionValue, int>> ObjectReferenceExpression => ObjectIdReferenceSelector;
 
-        public ICollection<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType)
+        public ICollection<TOptionType> FilterByType(int? objectType)
         {
             var filterFunc = GetOptionTypeQuery().WithObjectType(objectType).Query()?.CacheCompile();
             if (filterFunc != null)
-                return collection.Where(filterFunc).ToArray();
-            return collection.ToArray();
+                return OptionTypes.Where(filterFunc).ToArray();
+            return OptionTypes.ToArray();
         }
 
         public TDynamic FromEntity(TEntity entity, bool withDefaults = false)
@@ -160,7 +160,7 @@ namespace VitalChoice.DynamicData.Base
 
             if (entity.OptionTypes == null)
             {
-                entity.OptionTypes = FilterByType(OptionTypes, dynamic.IdObjectType);
+                entity.OptionTypes = FilterByType(dynamic.IdObjectType);
             }
 
             UpdateEntityItem(dynamic, entity);
@@ -193,7 +193,7 @@ namespace VitalChoice.DynamicData.Base
 
             if (optionTypes == null)
             {
-                optionTypes = FilterByType(OptionTypes, dynamic.IdObjectType);
+                optionTypes = FilterByType(dynamic.IdObjectType);
             }
             var entity = new TEntity { OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes };
             var optionTypesCache = optionTypes.ToDictionary(o => o.Name, o => o);
@@ -215,7 +215,7 @@ namespace VitalChoice.DynamicData.Base
 
             if (entity.OptionTypes == null)
             {
-                entity.OptionTypes = FilterByType(OptionTypes, entity.IdObjectType);
+                entity.OptionTypes = FilterByType(entity.IdObjectType);
             }
 
             var result = FromEntityItem(entity, withDefaults);
@@ -231,7 +231,7 @@ namespace VitalChoice.DynamicData.Base
             items = RemoveInvalidForUpdate(items);
             foreach (var pair in items.Where(pair => pair.Entity.OptionTypes == null))
             {
-                pair.Entity.OptionTypes = FilterByType(OptionTypes, pair.Dynamic.IdObjectType);
+                pair.Entity.OptionTypes = FilterByType(pair.Dynamic.IdObjectType);
             }
             foreach (var pair in items)
             {
@@ -264,7 +264,7 @@ namespace VitalChoice.DynamicData.Base
                     items.Where(d => d != null).Select(
                         dynamic =>
                         {
-                            var entity = ToEntityItem(dynamic, FilterByType(OptionTypes, dynamic.IdObjectType));
+                            var entity = ToEntityItem(dynamic, FilterByType(dynamic.IdObjectType));
                             return new DynamicEntityPair<TDynamic, TEntity>(dynamic, entity);
                         })
                         .ToArray();
@@ -287,7 +287,7 @@ namespace VitalChoice.DynamicData.Base
 
             foreach (var pair in items.Where(pair => pair.Value2 == null))
             {
-                pair.Value2 = FilterByType(OptionTypes, pair.Value1.IdObjectType);
+                pair.Value2 = FilterByType(pair.Value1.IdObjectType);
             }
             var results =
                 items.Where(d => d.Value1 != null).Select(
@@ -305,7 +305,7 @@ namespace VitalChoice.DynamicData.Base
 
             foreach (var entity in items.Where(pair => pair.OptionTypes == null))
             {
-                entity.OptionTypes = FilterByType(OptionTypes, entity.IdObjectType);
+                entity.OptionTypes = FilterByType(entity.IdObjectType);
             }
             List<DynamicEntityPair<TDynamic, TEntity>> results =
                 items.Where(e => e != null).Select(
@@ -371,7 +371,7 @@ namespace VitalChoice.DynamicData.Base
                     true);
                 foreach (var pair in cache)
                 {
-                    var mappingName = pair.Value.Map.Name ?? pair.Key;
+                    var mappingName = pair.Value.Map?.Name ?? pair.Key;
                     if (!dynamicCache.ContainsKey(mappingName))
                     {
                         object dynamicValue;
@@ -404,7 +404,7 @@ namespace VitalChoice.DynamicData.Base
                 var data = dynamic.DictionaryData;
                 foreach (var pair in cache)
                 {
-                    var mappingName = pair.Value.Map.Name ?? pair.Key;
+                    var mappingName = pair.Value.Map?.Name ?? pair.Key;
                     if (!dynamicCache.ContainsKey(mappingName))
                     {
                         var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,

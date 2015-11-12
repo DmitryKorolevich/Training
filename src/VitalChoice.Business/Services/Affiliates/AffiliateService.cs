@@ -77,10 +77,10 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _vCustomerInAffiliateRepository = vCustomerInAffiliateRepository;
@@ -237,9 +237,9 @@ namespace VitalChoice.Business.Services.Affiliates
             return await UpdateAsync(model, uow, null);
         }
 
-        protected override async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
+        protected override async Task<bool> DeleteAsync(IUnitOfWorkAsync uow, int id, bool physically)
         {
-            var toReturn = await base.DeleteAsync(id, uow, physically);
+            var toReturn = await base.DeleteAsync(uow, id, physically);
             if (toReturn)
             {
                 var appUser = await _affiliateUserService.GetAsync(id);
@@ -252,7 +252,7 @@ namespace VitalChoice.Business.Services.Affiliates
             return toReturn;
         }
 
-        protected override async Task<List<MessageInfo>> Validate(AffiliateDynamic model)
+        protected override async Task<List<MessageInfo>> ValidateAsync(AffiliateDynamic model)
         {
             var errors = new List<MessageInfo>();
 
@@ -397,7 +397,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<bool> SelectAnyAsync(int id)
         {
-            return await this.ObjectRepository.Query(p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted).SelectAnyAsync();
+            return await ObjectRepository.Query(p => p.Id == id && p.StatusCode != (int)RecordStatusCode.Deleted).SelectAnyAsync();
         }
 
         #endregion

@@ -349,7 +349,7 @@ namespace VitalChoice.DynamicData.Base
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                var mappingName = pair.Value.Map?.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
                 if (objectCache.TryGetValue(mappingName, out dynamicProperty))
                 {
@@ -378,7 +378,7 @@ namespace VitalChoice.DynamicData.Base
             var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
             foreach (var pair in modelCache)
             {
-                var mappingName = pair.Value.Map.Name ?? pair.Key;
+                var mappingName = pair.Value.Map?.Name ?? pair.Key;
                 GenericProperty dynamicProperty;
                 if (objectCache.TryGetValue(mappingName, out dynamicProperty))
                 {

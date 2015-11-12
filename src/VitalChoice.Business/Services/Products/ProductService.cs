@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
@@ -18,8 +16,6 @@ using VitalChoice.Domain.Constants;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Domain.Exceptions;
@@ -30,10 +26,7 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
-using VitalChoice.DynamicData.Helpers;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Entities;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
@@ -46,11 +39,9 @@ namespace VitalChoice.Business.Services.Products
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
-        private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly ProductMapper _mapper;
-        private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoriesRepository;
         private readonly IEcommerceRepositoryAsync<VCustomerFavorite> _vCustomerFavoriteRepository;
         private readonly SkuMapper _skuMapper;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -61,58 +52,46 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
 
-        protected override async Task AfterSelect(ICollection<Product> entities)
+        protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
+        {
+            return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
+        }
+
+        protected override Task AfterSelect(ICollection<Product> entities)
         {
             foreach (var entity in entities)
             {
-                entity.Skus =
-                    await
-                        _skuRepository.Query(new SkuQuery().NotDeleted().WithProductId(entity.Id))
-                            .Include(p => p.OptionValues)
-                            .OrderBy(skus => skus.OrderBy(s => s.Order))
-                            .SelectAsync(false);
-                entity.ProductsToCategories =
-                    await _productToCategoriesRepository.Query(c => c.IdProduct == entity.Id).SelectAsync(false);
+                entity.Skus = entity.Skus?.OrderBy(s => s.Order).ToArray();
             }
+            return Task.Delay(0);
         }
 
-        protected override async Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
-        {
-            var skuRepository = uow.RepositoryAsync<Sku>();
-            var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
-            var skuOptionValueRepository = uow.RepositoryAsync<SkuOptionValue>();
-            entity.Skus =
-                    await skuRepository.Query(p => p.IdProduct == entity.Id && p.StatusCode != (int)RecordStatusCode.Deleted)
-                        .Include(p => p.OptionValues)
-                        .SelectAsync();
-            foreach (var sku in entity.Skus)
-            {
-                sku.OptionTypes = entity.OptionTypes;
-                await skuOptionValueRepository.DeleteAllAsync(sku.OptionValues);
-            }
-            entity.ProductsToCategories = categoriesRepository.Query(c => c.IdProduct == model.Id).Select();
-            await categoriesRepository.DeleteAllAsync(entity.ProductsToCategories);
-        }
-
-        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)
         {
             var skuOptionValuesRepository = uow.RepositoryAsync<SkuOptionValue>();
+            var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
-            foreach (var sku in entity.Skus)
+            Dictionary<int, Sku> updatedSkus = updated.Skus.ToDictionary(s => s.Id);
+            foreach (var sku in initial.Skus)
             {
-                if (sku.StatusCode == (int)RecordStatusCode.Deleted)
+                Sku updatedSku;
+                if (updatedSkus.TryGetValue(sku.Id, out updatedSku))
                 {
-                    foreach (var value in sku.OptionValues)
-                    {
-                        value.Id = 0;
-                    }
+                    await
+                        skuOptionValuesRepository.DeleteAllAsync(sku.ExceptOptionsIn(updatedSku));
                 }
-                await skuOptionValuesRepository.InsertRangeAsync(sku.OptionValues);
+                else
+                {
+                    await skuOptionValuesRepository.DeleteAllAsync(sku.OptionValues);
+                    await skuRepository.DeleteAsync(sku);
+                }
             }
-            await categoriesRepository.InsertRangeAsync(entity.ProductsToCategories);
+            await
+                categoriesRepository.DeleteAllAsync(initial.ProductsToCategories.ExceptKeyedWith(updated.ProductsToCategories,
+                    intialCat => intialCat.IdCategory, updatedCat => updatedCat.IdCategory));
         }
 
-        protected override async Task<List<MessageInfo>> Validate(ProductDynamic model)
+        protected override async Task<List<MessageInfo>> ValidateAsync(ProductDynamic model)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
@@ -120,9 +99,9 @@ namespace VitalChoice.Business.Services.Products
                 await
                     _productRepository.Query(
                         new ProductQuery().NotDeleted().Excluding(model.Id).WithName(model.Name))
-                        .SelectAsync(false);
+                        .SelectFirstOrDefaultAsync(false);
 
-            if (productSameName.Any())
+            if (productSameName != null)
             {
                 errors.AddRange(
                     model.CreateError()
@@ -157,7 +136,7 @@ namespace VitalChoice.Business.Services.Products
             return errors;
         }
 
-        protected override async Task<List<MessageInfo>> ValidateDelete(int id)
+        protected override async Task<List<MessageInfo>> ValidateDeleteAsync(int id)
         {
             var skuExists =
                 await
@@ -188,18 +167,17 @@ namespace VitalChoice.Business.Services.Products
             INotificationService notificationService,
             IRepositoryAsync<ProductContent> productContentRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
+            DirectMapper<Product> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
             _vProductSkuRepository = vProductSkuRepository;
             _vSkuRepository = vSkuRepository;
-            _lookupRepository = lookupRepository;
             _productRepository = productRepository;
             _skuRepository = skuRepository;
             _mapper = mapper;
-            _productToCategoriesRepository = productToCategoriesRepository;
             _adminProfileRepository = adminProfileRepository;
             _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
             _skuMapper = skuMapper;
@@ -371,8 +349,7 @@ namespace VitalChoice.Business.Services.Products
 
             foreach (var sku in skus)
             {
-                sku.OptionTypes =
-                    _mapper.OptionTypes.Where(GetOptionTypeQuery(sku.Product.IdObjectType).Query().CacheCompile()).ToList();
+                sku.OptionTypes = _mapper.FilterByType(sku.Product.IdObjectType);
                 sku.Product.OptionTypes = sku.OptionTypes;
             }
 
@@ -775,9 +752,9 @@ namespace VitalChoice.Business.Services.Products
             errors.Raise();
         }
 
-        protected override async Task<bool> DeleteAsync(int id, IUnitOfWorkAsync uow, bool physically)
+        protected override async Task<bool> DeleteAsync(IUnitOfWorkAsync uow, int id, bool physically)
         {
-            var result = await base.DeleteAsync(id, uow, physically);
+            var result = await base.DeleteAsync(uow, id, physically);
             if(result)
             {
                 var productContent = (await _productContentRepository.Query(p=>p.Id==id).SelectAsync()).FirstOrDefault();

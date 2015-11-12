@@ -109,6 +109,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,
                         entity.CustomerPaymentMethods);
+                foreach (var paymentMethod in entity.CustomerPaymentMethods)
+                {
+                    if (paymentMethod.StatusCode == (int) RecordStatusCode.Deleted && paymentMethod.BillingAddress != null)
+                    {
+                        paymentMethod.BillingAddress.StatusCode = (int) RecordStatusCode.Deleted;
+                    }
+                }
                 await _customerAddressMapper.UpdateEntityAsync(dynamic.ProfileAddress, entity.ProfileAddress);
             });
         }

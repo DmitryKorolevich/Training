@@ -186,33 +186,9 @@ namespace VC.Admin.ModelConverters
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;
                         dbCustomer.OrderNotes = dynamic.Customer.OrderNotes;
 
-                        var profileAddress =
-                            dbCustomer.ShippingAddresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
-                        if (profileAddress != null)
-                        {
-                            dbCustomer.ShippingAddresses.Remove(profileAddress);
-                        }
-                        profileAddress =
-                            dynamic.Customer.ShippingAddresses.FirstOrDefault(p => p.IdObjectType == (int) AddressType.Profile);
-                        if (profileAddress != null)
-                        {
-                            dbCustomer.ShippingAddresses.Add(profileAddress);
-                        }
-
                         if (model.UpdateShippingAddressForCustomer)
                         {
-                            var shippingAddresses =
-                                dbCustomer.ShippingAddresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
-                            foreach (var address in shippingAddresses)
-                            {
-                                dbCustomer.ShippingAddresses.Remove(address);
-                            }
-                            shippingAddresses =
-                                dynamic.Customer.ShippingAddresses.Where(p => p.IdObjectType == (int) AddressType.Shipping).ToList();
-                            foreach (var address in shippingAddresses)
-                            {
-                                dbCustomer.ShippingAddresses.Add(address);
-                            }
+                            dbCustomer.ShippingAddresses = dynamic.Customer.ShippingAddresses;
                         }
 
                         if (model.UpdateCardForCustomer && dynamic.PaymentMethod != null)

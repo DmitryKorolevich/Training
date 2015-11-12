@@ -28,6 +28,7 @@ using VitalChoice.Domain.Helpers;
 using VitalChoice.Domain.Transfer.Affiliates;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Orders;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
@@ -66,10 +67,10 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IAffiliateService affiliateService,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DynamicExpressionVisitor queryVisitor)
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DirectMapper<Order> directMapper, DynamicExpressionVisitor queryVisitor)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
             _vOrderRepository = vOrderRepository;
             _adminProfileRepository = adminProfileRepository;
@@ -109,32 +110,22 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(p => p.OptionValues);
         }
 
-        //TODO: lambda caching
         protected override async Task AfterSelect(ICollection<Order> entities)
         {
-            var productOptionTypes = _productMapper.OptionTypes;
-            bool skuLoaded = true;
-            foreach(var entity in entities)
-            {
-                skuLoaded = skuLoaded && entity.Skus != null;
-            }
-            if (skuLoaded)
+            if (entities.SelectMany(e => e.Skus).All(s => s != null))
             {
                 foreach (
                     var orderToSku in
                         entities.SelectMany(o => o.Skus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
                 {
-                    var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                        .WithObjectType(orderToSku.Sku.Product.IdObjectType)
-                        .Query()
-                        .CacheCompile()).ToList();
+                    var optionTypes = _productMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.OptionTypes = optionTypes;
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
                 var invalidSkuOrdered =
                     entities.SelectMany(o => o.Skus)
                         .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                        .ToList();
+                        .ToArray();
                 var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
                 var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
                     .Include(p => p.Product)
@@ -146,10 +137,7 @@ namespace VitalChoice.Business.Services.Orders
                     Sku sku;
                     if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
                     {
-                        var optionTypes = productOptionTypes.Where(_productMapper.GetOptionTypeQuery()
-                            .WithObjectType(sku.Product.IdObjectType)
-                            .Query()
-                            .CacheCompile()).ToList();
+                        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
                         orderToSku.Sku = sku;
                         orderToSku.Sku.Product = sku.Product;
                         orderToSku.Sku.OptionTypes = optionTypes;
@@ -218,14 +206,14 @@ namespace VitalChoice.Business.Services.Orders
                 orderToSkuRepository.DeleteAllAsync(entity.Skus.WhereAll(model.Skus, (s, ds) => s.IdSku != ds.Sku?.Id));
         }
 
-        protected override Task<List<MessageInfo>> Validate(OrderDynamic dynamic)
+        protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
         {
             if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
             }
-            return base.Validate(dynamic);
+            return base.ValidateAsync(dynamic);
         }
 
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)

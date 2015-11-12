@@ -48,14 +48,14 @@ namespace VitalChoice.Data.Helpers
             _expression = expression;
         }
 
-        public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
+        public Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
         {
-            return await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector).ToListAsync();
+            return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector).ToListAsync();
         }
 
-        public async Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true)
+        public Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true)
         {
-            return (await SelectAsync(tracking)).FirstOrDefault();
+            return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).FirstOrDefaultAsync();
         }
 
         public IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
@@ -81,14 +81,14 @@ namespace VitalChoice.Data.Helpers
             return new IncludableQueryFluent<TEntity, TProperty>(this, Query.Include(expression));
         }
 
-        public async Task<bool> SelectAnyAsync()
+        public Task<bool> SelectAnyAsync()
         {
-            return (await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).FirstOrDefaultAsync()) != null;
+            return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).AnyAsync();
         }
 
-        public async Task<int> SelectCountAsync()
+        public Task<int> SelectCountAsync()
         {
-            return await RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).CountAsync();
+            return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy).CountAsync();
         }
 
         public List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false)
@@ -96,9 +96,10 @@ namespace VitalChoice.Data.Helpers
             totalCount = RepositoryAsync<TEntity>.Select(Query, _expression).Count();
             return RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, page, pageSize, tracking).ToList();
         }
+
         public async Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false)
         {
-            var count =await RepositoryAsync<TEntity>.Select(Query, _expression).CountAsync();
+            var count = await RepositoryAsync<TEntity>.Select(Query, _expression).CountAsync();
             var items = await Repository.SelectAsync(Query, _expression, _orderBy, page, pageSize, tracking);
             return new PagedList<TEntity>(items, count);
         }

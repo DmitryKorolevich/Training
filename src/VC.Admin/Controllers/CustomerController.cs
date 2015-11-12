@@ -300,6 +300,7 @@ namespace VC.Admin.Controllers
                 {
                     customerNote.IdEditedBy = userId;
                 }
+                item.ProfileAddress.IdEditedBy = userId;
             }
             item.IdEditedBy = userId;
             if (item.Id > 0)

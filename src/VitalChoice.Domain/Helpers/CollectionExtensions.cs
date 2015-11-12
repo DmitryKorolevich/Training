@@ -87,18 +87,32 @@ namespace VitalChoice.Domain.Helpers
             return main.Where(m => compareTo.All(c => allCondition(m, c)));
         }
 
-        public static ICollection<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
-            IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
+        public static IEnumerable<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> left,
+            IEnumerable<T2> right, Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector)
         {
-            HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
-            return main.Where(m => !searchIn.Contains(mainKeySelector(m))).ToList();
+            HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(rightKeySelector));
+            return left.Where(m => !searchIn.Contains(leftKeySelector(m)));
         }
 
-        public static ICollection<T1> IntersectKeyedWith<T1, T2, TKey>(this IEnumerable<T1> main,
-            IEnumerable<T2> compareTo, Func<T1, TKey> mainKeySelector, Func<T2, TKey> compareToKeySelector)
+        public static IEnumerable<T1> IntersectKeyedWith<T1, TKey>(this IEnumerable<T1> left,
+            IEnumerable<T1> right, Func<T1, TKey> keySelector)
         {
-            HashSet<TKey> searchIn = new HashSet<TKey>(compareTo.Select(compareToKeySelector));
-            return main.Where(m => searchIn.Contains(mainKeySelector(m))).ToList();
+            HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(keySelector));
+            return left.Where(m => searchIn.Contains(keySelector(m)));
+        }
+
+        public static IEnumerable<T1> ExceptKeyedWith<T1, TKey>(this IEnumerable<T1> left,
+            IEnumerable<T1> right, Func<T1, TKey> keySelector)
+        {
+            HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(keySelector));
+            return left.Where(m => !searchIn.Contains(keySelector(m)));
+        }
+
+        public static IEnumerable<T1> IntersectKeyedWith<T1, T2, TKey>(this IEnumerable<T1> left,
+            IEnumerable<T2> right, Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector)
+        {
+            HashSet<TKey> searchIn = new HashSet<TKey>(right.Select(rightKeySelector));
+            return left.Where(m => searchIn.Contains(leftKeySelector(m)));
         }
 
         public static void CopyTo<T1, T2>(this IDictionary<T1, T2> src, IDictionary<T1, T2> dest)

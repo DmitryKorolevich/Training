@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Domain.Entities.eCommerce.Users;
+using VitalChoice.Domain.Helpers;
 
 namespace VitalChoice.Domain.Entities.eCommerce.Base
 {
@@ -26,5 +27,12 @@ namespace VitalChoice.Domain.Entities.eCommerce.Base
         public ICollection<TOptionValue> OptionValues { get; set; }
 
         public ICollection<TOptionType> OptionTypes { get; set; }
+
+        public IEnumerable<TOptionValue> ExceptOptionsIn(
+            DynamicDataEntity<TOptionValue, TOptionType> updated)
+        {
+            return OptionValues.ExceptKeyedWith(updated.OptionValues,
+                item => item.IdOptionType);
+        }
     }
 }

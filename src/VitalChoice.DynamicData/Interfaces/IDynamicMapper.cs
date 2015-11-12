@@ -14,10 +14,11 @@ namespace VitalChoice.DynamicData.Interfaces
         where TDynamic : MappedObject
         where TEntity: DynamicDataEntity
     {
+
     }
 
     public class DynamicEntityPair<TDynamic, TEntity>
-        where TEntity : Entity
+        where TEntity : DynamicDataEntity 
         where TDynamic : MappedObject
     {
         public DynamicEntityPair(TDynamic dynamic, TEntity entity)
@@ -27,6 +28,7 @@ namespace VitalChoice.DynamicData.Interfaces
         }
 
         public TEntity Entity { get; set; }
+        public TEntity InitialEntity { get; set; }
         public TDynamic Dynamic { get; set; }
     }
 
@@ -79,7 +81,7 @@ namespace VitalChoice.DynamicData.Interfaces
     {
         IQueryOptionType<TOptionType> GetOptionTypeQuery();
         ICollection<TOptionType> OptionTypes { get; }
-        ICollection<TOptionType> FilterByType(IEnumerable<TOptionType> collection, int? objectType);
+        ICollection<TOptionType> FilterByType(int? objectType);
         Action<TOptionValue, int> SetObjectReferenceId { get; }
         Func<TOptionValue, int> GetObjectReferenceId { get; }
         Expression<Func<TOptionValue, int>> ObjectReferenceExpression { get; }
