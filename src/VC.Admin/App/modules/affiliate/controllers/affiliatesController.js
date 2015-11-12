@@ -84,5 +84,10 @@
             }, 'Are you sure you want to delete this affiliate?');
         };
 
+        $scope.pay = function (id)
+        {
+
+        };
+
         initialize();
     }]);

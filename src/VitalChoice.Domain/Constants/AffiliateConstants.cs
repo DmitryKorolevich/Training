@@ -11,5 +11,8 @@ namespace VitalChoice.Domain.Constants
         
         public const string AffiliatePublicIdParam = "idaffiliate";
         public const int AffiliatePublicIdParamExpiredDays = 30;
+        
+        public const decimal AffiliateMinPayCommisionsAmount = 50;
+        public const string AffiliateOrderPaymentsCountToDateOptionName = "AffiliateOrderPaymentsCountToDate";
     }
 }

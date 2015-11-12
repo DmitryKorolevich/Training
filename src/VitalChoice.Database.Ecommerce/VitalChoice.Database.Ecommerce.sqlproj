@@ -161,7 +161,7 @@
     <None Include="PostDeployment\Scripts\VProductSkus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\Affiliates.sql" />
+    <None Include="PreDeployment\Scripts\AppOptions.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PreDeployment\Scripts\VAffiliates.sql" />
@@ -207,5 +207,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VSkus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Affiliates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VAffiliateNotPaidCommissions.sql" />
   </ItemGroup>
 </Project>

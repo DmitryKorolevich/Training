@@ -14,5 +14,7 @@ namespace VitalChoice.Domain.Transfer.Affiliates
         public string Company { get; set; }
 
         public int? Tier { get; set; }
+
+        public bool WithAvailablePayCommision { get; set; }
     }
 }

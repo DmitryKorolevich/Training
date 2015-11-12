@@ -49,7 +49,6 @@
 :r .\Scripts\CustomerFavoritesView.sql
 
 :r .\Scripts\DiscountUpdates.sql
-
 :r .\Scripts\CustomerAddressStructureUpdate.sql
-
 :r .\Scripts\AllValueTablesStructureOptimize.sql
+:r .\Scripts\AppOptions.sql

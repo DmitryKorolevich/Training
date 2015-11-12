@@ -286,9 +286,9 @@ namespace VC.Admin.Controllers
         {
             return await _affiliateService.GetAffiliatesSummary();
         }
-        
+
         [HttpGet]
-        public async Task<Result<ICollection<AffiliatesSummaryReportItemModel>>> GetAffiliatesSummaryReportItemsForMonths(int count=3,bool include=true)
+        public async Task<Result<ICollection<AffiliatesSummaryReportItemModel>>> GetAffiliatesSummaryReportItemsForMonths(int count = 3, bool include = true)
         {
             if (count > 12)
                 count = 12;
@@ -298,12 +298,22 @@ namespace VC.Admin.Controllers
                 count++;
             DateTime lastMonthStartDay = DateTime.Now;
             lastMonthStartDay = new DateTime(lastMonthStartDay.Year, lastMonthStartDay.Month, 1);
-            if(!include)
+            if (!include)
             {
                 lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
             }
             lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
             return (await _affiliateService.GetAffiliatesSummaryReportItemsForMonths(lastMonthStartDay, count)).ToList();
+        }
+
+        [HttpGet]
+        public async Task<Result<ICollection<PaymentHistoryLineItemModel>>> GetAffiliatePaymentHistory(int id)
+        {
+            return (await _affiliateService.GetAffiliatePayments(id)).Select(p => new PaymentHistoryLineItemModel()
+            {
+                DateCreated = p.DateCreated,
+                Amount = p.Amount,
+            }).ToList();
         }
     }
 }

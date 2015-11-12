@@ -67,5 +67,9 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.get(baseUrl + 'GetAffiliatesSummaryReportItemsForMonths/?count={0}&include={1}'.format(count,include), getConfig(tracker));
 	    },
+	    getAffiliatePaymentHistory: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetAffiliatePaymentHistory/' + id, getConfig(tracker));
+	    },
 	};
 }]);

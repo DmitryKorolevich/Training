@@ -26,6 +26,7 @@ using VitalChoice.Domain.Entities.eCommerce.Help;
 using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.Domain.Entities.eCommerce.Promotion;
+using VitalChoice.Domain.Entities.eCommerce;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -73,6 +74,10 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(f => f.Id);
             });
+
+            builder.Entity<AppOption>().HasKey(f => f.OptionName);
+            builder.Entity<AppOption>().Ignore(f => f.Id);
+            builder.Entity<AppOption>().ToTable("AppOptions");
 
 
             builder.Entity<FieldTypeEntity>(entity =>
@@ -1335,6 +1340,17 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VAffiliates");
                 entity.Ignore(x => x.EditedByAgentId);
+                entity.HasOne(v => v.NotPaidCommission)
+                    .WithOne(p => p.Affiliate)
+                    .ForeignKey<VAffiliate>(p => p.Id)
+                    .PrincipalKey<VAffiliateNotPaidCommission>(p => p.Id)
+                    .Required();
+            });
+
+            builder.Entity<VAffiliateNotPaidCommission>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("VAffiliateNotPaidCommissions");
             });
 
             builder.Entity<AffiliateOptionValue>(entity =>

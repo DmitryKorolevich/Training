@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VC.Public.Models.Affiliate
+namespace VitalChoice.Domain.Transfer.Affiliates
 {
-    public class PaymentHistoryLineModel
+    public class PaymentHistoryLineItemModel
     {
 	    public DateTime DateCreated { get; set; }
 

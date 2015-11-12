@@ -51,6 +51,7 @@ namespace VitalChoice.Business.Services.Affiliates
         IAffiliateService
     {
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;
+        private readonly IEcommerceRepositoryAsync<VAffiliateNotPaidCommission> _vAffiliateNotPaidCommissionRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<VCustomerInAffiliate> _vCustomerInAffiliateRepository;
         private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
@@ -62,6 +63,7 @@ namespace VitalChoice.Business.Services.Affiliates
         private readonly IOptions<AppOptions> _appOptions;
 
         public AffiliateService(IEcommerceRepositoryAsync<VAffiliate> vAffiliateRepository,
+            IEcommerceRepositoryAsync<VAffiliateNotPaidCommission> vAffiliateNotPaidCommissionRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
@@ -83,10 +85,10 @@ namespace VitalChoice.Business.Services.Affiliates
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
         {
             _vAffiliateRepository = vAffiliateRepository;
+            _vAffiliateNotPaidCommissionRepository = vAffiliateNotPaidCommissionRepository;
             _vCustomerInAffiliateRepository = vCustomerInAffiliateRepository;
             _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
             _affiliatePaymentRepository = affiliatePaymentRepository;
-            _vAffiliateRepository = vAffiliateRepository;
             _adminProfileRepository = adminProfileRepository;
             _notificationService = notificationService;
             _affiliateUserService = affiliateUserService;
@@ -102,9 +104,13 @@ namespace VitalChoice.Business.Services.Affiliates
         public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
         {
             var conditions = new VAffiliateQuery().NotDeleted().WithId(filter.Id).WithTier(filter.Tier).WithName(filter.Name).
-                WithCompany(filter.Company);
+                WithCompany(filter.Company).WithAvailablePayCommision(filter.WithAvailablePayCommision);
 
             var query = _vAffiliateRepository.Query(conditions);
+            if (filter.WithAvailablePayCommision)
+            {
+                query = query.Include(p => p.NotPaidCommission);
+            }
 
             Func<IQueryable<VAffiliate>, IOrderedQueryable<VAffiliate>> sortable = x => x.OrderBy(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
@@ -188,6 +194,20 @@ namespace VitalChoice.Business.Services.Affiliates
                         {
                             item.EditedByAgentId = profile.AgentId;
                         }
+                    }
+                }
+            }
+
+            if (!filter.WithAvailablePayCommision)
+            {
+                var ids = toReturn.Items.Select(pp => pp.Id).ToList();
+                var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
+                foreach(var commision in commissions)
+                {
+                    var item = toReturn.Items.FirstOrDefault(p => p.Id == commision.Id);
+                    if(item!=null)
+                    {
+                        item.NotPaidCommission = commision;
                     }
                 }
             }

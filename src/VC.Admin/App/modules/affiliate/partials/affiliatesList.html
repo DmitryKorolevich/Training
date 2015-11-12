@@ -16,6 +16,16 @@
             </div>
         </div>
         <div class="row form-group">
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="WithAvailablePayCommision" data-ng-model="filter.WithAvailablePayCommision" />
+                        Show only affiliates with available payments
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
             <div class="col-md-4">
                 <button class="btn btn-info" data-ng-click="filterAffiliates();" type="button">Filter</button>
             </div>
@@ -84,6 +94,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th>Commission balance</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
                             <span>Last Updated</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
@@ -109,8 +120,13 @@
                         </td>
                         <td>{{::item.Tier}}</td>
                         <td>{{::item.CustomersCount}}</td>
+                        <td data-ng-if="item.NotPaidCommissionsAmount">{{::item.NotPaidCommissionsAmount | currency}}</td>
+                        <td data-ng-if="!item.NotPaidCommissionsAmount"></td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>
+                            <button data-ng-if="item.NotPaidCommissionsAmount && item.NotPaidCommissionsAmount>=50" title="Pay Affiliate" class="btn btn-default btn-primary btn-xs" data-ng-click="pay(item.Id);">
+                                Pay Affiliate
+                            </button>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </button>

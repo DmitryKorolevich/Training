@@ -26,6 +26,8 @@ using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using System.Threading;
 using System.Globalization;
 using VitalChoice.Domain.Entities.Roles;
+using VitalChoice.Domain.Entities.eCommerce;
+using VitalChoice.Domain.Constants;
 
 namespace VitalChoice.Business.Services
 {
@@ -43,16 +45,27 @@ namespace VitalChoice.Business.Services
         private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository;
         private readonly IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> lookupRepository;
+        private readonly IEcommerceRepositoryAsync<AppOption> appOptionRepository;
         private readonly ISettingService settingService;
         private readonly IBackendSettingsService _backendSettingsService;
         private readonly ILocalizationService _localizationService;
+        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
-        public AppInfrastructureService(ICacheProvider cache, IOptions<AppOptions> appOptions, RoleManager<ApplicationRole> roleManager,
-            IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository, IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            IOptions<AppOptions> appOptionsAccessor, IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
-            IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository, IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
+        public AppInfrastructureService(
+            ICacheProvider cache, 
+            IOptions<AppOptions> appOptions, 
+            RoleManager<ApplicationRole> roleManager,
+            IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository, 
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            IOptions<AppOptions> appOptionsAccessor,
+            IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository,
+            IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository,
+            IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
             IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository,
-            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository, IEcommerceRepositoryAsync<Lookup> lookupRepository, ISettingService settingService,
+            IEcommerceRepositoryAsync<LookupVariant> lookupVariantRepository,
+            IEcommerceRepositoryAsync<Lookup> lookupRepository,
+            IEcommerceRepositoryAsync<AppOption> appOptionRepository,
+            ISettingService settingService,
             IBackendSettingsService backendSettingsService,
             ILocalizationService localizationService)
         {
@@ -68,9 +81,11 @@ namespace VitalChoice.Business.Services
             this.promotionTypeEntityRepository = promotionTypeEntityRepository;
             this.lookupVariantRepository = lookupVariantRepository;
             this.lookupRepository = lookupRepository;
+            this.appOptionRepository = appOptionRepository;
             this.settingService = settingService;
             _localizationService = localizationService;
             _backendSettingsService = backendSettingsService;
+            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         private ReferenceData Populate()
@@ -340,8 +355,26 @@ namespace VitalChoice.Business.Services
                     Text = x.ValueVariant
                 }).ToList();
 
+            //BUG: shoule be moved to the specific worker
+            SetupAppSettings();
+
             return referenceData;
             
+        }
+
+        private void SetupAppSettings()
+        {
+            var affiliateReportDateOption = appOptionRepository.Query(p => p.OptionName == AffiliateConstants.AffiliateOrderPaymentsCountToDateOptionName).Select().FirstOrDefault();
+            var firstDayOfCurrentMonth = DateTime.Now;
+            firstDayOfCurrentMonth = new DateTime(firstDayOfCurrentMonth.Year, firstDayOfCurrentMonth.Month, 1);
+            var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            var dbDate = DateTime.MinValue;
+            DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
+            if(date!= dbDate)
+            {
+                affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
+                appOptionRepository.Update(affiliateReportDateOption);
+            }
         }
 
         private ReferenceData SetAppSettings(ReferenceData referenceData)

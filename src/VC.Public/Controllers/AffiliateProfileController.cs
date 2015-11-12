@@ -196,7 +196,7 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> PaymentHistory()
         {
-            var toReturn = (await _affiliateService.GetAffiliatePayments(GetInternalAffiliateId())).Select(p => new PaymentHistoryLineModel()
+            var toReturn = (await _affiliateService.GetAffiliatePayments(GetInternalAffiliateId())).Select(p => new PaymentHistoryLineItemModel()
             {
                 DateCreated = p.DateCreated,
                 Amount = p.Amount,
