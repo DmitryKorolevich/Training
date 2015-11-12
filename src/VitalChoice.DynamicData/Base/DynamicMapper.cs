@@ -427,7 +427,6 @@ namespace VitalChoice.DynamicData.Base
                 throw new ApiException($"UpdateEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
             var optionTypesCache = entity.OptionTypes.ToDictionary(o => o.Name, o => o);
-            entity.OptionValues = new List<TOptionValue>();
 
             FillEntityOptions(dynamic, optionTypesCache, entity);
             entity.DateCreated = entity.DateCreated;
@@ -510,18 +509,35 @@ namespace VitalChoice.DynamicData.Base
 
         private static void FillEntityOptions(TDynamic obj, Dictionary<string, TOptionType> optionTypesCache, TEntity entity)
         {
+            Dictionary<int, TOptionValue> optionValues = entity.OptionValues.ToDictionary(v => v.IdOptionType);
             foreach (var data in obj.DynamicData)
             {
-                if (data.Value == null) continue;
                 TOptionType optionType;
 
                 if (!optionTypesCache.TryGetValue(data.Key, out optionType)) continue;
 
-                var option = new TOptionValue();
-                MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, data.Value,
-                    (FieldType)optionType.IdFieldType);
-                option.IdOptionType = optionType.Id;
-                entity.OptionValues.Add(option);
+                TOptionValue option;
+                if (optionValues.TryGetValue(optionType.Id, out option))
+                {
+                    if (data.Value == null)
+                    {
+                        entity.OptionValues.Remove(option);
+                        continue;
+                    }
+                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, data.Value,
+                        (FieldType)optionType.IdFieldType);
+                }
+                else
+                {
+                    if (data.Value == null)
+                        continue;
+
+                    option = new TOptionValue();
+                    MapperTypeConverter.ConvertToOption<TOptionValue, TOptionType>(option, data.Value,
+                        (FieldType)optionType.IdFieldType);
+                    option.IdOptionType = optionType.Id;
+                    entity.OptionValues.Add(option);
+                }
             }
         }
 
