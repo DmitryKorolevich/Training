@@ -3,7 +3,6 @@
 
   "files": [
     "lib/jquery/jquery.js",
-    "assets/scripts/vendor/jquery-ui/jquery-ui.min.js",
     "assets/scripts/vendor/jquery.validate.js",
     "assets/scripts/vendor/additional-methods.js",
     "assets/scripts/vendor/jquery.validate.unobtrusive.js",
@@ -13,6 +12,7 @@
     "assets/scripts/vendor/toast/jquery.toast.min.js",
     "assets/scripts/vendor/jquery.unobtrusive-ajax.min.js",
     "assets/scripts/vendor/bootstrap.min.js",
+    "assets/scripts/vendor/jquery-ui/jquery-ui.min.js",
     "assets/scripts/plugins.js"
   ]
 }
