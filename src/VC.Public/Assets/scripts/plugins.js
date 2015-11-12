@@ -96,6 +96,8 @@ $(function () {
 
 	$(".phone-mask").mask("(999) 999-9999? x99999");
 
+	$(".tabs-control").tabs();
+
 	if (successMessage) {
 		notifySuccess(successMessage);
 	}
@@ -111,20 +113,27 @@ function confirmAction(successCallback, errorCallback, text) {
 		'<p>' + message + '</p></div>').dialog({
 		resizable: false,
 		modal: true,
-		buttons: {
-			"Ok": function () {
-				if (successCallback) {
-					successCallback();
+		buttons: [
+			{
+				text: "Ok",
+				'class': "main-dialog-button",
+				click: function () {
+					if (successCallback) {
+						successCallback();
+					}
+					$(this).dialog("close");
 				}
-				$(this).dialog("close");
 			},
-			Cancel: function () {
-				if (errorCallback) {
-					errorCallback();
+			{
+				text: "Cancel",
+				click: function() {
+					if (errorCallback) {
+						errorCallback();
+					}
+					$(this).dialog("close");
 				}
-				$(this).dialog("close");
 			}
-		}
+		]
 	});
 }
 
