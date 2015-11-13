@@ -86,7 +86,12 @@
 
         $scope.pay = function (id)
         {
-
+            modalUtil.open('app/modules/affiliate/partials/affiliatePayCommissions.html', 'affiliatePayCommissionsController', {
+                id: id, thenCallback: function ()
+                {
+                    refreshAffiliates();
+                }
+            }, { size: 'sm' });
         };
 
         initialize();

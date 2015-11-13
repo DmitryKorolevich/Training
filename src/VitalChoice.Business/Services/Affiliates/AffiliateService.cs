@@ -202,10 +202,10 @@ namespace VitalChoice.Business.Services.Affiliates
             {
                 var ids = toReturn.Items.Select(pp => pp.Id).ToList();
                 var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
-                foreach(var commision in commissions)
+                foreach (var commision in commissions)
                 {
                     var item = toReturn.Items.FirstOrDefault(p => p.Id == commision.Id);
-                    if(item!=null)
+                    if (item != null)
                     {
                         item.NotPaidCommission = commision;
                     }
@@ -383,7 +383,7 @@ namespace VitalChoice.Business.Services.Affiliates
             if (!string.IsNullOrWhiteSpace(password))
             {
                 appUser.IsConfirmed = true;
-				appUser.ConfirmationToken = Guid.Empty;
+                appUser.ConfirmationToken = Guid.Empty;
             }
 
             appUser.Email = model.Email;
@@ -433,7 +433,8 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<ICollection<AffiliatePayment>> GetAffiliatePayments(int idAffiliate)
         {
-            var toReturn = (await _affiliatePaymentRepository.Query(p => p.IdAffiliate == idAffiliate).SelectAsync(false)).ToList();
+            Func<IQueryable<AffiliatePayment>, IOrderedQueryable<AffiliatePayment>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            var toReturn = (await _affiliatePaymentRepository.Query(p => p.IdAffiliate == idAffiliate).OrderBy(sortable).SelectAsync(false)).ToList();
             return toReturn;
         }
 
@@ -467,7 +468,7 @@ namespace VitalChoice.Business.Services.Affiliates
             var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.Id == idOrder).SelectAsync()).FirstOrDefault();
             if (dbItem != null)
             {
-                if(dbItem.Status==AffiliateOrderPaymentStatus.Paid)
+                if (dbItem.Status == AffiliateOrderPaymentStatus.Paid)
                 {
                     return false;
                 }
@@ -479,8 +480,8 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item)
         {
-            var dbItem = (await _affiliateOrderPaymentRepository.Query(p=>p.Id==item.Id).SelectAsync()).FirstOrDefault();
-            if(dbItem==null)
+            var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.Id == item.Id).SelectAsync()).FirstOrDefault();
+            if (dbItem == null)
             {
                 dbItem = new AffiliateOrderPayment();
                 dbItem.Status = AffiliateOrderPaymentStatus.NotPaid;
@@ -493,7 +494,7 @@ namespace VitalChoice.Business.Services.Affiliates
             }
             else
             {
-                if(dbItem.Status == AffiliateOrderPaymentStatus.NotPaid)
+                if (dbItem.Status == AffiliateOrderPaymentStatus.NotPaid)
                 {
                     dbItem.Amount = item.Amount;
 
@@ -502,6 +503,59 @@ namespace VitalChoice.Business.Services.Affiliates
             }
 
             return dbItem;
+        }
+
+        public async Task<bool> PayForAffiliateOrders(int idAffiliate, DateTime to)
+        {
+            var toReturn = true;
+            bool exist = await this.SelectAnyAsync(idAffiliate);
+            if (!exist)
+            {
+                throw new AppValidationException(
+                    string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]));
+            }
+            using (var uow = CreateUnitOfWork())
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
+                        var affiliatePaymentRepository = uow.RepositoryAsync<AffiliatePayment>();
+
+                        var orderPayments = (await affiliateOrderPaymentRepository.Query(p => p.IdAffiliate == idAffiliate && p.Status == AffiliateOrderPaymentStatus.NotPaid &&
+                            p.Order.DateCreated < to).SelectAsync()).ToList();
+                        if(orderPayments.Sum(p=>p.Amount)<AffiliateConstants.AffiliateMinPayCommisionsAmount)
+                        {
+                            throw new AppValidationException(
+                                string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AffiliateMinPayCommisionsAmountNotMatch], AffiliateConstants.AffiliateMinPayCommisionsAmount));
+                        }
+
+                        AffiliatePayment payment = new AffiliatePayment();
+                        payment.IdAffiliate = idAffiliate;
+                        payment.DateCreated = DateTime.Now;
+                        payment.Amount = orderPayments.Sum(p => p.Amount);
+                        affiliatePaymentRepository.Insert(payment);
+                        await uow.SaveChangesAsync();
+
+                        foreach(var orderPayment in orderPayments)
+                        {
+                            orderPayment.Status = AffiliateOrderPaymentStatus.Paid;
+                            orderPayment.IdAffiliatePayment = payment.Id;
+                        }
+                        await uow.SaveChangesAsync();
+
+                        transaction.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         public async Task<AffiliatesSummaryModel> GetAffiliatesSummary()
@@ -519,15 +573,15 @@ namespace VitalChoice.Business.Services.Affiliates
         public async Task<ICollection<AffiliatesSummaryReportItemModel>> GetAffiliatesSummaryReportItemsForMonths(DateTime lastMonthStartDay, int monthCount)
         {
             List<AffiliatesSummaryReportItemModel> toReturn = new List<AffiliatesSummaryReportItemModel>();
-            while(monthCount>0)
+            while (monthCount > 0)
             {
                 var spItems = await _affiliateOrderPaymentRepository.GetAffiliatesSummaryReport(lastMonthStartDay, lastMonthStartDay.AddMonths(1));
 
                 var newStatistic = spItems.FirstOrDefault(p => p.IdType == 1);
                 var repeatStatistic = spItems.FirstOrDefault(p => p.IdType == 2);
                 AffiliatesSummaryReportItemModel item = new AffiliatesSummaryReportItemModel();
-                item.Month = lastMonthStartDay.ToString("MMMM",CultureInfo.InvariantCulture);
-                if(newStatistic!=null)
+                item.Month = lastMonthStartDay.ToString("MMMM", CultureInfo.InvariantCulture);
+                if (newStatistic != null)
                 {
                     item.NewTransactions = newStatistic.Count;
                     item.NewSales = newStatistic.Sum;
@@ -540,11 +594,11 @@ namespace VitalChoice.Business.Services.Affiliates
                     item.TotalSales = item.NewSales + item.RepeatSales;
                     if (item.TotalTransactions != 0)
                     {
-                        item.NewTransactionsPercent =Math.Round((((decimal)item.NewTransactions) / item.TotalTransactions)*100,2);
+                        item.NewTransactionsPercent = Math.Round((((decimal)item.NewTransactions) / item.TotalTransactions) * 100, 2);
                     }
                     if (item.TotalSales != 0)
                     {
-                        item.NewSalesPercent = Math.Round((((decimal)item.NewSales) / item.TotalSales)*100,2);
+                        item.NewSalesPercent = Math.Round((((decimal)item.NewSales) / item.TotalSales) * 100, 2);
                     }
                 }
                 toReturn.Add(item);

@@ -40,6 +40,8 @@ namespace VitalChoice.Interfaces.Services.Affiliates
 
         Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item);
 
+        Task<bool> PayForAffiliateOrders(int idAffiliate, DateTime to);
+
         Task<AffiliatesSummaryModel> GetAffiliatesSummary();
 
         Task<ICollection<AffiliatesSummaryReportItemModel>> GetAffiliatesSummaryReportItemsForMonths(DateTime lastMonthStartDay, int monthCount);

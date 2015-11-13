@@ -95,6 +95,16 @@ String.isString = function (fVar) {
     return typeof fVar == 'string' || fVar instanceof String;
 };
 
+String.prototype.formatPhone = function ()
+{
+    return String.formatPhone(this);
+};
+
+String.formatPhone = function (fSource)
+{
+    return fSource.replace(/(\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2-$3 x");
+};
+
 if (!('startsWith' in String.prototype))
     String.prototype.startsWith = function (fChars) {
         return this.length > fChars.length && this.indexOf(fChars) == 0;

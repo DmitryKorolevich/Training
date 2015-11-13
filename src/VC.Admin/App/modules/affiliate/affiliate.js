@@ -6,6 +6,7 @@ angular.module('app.modules.affiliate', [
 	'app.modules.affiliate.controllers.affiliateSendEmailController',
 	'app.modules.affiliate.controllers.customersInAffiliatesReportController',
 	'app.modules.affiliate.controllers.affiliatesSummaryReportController',
+	'app.modules.affiliate.controllers.affiliatePayCommissionsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

@@ -71,5 +71,13 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return $http.get(baseUrl + 'GetAffiliatePaymentHistory/' + id, getConfig(tracker));
 	    },
+	    payForAffiliateOrders: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'PayForAffiliateOrders/' + id, getConfig(tracker));
+	    },
+	    getUnpaidOrdersForLastPeriod: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetUnpaidOrdersForLastPeriod/' + id, getConfig(tracker));
+	    },
 	};
 }]);

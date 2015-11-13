@@ -1,0 +1,67 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Payment Summary</h3>
+</div>
+<div class="modal-body">
+    <spinner-overlay data-loading="refreshTracker.active()">
+        <div class="row form-group">
+            <div class="col-md-6">
+                <span>Affiliate <strong>{{options.Id}}</strong> has a commission balance of <strong>{{options.Amount | currency}}</strong></span><br />
+                <strong>Payment as:</strong><br />
+                <span data-ng-if="affiliate.PaymentType==1">Cash</span>
+                <span data-ng-if="affiliate.PaymentType==2">Credit</span><br /><br />
+                <strong>Payable to:</strong><br />
+                <span>{{affiliate.ChecksPayableTo}}</span><br/>
+                <button class="btn btn-success" ladda="refreshTracker.active()" data-ng-click="pay()">Pay Affiliate</button>
+            </div>
+            <div class="col-md-6">
+                <strong>Address:</strong><br />
+                <span>{{affiliate.Name}}</span><br />
+                <span>{{affiliate.Company}}</span><br />
+                <span>{{affiliate.Phone.formatPhone()}}</span><br />
+                <span>{{affiliate.Address1}}</span><br />
+                <span>{{affiliate.Address2}}</span><br />
+                <span>{{affiliate.City}}, {{affiliate.StateCode ? affiliate.StateCode : affiliate.County}} {{affiliate.Zip}}</span><br />
+                <span>{{affiliate.CountryCode}}</span><br />
+            </div>
+        </div>
+        <accordion>
+            <accordion-group heading="test">
+                <accordion-heading>
+                    <span class="legend">Order Commissions</span>
+                </accordion-heading>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Order Number</th>
+                            <th>New Order</th>
+                            <th>Product Total</th>
+                            <th>Order Total</th>
+                            <th>Shipping</th>
+                            <th>Tax</th>
+                            <th>Commission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in commissions">
+                            <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
+                            <td>{{::item.IdOrder}}</td>
+                            <td>
+                                <span data-ng-if="item.NewCustomerOrder" class="label label-success font-default">Yes</span>
+                            </td>
+                            <td>{{::item.ProductTotal | currency}}</td>
+                            <td>{{::item.OrderTotal | currency}}</td>
+                            <td>{{::item.Shipping | currency}}</td>
+                            <td>{{::item.Tax | currency}}</td>
+                            <td>{{::item.Commission | currency}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </accordion-group>
+        </accordion>
+    </spinner-overlay>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-success" ladda="refreshTracker.active()" data-ng-click="pay()">Pay Affiliate</button>
+    <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

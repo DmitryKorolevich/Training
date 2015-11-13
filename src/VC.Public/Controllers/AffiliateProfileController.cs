@@ -211,17 +211,7 @@ namespace VC.Public.Controllers
             filter.IdAffiliate = GetInternalAffiliateId();
             filter.Status = AffiliateOrderPaymentStatus.NotPaid;
             var result = await _affiliateService.GetAffiliateOrderPayments(filter);
-            var toReturn = result.Items.Select(p => new OrderPaymentLineModel()
-            {
-                DateCreated=p.Order.DateCreated,
-                IdOrder=p.Id,
-                NewCustomerOrder=p.NewCustomerOrder,
-                ProductTotal=p.Order.ProductsSubtotal,
-                OrderTotal=p.Order.Total,
-                Shipping=p.Order.ShippingTotal,
-                Tax=p.Order.TaxTotal,
-                Commission=p.Amount,
-            }).ToList();
+            var toReturn = result.Items.Select(p => new OrderPaymentListItemModel(p)).ToList();
             return View(toReturn);
         }
 
@@ -251,7 +241,7 @@ namespace VC.Public.Controllers
                 ItemsPerPage= BaseAppConstants.DEFAULT_LIST_TAKE_COUNT,
                 TotalItems = result.Count,
             };
-            toReturn.Items = result.Items.Select(p => new OrderPaymentLineModel()
+            toReturn.Items = result.Items.Select(p => new OrderPaymentListItemModel()
             {
                 DateCreated = p.Order.DateCreated,
                 IdOrder = p.Id,
