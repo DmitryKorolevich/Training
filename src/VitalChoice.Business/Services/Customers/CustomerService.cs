@@ -202,22 +202,25 @@ namespace VitalChoice.Business.Services.Customers
             var customerToShippingRepository = uow.RepositoryAsync<CustomerToShippingAddress>();
 
 		    await
-		        SyncDbCollections<Address, AddressOptionValue, AddressOptionType>(uow, initial.ShippingAddresses.Select(s => s.ShippingAddress),
-		            updated.ShippingAddresses.Select(s => s.ShippingAddress));
+		        SyncDbCollections<Address, AddressOptionValue>(uow, initial.ShippingAddresses.Select(s => s.ShippingAddress),
+		            updated.ShippingAddresses.Select(s => s.ShippingAddress), true);
 
             await customerToShippingRepository.DeleteAllAsync(
                 updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode == (int)RecordStatusCode.Deleted));
 
+		    await customerToShippingRepository.InsertGraphRangeAsync(
+		        updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted && s.IdAddress == 0));
+
             await
-		        SyncDbCollections<CustomerNote, CustomerNoteOptionValue, CustomerNoteOptionType>(uow, initial.CustomerNotes, updated.CustomerNotes);
+		        SyncDbCollections<CustomerNote, CustomerNoteOptionValue>(uow, initial.CustomerNotes, updated.CustomerNotes, true);
 
 		    await
-		        SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue, CustomerPaymentMethodOptionType>(uow,
-		            initial.CustomerPaymentMethods, updated.CustomerPaymentMethods);
+		        SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue>(uow,
+		            initial.CustomerPaymentMethods, updated.CustomerPaymentMethods, true);
 
             await
-                SyncDbCollections<Address, AddressOptionValue, AddressOptionType>(uow, initial.CustomerPaymentMethods.Select(p => p.BillingAddress),
-                    updated.CustomerPaymentMethods.Select(p => p.BillingAddress));
+                SyncDbCollections<Address, AddressOptionValue>(uow, initial.CustomerPaymentMethods.Select(p => p.BillingAddress),
+                    updated.CustomerPaymentMethods.Select(p => p.BillingAddress), true);
 
             List<string> fileNamesForDelete = new List<string>();
 			foreach (var dbFile in updated.Files)

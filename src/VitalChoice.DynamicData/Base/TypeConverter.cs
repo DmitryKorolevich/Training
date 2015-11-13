@@ -6,6 +6,8 @@ using Autofac.Features.Indexed;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Domain.Helpers;
+using VitalChoice.DynamicData.Delegates;
+using VitalChoice.DynamicData.Services;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -13,6 +15,7 @@ namespace VitalChoice.DynamicData.Base
     {
         private readonly IIndex<Type, IObjectMapper> _mappers;
         private readonly IModelConverterService _converterService;
+        private readonly Dictionary<object, object> _objects = new Dictionary<object, object>();
 
         public TypeConverter(IIndex<Type, IObjectMapper> mappers, IModelConverterService converterService)
         {
@@ -141,6 +144,58 @@ namespace VitalChoice.DynamicData.Base
             }
             var mapper = ObjectMapper.CreateObjectMapper(this, _converterService, sourceType);
             return mapper?.ToModel(obj, destType);
+        }
+
+        public object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone)
+        {
+            if (obj == null)
+                return null;
+
+            object result;
+
+            if (_objects.TryGetValue(obj, out result))
+                return result;
+
+            result = Activator.CreateInstance(objectType);
+
+            _objects.Add(obj, result);
+
+            var objectCache = DynamicTypeCache.GetTypeCache(DynamicTypeCache.ObjectTypeMappingCache, objectType, true);
+            foreach (var pair in objectCache)
+            {
+                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                if (pair.Value.PropertyTypeInfo.IsSubclassOf(baseTypeToMemberwiseClone))
+                {
+                    var value = Clone(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone);
+                    if (value != null)
+                    {
+                        pair.Value.Set?.Invoke(result, value);
+                    }
+                }
+                else if (propertyElementType != null && propertyElementType.GetTypeInfo().IsSubclassOf(baseTypeToMemberwiseClone))
+                {
+                    var collection = pair.Value.Get?.Invoke(obj);
+                    if (collection != null)
+                    {
+                        var results = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(propertyElementType));
+                        foreach (var item in (IEnumerable) collection)
+                        {
+                            var value = Clone(item, propertyElementType, baseTypeToMemberwiseClone);
+                            results.Add(value);
+                        }
+                        pair.Value.Set?.Invoke(result, results);
+                    }
+                    else
+                    {
+                        pair.Value.Set?.Invoke(result, null);
+                    }
+                }
+                else
+                {
+                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                }
+            }
+            return result;
         }
     }
 }

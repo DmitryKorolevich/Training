@@ -8,6 +8,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Domain;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.eCommerce.Base;
 using VitalChoice.Domain.Entities.eCommerce.History;
@@ -224,7 +225,7 @@ namespace VitalChoice.DynamicData.Base
                     .ToList();
                 foreach (var item in items)
                 {
-                    item.InitialEntity = _directMapper.ToModel<TEntity>(item.Entity);
+                    item.InitialEntity = _directMapper.Clone<Entity>(item.Entity);
                     item.Entity.OptionTypes = Mapper.FilterByType(item.Dynamic.IdObjectType);
                     item.InitialEntity.OptionTypes = item.Entity.OptionTypes;
                 }
@@ -251,7 +252,7 @@ namespace VitalChoice.DynamicData.Base
             var entity = await query.SelectFirstOrDefaultAsync();
             if (entity == null)
                 return null;
-            var initialEntity = _directMapper.ToModel<TEntity>(entity);
+            var initialEntity = _directMapper.Clone<Entity>(entity);
             entity.OptionTypes = Mapper.FilterByType(model.IdObjectType);
             initialEntity.OptionTypes = entity.OptionTypes;
             await
@@ -267,35 +268,30 @@ namespace VitalChoice.DynamicData.Base
             return entity;
         }
 
-        protected static async Task SyncDbCollections<T, TValue, TType>(IUnitOfWorkAsync uow, IEnumerable<T> initial, IEnumerable<T> updated)
-            where T : DynamicDataEntity<TValue, TType>
-            where TValue : OptionValue<TType>
-            where TType : OptionType
+        protected static async Task SyncDbCollections<T, TValue>(IUnitOfWorkAsync uow, IEnumerable<T> initial, IEnumerable<T> updated, bool removePhysically)
+            where T : DynamicDataEntity<TValue>
+            where TValue : OptionValue
         {
             IRepositoryAsync<TValue> optionValuesRepository = uow.RepositoryAsync<TValue>();
             IRepositoryAsync<T> objectRepository = uow.RepositoryAsync<T>();
-            Dictionary<int, T> initialObjects = initial.Where(o => o != null).ToDictionary(o => o.Id);
-
             foreach (var obj in updated)
             {
                 if (obj == null)
                     continue;
 
-                T initialObject;
                 if (obj.StatusCode == (int)RecordStatusCode.Deleted)
                 {
-                    if (initialObjects.TryGetValue(obj.Id, out initialObject))
+                    if (removePhysically)
                     {
-                        await optionValuesRepository.DeleteAllAsync(initialObject.OptionValues);
+                        await optionValuesRepository.DeleteAllAsync(obj.OptionValues);
+                        await objectRepository.DeleteAsync(obj);
                     }
-                    await optionValuesRepository.DeleteAllAsync(obj.OptionValues);
-                    await objectRepository.DeleteAsync(obj);
                 }
                 else
                 {
-                    if (initialObjects.TryGetValue(obj.Id, out initialObject))
+                    if (obj.Id == 0)
                     {
-                        await optionValuesRepository.DeleteAllAsync(initialObject.ExceptOptionsIn(obj));
+                        await objectRepository.InsertGraphAsync(obj);
                     }
                 }
             }
@@ -411,8 +407,6 @@ namespace VitalChoice.DynamicData.Base
             await
                 bigValueRepository.InsertRangeAsync(
                     items.SelectMany(i => i.Entity.OptionValues).Where(b => b.BigValue != null).Select(o => o.BigValue));
-
-            await valueRepository.DeleteAllAsync(items.SelectMany(i => i.InitialEntity.ExceptOptionsIn(i.Entity)));
 
             foreach (var pair in items)
             {

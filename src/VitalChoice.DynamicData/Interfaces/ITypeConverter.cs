@@ -6,5 +6,6 @@ namespace VitalChoice.DynamicData.Interfaces
     {
         object ConvertFromModel(Type sourceType, Type destType, object obj);
         object ConvertToModel(Type sourceType, Type destType, object obj);
+        object Clone(object obj, Type objectType, Type baseTypeToMemberwiseClone);
     }
 }

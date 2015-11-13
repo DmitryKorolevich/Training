@@ -54,7 +54,7 @@ namespace VitalChoice.Core.Infrastructure
 				}
 
 				var superAdmin =
-				context.HttpContext.ApplicationServices.GetService<IAppInfrastructureService>()
+				context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
 					.Get()
 					.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
 					.Text;

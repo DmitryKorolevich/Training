@@ -105,6 +105,15 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
                 var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
                 await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
+
+                entity.ShippingAddresses.Merge(addresses,
+                    (address, newAddress) => address.IdAddress != newAddress.Id, s => new CustomerToShippingAddress
+                    {
+                        IdAddress = s.Id,
+                        IdCustomer = dynamic.Id,
+                        ShippingAddress = s
+                    });
+
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
                 await
                     _paymentMethodMapper.SyncCollectionsAsync(dynamic.CustomerPaymentMethods,

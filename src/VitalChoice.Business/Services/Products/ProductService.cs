@@ -61,31 +61,15 @@ namespace VitalChoice.Business.Services.Products
         {
             foreach (var entity in entities)
             {
-                entity.Skus = entity.Skus?.OrderBy(s => s.Order).ToArray();
+                entity.Skus = entity.Skus?.Where(s => s.StatusCode != (int) RecordStatusCode.Deleted).OrderBy(s => s.Order).ToArray();
             }
             return Task.Delay(0);
         }
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)
         {
-            var skuOptionValuesRepository = uow.RepositoryAsync<SkuOptionValue>();
-            var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
-            Dictionary<int, Sku> updatedSkus = updated.Skus.ToDictionary(s => s.Id);
-            foreach (var sku in initial.Skus)
-            {
-                Sku updatedSku;
-                if (updatedSkus.TryGetValue(sku.Id, out updatedSku))
-                {
-                    await
-                        skuOptionValuesRepository.DeleteAllAsync(sku.ExceptOptionsIn(updatedSku));
-                }
-                else
-                {
-                    await skuOptionValuesRepository.DeleteAllAsync(sku.OptionValues);
-                    await skuRepository.DeleteAsync(sku);
-                }
-            }
+            await SyncDbCollections<Sku, SkuOptionValue>(uow, initial.Skus, updated.Skus, false);
             await
                 categoriesRepository.DeleteAllAsync(initial.ProductsToCategories.ExceptKeyedWith(updated.ProductsToCategories,
                     intialCat => intialCat.IdCategory, updatedCat => updatedCat.IdCategory));
@@ -639,7 +623,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if(productContent==null)
             {
-                throw new AppValidationException("Product without content info cannot be created");
+                throw new ApiException("Product without content info cannot be created");
             }
 
             await Validate(productContent);
@@ -649,26 +633,8 @@ namespace VitalChoice.Business.Services.Products
                 try
                 {
                     var product = await base.InsertAsync(model, uow);
-                    
-                    productContent.Id = product.Id;
-                    productContent.StatusCode = (RecordStatusCode)model.StatusCode;
-                    productContent.UserId = model.IdEditedBy;
-                    productContent.ContentItem.Created = DateTime.Now;
-                    productContent.ContentItem.Updated = productContent.ContentItem.Created;
 
-                    if(productContent.MasterContentItemId==0)
-                    {
-                        //set predefined master
-                        var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Product).SelectAsync(false)).FirstOrDefault();
-                        if (contentType?.DefaultMasterContentItemId != null)
-                        {
-                            productContent.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
-                        }
-                        else
-                        {
-                            throw new AppValidationException("The default master template isn't confugured. Please contact support.");
-                        }
-                    }
+                    await UpdateContentForInsert(model, productContent);
 
                     await _productContentRepository.InsertGraphAsync(productContent);
 
@@ -676,7 +642,7 @@ namespace VitalChoice.Business.Services.Products
 
                     return product;
                 }
-                catch (Exception e)
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -686,47 +652,67 @@ namespace VitalChoice.Business.Services.Products
 
         private async Task<Product> UpdateAsync(ProductDynamic model, IUnitOfWorkAsync uow, ProductContent productContent)
         {
-            //using (var transaction = uow.BeginTransaction())
-            //{
-            //    try
-            //    {
-
-                    ProductContent dbProductContent = null;
-                    if (productContent != null)
-                    {
-                        dbProductContent = (await _productContentRepository.Query(p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted).Include(p => p.ContentItem).
-                            SelectAsync()).FirstOrDefault();
-                        if (dbProductContent == null)
-                        {
-                            throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ObjectNotFound]);
-                        }
-
-                        await Validate(productContent);
-                    }
-
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
                     var product = await base.UpdateAsync(model, uow);
-
                     if (productContent != null)
                     {
-                        dbProductContent.Url = productContent.Url;
-                        dbProductContent.StatusCode = (RecordStatusCode)model.StatusCode;
-                        dbProductContent.ContentItem.Updated = DateTime.Now;
-                        dbProductContent.ContentItem.Template = productContent.ContentItem.Template;
-                        dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
+                        var dbProductContent = (await
+                            _productContentRepository.Query(p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
+                                .Include(p => p.ContentItem)
+                                .SelectAsync()).FirstOrDefault();
+                        if (dbProductContent != null)
+                        {
+                            await Validate(productContent);
 
-                        await _productContentRepository.UpdateAsync(dbProductContent);
+                            dbProductContent.Url = productContent.Url;
+                            dbProductContent.StatusCode = (RecordStatusCode) model.StatusCode;
+                            dbProductContent.ContentItem.Updated = DateTime.Now;
+                            dbProductContent.ContentItem.Template = productContent.ContentItem.Template;
+                            dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
+
+                            await _productContentRepository.UpdateAsync(dbProductContent);
+                        }
+                        else
+                        {
+                            await UpdateContentForInsert(model, productContent);
+
+                            await _productContentRepository.InsertGraphAsync(productContent);
+                        }
                     }
-
-                    //transaction.Commit();
-
+                    transaction.Commit();
                     return product;
-                //}
-                //catch (Exception ex)
-                //{
-                //    transaction.Rollback();
-                //    throw;
-                //}
-            //}
+
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        private async Task UpdateContentForInsert(ProductDynamic model, ProductContent productContent)
+        {
+            productContent.StatusCode = (RecordStatusCode) model.StatusCode;
+            productContent.UserId = model.IdEditedBy;
+            productContent.ContentItem.Created = DateTime.Now;
+            productContent.ContentItem.Updated = productContent.ContentItem.Created;
+            if (productContent.MasterContentItemId == 0)
+            {
+                //set predefined master
+                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int) ContentType.Product).SelectAsync(false)).FirstOrDefault();
+                if (contentType?.DefaultMasterContentItemId != null)
+                {
+                    productContent.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
+                }
+                else
+                {
+                    throw new AppValidationException("The default master template isn't confugured. Please contact support.");
+                }
+            }
         }
 
         protected async Task Validate(ProductContent model)
@@ -774,10 +760,10 @@ namespace VitalChoice.Business.Services.Products
             if(toReturn.ProductDynamic!=null)
             {
                 toReturn.ProductContent = (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
-                if(toReturn.ProductContent==null)
-                {
-                    throw new AppValidationException("Content info doesn't exist for the given product");
-                }
+                //if(toReturn.ProductContent==null)
+                //{
+                //    throw new AppValidationException("Content info doesn't exist for the given product");
+                //}
             }
             return toReturn;
         }

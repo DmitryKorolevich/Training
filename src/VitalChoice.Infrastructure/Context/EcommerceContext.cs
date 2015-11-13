@@ -1342,9 +1342,9 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(x => x.EditedByAgentId);
                 entity.HasOne(v => v.NotPaidCommission)
                     .WithOne(p => p.Affiliate)
-                    .ForeignKey<VAffiliate>(p => p.Id)
-                    .PrincipalKey<VAffiliateNotPaidCommission>(p => p.Id)
-                    .Required();
+                    .HasForeignKey<VAffiliate>(p => p.Id)
+                    .HasPrincipalKey<VAffiliateNotPaidCommission>(p => p.Id)
+                    .IsRequired();
             });
 
             builder.Entity<VAffiliateNotPaidCommission>(entity =>

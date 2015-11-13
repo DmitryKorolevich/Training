@@ -24,4 +24,5 @@ Post-Deployment Script Template
 :r .\Scripts\VHelpTickets.sql
 :r .\Scripts\SPGetEngangedAffiliatesCount.sql
 :r .\Scripts\SPGetAffiliatesSummaryReport.sql
-:r .\Scripts\VSkus.sql:r .\Scripts\VAffiliateNotPaidCommissions.sql
+:r .\Scripts\VSkus.sql
+:r .\Scripts\VAffiliateNotPaidCommissions.sql
