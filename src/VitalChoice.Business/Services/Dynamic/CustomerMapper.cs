@@ -81,14 +81,14 @@ namespace VitalChoice.Business.Services.Dynamic
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
                 entity.IdAffiliate = dynamic.IdAffiliate;
 
-                entity.PaymentMethods.Merge(dynamic.ApprovedPaymentMethods, (method, i) => method.IdPaymentMethod != i,
+                entity.PaymentMethods.MergeKeyed(dynamic.ApprovedPaymentMethods, method => method.IdPaymentMethod, i => i,
                     c => new CustomerToPaymentMethod
                     {
                         IdCustomer = dynamic.Id,
                         IdPaymentMethod = c
                     });
 
-                entity.OrderNotes.Merge(dynamic.OrderNotes, (note, i) => note.IdOrderNote != i,
+                entity.OrderNotes.MergeKeyed(dynamic.OrderNotes, note => note.IdOrderNote, i => i,
                     c => new CustomerToOrderNote
                     {
                         IdCustomer = dynamic.Id,
@@ -106,12 +106,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
                 await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
 
-                entity.ShippingAddresses.Merge(addresses,
-                    (address, newAddress) => address.IdAddress != newAddress.Id, s => new CustomerToShippingAddress
+                entity.ShippingAddresses.MergeKeyedAdd(addresses,
+                    address => address.IdAddress, newAddress => newAddress.Id, dbAddress => new CustomerToShippingAddress
                     {
-                        IdAddress = s.Id,
+                        IdAddress = dbAddress.Id,
                         IdCustomer = dynamic.Id,
-                        ShippingAddress = s
+                        ShippingAddress = dbAddress
                     });
 
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);

@@ -82,11 +82,12 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.CategoryIds != null)
                 {
-                    entity.ProductsToCategories = dynamic.CategoryIds.Select(c => new ProductToCategory
-                    {
-                        IdCategory = c,
-                        IdProduct = dynamic.Id
-                    }).ToList();
+                    entity.ProductsToCategories.MergeKeyed(dynamic.CategoryIds, category => category.IdCategory, i => i,
+                        i => new ProductToCategory
+                        {
+                            IdCategory = i,
+                            IdProduct = dynamic.Id
+                        });
                 }
 
                 await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus, entity.OptionTypes);

@@ -157,22 +157,7 @@ namespace VitalChoice.Business.Services.Customers
 
 		protected override async Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
 		{
-			var customerToPaymentMethodRepository = uow.RepositoryAsync<CustomerToPaymentMethod>();
-			var customerToOrderNoteRepository = uow.RepositoryAsync<CustomerToOrderNote>();
 			var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
-
-		    await
-		        customerToPaymentMethodRepository.DeleteAllAsync(
-		            entity.PaymentMethods.ExceptKeyedWith(
-		                model.ApprovedPaymentMethods,
-		                left => left.IdPaymentMethod,
-		                right => right));
-		    await
-		        customerToOrderNoteRepository.DeleteAllAsync(
-		            entity.OrderNotes.ExceptKeyedWith(
-		                model.OrderNotes,
-		                left => left.IdOrderNote,
-		                right => right));
 
 			if (model.Files != null && model.Files.Any() && entity.Files != null)
 			{

@@ -161,9 +161,9 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _orderAddressMapper.UpdateEntityAsync(dynamic.ShippingAddress, entity.ShippingAddress);
 
                 entity.IdCustomer = dynamic.Customer.Id;
-                entity.GiftCertificates?.Merge(dynamic.GiftCertificates,
-                    (g, gio) =>
-                        g.IdGiftCertificate != gio.GiftCertificate?.Id,
+                entity.GiftCertificates?.MergeKeyed(
+                    dynamic.GiftCertificates,
+                    g => g.IdGiftCertificate, gio => gio.GiftCertificate?.Id,
                     g => new OrderToGiftCertificate
                     {
                         Amount = g.Amount,
@@ -190,7 +190,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         }
                     }
                     //Add
-                    entity.Skus.Merge(dynamic.Skus, (s, ds) => s.IdSku != ds.Sku?.Id,
+                    entity.Skus.MergeKeyed(dynamic.Skus, s => s.IdSku, ds => ds.Sku?.Id,
                         s => new OrderToSku
                         {
                             Amount = s.Amount,

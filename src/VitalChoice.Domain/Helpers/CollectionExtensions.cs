@@ -70,15 +70,50 @@ namespace VitalChoice.Domain.Helpers
             }
         }
 
-        public static void Merge<T1, T2>(this ICollection<T1> main, IEnumerable<T2> toAdd,
+        public static void RemoveAll<T>(this ICollection<T> collection, IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                collection.Remove(item);
+            }
+        }
+
+        public static void MergeAdd<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
             Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
         {
-            if (addCondition == null)
-                throw new ArgumentNullException(nameof(addCondition));
-            if (projection == null)
-                throw new ArgumentNullException(nameof(projection));
+            if (main != null && toAdd != null)
+            {
+                main.AddRange(toAdd.WhereAll(main, (r, l) => addCondition(l, r)).Select(projection).ToArray());
+            }
+        }
 
-            main?.AddRange(toAdd?.WhereAll(main, (m, c) => addCondition(c, m)).Select(projection));
+        public static void MergeKeyedAdd<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.AddRange(toAdd.ExceptKeyedWith(main, rightKeySelector, leftKeySelector).Select(projection).ToArray());
+            }
+        }
+
+        public static void Merge<T1, T2>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, T2, bool> addCondition, Func<T2, T1> projection)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.MergeAdd(toAdd, addCondition, projection);
+                main.RemoveAll(main.WhereAll(toAdd, addCondition).ToArray());
+            }
+        }
+
+        public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.MergeKeyedAdd(toAdd, leftKeySelector, rightKeySelector, projection);
+                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
+            }
         }
 
         public static IEnumerable<T1> WhereAll<T1, T2>(this IEnumerable<T1> main, IEnumerable<T2> compareTo,

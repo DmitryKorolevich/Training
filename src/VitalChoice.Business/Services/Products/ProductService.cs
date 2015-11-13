@@ -68,11 +68,7 @@ namespace VitalChoice.Business.Services.Products
 
         protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)
         {
-            var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();
             await SyncDbCollections<Sku, SkuOptionValue>(uow, initial.Skus, updated.Skus, false);
-            await
-                categoriesRepository.DeleteAllAsync(initial.ProductsToCategories.ExceptKeyedWith(updated.ProductsToCategories,
-                    intialCat => intialCat.IdCategory, updatedCat => updatedCat.IdCategory));
         }
 
         protected override async Task<List<MessageInfo>> ValidateAsync(ProductDynamic model)
