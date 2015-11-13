@@ -24,7 +24,11 @@ namespace VitalChoice.Domain.Transfer.Affiliates
 
         public bool NewCustomerOrder { get; set; }
 
-        public OrderPaymentListItemModel(AffiliateOrderPayment orderPayment)
+	    public OrderPaymentListItemModel()
+	    {
+	    }
+
+	    public OrderPaymentListItemModel(AffiliateOrderPayment orderPayment)
         {
             if (orderPayment != null)
             {
