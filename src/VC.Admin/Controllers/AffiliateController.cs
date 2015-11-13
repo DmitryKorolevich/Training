@@ -40,6 +40,7 @@ using Newtonsoft.Json;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Customers;
 using VitalChoice.Business.ExportMaps;
+using VitalChoice.Domain.Transfer.Country;
 
 namespace VC.Admin.Controllers
 {
@@ -53,6 +54,7 @@ namespace VC.Admin.Controllers
         private readonly Country _defaultCountry;
         private readonly IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _exportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
+        private readonly ICountryService _countryService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
@@ -64,6 +66,7 @@ namespace VC.Admin.Controllers
             IAppInfrastructureService appInfrastructureService,
             IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> exportAffiliateOrderListItemService,
             IOrderService orderService,
+            ICountryService countryService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             _affiliateService = affiliateService;
@@ -73,6 +76,7 @@ namespace VC.Admin.Controllers
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
             _exportAffiliateOrderListItemService = exportAffiliateOrderListItemService;
             _orderService = orderService;
+            _countryService = countryService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             logger = loggerProvider.CreateLoggerDefault();
         }
@@ -138,6 +142,19 @@ namespace VC.Admin.Controllers
 
             toReturn.IsConfirmed = login.IsConfirmed;
             toReturn.PublicUserId = login.PublicId;
+
+            CountryFilter filter = new CountryFilter();
+            var countries = await _countryService.GetCountriesAsync(filter);
+            var country = countries.FirstOrDefault(p => p.Id == toReturn.IdCountry);
+            if(country!=null)
+            {
+                toReturn.CountryCode = country.CountryCode;
+                var state = country.States.FirstOrDefault(p => p.Id == toReturn.IdState);
+                if(state!=null)
+                {
+                    toReturn.StateCode = state.StateCode;
+                }
+            }
 
             return toReturn;
         }
@@ -282,9 +299,36 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<Result<ICollection<OrderPaymentListItemModel>>> GetUnpaidOrdersForLastPeriod(int id)
+        {
+            AffiliateOrderPaymentFilter filter = new AffiliateOrderPaymentFilter();
+            filter.IdAffiliate = id;
+            filter.Status = AffiliateOrderPaymentStatus.NotPaid;
+            filter.To = GetLastMonthStartDayFromPSTInLocal();
+            var result = await _affiliateService.GetAffiliateOrderPayments(filter);
+            var toReturn = result.Items.Select(p => new OrderPaymentListItemModel(p)).ToList();
+            return toReturn;
+        }
+
+        [HttpGet]
         public async Task<Result<AffiliatesSummaryModel>> GetAffiliatesSummary()
         {
             return await _affiliateService.GetAffiliatesSummary();
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> PayForAffiliateOrders(int id, [FromBody] object model)
+        {
+            return await _affiliateService.PayForAffiliateOrders(id, GetLastMonthStartDayFromPSTInLocal());
+        }
+
+        [NonAction]
+        private DateTime GetLastMonthStartDayFromPSTInLocal()
+        {
+            DateTime lastMonthStartDay = DateTime.Now;
+            lastMonthStartDay = new DateTime(lastMonthStartDay.Year, lastMonthStartDay.Month, 1);
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            return lastMonthStartDay;
         }
 
         [HttpGet]

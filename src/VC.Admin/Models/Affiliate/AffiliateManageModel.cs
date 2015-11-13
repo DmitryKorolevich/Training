@@ -48,8 +48,12 @@ namespace VC.Admin.Models.Affiliate
         [Map]
         public int? IdCountry { get; set; }
 
+        public string CountryCode { get; set; }
+
         [Map]
         public int? IdState { get; set; }
+
+        public string StateCode { get; set; }
 
         [Map]
         public string County { get; set; }

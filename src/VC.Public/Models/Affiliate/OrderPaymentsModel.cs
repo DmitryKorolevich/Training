@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Domain.Transfer.Affiliates;
 
 namespace VC.Public.Models.Affiliate
 {
@@ -14,7 +15,7 @@ namespace VC.Public.Models.Affiliate
 
         public int Count { get; set; }
 
-        public ICollection<OrderPaymentLineModel> Items { get; set; }
+        public ICollection<OrderPaymentListItemModel> Items { get; set; }
 
         public PaginationSettings Paging { get; set; }
     }

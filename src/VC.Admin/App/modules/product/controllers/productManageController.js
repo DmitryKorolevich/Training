@@ -44,19 +44,26 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     $scope.serverMessages = new ServerMessages(result.Messages);
                     var formForShowing = null;
                     $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            if (value.Field.indexOf('.') > -1) {
+                        if (value.Field)
+                        {
+                            if (value.Field.indexOf('.') > -1)
+                            {
                                 var items = value.Field.split(".");
                                 $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
                                 formForShowing = items[0];
                                 openSKUs();
                             }
-                            else {
-                                $.each($scope.forms, function (index, form) {
-                                    if (form && !(typeof form === 'boolean')) {
-                                        if (form[value.Field] != undefined) {
+                            else
+                            {
+                                $.each($scope.forms, function (index, form)
+                                {
+                                    if (form && !(typeof form === 'boolean'))
+                                    {
+                                        if (form[value.Field] != undefined)
+                                        {
                                             form[value.Field].$setValidity("server", false);
-                                            if (formForShowing == null) {
+                                            if (formForShowing == null)
+                                            {
                                                 formForShowing = index;
                                             }
                                             return false;
@@ -64,6 +71,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
                                     }
                                 });
                             }
+                        }
+                        else
+                        {
+                            messages += value.Message+ "<br/>";
                         }
                     });
 

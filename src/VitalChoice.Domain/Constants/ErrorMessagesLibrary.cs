@@ -37,6 +37,7 @@ namespace VitalChoice.Domain.Constants
 		    public const string InvalidToken = "InvalidToken";
             public const string InvalidIdAffiliate = "InvalidIdAffiliate";
             public const string ObjectNotFound = "ObjectNotFound";
+            public const string AffiliateMinPayCommisionsAmountNotMatch = "AffiliateMinPayCommisionsAmountNotMatch";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -70,7 +71,8 @@ namespace VitalChoice.Domain.Constants
 			{Keys.PasswordRequiresSpecialCharacter, "Passwords must contain at least 1 special character."},
 			{Keys.InvalidToken, "Authentication token that has been sent to your email either is expired or regenerated already"},
             {Keys.InvalidIdAffiliate, "Affiliate with the given Id cannot be found"},
-            {Keys.ObjectNotFound, "Object cannot be found"}
+            {Keys.ObjectNotFound, "Object cannot be found"},
+            {Keys.AffiliateMinPayCommisionsAmountNotMatch, "Affiliate balance is less than ${0}"},
         };
     }
 }
