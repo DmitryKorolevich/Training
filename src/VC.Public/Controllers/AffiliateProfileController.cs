@@ -241,17 +241,7 @@ namespace VC.Public.Controllers
                 ItemsPerPage= BaseAppConstants.DEFAULT_LIST_TAKE_COUNT,
                 TotalItems = result.Count,
             };
-            toReturn.Items = result.Items.Select(p => new OrderPaymentListItemModel()
-            {
-                DateCreated = p.Order.DateCreated,
-                IdOrder = p.Id,
-                NewCustomerOrder = p.NewCustomerOrder,
-                ProductTotal = p.Order.ProductsSubtotal,
-                OrderTotal = p.Order.Total,
-                Shipping = p.Order.ShippingTotal,
-                Tax = p.Order.TaxTotal,
-                Commission = p.Amount,
-            }).ToList();
+            toReturn.Items = result.Items.Select(p => new OrderPaymentListItemModel(p)).ToList();
             return View(toReturn);
         }
 
