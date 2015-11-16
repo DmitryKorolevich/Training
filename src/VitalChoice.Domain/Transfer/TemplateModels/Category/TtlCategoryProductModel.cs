@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VitalChoice.Domain.Transfer.TemplateModels
+﻿namespace VitalChoice.Domain.Transfer.TemplateModels.Category
 {
     public class TtlCategoryProductModel
     {

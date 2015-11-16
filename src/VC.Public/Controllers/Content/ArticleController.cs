@@ -8,14 +8,17 @@ namespace VC.Public.Controllers.Content
 {
     public class ArticleController : BaseContentController
     {
-        public ArticleController(IContentViewService contentService) : base(contentService)
-        {
-        }
+	    private readonly IContentViewService _contentService;
 
-        [HttpGet]
+	    public ArticleController(IContentViewService contentService)
+	    {
+		    _contentService = contentService;
+	    }
+
+	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters());
+            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -26,7 +29,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters(), url);
+            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -37,7 +40,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Article(string url)
         {
-            var toReturn = await ContentService.GetContentItemContentAsync(ContentType.Article, GetParameters(), url);
+            var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Article, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

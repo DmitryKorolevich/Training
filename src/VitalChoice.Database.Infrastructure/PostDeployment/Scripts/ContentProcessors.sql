@@ -27,3 +27,17 @@ BEGIN
 	([MasterContentItemId],[ContentProcessorId])
 	SELECT [Id], 4 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Product sub categories'
 END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentProcessors] WHERE [Type] = N'ProductPageProcessor')
+BEGIN
+	INSERT INTO [dbo].[ContentProcessors]
+	(Id, [Type], Name, Description)
+	VALUES
+	(5, N'ProductPageProcessor', N'Product page processor', N'Processor to manage product page')
+
+	INSERT INTO [dbo].[MasterContentItemsToContentProcessors]
+	([MasterContentItemId],[ContentProcessorId])
+	SELECT [Id], 5 FROM [dbo].[MasterContentItems] WHERE [Name] = N'Product page'
+END

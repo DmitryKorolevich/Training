@@ -27,7 +27,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Interfaces.Entities;
+using VitalChoice.DynamicData.Entities.Transfer;
 
 namespace VC.Admin.Controllers
 {

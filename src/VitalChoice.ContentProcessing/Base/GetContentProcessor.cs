@@ -16,7 +16,7 @@ namespace VitalChoice.ContentProcessing.Base
     {
         protected readonly IRepositoryAsync<TResult> ContentRepository;
 
-        protected GetContentProcessor(IObjectMapper<TModel> mapper, IRepositoryAsync<TResult> contentRepository) : base(mapper)
+        public GetContentProcessor(IObjectMapper<TModel> mapper, IRepositoryAsync<TResult> contentRepository) : base(mapper)
         {
             ContentRepository = contentRepository;
         }

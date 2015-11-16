@@ -9,14 +9,17 @@ namespace VC.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
-        public RecipeController(IContentViewService contentService) : base(contentService)
-        {
-        }
+	    private readonly IContentViewService _contentService;
 
-        [HttpGet]
+	    public RecipeController(IContentViewService contentService)
+	    {
+		    _contentService = contentService;
+	    }
+
+	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
+            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -27,7 +30,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await ContentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
+            var toReturn = await _contentService.GetCategoryContentAsync(ContentType.RecipeCategory, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -38,7 +41,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> Recipe(string url)
         {
-            var toReturn = await ContentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
+            var toReturn = await _contentService.GetContentItemContentAsync(ContentType.Recipe, GetParameters(), url);
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -48,7 +51,7 @@ namespace VC.Public.Controllers.Content
 
         [HttpGet]
         public async Task<IActionResult> EditContent(int id) {
-            var item = await ContentService.GetContentItemAsync(id);
+            var item = await _contentService.GetContentItemAsync(id);
             if (item != null)
             {
                 return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
@@ -63,12 +66,12 @@ namespace VC.Public.Controllers.Content
         [HttpPost]
         public async Task<IActionResult> UpdateContent(int id, ContentEditModel model)
         {
-            var item = await ContentService.GetContentItemAsync(id);
+            var item = await _contentService.GetContentItemAsync(id);
             if (item != null)
             {
                 item.Template = model.Template;
                 item.Updated = DateTime.Now;
-                await ContentService.UpdateContentItemAsync(item);
+                await _contentService.UpdateContentItemAsync(item);
                 return RedirectToAction("EditContent", new {id = id});
             }
             return BaseNotFoundView();
@@ -77,7 +80,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> EditMasterContent(int id)
         {
-            var item = await ContentService.GetMasterContentItemAsync(id);
+            var item = await _contentService.GetMasterContentItemAsync(id);
             if (item != null) {
                 return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
                 {
@@ -91,12 +94,12 @@ namespace VC.Public.Controllers.Content
 
         [HttpPost]
         public async Task<IActionResult> UpdateMasterContent(int id, ContentEditModel model) {
-            var item = await ContentService.GetMasterContentItemAsync(id);
+            var item = await _contentService.GetMasterContentItemAsync(id);
             if (item != null)
             {
                 item.Template = model.Template;
                 item.Updated = DateTime.Now;
-                await ContentService.UpdateMasterContentItemAsync(item);
+                await _contentService.UpdateMasterContentItemAsync(item);
                 return RedirectToAction("EditMasterContent", new { id = id });
             }
             return BaseNotFoundView();

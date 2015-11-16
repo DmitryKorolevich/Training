@@ -75,9 +75,11 @@ using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Domain.Entities.Settings;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Formatters;
+using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
+using VitalChoice.Domain.Entities.Content;
 using VitalChoice.DynamicData.Extensions;
 using IContentViewService = VitalChoice.Interfaces.Services.Content.IContentViewService;
 
@@ -360,7 +362,8 @@ namespace VitalChoice.Core.DependencyInjection
                     (pi, cc) => cc.ResolveNamed<IUserValidator<ApplicationUser>>("affiliateUserValidator"))
                 .WithParameter((pi, cc) => pi.Name == "signInManager",
                     (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager"));
-            builder.RegisterType<ProductViewService>().As<IProductViewService>(); 
+            builder.RegisterType<CategoryViewService>().As<ICategoryViewService>(); 
+			builder.RegisterType<ProductViewService>().As<IProductViewService>();
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
             builder.RegisterType<ProductReviewService>().As<IProductReviewService>();

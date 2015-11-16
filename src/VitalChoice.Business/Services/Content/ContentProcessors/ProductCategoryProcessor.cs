@@ -13,6 +13,7 @@ using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Transfer.TemplateModels;
+using VitalChoice.Domain.Transfer.TemplateModels.Category;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
@@ -134,7 +135,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         }
 
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, string url,
-            IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems)
+            IList<TtlBreadcrumbItemModel> breadcrumbItems)
         {
             if (rootCategory == null)
                 return false;
@@ -142,8 +143,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             {
                 if (!rootCategory.Url.Equals(url, StringComparison.OrdinalIgnoreCase))
                 {
-                    breadcrumbItems.Clear();
-                    return false;
+					var last = breadcrumbItems.LastOrDefault();
+					if (last != null)
+					{
+						breadcrumbItems.Remove(last);
+					}
+					return false;
                 }
                 else
                 {
@@ -153,7 +158,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             foreach (var subItem in rootCategory.SubItems)
             {
-                breadcrumbItems.Add(new TtlCategoryBreadcrumbItemModel()
+                breadcrumbItems.Add(new TtlBreadcrumbItemModel()
                 {
                     Label = subItem.NavLabel,
                     Url = subItem.Url
@@ -191,7 +196,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, IList<ProductContent> productContents=null,
             ProductNavCategoryLite rootNavCategory = null)
         {
-            IList<TtlCategoryBreadcrumbItemModel> breadcrumbItems = new List<TtlCategoryBreadcrumbItemModel>();
+            IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
             BuildBreadcrumb(rootNavCategory, productCategoryContent.Url, breadcrumbItems);
             var toReturn = new TtlCategoryModel
             {

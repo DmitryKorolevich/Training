@@ -10,7 +10,6 @@ using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Interfaces.Entities;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

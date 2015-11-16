@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Transfer.Products;
+﻿using System.Collections.Generic;
 
-namespace VitalChoice.Domain.Transfer.TemplateModels
+namespace VitalChoice.Domain.Transfer.TemplateModels.Category
 {
     public class TtlCategoryModel
     {
@@ -13,7 +9,7 @@ namespace VitalChoice.Domain.Transfer.TemplateModels
 			SubCategories = new List<TtlCategoryModel>();
 			SideMenuItems = new List<TtlSidebarMenuItemModel>();
 			Products = new List<TtlCategoryProductModel>();
-			BreadcrumbOrderedItems = new List<TtlCategoryBreadcrumbItemModel>();
+			BreadcrumbOrderedItems = new List<TtlBreadcrumbItemModel>();
         }
 
 	    public string Name { get; set; }
@@ -36,6 +32,6 @@ namespace VitalChoice.Domain.Transfer.TemplateModels
 
 	    public IList<TtlSidebarMenuItemModel> SideMenuItems { get; set; }
 
-	    public IList<TtlCategoryBreadcrumbItemModel> BreadcrumbOrderedItems { get; set; }
+	    public IList<TtlBreadcrumbItemModel> BreadcrumbOrderedItems { get; set; }
     }
 }

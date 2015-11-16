@@ -29,10 +29,10 @@ using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-	public class ProductViewService : ContentViewService<ProductCategoryContent>, IProductViewService
+	public class ProductViewService : ContentViewService<ProductContent>, IProductViewService
 	{
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        ProductCategoryDefaultProcessor defaultProcessor,
+	        IContentProcessor<ProductContent, ProcessorModel> defaultProcessor,
 	        IContentProcessorService processorService)
 	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
         {
@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Services.Products
 
 	    #region Public
 
-	    protected override async Task<ProductCategoryContent> GetData(IDictionary<string, object> queryData)
+	    protected override async Task<ProductContent> GetData(IDictionary<string, object> queryData)
 	    {
 	        var productCategory = await base.GetData(queryData);
             if (productCategory == null)
@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Services.Products
             return productCategory;
 	    }
 
-	    public Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes,
+	    public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
 	        Dictionary<string, object> parameters)
 	    {
 	        var paramProperty =
@@ -71,6 +71,6 @@ namespace VitalChoice.Business.Services.Products
 	        return GetContentAsync(parameters);
 	    }
 
-	    #endregion
+		#endregion
     }
 }

@@ -10,19 +10,6 @@ namespace VC.Public.Controllers.Content
 {
     public class BaseContentController : Controller
     {
-        protected readonly IContentViewService ContentService;
-        protected readonly IProductViewService ProductViewService;
-
-        public BaseContentController(IContentViewService contentService)
-        {
-            this.ContentService = contentService;
-        }
-
-        public BaseContentController(IProductViewService productViewService)
-        {
-            this.ProductViewService = productViewService;
-        }
-
         //Get params fron action params and all aditional query params
         protected Dictionary<string, object> GetParameters()
         {

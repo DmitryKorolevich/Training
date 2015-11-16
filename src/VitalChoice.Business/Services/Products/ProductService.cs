@@ -34,7 +34,6 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Entities;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
@@ -76,7 +75,7 @@ namespace VitalChoice.Business.Services.Products
             }
         }
 
-        protected async override Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
+        protected override async Task BeforeEntityChangesAsync(ProductDynamic model, Product entity, IUnitOfWorkAsync uow)
         {
             var skuRepository = uow.RepositoryAsync<Sku>();
             var categoriesRepository = uow.RepositoryAsync<ProductToCategory>();

@@ -6,7 +6,7 @@ using VitalChoice.Domain.Transfer.Products;
 
 namespace VitalChoice.Domain.Transfer.TemplateModels
 {
-    public class TtlCategoryBreadcrumbItemModel
+    public class TtlBreadcrumbItemModel
 	{
 	    public string Label { get; set; }
 
