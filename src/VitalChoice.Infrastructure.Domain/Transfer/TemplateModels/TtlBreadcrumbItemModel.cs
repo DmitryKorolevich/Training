@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 {
-    public class TtlCategoryBreadcrumbItemModel
+    public class TtlBreadcrumbItemModel
 	{
 	    public string Label { get; set; }
 

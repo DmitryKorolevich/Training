@@ -64,7 +64,6 @@ using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
 using VitalChoice.Ecommerce.Cache;
@@ -119,6 +118,17 @@ namespace VitalChoice.Core.DependencyInjection
             services.AddMvc();
 
             services.AddAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
+
+            services.Configure<AppOptionsBase>(options =>
+            {
+                options.LogPath = configuration.GetSection("App:LogPath").Value;
+                options.Connection = new Connection
+                {
+                    UserName = configuration.GetSection("App:Connection:UserName").Value,
+                    Password = configuration.GetSection("App:Connection:Password").Value,
+                    Server = configuration.GetSection("App:Connection:Server").Value,
+                };
+            });
 
             services.Configure<AppOptions>(options =>
             {
@@ -270,7 +280,7 @@ namespace VitalChoice.Core.DependencyInjection
             //    FileService.Init(appPath);
             //}
 
-            UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptions>>());
+            UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
 
             return container.Resolve<IServiceProvider>();
             //}
@@ -279,8 +289,12 @@ namespace VitalChoice.Core.DependencyInjection
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
-            builder.RegisterType<VitalChoiceContext>().As<IDataContextAsync>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<EcommerceContext>().InstancePerLifetimeScope();
+            builder.RegisterType<VitalChoiceContext>()
+                .As<IDataContextAsync>()
+                .AsSelf()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<EcommerceContext>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
             builder.RegisterGeneric(typeof (RepositoryAsync<>))
                 .As(typeof (IRepositoryAsync<>));
@@ -296,7 +310,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .As(typeof (IGenericService<>));
             builder.RegisterGeneric(typeof(ExportService<,>))
                 .As(typeof(IExportService<,>));
-            builder.RegisterType<ContentEditService>().As<IContentViewService>();
+            builder.RegisterType<ContentEditService>().As<IContentEditService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<MasterContentService>().As<IMasterContentService>();
             builder.RegisterType<GeneralContentService>().As<IGeneralContentService>();
@@ -357,6 +371,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CountryService>().As<ICountryService>();
             builder.RegisterType<SettingService>().As<ISettingService>();
             builder.RegisterType<FileService>().As<IFileService>();
+            
             builder.RegisterType<EmailSender>()
                 .As<IEmailSender>()
                 .WithParameter((pi, cc) => pi.Name == "options", (pi, cc) => cc.Resolve<IOptions<AppOptions>>())

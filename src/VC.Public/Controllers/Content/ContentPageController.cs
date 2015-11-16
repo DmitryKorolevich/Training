@@ -8,11 +8,9 @@ namespace VC.Public.Controllers.Content
 {
     public class ContentPageController : BaseContentController
     {
-        public ContentPageController(IContentEditService contentService) : base(contentService)
-        {
-        }
+        private readonly IContentEditService _contentService;
 
-	    public ContentPageController(IContentViewService contentService)
+        public ContentPageController(IContentEditService contentService)
 	    {
 		    _contentService = contentService;
 	    }

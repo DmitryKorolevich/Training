@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VitalChoice.Domain.Transfer.TemplateModels.Category
+namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Category
 {
     public class TtlCategoryModel
     {

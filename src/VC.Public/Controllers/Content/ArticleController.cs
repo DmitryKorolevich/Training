@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
+using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -8,16 +9,14 @@ namespace VC.Public.Controllers.Content
 {
     public class ArticleController : BaseContentController
     {
-        public ArticleController(IContentEditService contentService) : base(contentService)
-        {
-        }
-
-	    public ArticleController(IContentViewService contentService)
+	    public ArticleController(IContentEditService contentService)
 	    {
-		    _contentService = contentService;
+            _contentService = contentService;
 	    }
 
-	    [HttpGet]
+        private readonly IContentEditService _contentService;
+
+        [HttpGet]
         public async Task<IActionResult> Categories()
         {
             var toReturn = await _contentService.GetCategoryContentAsync(ContentType.ArticleCategory, GetParameters());

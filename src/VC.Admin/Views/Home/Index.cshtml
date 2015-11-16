@@ -1,4 +1,6 @@
-﻿@inject Microsoft.Extensions.OptionsModel.IOptions<AppOptions> appOptions;
+﻿@using System.Threading.Tasks
+@using VitalChoice.Infrastructure.Domain.Options
+@inject Microsoft.Extensions.OptionsModel.IOptions<AppOptions> appOptions;
 <!DOCTYPE html>
 <html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Value.Versioning.BuildNumber'">
 <head>

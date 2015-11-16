@@ -9,11 +9,9 @@ namespace VC.Public.Controllers.Content
 {
     public class RecipeController : BaseContentController
     {
-        public RecipeController(IContentEditService contentService) : base(contentService)
-        {
-        }
+        private readonly IContentEditService _contentService;
 
-	    public RecipeController(IContentViewService contentService)
+        public RecipeController(IContentEditService contentService)
 	    {
 		    _contentService = contentService;
 	    }

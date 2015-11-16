@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Customs;
-using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Transfer.TemplateModels;
-using VitalChoice.Domain.Transfer.TemplateModels.Category;
-using VitalChoice.Domain.Transfer.TemplateModels.ProductPage;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
+using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage

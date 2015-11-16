@@ -5,9 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Framework.Logging;
-using Templates;
-using Templates.Exceptions;
 using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -15,17 +12,15 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.Infrastructure.Cache;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Transfer.TemplateModels;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
+using Microsoft.Extensions.Logging;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Products
 {
