@@ -27,6 +27,7 @@ namespace VitalChoice.Data.Repositories.Customs
             if (!String.IsNullOrEmpty(filter.FieldValue) && filter.FieldIds!=null &&
                 filter.FieldIds.Count>0)
             {
+                var context = (this.Context as DbContext);
                 var temp = this.DbSet.Where(p => filter.FieldIds.Contains(p.IdOptionType) && p.Value.StartsWith(filter.FieldValue) &&
                     p.Address.StatusCode != (int)RecordStatusCode.Deleted);
                 if(filter.IdReferencedObjectType.HasValue)

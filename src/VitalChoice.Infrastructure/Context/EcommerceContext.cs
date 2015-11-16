@@ -684,7 +684,7 @@ namespace VitalChoice.Infrastructure.Context
                 .Required(false);
             builder.Entity<Address>()
                 .HasMany(a => a.OptionValues)
-                .WithOne()
+                .WithOne(p=>p.Address)
                 .ForeignKey(o => o.IdAddress)
                 .PrincipalKey(a => a.Id)
                 .Required();
@@ -705,12 +705,6 @@ namespace VitalChoice.Infrastructure.Context
                 .HasOne(v => v.OptionType)
                 .WithMany()
                 .ForeignKey(t => t.IdOptionType)
-                .PrincipalKey(v => v.Id)
-                .Required();
-            builder.Entity<AddressOptionValue>()
-                .HasOne(v => v.Address)
-                .WithMany()
-                .ForeignKey(t => t.IdAddress)
                 .PrincipalKey(v => v.Id)
                 .Required();
 
