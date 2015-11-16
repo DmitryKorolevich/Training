@@ -46,6 +46,8 @@ using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
+using VitalChoice.Domain.Transfer;
+using VitalChoice.Data.Repositories.Customs;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -55,19 +57,21 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
         private readonly DynamicExpressionVisitor _queryVisitor;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
+	    private readonly CustomerRepository _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
 	    private readonly IStorefrontUserService _storefrontUserService;
         private readonly IEcommerceRepositoryAsync<Affiliate> _affiliateRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
+        private readonly AddressOptionValueRepository _addressOptionValueRepositoryAsync;
+        private readonly CustomerAddressMapper _customerAddressMapper;
 
-		private static string _customerContainerName;
+        private static string _customerContainerName;
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
-            IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
+            CustomerRepository customerRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
@@ -78,7 +82,10 @@ namespace VitalChoice.Business.Services.Customers
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, 
+            DynamicExpressionVisitor queryVisitor,
+            AddressOptionValueRepository addressOptionValueRepositoryAsync,
+            CustomerAddressMapper customerAddressMapper)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, queryVisitor)
@@ -95,6 +102,8 @@ namespace VitalChoice.Business.Services.Customers
 		    _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
             _queryVisitor = queryVisitor;
+            _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
+            _customerAddressMapper = customerAddressMapper;
         }
 
 		private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
@@ -626,5 +635,22 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
+
+        public async Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter)
+        {
+            ICollection<string> toReturn = new List<string>();
+            var fields = _customerAddressMapper.OptionTypes.Where(p => p.Name == filter.FieldName).ToList();
+            if (fields != null && fields.Count>0)
+            {
+                filter.FieldIds = fields.Select(p => p.Id).ToList();
+                toReturn = await _addressOptionValueRepositoryAsync.GetAddressFieldValuesByValue(filter);
+            }
+            return toReturn;
+        }
+
+        public async Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter)
+        {
+            return await _customerRepositoryAsync.GetCustomerStaticFieldValuesByValue(filter);
+        }
     }
 }

@@ -70,6 +70,7 @@ namespace VitalChoice.Infrastructure.Context
             #region Base
 
             builder.Entity<CountModel>().HasKey(f => f.Id);
+            builder.Entity<IdModel>().HasKey(f => f.Id);
 
             builder.Entity<AppOption>().HasKey(f => f.OptionName);
             builder.Entity<AppOption>().Ignore(f => f.Id);
@@ -704,6 +705,12 @@ namespace VitalChoice.Infrastructure.Context
                 .HasOne(v => v.OptionType)
                 .WithMany()
                 .ForeignKey(t => t.IdOptionType)
+                .PrincipalKey(v => v.Id)
+                .Required();
+            builder.Entity<AddressOptionValue>()
+                .HasOne(v => v.Address)
+                .WithMany()
+                .ForeignKey(t => t.IdAddress)
                 .PrincipalKey(v => v.Id)
                 .Required();
 

@@ -41,6 +41,7 @@ using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
 using Microsoft.Framework.DependencyInjection;
 using VitalChoice.Business.ExportMaps;
+using VitalChoice.Domain.Transfer;
 
 namespace VC.Admin.Controllers
 {
@@ -510,6 +511,19 @@ namespace VC.Admin.Controllers
             }
 
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<string>>> GetCustomerStaticFieldValuesByValue([FromBody]ValuesByFieldValueFilter filter)
+        {
+            return (await _customerService.GetCustomerStaticFieldValuesByValue(filter)).ToList();
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<string>>> GetProfileAddressFieldValuesByValueAsync([FromBody]ValuesByFieldValueFilter filter)
+        {
+            filter.IdReferencedObjectType = (int)AddressType.Profile;
+            return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
         }
     }
 }

@@ -7,6 +7,7 @@ using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.Domain.Transfer.Azure;
 using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Domain.Transfer.Customers;
+using VitalChoice.Domain.Transfer;
 using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 
@@ -27,5 +28,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 	    Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password);
 
 		Task<CustomerDynamic> UpdateAsync(CustomerDynamic model, string password);
-	}
+
+        Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter);
+
+        Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter);
+    }
 }
