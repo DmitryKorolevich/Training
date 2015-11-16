@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Transfer.PaymentMethod;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 
 namespace VitalChoice.Interfaces.Services.Payments
 {

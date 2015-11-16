@@ -1,11 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.ContentManagement
 {

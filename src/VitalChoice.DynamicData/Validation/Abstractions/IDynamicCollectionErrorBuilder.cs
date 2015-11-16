@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.DynamicData.Validation.Abstractions
 {

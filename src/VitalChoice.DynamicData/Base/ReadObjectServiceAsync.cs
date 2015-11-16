@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-
-namespace VitalChoice.DynamicData.Base
+﻿namespace VitalChoice.DynamicData.Base
 {
     //public abstract partial class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>
     //    where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()

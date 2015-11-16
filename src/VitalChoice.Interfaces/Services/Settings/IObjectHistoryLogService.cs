@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.History;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Country;
-using VitalChoice.Domain.Transfer.Settings;
+﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.History;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 
 namespace VitalChoice.Interfaces.Services.Settings
 {

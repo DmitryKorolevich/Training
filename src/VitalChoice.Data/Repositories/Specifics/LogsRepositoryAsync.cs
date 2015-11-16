@@ -1,5 +1,5 @@
 ﻿using VitalChoice.Data.DataContext;
-using VitalChoice.Domain;
+using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Repositories.Specifics
 {

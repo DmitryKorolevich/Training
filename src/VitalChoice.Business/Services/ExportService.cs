@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.VitalGreen;
-using VitalChoice.Domain.Helpers.Export;
-using VitalChoice.Domain.Transfer.VitalGreen;
+﻿using System.Collections.Generic;
 using VitalChoice.Interfaces.Services;
-using System.Reflection;
-using System.Reflection.Emit;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.DynamicData.Delegates;
-using System.Text;
 using CsvHelper;
 using System.IO;
 using CsvHelper.Configuration;
+using VitalChoice.Ecommerce.Domain.Helpers.Export;
 
 namespace VitalChoice.Business.Services
 {

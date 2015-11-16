@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Collections.Generic;
 using VC.Admin.Validators.ContentManagement;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Models.ContentManagement

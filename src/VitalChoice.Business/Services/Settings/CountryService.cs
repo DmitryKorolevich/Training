@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Country;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 

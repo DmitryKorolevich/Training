@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Business.Workflow.ActionResolvers;
-using VitalChoice.Business.Workflow.Actions;
-using VitalChoice.Business.Workflow.Trees;
-using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Domain.Entities.Workflow;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Workflow;
+using VitalChoice.Ecommerce.Domain.Entities.Workflow;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Core;
+using VitalChoice.Workflow.Data;
 
 namespace VitalChoice.Business.Services.Workflow
 {

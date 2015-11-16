@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content

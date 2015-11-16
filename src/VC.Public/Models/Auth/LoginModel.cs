@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using VC.Public.Validators.Auth;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 

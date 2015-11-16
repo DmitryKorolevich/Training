@@ -1,6 +1,4 @@
-﻿using VitalChoice.Domain;
-
-namespace VitalChoice.Data.Repositories
+﻿namespace VitalChoice.Data.Repositories
 {
 	///added to differentiate uof repository and regular
 	//public interface IUnitRepositoryAsync<TEntity> : IUnitReadRepositoryAsync<TEntity>, IRepositoryAsync<TEntity>

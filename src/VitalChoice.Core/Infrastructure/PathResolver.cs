@@ -1,5 +1,4 @@
 ﻿#if DNX451 || DOTNET5_4 || NET45
-using System;
 using System.IO;
 using Microsoft.Extensions.PlatformAbstractions;
 

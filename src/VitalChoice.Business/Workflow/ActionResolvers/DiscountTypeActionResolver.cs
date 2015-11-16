@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.DynamicData.Validation;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.ActionResolvers

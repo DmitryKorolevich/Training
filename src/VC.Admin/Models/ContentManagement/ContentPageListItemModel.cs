@@ -2,13 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using VitalChoice.Business.Helpers;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.ContentPages;
 
 namespace VC.Admin.Models.ContentManagement
 {

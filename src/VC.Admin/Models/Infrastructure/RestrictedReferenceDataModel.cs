@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Transfer;
 
 namespace VC.Admin.Models.Infrastructure
 {

@@ -17,14 +17,10 @@
 #endregion
 
 namespace FluentValidation.Validators {
-	using System;
-	using System.Text.RegularExpressions;
-	using Attributes;
-	using Internal;
-	using Resources;
-	using Results;
+    using System.Text.RegularExpressions;
+    using Resources;
 
-	public class RegularExpressionValidator : PropertyValidator, IRegularExpressionValidator {
+    public class RegularExpressionValidator : PropertyValidator, IRegularExpressionValidator {
 		readonly string expression;
 		readonly Regex regex;
 

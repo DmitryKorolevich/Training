@@ -5,7 +5,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity.Validators;
 using VitalChoice.Interfaces.Services;
 

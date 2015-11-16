@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity.Storage;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Interfaces.Services.Users
 {

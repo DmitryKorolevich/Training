@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.OptionsModel;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Help;
-using VitalChoice.Domain.Entities.Help;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Mail;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Business.Mail
 {

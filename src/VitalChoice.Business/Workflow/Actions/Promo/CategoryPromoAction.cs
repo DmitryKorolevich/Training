@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Promo

@@ -1,27 +1,18 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using Autofac;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Dnx.Runtime;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
-using Newtonsoft.Json;
 using VC.Admin.AppConfig;
-using VitalChoice.Business.Services;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Services;
-using VitalChoice.DynamicData.Services;
 
 
 namespace VC.Admin

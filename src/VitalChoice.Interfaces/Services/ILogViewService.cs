@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Logs;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Logs;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Interfaces.Services
 {

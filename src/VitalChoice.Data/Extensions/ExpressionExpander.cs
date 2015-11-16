@@ -1,10 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
-
-namespace VitalChoice.Data.Extensions
+﻿namespace VitalChoice.Data.Extensions
 {
 	///// <summary>
 	///// Custom expresssion visitor for ExpandableQuery. This expands calls to Expression.Compile() and

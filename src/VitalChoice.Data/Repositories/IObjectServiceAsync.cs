@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
 
 namespace VitalChoice.Data.Repositories
 {

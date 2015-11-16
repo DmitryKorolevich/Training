@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Identity.UserStores
 {

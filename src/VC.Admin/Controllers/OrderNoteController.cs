@@ -4,10 +4,11 @@ using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.OrderNote;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Validation.Models;
 

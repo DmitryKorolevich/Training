@@ -6,13 +6,11 @@ using Autofac.Features.Indexed;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {

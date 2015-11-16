@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Attributes;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
+﻿using System.ComponentModel.DataAnnotations;
+using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Profile
 {

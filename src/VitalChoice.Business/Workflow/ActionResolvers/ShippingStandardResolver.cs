@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.Domain.Transfer.Base;
+﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.ActionResolvers

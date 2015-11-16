@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using VitalChoice.Domain.Entities.eCommerce.Base;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Data.Helpers
 {

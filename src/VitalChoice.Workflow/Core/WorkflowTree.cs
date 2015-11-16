@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Workflow;
+using VitalChoice.Ecommerce.Domain.Entities.Workflow;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Workflow.Base;
+using VitalChoice.Workflow.Data;
 
 namespace VitalChoice.Workflow.Core
 {

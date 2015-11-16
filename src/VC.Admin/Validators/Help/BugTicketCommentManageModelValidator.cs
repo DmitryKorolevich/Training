@@ -1,13 +1,9 @@
 ﻿using FluentValidation;
-using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Validation.Helpers;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Domain.Constants;
-using System;
 using VC.Admin.Models.Help;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Validators.Affiliate
 {

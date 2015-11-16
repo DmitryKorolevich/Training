@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "VitalChoice.Domain": "",
+    "VitalChoice.Infrastructure.Domain": "",
     "VitalChoice.DynamicData": "",
     "VitalChoice.Interfaces": "",
     "VitalChoice.Infrastructure": "",

@@ -2,8 +2,8 @@
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Transfer.Azure;
+using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 
 namespace VitalChoice.Infrastructure.Azure
 {

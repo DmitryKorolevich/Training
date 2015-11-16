@@ -2,15 +2,13 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Account;
 using VitalChoice.Core.Base;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 

@@ -1,9 +1,8 @@
 using System;
 using System.Linq.Expressions;
-using Microsoft.Data.Entity;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain;
 using Microsoft.Data.Entity.Query;
+using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Helpers
 {

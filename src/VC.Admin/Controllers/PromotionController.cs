@@ -1,28 +1,26 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Entities;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
 using System.Security.Claims;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.DynamicData.Entities;
 using System;
-using VitalChoice.Domain.Transfer.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Domain.Entities.eCommerce.Promotion;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
+using System.Linq;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
 {

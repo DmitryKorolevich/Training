@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Products

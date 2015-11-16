@@ -1,6 +1,4 @@
-﻿using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Validation.Models;
+﻿using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Lookup
 {

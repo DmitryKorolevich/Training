@@ -1,31 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Settings;
-using VitalChoice.Domain.Transfer.Settings;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Entities.eCommerce.History;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.Users;
 using VitalChoice.Data.Services;
 using Newtonsoft.Json;
-using VitalChoice.Domain.Entities.eCommerce;
 using System.Reflection;
-using VitalChoice.Domain;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.History;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Settings
 {

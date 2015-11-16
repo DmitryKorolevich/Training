@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using VitalChoice.DynamicData.Interfaces;
 
 namespace VitalChoice.DynamicData.Validation.Abstractions
 {

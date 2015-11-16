@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Workflow;
+﻿using System.Threading.Tasks;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Base

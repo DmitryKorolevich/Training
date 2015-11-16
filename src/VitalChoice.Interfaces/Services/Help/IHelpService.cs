@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Affiliates;
-using VitalChoice.Domain.Entities.eCommerce.Help;
-using VitalChoice.Domain.Entities.Help;
-using VitalChoice.Domain.Mail;
-using VitalChoice.Domain.Transfer.Affiliates;
-using VitalChoice.Domain.Transfer.Azure;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Help;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
+﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
+using VitalChoice.Infrastructure.Domain.Transfer.Azure;
+using VitalChoice.Infrastructure.Domain.Transfer.Help;
 
 namespace VitalChoice.Interfaces.Services.Help
 {

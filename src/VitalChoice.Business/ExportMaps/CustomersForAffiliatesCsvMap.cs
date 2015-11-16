@@ -1,11 +1,6 @@
 ﻿using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.VitalGreen;
-using VitalChoice.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.ExportMaps
 {

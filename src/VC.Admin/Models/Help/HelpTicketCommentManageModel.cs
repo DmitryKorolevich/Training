@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using VC.Admin.Validators.Product;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.DynamicData.Interfaces;
 using VC.Admin.Validators.Affiliate;
-using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
 
 namespace VC.Admin.Models.Help
 {

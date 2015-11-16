@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Domain.Entities;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
 
 namespace VC.Admin.Models.PaymentMethod
 {

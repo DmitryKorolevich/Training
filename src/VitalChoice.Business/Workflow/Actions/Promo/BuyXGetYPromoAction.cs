@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Entities.Transfer;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Promo

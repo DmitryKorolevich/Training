@@ -8,16 +8,17 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Mail;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using Microsoft.Data.Entity;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -89,7 +90,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     if(item.UserId==user.Id)
                     {
-                        item.User = user;
+                        item.AgentId = user.Profile?.AgentId;
                         break;
                     }
                 }

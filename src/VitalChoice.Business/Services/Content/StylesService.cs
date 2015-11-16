@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Data.Helpers;
+﻿using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Interfaces.Services.Content;
 
 namespace VitalChoice.Business.Services.Content

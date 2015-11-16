@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

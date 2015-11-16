@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VitalChoice.Infrastructure.Identity
+﻿namespace VitalChoice.Infrastructure.Identity
 {
     public static class IdentityConstants
     {

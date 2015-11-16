@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNet.Http;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Domain.Entities.Options;
 using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.AspNet.Mvc.Infrastructure;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.Infrastructure
 {

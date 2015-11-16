@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.ContentManagement;
-using VC.Admin.Models.UserManagement;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Validation.Models;
 

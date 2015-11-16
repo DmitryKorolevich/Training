@@ -1,10 +1,5 @@
-﻿#if DOTNET5_4 || DNX451
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Pipes;
-using System.Threading;
 using System.Threading.Tasks;
 using Templates;
 using Templates.Data;

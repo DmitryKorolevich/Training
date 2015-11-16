@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Domain.Entities.Files;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Entities.Files;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services

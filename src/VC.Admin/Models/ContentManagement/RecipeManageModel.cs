@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using VC.Admin.Validators.ContentManagement;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 

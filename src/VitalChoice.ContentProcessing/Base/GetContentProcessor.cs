@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.ContentProcessing.Base
 {

@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
-using VitalChoice.DynamicData.Base;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.DynamicData.Interfaces
 {

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
-using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Admin.ModelConverters
 {

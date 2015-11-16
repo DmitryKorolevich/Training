@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
-using VitalChoice.Domain.Mail;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 using Templates.Helpers;
 using VitalChoice.Business.Queries.Workflow;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities.Workflow;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Workflow;
+using VitalChoice.Ecommerce.Domain.Entities.Workflow;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Workflow.Core;
+using VitalChoice.Workflow.Data;
 
 namespace VitalChoice.Business.Services.Workflow
 {

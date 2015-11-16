@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models.Menu;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 

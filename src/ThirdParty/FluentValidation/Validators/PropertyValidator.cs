@@ -16,15 +16,12 @@
 // The latest version of this file can be found at http://www.codeplex.com/FluentValidation
 #endregion
 
-using System.Threading;
-
 namespace FluentValidation.Validators {
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Threading.Tasks;
-	using FluentValidation.Internal;
 	using Resources;
 	using Results;
 

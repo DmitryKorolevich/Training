@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Validation.Models;
-using VitalChoice.Validation.Models.Interfaces;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Business.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Entities.eCommerce.Affiliates;
-using VitalChoice.Domain.Entities.eCommerce.Help;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
+using VitalChoice.Infrastructure.Domain.Transfer.Help;
 
 namespace VC.Admin.Models.Help
 {

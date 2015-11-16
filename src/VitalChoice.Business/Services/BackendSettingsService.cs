@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Settings;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services

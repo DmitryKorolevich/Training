@@ -1,10 +1,10 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Delegates;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Helpers
 {

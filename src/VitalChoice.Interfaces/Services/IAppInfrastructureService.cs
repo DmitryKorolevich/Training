@@ -1,4 +1,4 @@
-﻿using VitalChoice.Domain.Transfer.Base;
+﻿using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Interfaces.Services
 {

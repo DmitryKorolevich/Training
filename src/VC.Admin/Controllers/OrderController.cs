@@ -1,44 +1,31 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VC.Admin.Models;
 using VC.Admin.Models.Product;
-using VitalChoice.Business.Services;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Entities;
-using VitalChoice.DynamicData.Entities;
 using System;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Services;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
-using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
-using VC.Admin.Models.Order;
-using VitalChoice.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Orders;
-using System.Threading;
-using VC.Admin.Models.Customer;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using static System.String;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using System.Linq;
+using VC.Admin.Models.Orders;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.Controllers
 {
@@ -270,7 +257,7 @@ namespace VC.Admin.Controllers
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
 
-            if (toReturn.Main != null && !IsNullOrEmpty(toReturn.Main.Data))
+            if (toReturn.Main != null && !string.IsNullOrEmpty(toReturn.Main.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Main.Data, typeof(OrderDynamic));
                 var model = _mapper.ToModel<OrderManageModel>(dynamic);
@@ -280,7 +267,7 @@ namespace VC.Admin.Controllers
                     NullValueHandling = NullValueHandling.Include,
                 });
             }
-            if (toReturn.Before != null && !IsNullOrEmpty(toReturn.Before.Data))
+            if (toReturn.Before != null && !string.IsNullOrEmpty(toReturn.Before.Data))
             {
                 var dynamic = (OrderDynamic)JsonConvert.DeserializeObject(toReturn.Before.Data, typeof(OrderDynamic));
                 var model = _mapper.ToModel<OrderManageModel>(dynamic);

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.eCommerce.History;
 
 namespace VitalChoice.Data.Services
 {

@@ -21,7 +21,6 @@ namespace FluentValidation.Validators {
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Threading.Tasks;
-	using FluentValidation.Internal;
 	using Resources;
 	using Results;
 

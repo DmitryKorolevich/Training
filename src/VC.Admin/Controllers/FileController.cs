@@ -2,23 +2,17 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
 using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Settings;
-using Microsoft.AspNet.Http;
 using Microsoft.Net.Http.Headers;
-using System.IO;
 using System;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Business.Services;
 using VitalChoice.Core.Base;
-using VitalChoice.Domain.Entities.Files;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Entities.Permissions;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Core.Services;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Entities.Files;
+using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 
 namespace VC.Admin.Controllers
 {

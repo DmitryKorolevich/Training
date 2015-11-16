@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Help;
-using VitalChoice.Domain.Entities.Help;
-using VitalChoice.Domain.Mail;
+﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Mail;
 
 namespace VitalChoice.Business.Mail
 {

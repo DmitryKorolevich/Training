@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.Utils;
+using VitalChoice.Infrastructure.Domain.Entities.Localization;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Business.Services
 {

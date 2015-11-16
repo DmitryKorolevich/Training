@@ -8,13 +8,14 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.History;
-using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.History;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.DynamicData.Base

@@ -1,26 +1,21 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Core.Base;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Workflow.Core;
-using VitalChoice.Domain.Entities.Options;
 using VitalChoice.Infrastructure.Context;
-using Microsoft.AspNet.Identity.EntityFramework;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Workflow.Contexts;
 using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
+using VitalChoice.Ecommerce.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 
 namespace VitalChoice.Workflow.Configuration
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VitalChoice.Workflow.Core
+﻿namespace VitalChoice.Workflow.Core
 {
     public interface ITreeActionSetup<out TContext, TResult>
         where TContext : WorkflowDataContext<TResult>

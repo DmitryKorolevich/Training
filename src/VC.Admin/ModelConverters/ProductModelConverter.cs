@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using VC.Admin.Models.Product;
-using VitalChoice.Domain.Constants;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.ModelConverters
 {

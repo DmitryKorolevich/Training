@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
+﻿using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

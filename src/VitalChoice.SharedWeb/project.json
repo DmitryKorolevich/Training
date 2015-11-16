@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
    "dependencies": {
-    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",

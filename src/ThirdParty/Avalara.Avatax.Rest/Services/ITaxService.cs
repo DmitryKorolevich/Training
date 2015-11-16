@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Avatax;
 
 namespace Avalara.Avatax.Rest.Services
 {

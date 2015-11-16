@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Business.Workflow.ActionResolvers;
+﻿using VitalChoice.Business.Workflow.ActionResolvers;
 using VitalChoice.Business.Workflow.Actions;
 using VitalChoice.Business.Workflow.Actions.Discounts;
 using VitalChoice.Business.Workflow.Actions.GiftCertificates;
@@ -11,9 +7,9 @@ using VitalChoice.Business.Workflow.Actions.Promo;
 using VitalChoice.Business.Workflow.Actions.Shipping;
 using VitalChoice.Business.Workflow.Actions.Tax;
 using VitalChoice.Business.Workflow.Trees;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Workflow.Contexts;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Configuration

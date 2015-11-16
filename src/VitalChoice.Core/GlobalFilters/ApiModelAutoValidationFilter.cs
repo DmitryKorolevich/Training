@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using VitalChoice.Domain.Exceptions;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNet.Mvc.Filters;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Core.GlobalFilters
 {

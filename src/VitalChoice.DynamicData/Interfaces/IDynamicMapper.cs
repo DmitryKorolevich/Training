@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.DynamicData.Base;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {

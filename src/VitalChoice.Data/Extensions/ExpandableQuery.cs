@@ -1,15 +1,4 @@
-﻿using Microsoft.Data.Entity.Query;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using JetBrains.Annotations;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Data.Entity.Query.Internal;
-
-namespace VitalChoice.Data.Extensions
+﻿namespace VitalChoice.Data.Extensions
 {
 //	/// <summary>
 //	/// An IQueryable wrapper that allows us to visit the query's expression tree just before LINQ to SQL gets to it.

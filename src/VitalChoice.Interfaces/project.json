@@ -8,7 +8,8 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*",    

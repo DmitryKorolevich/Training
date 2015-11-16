@@ -1,13 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using VC.Admin.Models.Customer;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.ModelConverters
 {

@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
-using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Content;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors
 {

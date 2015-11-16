@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 #endif
 using System.Reflection;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 
 namespace CsvHelper
 {

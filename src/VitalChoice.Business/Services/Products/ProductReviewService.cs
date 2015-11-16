@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Mail;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
-using Microsoft.Data.Entity;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Business.Services.Products
 {

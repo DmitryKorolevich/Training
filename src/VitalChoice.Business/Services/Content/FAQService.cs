@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Templates;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Ecommerce.Cache;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.Faq;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -129,7 +132,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
-                var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.FAQ).SelectAsync()).FirstOrDefault();
+                var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.Faq).SelectAsync()).FirstOrDefault();
                 if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
@@ -188,7 +191,7 @@ namespace VitalChoice.Business.Services.Content
             var dbItem = (await faqRepository.Query(p => p.Id == id).Include(p=>p.FAQsToContentCategories).SelectAsync(false)).FirstOrDefault();
             if (dbItem != null)
             {
-                var categories = await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.FAQCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
+                var categories = await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.FaqCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
 
                 List<int> forDelete = new List<int>();
                 foreach (var faqToContentCategory in dbItem.FAQsToContentCategories)

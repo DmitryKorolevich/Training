@@ -3,18 +3,14 @@ using System.IO;
 using System.Reflection;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.AspNet.Hosting;
-using Microsoft.Dnx.Runtime;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VC.Public.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
-using cloudscribe.Web.Pagination;
 using Microsoft.AspNet.Identity;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace VC.Public

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using VC.Public.Validators;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.VitalGreen;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 

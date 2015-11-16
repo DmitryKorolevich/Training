@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 

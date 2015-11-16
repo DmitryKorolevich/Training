@@ -1,10 +1,10 @@
 ﻿using System;
 using VC.Public.Models.Auth;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Public.ModelConverters.Customer
 {

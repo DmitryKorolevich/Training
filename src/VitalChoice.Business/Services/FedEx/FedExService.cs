@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using System.Threading.Tasks;
 using VitalChoice.Business.FedEx.Ship;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.VitalGreen;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.FedEx

@@ -4,15 +4,14 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Utility;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using VitalChoice.Domain.Avatax;
-using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Infrastructure.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 
 namespace Avalara.Avatax.Rest.Services

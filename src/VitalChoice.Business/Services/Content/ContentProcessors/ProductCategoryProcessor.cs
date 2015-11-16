@@ -6,16 +6,13 @@ using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Domain.Transfer.TemplateModels;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Infrastructure.UnitOfWork;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors

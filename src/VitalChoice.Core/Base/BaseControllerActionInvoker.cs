@@ -2,16 +2,13 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Interfaces.Services;
 using Microsoft.AspNet.Mvc.Controllers;
 using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.AspNet.Mvc.Infrastructure;
-using System.Diagnostics.Tracing;
 
 namespace VitalChoice.Core.Base
 {

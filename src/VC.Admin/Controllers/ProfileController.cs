@@ -1,24 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
-using Microsoft.AspNet.Hosting;
 using System.Security.Claims;
 using Microsoft.AspNet.Http;
 using VC.Admin.Models.Profile;
 using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Base;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
 

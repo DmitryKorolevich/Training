@@ -1,6 +1,6 @@
-﻿using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
+﻿using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Interfaces.Services
 {

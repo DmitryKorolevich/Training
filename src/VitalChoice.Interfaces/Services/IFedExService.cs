@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.VitalGreen;
+﻿using System.Collections.Generic;
+using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 
 namespace VitalChoice.Interfaces.Services
 {

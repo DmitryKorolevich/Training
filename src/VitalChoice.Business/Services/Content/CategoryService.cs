@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Templates;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Ecommerce.Cache;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Domain.Content;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.ContentPages;
+using VitalChoice.Infrastructure.Domain.Content.Faq;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
+using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 
@@ -260,7 +265,7 @@ namespace VitalChoice.Business.Services.Content
                     }
                 }
 
-                if (dbItem.Type == ContentType.FAQCategory)
+                if (dbItem.Type == ContentType.FaqCategory)
                 {
                     var categories = await faqToContentCategory.Query(p => p.ContentCategoryId == id).SelectAsync(false);
                     var exist = false;

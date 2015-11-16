@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.ContentProcessing.Interfaces
 {

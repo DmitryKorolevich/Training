@@ -1,32 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
-using VC.Public.ModelConverters;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
-using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Affiliates;
-using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VC.Public.Models.Affiliate;
 using VitalChoice.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using Microsoft.AspNet.Mvc.Rendering;
 using VitalChoice.Core.Infrastructure;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using System.Linq;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Public.Controllers
 {
@@ -292,7 +286,7 @@ namespace VC.Public.Controllers
 
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
         {
-            var settings = this.HttpContext.ApplicationServices.GetService<IAppInfrastructureService>().Get();
+            var settings = HttpContext.RequestServices.GetService<IAppInfrastructureService>().Get();
             model.MonthlyEmailsSentOptions = settings.AffiliateMonthlyEmailsSentOptions.Select(p => new SelectListItem()
             {
                 Value = p.Key.ToString(),

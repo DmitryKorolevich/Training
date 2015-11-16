@@ -17,12 +17,7 @@
 #endregion
 
 namespace FluentValidation.Validators {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Reflection;
-	using Attributes;
-	using Internal;
+    using Internal;
 
 	public class PropertyValidatorContext {
 		private readonly MessageFormatter messageFormatter = new MessageFormatter();

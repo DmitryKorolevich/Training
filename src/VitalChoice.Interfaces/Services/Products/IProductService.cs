@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Interfaces.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

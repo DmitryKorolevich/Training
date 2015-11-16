@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
-
-namespace VitalChoice.Data.Repositories
+﻿namespace VitalChoice.Data.Repositories
 {
     //public interface IReadObjectServiceAsync<T, TEntity>
     //    where TEntity : Entity

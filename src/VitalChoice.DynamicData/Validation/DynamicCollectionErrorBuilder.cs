@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation.Abstractions;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.DynamicData.Validation
 {

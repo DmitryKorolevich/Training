@@ -5,10 +5,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
 using VitalChoice.Business.Services;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VitalChoice.Core.Infrastructure.Helpers
 {

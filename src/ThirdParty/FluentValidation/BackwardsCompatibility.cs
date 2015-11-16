@@ -144,7 +144,6 @@ namespace FluentValidation {
 
 namespace FluentValidation.Attributes {
 	using System;
-	using Internal;
 	using Resources;
 
 	[Obsolete("The ValidationMessage attribute has been deprecated. Your validators should now inherit from the abstract base class FluentValidation.Validators.PropertyValidator and specify the error message in the constructor.")]

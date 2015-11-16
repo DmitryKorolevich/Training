@@ -20,11 +20,9 @@ namespace FluentValidation.Validators {
 	using System;
 	using System.Linq.Expressions;
 	using System.Reflection;
-	using Attributes;
 	using Internal;
-	using Results;
 
-	public abstract class AbstractComparisonValidator : PropertyValidator, IComparisonValidator {
+    public abstract class AbstractComparisonValidator : PropertyValidator, IComparisonValidator {
 
 		readonly Func<object, object> valueToCompareFunc;
 

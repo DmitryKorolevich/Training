@@ -19,13 +19,11 @@
 namespace FluentValidation.Internal {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Text.RegularExpressions;
-	using Validators;
 
-	/// <summary>
+    /// <summary>
 	/// Useful extensions
 	/// </summary>
 	public static class Extensions {

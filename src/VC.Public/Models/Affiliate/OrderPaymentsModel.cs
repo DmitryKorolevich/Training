@@ -1,9 +1,7 @@
 ﻿using cloudscribe.Web.Pagination;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Transfer.Affiliates;
+using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
 namespace VC.Public.Models.Affiliate
 {

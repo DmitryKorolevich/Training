@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Core;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Interfaces.Services;
-using VitalChoice.Validation.Models.Interfaces;
 using Microsoft.AspNet.Mvc.Abstractions;
 using Microsoft.AspNet.Mvc.Controllers;
 using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.AspNet.Mvc.Formatters;
 using Microsoft.AspNet.Mvc.Infrastructure;
-using System.Diagnostics.Tracing;
 using System;
 using System.Diagnostics;
 

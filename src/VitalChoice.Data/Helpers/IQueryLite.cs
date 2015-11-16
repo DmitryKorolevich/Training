@@ -1,7 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Domain;
+using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Helpers
 {

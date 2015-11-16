@@ -1,11 +1,8 @@
 ﻿using VitalChoice.Validation.Logic;
 using FluentValidation;
 using VC.Admin.Models.Profile;
-using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Infrastructure.Utils;
-using VitalChoice.Validation.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Validators.Profile
 {

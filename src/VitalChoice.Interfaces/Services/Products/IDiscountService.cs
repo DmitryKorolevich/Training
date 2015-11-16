@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {

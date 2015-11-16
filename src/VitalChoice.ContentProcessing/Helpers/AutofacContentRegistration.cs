@@ -1,15 +1,9 @@
 ﻿using Autofac;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using VitalChoice.Business.Services;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.ContentProcessing.Helpers
 {

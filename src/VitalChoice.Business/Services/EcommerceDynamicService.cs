@@ -1,15 +1,12 @@
-﻿using System;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Data.Repositories.Specifics;
+﻿using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.eCommerce;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.History;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.UnitOfWork;
 using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 

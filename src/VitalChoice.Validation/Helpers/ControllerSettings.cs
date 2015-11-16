@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
 using VitalChoice.Validation.Models.Interfaces;
+using System.Reflection;
 
 namespace VitalChoice.Validation.Helpers
 {

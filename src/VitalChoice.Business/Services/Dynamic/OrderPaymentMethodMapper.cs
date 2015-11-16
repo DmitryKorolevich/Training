@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Autofac.Features.Indexed;
-using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

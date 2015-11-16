@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Workflow;
 using VitalChoice.Workflow.Core;
+using VitalChoice.Workflow.Data;
 
 namespace VitalChoice.Business.Services.Workflow
 {

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
-using VitalChoice.Core.GlobalFilters;
+﻿using VitalChoice.Core.GlobalFilters;
 
 namespace VitalChoice.Core.Base
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 
 namespace VC.Admin.Models.Infrastructure
 {

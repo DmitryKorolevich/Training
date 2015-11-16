@@ -1,45 +1,31 @@
 ﻿using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
 using System.Data.SqlClient;
-using System.IO;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Data.DataContext;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.Localization;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Entities.Settings;
-using VitalChoice.Domain.Entities.Help;
-using VitalChoice.Domain.Entities.VitalGreen;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Content;
+using VitalChoice.Infrastructure.Domain.Content.Articles;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.ContentPages;
+using VitalChoice.Infrastructure.Domain.Content.Faq;
+using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
+using VitalChoice.Infrastructure.Domain.Entities.Localization;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 
 namespace VitalChoice.Infrastructure.Context
 {
     public class VitalChoiceContext : IdentityDataContext
     {
-        private readonly IOptions<AppOptions> _options;
-        private static bool created;
+        private readonly IOptions<AppOptionsBase> _options;
 
-        public VitalChoiceContext(IOptions<AppOptions> options)
+        public VitalChoiceContext(IOptions<AppOptionsBase> options)
         {
             _options = options;
-            // Create the database and schema if it doesn't exist
-            // This is a temporary workaround to create database until Entity Framework database migrations 
-            // are supported in ASP.NET 5
-            //if (!created)
-            //{
-            //	//Database.AsRelational().AsSqlServer();//.EnsureCreated();//ApplyMigration()//.AsMigrationsEnabled()
-            //             created = true;
-            //}
-        }
-
-        public VitalChoiceContext(IOptions<AppOptions> options, bool uofScoped = false) : this(options)
-        {
-
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)

@@ -1,12 +1,9 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 using VC.Admin.Models.Customer;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Validators.Customer
 {

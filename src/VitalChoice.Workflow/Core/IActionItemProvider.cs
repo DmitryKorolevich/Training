@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Workflow;
+using VitalChoice.Workflow.Data;
 
 namespace VitalChoice.Workflow.Core
 {

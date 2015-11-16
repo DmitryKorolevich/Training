@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using VitalChoice.Domain.Entities.eCommerce.Base;
 
 namespace VitalChoice.DynamicData.Interfaces
 {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Avatax;
-using VitalChoice.Workflow.Contexts;
+using VitalChoice.Infrastructure.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 
 namespace VitalChoice.Interfaces.Services.Avatax
 {

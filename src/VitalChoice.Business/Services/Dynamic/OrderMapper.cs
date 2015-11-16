@@ -3,23 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Autofac.Features.Indexed;
-using VitalChoice.Business.Queries.Order;
-using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Exceptions;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Transfer.Orders;
-using VitalChoice.DynamicData.Entities.Transfer;
-using VitalChoice.DynamicData.Helpers;
-using VitalChoice.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Business.Services.Dynamic
 {

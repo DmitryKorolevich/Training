@@ -4,24 +4,18 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
-using VC.Public.ModelConverters;
 using VC.Public.Models.Auth;
 using VitalChoice.Core.Base;
-using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
-using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNet.Authorization;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Public.Controllers
 {

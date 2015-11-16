@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Models
 {

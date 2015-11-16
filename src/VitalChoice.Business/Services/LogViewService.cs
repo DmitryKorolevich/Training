@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Log;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Logs;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Logs;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services

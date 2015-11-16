@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Entities.eCommerce.Affiliates;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Domain.Entities.eCommerce.Help;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
-using VitalChoice.Domain.Transfer;
-using VitalChoice.Domain.Transfer.Base;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Helpers
 {

@@ -1,14 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Core.Base;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Validation.Models;
 

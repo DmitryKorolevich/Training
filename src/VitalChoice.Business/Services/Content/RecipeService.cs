@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Templates;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.ContentManagement;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Entities.eCommerce.Products;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Transaction;
+using VitalChoice.Ecommerce.Cache;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Business.Services.Content
 {

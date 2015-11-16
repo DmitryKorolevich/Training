@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using VitalChoice.Domain.Attributes;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Validation.Models;
+using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VC.Public.Models.Profile
 {

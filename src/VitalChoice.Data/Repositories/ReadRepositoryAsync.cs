@@ -5,11 +5,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using VitalChoice.Data.DataContext;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Repositories
 {
@@ -18,7 +15,7 @@ namespace VitalChoice.Data.Repositories
 		//public bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
 
 		protected IDataContextAsync Context { get; }
-		internal DbSet<TEntity> DbSet { get; }
+		protected internal DbSet<TEntity> DbSet { get; }
 
 		public ReadRepositoryAsync(IDataContextAsync context)
 		{

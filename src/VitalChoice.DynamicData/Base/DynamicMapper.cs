@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Autofac.Features.Indexed;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.DynamicData.Delegates;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Services;
@@ -13,11 +10,12 @@ using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Helpers;
-using System.Collections;
 using System.Threading;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Base
 {

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using VitalChoice.Domain.Attributes;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Delegates;
-using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Services
 {

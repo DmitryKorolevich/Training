@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Data.UnitOfWork;
-using VitalChoice.Domain.Entities.Options;
+﻿using VitalChoice.Ecommerce.UnitOfWork;
 using VitalChoice.Infrastructure.Context;
 
 namespace VitalChoice.Infrastructure.UnitOfWork

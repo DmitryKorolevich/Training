@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 

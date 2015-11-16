@@ -2,14 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using VC.Public.Validators;
 using VC.Public.Validators.Affiliate;
-using VitalChoice.Domain.Attributes;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.DynamicData.Entities;
+using VitalChoice.Ecommerce.Domain.Attributes;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 

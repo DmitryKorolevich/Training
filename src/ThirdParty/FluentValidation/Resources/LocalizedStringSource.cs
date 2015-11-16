@@ -19,7 +19,6 @@
 namespace FluentValidation.Resources {
 	using System;
 	using System.Linq.Expressions;
-	using System.Reflection;
 	using Internal;
 
 	/// <summary>

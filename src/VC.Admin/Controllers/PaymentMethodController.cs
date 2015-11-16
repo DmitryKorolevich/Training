@@ -1,29 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
 using VitalChoice.Validation.Models;
-using Microsoft.AspNet.Hosting;
-using System.Security.Claims;
 using VC.Admin.Models.PaymentMethod;
-using VC.Admin.Models.UserManagement;
-using VC.Admin.Validators.UserManagement;
 using VitalChoice.Core.Base;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Transfer.PaymentMethod;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services.Payments;
-using VitalChoice.Validation.Attributes;
 
 namespace VC.Admin.Controllers
 {

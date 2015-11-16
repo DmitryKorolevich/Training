@@ -19,7 +19,6 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security;
 
 [assembly: AssemblyTitle("FluentValidation")]
 [assembly: AssemblyDescription("FluentValidation")]

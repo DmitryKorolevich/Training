@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Domain.Entities.Permissions;
-using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using AuthorizationContext = Microsoft.AspNet.Mvc.Filters.AuthorizationContext;
 using Microsoft.AspNet.Mvc.Filters;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using System.Linq;
+using System;
 
 namespace VitalChoice.Core.Infrastructure
 {

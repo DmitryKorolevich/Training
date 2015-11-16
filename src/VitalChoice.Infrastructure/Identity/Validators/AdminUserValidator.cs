@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+
 #if DNX451
-using System.Net.Mail;
+
 #endif
 
 namespace VitalChoice.Infrastructure.Identity.Validators

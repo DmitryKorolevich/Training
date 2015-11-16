@@ -1,4 +1,3 @@
-using System.Linq;
 using FluentValidation;
 using VitalChoice.Validation.Logic.Interfaces;
 

@@ -7,7 +7,9 @@
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
-    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce": "",
     "VitalChoice.Interfaces": "1.0.0-*",
     "WindowsAzure.Storage": "6.0.1-*",
     "Templates": "2.3.3-rc1"

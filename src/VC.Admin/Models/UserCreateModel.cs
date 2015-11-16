@@ -1,8 +1,8 @@
 ﻿using VC.Admin.Validators.Users;
 using VitalChoice.Validation.Models;
-using VitalChoice.Domain.Entities.eCommerce.Users;
 using VitalChoice.Validation.Attributes;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Ecommerce.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Models
 {

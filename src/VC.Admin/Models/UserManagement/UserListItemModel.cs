@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using VC.Admin.Validators.UserManagement;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.Roles;
-using VitalChoice.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Models.UserManagement

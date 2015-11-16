@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {

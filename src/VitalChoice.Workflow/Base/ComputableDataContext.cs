@@ -1,5 +1,4 @@
-﻿using System;
-using VitalChoice.Workflow.Core;
+﻿using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Workflow.Base
 {

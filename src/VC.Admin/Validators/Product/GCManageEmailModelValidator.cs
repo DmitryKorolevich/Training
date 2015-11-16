@@ -1,12 +1,10 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
-using System;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Infrastructure.Utils;
-using VitalChoice.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Validators.Product
 {

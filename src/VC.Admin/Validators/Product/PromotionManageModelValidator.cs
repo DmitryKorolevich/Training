@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Validation.Helpers;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Entities.eCommerce.Promotions;
-using VitalChoice.Domain.Constants;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 
 namespace VC.Admin.Validators.Product
 {

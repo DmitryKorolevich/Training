@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VC.Public.Controllers.Content
+﻿namespace VC.Public.Controllers.Content
 {
     public class AreaController
     {

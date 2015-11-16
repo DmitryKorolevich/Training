@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Templates;
 using Templates.Exceptions;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Interfaces.Services;
+using System.Linq;
+using VitalChoice.Ecommerce.Cache;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Cache;
+using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VitalChoice.ContentProcessing.Base
 {

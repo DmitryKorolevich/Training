@@ -19,9 +19,7 @@
 namespace FluentValidation.Validators {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq.Expressions;
 	using System.Threading.Tasks;
-	using FluentValidation.Internal;
 	using Resources;
 	using Results;
 

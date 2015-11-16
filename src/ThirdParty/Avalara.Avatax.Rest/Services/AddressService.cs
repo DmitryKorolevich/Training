@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Avalara.Avatax.Rest.Utility;
 using Microsoft.Extensions.OptionsModel;
 using Newtonsoft.Json;
-using VitalChoice.Domain.Avatax;
-using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Infrastructure.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace Avalara.Avatax.Rest.Services
 {

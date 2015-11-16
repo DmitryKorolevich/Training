@@ -22,9 +22,8 @@ namespace FluentValidation {
 	using System.Linq.Expressions;
 	using Internal;
 	using Resources;
-	using Validators;
 
-	/// <summary>
+    /// <summary>
 	/// Default options that can be used to configure a validator.
 	/// </summary>
 	public static class DefaultValidatorOptions {

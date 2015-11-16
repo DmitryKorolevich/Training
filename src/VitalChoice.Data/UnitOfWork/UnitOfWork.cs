@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Domain;
+using VitalChoice.Ecommerce.Domain;
 
 #endregion
 

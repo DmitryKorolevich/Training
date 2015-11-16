@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using VC.Admin.Validators.OrderNote;
-using VC.Admin.Validators.UserManagement;
-using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Models.Interfaces;

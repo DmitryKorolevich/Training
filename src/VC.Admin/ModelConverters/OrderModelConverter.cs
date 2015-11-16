@@ -1,27 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using VC.Admin.Models.Customer;
-using VC.Admin.Models.Order;
 using VC.Admin.Models.Product;
 using VitalChoice.Business.Queries.Product;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
-using VitalChoice.Domain.Transfer.Orders;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Discounts;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.Interfaces.Services;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;
+using VC.Admin.Models.Orders;
+using VitalChoice.Business.Queries.Products;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.ModelConverters
 {

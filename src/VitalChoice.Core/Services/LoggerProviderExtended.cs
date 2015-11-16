@@ -6,7 +6,6 @@ using System.IO;
 using System.Xml;
 using Antlr4.Runtime.Misc;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Data.Extensions;
 #if !DOTNET5_4
 using NLog;
 #endif

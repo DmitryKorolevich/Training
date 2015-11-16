@@ -3,7 +3,7 @@
 using System;
 using System.Linq.Expressions;
 using VitalChoice.Data.Helpers;
-using VitalChoice.Domain;
+using VitalChoice.Ecommerce.Domain;
 
 #endregion
 

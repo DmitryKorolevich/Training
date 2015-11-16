@@ -16,7 +16,6 @@ using CsvHelper.MissingFrom20;
 #if !NET_2_0
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 #endif
 #if !NET_2_0 && !NET_3_5 && !PCL && !DOTNET5_4
 using System.Dynamic;

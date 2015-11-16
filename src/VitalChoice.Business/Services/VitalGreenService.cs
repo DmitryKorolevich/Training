@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.VitalGreen;
-using VitalChoice.Domain.Transfer.VitalGreen;
+using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
+using VitalChoice.Infrastructure.Domain.Transfer.VitalGreen;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services

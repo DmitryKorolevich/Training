@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Shipping;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Shipping

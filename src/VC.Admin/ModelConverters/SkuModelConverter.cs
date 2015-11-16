@@ -1,8 +1,7 @@
 ﻿using VC.Admin.Models.Product;
-using VitalChoice.Domain.Entities;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Admin.ModelConverters
 {

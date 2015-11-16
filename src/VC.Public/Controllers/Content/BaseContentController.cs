@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
@@ -10,10 +9,10 @@ namespace VC.Public.Controllers.Content
 {
     public class BaseContentController : Controller
     {
-        protected readonly IContentViewService ContentService;
+        protected readonly IContentEditService ContentService;
         protected readonly IProductViewService ProductViewService;
 
-        public BaseContentController(IContentViewService contentService)
+        public BaseContentController(IContentEditService contentService)
         {
             this.ContentService = contentService;
         }

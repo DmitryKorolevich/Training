@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Attributes;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Auth

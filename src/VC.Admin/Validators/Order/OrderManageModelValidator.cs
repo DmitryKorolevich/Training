@@ -1,18 +1,13 @@
 ﻿using System.Linq;
 using FluentValidation;
-using VC.Admin.Models.Product;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Infrastructure.Utils;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Validation.Helpers;
-using VitalChoice.Domain.Constants;
-using VC.Admin.Models.Order;
 using VC.Admin.Validators.Customer;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
 using System;
-using System.Globalization;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
+using VC.Admin.Models.Orders;
 
 namespace VC.Admin.Validators.Order
 {

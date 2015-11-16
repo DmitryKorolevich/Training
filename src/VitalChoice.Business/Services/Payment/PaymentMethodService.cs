@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Payment;
@@ -12,11 +10,10 @@ using VitalChoice.Business.Queries.User;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Transfer.PaymentMethod;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Payments;
 

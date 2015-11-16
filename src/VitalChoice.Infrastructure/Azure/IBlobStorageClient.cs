@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Transfer.Azure;
+using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 
 namespace VitalChoice.Infrastructure.Azure
 {

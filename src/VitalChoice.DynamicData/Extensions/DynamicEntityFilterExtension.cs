@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Base;
+﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.DynamicData.Extensions
 {

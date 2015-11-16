@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Transfer.Affiliates;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Orders;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.Workflow.Contexts;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {

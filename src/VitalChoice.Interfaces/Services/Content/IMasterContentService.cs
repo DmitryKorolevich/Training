@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.Content;
-using VitalChoice.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 
 namespace VitalChoice.Interfaces.Services.Content
 {

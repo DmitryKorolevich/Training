@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Storage;
 using VitalChoice.Data.DataContext;

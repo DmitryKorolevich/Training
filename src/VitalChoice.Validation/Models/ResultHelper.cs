@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Validation.Models
 {

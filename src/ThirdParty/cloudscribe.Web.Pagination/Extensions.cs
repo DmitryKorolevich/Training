@@ -4,11 +4,9 @@
 // Created:					2015-10-12
 // Last Modified:			2015-10-25
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace cloudscribe.Web.Pagination
 {

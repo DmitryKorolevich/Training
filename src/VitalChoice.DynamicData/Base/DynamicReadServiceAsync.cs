@@ -3,20 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Entities.eCommerce.History;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
 namespace VitalChoice.DynamicData.Base

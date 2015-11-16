@@ -7,7 +7,8 @@
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
   "dependencies": {
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
-    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "System.Net.Http": "4.0.1-*",
     "Newtonsoft.Json": "7.0.1",
     "VitalChoice.Interfaces": "1.0.0-*"

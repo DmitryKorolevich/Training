@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
-using VC.Public.Models.Menu;
 using VC.Public.Models.Profile;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.Infrastructure.Identity;
-using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 
 namespace VC.Public.Components.Profile

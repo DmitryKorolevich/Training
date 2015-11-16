@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Autofac;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Extensions
 {

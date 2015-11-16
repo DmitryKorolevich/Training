@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Transfer.Azure;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Customers;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Azure;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Interfaces.Services.Customers
 {

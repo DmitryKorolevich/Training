@@ -2,10 +2,8 @@
 using FluentValidation;
 using VC.Admin.Models.UserManagement;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Domain.Entities.Localization.Groups;
-using VitalChoice.Infrastructure.Utils;
+using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Logic;
-using VitalChoice.Validation.Helpers;
 
 namespace VC.Admin.Validators.UserManagement
 {

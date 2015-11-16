@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Infrastructure.Identity
 {

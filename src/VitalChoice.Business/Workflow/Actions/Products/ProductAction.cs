@@ -1,8 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.DynamicData.Entities.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
-using VitalChoice.Workflow.Contexts;
 using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Actions.Products

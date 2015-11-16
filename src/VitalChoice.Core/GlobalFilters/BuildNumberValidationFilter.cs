@@ -3,7 +3,7 @@ using Microsoft.AspNet.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.Extensions.Primitives;
-using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.Core.GlobalFilters
 {

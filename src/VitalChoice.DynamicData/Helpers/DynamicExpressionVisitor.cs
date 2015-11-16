@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Helpers
 {

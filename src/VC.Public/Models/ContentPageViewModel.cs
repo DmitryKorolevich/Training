@@ -1,4 +1,4 @@
-﻿using VitalChoice.Domain.Entities.Content;
+﻿using VitalChoice.Infrastructure.Domain.Content.Base;
 
 namespace VC.Public.Models
 {

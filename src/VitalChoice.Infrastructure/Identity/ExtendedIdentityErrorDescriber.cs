@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using VitalChoice.Domain.Constants;
+﻿using Microsoft.AspNet.Identity;
+using VitalChoice.Infrastructure.Domain.Constants;
 
 namespace VitalChoice.Infrastructure.Identity
 {

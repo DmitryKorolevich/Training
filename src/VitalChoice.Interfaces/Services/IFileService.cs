@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VitalChoice.Domain.Entities.Files;
+using VitalChoice.Infrastructure.Domain.Entities.Files;
 
 namespace VitalChoice.Interfaces.Services
 {

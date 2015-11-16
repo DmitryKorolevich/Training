@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using VitalChoice.Domain.Entities.eCommerce.Base;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation.Abstractions;
+using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.DynamicData.Validation
 {

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Domain.Attributes;
+using VitalChoice.Ecommerce.Domain.Attributes;
 
 namespace VitalChoice.DynamicData.Delegates
 {

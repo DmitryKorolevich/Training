@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Infrastructure.Models;
-using VitalChoice.Domain.Entities.Options;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Admin.Components
 {

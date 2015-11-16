@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Entities.eCommerce.Affiliates;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Mail;
-using VitalChoice.Domain.Transfer.Affiliates;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
 namespace VitalChoice.Interfaces.Services.Affiliates
 {

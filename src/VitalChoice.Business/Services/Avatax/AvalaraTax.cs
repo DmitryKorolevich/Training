@@ -2,25 +2,22 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Avalara.Avatax.Rest.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using VitalChoice.Domain.Avatax;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Helpers;
-using VitalChoice.DynamicData.Entities;
-using VitalChoice.DynamicData.Entities.Transfer;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Avatax;
-using VitalChoice.Workflow.Contexts;
-using Address = VitalChoice.Domain.Avatax.Address;
+using Address = VitalChoice.Infrastructure.Domain.Avatax.Address;
 
 namespace VitalChoice.Business.Services.Avatax
 {

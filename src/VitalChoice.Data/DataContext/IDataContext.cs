@@ -2,7 +2,6 @@
 
 using Microsoft.Data.Entity;
 using System;
-using System.Collections.Generic;
 
 namespace VitalChoice.Data.DataContext
 {

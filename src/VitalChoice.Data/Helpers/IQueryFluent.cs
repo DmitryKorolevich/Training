@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VitalChoice.Domain;
-using VitalChoice.Domain.Transfer;
-using VitalChoice.Domain.Transfer.Base;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Transfer;
 
 namespace VitalChoice.Data.Helpers
 {
