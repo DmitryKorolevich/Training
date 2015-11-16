@@ -41,7 +41,7 @@ namespace VitalChoice.Core.Infrastructure
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)
 		{
-			var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
+			var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
 			var claimUser = context.HttpContext.User;
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
@@ -50,7 +50,7 @@ namespace VitalChoice.Core.Infrastructure
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
 				{
 					var customerRoles =
-						context.HttpContext.ApplicationServices.GetService<IAppInfrastructureService>()
+						context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
 							.Get()
 							.CustomerRoles;
 

@@ -127,10 +127,7 @@ namespace VitalChoice.Business.Services.Content
                     SelectAsync()).FirstOrDefault();
                 if (dbItem != null)
                 {
-                    foreach (var proccesorRef in dbItem.MasterContentItemToContentProcessors)
-                    {
-                        await masterContentItemToProcessorsRepository.DeleteAsync(proccesorRef.Id);
-                    }
+                    await masterContentItemToProcessorsRepository.DeleteAllAsync(dbItem.MasterContentItemToContentProcessors);
                 }
             }
 

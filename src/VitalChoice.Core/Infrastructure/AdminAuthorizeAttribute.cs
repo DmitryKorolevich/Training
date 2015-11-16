@@ -42,7 +42,7 @@ namespace VitalChoice.Core.Infrastructure
 
 		public override async Task OnAuthorizationAsync(AuthorizationContext context)
 		{
-			var authorizationService = context.HttpContext.ApplicationServices.GetService<IAuthorizationService>();
+			var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
 			var claimUser = context.HttpContext.User;
 			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);

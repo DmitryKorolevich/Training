@@ -262,7 +262,7 @@ namespace VitalChoice.DynamicData.Base
                     {
                         new DynamicEntityPair<TDynamic, TEntity>(model, entity) { InitialEntity = initialEntity}
                     }, bigValueRepository, valueRepository);
-            await mainRepository.UpdateAsync(entity);
+            //await mainRepository.UpdateAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
             await AfterSelect(new List<TEntity> {entity});
 

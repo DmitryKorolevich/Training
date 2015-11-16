@@ -12,7 +12,7 @@
     "VitalChoice.Ecommerce": "",
     "VitalChoice.Interfaces": "1.0.0-*",
     "WindowsAzure.Storage": "6.0.1-*",
-    "Templates": "2.3.3-rc1"
+    "Templates": "2.3.5-rc1"
   },
 
   "frameworks": {

@@ -1,6 +1,9 @@
-﻿@using VitalChoice.Infrastructure.Identity
+﻿@using System.Threading.Tasks
+@using Microsoft.Extensions.OptionsModel
+@using VitalChoice.Infrastructure.Domain.Options
+@using VitalChoice.Infrastructure.Identity
 @using VitalChoice.Interfaces.Services
-@inject Microsoft.Framework.OptionsModel.IOptions<AppOptions> appOptions;
+@inject IOptions<AppOptions> appOptions;
 @inject IAppInfrastructureService appInfrastructureService;
 
 <!DOCTYPE html>

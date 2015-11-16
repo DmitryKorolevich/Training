@@ -11,7 +11,7 @@ namespace VitalChoice.Core.GlobalFilters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var optionsAccessor = context.HttpContext.ApplicationServices.GetService<IOptions<AppOptions>>();
+            var optionsAccessor = context.HttpContext.RequestServices.GetService<IOptions<AppOptions>>();
 
             var buildNumber = context.HttpContext.Request.Headers["Build-Number"];
             if (StringValues.IsNullOrEmpty(buildNumber))
