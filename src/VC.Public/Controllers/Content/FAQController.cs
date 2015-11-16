@@ -12,7 +12,12 @@ namespace VC.Public.Controllers.Content
         {
         }
 
-        [HttpGet]
+	    public FaqController(IContentViewService contentService)
+	    {
+		   _contentService = contentService;
+	    }
+
+	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
             var toReturn = await ContentService.GetCategoryContentAsync(ContentType.FaqCategory, GetParameters());

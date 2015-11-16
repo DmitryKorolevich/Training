@@ -11,9 +11,14 @@ namespace VC.Public.Controllers
 {
     public class ProductController : BaseContentController
     {
-        public ProductController(IProductViewService productViewService) : base(productViewService)
-        {
-        }
+	    private readonly ICategoryViewService _categoryViewService;
+	    private readonly IProductViewService _productViewService;
+
+	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService)
+	    {
+		    _categoryViewService = categoryViewService;
+		    _productViewService = productViewService;
+	    }
 
 	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
 	    {
@@ -28,7 +33,7 @@ namespace VC.Public.Controllers
 	    [HttpGet]
         public async Task<IActionResult> Categories()
         {
-            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
+            var toReturn = await _categoryViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
@@ -39,12 +44,23 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> Category(string url)
         {
-            var toReturn = await ProductViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
+            var toReturn = await _categoryViewService.GetProductCategoryContentAsync(GetCategoryMenuAvailability(), GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
             return BaseNotFoundView();
         }
-    }
+
+		[HttpGet]
+		public async Task<IActionResult> Product(string url)
+		{
+			var toReturn = await _productViewService.GetProductPageContentAsync(GetCategoryMenuAvailability(), GetParameters());
+			if (toReturn != null)
+			{
+				return BaseView(new ContentPageViewModel(toReturn));
+			}
+			return BaseNotFoundView();
+		}
+	}
 }

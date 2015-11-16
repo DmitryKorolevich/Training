@@ -1,26 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Microsoft.Framework.Logging;
+using Templates;
+using Templates.Exceptions;
 using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
-using VitalChoice.Ecommerce.Cache;
-using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Repositories.Customs;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Domain.Constants;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Helpers;
 using VitalChoice.Infrastructure.Cache;
-using VitalChoice.Infrastructure.Domain.Content.Base;
-using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Domain.Transfer.TemplateModels;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-	public class ProductViewService : ContentViewService<ProductCategoryContent>, IProductViewService
+	public class ProductViewService : ContentViewService<ProductContent>, IProductViewService
 	{
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
-	        ProductCategoryDefaultProcessor defaultProcessor,
+	        IContentProcessor<ProductContent, ProcessorModel> defaultProcessor,
 	        IContentProcessorService processorService)
 	        : base(templatesCache, loggerProvider, defaultProcessor, processorService)
         {
@@ -28,7 +40,7 @@ namespace VitalChoice.Business.Services.Products
 
 	    #region Public
 
-	    protected override async Task<ProductCategoryContent> GetData(IDictionary<string, object> queryData)
+	    protected override async Task<ProductContent> GetData(IDictionary<string, object> queryData)
 	    {
 	        var productCategory = await base.GetData(queryData);
             if (productCategory == null)
@@ -45,7 +57,7 @@ namespace VitalChoice.Business.Services.Products
             return productCategory;
 	    }
 
-	    public Task<ContentViewModel> GetProductCategoryContentAsync(IList<CustomerTypeCode> customerTypeCodes,
+	    public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
 	        Dictionary<string, object> parameters)
 	    {
 	        var paramProperty =
@@ -59,6 +71,6 @@ namespace VitalChoice.Business.Services.Products
 	        return GetContentAsync(parameters);
 	    }
 
-	    #endregion
+		#endregion
     }
 }

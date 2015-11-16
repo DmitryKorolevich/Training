@@ -670,3 +670,304 @@ BEGIN
 WHERE [Name] = 'Product sub categories'
 	END
 END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@using() {{VitalChoice.Domain.Transfer.TemplateModels}}%' AND [Name] = 'Product sub categories')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.Category}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<menu_sidebar>
+{{
+	<ul class="category-sidebar">
+	    @list(SideMenuItems)
+        {{
+            <li>
+			     @if(@model.SubItems.Count > 0):param() {{
+			        <a href="#" title="@(Label)">
+				        @(Label)
+			        </a>
+		            <ul>
+		                    @list(SubItems)
+                            {{
+                                <li>
+                                    <a href="@(Url)" title="@(Label)">
+                                        @(Label)
+                                    </a>
+                                </li>
+                            }}
+		            </ul>
+		        }}
+		        @if(@model.SubItems.Count == 0):param(){{
+		            <a href="@(Url)" title="@(Label)">
+				        @(Label)
+			        </a>
+		        }}
+			</li>
+        }}
+		<li><a href="#">Top Sellers</a></li>
+		<li><a href="#">Special Offers</a></li>
+		<li><a href="#">New Products</a></li>
+	</ul>
+}}
+
+<category_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
+        {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            @if(@model != chained.Last()){{
+                <img src="/assets/images/breadarrow2.jpg">
+            }}
+        }}
+	</div>
+}}
+
+<category_top>
+{{
+	@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)):param() {{
+	    <img src="@(FileImageLargeUrl)">
+	    <br>
+	}}
+	@(LongDescription)
+}}
+
+<category_article>
+{{
+    @(LongDescriptionBottom)
+}}
+
+<layout> -> (ProductCategory)
+{{
+<aside id="menuSidebar" class="category-aside">
+    @menu_sidebar()
+</aside>
+<section class="category-main">
+	@category_breadcrumb()
+	<div class="category-top">
+	    @category_top()
+	</div>
+	<div class="categories-selection-container">
+	    @list(SubCategories)
+        {{
+			<a href="@(Url)" title="@(Name)">
+				<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+			</a>
+        }}
+        @list(Products)
+        {{
+			<a href="/product/@(Url)" title="@(Name)">
+				<img src="@(Thumbnail)" alt="@(Name)">@(Name)
+			</a>
+        }}
+	</div>
+	<article class="category-article">
+	    @category_article()
+	</article>
+</section>
+}}:: TtlCategoryModel 
+%>'
+WHERE [Name] = 'Product sub categories'
+
+END
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE (Template = N'' OR Template is NULL) AND [Name] = 'Product page')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<product_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(BreadcrumbOrderedItems):param(BreadcrumbOrderedItems)
+        {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            @if(@model != chained.Last()){{
+                <img src="/assets/images/breadarrow2.jpg">
+            }}
+        }}
+	</div>
+}}
+
+<product_introduction>
+{{
+    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
+	<div class="product-intro-info">
+		<div class="product-intro-main">
+			<div class="product-intro-headers">
+				<h1>@(Name)</h1>
+				<h2>Skinless/Boneless 6-oz. Portions</h2>
+				<h3>Product #@(@model.Skus.First().Code)</h3>
+			</div>
+			<img title="Alaska Seafood" src="/assets/images/products/ASMI-W.jpg"/>
+		</div>
+		<div class="product-intro-sub">
+			<div class="product-stars-container">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+			</div>
+			<span class="product-reviews-count">[185]</span>
+			<a href="#">
+				Read <strong>185</strong> reviews
+			</a>
+			<a href="#">
+				Write a Review
+			</a>
+		</div>
+		<p class="product-intro-description">
+			Rich in flavor, omega-3s, and vitamin D, our most popular salmon is abundant with the antioxidant astaxanthin, the source of its vibrant red hue. Its pure, fresh flavor is what some call the truest salmon taste.
+		</p>
+		<a class="product-intro-more" href="#tabs-details">Read more ></a>
+		<div class="product-action-bar">
+			<div class="product-action-left">
+				<span class="action-left-header">Number of Portions:</span>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					6 - $79.00
+				</label>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					12 - $138.00
+				</label>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					24 - $239.00 <span class="product-best-value">Best Value!</span>
+				</label>
+			</div>
+			<div class="product-action-right">
+				<span class="product-selected-price">Selected Price $79.00</span>
+				<a href="#">
+					<img src="/assets/images/addtocartorange-2015.jpg"/>
+				</a>
+			</div>
+		</div>
+	</div>
+}}
+
+<product_details>
+{{
+    <div class="tabs-control">
+			<ul>
+				<li><a href="#tabs-details">Details</a></li>
+				<li><a href="#tabs-reviews">Reviews</a></li>
+				<li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
+				<li><a href="#tabs-recipes">Recipes</a></li>
+				<li><a href="#tabs-serving">Serving/Care</a></li>
+				<li><a href="#tabs-shipping">Shipping</a></li>
+			</ul>
+			<div class="tab-container" id="tabs-details">
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+			</div>
+			<div id="tabs-reviews">
+				<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+			</div>
+			<div id="tabs-nutrition">
+				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+			</div>
+			<div id="tabs-recipes">
+				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+			</div>
+			<div id="tabs-serving">
+				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+			</div>
+			<div id="tabs-shipping">
+				<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+				<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+			</div>
+		</div>
+}}
+	
+<product_accessories>
+{{
+    <div class="product-related-accessories">
+		<span class="product-accessories-title">Try one of these delicious recipes</span>
+		<div class="accessories-container">
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-wild-salmon.jpg">
+				Vital Choice Wild Salmon
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-salmon-sauteed.jpg">
+				Sauteing Sockeye Salmon
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-becky.jpg">
+				Chef Becky Selengut
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-salmon-broiled.jpg">
+				How to Broil Salmon
+			</a>
+		</div>
+	</div>
+	<div class="product-related-accessories accessories-top-margin">
+		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
+		<div class="accessories-container">
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/Sockeye6oz_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/FTM606_tuna_med_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/cwrp_casn_salmon_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/NCB106_goodfishbook_218.jpg">
+			</a>
+		</div>
+	</div>
+}}		
+	
+<layout> -> (ProductPage)
+{{
+    <div class="product-main">
+        @product_breadcrumb()
+        <section class="product-intro-container">
+	        @product_introduction()    
+	    </section>
+	    <section class="product-detais">
+	        @product_details()
+	    </section>
+	    <section class="product-accessories">
+	        @product_accessories()
+	    </section>
+    </div>
+}}:: TtlProductPageModel 
+%>'
+WHERE [Name] = 'Product page'
+
+END
