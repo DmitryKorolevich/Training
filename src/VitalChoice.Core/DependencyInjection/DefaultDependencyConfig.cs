@@ -66,6 +66,7 @@ using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
+using VitalChoice.Business.Repositories;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Options;

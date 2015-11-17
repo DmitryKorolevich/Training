@@ -5,15 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer;
-using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
     public class AddressOptionValueRepository : EcommerceRepositoryAsync<AddressOptionValue>
     {
@@ -27,7 +24,7 @@ namespace VitalChoice.Data.Repositories.Customs
             if (!String.IsNullOrEmpty(filter.FieldValue) && filter.FieldIds!=null &&
                 filter.FieldIds.Count>0)
             {
-                var context = (this.Context as DbContext);
+                var context = this.Context;
                 var temp = this.DbSet.Where(p => filter.FieldIds.Contains(p.IdOptionType) && p.Value.StartsWith(filter.FieldValue) &&
                     p.Address.StatusCode != (int)RecordStatusCode.Deleted);
                 if(filter.IdReferencedObjectType.HasValue)

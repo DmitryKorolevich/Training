@@ -1,20 +1,16 @@
 ﻿using Microsoft.Data.Entity;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Data.DataContext;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Products;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer;
-using VitalChoice.Domain.Transfer.Products;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Data.Repositories.Customs
+namespace VitalChoice.Business.Repositories
 {
     public class CustomerRepository : EcommerceRepositoryAsync<Customer>
     {
@@ -31,7 +27,7 @@ namespace VitalChoice.Data.Repositories.Customs
             {
                 case "Id":
                     //BUG: should be redone on standart logic after adding normal LIKE support from EF7
-                    var data = (this.Context as DbContext).Set<IdModel>().FromSql("SELECT DISTINCT TOP(20) [p].[Id] As Id FROM [Customers] AS [p]" +
+                    var data = this.Context.Set<IdModel>().FromSql("SELECT DISTINCT TOP(20) [p].[Id] As Id FROM [Customers] AS [p]" +
                                         "WHERE([p].[StatusCode] <> 3) AND [p].[Id] LIKE ({0}+ '%')" +
                                         "ORDER BY [p].[Id]",filter.FieldValue).ToList();
                     return data.Select(p => p.Id.ToString()).ToList();

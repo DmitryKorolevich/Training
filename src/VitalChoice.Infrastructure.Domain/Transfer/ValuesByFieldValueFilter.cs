@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using VitalChoice.Domain.Entities.eCommerce.Orders;
-using VitalChoice.Domain.Transfer.Base;
+﻿using System.Collections.Generic;
 
-namespace VitalChoice.Domain.Transfer
+namespace VitalChoice.Infrastructure.Domain.Transfer
 {
     public class ValuesByFieldValueFilter : FilterBase
     {

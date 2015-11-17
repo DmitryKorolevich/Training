@@ -21,6 +21,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
+using VitalChoice.Business.Repositories;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -74,7 +75,7 @@ namespace VitalChoice.Business.Services.Customers
 			IStorefrontUserService storefrontUserService,
 			IEcommerceRepositoryAsync<User> userRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor)
+            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExpressionVisitor queryVisitor, AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -90,8 +91,8 @@ namespace VitalChoice.Business.Services.Customers
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
-            _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
-            _customerAddressMapper = customerAddressMapper;
+	        _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
+	        _customerAddressMapper = customerAddressMapper;
         }
 
         protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
