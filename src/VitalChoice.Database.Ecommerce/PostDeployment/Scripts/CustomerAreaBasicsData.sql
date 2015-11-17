@@ -441,3 +441,14 @@ BEGIN
 END
 
 GO
+
+IF EXISTS (SELECT [Id] FROM [dbo].[PaymentMethods] WHERE [Name] = N'Prepaid')
+BEGIN
+	DECLARE @id int
+	SET @id = (SELECT TOP 1 Id FROM [dbo].[PaymentMethods] WHERE [Name] = N'Prepaid')
+
+	DELETE [dbo].[PaymentMethodsToCustomerTypes] WHERE IdPaymentMethod=@id
+	DELETE [dbo].[PaymentMethods] WHERE Id=@id
+END
+
+GO

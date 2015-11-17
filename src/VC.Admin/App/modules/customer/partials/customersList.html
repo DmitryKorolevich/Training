@@ -124,8 +124,12 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="customer in customers">
-                        <td>{{::customer.Id}}</td>
-                        <td>{{::customer.Name}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Id}}</a>
+                        </td>
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Name}}</a>
+                        </td>
                         <td>{{::customer.Email}}</td>
                         <td>{{::customer.State}}</td>
                         <td>{{::customer.City}}</td>

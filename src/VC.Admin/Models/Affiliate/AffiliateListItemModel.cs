@@ -38,7 +38,7 @@ namespace VC.Admin.Models.Affiliate
 
         public string EditedByAgentId { get; set; }
 
-        public decimal? NotPaidCommissionsAmount { get; set; }
+        public decimal NotPaidCommissionsAmount { get; set; }
 
         public long? NotPaidCommissionsCount { get; set; }
 

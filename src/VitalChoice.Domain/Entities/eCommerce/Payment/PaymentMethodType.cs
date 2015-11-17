@@ -11,7 +11,6 @@ namespace VitalChoice.Domain.Entities.eCommerce.Payment
         Oac = 2,
         Check = 3,
         NoCharge = 4,
-        Prepaid = 5,
         WireTransfer = 6,
         Marketing = 7,
         VCWellnessEmployeeProgram = 8
