@@ -9,6 +9,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Domain.Entities;
 using VitalChoice.Domain.Entities.Content;
 using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.Roles;
 using VitalChoice.Domain.Exceptions;
 using VitalChoice.Domain.Transfer.Products;
 using VitalChoice.Domain.Transfer.TemplateModels;
@@ -23,7 +24,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 {
     public class ProductPageParameters : ProcessorModel<ProductContent>
     {
-		public IList<CustomerTypeCode> CustomerTypeCodes { get; set; }
+		public const string YoutubeVideoFormat = "https://www.youtube.com/watch?v={0}";
+		public const string CategoryBaseUrl = "/products/";
+
+		public RoleType Role { get; set; }
 
 		public bool Preview { get; set; }
     }
@@ -67,7 +71,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			    });
 		    }
 
-            return PopulateProductPageTemplateModel(model.Model, eProduct, rootNavCategory);
+            return PopulateProductPageTemplateModel(model, eProduct, rootNavCategory);
         }
 
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, int categoryId,
@@ -97,7 +101,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 breadcrumbItems.Add(new TtlBreadcrumbItemModel()
                 {
                     Label = subItem.ProductCategory.Name,
-                    Url = "/products/" + subItem.Url
+                    Url = ProductPageParameters.CategoryBaseUrl + subItem.Url
                 });
 
                 if (!subItem.Id.Equals(categoryId))
@@ -117,11 +121,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             return false;
         }
 
-        private TtlProductPageModel PopulateProductPageTemplateModel(ProductContent productContent, ProductDynamic eProduct,
+        private TtlProductPageModel PopulateProductPageTemplateModel(ProductPageParameters model, ProductDynamic eProduct,
             ProductNavCategoryLite rootNavCategory = null)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
+	        var productContent = model.Model;
 	        if (eProduct.CategoryIds.Any())
 	        {
 				BuildBreadcrumb(rootNavCategory, eProduct.CategoryIds.First(), breadcrumbItems);
@@ -144,7 +149,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 		        Skus = eProduct.Skus.OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
 		        {
 			        Code = x.Code,
-			        Price = x.Price,
+			        Price = model.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
 			        PortionsCount = x.Data.QTY
 		        }).ToList(),
 		        YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
@@ -153,21 +158,27 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        {
 				        Image = eProduct.Data.YouTubeImage1,
 				        Text = eProduct.Data.YouTubeText1,
-				        Video = eProduct.Data.YouTubeVideo1
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo1)
 			        },
 			        new TtlRelatedYoutubeVideoModel()
 			        {
 				        Image = eProduct.Data.YouTubeImage2,
 				        Text = eProduct.Data.YouTubeText2,
-				        Video = eProduct.Data.YouTubeVideo2
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo2)
 			        },
 			        new TtlRelatedYoutubeVideoModel()
 			        {
 				        Image = eProduct.Data.YouTubeImage3,
 				        Text = eProduct.Data.YouTubeText3,
-				        Video = eProduct.Data.YouTubeVideo3
-			        }
-		        },
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo3)
+			        },
+					new TtlRelatedYoutubeVideoModel()
+					{
+						Image = eProduct.Data.YouTubeImage4,
+						Text = eProduct.Data.YouTubeText4,
+						Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo4) 
+					}
+				},
 		        CrossSells = new List<TtlCrossSellProductModel>()
 		        {
 			        new TtlCrossSellProductModel()
@@ -197,31 +208,55 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        Content = eProduct.Data.Description,
 			        Hidden = eProduct.Data.DescriptionHide
 		        },
-		        IngredientsTab = new TtlProductPageTabContent()
+	        };
+
+	        if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
+	        {
+		        toReturn.IngredientsTab = new TtlProductPageTabContent()
 		        {
 			        TitleOverride = eProduct.Data.IngredientsTitleOverride,
 			        Content = eProduct.Data.Ingredients,
 			        Hidden = eProduct.Data.IngredientsHide
-		        },
-		        RecipesTab = new TtlProductPageTabContent()
-		        {
-			        TitleOverride = eProduct.Data.RecipesTitleOverride,
-			        Content = eProduct.Data.Recipes,
-			        Hidden = eProduct.Data.RecipesHide
-		        },
-		        ServingTab = new TtlProductPageTabContent()
-		        {
-			        TitleOverride = eProduct.Data.ServingTitleOverride,
-			        Content = eProduct.Data.Serving,
-			        Hidden = eProduct.Data.ServingHide
-		        },
-		        ShippingTab = new TtlProductPageTabContent()
-		        {
-			        TitleOverride = eProduct.Data.ShippingTitleOverride,
-			        Content = eProduct.Data.Shipping,
-			        Hidden = eProduct.Data.ShippingHide
-		        }
-	        };
+		        };
+	        }
+
+			if (eProduct.DictionaryData.ContainsKey("RecipesTitleOverride"))
+			{
+				toReturn.RecipesTab = new TtlProductPageTabContent()
+				{
+					TitleOverride = eProduct.Data.RecipesTitleOverride,
+					Content = eProduct.Data.Recipes,
+					Hidden = eProduct.Data.RecipesHide
+				};
+			}
+
+			if (eProduct.DictionaryData.ContainsKey("ServingTitleOverride"))
+			{
+				toReturn.ServingTab = new TtlProductPageTabContent()
+				{
+					TitleOverride = eProduct.Data.ServingTitleOverride,
+					Content = eProduct.Data.Serving,
+					Hidden = eProduct.Data.ServingHide
+				};
+			}
+
+			if (eProduct.DictionaryData.ContainsKey("ShippingTitleOverride"))
+			{
+				toReturn.ShippingTab = new TtlProductPageTabContent()
+				{
+					TitleOverride = eProduct.Data.ShippingTitleOverride,
+					Content = eProduct.Data.Shipping,
+					Hidden = eProduct.Data.ShippingHide
+				};
+			}
+
+	        var bestValuedSku =
+		        toReturn.Skus.Where(z => z.PortionsCount != 0).FirstOrDefault(x => x.Price/x.PortionsCount == toReturn.Skus.Where(z=>z.PortionsCount != 0).Max(y => y.Price/x.PortionsCount));
+	        if (bestValuedSku != null)
+	        {
+				bestValuedSku.BestValue = true;
+			}
+
             return toReturn;
         }
 

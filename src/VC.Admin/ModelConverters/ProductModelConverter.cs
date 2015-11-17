@@ -36,6 +36,7 @@ namespace VC.Admin.ModelConverters
                 new VideoModel(),
                 new VideoModel(),
                 new VideoModel(),
+                new VideoModel()
             };
             for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
             {
