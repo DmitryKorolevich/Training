@@ -971,3 +971,238 @@ BEGIN
 WHERE [Name] = 'Product page'
 
 END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<div class="tab-container" id="tabs-details">%' AND [Name] = 'Product page')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Domain.Transfer.TemplateModels.ProductPage}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<product_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            <img src="/assets/images/breadarrow2.jpg">
+        }}
+        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
+	</div>
+}}
+
+<product_introduction>
+{{
+    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
+	<div class="product-intro-info">
+		<div class="product-intro-main">
+			<div class="product-intro-headers">
+				<h1>@(Name)</h1>
+				@if(@model.SubTitle != null):param() {{
+				    <h2>@(SubTitle)</h2>
+				}}
+				<h3>Product #@(@model.Skus.First().Code)</h3>
+			</div>
+			@if(@model.SpecialIcon == 1){{
+			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 2){{
+			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 3){{
+			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 4){{
+			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 5){{
+			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 6){{
+			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
+			}}
+		</div>
+		<div class="product-intro-sub">
+			<div class="product-stars-container">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+			</div>
+			<span class="product-reviews-count">[185]</span>
+			<a href="#">
+				Read <strong>185</strong> reviews
+			</a>
+			<a href="#">
+				Write a Review
+			</a>
+		</div>
+		<div class="product-intro-description">
+			@(ShortDescription)
+		</div>
+		<a class="product-intro-more" href="#tabs-details">Read more ></a>
+		<div class="product-action-bar">
+			<div class="product-action-left">
+				<span class="action-left-header">Number of Portions:</span>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					6 - $79.00
+				</label>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					12 - $138.00
+				</label>
+				<label class="product-portion-line">
+					<input type="radio"/>
+					24 - $239.00 <span class="product-best-value">Best Value!</span>
+				</label>
+			</div>
+			<div class="product-action-right">
+				<span class="product-selected-price">Selected Price $79.00</span>
+				<a href="#">
+					<img src="/assets/images/addtocartorange-2015.jpg"/>
+				</a>
+			</div>
+		</div>
+	</div>
+}}
+
+<product_details>
+{{
+    <div class="tabs-control">
+			<ul>
+			    @if(@model.DescriptionTab.Hidden == false):param() {{
+			        @if(@model.DescriptionTab.TitleOverride != null):param() {{
+			             <li><a href="#tabs-details">@(@model.DescriptionTab.TitleOverride)</a></li>
+			        }}
+			        @if(@model.DescriptionTab.TitleOverride == null) {{
+			             <li><a href="#tabs-details">Details</a></li>
+			        }}
+			    }}
+			    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
+			    @if(@model.IngredientsTab.Hidden == false):param() {{
+			        @if(@model.IngredientsTab.TitleOverride != null):param() {{
+			             <li><a href="#tabs-nutrition">@(@model.IngredientsTab.TitleOverride)</a></li>
+			        }}
+			        @if(@model.IngredientsTab.TitleOverride == null) {{
+			             <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
+			        }}
+			    }}
+			    @if(@model.RecipesTab.Hidden == false):param() {{
+			        @if(@model.RecipesTab.TitleOverride != null):param() {{
+			             <li><a href="#tabs-recipes">@(@model.RecipesTab.TitleOverride)</a></li>
+			        }}
+			        @if(@model.RecipesTab.TitleOverride == null) {{
+			             <li><a href="#tabs-recipes">Recipes</a></li>
+			        }}
+			    }}
+			    @if(@model.ServingTab.Hidden == false):param() {{
+			        @if(@model.ServingTab.TitleOverride != null):param() {{
+			             <li><a href="#tabs-serving">@(@model.ServingTab.TitleOverride)</a></li>
+			        }}
+			        @if(@model.ServingTab.TitleOverride == null) {{
+			             <li><a href="#tabs-serving">Serving/Care</a></li>
+			        }}
+			    }}
+			    @if(@model.ShippingTab.Hidden == false):param() {{
+			        @if(@model.ShippingTab.TitleOverride != null):param() {{
+			             <li><a href="#tabs-shipping">@(@model.ShippingTab.TitleOverride)</a></li>
+			        }}
+			        @if(@model.ShippingTab.TitleOverride == null) {{
+			             <li><a href="#tabs-shipping">Shipping</a></li>
+			        }}
+			    }}
+			</ul>
+			@if(@model.DescriptionTab.Hidden == false):param() {{
+			    <div id="tabs-details">
+			        @(@model.DescriptionTab.Content)
+				</div>
+			}}
+			<!--Reviews -->
+			@if(@model.IngredientsTab.Hidden == false):param() {{
+			    <div id="tabs-nutrition">
+			        @(@model.IngredientsTab.Content)
+				</div>
+			}}
+			@if(@model.RecipesTab.Hidden == false):param() {{
+			    <div id="tabs-recipes">
+			        @(@model.RecipesTab.Content)
+				</div>
+			}}
+			@if(@model.ServingTab.Hidden == false):param() {{
+			    <div id="tabs-serving">
+			        @(@model.ServingTab.Content)
+				</div>
+			}}
+			@if(@model.ShippingTab.Hidden == false):param() {{
+			    <div id="tabs-shipping">
+			        @(@model.ShippingTab.Content)
+				</div>
+			}}
+		</div>
+}}
+	
+<product_accessories>
+{{
+    <div class="product-related-accessories">
+		<span class="product-accessories-title">Try one of these delicious recipes</span>
+		<div class="accessories-container">
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-wild-salmon.jpg">
+				Vital Choice Wild Salmon
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-salmon-sauteed.jpg">
+				Sauteing Sockeye Salmon
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-becky.jpg">
+				Chef Becky Selengut
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/video-thumb-salmon-broiled.jpg">
+				How to Broil Salmon
+			</a>
+		</div>
+	</div>
+	<div class="product-related-accessories accessories-top-margin">
+		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
+		<div class="accessories-container">
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/Sockeye6oz_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/FTM606_tuna_med_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/cwrp_casn_salmon_218.jpg">
+			</a>
+			<a class="product-related-link" href="#">
+				<img src="/assets/images/products/NCB106_goodfishbook_218.jpg">
+			</a>
+		</div>
+	</div>
+}}		
+	
+<layout> -> (ProductPage)
+{{
+    <div class="product-main">
+        @product_breadcrumb()
+        <section class="product-intro-container">
+	        @product_introduction()    
+	    </section>
+	    <section class="product-detais">
+	        @product_details()
+	    </section>
+	    <section class="product-accessories">
+	        @product_accessories()
+	    </section>
+    </div>
+}}:: TtlProductPageModel 
+%>'
+WHERE [Name] = 'Product page'
+
+END

@@ -51,7 +51,10 @@ namespace VC.Admin.Models.Product
         [Localized(GeneralFieldNames.Name)]
         public string Name { get; set; }
 
-        [Localized(GeneralFieldNames.Url)]
+		[Map]
+		public string SubTitle { get; set; }
+
+		[Localized(GeneralFieldNames.Url)]
         public string Url { get; set; }
 
         public int MasterContentItemId { get; set; }

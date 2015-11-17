@@ -96,8 +96,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 breadcrumbItems.Add(new TtlBreadcrumbItemModel()
                 {
-                    Label = subItem.NavLabel,
-                    Url = subItem.Url
+                    Label = subItem.ProductCategory.Name,
+                    Url = "/products/" + subItem.Url
                 });
 
                 if (!subItem.Id.Equals(categoryId))
@@ -125,100 +125,103 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 	        if (eProduct.CategoryIds.Any())
 	        {
 				BuildBreadcrumb(rootNavCategory, eProduct.CategoryIds.First(), breadcrumbItems);
+				breadcrumbItems.Add(new TtlBreadcrumbItemModel()
+				{
+					Label = eProduct.Name,
+					Url = productContent.Url
+				});
 			}
 
-            var toReturn = new TtlProductPageModel
-			{
-                Name = eProduct.Name,
-                Url = productContent.Url,
-				Image = eProduct.Data.MainProductImage,
-                ShortDescription = eProduct.Data.ShortDescription,
-				SpecialIconUrl = eProduct.Data.SpecialIcon,
-                BreadcrumbOrderedItems = breadcrumbItems,
-				Skus = eProduct.Skus.OrderBy(x=>x.Order).Select(x=> new TtlProductPageSkuModel()
-				{
-					Code = x.Code,
-					Price = x.Price,
-					PortionsCount = x.Data.QTY
-				}).ToList(),
-				YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
-				{
-					new TtlRelatedYoutubeVideoModel()
-					{
-						Image = eProduct.Data.YouTubeImage1,
-						Text = eProduct.Data.YouTubeText1,
-						Video = eProduct.Data.YouTubeVideo1
-					},
-					new TtlRelatedYoutubeVideoModel()
-					{
-						Image = eProduct.Data.YouTubeImage2,
-						Text = eProduct.Data.YouTubeText2,
-						Video = eProduct.Data.YouTubeVideo2
-					},
-					new TtlRelatedYoutubeVideoModel()
-					{
-						Image = eProduct.Data.YouTubeImage3,
-						Text = eProduct.Data.YouTubeText3,
-						Video = eProduct.Data.YouTubeVideo3
-					}
-				},
-				CrossSells = new List<TtlCrossSellProductModel>()
-				{
-					new TtlCrossSellProductModel()
-					{
-						Image =  eProduct.Data.CrossSellImage1,
-						Url = eProduct.Data.CrossSellUrl1,
-					},
-					new TtlCrossSellProductModel()
-					{
-						Image =  eProduct.Data.CrossSellImage2,
-						Url = eProduct.Data.CrossSellUrl2,
-					},
-                    new TtlCrossSellProductModel()
-					{
-						Image =  eProduct.Data.CrossSellImage1,
-						Url = eProduct.Data.CrossSellUrl2,
-					},
-                    new TtlCrossSellProductModel()
-					{
-						Image =  eProduct.Data.CrossSellImage1,
-						Url = eProduct.Data.CrossSellUrl2,
-					}
-				},
-				Tabs = new List<TtlProductPageTabContent>()
-				{
-					new TtlProductPageTabContent()
-					{
-						TitleOverride = eProduct.Data.DescriptionTitleOverride,
-						Content = eProduct.Data.Description,
-						Hidden = eProduct.Data.DescriptionHide
-					},
-					new TtlProductPageTabContent()
-					{
-						TitleOverride = eProduct.Data.IngredientsTitleOverride,
-						Content = eProduct.Data.Ingredients,
-						Hidden = eProduct.Data.IngredientsHide
-					},
-					new TtlProductPageTabContent()
-					{
-						TitleOverride = eProduct.Data.RecipesTitleOverride,
-						Content = eProduct.Data.Recipes,
-						Hidden = eProduct.Data.RecipesHide
-					},
-					new TtlProductPageTabContent()
-					{
-						TitleOverride = eProduct.Data.ServingTitleOverride,
-						Content = eProduct.Data.Serving,
-						Hidden = eProduct.Data.ServingHide
-					},	
-					new TtlProductPageTabContent()
-					{
-						TitleOverride = eProduct.Data.ShippingTitleOverride,
-						Content = eProduct.Data.Shipping,
-						Hidden = eProduct.Data.ShippingHide
-					},
-				}
-            };
+	        var toReturn = new TtlProductPageModel
+	        {
+		        Name = eProduct.Name,
+		        SubTitle = eProduct.Data.SubTitle,
+		        Url = productContent.Url,
+		        Image = eProduct.Data.MainProductImage,
+		        ShortDescription = eProduct.Data.ShortDescription,
+		        SpecialIcon = eProduct.Data.SpecialIcon,
+		        BreadcrumbOrderedItems = breadcrumbItems,
+		        Skus = eProduct.Skus.OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
+		        {
+			        Code = x.Code,
+			        Price = x.Price,
+			        PortionsCount = x.Data.QTY
+		        }).ToList(),
+		        YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
+		        {
+			        new TtlRelatedYoutubeVideoModel()
+			        {
+				        Image = eProduct.Data.YouTubeImage1,
+				        Text = eProduct.Data.YouTubeText1,
+				        Video = eProduct.Data.YouTubeVideo1
+			        },
+			        new TtlRelatedYoutubeVideoModel()
+			        {
+				        Image = eProduct.Data.YouTubeImage2,
+				        Text = eProduct.Data.YouTubeText2,
+				        Video = eProduct.Data.YouTubeVideo2
+			        },
+			        new TtlRelatedYoutubeVideoModel()
+			        {
+				        Image = eProduct.Data.YouTubeImage3,
+				        Text = eProduct.Data.YouTubeText3,
+				        Video = eProduct.Data.YouTubeVideo3
+			        }
+		        },
+		        CrossSells = new List<TtlCrossSellProductModel>()
+		        {
+			        new TtlCrossSellProductModel()
+			        {
+				        Image = eProduct.Data.CrossSellImage1,
+				        Url = eProduct.Data.CrossSellUrl1,
+			        },
+			        new TtlCrossSellProductModel()
+			        {
+				        Image = eProduct.Data.CrossSellImage2,
+				        Url = eProduct.Data.CrossSellUrl2,
+			        },
+			        new TtlCrossSellProductModel()
+			        {
+				        Image = eProduct.Data.CrossSellImage1,
+				        Url = eProduct.Data.CrossSellUrl2,
+			        },
+			        new TtlCrossSellProductModel()
+			        {
+				        Image = eProduct.Data.CrossSellImage1,
+				        Url = eProduct.Data.CrossSellUrl2,
+			        }
+		        },
+		        DescriptionTab = new TtlProductPageTabContent()
+		        {
+			        TitleOverride = eProduct.Data.DescriptionTitleOverride,
+			        Content = eProduct.Data.Description,
+			        Hidden = eProduct.Data.DescriptionHide
+		        },
+		        IngredientsTab = new TtlProductPageTabContent()
+		        {
+			        TitleOverride = eProduct.Data.IngredientsTitleOverride,
+			        Content = eProduct.Data.Ingredients,
+			        Hidden = eProduct.Data.IngredientsHide
+		        },
+		        RecipesTab = new TtlProductPageTabContent()
+		        {
+			        TitleOverride = eProduct.Data.RecipesTitleOverride,
+			        Content = eProduct.Data.Recipes,
+			        Hidden = eProduct.Data.RecipesHide
+		        },
+		        ServingTab = new TtlProductPageTabContent()
+		        {
+			        TitleOverride = eProduct.Data.ServingTitleOverride,
+			        Content = eProduct.Data.Serving,
+			        Hidden = eProduct.Data.ServingHide
+		        },
+		        ShippingTab = new TtlProductPageTabContent()
+		        {
+			        TitleOverride = eProduct.Data.ShippingTitleOverride,
+			        Content = eProduct.Data.Shipping,
+			        Hidden = eProduct.Data.ShippingHide
+		        }
+	        };
             return toReturn;
         }
 

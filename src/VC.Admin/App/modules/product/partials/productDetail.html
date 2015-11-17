@@ -58,16 +58,25 @@
                                             </div>
 
                                             <span class="legend">Name, Clean URL & Short Description</span>
-                                            <div class="form-group">
-                                                <label for="name" class="col-md-3 control-label">Name</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="product.Name" required>
-                                                    <div class="error-container" ng-show="forms.submitted && forms.parentDetails.Name.$invalid">
-                                                        <small class="error" ng-show="forms.parentDetails.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
-                                                        <small class="error" ng-show="forms.parentDetails.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
+											<div class="form-group">
+												<label for="name" class="col-md-3 control-label">Name</label>
+												<div class="col-md-9">
+													<input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="product.Name" required>
+													<div class="error-container" ng-show="forms.submitted && forms.parentDetails.Name.$invalid">
+														<small class="error" ng-show="forms.parentDetails.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+														<small class="error" ng-show="forms.parentDetails.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="name" class="col-md-3 control-label">Sub Title</label>
+												<div class="col-md-9">
+													<input type="text" name="SubTitle" class="form-control" placeholder="Sub Title" data-ng-model="product.SubTitle">
+													<div class="error-container" ng-show="forms.submitted && forms.parentDetails.SubTitle.$invalid">
+														<small class="error" ng-show="forms.parentDetails.SubTitle.$error.server">{{serverMessages.GetMessage('SubTitle')}}</small>
+													</div>
+												</div>
+											</div>
                                             <div class="form-group">
                                                 <label for="url" class="col-md-3 control-label">URL</label>
                                                 <div class="col-md-9">
