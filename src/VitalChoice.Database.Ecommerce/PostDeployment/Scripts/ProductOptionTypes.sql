@@ -792,20 +792,40 @@ BEGIN
 	SELECT 'Y-35_v-CoJI', 4, 4, N'YouTubeVideo4'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = '/assets/images/store/video-thumb-salmon-broiled.jpg'
-	WHERE Name = 'YouTubeImage1' OR Name = 'YouTubeImage2' OR Name = 'YouTubeImage3'
+	SET DefaultValue = '/assets/images/store/video-thumb-wild-salmon.jpg'
+	WHERE Name = 'YouTubeImage1'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = 'Vital Choice Omega-3s & Supplements'
+	SET DefaultValue = '/assets/images/store/video-thumb-salmon-sauteed.jpg'
+	WHERE Name = 'YouTubeImage2'
+
+	UPDATE ProductOptionTypes
+	SET DefaultValue = '/assets/images/store/video-thumb-becky.jpg'
+	WHERE Name = 'YouTubeImage3'
+
+	UPDATE ProductOptionTypes
+	SET DefaultValue = 'Vital Choice Wild Salmon'
 	WHERE Name = 'YouTubeText1'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = 'Mixed Seafood Snack Plate'
+	SET DefaultValue = 'Sauteing Sockeye Salmon'
 	WHERE Name = 'YouTubeText2'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = 'An Interview with Chef Becky Selengut'
+	SET DefaultValue = 'Chef Becky Selengut'
 	WHERE Name = 'YouTubeText3'
+
+	UPDATE ProductOptionTypes
+	SET DefaultValue = 'MY6vBsQMfdw'
+	WHERE Name = 'YouTubeVideo1'
+
+	UPDATE ProductOptionTypes
+	SET DefaultValue = '38FwAMSnFAA'
+	WHERE Name = 'YouTubeVideo2'
+
+	UPDATE ProductOptionTypes
+	SET DefaultValue = 'vCsRTamxWuw'
+	WHERE Name = 'YouTubeVideo3'
 
 	UPDATE ProductOptionTypes
 	SET DefaultValue = '/assets/images/store/Sockeye6oz_218.jpg'
@@ -816,7 +836,7 @@ BEGIN
 	WHERE Name = 'CrossSellUrl1'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = '/assets/images/store/Sockeye6oz_218.jpg'
+	SET DefaultValue = '/assets/images/store/FTM606_tuna_med_218.jpg'
 	WHERE Name = 'CrossSellImage2'
 
 	UPDATE ProductOptionTypes
@@ -824,7 +844,7 @@ BEGIN
 	WHERE Name = 'CrossSellUrl2'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = '/assets/images/store/Sockeye6oz_218.jpg'
+	SET DefaultValue = '/assets/images/store/cwrp_casn_salmon_218.jpg'
 	WHERE Name = 'CrossSellImage3'
 
 	UPDATE ProductOptionTypes
@@ -832,7 +852,7 @@ BEGIN
 	WHERE Name = 'CrossSellUrl3'
 
 	UPDATE ProductOptionTypes
-	SET DefaultValue = '/assets/images/store/Sockeye6oz_218.jpg'
+	SET DefaultValue = '/assets/images/store/NCB106_goodfishbook_218.jpg'
 	WHERE Name = 'CrossSellImage4'
 
 	UPDATE ProductOptionTypes
