@@ -4,6 +4,10 @@
 	<title>Vital Choice | Top Favorite Items</title>
 }
 
+@section PageScripts {
+    <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+}
+
 <div class="working-area-holder">
 	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")

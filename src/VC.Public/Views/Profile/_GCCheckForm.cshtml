@@ -1,0 +1,22 @@
+﻿@*@section PageScripts {
+    <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+}*@
+@*BUG: should be userd as adding the given script to section or sending command to the main layout. Not implemented in MVC yet - https://github.com/aspnet/Mvc/issues/2910*@
+<div class="gc-checker">
+    <div class="form-group info" style="display: none;">
+        <img class="active" src="/assets/images/icon_checkmark_sm_green.gif" alt="This Gift Certificate is active and has not expired." />
+        <img class="inactive" src="/assets/images/icon_error.gif" alt="This Gift Certificate is inactive or has expired." />
+        <strong class="status"></strong><br />
+        <span class="code">Code: <strong></strong><br /></span>
+        <span class="amount">Available Amount: <strong></strong></span>
+    </div>
+    <div class="form-group">
+        <span class="info-text">Check Gift Certificate Balance</span><br />
+        <span>Gift Certificate Code:</span><br />
+        <input type="text"><br />
+    </div>
+    <div class="form-group">
+        <input class="yellow" type="button" value="Check Balance" />
+        <hr />
+    </div>
+</div>

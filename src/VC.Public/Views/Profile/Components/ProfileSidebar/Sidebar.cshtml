@@ -4,10 +4,9 @@
 	<span class="info-text bottom-indent-small length-restricted-text">Welcome</span><br/>
 	<span class="info-text length-restricted-text">@Model.FirstName&nbsp;@Model.LastName</span><br/>
 	<span class="info-text length-restricted-text">Customer ID: @Model.Id</span>
+    <hr />
 </div>
-<div class="form-group">
-	<hr/>
-</div>
+@Html.Partial("_GCCheckForm")
 <div class="profile-sidebar-links">
 	<div class="form-group">
 		@Html.ActionLink("My Favorites", "TopFavoriteItems", "Profile")
