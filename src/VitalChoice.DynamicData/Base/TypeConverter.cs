@@ -50,6 +50,11 @@ namespace VitalChoice.DynamicData.Base
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
             }
+            if (sourceType == typeof(long) && (destType == typeof(int) || destType == typeof(int?)))
+            {
+                return (int)((long)obj);
+            }
+
             var unwrappedSrc = sourceType.UnwrapNullable();
             var enumType = unwrappedSrc.TryUnwrapEnum();
             if (enumType != null)
@@ -106,6 +111,10 @@ namespace VitalChoice.DynamicData.Base
             if (unwrappedDest.GetTypeInfo().IsEnum)
             {
                 return Enum.Parse(unwrappedDest, obj.ToString());
+            }
+            if (sourceType == typeof(long) && (destType==typeof(int) || destType == typeof(int?)))
+            {
+                return (int)((long)obj);
             }
 
             IObjectMapper objectMapper;
