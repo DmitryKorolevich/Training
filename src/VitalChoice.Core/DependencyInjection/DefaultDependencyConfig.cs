@@ -389,6 +389,10 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<AffiliateOrderPaymentRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+            builder.RegisterType<AddressOptionValueRepository>()
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+            builder.RegisterType<CustomerRepository>()
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
             builder.RegisterType<CustomerService>().As<ICustomerService>();

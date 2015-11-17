@@ -156,7 +156,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             {
                 breadcrumbItems.Add(new TtlBreadcrumbItemModel()
                 {
-                    Label = subItem.NavLabel,
+                    Label = subItem.ProductCategory.Name,
                     Url = subItem.Url
                 });
 

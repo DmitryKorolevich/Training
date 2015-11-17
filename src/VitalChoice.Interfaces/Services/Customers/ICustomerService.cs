@@ -26,5 +26,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 	    Task<CustomerDynamic> InsertAsync(CustomerDynamic model, string password);
 
 		Task<CustomerDynamic> UpdateAsync(CustomerDynamic model, string password);
-	}
+
+        Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter);
+
+        Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter);
+    }
 }

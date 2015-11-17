@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Templates.Helpers;
 using VitalChoice.Business.Queries.Workflow;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;

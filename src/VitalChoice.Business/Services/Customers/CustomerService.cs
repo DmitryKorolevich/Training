@@ -49,19 +49,21 @@ namespace VitalChoice.Business.Services.Customers
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
-	    private readonly IEcommerceRepositoryAsync<Customer> _customerRepositoryAsync;
+	    private readonly CustomerRepository _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
 	    private readonly IStorefrontUserService _storefrontUserService;
         private readonly IEcommerceRepositoryAsync<Affiliate> _affiliateRepositoryAsync;
         private readonly IOptions<AppOptions> _appOptions;
+        private readonly AddressOptionValueRepository _addressOptionValueRepositoryAsync;
+        private readonly CustomerAddressMapper _customerAddressMapper;
 
         private static string _customerContainerName;
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
-            IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
+            CustomerRepository customerRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
@@ -88,6 +90,8 @@ namespace VitalChoice.Business.Services.Customers
 		    _appOptions = appOptions;
 		    _userRepositoryAsync = userRepositoryAsync;
             _affiliateRepositoryAsync = affiliateRepositoryAsync;
+            _addressOptionValueRepositoryAsync = addressOptionValueRepositoryAsync;
+            _customerAddressMapper = customerAddressMapper;
         }
 
         protected override IQueryLite<Customer> BuildQuery(IQueryLite<Customer> query)
@@ -445,6 +449,22 @@ namespace VitalChoice.Business.Services.Customers
 	    {
 		    return await _storageClient.DownloadBlobAsync(_customerContainerName, $"{customerPublicId}/{fileName}");
 	    }
+		public async Task<ICollection<string>> GetAddressFieldValuesByValueAsync(ValuesByFieldValueFilter filter)
+        {
+            ICollection<string> toReturn = new List<string>();
+            var fields = _customerAddressMapper.OptionTypes.Where(p => p.Name == filter.FieldName).ToList();
+            if (fields != null && fields.Count>0)
+            {
+                filter.FieldIds = fields.Select(p => p.Id).ToList();
+                toReturn = await _addressOptionValueRepositoryAsync.GetAddressFieldValuesByValue(filter);
+            }
+            return toReturn;
+        }
+
+        public async Task<ICollection<string>> GetCustomerStaticFieldValuesByValue(ValuesByFieldValueFilter filter)
+        {
+            return await _customerRepositoryAsync.GetCustomerStaticFieldValuesByValue(filter);
+        }
 
         private async Task<bool> DeleteFileAsync(string fileName, string customerPublicId)
         {

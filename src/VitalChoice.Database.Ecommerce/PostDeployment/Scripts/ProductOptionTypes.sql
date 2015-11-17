@@ -747,3 +747,18 @@ SET [IdFieldType] = 3
 WHERE [Name] = 'QTY'
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ProductOptionTypes] WHERE [Name] = N'SubTitle')
+BEGIN
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdObjectType, Name)
+	SELECT NULL, 4, 1, N'SubTitle'
+	UNION
+	SELECT NULL, 4, 2, N'SubTitle'
+	UNION
+	SELECT NULL, 4, 3, N'SubTitle'
+	UNION
+	SELECT NULL, 4, 4, N'SubTitle'
+END
+
+GO

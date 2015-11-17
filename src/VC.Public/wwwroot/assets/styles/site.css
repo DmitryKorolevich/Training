@@ -1393,8 +1393,6 @@ footer {
 }
 .product-main .product-intro-main img {
   vertical-align: top;
-  width: 100px;
-  height: 60px;
   float: right;
 }
 .product-main .product-intro-headers {
@@ -1443,6 +1441,9 @@ footer {
   font-size: 14px;
   line-height: 14px;
   color: #333333;
+  margin: 0px;
+}
+.product-main .product-intro-description p {
   margin: 0px;
 }
 .product-main .product-intro-more {
@@ -1617,4 +1618,7 @@ footer {
 }
 .product-related-link img {
   width: inherit;
+}
+.product-main .tabs-control {
+  width: 954px;
 }

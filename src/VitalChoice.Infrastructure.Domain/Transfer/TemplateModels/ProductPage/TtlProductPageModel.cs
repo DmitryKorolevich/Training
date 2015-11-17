@@ -10,10 +10,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 			CrossSells = new List<TtlCrossSellProductModel>();
 			BreadcrumbOrderedItems = new List<TtlBreadcrumbItemModel>();
 		    Skus = new List<TtlProductPageSkuModel>();
-			Tabs = new List<TtlProductPageTabContent>();
 	    }
 
 	    public string Name { get; set; }
+
+	    public string SubTitle { get; set; }
 
 		public string Url { get; set; }
 
@@ -21,7 +22,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public string ShortDescription { get; set; }
 
-	    public string SpecialIconUrl { get; set; }
+	    public int? SpecialIcon { get; set; }
 
 	    public IList<TtlRelatedYoutubeVideoModel> YoutubeVideos { get; set; }
 
@@ -31,6 +32,14 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public IList<TtlProductPageSkuModel> Skus { get; set; }
 
-	    public IList<TtlProductPageTabContent> Tabs { get; set; }
+	    public TtlProductPageTabContent DescriptionTab { get; set; }
+
+	    public TtlProductPageTabContent IngredientsTab { get; set; }
+
+	    public TtlProductPageTabContent RecipesTab { get; set; }
+
+	    public TtlProductPageTabContent ServingTab { get; set; }
+
+	    public TtlProductPageTabContent ShippingTab { get; set; }
     }
 }

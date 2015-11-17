@@ -509,5 +509,18 @@ namespace VC.Admin.Controllers
 
             return toReturn;
         }
+
+        [HttpPost]
+        public async Task<Result<ICollection<string>>> GetCustomerStaticFieldValuesByValue([FromBody]ValuesByFieldValueFilter filter)
+        {
+            return (await _customerService.GetCustomerStaticFieldValuesByValue(filter)).ToList();
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<string>>> GetProfileAddressFieldValuesByValueAsync([FromBody]ValuesByFieldValueFilter filter)
+        {
+            filter.IdReferencedObjectType = (int)AddressType.Profile;
+            return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
+        }
     }
 }

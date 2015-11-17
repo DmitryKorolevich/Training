@@ -94,7 +94,13 @@ namespace VC.Admin.Validators.Product
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Name, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
-                RuleFor(model => model.Url)
+				RuleFor(model => model.SubTitle)
+					.NotEmpty()
+					.WithMessage(model => model.SubTitle, ValidationMessages.FieldRequired)
+					.Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+					.WithMessage(model => model.SubTitle, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+				RuleFor(model => model.Url)
                     .NotEmpty()
                     .WithMessage(model => model.Url, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
