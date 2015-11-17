@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Domain.Attributes;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.GC

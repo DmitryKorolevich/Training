@@ -14,18 +14,6 @@ using VC.Public.Models.Auth;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Domain.Constants;
-using VitalChoice.Domain.Entities;
-using VitalChoice.Domain.Entities.eCommerce.Addresses;
-using VitalChoice.Domain.Entities.eCommerce.Customers;
-using VitalChoice.Domain.Entities.eCommerce.Payment;
-using VitalChoice.Domain.Entities.Options;
-using VitalChoice.Domain.Entities.Users;
-using VitalChoice.Domain.Exceptions;
-using VitalChoice.Domain.Transfer.Base;
-using VitalChoice.Domain.Transfer.Orders;
-using VitalChoice.Domain.Transfer.Products;
-using VitalChoice.DynamicData.Entities;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
@@ -33,6 +21,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VC.Public.Models.GC;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Public.Controllers
 {
