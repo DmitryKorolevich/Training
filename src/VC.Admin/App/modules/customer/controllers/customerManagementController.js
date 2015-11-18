@@ -32,6 +32,7 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		        $scope.forms = {};
 
 		        $scope.filter = {
+                    Address: {},
 		            SearchText: "",
 		            Paging: { PageIndex: 1, PageItemCount: 100 },
 		            Sorting: gridSorterUtil.resolve(refreshCustomers, 'Updated', 'Desc')
@@ -51,13 +52,13 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		    $scope.filterCustomers = function ()
 		    {
 		        if ((!$scope.filter.Email || $scope.filter.Email.length<3) &&
-                    (!$scope.filter.LastName || $scope.filter.LastName.length<3) &&
-                    (!$scope.filter.FirstName || $scope.filter.FirstName.length<3) &&
-                    (!$scope.filter.Address1 || $scope.filter.Address1.length<3) &&
+                    (!$scope.filter.Address.LastName || $scope.filter.Address.LastName.length < 3) &&
+                    (!$scope.filter.Address.FirstName || $scope.filter.Address.FirstName.length < 3) &&
+                    (!$scope.filter.Address.Address1 || $scope.filter.Address.Address1.length < 3) &&
                     (!$scope.filter.SearchText || $scope.filter.SearchText.length<3) &&
-                    (!$scope.filter.City || $scope.filter.City.length < 3) &&
-                    (!$scope.filter.Zip || $scope.filter.Zip.length<3) &&
-                    (!$scope.filter.Phone || $scope.filter.Phone.length<3))
+                    (!$scope.filter.Address.City || $scope.filter.Address.City.length < 3) &&
+                    (!$scope.filter.Address.Zip || $scope.filter.Address.Zip.length < 3) &&
+                    (!$scope.filter.Address.Phone || $scope.filter.Address.Phone.length < 3))
 		        {                    
 					toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
                     return;

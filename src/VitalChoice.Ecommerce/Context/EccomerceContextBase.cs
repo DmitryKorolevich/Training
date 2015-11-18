@@ -858,7 +858,7 @@ namespace VitalChoice.Ecommerce.Context
                     .IsRequired(false);
                 entity
                     .HasMany(a => a.OptionValues)
-                    .WithOne()
+                    .WithOne(v => v.Address)
                     .HasForeignKey(o => o.IdAddress)
                     .HasPrincipalKey(a => a.Id)
                     .IsRequired();
@@ -892,9 +892,6 @@ namespace VitalChoice.Ecommerce.Context
                     .IsRequired();
                 entity.Ignore(c => c.BigValue);
                 entity.Ignore(c => c.IdBigString);
-                entity.HasIndex(a => new { a.Value, a.IdOptionType });
-                entity.HasIndex(a => a.Value);
-                entity.Property(a => a.Value).HasMaxLength(250);
             });
 
 

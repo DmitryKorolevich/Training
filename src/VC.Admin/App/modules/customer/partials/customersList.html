@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="filter.LastName"
+                        <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="filter.Address.LastName"
                                typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'LastName')" typeahead-loading="loadingByLastName">
                         <span class="input-group-addon">
                             <i ng-show="loadingByLastName" class="glyphicon glyphicon-refresh"></i>
@@ -22,10 +22,10 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="First Name" data-ng-model="filter.FirstName">
+                    <input type="text" class="form-control" placeholder="First Name" data-ng-model="filter.Address.FirstName">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address1">
+                    <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address.Address1">
                 </div>
             </div>
             <div class="row form-group">
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="filter.City"
+                        <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="filter.Address.City"
                                typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
                         <span class="input-group-addon">
                             <i ng-show="loadingByCity" class="glyphicon glyphicon-refresh"></i>
@@ -48,10 +48,10 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Zip">
+                    <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Address.Zip">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Phone">
+                    <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Address.Phone">
                 </div>
             </div>
         </form>
