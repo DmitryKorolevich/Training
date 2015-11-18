@@ -11,7 +11,7 @@ namespace VitalChoice.Domain.Constants
         public const string FIELD_NAME_YOUTUBE_VIDEO = "YouTubeVideo";
         public const string FIELD_NAME_YOUTUBE_IMAGE = "YouTubeImage";
         public const string FIELD_NAME_YOUTUBE_TEXT = "YouTubeText";
-        public const int FIELD_COUNT_YOUTUBE = 3;
+        public const int FIELD_COUNT_YOUTUBE = 4;
 
         public const string FIELD_NAME_DISREGARD_STOCK = "DisregardStock";
         public const string FIELD_NAME_STOCK = "Stock";

@@ -12,5 +12,7 @@ namespace VitalChoice.Domain.Transfer.TemplateModels.ProductPage
 	    public int PortionsCount { get; set; }
 
 	    public decimal Price { get; set; }
+
+	    public bool BestValue { get; set; }
     }
 }
