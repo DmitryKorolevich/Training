@@ -13,5 +13,5 @@ foreach ($target in $targetNames) {
 	GruntTask -taskName "release"
 	DnuAll -deployPath "${RootDeploy}\${target}"
 	RestoreRuntime -deployPath "${RootDeploy}\${target}"
-	cp "web.config" "${RootDeploy}\${target}\wwwroot\"
+	#cp "web.config" "${RootDeploy}\${target}\wwwroot\"
 }

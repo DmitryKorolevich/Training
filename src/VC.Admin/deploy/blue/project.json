@@ -27,17 +27,21 @@
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
     "EntityFramework.Core": "7.0.0-*",
-    "EntityFramework.Commands": "7.0.0-*",
-    "VitalChoice.Domain": "1.0.0-*",
+    "VitalChoice.Ecommerce.Domain": "1.0.0-*",
+    "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
     "VitalChoice.Validation": "1.0.0-*",
-    "VitalChoice.DynamicData": "1.0.0-*",
+    "VitalChoice.DynamicData": "1.0.0-*",    
+    "VitalChoice.SharedWeb": "1.0.0-*",
     "System.Net.Http": "4.0.1-*"
   },
   "frameworks": {
     "dnx451": {
+      "dependencies": {
+        "EntityFramework.Commands": "7.0.0-*"
+      }
     },
     "dotnet5.4": {
       "dependencies": {
@@ -47,7 +51,7 @@
   },
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel",
-    "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5004",
+    "kestrel": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5504",
     "gen": "Microsoft.Extensions.CodeGeneration",
     "ef": "EntityFramework.Commands"
   }
