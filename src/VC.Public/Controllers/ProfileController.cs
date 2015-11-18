@@ -11,6 +11,7 @@ using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
@@ -18,7 +19,9 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Customers;
@@ -27,9 +30,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VitalChoice.Interfaces.Services.Help;
-using VitalChoice.Domain.Transfer.Help;
 using VitalChoice.SharedWeb.Models.Help;
-using VitalChoice.Domain.Entities.eCommerce.Help;
 
 namespace VC.Public.Controllers
 {
@@ -43,10 +44,11 @@ namespace VC.Public.Controllers
 		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
 		private readonly IProductService _productService;
 		private readonly IOrderService _orderService;
+        private readonly IHelpService _helpService;
 
-		public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
+        public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
 			ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService)
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService, IHelpService helpService)
 		{
 			_contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
@@ -55,6 +57,7 @@ namespace VC.Public.Controllers
 			_paymentMethodConverter = paymentMethodConverter;
 			_orderService = orderService;
 			_productService = productService;
+            _helpService = helpService;
 		}
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(ShortOrderFilter filter)
