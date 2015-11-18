@@ -37,19 +37,19 @@ namespace VitalChoice.Business.Services.Products
 
 	    protected override async Task<ProductContent> GetData(IDictionary<string, object> queryData)
 	    {
-	        var productCategory = await base.GetData(queryData);
-            if (productCategory == null)
+	        var product = await base.GetData(queryData);
+            if (product == null)
             {
-                Logger.LogInformation("The category could not be found {" + queryData.FormatDictionary() + "}");
+                Logger.LogInformation("The product could not be found {" + queryData.FormatDictionary() + "}");
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
                 return null;
             }
-            if (productCategory.ContentItem == null)
+            if (product.ContentItem == null)
             {
-                Logger.LogError("The category {0} have no template", productCategory.Url);
+                Logger.LogError("The product {0} have no template", product.Url);
                 return null;
             }
-            return productCategory;
+            return product;
 	    }
 
 	    public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
