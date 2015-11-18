@@ -228,6 +228,12 @@ namespace VitalChoice.Business.Services.Orders
             return base.Validate(dynamic);
         }
 
+        public async Task<int?> GetOrderIdCustomer(int id)
+        {
+            var order = (await this.ObjectRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted && p.Id == id).SelectAsync(false)).FirstOrDefault();
+            return order?.IdCustomer;
+        }
+
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
 	        Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;

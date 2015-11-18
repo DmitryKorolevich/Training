@@ -39,7 +39,8 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "VitalChoice.Validation": "1.0.0-*"
+    "VitalChoice.Validation": "1.0.0-*",
+    "VitalChoice.SharedWeb": "1.0.0-*"
   },
   "frameworks": {
     "dnx451": {

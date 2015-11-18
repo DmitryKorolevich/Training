@@ -38,6 +38,7 @@ using Microsoft.Net.Http.Headers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Domain.Entities.Help;
 using Microsoft.Framework.Primitives;
+using VitalChoice.SharedWeb.Models.Help;
 #if DNX451
 using System.Net.Mime;
 #endif

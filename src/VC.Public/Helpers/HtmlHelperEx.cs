@@ -44,5 +44,12 @@ namespace VC.Public.Helpers
 				return new HtmlString(value?.ToString() ?? string.Empty);
 			}
 		}
+
+        private static TimeZoneInfo _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+
+        public static DateTime ConvertToPST(this DateTime date)
+        {
+            return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, _pstTimeZoneInfo);
+        } 
 	}
 }

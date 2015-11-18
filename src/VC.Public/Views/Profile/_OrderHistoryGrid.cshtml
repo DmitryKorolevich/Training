@@ -41,7 +41,7 @@
 					<td>@item.Total.ToString("C2")</td>
 					<td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
 					<td>No</td>
-					<td><a href="#">Help Desk</a></td>
+					<td>@Html.ActionLink("Help Desk","HelpTickets", new { idorder= item.Id})</td>
 				</tr>
 			}
 		}

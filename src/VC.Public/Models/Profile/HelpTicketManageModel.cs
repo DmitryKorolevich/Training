@@ -1,0 +1,98 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using VitalChoice.Domain.Entities;
+using VitalChoice.Domain.Entities.Content;
+using VitalChoice.Validation.Models;
+using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models.Interfaces;
+using VitalChoice.Domain.Entities.eCommerce.Products;
+using VitalChoice.Domain.Entities.Localization.Groups;
+using VitalChoice.DynamicData.Entities;
+using VitalChoice.Domain.Entities.eCommerce.Discounts;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Domain.Entities.eCommerce.Help;
+using System.ComponentModel.DataAnnotations;
+using VitalChoice.Domain.Constants;
+
+namespace VC.Public.Models.Profile
+{
+    public class HelpTicketManageModel : BaseModel
+    {
+        [Display(Name = "Message #")]
+        public int Id { get; set; }
+
+        [Display(Name = "Order #")]
+        public int IdOrder { get; set; }
+
+        public int IdCustomer { get; set; }
+
+        public string Customer { get; set; }
+
+        [Display(Name = "Initially posted on")]
+        public DateTime DateCreated { get; set; }
+
+        public DateTime DateEdited { get; set; }
+
+        [Display(Name = "Status")]
+        public RecordStatusCode StatusCode { get; set; }
+
+        [Required]
+        [Display(Name = "Priority")]
+        public TicketPriority Priority { get; set; }
+
+        [Required]
+        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [Display(Name = "Summary")]
+        public string Summary { get; set; }
+
+        [Required]
+        [MaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
+        [Display(Name = "Description")]
+        public string Description { get; set; }
+
+        public ICollection<HelpTicketCommentManageModel> Comments { get; set; }
+
+        public HelpTicketManageModel()
+        {
+        }
+
+        public HelpTicketManageModel(HelpTicket item)
+        {
+            if (item != null)
+            {
+                Id = item.Id;
+                IdOrder = item.IdOrder;
+                DateCreated = item.DateCreated;
+                DateEdited = item.DateEdited;
+                StatusCode = item.StatusCode;
+                Priority = item.Priority;
+                Summary = item.Summary;
+                Description = item.Description;
+                IdCustomer = item.IdCustomer;
+                Customer = item.Customer;
+                if(item.Comments!=null)
+                {
+                    Comments = new List<HelpTicketCommentManageModel>();
+                    foreach(var comment in item.Comments)
+                    {
+                        Comments.Add(new HelpTicketCommentManageModel(comment));
+                    }
+                }
+            }
+        }
+
+        public HelpTicket Convert()
+        {
+            HelpTicket toReturn = new HelpTicket();
+            toReturn.Id = Id;
+            toReturn.IdOrder = IdOrder;
+            toReturn.StatusCode = StatusCode;
+            toReturn.Priority = Priority;
+            toReturn.Summary = Summary;
+            toReturn.Description = Description;
+
+            return toReturn;
+        }
+    }
+}

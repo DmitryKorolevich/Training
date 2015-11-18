@@ -1,0 +1,192 @@
+﻿@using VitalChoice.Interfaces.Services
+@model VC.Public.Models.Profile.HelpTicketManageModel
+@inject IAppInfrastructureService appInfrastructureService;
+
+@{
+    var infrastructure = appInfrastructureService.Get();
+}
+
+@section Meta {
+    <title>Vital Choice | Help Ticket</title>
+}
+
+@section PageScripts {
+    <script src="@Url.Content("/app/modules/profile/helpticket.js")"></script>
+}
+
+<script>
+    successMessage = '@ViewBag.SuccessMessage';
+</script>
+
+<div class="working-area-holder">
+    <div class="left-pane clean-border">
+        @await Component.InvokeAsync("ProfileSidebar")
+    </div>
+    <div class="right-pane clean-indent help-ticket">
+
+        @Html.AntiForgeryToken()
+        <h4>Help Desk</h4>
+        @Html.ValidationSummary(true, "")
+        @if (Model != null)
+            {
+            @using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, new { @class = "form-regular main medium-small border-form-left inner " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
+            {
+                <input name="IdOrder" value="@Html.DisplayForEx(x => x.IdOrder)" type="hidden">
+                <input name="Id" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
+                @if (Model.Id != 0)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Id, new { @class = "control-label" })
+                        <div class="input-group">
+                            <label class="form-control-static bold">@Html.DisplayForEx(m => m.Id)</label>
+                        </div>
+                        <div class="input-group">
+                            <label class="form-control-static"><a class="delete-ticket-button" href="#">Delete</a></label>
+                        </div>
+                    </div>
+                }
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IdOrder, new { @class = "control-label" })
+                    <div class="input-group">
+                        <label class="form-control-static bold">@Html.DisplayForEx(m => m.IdOrder)</label>
+                    </div>
+                </div>
+                @if (Model.Id != 0)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DateCreated, new { @class = "control-label" })
+                        <div class="input-group">
+                            <label class="form-control-static bold">@Model.DateCreated.ConvertToPST().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</label>
+                        </div>
+                    </div>
+                }
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Priority, new { @class = "control-label" })
+                    <div class="input-group">
+                        @if (Model.Id != 0)
+                        {
+                            @Html.DropDownListFor(m => m.Priority, @infrastructure.Priorities.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key.ToString() }).ToList(), new { @class = "form-control", @disabled = "disabled" })
+                        }
+                        else
+                        {
+                            @Html.DropDownListFor(m => m.Priority, @infrastructure.Priorities.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key.ToString() }).ToList(), new { @class = "form-control" })
+                        }
+                        @Html.ValidationMessageFor(m => m.Priority, "")
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Summary, new { @class = "control-label" })
+                    <div class="input-group">
+                        @if (Model.Id != 0)
+                        {
+                            @Html.TextBoxFor(m => m.Summary, new { @class = "form-control", @disabled = "disabled" })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.Summary, new { @class = "form-control" })
+                        }
+                        @Html.ValidationMessageFor(m => m.Summary, "")
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Description, new { @class = "control-label" })
+                    <div class="input-group">
+                        @if (Model.Id != 0)
+                        {
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control big", @rows = 10, @disabled = "disabled" })
+                        }
+                        else
+                        {
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control big", @rows = 10 })
+                        }
+                        @Html.ValidationMessageFor(m => m.Description, "")
+                    </div>
+                </div>
+                @if (Model.Id != 0)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.StatusCode, new { @class = "control-label" })
+                        <div class="input-group">
+                            <label class="form-control-static bold">@infrastructure.TicketStatuses.Single(x => x.Key == (int)Model.StatusCode).Text</label>
+                        </div>
+                    </div>
+                    <div class="sub-title"><span>Comments</span></div>
+                }
+                else
+                {
+                    <div class="form-buttons-group">
+                        <input class="yellow add-ticket-button" type="submit" value="Add New Help Ticket" />
+                        <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back" />
+                        @Html.ActionLink("Other Help Tickets", "HelpTickets", new { idorder = Model.IdOrder }, new { @class = "button" })
+                    </div>
+                }
+            }
+            @using (Html.BeginForm("DeleteHelpTicket", "Profile", null, FormMethod.Post, new { @class = "delete-ticket", role = "form" }))
+            {
+                <input name="IdOrder" value="@Html.DisplayForEx(x => x.IdOrder)" type="hidden">
+                <input name="Id" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
+            }
+            @if (Model.Id != 0)
+            {
+                    @foreach (var comment in Model.Comments)
+                    {
+                        @using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular exist-comment medium-small border-form-left inner", role = "form" }))
+                        {
+                        <div class="comment">
+                            <div class="form-group">
+                                <span>
+                                    @(comment.DateCreated == comment.DateEdited ? "Submitted" : "Modified") on
+                                    <strong>@comment.DateEdited.ConvertToPST().ToString("MM/dd/yy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</strong> by
+                                    <strong>@(!String.IsNullOrEmpty(comment.EditedBy) ? String.Format("Vital Choice ({0})", comment.EditedBy) : comment.Customer)</strong>
+                                </span>
+                                @if (String.IsNullOrEmpty(comment.EditedBy))
+                                {
+                                    <label class="form-control-static pull-right">
+                                        <a class="edit-comment-button" href="#">Edit</a>
+                                        <a style="display: none;" class="update-comment-button" href="#">Update</a>
+                                        &nbsp;|&nbsp;
+                                        <a class="delete-comment-button" href="#">Delete</a>
+                                        <a style="display: none;" class="cancel-comment-button" href="#">Cancel</a>
+                                    </label>
+                                }
+                            </div>
+                            <div class="form-group">
+                                <input name="IdHelpTicket" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
+                                <input style="display: none;" name="Id" value="@comment.Id" type="hidden">
+                                <label class="control-label" for="Comment">Comment</label>
+                                <div class="input-group read">
+                                    <label class="form-control-static fixed">@comment.Comment</label>
+                                </div>
+                                <div style="display: none;" class="input-group edit">
+                                    <textarea class="form-control big margin-bottom-small" data-val="true" data-val-maxlength="The field Comment must be a string or array type with a maximum length of 1000" data-val-maxlength-max="1000" data-val-required="The Comment field is required." id="Comment" name="Comment" rows="10">@comment.Comment</textarea>
+                                    <span class="field-validation-valid" data-valmsg-for="Comment" data-valmsg-replace="true"></span>
+                                </div>
+                                <hr class="clear" />
+                            </div>
+                        </div>
+                        }
+                    }
+
+                    @using (Html.BeginForm("UpdateHelpTicketComment", "Profile", null, FormMethod.Post, new { @class = "form-regular new-comment medium-small border-form-left inner", role = "form" }))
+                    {
+                        <form class="form-regular new-comment medium-small border-form-left inner margin-bottom-big" role="form" novalidate="novalidate">
+                            <div class="sub-title"><span>Add New Comment</span></div>
+                            <input name="IdHelpTicket" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
+                            <div class="form-group">
+                                <label class="control-label" for="NewComment">Comment</label>
+                                <div class="input-group">
+                                    <textarea class="form-control big" data-val="true" data-val-maxlength="The field Comment must be a string or array type with a maximum length of 1000" data-val-maxlength-max="1000" data-val-required="The Comment field is required." id="NewComment" name="Comment" rows="10"></textarea>
+                                    <span class="field-validation-valid" data-valmsg-for="Comment" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                            <div class="form-buttons-group">
+                                <input class="yellow add-comment-button" type="submit" value="Add New Comment" />
+                                <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back" />
+                                @Html.ActionLink("Other Help Tickets", "HelpTickets", new { idorder = Model.IdOrder }, new { @class = "button" })
+                            </div>
+                        </form>
+                    }
+            }
+        }
+    </div>
+</div>

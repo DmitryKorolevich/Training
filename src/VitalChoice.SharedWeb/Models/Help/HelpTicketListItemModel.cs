@@ -13,7 +13,7 @@ using VitalChoice.Domain.Entities.eCommerce.Orders;
 using VitalChoice.Domain.Entities.eCommerce.Affiliates;
 using VitalChoice.Domain.Entities.eCommerce.Help;
 
-namespace VC.Admin.Models.Help
+namespace VitalChoice.SharedWeb.Models.Help
 {
     public class HelpTicketListItemModel : BaseModel
     {
