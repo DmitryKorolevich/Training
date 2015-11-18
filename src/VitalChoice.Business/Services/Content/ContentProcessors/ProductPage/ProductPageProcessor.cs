@@ -55,6 +55,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             }
 
 			var eProduct = await _productService.SelectAsync(model.Model.Id, true);
+		    if (eProduct.Hidden)
+		    {
+				return null;
+			}
 
 		    ProductNavCategoryLite rootNavCategory = null;
             if (eProduct.CategoryIds.Any())
@@ -140,7 +144,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 		        ShortDescription = eProduct.Data.ShortDescription,
 		        SpecialIcon = eProduct.Data.SpecialIcon,
 		        BreadcrumbOrderedItems = breadcrumbItems,
-		        Skus = eProduct.Skus.OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
+		        Skus = eProduct.Skus.Where(x=>!x.Hidden).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
 		        {
 			        Code = x.Code,
 			        Price = model.Role == RoleType.Retail ? x.Price : x.WholesalePrice,

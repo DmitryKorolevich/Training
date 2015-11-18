@@ -204,7 +204,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 LongDescription = productCategoryContent.LongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
                 SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x)).ToList(),
-                Products = products?.Select(x => new TtlCategoryProductModel
+                Products = products?.Where(x=>!x.Hidden).Select(x => new TtlCategoryProductModel
                 {
                     Id = x.IdProduct,
                     Name = x.Name,
