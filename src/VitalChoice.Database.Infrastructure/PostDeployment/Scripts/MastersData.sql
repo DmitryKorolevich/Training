@@ -1787,13 +1787,13 @@ BEGIN
 {{
     <script>
    window.addEventListener("load", function(){
-          $("input[name=sku]:first").attr("checked", true);
+          '+ CHAR(36) + '("input[name=sku]:first").attr("checked", true);
    
-         $("body").on("change", "input[name=sku]", function(){
+         '+ CHAR(36) + '("body").on("change", "input[name=sku]", function(){
             var jChecked =  '+ CHAR(36) + '("input[name=sku]:checked");
             
-             $("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
-             $("#hSelectedCode").text("Product #" + jChecked.val());
+             '+ CHAR(36) + '("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
+             '+ CHAR(36) + '("#hSelectedCode").text("Product #" + jChecked.val());
         });
     }, false);
     </script>
