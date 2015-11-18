@@ -15,7 +15,7 @@
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
-    "Templates": "2.4.1-rc1",
+    "Templates": "2.4.2-rc1",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.ContentProcessing": "",
     "VitalChoice.Data": "1.0.0-*",

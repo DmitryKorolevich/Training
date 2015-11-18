@@ -5,7 +5,6 @@ using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using VC.Admin.AppConfig;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.Core.Infrastructure;
-
+using Microsoft.AspNet.Identity;
 
 namespace VC.Admin
 {
