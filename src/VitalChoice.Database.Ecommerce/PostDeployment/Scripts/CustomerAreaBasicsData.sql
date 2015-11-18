@@ -447,6 +447,8 @@ BEGIN
 	DECLARE @id int
 	SET @id = (SELECT TOP 1 Id FROM [dbo].[PaymentMethods] WHERE [Name] = N'Prepaid')
 
+	DELETE [dbo].[CustomerPaymentMethods] WHERE IdObjectType=@id
+	DELETE [dbo].[OrderPaymentMethods] WHERE IdObjectType=@id
 	DELETE [dbo].[PaymentMethodsToCustomerTypes] WHERE IdPaymentMethod=@id
 	DELETE [dbo].[PaymentMethods] WHERE Id=@id
 END
