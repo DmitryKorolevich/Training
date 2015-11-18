@@ -175,6 +175,7 @@ namespace VC.Admin.Controllers
                         new VideoModel() { IsDefault=true},
                         new VideoModel() { IsDefault=true},
                         new VideoModel() { IsDefault=true},
+                        new VideoModel() { IsDefault=true}
                     },
                 };
             }
