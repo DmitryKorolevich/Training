@@ -193,13 +193,13 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        },
 			        new TtlCrossSellProductModel()
 			        {
-				        Image = eProduct.Data.CrossSellImage1,
-				        Url = eProduct.Data.CrossSellUrl2,
+				        Image = eProduct.Data.CrossSellImage3,
+				        Url = eProduct.Data.CrossSellUrl3,
 			        },
 			        new TtlCrossSellProductModel()
 			        {
-				        Image = eProduct.Data.CrossSellImage1,
-				        Url = eProduct.Data.CrossSellUrl2,
+				        Image = eProduct.Data.CrossSellImage4,
+				        Url = eProduct.Data.CrossSellUrl4,
 			        }
 		        },
 		        DescriptionTab = new TtlProductPageTabContent()
