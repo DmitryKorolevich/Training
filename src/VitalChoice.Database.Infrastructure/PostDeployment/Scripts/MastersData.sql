@@ -1438,3 +1438,107 @@ BEGIN
 WHERE [Name] = 'Product page'
 
 END
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@using() {{VitalChoice.Domain%' AND [Name] = 'Product sub categories')
+BEGIN
+	UPDATE MasterContentItems
+	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels}}
+	@using() {{System.Linq}}
+	@model() {{dynamic}}
+
+	<%
+	<menu_sidebar>
+	{{
+		<ul class="category-sidebar">
+			@list(SideMenuItems)
+			{{
+				<li>
+					 @if(@model.SubItems.Count > 0) {{
+						<a href="#" title="@(Label)">
+							@(Label)
+						</a>
+						<ul>
+								@list(SubItems)
+								{{
+									<li>
+										<a href="@(Url)" title="@(Label)">
+											@(Label)
+										</a>
+									</li>
+								}}
+						</ul>
+					}}
+					@if(@model.SubItems.Count == 0){{
+						<a href="@(Url)" title="@(Label)">
+							@(Label)
+						</a>
+					}}
+				</li>
+			}}
+			<li><a href="#">Top Sellers</a></li>
+			<li><a href="#">Special Offers</a></li>
+			<li><a href="#">New Products</a></li>
+		</ul>
+	}}
+
+	<category_breadcrumb>
+	{{
+		<div class="category-breadcrumb">
+			@list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1))
+			{{
+				<a href="@(Url)" title="@(Label)">@(Label)</a>
+				<img src="/assets/images/breadarrow2.jpg">
+			}}
+			@(@model.BreadcrumbOrderedItems.Last())
+			{{
+				<a href="@(Url)" title="@(Label)">@(Label)</a>
+			}}
+		</div>
+	}}
+
+	<category_top>
+	{{
+		@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)) {{
+			<img src="@(FileImageLargeUrl)">
+			<br>
+		}}
+		@(LongDescription)
+	}}
+
+	<category_article>
+	{{
+		@(LongDescriptionBottom)
+	}}
+
+	<layout> -> (ProductCategory)
+	{{
+	<aside id="menuSidebar" class="category-aside">
+		@menu_sidebar()
+	</aside>
+	<section class="category-main">
+		@category_breadcrumb()
+		<div class="category-top">
+			@category_top()
+		</div>
+		<div class="categories-selection-container">
+			@list(SubCategories)
+			{{
+				<a href="@(Url)" title="@(Name)">
+					<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+				</a>
+			}}
+			@list(Products)
+			{{
+				<a href="/product/@(Url)" title="@(Name)">
+					<img src="@(Thumbnail)" alt="@(Name)">@(Name)
+				</a>
+			}}
+		</div>
+		<article class="category-article">
+			@category_article()
+		</article>
+	</section>
+	}}:: TtlCategoryModel 
+	%>'
+	WHERE [Name] = 'Product sub categories'
+END
