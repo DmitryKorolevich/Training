@@ -4,7 +4,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 
-namespace VC.Admin.Models.Help
+namespace VitalChoice.SharedWeb.Models.Help
 {
     public class HelpTicketListItemModel : BaseModel
     {

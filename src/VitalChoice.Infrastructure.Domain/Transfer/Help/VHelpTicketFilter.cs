@@ -13,5 +13,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Help
         public RecordStatusCode? StatusCode { get; set; }
 
         public TicketPriority? Priority { get; set; }
+
+        public int? IdOrder { get; set; }
+
+        public int? IdCustomer { get; set; }
     }
 }

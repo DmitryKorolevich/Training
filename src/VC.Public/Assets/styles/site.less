@@ -3,6 +3,11 @@
     src: url(/assets/fonts/Paneuropa-Highway.ttf.woff);
 }
 
+@bgcolor-success: #73a839;
+@bgcolor-info: #033c73;
+@bgcolor-warning: #dd5600;
+@bgcolor-danger: #c71c22;
+
 html{
 	line-height:normal;
 }
@@ -26,6 +31,34 @@ body {
 
 .clear {
     clear: both;
+}
+
+.label {
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-align: center;    
+    display: inline;
+    padding: .2em .6em .3em;
+    color: #fff;
+    border-radius: .25em;
+}
+
+.label-success {
+    background-color: @bgcolor-success;
+}
+
+.label-info {
+    background-color: @bgcolor-info;
+}
+
+.label-warning {
+    background-color: @bgcolor-warning;
+}
+
+.label-danger {
+    background-color: @bgcolor-danger;
 }
 
 .header-top{
@@ -1162,6 +1195,11 @@ footer{
 		}
 	}
 
+.border-form-left.inner{
+    min-height: auto;
+    margin-bottom: 0;
+}
+
 .form-regular.medium{
 	.control-label{
 		width:200px;
@@ -1300,12 +1338,22 @@ footer{
 				}
 			}
 
+            .form-control.big {
+                width: 400px;
+            }
+
             input[type="checkbox"].form-control, input[type="radio"].form-control { height: auto; margin-top: 9px; margin-right: 7px; width: auto;}
+
+            textarea.form-control { height: auto;}
 
 			.form-control-static{
 				padding: 8px 5px;
 				display:block;
 				color:rgb(51, 51, 51);
+			}
+
+            .form-control-static.bold{
+				font-weight: bold;
 			}
 
 			.form-control:focus{
@@ -1333,21 +1381,21 @@ footer{
             float: none;
         }
     }
+}
 
-	.form-buttons-group{
-		margin-top: 15px;
-		margin-bottom: 15px;
-		float:left;
-		clear:left;
+.form-buttons-group{
+	margin-top: 15px;
+	margin-bottom: 15px;
+	float:left;
+	clear:left;
 
-		:first-child{
-			margin-left:215px;
-		}
+	:first-child{
+		margin-left:215px;
 	}
+}
 
-	.pull-right{
-		float:right;
-	}
+.pull-right{
+	float:right;
 }
 
 .validation-summary-errors{
@@ -1476,20 +1524,24 @@ footer{
 	font-weight: bold;
 }
 
+.margin-bottom-big{
+	margin-bottom:50px !important;
+}
+
 .margin-top-medium{
-	margin-top:30px;
+	margin-top:30px !important;
 }
 
 .margin-bottom-medium{
-	margin-bottom:30px;
+	margin-bottom:30px !important;
 }
 
 .margin-top-small{
-	margin-top:10px;
+	margin-top:10px !important;
 }
 
 .margin-bottom-small{
-	margin-bottom:10px;
+	margin-bottom:10px !important;
 }
 
 .standard-table { width: 100%;}

@@ -23,6 +23,29 @@ body {
 .clear {
   clear: both;
 }
+.label {
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: baseline;
+  white-space: nowrap;
+  text-align: center;
+  display: inline;
+  padding: .2em .6em .3em;
+  color: #fff;
+  border-radius: .25em;
+}
+.label-success {
+  background-color: #73a839;
+}
+.label-info {
+  background-color: #033c73;
+}
+.label-warning {
+  background-color: #dd5600;
+}
+.label-danger {
+  background-color: #c71c22;
+}
 .header-top {
   height: 38px;
   position: relative;
@@ -1002,6 +1025,10 @@ footer {
 .border-form-left .form-control-important-info {
   width: auto;
 }
+.border-form-left.inner {
+  min-height: auto;
+  margin-bottom: 0;
+}
 .form-regular.medium .control-label {
   width: 200px;
 }
@@ -1107,6 +1134,9 @@ footer {
 .form-regular .form-group .input-group .form-control.date-picker {
   width: 100px;
 }
+.form-regular .form-group .input-group .form-control.big {
+  width: 400px;
+}
 .form-regular .form-group .input-group input[type="checkbox"].form-control,
 .form-regular .form-group .input-group input[type="radio"].form-control {
   height: auto;
@@ -1114,10 +1144,16 @@ footer {
   margin-right: 7px;
   width: auto;
 }
+.form-regular .form-group .input-group textarea.form-control {
+  height: auto;
+}
 .form-regular .form-group .input-group .form-control-static {
   padding: 8px 5px;
   display: block;
   color: #333333;
+}
+.form-regular .form-group .input-group .form-control-static.bold {
+  font-weight: bold;
 }
 .form-regular .form-group .input-group .form-control:focus {
   background-color: #FFFFCC;
@@ -1136,16 +1172,16 @@ footer {
   margin-right: 10px;
   float: none;
 }
-.form-regular .form-buttons-group {
+.form-buttons-group {
   margin-top: 15px;
   margin-bottom: 15px;
   float: left;
   clear: left;
 }
-.form-regular .form-buttons-group :first-child {
+.form-buttons-group :first-child {
   margin-left: 215px;
 }
-.form-regular .pull-right {
+.pull-right {
   float: right;
 }
 .validation-summary-errors {
@@ -1265,17 +1301,20 @@ footer {
 .bold {
   font-weight: bold;
 }
+.margin-bottom-big {
+  margin-bottom: 50px !important;
+}
 .margin-top-medium {
-  margin-top: 30px;
+  margin-top: 30px !important;
 }
 .margin-bottom-medium {
-  margin-bottom: 30px;
+  margin-bottom: 30px !important;
 }
 .margin-top-small {
-  margin-top: 10px;
+  margin-top: 10px !important;
 }
 .margin-bottom-small {
-  margin-bottom: 10px;
+  margin-bottom: 10px !important;
 }
 .standard-table {
   width: 100%;

@@ -11,6 +11,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	public interface IOrderService: IEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
 	{
         Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
+        Task<int?> GetOrderIdCustomer(int id);
         Task<PagedList<VOrder>> GetOrdersAsync(VOrderFilter filter);
 	    Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order);

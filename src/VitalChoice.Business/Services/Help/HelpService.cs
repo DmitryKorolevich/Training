@@ -86,7 +86,7 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<PagedList<VHelpTicket>> GetHelpTicketsAsync(VHelpTicketFilter filter)
         {
             var conditions = new VHelpTicketQuery().WithDateCreatedFrom(filter.From).WithDateCreatedTo(filter.To)
-                .WithStatus(filter.StatusCode).WithPriority(filter.Priority);
+                .WithStatus(filter.StatusCode).WithPriority(filter.Priority).WithIdOrder(filter.IdOrder).WithIdCustomer(filter.IdCustomer);
 
             var query = _vHelpTicketRepository.Query(conditions);
 
@@ -151,8 +151,20 @@ namespace VitalChoice.Business.Services.HelpService
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
             }
-
-            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            PagedList<VHelpTicket> toReturn;
+            if (filter.Paging != null)
+            {
+                toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = await query.OrderBy(sortable).SelectAsync(false);
+                toReturn = new PagedList<VHelpTicket>()
+                {
+                    Count = items.Count,
+                    Items = items,
+                };
+            }
             return toReturn;
         }
 

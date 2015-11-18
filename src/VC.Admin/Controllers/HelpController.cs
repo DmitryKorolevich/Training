@@ -14,6 +14,7 @@ using VC.Admin.Models.Help;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using Microsoft.Extensions.Primitives;
+using VitalChoice.SharedWeb.Models.Help;
 #if DNX451
 #endif
 using VitalChoice.Ecommerce.Domain.Entities;

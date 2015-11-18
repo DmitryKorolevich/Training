@@ -49,5 +49,23 @@ namespace VitalChoice.Business.Queries.Help
             Add(x => x.Id == id);
             return this;
         }
+
+        public VHelpTicketQuery WithIdOrder(int? id)
+        {
+            if (id.HasValue)
+            {
+                Add(x => x.IdOrder == id.Value);
+            }
+            return this;
+        }
+
+        public VHelpTicketQuery WithIdCustomer(int? id)
+        {
+            if (id.HasValue)
+            {
+                Add(x => x.IdCustomer == id.Value);
+            }
+            return this;
+        }
     }
 }
