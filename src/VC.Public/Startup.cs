@@ -38,7 +38,7 @@ namespace VC.Public
 
             var reg = new StorefrontDependencyConfig();
 
-            return reg.RegisterInfrastructure(Configuration, services, null, typeof(Startup).GetTypeInfo().Assembly);
+            return reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
         }
 
         // Configure is called after ConfigureServices is called.

@@ -55,7 +55,7 @@
                             </a>
                         </td>
                         <td>
-                            <a ui-sref="index.oneCol.productDetail({id:item.ProductId})">{{::item.Name}}</a>
+                            <a ui-sref="index.oneCol.productDetail({id:item.ProductId})">{{::item.Name}}<br/>{{::item.SubTitle}}</a>
                         </td>
                         <td>
                             <span>{{getReferenceItem(ReferenceData.ShortProductTypes, item.IdProductType).Text}}</span>

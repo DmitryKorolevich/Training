@@ -32,6 +32,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.product.Id = result.Data.Id;
+                $scope.previewUrl = $scope.basePreviewUrl.format($scope.product.Url);
                 refreshPossiableProductTypes();
                 refreshHistory();
             } else {
@@ -95,8 +96,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
             $scope.forms = {};
             $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
-            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}?preview=true';
-            $scope.baseUrl = $rootScope.ReferenceData.PublicHost.substring(0, $rootScope.ReferenceData.PublicHost.length - 1) + '{0}';
+            $scope.basePreviewUrl = $rootScope.ReferenceData.PublicHost + 'product/{0}';
             $scope.previewUrl = null;
             $scope.allTypes = $rootScope.ReferenceData.ProductTypes;
             $scope.googleCategories = [];
@@ -217,6 +217,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			                else {
 			                    $scope.product.Type = 2;//Perishable
 			                }
+			            }
+			            if ($scope.product.Url)
+			            {
+			                $scope.previewUrl = $scope.basePreviewUrl.format($scope.product.Url);
 			            }
 			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);

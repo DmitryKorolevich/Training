@@ -5,7 +5,8 @@
                 <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
             </div>
             <div class="btn-group margin-top-10px">
-                <button ui-sref="index.oneCol.manageProducts" class="btn btn-info width-80px">View</button>
+                <a target="_blank" href="{{previewUrl}}" data-ng-if="previewUrl" class="btn btn-info width-80px">View</a>
+                <a data-ng-if="!previewUrl" class="btn btn-info width-80px">View</a>
                 <button cancel-button-default-state="index.oneCol.manageProducts" cancel-button class="btn btn-default width-80px" unsaved-warning-clear>Cancel</button>
             </div>
             <div class="margin-top-10px">

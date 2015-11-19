@@ -26,8 +26,8 @@ namespace VitalChoice.Business.Services
             Current = this;
         }
 
-        private const string DOMAIN_ASSEMBLY_NAME = "VitalChoice.Domain";
-        private const string LOCALIZATION_GROUPS_NAMESPACE = "VitalChoice.Domain.Entities.Localization.Groups";
+        private const string DOMAIN_ASSEMBLY_NAME = "VitalChoice.Infrastructure.Domain";
+        private const string LOCALIZATION_GROUPS_NAMESPACE = "VitalChoice.Infrastructure.Domain.Entities.Localization.Groups";
         private const string NO_LABEL_VALUES = "Not defined";
 
         private Dictionary<int, Dictionary<int, List<LocalizationItemData>>> _localizationData;

@@ -82,8 +82,7 @@ namespace VitalChoice.Core.DependencyInjection
     {
         //private static bool _called = false;
 
-        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            string appPath, Assembly projectAssembly)
+        public IServiceProvider RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, Assembly projectAssembly)
         {
             //if (!_called)
             //{
@@ -161,7 +160,8 @@ namespace VitalChoice.Core.DependencyInjection
                 options.AdminHost = configuration.GetSection("App:AdminHost").Value;
                 options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
                 options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
-	            options.EmailConfiguration = new Email
+                options.FilesPath = configuration.GetSection("App:FilesPath").Value;
+                options.EmailConfiguration = new Email
 	            {
 		            From = configuration.GetSection("App:Email:From").Value,
 		            Host = configuration.GetSection("App:Email:Host").Value,
@@ -275,11 +275,6 @@ namespace VitalChoice.Core.DependencyInjection
 
             var container = BuildContainer(projectAssembly, builder);
             AutofacExecutionContext.Configure(container);
-
-            //if (!string.IsNullOrEmpty(appPath))
-            //{
-            //    FileService.Init(appPath);
-            //}
 
             UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
 

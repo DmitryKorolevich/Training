@@ -631,6 +631,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     var product = await base.InsertAsync(model, uow);
 
+                    productContent.Id = product.Id;
                     await UpdateContentForInsert(model, productContent);
 
                     await _productContentRepository.InsertGraphAsync(productContent);
