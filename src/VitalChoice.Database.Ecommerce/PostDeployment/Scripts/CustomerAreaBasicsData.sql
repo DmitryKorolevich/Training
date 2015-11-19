@@ -449,8 +449,9 @@ BEGIN
 
 	DELETE [dbo].[CustomerPaymentMethods] WHERE IdObjectType=@id
 	DELETE [dbo].[OrderPaymentMethods] WHERE IdObjectType=@id
-	--DELETE [dbo].[PaymentMethodsToCustomerTypes] WHERE IdPaymentMethod=@id
-	--DELETE [dbo].[PaymentMethods] WHERE Id=@id
+	DELETE [dbo].[CustomersToPaymentMethods] WHERE IdPaymentMethod=@id
+	DELETE [dbo].[PaymentMethodsToCustomerTypes] WHERE IdPaymentMethod=@id
+	DELETE [dbo].[PaymentMethods] WHERE Id=@id
 END
 
 GO
