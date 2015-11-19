@@ -5,7 +5,7 @@
             <div class="row form-group">
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="Email" data-ng-model="filter.Email"
+                        <input type="text" name="Id" class="form-control" placeholder="Email" data-ng-model="filter.Email" autocomplete="false"
                                typeahead-min-length="1" typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Email')" typeahead-loading="loadingByEmail">
                         <span class="input-group-addon">
                             <i ng-show="loadingByEmail" class="glyphicon glyphicon-refresh"></i>
@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="filter.Address.LastName"
+                        <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="filter.Address.LastName" autocomplete="false"
                                typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'LastName')" typeahead-loading="loadingByLastName">
                         <span class="input-group-addon">
                             <i ng-show="loadingByLastName" class="glyphicon glyphicon-refresh"></i>
@@ -22,16 +22,16 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="First Name" data-ng-model="filter.Address.FirstName">
+                    <input type="text" class="form-control" placeholder="First Name" data-ng-model="filter.Address.FirstName" autocomplete="false">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address.Address1">
+                    <input type="text" class="form-control" placeholder="Address 1" data-ng-model="filter.Address.Address1" autocomplete="false">
                 </div>
             </div>
             <div class="row form-group">
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="Customer #" data-ng-model="filter.SearchText" numbers-only
+                        <input type="text" name="Id" class="form-control" placeholder="Customer #" data-ng-model="filter.SearchText" numbers-only autocomplete="false"
                                typeahead-min-length="1" typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Id')" typeahead-loading="loadingById">
                         <span class="input-group-addon">
                             <i ng-show="loadingById" class="glyphicon glyphicon-refresh"></i>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="input-group autocomplete">
-                        <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="filter.Address.City"
+                        <input type="text" name="Id" class="form-control" placeholder="City" data-ng-model="filter.Address.City" autocomplete="false"
                                typeahead-min-length="1" typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
                         <span class="input-group-addon">
                             <i ng-show="loadingByCity" class="glyphicon glyphicon-refresh"></i>
@@ -48,10 +48,10 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Address.Zip">
+                    <input type="text" class="form-control" placeholder="Zip" data-ng-model="filter.Address.Zip" autocomplete="false">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Address.Phone">
+                    <input type="text" class="form-control" placeholder="Phone" data-ng-model="filter.Address.Phone" autocomplete="false">
                 </div>
             </div>
         </form>
