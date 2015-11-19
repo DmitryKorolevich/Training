@@ -37,7 +37,9 @@ namespace VC.Public.Controllers
 	[CustomerAuthorize]
 	public class ProfileController : BaseMvcController
 	{
-		private readonly IHttpContextAccessor _contextAccessor;
+        private const string TicketCommentMessageTempData = "ticket-comment-messsage";
+
+        private readonly IHttpContextAccessor _contextAccessor;
 		private readonly IStorefrontUserService _storefrontUserService;
 		private readonly ICustomerService _customerService;
 		private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
@@ -50,7 +52,7 @@ namespace VC.Public.Controllers
 			ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService, IHelpService helpService)
 		{
-			_contextAccessor = contextAccessor;
+            _contextAccessor = contextAccessor;
 			_storefrontUserService = storefrontUserService;
 			_customerService = customerService;
 			_addressConverter = addressConverter;
@@ -541,6 +543,10 @@ namespace VC.Public.Controllers
                 if (item != null)
                 {
                     toReturn = new HelpTicketManageModel(item);
+                    if(TempData.ContainsKey(TicketCommentMessageTempData))
+                    {
+                        ViewBag.SuccessMessage = TempData[TicketCommentMessageTempData];
+                    }
                 }
             } else if(idorder.HasValue)
             {
@@ -586,22 +592,21 @@ namespace VC.Public.Controllers
             var toReturn = new HelpTicketManageModel(await _helpService.GetHelpTicketAsync(item.IdHelpTicket));
             if (model.Id == 0)
             {
-                ViewBag.SuccessMessage = "New comment was successfully added.";
+                TempData[TicketCommentMessageTempData] = "New comment was successfully added.";
             }
             else
             {
-                ViewBag.SuccessMessage = "Comment was successfully updated.";
+                TempData[TicketCommentMessageTempData] = "Comment was successfully updated.";
             }
-            return View("HelpTicket",toReturn);
+            return RedirectToAction("HelpTicket", new { id = item.IdHelpTicket });
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteHelpTicketComment(HelpTicketCommentManageModel model)
         {
             var result = await _helpService.DeleteHelpTicketCommentAsync(model.Id, null);
-            var toReturn = new HelpTicketManageModel(await _helpService.GetHelpTicketAsync(model.IdHelpTicket));
-            ViewBag.SuccessMessage = "Comment was successfully deleted.";
-            return View("HelpTicket", toReturn);
+            TempData[TicketCommentMessageTempData] = "Comment was successfully deleted.";
+            return RedirectToAction("HelpTicket", new { id = model.IdHelpTicket });
         }
     }
 }

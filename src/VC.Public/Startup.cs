@@ -37,8 +37,8 @@ namespace VC.Public
             Configuration = configuration.Build();
 
             var reg = new StorefrontDependencyConfig();
-
-            return reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
+            var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
+            return result;
         }
 
         // Configure is called after ConfigureServices is called.
@@ -68,7 +68,8 @@ namespace VC.Public
 
 			app.UseCookieAuthentication();
 
-			app.UseMvc(RouteConfig.RegisterRoutes).UseCookieAuthentication(x =>
+            app.UseSession();
+            app.UseMvc(RouteConfig.RegisterRoutes).UseCookieAuthentication(x =>
             {
                 x.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType;
                 x.LogoutPath = "/Account/Logout";

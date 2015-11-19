@@ -36,7 +36,7 @@ namespace VC.Admin
 			Configuration = configuration.Build();
 
             var reg = new AdminDependencyConfig();
-            
+
             var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
             return result;
 		}

@@ -115,6 +115,7 @@ namespace VitalChoice.Core.DependencyInjection
                     .Transient<IActionInvokerProvider, ValidationActionInvokerProvider>());
 
             // Add MVC services to the services container.
+            StartCustomServicesRegistration(services);
             services.AddMvc();
 
             services.AddAuthorization(x => x.AddPolicy(IdentityConstants.IdentityBasicProfile, y => y.RequireAuthenticatedUser()));
@@ -424,6 +425,11 @@ namespace VitalChoice.Core.DependencyInjection
 
             var container = builder.Build();
             return container;
+        }
+
+        protected virtual void StartCustomServicesRegistration(IServiceCollection services)
+        {
+
         }
 
 	    protected virtual void FinishCustomRegistrations(ContainerBuilder builder)

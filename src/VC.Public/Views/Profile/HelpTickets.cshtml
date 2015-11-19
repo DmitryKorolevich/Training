@@ -51,7 +51,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <span class="label @(item.Priority == VitalChoice.Domain.Entities.eCommerce.Help.TicketPriority.Medium ? "label-warning" : item.Priority == VitalChoice.Domain.Entities.eCommerce.Help.TicketPriority.Low ? "label-info" : "label-danger" )">
+                                        <span class="label @(item.Priority == VitalChoice.Infrastructure.Domain.Entities.Help.TicketPriority.Medium ? "label-warning" : item.Priority == VitalChoice.Infrastructure.Domain.Entities.Help.TicketPriority.Low ? "label-info" : "label-danger" )">
                                             @infrastructure.Priorities.Single(x => x.Key == (int)item.Priority).Text
                                         </span>
                                     </td>
@@ -60,7 +60,7 @@
                                     </td>
                                     <td>@item.DateEdited.ConvertToPST().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</td>
                                     <td>
-                                        <span class="label @(item.StatusCode == VitalChoice.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
+                                        <span class="label @(item.StatusCode == VitalChoice.Ecommerce.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
                                             @infrastructure.TicketStatuses.Single(x => x.Key == (int)item.StatusCode).Text
                                         <span>
                                     </td>
