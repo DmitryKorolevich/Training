@@ -13,7 +13,7 @@ using VitalChoice.Business.Services.Content.ContentProcessors;
 using VitalChoice.Business.Services.Settings;
 using VitalChoice.Business.Services.Workflow;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Identity;

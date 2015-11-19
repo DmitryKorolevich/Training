@@ -11,7 +11,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;

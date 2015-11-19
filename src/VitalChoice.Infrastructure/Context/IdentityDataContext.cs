@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Storage;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
-namespace VitalChoice.Data.DataContext
+namespace VitalChoice.Data.Context
 {
 	public class IdentityDataContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataContext, IDataContextAsync
 	{
@@ -16,6 +18,11 @@ namespace VitalChoice.Data.DataContext
         }
 
 		public Guid InstanceId { get; }
+
+	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+	    {
+	        return Database.BeginTransaction(isolation);
+	    }
 
 	    public override int SaveChanges()
 		{

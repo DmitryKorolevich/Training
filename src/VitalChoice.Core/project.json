@@ -2,7 +2,7 @@
 
   "version": "1.0.0-*",
   "dependencies": {
-    "Autofac.Extensions.DependencyInjection": "",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
     "cloudscribe.Web.Pagination": "",
     "Microsoft.AspNet.Authentication.Cookies": "1.0.0-*",

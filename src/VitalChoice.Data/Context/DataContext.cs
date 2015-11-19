@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Storage;
 
-namespace VitalChoice.Data.DataContext
+namespace VitalChoice.Data.Context
 {
 	public class DataContext : DbContext, IDataContext, IDataContextAsync
 	{
@@ -14,6 +16,11 @@ namespace VitalChoice.Data.DataContext
 
 		public Guid InstanceId { get; }
 
+	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+	    {
+	        return Database.BeginTransaction(isolation);
+	    }
+
 	    public override int SaveChanges()
 		{
 			var changes = base.SaveChanges();
@@ -22,8 +29,6 @@ namespace VitalChoice.Data.DataContext
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-            if (cancellationToken == default(CancellationToken))
-                cancellationToken = CancellationToken.None;
 			var changesAsync = await base.SaveChangesAsync(cancellationToken);
 			return changesAsync;
 		}

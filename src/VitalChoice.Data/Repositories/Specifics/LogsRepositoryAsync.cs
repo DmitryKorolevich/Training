@@ -1,4 +1,4 @@
-﻿using VitalChoice.Data.DataContext;
+﻿using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Data.Repositories.Specifics
