@@ -25,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VitalChoice.Business.Services.HelpService
 {
@@ -303,6 +304,12 @@ namespace VitalChoice.Business.Services.HelpService
                     else
                     {
                         var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
+
+                        if ((dbItem.IdEditedBy.HasValue && !item.IdEditedBy.HasValue) || (!dbItem.IdEditedBy.HasValue && item.IdEditedBy.HasValue))
+                        {
+                            throw new Exception("The help ticket can't be updated by the given user.");
+                        }
+
                         item.Order = dbItem.Order;
                         item.IdHelpTicket = dbItem.IdHelpTicket;
                         item.DateCreated = dbItem.DateCreated;
@@ -345,6 +352,10 @@ namespace VitalChoice.Business.Services.HelpService
 
             if (item != null)
             {
+                if((adminId.HasValue && !item.IdEditedBy.HasValue) || (!adminId.HasValue && item.IdEditedBy.HasValue))
+                {
+                    throw new Exception("The help ticket can't be updated by the given user.");
+                }
                 item.StatusCode = RecordStatusCode.Deleted;
                 item.IdEditedBy = adminId;
                 item.DateEdited = DateTime.Now;
