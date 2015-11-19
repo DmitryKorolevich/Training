@@ -7,7 +7,7 @@
   "licenseUrl": "",
 
   "dependencies": {
-    "Autofac.Extensions.DependencyInjection": "",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "Microsoft.Extensions.Configuration.Abstractions": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",

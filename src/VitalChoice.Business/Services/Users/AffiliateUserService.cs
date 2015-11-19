@@ -5,7 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Mail;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;

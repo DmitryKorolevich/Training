@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Entity;
 using Microsoft.Extensions.OptionsModel;
 using System.Data.SqlClient;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;

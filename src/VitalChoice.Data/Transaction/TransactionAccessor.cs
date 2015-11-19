@@ -1,22 +1,22 @@
 ﻿using System.Data;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Storage;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
 {
     public class TransactionAccessor
     {
-	    private readonly DbContext _dataContext;
+	    private readonly IDataContext _dataContext;
 
-	    public TransactionAccessor(IDataContextAsync dataContext)
+	    public TransactionAccessor(IDataContext dataContext)
 	    {
-		    this._dataContext = (DbContext)dataContext;
+		    _dataContext = dataContext;
 	    }
 
-	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
 	    {
-			return _dataContext.Database.BeginTransaction(isolation);
+			return _dataContext.BeginTransaction(isolation);
 		}
     }
 }

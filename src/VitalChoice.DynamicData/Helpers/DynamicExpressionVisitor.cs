@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Autofac.Features.Indexed;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Extensions;

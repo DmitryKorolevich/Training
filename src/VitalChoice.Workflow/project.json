@@ -5,7 +5,7 @@
     "EntityFramework.Core": "7.0.0-*",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "VitalChoice.Ecommerce.Domain": ""
   },
 

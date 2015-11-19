@@ -6,7 +6,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity.Storage;
-using VitalChoice.Data.DataContext;
+using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain;

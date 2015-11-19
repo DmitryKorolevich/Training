@@ -8,6 +8,6 @@ namespace VitalChoice.Data.UnitOfWork
     {
         int SaveChanges();
         void Dispose(bool disposing);
-	    IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted);
+	    IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
     }
 }

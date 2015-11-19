@@ -2,11 +2,15 @@
 
 using Microsoft.Data.Entity;
 using System;
+using System.Data;
+using Microsoft.Data.Entity.Storage;
 
-namespace VitalChoice.Data.DataContext
+namespace VitalChoice.Data.Context
 {
     public interface IDataContext : IDisposable
     {
+        IRelationalTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
+
         int SaveChanges();
 
         DbSet<T> Set<T>() 
