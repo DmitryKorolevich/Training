@@ -8,6 +8,18 @@ angular.module('app.core.utils.confirmation.confirmController', [])
 			confirmText = data.confirmText;
 		}
 		$scope.confirmText = confirmText;
+		var okLabel = "OK";
+		if (data.okLabel != null)
+		{
+		    okLabel = data.okLabel;
+		}
+		$scope.okLabel = okLabel;
+		var cancelLabel = "Cancel";
+		if (data.cancelLabel != null)
+		{
+		    cancelLabel = data.cancelLabel;
+		}
+		$scope.cancelLabel = cancelLabel;
 		$scope.okHandler = data.okHandler;
 		$scope.cancelHandler = data.cancelHandler;
 	};

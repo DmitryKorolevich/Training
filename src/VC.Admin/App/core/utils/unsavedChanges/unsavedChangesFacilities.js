@@ -91,7 +91,7 @@ angular.module('app.core.utils.unsavedChanges.unsavedChangesFacilities', [])
 						if (!allFormsClean()) {
 							confirmUtil.confirm(function() {
 								$rootScope.$state.go(next.name);
-							}, messages.navigate);
+							}, messages.navigate, null, "Proceed and lose all changes", "Close and review all changes");
 
 							_this.allFormsCleanUp();
 							ngProgress.reset();
