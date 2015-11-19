@@ -13,6 +13,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string AdminHost { get; set; }
         public string MainSuperAdminEmail{get;set;}
         public string FilesRelativePath { get; set; }
+        public string FilesPath { get; set; }
         public Email EmailConfiguration { get; set; }
 		public Versioning Versioning { get; set; }
 		public AzureStorage AzureStorage { get; set; }

@@ -418,7 +418,8 @@ function ($scope, $rootScope, $state, $stateParams, $modal, $timeout, appBootstr
             var filterdFiles = [];
             if ($scope.filter.FilteredName) {
                 $.each($scope.files, function (index, file) {
-                    if (file.Name.indexOf($scope.filter.FilteredName) > -1) {
+                    if (file.Name.toLowerCase().indexOf($scope.filter.FilteredName.toLowerCase()) > -1)
+                    {
                         filterdFiles.push(file);
                     }
                 });

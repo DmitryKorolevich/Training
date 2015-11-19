@@ -25,30 +25,31 @@ namespace VitalChoice.Business.Services
         private readonly IOptions<AppOptions> appOptions;
         private static string error = "";
 
-        public static void Init(string rootDir)
-        {
-            if (!String.IsNullOrEmpty(rootDir))
-            {
-                try
-                {
-                    _rootDir = rootDir.ToLower();
-                    DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
-                    if (!dirInfo.Exists)
-                    {
-                        dirInfo.Create();
-                    }
-                }
-                catch(Exception e)
-                {
-                    error += e.ToString();
-                }
-            }
-        }
+        //public static void Init(string rootDir)
+        //{
+        //    if (!String.IsNullOrEmpty(rootDir))
+        //    {
+        //        try
+        //        {
+        //            _rootDir = rootDir.ToLower();
+        //            DirectoryInfo dirInfo = new DirectoryInfo(rootDir);
+        //            if (!dirInfo.Exists)
+        //            {
+        //                dirInfo.Create();
+        //            }
+        //        }
+        //        catch(Exception e)
+        //        {
+        //            error += e.ToString();
+        //        }
+        //    }
+        //}
 
         public FileService(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
         {
             this.logger = loggerProvider.CreateLoggerDefault();
             this.appOptions = appOptions;
+            _rootDir= this.appOptions.Value.FilesPath.ToLower();
         }
 
         #region Dirs

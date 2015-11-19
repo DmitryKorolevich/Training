@@ -36,15 +36,15 @@
                                                 <label for="active" class="col-md-3 control-label">Active</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="ActivatePending" data-ng-model="affiliate.ActivatePending" /></label>
+                                                        <label><input type="checkbox" id="active" name="ActivatePending" data-ng-model="affiliate.ActivatePending" /></label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div data-ng-if="affiliate.StatusCode != 5 && affiliate.Id" class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Suspend</label>
+                                                <label for="suspend" class="col-md-3 control-label">Suspend</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4" /></label>
+                                                        <label><input type="checkbox" id="suspend" name="StatusCode" data-ng-click="toggleSuspended();" data-ng-checked="affiliate.StatusCode == 4" /></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -78,18 +78,18 @@
 
                                             <span class="legend">Promoting Vital Choice</span>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Brick and Mortar</label>
+                                                <label for="brickandmortar" class="col-md-3 control-label">Brick and Mortar</label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="BrickAndMortar" data-ng-model="affiliate.BrickAndMortar" /></label>
+                                                        <label><input type="checkbox" id="brickandmortar" name="BrickAndMortar" data-ng-model="affiliate.BrickAndMortar" /></label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Website</label>
+                                                <label for="promotebywebsite" class="col-md-3 control-label">Website</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByWebsite" data-ng-model="affiliate.PromoteByWebsite" /></label>
+                                                        <label><input type="checkbox" id="promotebywebsite" name="PromoteByWebsite" data-ng-model="affiliate.PromoteByWebsite" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByWebsite" class="col-md-3 control-label">Website URL</label>
@@ -102,10 +102,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Links on your emails</label>
+                                                <label for="promotebyemails" class="col-md-3 control-label">Links on your emails</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByEmails" data-ng-model="affiliate.PromoteByEmails" /></label>
+                                                        <label><input type="checkbox" id="promotebyemails" name="PromoteByEmails" data-ng-model="affiliate.PromoteByEmails" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByEmails" class="col-md-3 control-label">Monthly emails sent</label>
@@ -119,10 +119,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Facebook</label>
+                                                <label for="promotebyfacebook" class="col-md-3 control-label">Facebook</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByFacebook" data-ng-model="affiliate.PromoteByFacebook" /></label>
+                                                        <label><input type="checkbox" id="promotebyfacebook" name="PromoteByFacebook" data-ng-model="affiliate.PromoteByFacebook" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByFacebook" class="col-md-3 control-label">Facebook page URL</label>
@@ -135,10 +135,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Twitter</label>
+                                                <label for="promotebytwitter" class="col-md-3 control-label">Twitter</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByTwitter" data-ng-model="affiliate.PromoteByTwitter" /></label>
+                                                        <label><input type="checkbox" id="promotebytwitter" name="PromoteByTwitter" data-ng-model="affiliate.PromoteByTwitter" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByTwitter" class="col-md-3 control-label">Twitter page URL</label>
@@ -151,10 +151,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Blog</label>
+                                                <label for="promotebyblog" class="col-md-3 control-label">Blog</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByBlog" data-ng-model="affiliate.PromoteByBlog" /></label>
+                                                        <label><input type="checkbox" id="promotebyblog" name="PromoteByBlog" data-ng-model="affiliate.PromoteByBlog" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByBlog" class="col-md-3 control-label">Blog site URL</label>
@@ -167,10 +167,10 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label">Professional practice</label>
+                                                <label for="promotebyprofessionalpractice" class="col-md-3 control-label">Professional practice</label>
                                                 <div class="col-md-1">
                                                     <div class="checkbox">
-                                                        <label><input type="checkbox" name="PromoteByProfessionalPractice" data-ng-model="affiliate.PromoteByProfessionalPractice" /></label>
+                                                        <label><input type="checkbox" id="promotebyprofessionalpractice" name="PromoteByProfessionalPractice" data-ng-model="affiliate.PromoteByProfessionalPractice" /></label>
                                                     </div>
                                                 </div>
                                                 <label data-ng-if="affiliate.PromoteByProfessionalPractice" class="col-md-3 control-label">Practice</label>
@@ -184,33 +184,33 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label"></label>
+                                                <label for="pbdLEAN" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" name="PromoteByDrSearsLEANCoachAmbassador" data-ng-model="affiliate.PromoteByDrSearsLEANCoachAmbassador" />
+                                                            <input type="checkbox" id="pbLEAN" name="PromoteByDrSearsLEANCoachAmbassador" data-ng-model="affiliate.PromoteByDrSearsLEANCoachAmbassador" />
                                                             <strong>Dr. Sears LEAN Coach Ambassador* (*Must already be in the LEAN Program)</strong>
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label"></label>
+                                                <label for="pbVRE" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" name="PromoteByVerticalResponseEmail" data-ng-model="affiliate.PromoteByVerticalResponseEmail" />
+                                                            <input type="checkbox" id="pbVRE" name="PromoteByVerticalResponseEmail" data-ng-model="affiliate.PromoteByVerticalResponseEmail" />
                                                             <strong>Vertical Response Email</strong>
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="active" class="col-md-3 control-label"></label>
+                                                <label for="pbLE" class="col-md-3 control-label"></label>
                                                 <div class="col-md-9">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" name="PromoteByLeanEmail" data-ng-model="affiliate.PromoteByLeanEmail" />
+                                                            <input type="checkbox" id="pbLE" name="PromoteByLeanEmail" data-ng-model="affiliate.PromoteByLeanEmail" />
                                                             <strong>Lean Email</strong>
                                                         </label>
                                                     </div>

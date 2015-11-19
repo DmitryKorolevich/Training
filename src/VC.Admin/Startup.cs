@@ -37,8 +37,7 @@ namespace VC.Admin
 
             var reg = new AdminDependencyConfig();
 
-			var filesPath = Configuration.GetSection("App:FilesPath").Value;
-            var result = reg.RegisterInfrastructure(Configuration, services, filesPath, typeof(Startup).GetTypeInfo().Assembly);
+            var result = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly);
             return result;
 		}
 

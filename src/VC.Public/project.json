@@ -17,7 +17,7 @@
     "**.vspscc"
   ],
   "dependencies": {
-     "cloudscribe.Web.Pagination": "1.0.0-*",
+    "cloudscribe.Web.Pagination": "1.0.0-*",
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-*",
     "Microsoft.AspNet.Mvc": "6.0.0-*",
@@ -27,6 +27,8 @@
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
     "Microsoft.AspNet.StaticFiles": "1.0.0-*",
+    "Microsoft.AspNet.Http": "1.0.0-*",
+    "Microsoft.AspNet.Session": "1.0.0-*",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "Microsoft.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",

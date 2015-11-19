@@ -113,7 +113,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override async Task AfterSelect(ICollection<Order> entities)
         {
-            if (entities.SelectMany(e => e.Skus).All(s => s != null))
+            if (entities.All(e => e.Skus != null))
             {
                 foreach (
                     var orderToSku in

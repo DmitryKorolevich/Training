@@ -19,6 +19,8 @@ namespace VC.Admin.Models.Product
 
         public string Name { get; set; }
 
+        public string SubTitle { get; set; }
+
         public RecordStatusCode StatusCode { get; set; }
 
         public bool Hidden { get; set; }
@@ -27,17 +29,18 @@ namespace VC.Admin.Models.Product
 
         public DateTime DateEdited { get; set; }
 
-        public string EditedByAgentId {get;set;}
+        public string EditedByAgentId { get; set; }
 
         public IList<SkuListItemModel> SKUs { get; set; }
 
         public ProductListItemModel(VProductSku item)
         {
-            if(item!=null)
+            if (item != null)
             {
                 Id = item.SkuId;
                 ProductId = item.IdProduct;
                 Name = item.Name;
+                SubTitle = item.SubTitle;
                 Thumbnail = item.Thumbnail;
                 TaxCode = item.TaxCode;
                 StatusCode = item.StatusCode;
