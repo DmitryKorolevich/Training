@@ -116,8 +116,7 @@
                 {
                     <div class="form-buttons-group">
                         <input class="yellow add-ticket-button" type="submit" value="Add New Help Ticket" />
-                        <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back" />
-                        @Html.ActionLink("Other Help Tickets", "HelpTickets", new { idorder = Model.IdOrder }, new { @class = "button" })
+                        @Html.ActionLink("Back", "HelpTickets", new { idorder = Model.IdOrder, ignore= true }, new { @class = "button" })
                     </div>
                 }
             }
@@ -181,8 +180,7 @@
                             </div>
                             <div class="form-buttons-group">
                                 <input class="yellow add-comment-button" type="submit" value="Add New Comment" />
-                                <input data-back-button="@Url.Action("TopFavoriteItems", "Profile")" type="button" value="Back" />
-                                @Html.ActionLink("Other Help Tickets", "HelpTickets", new { idorder = Model.IdOrder }, new { @class = "button" })
+                                @Html.ActionLink("Back", "HelpTickets", new { idorder = Model.IdOrder }, new { @class = "button" })
                             </div>
                         </form>
                     }

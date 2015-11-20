@@ -89,9 +89,11 @@ angular.module('app.core.utils.unsavedChanges.unsavedChangesFacilities', [])
 					var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
 						// @todo this could be written a lot cleaner! 
 						if (!allFormsClean()) {
-							confirmUtil.confirm(function() {
-								$rootScope.$state.go(next.name);
-							}, messages.navigate, null, "Proceed and lose all changes", "Close and review all changes");
+						    confirmUtil.confirm(null, messages.navigate, 
+                                function ()
+                                {
+                                    $rootScope.$state.go(next.name);
+                                }, "Close and review all changes", "Proceed and lose all changes");
 
 							_this.allFormsCleanUp();
 							ngProgress.reset();

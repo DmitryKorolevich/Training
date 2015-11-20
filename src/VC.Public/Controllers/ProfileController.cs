@@ -34,33 +34,33 @@ using VitalChoice.SharedWeb.Models.Help;
 
 namespace VC.Public.Controllers
 {
-	[CustomerAuthorize]
-	public class ProfileController : BaseMvcController
-	{
+    [CustomerAuthorize]
+    public class ProfileController : BaseMvcController
+    {
         private const string TicketCommentMessageTempData = "ticket-comment-messsage";
 
         private readonly IHttpContextAccessor _contextAccessor;
-		private readonly IStorefrontUserService _storefrontUserService;
-		private readonly ICustomerService _customerService;
-		private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-		private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
-		private readonly IProductService _productService;
-		private readonly IOrderService _orderService;
+        private readonly IStorefrontUserService _storefrontUserService;
+        private readonly ICustomerService _customerService;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
+        private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
+        private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
 
         public ProfileController(IHttpContextAccessor contextAccessor, IStorefrontUserService storefrontUserService,
-			ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
+            ICustomerService customerService, IDynamicMapper<AddressDynamic, Address> addressConverter,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter, IOrderService orderService, IProductService productService, IHelpService helpService)
-		{
+        {
             _contextAccessor = contextAccessor;
-			_storefrontUserService = storefrontUserService;
-			_customerService = customerService;
-			_addressConverter = addressConverter;
-			_paymentMethodConverter = paymentMethodConverter;
-			_orderService = orderService;
-			_productService = productService;
+            _storefrontUserService = storefrontUserService;
+            _customerService = customerService;
+            _addressConverter = addressConverter;
+            _paymentMethodConverter = paymentMethodConverter;
+            _orderService = orderService;
+            _productService = productService;
             _helpService = helpService;
-		}
+        }
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(ShortOrderFilter filter)
         {
@@ -118,18 +118,18 @@ namespace VC.Public.Controllers
             return model;
         }
 
-	    private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer, int selectedId = 0)
-	    {
-	        var shippingAddresses = new List<ShippingInfoModel>();
-	        foreach (var shipping in currentCustomer.ShippingAddresses)
-	        {
-	            var shippingModel = _addressConverter.ToModel<ShippingInfoModel>(shipping);
+        private ShippingInfoModel PopulateShippingAddress(CustomerDynamic currentCustomer, int selectedId = 0)
+        {
+            var shippingAddresses = new List<ShippingInfoModel>();
+            foreach (var shipping in currentCustomer.ShippingAddresses)
+            {
+                var shippingModel = _addressConverter.ToModel<ShippingInfoModel>(shipping);
 
-	            shippingAddresses.Add(shippingModel);
-	        }
+                shippingAddresses.Add(shippingModel);
+            }
 
-	        ViewBag.ShippingAddresses = null;
-			ShippingInfoModel model;
+            ViewBag.ShippingAddresses = null;
+            ShippingInfoModel model;
             if (shippingAddresses.Any())
             {
                 model = selectedId > 0 ? shippingAddresses.Single(x => x.Id == selectedId) : shippingAddresses.First(x => x.Default);
@@ -170,12 +170,12 @@ namespace VC.Public.Controllers
             return customer;
         }
 
-		private void CleanProfileEmailFields(ChangeProfileModel model)
-		{
-			model.ConfirmEmail = model.NewEmail = string.Empty;
-			ModelState["NewEmail"] = new ModelStateEntry();
-			ModelState["ConfirmEmail"] = new ModelStateEntry();
-		}
+        private void CleanProfileEmailFields(ChangeProfileModel model)
+        {
+            model.ConfirmEmail = model.NewEmail = string.Empty;
+            ModelState["NewEmail"] = new ModelStateEntry();
+            ModelState["ConfirmEmail"] = new ModelStateEntry();
+        }
 
         public IActionResult Index()
         {
@@ -217,8 +217,8 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-		    var model =
-		        _addressConverter.ToModel<ChangeProfileModel>(currentCustomer.ProfileAddress);
+            var model =
+                _addressConverter.ToModel<ChangeProfileModel>(currentCustomer.ProfileAddress);
 
             return View(model);
         }
@@ -237,14 +237,14 @@ namespace VC.Public.Controllers
 
             var oldEmail = customer.Email;
 
-			var newProfileAddress = _addressConverter.FromModel(model);
-			newProfileAddress.IdObjectType = (int) AddressType.Profile;
-			customer.ProfileAddress = newProfileAddress;
-			customer.Email =
-				newProfileAddress.Data.Email =
-					!string.IsNullOrWhiteSpace(model.NewEmail) && !string.IsNullOrWhiteSpace(model.ConfirmEmail)
-						? model.NewEmail
-						: oldEmail;
+            var newProfileAddress = _addressConverter.FromModel(model);
+            newProfileAddress.IdObjectType = (int)AddressType.Profile;
+            customer.ProfileAddress = newProfileAddress;
+            customer.Email =
+                newProfileAddress.Data.Email =
+                    !string.IsNullOrWhiteSpace(model.NewEmail) && !string.IsNullOrWhiteSpace(model.ConfirmEmail)
+                        ? model.NewEmail
+                        : oldEmail;
 
             CleanProfileEmailFields(model);
             customer = await _customerService.UpdateAsync(customer);
@@ -261,8 +261,8 @@ namespace VC.Public.Controllers
 
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated];
 
-			model =
-				_addressConverter.ToModel<ChangeProfileModel>(customer.ProfileAddress);
+            model =
+                _addressConverter.ToModel<ChangeProfileModel>(customer.ProfileAddress);
 
             return View(model);
         }
@@ -325,7 +325,7 @@ namespace VC.Public.Controllers
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
             }
-			currentCustomer.CustomerPaymentMethods.Remove(creditCardToDelete);
+            currentCustomer.CustomerPaymentMethods.Remove(creditCardToDelete);
 
             await _customerService.UpdateAsync(currentCustomer);
 
@@ -352,25 +352,25 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-			if (model.Id > 0)
-			{
-				var shippingAddressToUpdate = currentCustomer.ShippingAddresses.Single(x => x.Id == model.Id);
-				currentCustomer.ShippingAddresses.Remove(shippingAddressToUpdate);
-			}
+            if (model.Id > 0)
+            {
+                var shippingAddressToUpdate = currentCustomer.ShippingAddresses.Single(x => x.Id == model.Id);
+                currentCustomer.ShippingAddresses.Remove(shippingAddressToUpdate);
+            }
 
-			if (model.Default)
-			{
-				var otherAddresses = currentCustomer.ShippingAddresses;
-				foreach (var otherAddress in otherAddresses)
-				{
-					otherAddress.Data.Default = false;
-				}
-			}
+            if (model.Default)
+            {
+                var otherAddresses = currentCustomer.ShippingAddresses;
+                foreach (var otherAddress in otherAddresses)
+                {
+                    otherAddress.Data.Default = false;
+                }
+            }
 
             var newAddress = _addressConverter.FromModel(model);
             newAddress.IdObjectType = (int)AddressType.Shipping;
 
-			currentCustomer.ShippingAddresses.Add(newAddress);
+            currentCustomer.ShippingAddresses.Add(newAddress);
 
             currentCustomer = await _customerService.UpdateAsync(currentCustomer);
 
@@ -378,10 +378,10 @@ namespace VC.Public.Controllers
                 ? InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyUpdated]
                 : InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
 
-			if (model.Id == 0 )
-			{
-				ModelState["Id"].RawValue = model.Id = currentCustomer.ShippingAddresses.Last().Id;
-			}
+            if (model.Id == 0)
+            {
+                ModelState["Id"].RawValue = model.Id = currentCustomer.ShippingAddresses.Last().Id;
+            }
 
             return View(PopulateShippingAddress(currentCustomer, model.Id));
         }
@@ -391,13 +391,13 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-			var shippingAddressToDelete = currentCustomer.ShippingAddresses.FirstOrDefault(x => x.Id == id);
-			if (shippingAddressToDelete == null)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
-			}
+            var shippingAddressToDelete = currentCustomer.ShippingAddresses.FirstOrDefault(x => x.Id == id);
+            if (shippingAddressToDelete == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+            }
 
-			currentCustomer.ShippingAddresses.Remove(shippingAddressToDelete);
+            currentCustomer.ShippingAddresses.Remove(shippingAddressToDelete);
 
             await _customerService.UpdateAsync(currentCustomer);
 
@@ -409,20 +409,20 @@ namespace VC.Public.Controllers
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
-			var found = false;
-			var addresses = currentCustomer.ShippingAddresses;
-			foreach (var address in addresses)
-			{
-				if (address.Id == id)
-				{
-					address.Data.Default = true;
-					found = true;
-				}
-				else
-				{
-					address.Data.Default = false;
-				}
-			}
+            var found = false;
+            var addresses = currentCustomer.ShippingAddresses;
+            foreach (var address in addresses)
+            {
+                if (address.Id == id)
+                {
+                    address.Data.Default = true;
+                    found = true;
+                }
+                else
+                {
+                    address.Data.Default = false;
+                }
+            }
 
             if (!found)
             {
@@ -511,7 +511,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> HelpTickets(int idorder)
+        public async Task<IActionResult> HelpTickets(int idorder, bool ignore = false)
         {
             ICollection<HelpTicketListItemModel> toReturn = new List<HelpTicketListItemModel>();
             ViewBag.IdOrder = (int?)null;
@@ -523,7 +523,7 @@ namespace VC.Public.Controllers
                 filter.IdOrder = idorder;
                 filter.IdCustomer = customerId;
                 var items = (await _helpService.GetHelpTicketsAsync(filter)).Items;
-                if(items.Count==0)
+                if (items.Count == 0 && !ignore)
                 {
                     return RedirectToAction("HelpTicket", new { idorder = idorder });
                 }
@@ -534,27 +534,29 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> HelpTicket(int? id=null,int? idorder=null)
+        public async Task<IActionResult> HelpTicket(int? id = null, int? idorder = null)
         {
             HelpTicketManageModel toReturn = null;
-            if(id.HasValue)
+            if (id.HasValue)
             {
                 var item = await _helpService.GetHelpTicketAsync(id.Value);
-                if (item != null)
+                var customerId = GetInternalCustomerId();
+                if (item != null && item.Order.IdCustomer==customerId)
                 {
                     toReturn = new HelpTicketManageModel(item);
-                    if(TempData.ContainsKey(TicketCommentMessageTempData))
+                    if (TempData.ContainsKey(TicketCommentMessageTempData))
                     {
                         ViewBag.SuccessMessage = TempData[TicketCommentMessageTempData];
                     }
                 }
-            } else if(idorder.HasValue)
+            }
+            else if (idorder.HasValue)
             {
                 toReturn = new HelpTicketManageModel(null)
                 {
                     StatusCode = RecordStatusCode.Active,
                     Priority = TicketPriority.Medium,
-                    IdOrder=idorder.Value,
+                    IdOrder = idorder.Value,
                 };
             }
             return View(toReturn);
@@ -588,7 +590,7 @@ namespace VC.Public.Controllers
             var item = model.Convert();
 
             item = await _helpService.UpdateHelpTicketCommentAsync(item);
-            
+
             var toReturn = new HelpTicketManageModel(await _helpService.GetHelpTicketAsync(item.IdHelpTicket));
             if (model.Id == 0)
             {

@@ -3,7 +3,8 @@
 angular.module('app.core.utils.confirmation.confirmUtil', [])
 .service('confirmUtil', ['$modal', '$log', function ($modal, $log) {
 	return {
-		confirm: function (okHandler, optionalConfirmText, optionalCancelHandler, optionalOkLabel, optionalCancelLabel) {
+	    confirm: function (okHandler, optionalConfirmText, optionalCancelHandler, optionalOkLabel, optionalCancelLabel)
+	    {
 			var modalInstance = $modal.open({
 				templateUrl: "app/core/utils/confirmation/confirmation.html",
 				controller: "confirmController",

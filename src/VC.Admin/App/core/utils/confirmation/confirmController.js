@@ -24,9 +24,13 @@ angular.module('app.core.utils.confirmation.confirmController', [])
 		$scope.cancelHandler = data.cancelHandler;
 	};
 
-	$scope.continue = function () {
-		$scope.okHandler();
-		$scope.close();
+	$scope.continue = function ()
+	{
+	    if ($scope.okHandler)
+	    {
+	        $scope.okHandler();
+	    }
+	    $modalInstance.close(false);
 	};
 
 	$scope.close = function () {
