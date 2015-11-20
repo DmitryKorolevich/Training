@@ -85,7 +85,7 @@ namespace VitalChoice.Infrastructure.Cache
                     {
                         if (
                             !result.Recompile(masterTemplate + template,
-                                new CompileContext(new TemplateOptions {AllowCSharp = true})).Success)
+                                new CompileContext(new TemplateOptions {AllowCSharp = true, ForceRemoveWhitespace = true})).Success)
                         {
                             //Update dates so old template using in runtime next request ok
                             result.MasterDateCreated = masterDateUpdated;
@@ -99,7 +99,7 @@ namespace VitalChoice.Infrastructure.Cache
                 }
             }
             result = new TtlTemplate(masterTemplate + template,
-                new CompileContext(new TemplateOptions {AllowCSharp = true}));
+                new CompileContext(new TemplateOptions {AllowCSharp = true, ForceRemoveWhitespace = true}));
             if (!result.CompileResult.Success)
                 throw new TemplateCompileException(result.CompileResult.Errors);
             result.MasterDateCreated = masterDateUpdated;
