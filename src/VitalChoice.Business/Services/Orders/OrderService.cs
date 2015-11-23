@@ -380,7 +380,7 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateHealthwiseOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            model.IsHealthwise = true;
+            //model.IsHealthwise = true;
             var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
             if (!model.IsHealthwise)
