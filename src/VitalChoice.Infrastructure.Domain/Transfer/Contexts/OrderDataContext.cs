@@ -98,6 +98,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public SplitInfo SplitInfo { get; set; }
 
+        public bool AllowHealthWise { get; set; }
+
         //public int GetCountryId(string countryCode)
         //{
         //    return _coutries.GetCountryId(countryCode);

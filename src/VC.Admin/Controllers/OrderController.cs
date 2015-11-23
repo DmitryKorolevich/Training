@@ -227,7 +227,7 @@ namespace VC.Admin.Controllers
                     {
                         item.Data.OrderType = orderType ?? (int)SourceOrderType.Phone;
                     }
-                    await _orderService.CalculateOrder(item);
+                    var context = await _orderService.CalculateOrder(item);
                     item = await _orderService.UpdateAsync(item);
                 }
                 else
@@ -240,7 +240,7 @@ namespace VC.Admin.Controllers
                     item.ShippingAddress.Id = 0;
                     item.PaymentMethod.Address.Id = 0;
                     item.PaymentMethod.Id = 0;
-                    await _orderService.CalculateOrder(item);
+                    var context = await _orderService.CalculateOrder(item);
                     item = await _orderService.InsertAsync(item);
                 }
             }
