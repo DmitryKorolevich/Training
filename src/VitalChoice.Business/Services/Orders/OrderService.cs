@@ -197,22 +197,6 @@ namespace VitalChoice.Business.Services.Orders
             //TODO: Add promo skus and skus to order
         }
 
-        protected override async Task BeforeEntityChangesAsync(OrderDynamic model, Order entity, IUnitOfWorkAsync uow)
-        {
-            var orderAddressOptionValuesRepository = uow.RepositoryAsync<OrderAddressOptionValue>();
-            var orderPaymentMethodOptionValuesRepository = uow.RepositoryAsync<OrderPaymentMethodOptionValue>();
-            await orderAddressOptionValuesRepository.DeleteAllAsync(entity.ShippingAddress.OptionValues);
-            await orderPaymentMethodOptionValuesRepository.DeleteAllAsync(entity.PaymentMethod.OptionValues);
-            await orderAddressOptionValuesRepository.DeleteAllAsync(entity.PaymentMethod.BillingAddress.OptionValues);
-            var orderToGcRepository = uow.RepositoryAsync<OrderToGiftCertificate>();
-            var orderToSkuRepository = uow.RepositoryAsync<OrderToSku>();
-            await
-                orderToGcRepository.DeleteAllAsync(entity.GiftCertificates.WhereAll(model.GiftCertificates,
-                    (g, dg) => g.IdGiftCertificate != dg.GiftCertificate?.Id));
-            await
-                orderToSkuRepository.DeleteAllAsync(entity.Skus.WhereAll(model.Skus, (s, ds) => s.IdSku != ds.Sku?.Id));
-        }
-
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
         {
             if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
