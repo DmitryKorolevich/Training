@@ -250,17 +250,29 @@ namespace VitalChoice.Business.Services.Affiliates
 
         protected override async Task<bool> DeleteAsync(IUnitOfWorkAsync uow, int id, bool physically)
         {
-            var toReturn = await base.DeleteAsync(uow, id, physically);
-            if (toReturn)
+            using (var transaction = uow.BeginTransaction())
             {
-                var appUser = await _affiliateUserService.GetAsync(id);
-                if (appUser != null)
+                try
                 {
-                    await _affiliateUserService.DeleteAsync(appUser);
+                    var toReturn = await base.DeleteAsync(uow, id, physically);
+                    if (toReturn)
+                    {
+                        var appUser = await _affiliateUserService.GetAsync(id);
+                        if (appUser != null)
+                        {
+                            await _affiliateUserService.DeleteAsync(appUser);
+                        }
+                    }
+
+                    transaction.Commit();
+                    return toReturn;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
                 }
             }
-
-            return toReturn;
         }
 
         protected override async Task<List<MessageInfo>> ValidateAsync(AffiliateDynamic model)
@@ -516,7 +528,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
                         var orderPayments = (await affiliateOrderPaymentRepository.Query(p => p.IdAffiliate == idAffiliate && p.Status == AffiliateOrderPaymentStatus.NotPaid &&
                             p.Order.DateCreated < to).SelectAsync()).ToList();
-                        if(orderPayments.Sum(p=>p.Amount)<AffiliateConstants.AffiliateMinPayCommisionsAmount)
+                        if (orderPayments.Sum(p => p.Amount) < AffiliateConstants.AffiliateMinPayCommisionsAmount)
                         {
                             throw new AppValidationException(
                                 string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AffiliateMinPayCommisionsAmountNotMatch], AffiliateConstants.AffiliateMinPayCommisionsAmount));
@@ -529,7 +541,7 @@ namespace VitalChoice.Business.Services.Affiliates
                         affiliatePaymentRepository.Insert(payment);
                         await uow.SaveChangesAsync();
 
-                        foreach(var orderPayment in orderPayments)
+                        foreach (var orderPayment in orderPayments)
                         {
                             orderPayment.Status = AffiliateOrderPaymentStatus.Paid;
                             orderPayment.IdAffiliatePayment = payment.Id;
