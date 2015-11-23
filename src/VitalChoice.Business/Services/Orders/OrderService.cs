@@ -274,7 +274,7 @@ namespace VitalChoice.Business.Services.Orders
             //    {
                     var entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = model.IdEditedBy;
-                    UpdateAffiliateOrderPayment(model, uow);
+                    await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
 
                     //transaction.Commit();
@@ -298,7 +298,7 @@ namespace VitalChoice.Business.Services.Orders
             foreach (var model in models)
             {
                 model.IdAddedBy = model.IdEditedBy;
-                UpdateAffiliateOrderPayment(model, uow);
+                await UpdateAffiliateOrderPayment(model, uow);
                 await UpdateHealthwiseOrder(model, uow);
             }
 
@@ -321,7 +321,7 @@ namespace VitalChoice.Business.Services.Orders
             //    {
                     var entity = await base.UpdateAsync(model, uow);
                     model.IdAddedBy = entity.IdAddedBy;
-                    UpdateAffiliateOrderPayment(model, uow);
+                    await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
 
                     //transaction.Commit();
@@ -349,7 +349,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             model.IdAddedBy = entity.IdAddedBy;
                         }
-                        UpdateAffiliateOrderPayment(model, uow);
+                        await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
                     }
 
@@ -364,7 +364,7 @@ namespace VitalChoice.Business.Services.Orders
             //}
         }
 
-        private void UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
             {
@@ -375,6 +375,31 @@ namespace VitalChoice.Business.Services.Orders
                 //TODO - calculate commission and set is a first order or no the given customer
                 //payment.Amount =
                 //payment.NewCustomerOrder =
+
+                return;
+
+                var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
+                var dbItem = (await affiliateOrderPaymentRepository.Query(p => p.Id == payment.Id).SelectAsync(false)).FirstOrDefault();
+                if (dbItem == null)
+                {
+                    dbItem = new AffiliateOrderPayment();
+                    dbItem.Status = AffiliateOrderPaymentStatus.NotPaid;
+                    dbItem.IdAffiliate = payment.IdAffiliate;
+                    dbItem.Id = payment.Id;
+                    dbItem.Amount = payment.Amount;
+                    dbItem.NewCustomerOrder = payment.NewCustomerOrder;
+
+                    await _affiliateOrderPaymentRepository.InsertAsync(dbItem);
+                }
+                else
+                {
+                    if (dbItem.Status == AffiliateOrderPaymentStatus.NotPaid)
+                    {
+                        dbItem.Amount = payment.Amount;
+
+                        await _affiliateOrderPaymentRepository.UpdateAsync(dbItem);
+                    }
+                }
             }
         }
 
@@ -386,6 +411,7 @@ namespace VitalChoice.Business.Services.Orders
             if (!model.IsHealthwise)
             {
                 healthwiseOrderRepository.Delete(model.Id);
+                await uow.SaveChangesAsync();
             }
             else
             {
