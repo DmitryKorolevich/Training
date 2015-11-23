@@ -67,6 +67,7 @@ using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
 using VitalChoice.Business.Repositories;
+using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
 using VitalChoice.Ecommerce.Domain.Options;
@@ -198,6 +199,12 @@ namespace VitalChoice.Core.DependencyInjection
                     ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
                     ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
                     TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
+                };
+	            options.GoogleCaptcha = new GoogleCaptcha
+	            {
+					PublicKey = configuration.GetSection("App:GoogleCaptcha:PublicKey").Value,
+					SecretKey = configuration.GetSection("App:GoogleCaptcha:SecretKey").Value,
+					VerifyUrl = configuration.GetSection("App:GoogleCaptcha:VerifyUrl").Value
                 };
             });
 
@@ -420,6 +427,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
+            builder.RegisterType<ReCaptchaValidator>().AsSelf();
 
 			FinishCustomRegistrations(builder);
 

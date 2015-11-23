@@ -2,13 +2,12 @@
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
-using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Core.Base;
 
 namespace VC.Public.Controllers.Content
 {
-    public class BaseContentController : Controller
-    {
+    public class BaseContentController : BaseMvcController
+	{
         //Get params fron action params and all aditional query params
         protected Dictionary<string, object> GetParameters()
         {

@@ -19,5 +19,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
 		public AzureStorage AzureStorage { get; set; }
         public FedExOptions FedExOptions { get; set; }
         public AvataxOptions Avatax { get; set; }
+	    public GoogleCaptcha GoogleCaptcha { get; set; }
     }
 }

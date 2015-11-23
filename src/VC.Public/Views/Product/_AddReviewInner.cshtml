@@ -1,0 +1,56 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.Extensions.OptionsModel
+@using VC.Public.Helpers
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Product.AddReviewModel
+@inject IOptions<AppOptions> appOptions;
+
+<div id="reviewDialogInner" title="Submit Your Review">
+	<script>
+		successMessage = '@ViewBag.SuccessMessage';
+	</script>
+	<form asp-controller="Product" asp-action="AddReview" data-ajax-success="reviewSubmitSuccess" data-ajax-failure="reviewSubmitError" data-ajax="true" data-method="post" data-ajax-mode="replace" data-ajax-update="#reviewDialogInner" class="form-regular medium-small">
+		@Html.HiddenFor(x => x.ProductId)
+		@Html.ValidationSummary(true, "")
+		<div class="form-group">
+			@Html.LabelFor(m => m.CustomerName, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.CustomerName, new {@class = "form-control bigger"})
+				@Html.ValidationMessageFor(m => m.CustomerName)
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.ReviewTitle, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.ReviewTitle, new {@class = "form-control bigger"})
+				@Html.ValidationMessageFor(m => m.ReviewTitle)
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.Rating, new {@class = "control-label"})
+			<div class="input-group radio-labeled-group">
+				<label>@Html.RadioButtonFor(m => m.Rating, 1, new {@class = "form-control"}) 1</label>
+				<label>@Html.RadioButtonFor(m => m.Rating, 2, new {@class = "form-control"}) 2</label>
+				<label>@Html.RadioButtonFor(m => m.Rating, 3, new {@class = "form-control"}) 3</label>
+				<label>@Html.RadioButtonFor(m => m.Rating, 4, new {@class = "form-control"}) 4</label>
+				<label>@Html.RadioButtonFor(m => m.Rating, 5, new {@class = "form-control"}) 5</label><span class="form-control-hint">(1 = worst, 5 = best)</span>
+				@Html.ValidationMessageFor(m => m.Rating)
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.Review, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextAreaFor(m => m.Review, new {@class = "form-control bigger", rows = 7})
+				@Html.ValidationMessageFor(m => m.Review)
+			</div>
+		</div>
+		<div class="form-group">
+			@Html.LabelFor(m => m.Email, new {@class = "control-label"})
+			<div class="input-group">
+				@Html.TextBoxFor(m => m.Email, new {@class = "form-control bigger"})
+				@Html.ValidationMessageFor(m => m.Email)
+			</div>
+		</div>
+		<div class="form-group google-captcha margin-top-medium" id="googleCaptcha"></div>
+	</form>
+</div>

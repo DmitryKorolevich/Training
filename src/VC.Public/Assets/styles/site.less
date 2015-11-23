@@ -1188,7 +1188,7 @@ footer{
 		padding-right:15px;
 		width: 723px;
 		margin-bottom:50px;
-		min-height: 360px;
+		min-height: 510px;
 
 		.form-control-important-info{
 			width:auto;
@@ -1231,6 +1231,19 @@ footer{
 		:first-child{
 			margin-left:135px;
 		}
+	}
+}
+
+.input-control{
+	background-color: #F7F7F7;
+	border: 1px solid #CCCCCC;
+	color: #000;
+	height: 31px;
+	padding: 2px 5px;
+	box-sizing: border-box;
+
+	&:focus{
+		background-color:#FFFFCC;
 	}
 }
 
@@ -1322,11 +1335,7 @@ footer{
 			float:left;
 
 			.form-control{
-				background-color: #F7F7F7;
-				border: 1px solid #CCCCCC;
-				color: #000;
-				height: 31px;
-				padding: 2px 5px;
+				.input-control;
 				width:200px;
 
 				&.small-form-control{
@@ -1340,6 +1349,10 @@ footer{
 
             .form-control.big {
                 width: 400px;
+            }
+
+			.form-control.bigger {
+                width: 300px;
             }
 
             input[type="checkbox"].form-control, input[type="radio"].form-control { height: auto; margin-top: 9px; margin-right: 7px; width: auto;}
@@ -1356,9 +1369,9 @@ footer{
 				font-weight: bold;
 			}
 
-			.form-control:focus{
-				background-color:#FFFFCC;
-			}
+			/*.form-control:focus{
+				.input-control:focus;
+			}*/
 
 			.field-validation-error{
 				color:red;
@@ -1820,7 +1833,8 @@ footer{
 }
 
 .ui-widget-overlay{
-	opacity:.7;
+	opacity:.6;
+	background: #AAAAAA;
 }
 
 #dialog-confirm{
@@ -1941,4 +1955,64 @@ footer{
 
 .product-main .tabs-control{
 	width: 954px;
+}
+
+.width-100-percent{
+	width:100%;
+}
+
+.ui-dialog .ui-dialog-titlebar{
+	padding: 10px;
+}
+.ui-dialog .form-regular .input-group .field-validation-error{
+	max-width:300px;
+}
+
+.ui-draggable .ui-dialog-titlebar{
+	background-color: #f3ece2;
+}
+
+.google-captcha{
+	text-align:right;
+
+	div{
+		div{
+			display:inline-block;
+		}
+	}
+}
+
+.form-regular .form-group .input-group.radio-labeled-group{
+	label{
+		margin-right:7px;
+
+		input[type=radio].form-control{
+			margin-right: 0px;
+		}
+	}
+}
+
+.addreview-product-title{
+	font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	display:block;
+}
+
+.addreview-product-thumbnail{
+	width:75px;
+	height:75px;
+	margin-right:20px;
+	float:left;
+}
+
+.addreview-product-container{
+	float:left;
+	max-width: 335px;
+}
+
+.addreview-product-info{
+	margin: 5px 0 15px 0;
+    float: left;
+    width: 100%;
 }

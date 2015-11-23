@@ -2,10 +2,10 @@
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
-using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
+using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Product
+namespace VC.Admin.Models.Products
 {
     [ApiValidator(typeof(ProductReviewManageModelValidator))]
     public class ProductReviewManageModel : BaseModel

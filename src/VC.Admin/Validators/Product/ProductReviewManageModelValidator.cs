@@ -4,6 +4,7 @@ using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Validation.Logic;
 using VitalChoice.Validation.Helpers;
 using System;
+using VC.Admin.Models.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 

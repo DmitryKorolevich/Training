@@ -1,0 +1,13 @@
+﻿@model VC.Public.Models.ContentPageViewModel
+
+@section Meta {
+        <title>@Html.Raw(Model.Title)</title>
+        <meta name="keywords" content="@Html.Raw(Model.MetaKeywords)">
+        <meta name="description" content="@Html.Raw(Model.MetaDescription)">
+}
+
+@section PageScripts {
+	<script src="@Url.Content("/app/modules/product/productPage.js")"></script>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
+}
+@Html.Raw(Model.HTML)

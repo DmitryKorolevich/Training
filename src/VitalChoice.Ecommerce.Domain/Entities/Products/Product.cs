@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Products
 {
     public class Product : DynamicDataEntity<ProductOptionValue, ProductOptionType>
     {
-        public string Name { get; set; }
+	    public Guid PublicId { get; set; }
+
+	    public string Name { get; set; }
 
         public bool Hidden { get; set; }
 

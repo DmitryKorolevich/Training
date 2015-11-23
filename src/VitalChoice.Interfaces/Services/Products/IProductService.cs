@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -68,6 +69,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false);
 
-        #endregion
-    }
+		Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
+
+		#endregion
+	}
 }

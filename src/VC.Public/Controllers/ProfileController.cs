@@ -445,21 +445,10 @@ namespace VC.Public.Controllers
 
             if (lastOrder != null)
             {
-                foreach (var skuOrdered in lastOrder.Skus)
-                {
-                    var lineModel = new LastOrderLineModel()
-                    {
-                        ProductUrl = skuOrdered.ProductWithoutSkus.Url,
-                        IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail,
-                        ProductName = skuOrdered.ProductWithoutSkus.Name,
-                        PortionsCount = skuOrdered.Sku.Data.QTY,
-                        Quantity = skuOrdered.Quantity,
-                        SelectedPrice = skuOrdered.Amount.ToString("C2"),
-                        SkuCode = skuOrdered.Sku.Code
-                    };
-
-                    lines.Add(lineModel);
-                }
+	            lines.AddRange(lastOrder.Skus.Select(skuOrdered => new LastOrderLineModel()
+	            {
+		            ProductUrl = skuOrdered.ProductWithoutSkus.Url, IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail, ProductName = skuOrdered.ProductWithoutSkus.Name, PortionsCount = skuOrdered.Sku.Data.QTY, Quantity = skuOrdered.Quantity, SelectedPrice = skuOrdered.Amount.ToString("C2"), SkuCode = skuOrdered.Sku.Code
+	            }));
             }
 
             return View(lines);

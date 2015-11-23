@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 {
@@ -11,6 +12,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 			BreadcrumbOrderedItems = new List<TtlBreadcrumbItemModel>();
 		    Skus = new List<TtlProductPageSkuModel>();
 	    }
+
+	    public Guid ProductPublicId { get; set; }
 
 	    public string Name { get; set; }
 

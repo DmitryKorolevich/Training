@@ -1819,3 +1819,270 @@ BEGIN
 WHERE [Name] = 'Product page'
 
 END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%var productPublicId = "@(ProductPublicId)";%' AND [Name] = 'Product page')
+BEGIN
+	UPDATE [dbo].[MasterContentItems]
+	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<product_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1)) {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            <img src="/assets/images/breadarrow2.jpg">
+        }}
+        <span>@(@model.BreadcrumbOrderedItems.Last().Label)</span>
+	</div>
+}}
+
+<product_introduction>
+{{
+    <img class="product-intro-image" alt="@(Name)" src="@(Image)"/>
+	<div class="product-intro-info">
+		<div class="product-intro-main">
+			<div class="product-intro-headers">
+				<h1>@(Name)</h1>
+				@if(SubTitle) {{
+				    <h2>@(SubTitle)</h2>
+				}}
+				@if(@model.Skus.Any()){{
+				    <h3 id="hSelectedCode">Product #@(@model.Skus.First().Code)</h3>
+				}}
+			</div>
+			@if(@model.SpecialIcon == 1){{
+			    <img title="MSC" src="/assets/images/specialIcons/msc-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 2){{
+			    <img title="USDA" src="/assets/images/specialIcons/usda-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 3){{
+			   <img title="ASMI" src="/assets/images/specialIcons/alaskaseafoodicon.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 4){{
+			   <img title="USDA + Fair Trade" src="/assets/images/specialIcons/usda-fairtrade-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 5){{
+			    <img title="Certified Humane" src="/assets/images/specialIcons/humane-atc.jpg"/>
+			}}
+			@if(@model.SpecialIcon == 6){{
+			    <img title="ASMI-W" src="/assets/images/specialIcons/ASMI-W.jpg"/>
+			}}
+		</div>
+		<div class="product-intro-sub">
+			<div class="product-stars-container">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+				<img src="/assets/images/products/fullstar.gif">
+			</div>
+			<span class="product-reviews-count">[185]</span>
+			<a href="#">
+				Read <strong>185</strong> reviews
+			</a>
+			<a id="writeReview" href="#">
+				Write a Review
+			</a>
+		</div>
+		<div class="product-intro-description">
+			@(ShortDescription)
+		</div>
+		<a class="product-intro-more" href="#tabs-details">Read more ></a>
+		<div class="product-action-bar">
+			<div class="product-action-left">
+				<span class="action-left-header">Number of Portions:</span>
+				@list(Skus) {{
+				    <label class="product-portion-line">
+					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
+					    @(PortionsCount) - @money(Price)
+					    @if(BestValue) {{
+					        <span class="product-best-value">Best Value!</span>
+					    }}
+				    </label>
+				}}
+			</div>
+			<div class="product-action-right">
+			    @if(@model.Skus.Any()){{
+				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+				}}
+				<a href="#">
+					<img src="/assets/images/addtocartorange-2015.jpg"/>
+				</a>
+			</div>
+		</div>
+	</div>
+}}
+
+<product_details>
+{{
+    <div class="tabs-control">
+		<ul>
+		    @(DescriptionTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-details">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                    <li><a href="#tabs-details">Details</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
+		    @(IngredientsTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                   <li><a href="#tabs-nutrition">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                       <li><a href="#tabs-nutrition">Nutrition & Ingredients</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+            @(RecipesTab) {{
+                @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-recipes">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-recipes">Recipes</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ServingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-serving">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-serving">Serving/Care</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		    @(ShippingTab) {{
+		        @if(){{
+		            @ifnot(Hidden){{
+		                @if(TitleOverride){{
+		                    <li><a href="#tabs-shipping">@(TitleOverride)</a></li>
+	                    }}
+	                    @ifnot(TitleOverride){{
+	                        <li><a href="#tabs-shipping">Shipping</a></li>
+                        }}
+	                }}
+	            }}
+            }}
+		</ul>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-details">
+    		            @(Content)
+    			    </div>
+	            }}  
+	        }}
+	    }}
+		<!--Reviews -->
+		@(IngredientsTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-nutrition">
+    		            @(Content)
+    			    </div>
+	            }}
+	        }}
+	    }}
+		@(RecipesTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-recipes">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ServingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-serving">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+		@(ShippingTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <div id="tabs-shipping">
+    		            @(Content)
+    			    </div>
+    			}}
+	        }}
+	    }}
+	</div>
+}}
+	
+<product_accessories>
+{{
+    <div class="product-related-accessories">
+		<span class="product-accessories-title">Try one of these delicious recipes</span>
+		<div class="accessories-container">
+		    @list(YoutubeVideos) {{
+                <a class="product-related-link" target="_blank" href="@(Video)">
+				    <img src="@(Image)">
+			    	@(Text)
+			    </a>
+            }}
+		</div>
+	</div>
+	<div class="product-related-accessories accessories-top-margin">
+		<span class="product-accessories-title">Discover these customer favorites ... satisfaction 100% Guaranteed!</span>
+		<div class="accessories-container">
+		    @list(CrossSells) {{
+                <a class="product-related-link" target="_blank" href="@(Url)">
+				    <img src="@(Image)">
+			    </a>
+            }}
+		</div>
+	</div>
+}}	
+
+<scripts>
+{{
+    <script>
+		var productPublicId = "@(ProductPublicId)";
+    </script>
+}}
+	
+<layout> -> (ProductPage)
+{{
+    <div class="product-main">
+        @product_breadcrumb()
+        <section class="product-intro-container">
+	        @product_introduction()    
+	    </section>
+	    <section class="product-detais">
+	        @product_details()
+	    </section>
+	    <section class="product-accessories">
+	        @product_accessories()
+	    </section>
+    </div>
+    @scripts()
+}}:: TtlProductPageModel 
+%>'
+WHERE [Name] = 'Product page'
+
+END

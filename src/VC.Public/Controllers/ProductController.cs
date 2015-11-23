@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Extensions.OptionsModel;
 using VC.Public.Controllers.Content;
 using VC.Public.Models;
+using VC.Public.Models.Product;
+using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -13,12 +20,25 @@ namespace VC.Public.Controllers
     {
 	    private readonly ICategoryViewService _categoryViewService;
 	    private readonly IProductViewService _productViewService;
+	    private readonly ReCaptchaValidator _reCaptchaValidator;
+	    private readonly IProductService _productService;
 
-	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService)
+	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService, ReCaptchaValidator reCaptchaValidator, IProductService productService)
 	    {
 		    _categoryViewService = categoryViewService;
 		    _productViewService = productViewService;
+		    _reCaptchaValidator = reCaptchaValidator;
+		    _productService = productService;
 	    }
+
+	    private async Task PopulateProductReviewAssets(Guid id)
+	    {
+			var productTransfer = await _productService.SelectTransferAsync(id, true);
+
+			ViewBag.Image = productTransfer.ProductDynamic.Data.Thumbnail;
+			ViewBag.Name = productTransfer.ProductDynamic.Name;
+			ViewBag.SubTitle = productTransfer.ProductDynamic.Data.SubTitle;
+		}
 
 	    private IList<CustomerTypeCode> GetCategoryMenuAvailability()
 	    {
@@ -58,9 +78,38 @@ namespace VC.Public.Controllers
 			var toReturn = await _productViewService.GetProductPageContentAsync(GetCategoryMenuAvailability(), GetParameters());
 			if (toReturn != null)
 			{
-				return BaseView(new ContentPageViewModel(toReturn));
+				return View("~/Views/Content/ProductPage.cshtml", new ContentPageViewModel(toReturn));
 			}
 			return BaseNotFoundView();
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> AddReview(Guid id)
+		{
+			await PopulateProductReviewAssets(id);
+
+			return PartialView("_AddReview", new AddReviewModel {ProductId = id});
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddReview(AddReviewModel model)
+		{
+			if (Validate(model))
+			{
+				if (! await _reCaptchaValidator.Validate(Request.Form["g-Recaptcha-Response"]))
+				{
+					ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
+				}
+				else
+				{
+					ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+					return PartialView("_AddReviewInner", model);
+				}
+			}
+
+			await PopulateProductReviewAssets(model.ProductId);
+
+			return PartialView("_AddReviewInner", model);
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
@@ -11,7 +12,9 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
             CategoryIds = new List<int>();
         }
 
-        public string Name { get; set; }
+	    public Guid PublicId { get; set; }
+
+	    public string Name { get; set; }
 
         public string Url { get; set; }
 

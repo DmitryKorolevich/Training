@@ -15,6 +15,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
+using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -229,12 +230,15 @@ namespace VC.Admin.Controllers
             transferEntity.ProductContent = content;
             transferEntity.ProductDynamic = item;
 
-            if (model.Id > 0)
-                item = (await productService.UpdateAsync(transferEntity));
-            else
-                item = (await productService.InsertAsync(transferEntity));
+	        if (model.Id > 0)
+		        item = (await productService.UpdateAsync(transferEntity));
+	        else
+	        {
+		        transferEntity.ProductDynamic.PublicId = Guid.NewGuid();
+				item = (await productService.InsertAsync(transferEntity));
+			}
 
-            ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
+			ProductManageModel toReturn = _mapper.ToModel<ProductManageModel>(item);
             return toReturn;
         }
 

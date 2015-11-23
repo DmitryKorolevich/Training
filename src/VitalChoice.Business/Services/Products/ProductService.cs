@@ -53,7 +53,12 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
 
-        protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
+		private async Task<ProductContent> SelectContentForTransfer(int id)
+		{
+			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+		}
+
+		protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
         {
             return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
         }
@@ -629,7 +634,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 try
                 {
-                    var product = await base.InsertAsync(model, uow);
+					var product = await base.InsertAsync(model, uow);
 
                     productContent.Id = product.Id;
                     await UpdateContentForInsert(model, productContent);
@@ -753,19 +758,29 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false)
         {
-            ProductContentTransferEntity toReturn = new ProductContentTransferEntity();
-            toReturn.ProductDynamic = await this.SelectAsync(id, withDefaults);
-            if(toReturn.ProductDynamic!=null)
+	        var toReturn = new ProductContentTransferEntity {ProductDynamic = await this.SelectAsync(id, withDefaults)};
+	        if(toReturn.ProductDynamic!=null)
             {
-                toReturn.ProductContent = (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
-                //if(toReturn.ProductContent==null)
-                //{
-                //    throw new AppValidationException("Content info doesn't exist for the given product");
-                //}
+                toReturn.ProductContent = await SelectContentForTransfer(id);
             }
             return toReturn;
         }
 
-        #endregion
-    }
+		public async Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false)
+		{
+			var toReturn = new ProductContentTransferEntity
+			{
+				ProductDynamic = await Mapper.FromEntityAsync(
+					await
+						SelectEntityFirstAsync(o => o.PublicId == id && o.StatusCode != (int) RecordStatusCode.Deleted), withDefaults)
+			};
+			if (toReturn.ProductDynamic != null)
+			{
+				toReturn.ProductContent = await SelectContentForTransfer(toReturn.ProductDynamic.Id);
+			}
+			return toReturn;
+		}
+
+		#endregion
+	}
 }

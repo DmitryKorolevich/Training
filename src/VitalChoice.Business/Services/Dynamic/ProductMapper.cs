@@ -39,6 +39,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 var dynamic = pair.Dynamic;
 
                 dynamic.Name = entity.Name;
+                dynamic.PublicId = entity.PublicId;
                 dynamic.Hidden = entity.Hidden;
                 dynamic.CategoryIds = entity.ProductsToCategories?.Select(p => p.IdCategory).ToList();
                 if (entity.Skus != null)
@@ -75,6 +76,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 SetSkuOrdering(dynamic.Skus);
                 entity.Hidden = dynamic.Hidden;
                 entity.Name = dynamic.Name;
+                entity.PublicId = dynamic.PublicId;
 
                 if (dynamic.CategoryIds != null)
                 {
@@ -101,6 +103,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 SetSkuOrdering(dynamic.Skus);
                 entity.Hidden = dynamic.Hidden;
                 entity.Name = dynamic.Name;
+                entity.PublicId = dynamic.PublicId;
                 entity.ProductsToCategories = dynamic.CategoryIds?.Select(c => new ProductToCategory
                 {
                     IdCategory = c,

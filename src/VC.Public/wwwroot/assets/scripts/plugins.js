@@ -46,6 +46,7 @@
 })(jQuery);
 
 var successMessage;
+var defaultModalSize = 461;
 
 $(function () {
 	//fix for IE7 and IE8
@@ -135,6 +136,11 @@ function confirmAction(successCallback, errorCallback, text) {
 			}
 		]
 	});
+}
+
+function reparseElementValidators($form) {
+	$form.removeData("validator").removeData("unobtrusiveValidation");
+	$.validator.unobtrusive.parse($form);
 }
 
 function notifySuccess(text) {

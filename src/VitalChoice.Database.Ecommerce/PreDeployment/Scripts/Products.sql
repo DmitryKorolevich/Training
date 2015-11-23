@@ -101,3 +101,22 @@ BEGIN
 	EXEC sp_rename 'dbo.Products.IdProductType', 'IdObjectType', 'COLUMN';
 	EXEC sp_rename 'dbo.ProductOptionTypes.IdProductType', 'IdObjectType', 'COLUMN';
 END
+
+GO
+
+IF COL_LENGTH('[dbo].[Products]','PublicId') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[Products]
+	ADD [PublicId] UNIQUEIDENTIFIER CONSTRAINT DF_Product_PublicId DEFAULT NEWID() NOT NULL
+
+	ALTER TABLE [dbo].[Products]
+	ADD CONSTRAINT UQ_Product_PublicId UNIQUE(PublicId)
+END
+
+GO
+
+IF OBJECT_ID('DF_Product_PublicId','D') IS NOT NULL
+BEGIN
+	ALTER TABLE [dbo].[Products]
+	DROP CONSTRAINT DF_Product_PublicId
+END

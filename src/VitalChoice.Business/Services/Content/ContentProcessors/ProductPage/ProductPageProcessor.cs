@@ -137,6 +137,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 	        var toReturn = new TtlProductPageModel
 	        {
+				ProductPublicId = eProduct.PublicId,
 		        Name = eProduct.Name,
 		        SubTitle = eProduct.Data.SubTitle,
 		        Url = productContent.Url,
