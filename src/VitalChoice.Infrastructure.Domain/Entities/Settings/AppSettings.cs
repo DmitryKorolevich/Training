@@ -5,5 +5,7 @@
         public int? GlobalPerishableThreshold { get; set; }
 
         public bool CreditCardAuthorizations { get; set; }
+
+        public int? HealthwisePeriodMaxItemsCount { get; set; }
     }
 }

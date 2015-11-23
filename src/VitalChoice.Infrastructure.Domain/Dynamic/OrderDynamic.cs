@@ -44,5 +44,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public decimal DiscountTotal { get; set; }
 
         public AffiliateOrderPayment AffiliateOrderPayment { get; set; }
+
+        public bool IsHealthwise { get; set; }
     }
 }

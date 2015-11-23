@@ -214,4 +214,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VAffiliateNotPaidCommissions.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Healthwise.sql" />
+  </ItemGroup>
 </Project>

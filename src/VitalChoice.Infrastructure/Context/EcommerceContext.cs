@@ -12,6 +12,8 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -130,6 +132,33 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VHelpTickets");
+            });
+
+            builder.Entity<HealthwiseOrder>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("HealthwiseOrders");
+                entity.HasOne(p => p.Order)
+                    .WithOne()
+                    .HasForeignKey<HealthwiseOrder>(p => p.Id)
+                    .HasPrincipalKey<Order>(p => p.Id)
+                    .IsRequired();
+            });
+
+            builder.Entity<HealthwisePeriod>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("HealthwisePeriods");
+                entity.HasMany(p => p.HealthwiseOrders)
+                    .WithOne(p=>p.HealthwisePeriod)
+                    .HasForeignKey(o => o.IdHealthwisePeriod)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
+                entity.HasOne(p => p.Customer)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdCustomer)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
             });
         }
     }

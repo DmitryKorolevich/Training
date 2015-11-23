@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
@@ -55,6 +57,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IAffiliateService _affiliateService;
         private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
         private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<HealthwiseOrder> _healthwiseOrderRepositoryAsync;
+        private readonly IAppInfrastructureService _appInfrastructureService;
 
         public OrderService(IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<Order> orderRepository,
@@ -68,7 +72,8 @@ namespace VitalChoice.Business.Services.Orders
             ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
             IAffiliateService affiliateService,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository,
-            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DirectMapper<Order> directMapper, DynamicExpressionVisitor queryVisitor)
+            IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync, DirectMapper<Order> directMapper, DynamicExpressionVisitor queryVisitor,
+            IAppInfrastructureService appInfrastructureService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -83,6 +88,7 @@ namespace VitalChoice.Business.Services.Orders
             _affiliateService = affiliateService;
             _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
+            _appInfrastructureService = appInfrastructureService;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -107,7 +113,7 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.Skus)
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
-					.ThenInclude(s => s.OptionValues)
+                    .ThenInclude(s => s.OptionValues)
                     .Include(p => p.OptionValues);
         }
 
@@ -150,7 +156,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override void LogItemInfoSetAfter(ObjectHistoryLogItem log, OrderDynamic model)
         {
-            log.IdObjectStatus = (int) model.OrderStatus;
+            log.IdObjectStatus = (int)model.OrderStatus;
         }
 
         protected override bool LogObjectFullData => true;
@@ -209,7 +215,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
         {
-            if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
+            if (dynamic.Customer.StatusCode == (int)CustomerStatus.Suspended)
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SuspendedCustomer]);
@@ -225,34 +231,34 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter)
         {
-	        Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable;
 
-			var sortOrder = filter.Sorting.SortOrder;
-	        switch (filter.Sorting.Path)
-	        {
-		        case OrderSortPath.OrderDate:
-			        if (sortOrder == SortOrder.Desc)
-			        {
-				        sortable = x => x.OrderByDescending(y => y.DateCreated);
-			        }
-			        else
-			        {
-				        sortable = x => x.OrderBy(y => y.DateCreated);
-			        }
-			        break;
-		        default:
-			        if (sortOrder == SortOrder.Desc)
-			        {
-				        sortable = x => x.OrderByDescending(y => y.Id);
-			        }
-			        else
-			        {
-						sortable = x => x.OrderBy(y => y.Id);
-					}
-			        break;
-	        }
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case OrderSortPath.OrderDate:
+                    if (sortOrder == SortOrder.Desc)
+                    {
+                        sortable = x => x.OrderByDescending(y => y.DateCreated);
+                    }
+                    else
+                    {
+                        sortable = x => x.OrderBy(y => y.DateCreated);
+                    }
+                    break;
+                default:
+                    if (sortOrder == SortOrder.Desc)
+                    {
+                        sortable = x => x.OrderByDescending(y => y.Id);
+                    }
+                    else
+                    {
+                        sortable = x => x.OrderBy(y => y.Id);
+                    }
+                    break;
+            }
 
-	        var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted();
+            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted();
 
             var query =
                 this.ObjectRepository.Query(orderQuery)
@@ -262,47 +268,103 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            var entity = await base.InsertAsync(model, uow);
-            model.IdAddedBy = model.IdEditedBy;
-            await UpdateAffiliateOrderPayment(model);
-            return entity;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    var entity = await base.InsertAsync(model, uow);
+                    model.IdAddedBy = model.IdEditedBy;
+                    UpdateAffiliateOrderPayment(model, uow);
+                    await UpdateHealthwiseOrder(model, uow);
+
+                    transaction.Commit();
+                    return entity;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            var entities = await base.InsertRangeAsync(models, uow);
-            foreach(var model in models)
+            using (var transaction = uow.BeginTransaction())
             {
-                model.IdAddedBy = model.IdEditedBy;
-                await UpdateAffiliateOrderPayment(model);
+                try
+                {
+                    var entities = await base.InsertRangeAsync(models, uow);
+                    foreach (var model in models)
+                    {
+                        model.IdAddedBy = model.IdEditedBy;
+                        UpdateAffiliateOrderPayment(model, uow);
+                        await UpdateHealthwiseOrder(model, uow);
+                    }
+
+                    transaction.Commit();
+                    return entities;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
-            return entities;
         }
 
         protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            var entity = await base.UpdateAsync(model, uow);
-            model.IdAddedBy = entity.IdAddedBy;
-            await UpdateAffiliateOrderPayment(model);
-            return entity;
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    var entity = await base.UpdateAsync(model, uow);
+                    model.IdAddedBy = entity.IdAddedBy;
+                    UpdateAffiliateOrderPayment(model, uow);
+                    await UpdateHealthwiseOrder(model, uow);
+
+                    transaction.Commit();
+                    return entity;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            var entities = await base.UpdateRangeAsync(models, uow);
-            foreach (var model in models)
+            using (var transaction = uow.BeginTransaction())
             {
-                var entity = entities.FirstOrDefault(p => p.Id == model.Id);
-                if(entity!=null)
+                try
                 {
-                    model.IdAddedBy = entity.IdAddedBy;
+                    var entities = await base.UpdateRangeAsync(models, uow);
+                    foreach (var model in models)
+                    {
+                        var entity = entities.FirstOrDefault(p => p.Id == model.Id);
+                        if (entity != null)
+                        {
+                            model.IdAddedBy = entity.IdAddedBy;
+                        }
+                        UpdateAffiliateOrderPayment(model, uow);
+                        await UpdateHealthwiseOrder(model, uow);
+                    }
+
+                    transaction.Commit();
+                    return entities;
                 }
-                await UpdateAffiliateOrderPayment(model);
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
-            return entities;
         }
 
-        private async Task UpdateAffiliateOrderPayment(OrderDynamic model)
+        private void UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
         {
             if (!model.IdAddedBy.HasValue && model.Customer.IdAffiliate.HasValue)
             {
@@ -313,7 +375,48 @@ namespace VitalChoice.Business.Services.Orders
                 //TODO - calculate commission and set is a first order or no the given customer
                 //payment.Amount =
                 //payment.NewCustomerOrder =
-                //await _affiliateService.UpdateAffiliateOrderPayment(payment);
+            }
+        }
+
+        private async Task UpdateHealthwiseOrder(OrderDynamic model, IUnitOfWorkAsync uow)
+        {
+            model.IsHealthwise = true;
+            var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
+            var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
+            if (!model.IsHealthwise)
+            {
+                healthwiseOrderRepository.Delete(model.Id);
+            }
+            else
+            {
+                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepository.Query(p=>p.Id==model.Id).SelectAsync(false)).FirstOrDefault();
+                if(healthwiseOrder==null)
+                {
+                    var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var dateNow = DateTime.Now;
+                    var period = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate).Include(p => p.HealthwiseOrders).SelectAsync(false)).FirstOrDefault();
+                    if (period == null || period.HealthwiseOrders.Count >= maxCount)
+                    {
+                        period = new HealthwisePeriod();
+                        period.IdCustomer = model.Customer.Id;
+                        period.StartDate = dateNow;
+                        period.EndDate = period.StartDate.AddYears(1);
+                        period.HealthwiseOrders = new List<HealthwiseOrder>()
+                        {
+                            new HealthwiseOrder() { Id=model.Id }
+                        };
+                        healthwisePeriodRepository.InsertGraph(period);
+                    }
+                    else
+                    {
+                        healthwiseOrder = new HealthwiseOrder() {
+                            Id = model.Id,
+                            IdHealthwisePeriod=period.Id
+                        };
+                        healthwiseOrderRepository.Insert(healthwiseOrder);
+                    }
+                    await uow.SaveChangesAsync();
+                }
             }
         }
 
@@ -465,7 +568,7 @@ namespace VitalChoice.Business.Services.Orders
                                                                          .ThenInclude(o => o.OptionValues)
                                                                          .Include(o => o.PaymentMethod)
                                                                          .ThenInclude(o => o.PaymentMethod)
-                                                                         .Include(o=>o.AffiliateOrderPayment));
+                                                                         .Include(o => o.AffiliateOrderPayment));
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var result = await this.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
@@ -484,7 +587,7 @@ namespace VitalChoice.Business.Services.Orders
                 customerFirstName = null;
                 customerLastName = null;
                 customerOrdersCount = 0;
-                if(order.PaymentMethod!=null && order.PaymentMethod.Address!=null && 
+                if (order.PaymentMethod != null && order.PaymentMethod.Address != null &&
                     order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") &&
                     order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
                 {
@@ -499,20 +602,20 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     customerOrdersCount = customerOrders[order.Customer.Id];
                 }
-                
+
                 AffiliateOrderListItemModel item = new AffiliateOrderListItemModel(order.AffiliateOrderPayment, customerFirstName, customerLastName,
                     customerOrdersCount);
                 toReturn.Items.Add(item);
             }
 
-            if(customerIds.Count>0)
+            if (customerIds.Count > 0)
             {
                 var customerConditions = new VCustomerQuery().NotDeleted().WithIds(customerIds.Distinct().ToList());
                 var customers = (await _vCustomerRepositoryAsync.Query(customerConditions).SelectAsync(false));
-                
+
                 foreach (var item in toReturn.Items)
                 {
-                    if(String.IsNullOrEmpty(item.CustomerName))
+                    if (String.IsNullOrEmpty(item.CustomerName))
                     {
                         var customer = customers.FirstOrDefault(p => p.Id == item.IdCustomer);
                         if (customer != null)

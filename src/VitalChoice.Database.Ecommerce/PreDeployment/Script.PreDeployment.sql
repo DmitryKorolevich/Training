@@ -52,3 +52,4 @@
 :r .\Scripts\CustomerAddressStructureUpdate.sql
 :r .\Scripts\AllValueTablesStructureOptimize.sql
 :r .\Scripts\AppOptions.sql
+:r .\Scripts\Healthwise.sql
