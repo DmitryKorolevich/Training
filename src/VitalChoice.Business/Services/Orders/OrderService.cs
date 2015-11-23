@@ -252,79 +252,79 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override async Task<Order> InsertAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            using (var transaction = uow.BeginTransaction())
-            {
-                try
-                {
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //    try
+            //    {
                     var entity = await base.InsertAsync(model, uow);
                     model.IdAddedBy = model.IdEditedBy;
                     UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
 
-                    transaction.Commit();
+                    //transaction.Commit();
                     return entity;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        transaction.Rollback();
+            //        throw;
+            //    }
+            //}
         }
 
         protected override async Task<List<Order>> InsertRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            using (var transaction = uow.BeginTransaction())
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //    try
+            //    {
+            var entities = await base.InsertRangeAsync(models, uow);
+            foreach (var model in models)
             {
-                try
-                {
-                    var entities = await base.InsertRangeAsync(models, uow);
-                    foreach (var model in models)
-                    {
-                        model.IdAddedBy = model.IdEditedBy;
-                        UpdateAffiliateOrderPayment(model, uow);
-                        await UpdateHealthwiseOrder(model, uow);
-                    }
-
-                    transaction.Commit();
-                    return entities;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+                model.IdAddedBy = model.IdEditedBy;
+                UpdateAffiliateOrderPayment(model, uow);
+                await UpdateHealthwiseOrder(model, uow);
             }
+
+            //        transaction.Commit();
+            return entities;
+                //}
+                //catch (Exception e)
+                //{
+                //    transaction.Rollback();
+                //    throw;
+                //}
+            //}
         }
 
         protected override async Task<Order> UpdateAsync(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            using (var transaction = uow.BeginTransaction())
-            {
-                try
-                {
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //    try
+            //    {
                     var entity = await base.UpdateAsync(model, uow);
                     model.IdAddedBy = entity.IdAddedBy;
                     UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
 
-                    transaction.Commit();
+                    //transaction.Commit();
                     return entity;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        transaction.Rollback();
+            //        throw;
+            //    }
+            //}
         }
 
         protected override async Task<List<Order>> UpdateRangeAsync(ICollection<OrderDynamic> models, IUnitOfWorkAsync uow)
         {
-            using (var transaction = uow.BeginTransaction())
-            {
-                try
-                {
+            //using (var transaction = uow.BeginTransaction())
+            //{
+            //    try
+            //    {
                     var entities = await base.UpdateRangeAsync(models, uow);
                     foreach (var model in models)
                     {
@@ -337,15 +337,15 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrder(model, uow);
                     }
 
-                    transaction.Commit();
+                    //transaction.Commit();
                     return entities;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        transaction.Rollback();
+            //        throw;
+            //    }
+            //}
         }
 
         private void UpdateAffiliateOrderPayment(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -364,7 +364,7 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateHealthwiseOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            model.IsHealthwise = true;
+            //model.IsHealthwise = true;
             var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
             if (!model.IsHealthwise)
