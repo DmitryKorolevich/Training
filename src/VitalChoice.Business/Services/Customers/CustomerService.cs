@@ -536,27 +536,27 @@ namespace VitalChoice.Business.Services.Customers
             appUser.FirstName = profileAddress.Data.FirstName;
             appUser.LastName = profileAddress.Data.LastName;
 
-            //TODO: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
-            //using (var transaction = uow.BeginTransaction())
-            //{
-            //try
-            //{
-            var customer = await base.UpdateAsync(model, uow);
+            //FIXED: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    var customer = await base.UpdateAsync(model, uow);
 
-            //transaction.Commit();
+                    var roles = MapCustomerTypeToRole(model);
 
-            var roles = MapCustomerTypeToRole(model);
+                    await _storefrontUserService.UpdateAsync(appUser, roles, password);
 
-            await _storefrontUserService.UpdateAsync(appUser, roles, password);
+                    transaction.Commit();
 
-            return customer;
-            //}
-            //catch (Exception ex)
-            //{
-            //	transaction.Rollback();
-            //	throw;
-            //}
-            //}
+                    return customer;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         private async Task<Customer> InsertAsync(CustomerDynamic model, IUnitOfWorkAsync uow, string password)

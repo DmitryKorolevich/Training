@@ -74,7 +74,7 @@ namespace VitalChoice.Data.Repositories
 			int? pageSize = null,
             bool tracking = true)
 		{
-		    //TODO: added temporarly till ef 7 becomes stable, remove when it arrives
+		    //FIXED: added temporarly till ef 7 becomes stable, remove when it arrives
 			//if (EarlyRead) 
 			//{
 			//	IEnumerable<TEntity> earlyRead = query.ToArray();

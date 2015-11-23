@@ -365,20 +365,20 @@ namespace VitalChoice.Business.Services.Affiliates
 
             switch (model.StatusCode)
             {
-                case (int)AffiliateStatus.Active:
+                case (int) AffiliateStatus.Active:
                     appUser.Status = UserStatus.Active;
                     break;
-                case (int)AffiliateStatus.NotActive:
+                case (int) AffiliateStatus.NotActive:
                     appUser.Status = UserStatus.NotActive;
                     break;
-                case (int)AffiliateStatus.Suspended:
+                case (int) AffiliateStatus.Suspended:
                     appUser.Status = UserStatus.Disabled;
                     break;
-                case (int)AffiliateStatus.Deleted:
+                case (int) AffiliateStatus.Deleted:
                     appUser.Status = UserStatus.NotActive;
                     appUser.DeletedDate = DateTime.Now;
                     break;
-                case (int)AffiliateStatus.Pending:
+                case (int) AffiliateStatus.Pending:
                     appUser.Status = UserStatus.Active;
                     break;
             }
@@ -395,27 +395,27 @@ namespace VitalChoice.Business.Services.Affiliates
             appUser.FirstName = model.Name;
             appUser.LastName = String.Empty;
 
-            //TODO: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
-            //using (var transaction = uow.BeginTransaction())
-            //{
-            //try
-            //{
-            var affiliate = await base.UpdateAsync(model, uow);
+            //FIXED: Investigate transaction read issues (new transaction allocated with any read on the same connection with overwrite/close current
+            using (var transaction = uow.BeginTransaction())
+            {
+                try
+                {
+                    var affiliate = await base.UpdateAsync(model, uow);
 
-            //transaction.Commit();
+                    var roles = new List<RoleType>() {RoleType.Affiliate};
 
-            var roles = new List<RoleType>() { RoleType.Affiliate };
+                    await _affiliateUserService.UpdateAsync(appUser, roles, password);
 
-            await _affiliateUserService.UpdateAsync(appUser, roles, password);
+                    transaction.Commit();
 
-            return affiliate;
-            //}
-            //catch (Exception ex)
-            //{
-            //	transaction.Rollback();
-            //	throw;
-            //}
-            //}
+                    return affiliate;
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
         public async Task<bool> SelectAnyAsync(int id)
