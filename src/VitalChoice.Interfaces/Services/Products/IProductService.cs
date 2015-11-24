@@ -72,5 +72,7 @@ namespace VitalChoice.Interfaces.Services.Products
 		Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
 
 		#endregion
+
+		Task<int> GetProductInternalIdAsync(Guid productId);
 	}
 }

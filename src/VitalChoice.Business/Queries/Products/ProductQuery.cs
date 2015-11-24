@@ -1,4 +1,5 @@
-﻿using VitalChoice.Data.Helpers;
+﻿using System;
+using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 
 namespace VitalChoice.Business.Queries.Product
@@ -23,5 +24,11 @@ namespace VitalChoice.Business.Queries.Product
             Add(p => p.Name == name);
             return this;
         }
-    }
+
+		public ProductQuery WithPublicId(Guid publicId)
+		{
+			Add(p => p.PublicId == publicId);
+			return this;
+		}
+	}
 }

@@ -1721,11 +1721,27 @@ footer{
 			font-size:12px;
 			line-height:14px;
 			vertical-align:middle;
+			
+			&:hover{
+				color: #F30;
+			}
 		}
 	}
 
 	.product-stars-container{
 		float:left;
+
+		img{
+			margin: 0 2px;
+
+			&:first-child{
+				margin-left:0px;
+			}
+
+			&.rating-last-child{
+				margin-right:0px;
+			}
+		}
 	}
 
 	.product-reviews-count{
@@ -1953,8 +1969,89 @@ footer{
 	}
 }
 
+.product-reviews-overall{
+	color: #4C4C4C;
+	margin: 12px 0;
+	font-family: Arial;
+    font-size: 13px;
+    text-align: left;
+
+	img{
+		vertical-align:top;
+		margin: 0 2px;
+
+		&:first-child{
+			margin-left:5px;
+		}
+
+		&.rating-last-child{
+			margin-right:5px;
+		}
+	}
+}
+
+.product-reviews-item{
+	color: #4C4C4C;
+
+	.reviews-item-rating{
+		display:inline-block;
+		padding: 0px 42px 0 0;
+		vertical-align:top;
+
+		img{
+			vertical-align:top;
+			margin: 0 2px;
+		}
+	}
+
+	.reviews-item-info{
+		display:inline-block;
+		vertical-align:top;
+		width:85%;
+
+		span{
+			display:block;
+			text-align:left;
+			line-height:14px;
+
+			&.reviews-item-title{
+				font-weight:bold;
+			}
+
+			&.reviews-item-text{
+				margin-top:10px;
+			}
+		}
+	}
+}
+
+.ui-widget-content .write-review-link{
+	color: #F63;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 14px;
+    vertical-align: middle;
+
+	&:hover{
+		color: #F30;
+	}
+}
+
+.ui-widget-content .read-more-reviews{
+	font-weight:bold;
+	.ui-widget-content .write-review-link;
+}
+
 .product-main .tabs-control{
 	width: 954px;
+
+	hr{
+		margin:16px 0 16px 0;
+		color: #e5e5e5;
+		background: #e5e5e5;
+		border: 0;
+		height: 1px;
+	}
 }
 
 .width-100-percent{

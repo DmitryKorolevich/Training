@@ -35,14 +35,16 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public IList<TtlProductPageSkuModel> Skus { get; set; }
 
-	    public TtlProductPageTabContent DescriptionTab { get; set; }
+	    public TtlProductPageTabContentModel DescriptionTab { get; set; }
 
-	    public TtlProductPageTabContent IngredientsTab { get; set; }
+	    public TtlProductPageTabContentModel IngredientsTab { get; set; }
 
-	    public TtlProductPageTabContent RecipesTab { get; set; }
+	    public TtlProductPageTabContentModel RecipesTab { get; set; }
 
-	    public TtlProductPageTabContent ServingTab { get; set; }
+	    public TtlProductPageTabContentModel ServingTab { get; set; }
 
-	    public TtlProductPageTabContent ShippingTab { get; set; }
+	    public TtlProductPageTabContentModel ShippingTab { get; set; }
+
+	    public TtlProductReviewsTabModel ReviewsTab { get; set; }
     }
 }

@@ -129,7 +129,21 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<ProductReview> GetProductReviewAsync(int id)
+	    public async Task<int> GetApprovedCountAsync(int productId)
+	    {
+			var conditions = new ProductReviewQuery().WithStatus(RecordStatusCode.Active).WithIdProduct(productId);
+
+			return await _productReviewRepository.Query(conditions).SelectCountAsync();
+		}
+
+	    public async Task<int> GetApprovedAverageRatingsAsync(int productId)
+	    {
+			var conditions = new ProductReviewQuery().WithStatus(RecordStatusCode.Active).WithIdProduct(productId);
+
+			return await Task.FromResult((int)Math.Round(_productReviewRepository.Query(conditions).Select(x=>x.Rating,false).DefaultIfEmpty(0).Average()));
+		}
+
+	    public async Task<ProductReview> GetProductReviewAsync(int id)
         {
             var conditions = new ProductReviewQuery().WithId(id).NotDeleted();
             var query = _productReviewRepository.Query(conditions).Include(p => p.Product);
