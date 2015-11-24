@@ -34,7 +34,7 @@ namespace VC.Admin.Controllers
     {
         private readonly IProductCategoryService productCategoryService;
         private readonly IProductService productService;
-        private readonly IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService;
+        private readonly IDynamicServiceAsync<ProductDynamic, Product> productUniversalService;
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
@@ -42,7 +42,7 @@ namespace VC.Admin.Controllers
         private readonly ILogger logger;
 
         public ProductController(IProductCategoryService productCategoryService, IProductService productService,
-            IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productUniversalService,
+            IDynamicServiceAsync<ProductDynamic, Product> productUniversalService,
             IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
             ILoggerProviderExtended loggerProvider, IDynamicMapper<ProductDynamic, Product> mapper,
             IObjectHistoryLogService objectHistoryLogService)

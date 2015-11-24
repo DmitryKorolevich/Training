@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
@@ -44,7 +45,7 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.Orders
 {
-    public class OrderService : EcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
+    public class OrderService : ExtendedEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
         IOrderService
     {
         private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;

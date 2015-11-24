@@ -114,9 +114,7 @@ namespace VC.Admin.ModelConverters
         {
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {
-                dynamic.Discount =
-                    _discountService.Select(queryObject: new DiscountQuery().WithCode(model.DiscountCode).NotDeleted(), withDefaults: true)
-                        .FirstOrDefault();
+                dynamic.Discount = _discountService.GetByCode(model.DiscountCode).Result;
             }
 
             ModelToGcsDynamic(model, dynamic);

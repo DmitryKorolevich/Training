@@ -54,9 +54,9 @@ namespace VC.Admin.Controllers
         private readonly Country _defaultCountry;
         private readonly IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _exportCustomersForAffiliatesService;
 
-        private readonly IEcommerceDynamicService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
+        private readonly IDynamicServiceAsync<AddressDynamic, Address>
             _addressService;
-        private readonly IEcommerceDynamicService<CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue>
+        private readonly IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote>
             _notesService;
 
 		private readonly ILogger logger;
@@ -66,10 +66,8 @@ namespace VC.Admin.Controllers
             IDynamicMapper<CustomerDynamic, Customer> customerMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IHttpContextAccessor contextAccessor,
-            IEcommerceDynamicService<AddressDynamic, Address, AddressOptionType, AddressOptionValue>
-                addressService,
-            IEcommerceDynamicService
-                <CustomerNoteDynamic, CustomerNote, CustomerNoteOptionType, CustomerNoteOptionValue> notesService,
+            IDynamicServiceAsync<AddressDynamic, Address> addressService,
+            IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> notesService,
             IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider, IStorefrontUserService storefrontUserService,
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,

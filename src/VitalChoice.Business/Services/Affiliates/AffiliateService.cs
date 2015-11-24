@@ -19,6 +19,7 @@ using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
 using VitalChoice.Business.Queries.Affiliates;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -38,7 +39,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Services.Affiliates
 {
-    public class AffiliateService : EcommerceDynamicService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>,
+    public class AffiliateService : ExtendedEcommerceDynamicService<AffiliateDynamic, Affiliate, AffiliateOptionType, AffiliateOptionValue>,
         IAffiliateService
     {
         private readonly IEcommerceRepositoryAsync<VAffiliate> _vAffiliateRepository;

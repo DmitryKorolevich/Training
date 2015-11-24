@@ -6,6 +6,7 @@ using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
@@ -36,7 +37,7 @@ using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressi
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class ProductService : EcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
+    public class ProductService : ExtendedEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue>, IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
         private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;

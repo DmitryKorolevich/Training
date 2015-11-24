@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using Autofac;
+using Autofac.Builder;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.DynamicData.Extensions
@@ -49,6 +52,32 @@ namespace VitalChoice.DynamicData.Extensions
             }
             return builder;
         }
+
+        public static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> RegisterGenericServiceDecorator(
+            this ContainerBuilder builder, Type implementor, string parameterName)
+        {
+            return builder.RegisterGeneric(implementor).WithParameter((pi, cc) => pi.Name == parameterName,
+                (pi, cc) =>
+                {
+                    var typeArguments = pi.ParameterType.TryGetTypeArguments(typeof (IDynamicReadServiceAsync<,>));
+                    if (typeArguments == null)
+                        throw new ArgumentException(
+                            "No type arguments in IDynamicReadServiceAsync<,> while resolving IExtendedDynamicServiceAsync<,,,>");
+                    var dynamicType = typeArguments[0];
+                    var entityType = typeArguments[1];
+                    var entityTypeArguments = entityType.TryGetTypeArguments(typeof (DynamicDataEntity<,>));
+                    if (entityTypeArguments == null)
+                        throw new ArgumentException(
+                            "No type arguments in DynamicDataEntity<,> while resolving IExtendedDynamicServiceAsync<,,,>. " +
+                            "Please use entity inherited from DynamicDataEntity<,>");
+                    var optionValueType = entityTypeArguments[0];
+                    var optionTypeType = entityTypeArguments[1];
+                    return
+                        cc.Resolve(typeof (IExtendedDynamicServiceAsync<,,,>).MakeGenericType(dynamicType, entityType,
+                            optionTypeType, optionValueType));
+                });
+        }
+
 
         public static ContainerBuilder RegisterModelConverters(this ContainerBuilder builder, Assembly containAssembly)
         {
