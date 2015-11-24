@@ -23,6 +23,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
             IWorkflowExecutionContext executionContext)
         {
             var eligiable = context.Promotions.Where(p => p.IdObjectType == (int) PromotionType.BuyXGetY);
+            var productService = executionContext.Resolve<IProductService>();
             foreach (var promo in eligiable)
             {
                 if (promo.Data.PromotionBuyType == (int)PromoBuyType.Any)
@@ -31,7 +32,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                     var applyCount =
                         context.Order.Skus.Where(s => promoskuIds.ContainsKey(s.Sku.Id))
                             .Sum(s => s.Quantity/promoskuIds[s.Sku.Id].Quantity);
-                    await AddPromoProducts(context, executionContext, promo, applyCount);
+                    await AddPromoProducts(context, productService, promo, applyCount);
                 }
                 else if (promo.Data.PromotionBuyType == (int)PromoBuyType.All)
                 {
@@ -39,14 +40,14 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
                     if (promo.PromotionsToBuySkus.All(s => orderSkuIds.ContainsKey(s.IdSku)))
                     {
                         var applyCount = promo.PromotionsToBuySkus.Min(s => orderSkuIds[s.IdSku].Quantity / s.Quantity);
-                        await AddPromoProducts(context, executionContext, promo, applyCount);
+                        await AddPromoProducts(context, productService, promo, applyCount);
                     }
                 }
             }
             return 0;
         }
 
-        private static async Task AddPromoProducts(OrderDataContext context, IWorkflowExecutionContext executionContext,
+        private static async Task AddPromoProducts(OrderDataContext context, IProductService productService,
             PromotionDynamic promo, int applyCount)
         {
             int? maxUsage = promo.Data.MaxTimesUse;
@@ -55,7 +56,6 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
             if (applyCount > 0)
             {
                 var skuListCache = promo.PromotionsToGetSkus.ToDictionary(s => s.IdSku);
-                var productService = executionContext.Resolve<IProductService>();
                 var promoSkus = await
                     productService.GetSkusOrderedAsync(
                         promo.PromotionsToGetSkus.Select(p => p.IdSku).ToArray());

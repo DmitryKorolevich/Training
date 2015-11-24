@@ -8,6 +8,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Validation;
@@ -30,7 +31,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class DiscountService : EcommerceDynamicService<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
+    public class DiscountService : ExtendedEcommerceDynamicService<DiscountDynamic, Discount, DiscountOptionType, DiscountOptionValue>, IDiscountService
     {
         private readonly IEcommerceRepositoryAsync<Discount> _discountRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
@@ -258,6 +259,11 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        public Task<DiscountDynamic> GetByCode(string code)
+        {
+            return SelectFirstAsync(new DiscountQuery().WithCode(code).NotDeleted(), withDefaults: true);
         }
 
         #endregion

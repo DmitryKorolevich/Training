@@ -7,6 +7,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Interfaces.Services.Products;
@@ -15,6 +16,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Entities.Promotion;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -27,7 +29,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class PromotionService : EcommerceDynamicService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>, IPromotionService
+    public class PromotionService : ExtendedEcommerceDynamicService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>, IPromotionService
     {
         private readonly IEcommerceRepositoryAsync<Promotion> _promotionRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
@@ -217,6 +219,14 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        public Task<List<PromotionDynamic>> GetActivePromotions(CustomerType customerType)
+        {
+            return SelectAsync(
+                new PromotionQuery().IsActive()
+                    .WithExpiredType(ExpiredType.NotExpired)
+                    .AllowCustomerType(customerType), withDefaults: true);
         }
 
         #endregion

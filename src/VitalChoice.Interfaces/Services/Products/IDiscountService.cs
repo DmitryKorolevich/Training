@@ -10,5 +10,6 @@ namespace VitalChoice.Interfaces.Services.Products
 	public interface IDiscountService : IDynamicServiceAsync<DiscountDynamic, Discount>
 	{
         Task<PagedList<DiscountDynamic>> GetDiscountsAsync(DiscountFilter filter);
-    }
+	    Task<DiscountDynamic> GetByCode(string code);
+	}
 }

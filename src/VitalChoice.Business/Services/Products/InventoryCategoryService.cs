@@ -8,6 +8,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.DynamicData.Extensions;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -21,11 +22,11 @@ namespace VitalChoice.Business.Services.Products
     public class InventoryCategoryService : IInventoryCategoryService
     {
         private readonly IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository;
-        private readonly IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService;
+        private readonly IExtendedDynamicReadServiceAsync<ProductDynamic, Product> productService;
         private readonly ILogger logger;
 
         public InventoryCategoryService(IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository,
-            IEcommerceDynamicService<ProductDynamic, Product, ProductOptionType, ProductOptionValue> productService,
+            IExtendedDynamicReadServiceAsync<ProductDynamic, Product> productService,
             ILoggerProviderExtended loggerProvider)
         {
             this.inventoryCategoryEcommerceRepository = inventoryCategoryEcommerceRepository;

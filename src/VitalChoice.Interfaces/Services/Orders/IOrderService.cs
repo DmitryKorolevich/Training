@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -8,7 +9,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
-	public interface IOrderService: IEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>
+	public interface IOrderService: IDynamicServiceAsync<OrderDynamic, Order>
 	{
         Task<PagedList<Order>> GetShortOrdersAsync(ShortOrderFilter filter);
         Task<int?> GetOrderIdCustomer(int id);

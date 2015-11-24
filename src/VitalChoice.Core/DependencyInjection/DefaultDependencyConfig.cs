@@ -67,9 +67,13 @@ using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
 using VitalChoice.Business.Repositories;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.UnitOfWork;
 using VitalChoice.Infrastructure.Cache;
@@ -412,8 +416,19 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
-            builder.RegisterGeneric(typeof (EcommerceDynamicService<,,,>))
-                .As(typeof (IEcommerceDynamicService<,,,>));
+
+            builder.RegisterGeneric(typeof(ExtendedEcommerceDynamicService<,,,>))
+                .As(typeof(IExtendedDynamicServiceAsync<,,,>));
+
+            builder.RegisterGenericServiceDecorator(typeof (EcommerceDynamicServiceDecorator<,>), "extendedService")
+                .As(typeof (IDynamicServiceAsync<,>));
+
+            builder.RegisterGenericServiceDecorator(typeof(EcommerceDynamicReadServiceDecorator<,>), "extendedService")
+                .As(typeof(IDynamicReadServiceAsync<,>));
+
+            builder.RegisterGenericServiceDecorator(typeof (ExtendedEcommerceDynamicReadServiceDecorator<,>), "extendedService")
+                .As(typeof (IExtendedDynamicReadServiceAsync<,>));
+
             builder.RegisterGeneric(typeof (TreeSetup<,>)).As(typeof (ITreeSetup<,>));
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();

@@ -19,7 +19,7 @@ using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressi
 namespace VitalChoice.DynamicData.Base
 {
     public abstract /*partial*/ class DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> :
-        IDynamicReadServiceAsync<TDynamic, TEntity>
+        IExtendedDynamicReadServiceAsync<TDynamic, TEntity>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()
@@ -110,7 +110,28 @@ namespace VitalChoice.DynamicData.Base
             return Mapper.ToModel<TModel>(await CreatePrototypeAsync(idObjectType));
         }
 
+        Task<TDynamic> IDynamicReadServiceAsync<TDynamic, TEntity>.SelectAsync(int id, bool withDefaults)
+        {
+            return SelectAsync(id, withDefaults, null);
+        }
+
+        Task<List<TDynamic>> IDynamicReadServiceAsync<TDynamic, TEntity>.SelectAsync(ICollection<int> ids, bool withDefaults)
+        {
+            return SelectAsync(ids, withDefaults, null);
+        }
+
+        TDynamic IDynamicReadServiceAsync<TDynamic, TEntity>.Select(int id, bool withDefaults)
+        {
+            return Select(id, withDefaults, null);
+        }
+
+        List<TDynamic> IDynamicReadServiceAsync<TDynamic, TEntity>.Select(ICollection<int> ids, bool withDefaults)
+        {
+            return Select(ids, withDefaults, null);
+        }
+
         public async Task<TDynamic> SelectAsync(int id, bool withDefaults = false,
+            // ReSharper disable once MethodOverloadWithOptionalParameter
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
             return
@@ -122,6 +143,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         public async Task<List<TDynamic>> SelectAsync(ICollection<int> ids, bool withDefaults = false,
+            // ReSharper disable once MethodOverloadWithOptionalParameter
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
         {
             return

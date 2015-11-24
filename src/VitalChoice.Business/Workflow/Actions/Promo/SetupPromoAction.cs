@@ -1,6 +1,9 @@
 ﻿using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Promotion;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Products;
@@ -21,11 +24,7 @@ namespace VitalChoice.Business.Workflow.Actions.Promo
             var promoService = executionContext.Resolve<IPromotionService>();
             context.Promotions =
                 await
-                    promoService.SelectAsync(queryObject:
-                        new PromotionQuery().IsActive()
-                            .WithExpiredType(ExpiredType.NotExpired)
-                            .AllowCustomerType((CustomerType) context.Order.Customer.IdObjectType), withDefaults: true);
-
+                    promoService.GetActivePromotions((CustomerType) context.Order.Customer.IdObjectType);
             return 0;
         }
     }

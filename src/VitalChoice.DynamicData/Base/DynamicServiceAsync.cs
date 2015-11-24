@@ -21,7 +21,7 @@ using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressi
 namespace VitalChoice.DynamicData.Base
 {
     public abstract partial class DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue> :
-        DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IDynamicServiceAsync<TDynamic, TEntity>
+        DynamicReadServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>, IExtendedDynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>
         where TEntity : DynamicDataEntity<TOptionValue, TOptionType>, new()
         where TOptionType : OptionType, new()
         where TOptionValue : OptionValue<TOptionType>, new()

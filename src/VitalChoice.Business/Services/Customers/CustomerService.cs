@@ -22,6 +22,7 @@ using VitalChoice.Data.Services;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Repositories;
+using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -45,7 +46,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: EcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
+    public class CustomerService: ExtendedEcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
