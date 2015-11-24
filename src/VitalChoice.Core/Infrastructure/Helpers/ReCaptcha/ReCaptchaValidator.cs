@@ -8,7 +8,9 @@ namespace VitalChoice.Core.Infrastructure.Helpers.ReCaptcha
 {
     public class ReCaptchaValidator
     {
-	    private readonly  GoogleCaptcha reCaptcha;
+        public const string DefaultPostParamName = "g-Recaptcha-Response";
+
+	    private readonly GoogleCaptcha reCaptcha;
 
 	    public ReCaptchaValidator(IOptions<AppOptions> options)
 	    {

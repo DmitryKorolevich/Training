@@ -76,6 +76,7 @@ namespace VC.Admin.Controllers
                     PromotionTypes = referenceData.PromotionTypes,
                     ExpiredTypes = referenceData.ExpiredTypes,
                     PromotionBuyTypes = referenceData.PromotionBuyTypes,
+                    PersonTitles=referenceData.PersonTitles,
                 };
 	        }
 			else

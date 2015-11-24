@@ -51,5 +51,19 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	    updateGlobalSettings: function (model, tracker) {
 	        return $http.post(baseUrl + 'UpdateGlobalSettings', model, getConfig(tracker));
 	    },
+
+	    //catalog requests
+	    getCatalogRequests: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetCatalogRequests', getConfig(tracker));
+	    },
+	    getCatalogRequestsReportFileUrl: function (buildNumber)
+	    {
+	        return baseUrl + 'GetCatalogRequestsReportFile?buildNumber={0}'.format(buildNumber);
+	    },
+	    deleteCatalogRequests: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'DeleteCatalogRequests', null, getConfig(tracker));
+	    },
 	};
 }]);

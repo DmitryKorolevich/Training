@@ -53,3 +53,4 @@
 :r .\Scripts\AllValueTablesStructureOptimize.sql
 :r .\Scripts\AppOptions.sql
 :r .\Scripts\Healthwise.sql
+:r .\Scripts\CatalogRequests.sql

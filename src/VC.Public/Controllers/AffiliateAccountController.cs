@@ -225,7 +225,6 @@ namespace VC.Public.Controllers
         public IActionResult Register()
         {
             AffiliateManageModel model = new AffiliateManageModel();
-            model.IdCountry = 4;
             InitRegisterModel(model);
             return View(model);
         }

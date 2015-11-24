@@ -455,3 +455,13 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[AddressOptionTypes] WHERE [IdObjectType]=3 AND Name='PersonTitle')
+BEGIN
+	INSERT INTO [dbo].[AddressOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'PersonTitle', 4, NULL, 3, NULL)
+END
+
+GO

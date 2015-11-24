@@ -341,5 +341,18 @@ namespace VitalChoice.Business.Helpers
             }
             return toReturn;
         }
+
+        public static IList<LookupItem<string>> GetPersonTitles()
+        {
+            IList<LookupItem<string>> toReturn = new List<LookupItem<string>>
+            {
+                new LookupItem<string>() {Key = "Mr.", Text="Mr." },
+                new LookupItem<string>() {Key = "Ms.", Text="Ms." },
+                new LookupItem<string>() {Key = "Miss.", Text="Miss." },
+                new LookupItem<string>() {Key = "Mrs.", Text="Mrs." },
+                new LookupItem<string>() {Key = "Dr.", Text="Dr." },
+            };
+            return toReturn;
+        }
     }
 }

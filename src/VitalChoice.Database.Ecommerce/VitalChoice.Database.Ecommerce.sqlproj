@@ -217,4 +217,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\Healthwise.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\CatalogRequests.sql" />
+  </ItemGroup>
 </Project>

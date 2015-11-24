@@ -109,7 +109,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },
                         { name: 'newCustomersReport', stateName: 'index.oneCol.newCustomersReport', stateLabel: 'New Customers Report', access: 3 },
 				    ]
-				}
+				},
+                { name: 'catalogRequests', stateName: 'index.oneCol.catalogRequests', stateLabel: 'Catalog Requests', access: 3 },
 			]
 		},
 		{

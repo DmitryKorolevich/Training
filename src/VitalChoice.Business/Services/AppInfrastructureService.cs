@@ -352,6 +352,7 @@ namespace VitalChoice.Business.Services
                     Key = x.Id,
                     Text = x.ValueVariant
                 }).ToList();
+            referenceData.PersonTitles = LookupHelper.GetPersonTitles();
 
             //BUG: shoule be moved to the specific worker
             SetupAppSettings();

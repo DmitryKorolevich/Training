@@ -14,6 +14,10 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using VitalChoice.Business.ExportMaps;
+using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
+using Microsoft.Net.Http.Headers;
+using System;
 
 namespace VC.Admin.Controllers
 {
@@ -24,6 +28,8 @@ namespace VC.Admin.Controllers
         private readonly ISettingService settingService;
         private readonly IFileService fileService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
+        private readonly ICatalogRequestAddressService _catalogRequestAddressService;
+        private readonly IExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> _exportCatalogRequestAddressService;
         private readonly ILogger logger;
 
         public SettingController(
@@ -32,6 +38,8 @@ namespace VC.Admin.Controllers
             ISettingService settingService,
             IFileService fileService,
             IObjectHistoryLogService objectHistoryLogService,
+            ICatalogRequestAddressService catalogRequestAddressService,
+            IExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
             ILoggerProviderExtended loggerProvider)
         {
             this.logViewService = logViewService;
@@ -39,6 +47,8 @@ namespace VC.Admin.Controllers
             this.settingService = settingService;
             this.fileService = fileService;
             this.objectHistoryLogService = objectHistoryLogService;
+            _catalogRequestAddressService = catalogRequestAddressService;
+            _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
             this.logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -142,6 +152,8 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
         {
+            var items =await _catalogRequestAddressService.GetCatalogRequestsAsync();
+
             var result = await logViewService.GetCommonItemsAsync(filter.LogLevel,filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
                 filter.Paging.PageIndex, filter.Paging.PageItemCount, filter.Sorting);
             var toReturn = new PagedList<LogListItemModel>
@@ -166,6 +178,41 @@ namespace VC.Admin.Controllers
                 Items = result.Items.Select(p => new ObjectHistoryLogListItemModel(p)).ToList(),
                 Count = result.Count,
             };
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region RequestCatalogs
+
+        [HttpGet]
+        public async Task<Result<ICollection<CatalogRequestAddressListItemModel>>> GetCatalogRequests()
+        {
+            var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
+
+            return items.ToList();
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetCatalogRequestsReportFile()
+        {
+            var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
+            var data = _exportCatalogRequestAddressService.ExportToCSV(items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.CATALOG_REQUESTS_REPORT, DateTime.Now.ToString("MM_dd_yyyy_hh_mm_ss")),
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> DeleteCatalogRequests([FromBody] object model)
+        {
+            var toReturn = await _catalogRequestAddressService.DeleteCatalogRequestsAsync();
 
             return toReturn;
         }

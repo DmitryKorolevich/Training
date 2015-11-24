@@ -409,6 +409,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<FedExService>().As<IFedExService>();
             builder.RegisterType<VitalGreenService>().As<IVitalGreenService>();
             builder.RegisterType<StylesService>().As<IStylesService>();
+            builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
             builder.RegisterGeneric(typeof (EcommerceDynamicService<,,,>))
