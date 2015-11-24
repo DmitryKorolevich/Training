@@ -4,10 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
+using Autofac;
+using ExportWorkerRoleWithSBQueue.Services;
+using Microsoft.Azure;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace ExportWorkerRoleWithSBQueue
 {
@@ -18,28 +23,34 @@ namespace ExportWorkerRoleWithSBQueue
 
         // QueueClient is thread-safe. Recommended that you cache 
         // rather than recreating it on every request
-        QueueClient Client;
-        ManualResetEvent CompletedEvent = new ManualResetEvent(false);
+        private QueueClient _client;
+        private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
+        private IContainer _container;
 
         public override void Run()
         {
             Trace.WriteLine("Starting processing of messages");
 
-            // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
-            Client.OnMessage((receivedMessage) =>
+            _client.OnMessageAsync(receivedMessage =>
                 {
-                    try
+                    using (var scope = _container.BeginLifetimeScope())
                     {
-                        // Process the message
-                        Trace.WriteLine("Processing Service Bus message: " + receivedMessage.SequenceNumber.ToString());
-                    }
-                    catch
-                    {
-                        // Handle any message processing specific exceptions here
+                        var exportService = scope.Resolve<IOrderExportService>();
+                        switch (receivedMessage.ContentType)
+                        {
+                            case "application/order-export":
+                                var exportData = receivedMessage.GetBody<OrderExportData>();
+                                return Task.WhenAll(exportData.ExportInfo.Select(e => exportService.ExportOrder(e.Id, e.OrderType)));
+                            case "application/update-order-payment":
+                                break;
+                            case "application/update-customer-payment":
+                                break;
+                        }
+                        return Task.Delay(0);
                     }
                 });
 
-            CompletedEvent.WaitOne();
+            _completedEvent.WaitOne();
         }
 
         public override bool OnStart()
@@ -56,15 +67,17 @@ namespace ExportWorkerRoleWithSBQueue
             }
 
             // Initialize the connection to Service Bus Queue
-            Client = QueueClient.CreateFromConnectionString(connectionString, QueueName);
+            _client = QueueClient.CreateFromConnectionString(connectionString, QueueName);
+            _container = Configuration.BuildContainer();
             return base.OnStart();
         }
 
         public override void OnStop()
         {
             // Close the connection to Service Bus Queue
-            Client.Close();
-            CompletedEvent.Set();
+            _client.Close();
+            _completedEvent.Set();
+            _container.Dispose();
             base.OnStop();
         }
     }

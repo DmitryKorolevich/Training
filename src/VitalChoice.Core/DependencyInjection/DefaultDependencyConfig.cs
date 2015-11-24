@@ -80,6 +80,7 @@ using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -277,6 +278,12 @@ namespace VitalChoice.Core.DependencyInjection
                     configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
 
+            builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
+            builder.RegisterGeneric(typeof(Logger<>))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
+                .As(typeof(ILogger<>));
+
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()
                 .WithParameters(new List<Parameter>
@@ -316,8 +323,8 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<LogsContext>());
             builder.RegisterGeneric(typeof (GenericService<>))
                 .As(typeof (IGenericService<>));
-            builder.RegisterGeneric(typeof(ExportService<,>))
-                .As(typeof(IExportService<,>));
+            builder.RegisterGeneric(typeof(CsvExportService<,>))
+                .As(typeof(ICsvExportService<,>));
             builder.RegisterType<ContentEditService>().As<IContentEditService>();
             builder.RegisterType<LogViewService>().As<ILogViewService>();
             builder.RegisterType<MasterContentService>().As<IMasterContentService>();

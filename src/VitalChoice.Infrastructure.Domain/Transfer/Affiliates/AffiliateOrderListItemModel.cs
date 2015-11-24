@@ -1,11 +1,10 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Helpers.Export;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
 {
-    public class AffiliateOrderListItemModel : IExportable
+    public class AffiliateOrderListItemModel
     {
         public DateTime DateCreated { get; set; }
 

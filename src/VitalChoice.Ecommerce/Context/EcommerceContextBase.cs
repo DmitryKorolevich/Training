@@ -20,9 +20,9 @@ using VitalChoice.Ecommerce.Domain.Options;
 
 namespace VitalChoice.Ecommerce.Context
 {
-    public class EccomerceContextBase : DataContext
+    public class EcommerceContextBase : DataContext
     {
-        public EccomerceContextBase(IOptions<AppOptionsBase> options)
+        public EcommerceContextBase(IOptions<AppOptionsBase> options)
         {
             Options = options;
         }

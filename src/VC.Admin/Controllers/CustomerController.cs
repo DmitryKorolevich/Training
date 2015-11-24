@@ -52,7 +52,7 @@ namespace VC.Admin.Controllers
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
-        private readonly IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _exportCustomersForAffiliatesService;
+        private readonly ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _csvExportCustomersForAffiliatesService;
 
         private readonly IDynamicServiceAsync<AddressDynamic, Address>
             _addressService;
@@ -72,7 +72,7 @@ namespace VC.Admin.Controllers
             IOptions<AppOptions> appOptions,
             IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
-            IExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> exportCustomersForAffiliatesService)
+            ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -86,7 +86,7 @@ namespace VC.Admin.Controllers
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
-            _exportCustomersForAffiliatesService = exportCustomersForAffiliatesService;
+            _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
@@ -365,7 +365,7 @@ namespace VC.Admin.Controllers
                 }
             }
 
-            var data = _exportCustomersForAffiliatesService.ExportToCSV(items);
+            var data = _csvExportCustomersForAffiliatesService.ExportToCsv(items);
 
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {

@@ -105,6 +105,7 @@ namespace VitalChoice.Core.Services
         }
     }
 #endif
+
     public class LoggerProviderExtended : ILoggerProviderExtended
     {
         private readonly ILoggerFactory _factory;

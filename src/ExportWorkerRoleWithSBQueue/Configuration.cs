@@ -1,67 +1,30 @@
-﻿using System;
-using System.IO;
-using Autofac;
-using Microsoft.Extensions.Configuration;
+﻿using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Core.DependencyInjection;
-using VitalChoice.Core.Services;
-using VitalChoice.Interfaces.Services;
-using VitalChoice.Workflow.Core;
-using VitalChoice.Infrastructure.Context;
-using VitalChoice.Core.Infrastructure;
-using Microsoft.Extensions.PlatformAbstractions;
+using Autofac;
+using Autofac.Builder;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
+using VitalChoice.Core.DependencyInjection;
+using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Options;
+using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Workflow.Configuration
+namespace ExportWorkerRoleWithSBQueue
 {
-    public class Program
+    internal class Configuration
     {
-
-        public async Task Main(string[] args)
-        {
-            try
-            {
-                Console.WriteLine($"[{DateTime.Now:O}] Configuring IoC");
-
-                var container = BuildContainer();
-                using (var scope = container.BeginLifetimeScope())
-                {
-                    Console.WriteLine($"[{DateTime.Now:O}] Configuring DB");
-                    var setup = scope.Resolve<ITreeSetup<OrderDataContext, decimal>>();
-                    DefaultConfiguration.Configure(setup);
-                    if (await setup.UpdateAsync())
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine($"[{DateTime.Now:O}] Update Success!");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine($"[{DateTime.Now:O}] Update Failed! See logs for details.");
-                        Console.ResetColor();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"[{e.Source}] Update Failed!\r\n{e.Message}\r\n{e.StackTrace}");
-                Console.ResetColor();
-            }
-        }
-
-        private static IContainer BuildContainer()
+        internal static IContainer BuildContainer()
         {
             var applicationEnvironment =
                 (IApplicationEnvironment)
-                    CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
+                    CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json");
@@ -76,7 +39,8 @@ namespace VitalChoice.Workflow.Configuration
             var services = new ServiceCollection();
 
             services.AddEntityFramework()
-                .AddSqlServer();
+                .AddSqlServer()
+                .AddDbContext<VitalChoiceContext>();
 
             services.Configure<AppOptionsBase>(options =>
             {
@@ -110,12 +74,12 @@ namespace VitalChoice.Workflow.Configuration
                 .As<ILoggerProviderExtended>().SingleInstance();
 
             builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            builder.RegisterGeneric(typeof(Logger<>))
-                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+            builder.RegisterGeneric(typeof (Logger<>))
+                .WithParameter((pi, cc) => pi.ParameterType == typeof (ILoggerFactory),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-                .As(typeof(ILogger<>));
+                .As(typeof (ILogger<>));
 
-            var container = new AdminDependencyConfig().BuildContainer(typeof (Program).GetTypeInfo().Assembly, builder);
+            var container = new AdminDependencyConfig().BuildContainer(typeof(WorkerRole).GetTypeInfo().Assembly, builder);
             return container;
         }
     }

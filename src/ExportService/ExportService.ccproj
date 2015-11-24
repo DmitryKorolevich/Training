@@ -37,7 +37,7 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ExportWorkerRoleWithSBQueue\ExportWorkerRoleWithSBQueue.csproj">
+    <ProjectReference Include="..\ExportWorkerRoleWithSBQueue\ExportWorkerRoleWithSBQueue.xproj">
       <Name>ExportWorkerRoleWithSBQueue</Name>
       <Project>{17fe9af7-b2bb-430a-9f3a-2b3be2f7db58}</Project>
       <Private>True</Private>
