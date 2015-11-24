@@ -781,6 +781,13 @@ namespace VitalChoice.Business.Services.Products
 			return toReturn;
 		}
 
-		#endregion
+	    public async Task<int> GetProductInternalIdAsync(Guid productId)
+	    {
+			var productQuery = new ProductQuery().WithPublicId(productId).NotDeleted();
+
+		    return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
+	    }
+
+	    #endregion
 	}
 }

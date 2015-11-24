@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage;
@@ -30,12 +33,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
     {
 	    private readonly IProductService _productService;
 		private readonly IProductCategoryService _productCategoryService;
+		private readonly IProductReviewService _productReviewService;
 
-		public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper, IProductService productService, IProductCategoryService productCategoryService) : base(mapper)
+		public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper, IProductService productService, IProductCategoryService productCategoryService, IProductReviewService productReviewService) : base(mapper)
         {
 	        _productService = productService;
 			_productCategoryService = productCategoryService;
-		}
+			_productReviewService = productReviewService;
+        }
 
 	    public override async Task<TtlProductPageModel> ExecuteAsync(ProductPageParameters model)
         {
@@ -69,7 +74,26 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			    });
 		    }
 
-            return PopulateProductPageTemplateModel(model, eProduct, rootNavCategory);
+		    var lastProductReviews = await _productReviewService.GetProductReviewsAsync(new ProductReviewFilter()
+		    {
+			    IdProduct = eProduct.Id,
+			    Paging = new Paging()
+			    {
+				    PageIndex = 0,
+				    PageItemCount = 3
+			    },
+			    StatusCode = RecordStatusCode.Active,
+			    Sorting = new SortFilter()
+			    {
+					Path = ProductReviewSortPath.DateCreated,
+					SortOrder = SortOrder.Desc
+				}
+		    });
+
+		    var reviewsCount = await _productReviewService.GetApprovedCountAsync(eProduct.Id);
+		    var ratingsAverage = await _productReviewService.GetApprovedAverageRatingsAsync(eProduct.Id);
+
+			return PopulateProductPageTemplateModel(model, eProduct, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage);
         }
 
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, int categoryId,
@@ -120,7 +144,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         }
 
         private TtlProductPageModel PopulateProductPageTemplateModel(ProductPageParameters model, ProductDynamic eProduct,
-            ProductNavCategoryLite rootNavCategory = null)
+            ProductNavCategoryLite rootNavCategory, PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
@@ -201,17 +225,30 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 				        Url = eProduct.Data.CrossSellUrl4,
 			        }
 		        },
-		        DescriptionTab = new TtlProductPageTabContent()
+		        DescriptionTab = new TtlProductPageTabContentModel()
 		        {
 			        TitleOverride = eProduct.Data.DescriptionTitleOverride,
 			        Content = eProduct.Data.Description,
 			        Hidden = eProduct.Data.DescriptionHide
 		        },
+				ReviewsTab = new TtlProductReviewsTabModel()
+				{
+					AverageRatings = ratingsAverage,
+					ReviewsCount = reviewsCount,
+					Reviews = lastProductReviews.Items?.Select(x=> new TtlProductReviewModel()
+					{
+						CustomerName = x.CustomerName,
+						DateCreated = x.DateCreated,
+						Review = x.Description,
+						Title = x.Title,
+						Rating = x.Rating
+					}).ToList()
+				}
 	        };
 
 	        if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
 	        {
-		        toReturn.IngredientsTab = new TtlProductPageTabContent()
+		        toReturn.IngredientsTab = new TtlProductPageTabContentModel()
 		        {
 			        TitleOverride = eProduct.Data.IngredientsTitleOverride,
 			        Content = eProduct.Data.Ingredients,
@@ -221,7 +258,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 			if (eProduct.DictionaryData.ContainsKey("RecipesTitleOverride"))
 			{
-				toReturn.RecipesTab = new TtlProductPageTabContent()
+				toReturn.RecipesTab = new TtlProductPageTabContentModel()
 				{
 					TitleOverride = eProduct.Data.RecipesTitleOverride,
 					Content = eProduct.Data.Recipes,
@@ -231,7 +268,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 			if (eProduct.DictionaryData.ContainsKey("ServingTitleOverride"))
 			{
-				toReturn.ServingTab = new TtlProductPageTabContent()
+				toReturn.ServingTab = new TtlProductPageTabContentModel()
 				{
 					TitleOverride = eProduct.Data.ServingTitleOverride,
 					Content = eProduct.Data.Serving,
@@ -241,7 +278,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 			if (eProduct.DictionaryData.ContainsKey("ShippingTitleOverride"))
 			{
-				toReturn.ShippingTab = new TtlProductPageTabContent()
+				toReturn.ShippingTab = new TtlProductPageTabContentModel()
 				{
 					TitleOverride = eProduct.Data.ShippingTitleOverride,
 					Content = eProduct.Data.Shipping,

@@ -11,6 +11,10 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<PagedList<ProductReview>> GetProductReviewsAsync(ProductReviewFilter filter);
 
+        Task<int> GetApprovedCountAsync(int productId);
+
+        Task<int> GetApprovedAverageRatingsAsync(int productId);
+
         Task<ProductReview> GetProductReviewAsync(int id);
 
         Task<ProductReview> UpdateProductReviewAsync(ProductReview model);

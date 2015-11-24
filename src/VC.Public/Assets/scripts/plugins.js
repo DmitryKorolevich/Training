@@ -138,7 +138,8 @@ function confirmAction(successCallback, errorCallback, text) {
 	});
 }
 
-function reparseElementValidators($form) {
+function reparseElementValidators(selector) {
+	var $form = $(selector);
 	$form.removeData("validator").removeData("unobtrusiveValidation");
 	$.validator.unobtrusive.parse($form);
 }

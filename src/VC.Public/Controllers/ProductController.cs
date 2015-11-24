@@ -9,6 +9,7 @@ using VC.Public.Models;
 using VC.Public.Models.Product;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
@@ -22,13 +23,15 @@ namespace VC.Public.Controllers
 	    private readonly IProductViewService _productViewService;
 	    private readonly ReCaptchaValidator _reCaptchaValidator;
 	    private readonly IProductService _productService;
+	    private readonly IProductReviewService _productReviewService;
 
-	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService, ReCaptchaValidator reCaptchaValidator, IProductService productService)
+	    public ProductController(ICategoryViewService categoryViewService, IProductViewService productViewService, ReCaptchaValidator reCaptchaValidator, IProductService productService, IProductReviewService productReviewService)
 	    {
 		    _categoryViewService = categoryViewService;
 		    _productViewService = productViewService;
 		    _reCaptchaValidator = reCaptchaValidator;
 		    _productService = productService;
+		    _productReviewService = productReviewService;
 	    }
 
 	    private async Task PopulateProductReviewAssets(Guid id)
@@ -96,18 +99,27 @@ namespace VC.Public.Controllers
 		{
 			if (Validate(model))
 			{
-				if (! await _reCaptchaValidator.Validate(Request.Form["g-Recaptcha-Response"]))
+				if (!await _reCaptchaValidator.Validate(Request.Form["g-Recaptcha-Response"]))
 				{
 					ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
 				}
 				else
 				{
+					await _productReviewService.UpdateProductReviewAsync(new ProductReview()
+					{
+						IdProduct = await _productService.GetProductInternalIdAsync(model.ProductId),
+						StatusCode = RecordStatusCode.NotActive,
+						CustomerName = model.CustomerName?.Trim(),
+						Email = model.Email?.Trim(),
+						Title = model.ReviewTitle?.Trim(),
+						Rating = model.Rating,
+						Description = model.Review
+					});
+
 					ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
 					return PartialView("_AddReviewInner", model);
 				}
 			}
-
-			await PopulateProductReviewAssets(model.ProductId);
 
 			return PartialView("_AddReviewInner", model);
 		}

@@ -1822,7 +1822,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%var productPublicId = "@(ProductPublicId)";%' AND [Name] = 'Product page')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<review_rating>{{%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -1830,6 +1830,24 @@ BEGIN
 @model() {{dynamic}}
 
 <%
+<review_rating>{{
+    @if(@model == 1){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 2){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 3){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 4){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
+    @if(@model == 5){{
+         <img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif"/><img src="/assets/images/fullstar.gif" /><img class="rating-last-child" src="/assets/images/fullstar.gif" />
+    }}
+}}    
+    
 <product_breadcrumb>
 {{
     <div class="category-breadcrumb">
@@ -1876,24 +1894,20 @@ BEGIN
 		</div>
 		<div class="product-intro-sub">
 			<div class="product-stars-container">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
-				<img src="/assets/images/products/fullstar.gif">
+				@review_rating(@model.ReviewsTab.AverageRatings)
 			</div>
-			<span class="product-reviews-count">[185]</span>
-			<a href="#">
-				Read <strong>185</strong> reviews
+			<span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
+			<a href="#tabs-reviews" id="lnkReviewsTab">
+				Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
 			</a>
-			<a id="writeReview" href="#">
+			<a class="write-review-link" href="#">
 				Write a Review
 			</a>
 		</div>
 		<div class="product-intro-description">
 			@(ShortDescription)
 		</div>
-		<a class="product-intro-more" href="#tabs-details">Read more ></a>
+		<a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
 		<div class="product-action-bar">
 			<div class="product-action-left">
 				<span class="action-left-header">Number of Portions:</span>
@@ -1935,7 +1949,13 @@ BEGIN
 	                }}
 	            }}
             }}
-		    <!--<li><a href="#tabs-reviews">Reviews</a></li>-->
+            @(ReviewsTab){{
+                @if(){{
+                    @if(@model.ReviewsCount > 0){{
+                        <li><a href="#tabs-reviews">Reviews</a></li>
+                    }}
+                }}
+            }}
 		    @(IngredientsTab) {{
 		        @if(){{
 		            @ifnot(Hidden){{
@@ -1994,7 +2014,39 @@ BEGIN
 	            }}  
 	        }}
 	    }}
-		<!--Reviews -->
+	    @(ReviewsTab){{
+            @if(){{
+                @if(@model.ReviewsCount > 0){{
+                    <div id="tabs-reviews">
+    		            <p class="product-reviews-overall">
+    		                Average Ratings:
+    		                @review_rating(AverageRatings)  
+    		                @(AverageRatings)
+    		            </p>
+				        <a class="write-review-link" href="#">
+					        Write a Review
+				        </a>
+				        <hr/>
+				        @list(Reviews) {{
+                            <div class="product-reviews-item">
+					            <div class="reviews-item-rating">
+						            @review_rating(Rating)  
+						        </div>
+					            <div class="reviews-item-info">
+						            <span class="reviews-item-title">"@(Title)"</span>
+						            <span class="reviews-item-author">@(CustomerName) on @date(DateCreated) @time(DateCreated)</span>
+						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
+					            </div>
+				            </div>
+				            <hr />
+                        }}
+				        <a class="read-more-reviews" href="#">
+					        Read more reviews >
+				        </a>
+    			    </div>
+                }}
+            }}
+        }}
 		@(IngredientsTab) {{
 		    @if(){{
 		        @ifnot(Hidden){{
