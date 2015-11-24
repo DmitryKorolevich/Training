@@ -30,14 +30,14 @@ namespace VC.Public.Controllers
     {
         private const string RequestCatalogTempData = "request-catalog-messsage";
 
-        private readonly IEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> _catalogRequestAddressService;
+        private readonly IExtendedDynamicServiceAsync<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> _catalogRequestAddressService;
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IDynamicMapper<AddressDynamic, CatalogRequestAddress> _catalogRequestAddressMapper;
         private readonly ReCaptchaValidator _reCaptchaValidator;
         private readonly ILogger _logger;
 
         public HelpController(
-            IEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> catalogRequestAddressService,
+            IExtendedDynamicServiceAsync<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> catalogRequestAddressService,
             IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<AddressDynamic, CatalogRequestAddress> catalogRequestAddressMapper,
             ReCaptchaValidator reCaptchaValidator,

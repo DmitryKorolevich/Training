@@ -19,13 +19,13 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Business.Services.Ecommerce;
 
 namespace VitalChoice.Business.Services.Settings
 {
-    public class CatalogRequestAddressService : EcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue>, 
+    public class CatalogRequestAddressService : ExtendedEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue>, 
         ICatalogRequestAddressService
     {
-        private readonly IEcommerceDynamicService<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> _catalogRequestAddressService;
         private readonly IDynamicMapper<AddressDynamic, CatalogRequestAddress> _catalogRequestAddressMapper;
         private readonly ICountryService _countryService;
         private readonly IEcommerceRepositoryAsync<CatalogRequestAddress> _catalogRequestAddressRepository;
