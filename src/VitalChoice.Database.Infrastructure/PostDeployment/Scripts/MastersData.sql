@@ -1822,7 +1822,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<review_rating>{{%' AND [Name] = 'Product page')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%@time(DateCreated)</span>%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -1921,13 +1921,18 @@ BEGIN
 		}}
 		<div class="product-action-bar">
 			<div class="product-action-left">
-				<span class="action-left-header">Number of Portions:</span>
+				@if(SubProductGroupName){{
+					<span class="action-left-header">@(SubProductGroupName)</span>
+				}}
+				@ifnot(SubProductGroupName){{
+					<span class="action-left-header">Number of Portions:</span>
+				}}
 				@list(Skus) {{
 				    <label class="product-portion-line">
 					    <input name="sku" type="radio" value="@(Code)" data-price="@money(Price)"/>
 					    @(PortionsCount) - @money(Price)
-					    @if(BestValue) {{
-					        <span class="product-best-value">Best Value!</span>
+					    @if(SalesText) {{
+					        <span class="product-best-value">@(SalesText)</span>
 					    }}
 				    </label>
 				}}
@@ -2045,7 +2050,7 @@ BEGIN
 						        </div>
 					            <div class="reviews-item-info">
 						            <span class="reviews-item-title">"@(Title)"</span>
-						            <span class="reviews-item-author">@(CustomerName) on @date(DateCreated) @time(DateCreated)</span>
+						            <span class="reviews-item-author">@(CustomerName) on @time(DateCreated){{g}}</span>
 						            <span class="reviews-item-text"><b>Review:</b> @(Review)</span>
 					            </div>
 				            </div>
@@ -2103,7 +2108,7 @@ BEGIN
 		<span class="product-accessories-title">Try one of these delicious recipes</span>
 		<div class="accessories-container">
 		    @list(YoutubeVideos) {{
-                <a class="product-related-link" target="_blank" href="@(Video)">
+                <a class="product-related-link" target="_blank" href="@(Video)" data-video-id="@(VideoId)">
 				    <img src="@(Image)">
 			    	@(Text)
 			    </a>
