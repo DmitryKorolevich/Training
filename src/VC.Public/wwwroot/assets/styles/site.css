@@ -1493,6 +1493,15 @@ footer {
 .product-main .product-stars-container {
   float: left;
 }
+.product-main .product-stars-container img {
+  margin: 0 2px;
+}
+.product-main .product-stars-container img:first-child {
+  margin-left: 0px;
+}
+.product-main .product-stars-container img.rating-last-child {
+  margin-right: 0px;
+}
 .product-main .product-reviews-count {
   margin-left: 20px;
   font-size: 10px;

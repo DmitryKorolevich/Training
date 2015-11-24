@@ -140,7 +140,7 @@ namespace VitalChoice.Business.Services.Products
 	    {
 			var conditions = new ProductReviewQuery().WithStatus(RecordStatusCode.Active).WithIdProduct(productId);
 
-			return await Task.FromResult((int)Math.Round(_productReviewRepository.Query(conditions).Select(x=>x.Rating,false).Average()));
+			return await Task.FromResult((int)Math.Round(_productReviewRepository.Query(conditions).Select(x=>x.Rating,false).DefaultIfEmpty(0).Average()));
 		}
 
 	    public async Task<ProductReview> GetProductReviewAsync(int id)
