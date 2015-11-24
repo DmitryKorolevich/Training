@@ -1831,6 +1831,9 @@ BEGIN
 
 <%
 <review_rating>{{
+    @if(@model == 0){{
+         <img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
+    }}
     @if(@model == 1){{
          <img src="/assets/images/fullstar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif"/><img src="/assets/images/emptystar.gif" /><img class="rating-last-child" src="/assets/images/emptystar.gif" />
     }}
@@ -1893,13 +1896,15 @@ BEGIN
 			}}
 		</div>
 		<div class="product-intro-sub">
-			<div class="product-stars-container">
-				@review_rating(@model.ReviewsTab.AverageRatings)
+		    <div class="product-stars-container">
+			    @review_rating(@model.ReviewsTab.AverageRatings)
 			</div>
-			<span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
-			<a href="#tabs-reviews" id="lnkReviewsTab">
-				Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
-			</a>
+			@if(@model.ReviewsTab.ReviewsCount > 0){{
+			    <span class="product-reviews-count">[@(@model.ReviewsTab.ReviewsCount)]</span>
+			    <a href="#tabs-reviews" id="lnkReviewsTab">
+				    Read <strong>@(@model.ReviewsTab.ReviewsCount)</strong> reviews
+			    </a>
+			}}
 			<a class="write-review-link" href="#">
 				Write a Review
 			</a>
@@ -1907,7 +1912,13 @@ BEGIN
 		<div class="product-intro-description">
 			@(ShortDescription)
 		</div>
-		<a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
+		@(DescriptionTab) {{
+		    @if(){{
+		        @ifnot(Hidden){{
+		            <a class="product-intro-more" href="#tabs-details" id="lnkDescriptionTab">Read more ></a>
+		        }}
+		    }}
+		}}
 		<div class="product-action-bar">
 			<div class="product-action-left">
 				<span class="action-left-header">Number of Portions:</span>
