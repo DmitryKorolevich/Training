@@ -16,4 +16,13 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     {
         public ICollection<OrderExportItem> ExportInfo { get; set; }
     }
+
+    public class OrderExportItemResult
+    {
+        public int Id { get; set; }
+
+        public ICollection<string> Errors { get; set; }
+
+        public bool Success { get; set; }
+    }
 }

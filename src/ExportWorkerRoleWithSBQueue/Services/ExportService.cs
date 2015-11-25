@@ -11,17 +11,17 @@ namespace ExportWorkerRoleWithSBQueue.Services
 {
     public class OrderExportService : IOrderExportService
     {
-        public Task UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod)
+        public void UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod)
+        public void UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> ExportOrder(int idOrder, POrderType orderType)
+        public bool ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors)
         {
             throw new NotImplementedException();
         }
@@ -29,8 +29,8 @@ namespace ExportWorkerRoleWithSBQueue.Services
 
     public interface IOrderExportService
     {
-        Task UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod);
-        Task UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod);
-        Task<bool> ExportOrder(int idOrder, POrderType orderType);
+        void UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod);
+        void UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod);
+        bool ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
     }
 }

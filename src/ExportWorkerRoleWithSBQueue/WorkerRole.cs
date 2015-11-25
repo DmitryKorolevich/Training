@@ -8,10 +8,13 @@ using System.Threading.Tasks;
 using Autofac;
 using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.Azure;
+using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace ExportWorkerRoleWithSBQueue
@@ -31,24 +34,78 @@ namespace ExportWorkerRoleWithSBQueue
         {
             Trace.WriteLine("Starting processing of messages");
 
-            _client.OnMessageAsync(receivedMessage =>
+            _client.OnMessage(receivedMessage =>
+            {
+                switch (receivedMessage.ContentType)
                 {
-                    using (var scope = _container.BeginLifetimeScope())
-                    {
-                        var exportService = scope.Resolve<IOrderExportService>();
-                        switch (receivedMessage.ContentType)
+                    case OrderExportServiceConstants.ExportOrder:
+                        var exportData = receivedMessage.GetBody<OrderExportData>();
+                        //List<OrderExportError> errors = new List<OrderExportError>();
+                        Parallel.ForEach(exportData.ExportInfo, e =>
                         {
-                            case "application/order-export":
-                                var exportData = receivedMessage.GetBody<OrderExportData>();
-                                return Task.WhenAll(exportData.ExportInfo.Select(e => exportService.ExportOrder(e.Id, e.OrderType)));
-                            case "application/update-order-payment":
-                                break;
-                            case "application/update-customer-payment":
-                                break;
+                            using (var scope = _container.BeginLifetimeScope())
+                            {
+                                var exportService = scope.Resolve<IOrderExportService>();
+                                ICollection<string> errors = null;
+                                bool success;
+                                try
+                                {
+                                    success = exportService.ExportOrder(e.Id, e.OrderType, out errors);
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (errors == null)
+                                    {
+                                        errors = new List<string>();
+                                    }
+                                    errors.Add(ex.Message);
+                                    success = false;
+                                }
+                                string contentType = receivedMessage.ContentType;
+                                string sessionId = receivedMessage.SessionId;
+                                receivedMessage.Complete();
+                                
+                                _client.Send(new BrokeredMessage(new OrderExportItemResult
+                                {
+                                    Id = e.Id,
+                                    Success = success,
+                                    Errors = errors
+                                })
+                                {
+                                    ContentType = contentType,
+                                    SessionId = sessionId
+                                });
+                            }
+                        });
+                        break;
+                    case OrderExportServiceConstants.UpdateOrderPayment:
+                        var orderPaymentInfo = receivedMessage.GetBody<OrderPaymentMethodDynamic>();
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var exportService = scope.Resolve<IOrderExportService>();
+                            exportService.UpdatePaymentMethod(orderPaymentInfo);
+                            receivedMessage.Complete();
                         }
-                        return Task.Delay(0);
-                    }
-                });
+                        break;
+                    case OrderExportServiceConstants.UpdateCustomerPayment:
+                        var customerPaymentInfo = receivedMessage.GetBody<CustomerPaymentMethodDynamic>();
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var exportService = scope.Resolve<IOrderExportService>();
+                            exportService.UpdatePaymentMethod(customerPaymentInfo);
+                            receivedMessage.Complete();
+                        }
+                        break;
+                    default:
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var logger = scope.Resolve<ILogger>();
+                            logger.LogWarning($"Cannot process message with ContentType {receivedMessage.ContentType}");
+                            receivedMessage.Complete();
+                        }
+                        break;
+                }
+            });
 
             _completedEvent.WaitOne();
         }
