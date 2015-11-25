@@ -168,10 +168,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 		        Image = eProduct.Data.MainProductImage,
 		        ShortDescription = eProduct.Data.ShortDescription,
 		        SpecialIcon = eProduct.Data.SpecialIcon,
+				SubProductGroupName = eProduct.Data.SubProductGroupName,
 		        BreadcrumbOrderedItems = breadcrumbItems,
 		        Skus = eProduct.Skus.Where(x=>!x.Hidden).OrderBy(x => x.Order).Select(x => new TtlProductPageSkuModel()
 		        {
 			        Code = x.Code,
+					SalesText = x.Data.SalesText,
 			        Price = model.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
 			        PortionsCount = x.Data.QTY
 		        }).ToList(),
@@ -181,25 +183,29 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        {
 				        Image = eProduct.Data.YouTubeImage1,
 				        Text = eProduct.Data.YouTubeText1,
-				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo1)
-			        },
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo1),
+						VideoId = eProduct.Data.YouTubeVideo1
+					},
 			        new TtlRelatedYoutubeVideoModel()
 			        {
 				        Image = eProduct.Data.YouTubeImage2,
 				        Text = eProduct.Data.YouTubeText2,
-				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo2)
-			        },
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo2),
+						VideoId = eProduct.Data.YouTubeVideo2
+					},
 			        new TtlRelatedYoutubeVideoModel()
 			        {
 				        Image = eProduct.Data.YouTubeImage3,
 				        Text = eProduct.Data.YouTubeText3,
-				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo3)
-			        },
+				        Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo3),
+						VideoId = eProduct.Data.YouTubeVideo3
+					},
 					new TtlRelatedYoutubeVideoModel()
 					{
 						Image = eProduct.Data.YouTubeImage4,
 						Text = eProduct.Data.YouTubeText4,
-						Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo4) 
+						Video = string.Format(ProductPageParameters.YoutubeVideoFormat,eProduct.Data.YouTubeVideo4),
+						VideoId = eProduct.Data.YouTubeVideo4
 					}
 				},
 		        CrossSells = new List<TtlCrossSellProductModel>()

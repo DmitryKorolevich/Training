@@ -15,6 +15,7 @@
 		$("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
 		$("#hSelectedCode").text("Product #" + jChecked.val());
 	});
+
 	$("body").on("click", ".write-review-link", function () {
 		$.ajax({
 			url: "/Product/AddReview/" + productPublicId,
@@ -58,6 +59,19 @@
 			notifyError();
 		});
 
+		return false;
+	});
+
+	$('body').on("click", "a[data-video-id]", function () {
+		var youtubeLink = $(this).attr("data-video-id");
+		$("<iframe class='youtube-popup-container' frameborder='0' allowfullscreen='1' title='YouTube video player' " +
+				"src='https://www.youtube.com/embed/" + youtubeLink + "?autoplay=1&amp;iv_load_policy=3&amp;rel=0&amp;showinfo=0&amp;wmode=opaque&amp;enablejsapi=1&amp;origin=http%3A%2F%2Fwww.vitalchoice.com'>" +
+			"</iframe>")
+			.dialog({
+				resizable: false,
+				modal: true,
+				dialogClass: "youtube-dialog"
+			});
 		return false;
 	});
 }, false);

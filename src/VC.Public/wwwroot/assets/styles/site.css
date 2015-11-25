@@ -1576,6 +1576,9 @@ footer {
   color: #333333;
   text-align: left;
   display: block;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 .product-main .product-portion-line {
   display: block;
@@ -1591,6 +1594,10 @@ footer {
   color: #ff0000;
   float: right;
   font-size: 13px;
+  max-width: 100px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .product-main .product-portion-line input[type=radio] {
   vertical-align: middle;
@@ -1662,6 +1669,7 @@ footer {
   -moz-user-select: none;
   -khtml-user-select: none;
   cursor: pointer;
+  outline: none;
 }
 .tabs-control.ui-tabs .ui-tabs-nav .ui-corner-top:hover {
   background-color: #eeedeb;
@@ -1676,6 +1684,7 @@ footer {
   padding: 11px 14px 10px 14px;
   display: block;
   line-height: 17px;
+  outline: none;
 }
 .product-related-accessories {
   padding: 0 30px;
@@ -1836,4 +1845,31 @@ footer {
   margin: 5px 0 15px 0;
   float: left;
   width: 100%;
+}
+.ui-dialog .ui-dialog-content.youtube-popup-container {
+  padding: 0px;
+  width: 485px !important;
+  height: 350px !important;
+}
+.youtube-popup-close {
+  position: absolute;
+}
+.youtube-popup-close img {
+  margin-right: -25px;
+  margin-top: -15px;
+}
+.ui-dialog.youtube-dialog {
+  background-color: #000;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #000;
+  height: 350px !important;
+  padding: 20px ;
+  border: none;
+  width: 485px !important;
+  /*&::before{
+		content:url('/assets/images/close_button.png')
+	}*/
+}
+.ui-dialog.youtube-dialog .ui-dialog-titlebar {
+  display: none;
 }
