@@ -23,14 +23,13 @@
         @await Component.InvokeAsync("ProfileSidebar")
     </div>
     <div class="right-pane clean-indent help-ticket">
-
-        @Html.AntiForgeryToken()
-        <h4>Help Desk</h4>
-        @Html.ValidationSummary(true, "")
         @if (Model != null)
             {
             @using (Html.BeginForm("HelpTicket", "Profile", null, FormMethod.Post, new { @class = "form-regular main medium-small border-form-left inner " + (Model.Id == 0 ? "margin-bottom-big" : ""), role = "form" }))
             {
+                @Html.AntiForgeryToken()
+                <h4>Help Desk</h4>
+                @Html.ValidationSummary(true, "")
                 <input name="IdOrder" value="@Html.DisplayForEx(x => x.IdOrder)" type="hidden">
                 <input name="Id" value="@Html.DisplayForEx(x => x.Id)" type="hidden">
                 @if (Model.Id != 0)
