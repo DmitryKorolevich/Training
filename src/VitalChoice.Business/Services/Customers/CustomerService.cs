@@ -43,15 +43,18 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService: ExtendedEcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>, ICustomerService
+    public class CustomerService: ExtendedEcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>,
+        ICustomerService
     {
 	    private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<User> _userRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
-	    private readonly CustomerRepository _customerRepositoryAsync;
+        private readonly OrderRepository _orderRepository;
+        private readonly CustomerRepository _customerRepositoryAsync;
 	    private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
 	    private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
 	    private readonly IBlobStorageClient _storageClient;
@@ -65,6 +68,7 @@ namespace VitalChoice.Business.Services.Customers
 
 	    public CustomerService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepositoryAsync,
             IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepositoryAsync,
+            OrderRepository orderRepository,
             CustomerRepository customerRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, CustomerMapper customerMapper,
             IObjectLogItemExternalService objectLogItemExternalService,
@@ -83,6 +87,7 @@ namespace VitalChoice.Business.Services.Customers
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
+            _orderRepository = orderRepository;
             _customerRepositoryAsync = customerRepositoryAsync;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
 		    _adminProfileRepository = adminProfileRepository;
@@ -425,14 +430,16 @@ namespace VitalChoice.Business.Services.Customers
                     County = x.ProfileAddress.County,
                     StateOrCounty = x.ProfileAddress.County ?? x.ProfileAddress.State?.StateCode,
                     StatusCode = x.StatusCode,
-                    //LastOrderPlaced = x.LastOrderPlaced,
-                    //FirstOrderPlaced = x.FirstOrderPlaced,
-                    //TotalOrders = x.TotalOrders,
                 }).ToList(),
                 Count = customers.Count
             };
 
             return result;
+        }
+        
+        public async Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
+        {
+            return await _orderRepository.GetCustomerOrderStatistics(ids);
         }
 
         public async Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null)

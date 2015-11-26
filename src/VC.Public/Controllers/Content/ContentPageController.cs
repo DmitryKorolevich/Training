@@ -9,11 +9,15 @@ namespace VC.Public.Controllers.Content
     public class ContentPageController : BaseContentController
     {
         private readonly IContentEditService _contentService;
+        private readonly IContentPageViewService _contentPageViewService;
 
-        public ContentPageController(IContentEditService contentService)
+        public ContentPageController(
+            IContentEditService contentService,
+            IContentPageViewService contentPageViewService)
 	    {
 		    _contentService = contentService;
-	    }
+            _contentPageViewService = contentPageViewService;
+        }
 
 	    [HttpGet]
         public async Task<IActionResult> Categories()
@@ -40,7 +44,7 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> ContentPage(string url)
         {
-            var toReturn = await _contentService.GetContentItemContentAsync(ContentType.ContentPage, GetParameters(), url);
+            var toReturn = await _contentPageViewService.GetContentAsync(GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));

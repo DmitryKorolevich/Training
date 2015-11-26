@@ -3,10 +3,10 @@
     <div class="form-horizontal" ng-form="forms.filterForm" data-ng-submit="save()" data-ng-class="{submitted: submitted}" novalidate>
         <div class="row form-group">
             <div class="col-md-4">
-                <input type="text" class="form-control" name="SearchText" placeholder="SKU, Product Name" data-ng-model="filter.SearchText" ng-pattern='/^[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
+                <input type="text" class="form-control" name="SearchText" placeholder="SKU, Product Name" data-ng-model="filter.SearchText" ng-minlength="3" required>
                 <div class="error-container" ng-show="submitted && forms.filterForm.SearchText.$invalid">
                     <small class="error" ng-show="forms.filterForm.SearchText.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Search Text")}}</small>
-                    <small class="error" ng-show="forms.filterForm.SearchText.$error.pattern">{{getValidationMessage("{0} should have at least 3 symbols","Search Text")}}</small>
+                    <small class="error" ng-show="forms.filterForm.SearchText.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Search Text")}}</small>
                 </div>
             </div>
             <div class="col-md-4">

@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
@@ -20,7 +21,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 
         Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter);
 
-		Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
+        Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids);
+
+        Task<string> UploadFileAsync(byte[] file, string fileName, string customerPublicId, string contentType = null);
 
 		Task<Blob> DownloadFileAsync(string fileName, string customerPublicId);
 
