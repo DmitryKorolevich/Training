@@ -11,6 +11,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
+using VitalChoice.Business.Queries.Contents;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Cache;
@@ -92,7 +93,7 @@ namespace VitalChoice.Business.Services.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query = query.WithName(filter.Name).NotDeleted();
+            query = query.WithName(filter.Name).AssignedToProduct(filter.ProductId).NotDeleted();
 
             Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> sortable = x => x.OrderBy(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
@@ -123,7 +124,7 @@ namespace VitalChoice.Business.Services.Content
                     break;
             }
 
-            var toReturn = await recipeRepository.Query(query).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
+            var toReturn = await recipeRepository.Query(query).Include(x=>x.RecipesToProducts).Include(p => p.ContentItem).Include(p => p.RecipesToContentCategories).ThenInclude(p => p.ContentCategory).
                 Include(p => p.User).ThenInclude(p => p.Profile).
                 OrderBy(sortable).
                 SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);

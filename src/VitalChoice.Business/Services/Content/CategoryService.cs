@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Content;
+using VitalChoice.Business.Queries.Contents;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Ecommerce.Cache;
