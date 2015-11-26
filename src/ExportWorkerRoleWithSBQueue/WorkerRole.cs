@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -15,6 +16,8 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Encryption;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace ExportWorkerRoleWithSBQueue
@@ -23,12 +26,16 @@ namespace ExportWorkerRoleWithSBQueue
     {
         // The name of your queue
         const string QueueName = "ProcessingQueue";
+        const string RespondQueueName = "RespondQueue";
 
         // QueueClient is thread-safe. Recommended that you cache 
         // rather than recreating it on every request
         private QueueClient _client;
+        private QueueClient _respondClient;
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
         private IContainer _container;
+        private readonly ObjectEncryptionHost _objectEncryptionHost = new ObjectEncryptionHost();
+        
 
         public override void Run()
         {
@@ -38,8 +45,27 @@ namespace ExportWorkerRoleWithSBQueue
             {
                 switch (receivedMessage.ContentType)
                 {
+                    case OrderExportServiceConstants.GetPublicKey:
+                        _respondClient.Send(new BrokeredMessage(_objectEncryptionHost.PublicKey)
+                        {
+                            SessionId = receivedMessage.SessionId,
+                            ContentType = OrderExportServiceConstants.GetPublicKeySuccess
+                        });
+                        receivedMessage.Complete();
+                        break;
+                    case OrderExportServiceConstants.SetSessionKey:
+                        var sessionKey = Guid.Parse(receivedMessage.SessionId);
+                        var key = _objectEncryptionHost.RsaDecrypt<KeyExchange>(receivedMessage.GetBody<byte[]>());
+                        _objectEncryptionHost.AddSession(sessionKey, key);
+                        receivedMessage.Complete();
+                        _respondClient.Send(new BrokeredMessage(true)
+                        {
+                            SessionId = sessionKey.ToString(),
+                            ContentType = OrderExportServiceConstants.SetSessionKeySuccess
+                        });
+                        break;
                     case OrderExportServiceConstants.ExportOrder:
-                        var exportData = receivedMessage.GetBody<OrderExportData>();
+                        var exportData = _objectEncryptionHost.AesDecrypt<OrderExportData>(receivedMessage.GetBody<byte[]>(), Guid.Parse(receivedMessage.SessionId));
                         //List<OrderExportError> errors = new List<OrderExportError>();
                         Parallel.ForEach(exportData.ExportInfo, e =>
                         {
@@ -64,8 +90,8 @@ namespace ExportWorkerRoleWithSBQueue
                                 string contentType = receivedMessage.ContentType;
                                 string sessionId = receivedMessage.SessionId;
                                 receivedMessage.Complete();
-                                
-                                _client.Send(new BrokeredMessage(new OrderExportItemResult
+
+                                _respondClient.Send(new BrokeredMessage(new OrderExportItemResult
                                 {
                                     Id = e.Id,
                                     Success = success,
@@ -79,7 +105,9 @@ namespace ExportWorkerRoleWithSBQueue
                         });
                         break;
                     case OrderExportServiceConstants.UpdateOrderPayment:
-                        var orderPaymentInfo = receivedMessage.GetBody<OrderPaymentMethodDynamic>();
+                        var orderPaymentInfo =
+                            _objectEncryptionHost.AesDecrypt<OrderPaymentMethodDynamic>(receivedMessage.GetBody<byte[]>(),
+                                Guid.Parse(receivedMessage.SessionId));
                         using (var scope = _container.BeginLifetimeScope())
                         {
                             var exportService = scope.Resolve<IOrderExportService>();
@@ -88,7 +116,9 @@ namespace ExportWorkerRoleWithSBQueue
                         }
                         break;
                     case OrderExportServiceConstants.UpdateCustomerPayment:
-                        var customerPaymentInfo = receivedMessage.GetBody<CustomerPaymentMethodDynamic>();
+                        var customerPaymentInfo =
+                            _objectEncryptionHost.AesDecrypt<CustomerPaymentMethodDynamic>(receivedMessage.GetBody<byte[]>(),
+                                Guid.Parse(receivedMessage.SessionId));
                         using (var scope = _container.BeginLifetimeScope())
                         {
                             var exportService = scope.Resolve<IOrderExportService>();
@@ -122,9 +152,14 @@ namespace ExportWorkerRoleWithSBQueue
             {
                 namespaceManager.CreateQueue(QueueName);
             }
+            if (!namespaceManager.QueueExists(RespondQueueName))
+            {
+                namespaceManager.CreateQueue(RespondQueueName);
+            }
 
             // Initialize the connection to Service Bus Queue
             _client = QueueClient.CreateFromConnectionString(connectionString, QueueName);
+            _respondClient = QueueClient.CreateFromConnectionString(connectionString, RespondQueueName);
             _container = Configuration.BuildContainer();
             return base.OnStart();
         }
@@ -133,6 +168,7 @@ namespace ExportWorkerRoleWithSBQueue
         {
             // Close the connection to Service Bus Queue
             _client.Close();
+            _respondClient.Close();
             _completedEvent.Set();
             _container.Dispose();
             base.OnStop();

@@ -96,6 +96,8 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "ExportService", "src\Export
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExportWorkerRoleWithSBQueue", "src\ExportWorkerRoleWithSBQueue\ExportWorkerRoleWithSBQueue.xproj", "{59BEFC7A-2594-4BCE-9C14-00041D455837}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SharpSerializer", "src\ThirdParty\SharpSerializer\SharpSerializer.xproj", "{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -296,6 +298,14 @@ Global
 		{59BEFC7A-2594-4BCE-9C14-00041D455837}.Release|Any CPU.Build.0 = Release|Any CPU
 		{59BEFC7A-2594-4BCE-9C14-00041D455837}.Release|x64.ActiveCfg = Release|Any CPU
 		{59BEFC7A-2594-4BCE-9C14-00041D455837}.Release|x64.Build.0 = Release|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Debug|x64.Build.0 = Debug|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|x64.ActiveCfg = Release|Any CPU
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -329,5 +339,6 @@ Global
 		{FE4DE507-693E-40FA-9AC7-E715AC28866F} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{A666AFB4-0995-4CEB-AA5A-81E959322DAE} = {FE4DE507-693E-40FA-9AC7-E715AC28866F}
 		{59BEFC7A-2594-4BCE-9C14-00041D455837} = {FE4DE507-693E-40FA-9AC7-E715AC28866F}
+		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
 	EndGlobalSection
 EndGlobal
