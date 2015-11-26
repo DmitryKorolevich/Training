@@ -1,6 +1,6 @@
 ﻿namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 {
-    public class TtlProductPageTabContentModel
+    public class TtlProductPageTabModel
     {
 	    public string TitleOverride { get; set; }
 

@@ -1486,14 +1486,14 @@ footer {
 .product-main .product-intro-headers h1 {
   font-size: 26px;
   font-weight: bold;
-  line-height: 18px;
-  margin: 0 0 4px 0;
+  line-height: 26px;
+  margin: 0 0 0px 0;
   color: #333333;
 }
 .product-main .product-intro-headers h2 {
   font-size: 21px;
-  margin: 0 0 4px 0;
-  line-height: 18px;
+  margin: 0 0 6px 0;
+  line-height: 21px;
   font-weight: normal;
   color: #333333;
 }
@@ -1600,7 +1600,7 @@ footer {
   white-space: nowrap;
 }
 .product-main .product-portion-line input[type=radio] {
-  vertical-align: middle;
+  vertical-align: top;
   margin-right: 5px;
 }
 .product-main .product-action-right {
@@ -1846,17 +1846,18 @@ footer {
   float: left;
   width: 100%;
 }
-.ui-dialog .ui-dialog-content.youtube-popup-container {
+.ui-dialog .ui-dialog-content .youtube-popup-container {
   padding: 0px;
   width: 485px !important;
   height: 350px !important;
 }
 .youtube-popup-close {
+  right: 0px;
   position: absolute;
 }
 .youtube-popup-close img {
-  margin-right: -25px;
-  margin-top: -15px;
+  margin-top: -35px;
+  position: fixed;
 }
 .ui-dialog.youtube-dialog {
   background-color: #000;
@@ -1866,10 +1867,31 @@ footer {
   padding: 20px ;
   border: none;
   width: 485px !important;
-  /*&::before{
-		content:url('/assets/images/close_button.png')
-	}*/
+  position: fixed !important;
 }
 .ui-dialog.youtube-dialog .ui-dialog-titlebar {
   display: none;
+}
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+}
+a.product-recipe-link {
+  display: block;
+  line-height: 14px;
+}
+a.product-recipe-link:visited {
+  color: #2b6c82;
+  text-decoration: none;
+}
+a.product-recipe-link:link {
+  color: #2b6c82;
+  text-decoration: none;
+  outline: none;
+}
+a.product-recipe-link:hover {
+  text-decoration: underline;
 }

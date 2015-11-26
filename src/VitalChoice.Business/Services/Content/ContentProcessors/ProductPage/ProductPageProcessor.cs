@@ -9,12 +9,15 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage;
+using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
@@ -23,6 +26,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
     {
 		public const string YoutubeVideoFormat = "https://www.youtube.com/watch?v={0}";
 		public const string CategoryBaseUrl = "/products/";
+		public const string RecipeBaseUrl = "/recipe/";
 
 		public RoleType Role { get; set; }
 
@@ -34,12 +38,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 	    private readonly IProductService _productService;
 		private readonly IProductCategoryService _productCategoryService;
 		private readonly IProductReviewService _productReviewService;
+	    private readonly IRecipeService _recipeService;
 
-		public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper, IProductService productService, IProductCategoryService productCategoryService, IProductReviewService productReviewService) : base(mapper)
+	    public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper, IProductService productService, IProductCategoryService productCategoryService, IProductReviewService productReviewService, IRecipeService recipeService) : base(mapper)
         {
 	        _productService = productService;
 			_productCategoryService = productCategoryService;
 			_productReviewService = productReviewService;
+		    _recipeService = recipeService;
         }
 
 	    public override async Task<TtlProductPageModel> ExecuteAsync(ProductPageParameters model)
@@ -93,7 +99,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 		    var reviewsCount = await _productReviewService.GetApprovedCountAsync(eProduct.Id);
 		    var ratingsAverage = await _productReviewService.GetApprovedAverageRatingsAsync(eProduct.Id);
 
-			return PopulateProductPageTemplateModel(model, eProduct, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage);
+			return await PopulateProductPageTemplateModel(model, eProduct, rootNavCategory, lastProductReviews, reviewsCount, ratingsAverage);
         }
 
         private bool BuildBreadcrumb(ProductNavCategoryLite rootCategory, int categoryId,
@@ -143,7 +149,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             return false;
         }
 
-        private TtlProductPageModel PopulateProductPageTemplateModel(ProductPageParameters model, ProductDynamic eProduct,
+        private async Task<TtlProductPageModel> PopulateProductPageTemplateModel(ProductPageParameters model, ProductDynamic eProduct,
             ProductNavCategoryLite rootNavCategory, PagedList<ProductReview> lastProductReviews, int reviewsCount, int ratingsAverage)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
@@ -177,7 +183,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        Price = model.Role == RoleType.Retail ? x.Price : x.WholesalePrice,
 			        PortionsCount = x.Data.QTY
 		        }).ToList(),
-		        YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
+				YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
 		        {
 			        new TtlRelatedYoutubeVideoModel()
 			        {
@@ -231,7 +237,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 				        Url = eProduct.Data.CrossSellUrl4,
 			        }
 		        },
-		        DescriptionTab = new TtlProductPageTabContentModel()
+		        DescriptionTab = new TtlProductPageTabModel()
 		        {
 			        TitleOverride = eProduct.Data.DescriptionTitleOverride,
 			        Content = eProduct.Data.Description,
@@ -254,7 +260,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 	        if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
 	        {
-		        toReturn.IngredientsTab = new TtlProductPageTabContentModel()
+		        toReturn.IngredientsTab = new TtlProductPageTabModel()
 		        {
 			        TitleOverride = eProduct.Data.IngredientsTitleOverride,
 			        Content = eProduct.Data.Ingredients,
@@ -264,17 +270,24 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 			if (eProduct.DictionaryData.ContainsKey("RecipesTitleOverride"))
 			{
-				toReturn.RecipesTab = new TtlProductPageTabContentModel()
+				var recipes = await _recipeService.GetRecipesAsync(new RecipeListFilter() { ProductId = eProduct.Id });
+
+				toReturn.RecipesTab = new TtlProductRecipesTabModel()
 				{
 					TitleOverride = eProduct.Data.RecipesTitleOverride,
 					Content = eProduct.Data.Recipes,
-					Hidden = eProduct.Data.RecipesHide
+					Hidden = eProduct.Data.RecipesHide,
+					Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
+					{
+						Name = x.Name,
+						Url = ProductPageParameters.RecipeBaseUrl + x.Url
+					}).ToList(),
 				};
 			}
 
 			if (eProduct.DictionaryData.ContainsKey("ServingTitleOverride"))
 			{
-				toReturn.ServingTab = new TtlProductPageTabContentModel()
+				toReturn.ServingTab = new TtlProductPageTabModel()
 				{
 					TitleOverride = eProduct.Data.ServingTitleOverride,
 					Content = eProduct.Data.Serving,
@@ -284,7 +297,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 			if (eProduct.DictionaryData.ContainsKey("ShippingTitleOverride"))
 			{
-				toReturn.ShippingTab = new TtlProductPageTabContentModel()
+				toReturn.ShippingTab = new TtlProductPageTabModel()
 				{
 					TitleOverride = eProduct.Data.ShippingTitleOverride,
 					Content = eProduct.Data.Shipping,

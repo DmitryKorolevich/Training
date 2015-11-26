@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 
-namespace VitalChoice.Business.Queries.Content
+namespace VitalChoice.Business.Queries.Contents
 {
     public class RecipeQuery : QueryObject<Recipe>
     {
@@ -46,5 +47,15 @@ namespace VitalChoice.Business.Queries.Content
             And(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
             return this;
         }
+
+	    public RecipeQuery AssignedToProduct(int? productId)
+	    {
+		    if (productId.HasValue)
+		    {
+				And(x => x.RecipesToProducts.Any(y=>y.IdProduct == productId.Value));
+			}
+
+		    return this;
+	    }
     }
 }

@@ -1719,15 +1719,15 @@ footer{
 		h1{
 			font-size: 26px;
 			font-weight: bold;
-			line-height: 18px;
-			margin: 0 0 4px 0;
+			line-height: 26px;
+			margin: 0 0 0px 0;
 			color:rgb(51, 51, 51);
 		}
 
 		h2{
 			font-size: 21px;
-			margin: 0 0 4px 0;
-			line-height: 18px;
+			margin: 0 0 6px 0;
+			line-height: 21px;
 			font-weight:normal;
 			color:rgb(51, 51, 51);	
 		}
@@ -1854,7 +1854,7 @@ footer{
 		}
 
 		input[type=radio]{
-			vertical-align:middle;
+			vertical-align:top;
 			margin-right: 5px;
 		}
 	}
@@ -2152,21 +2152,23 @@ footer{
     width: 100%;
 }
 
-.ui-dialog .ui-dialog-content.youtube-popup-container{
+.ui-dialog .ui-dialog-content .youtube-popup-container{
 		padding:0px;
 		width:485px !important;
 		height:350px !important;
-	}
+}
 
 .youtube-popup-close{
+		right: 0px;
 		position:absolute;
 
 		img{
-			margin-right: -25px; margin-top: -15px;
+			margin-top: -35px;
+			position: fixed;
 		}
-	}
+}
 
-.ui-dialog.youtube-dialog{
+.ui-dialog.youtube-dialog{ 
 	background-color: #000;
     border-radius: 20px;
     box-shadow: 0 0 20px #000;
@@ -2174,12 +2176,37 @@ footer{
     padding: 20px ;
     border:none;
     width: 485px !important;
+	position: fixed !important;
 
 	.ui-dialog-titlebar{
 		display:none;
 	}
+}
 
-	/*&::before{
-		content:url('/assets/images/close_button.png')
-	}*/
+.ui-dialog.youtube-dialog .ui-dialog-content {
+    position: relative;
+    border: 0;
+    padding: 0;
+    background: none;
+    overflow: hidden;
+}
+
+a.product-recipe-link{
+	display:block;
+	line-height:14px;
+
+	&:visited {
+		color: #2b6c82;
+	    text-decoration: none;
+	}
+
+	&:link {
+		color: #2b6c82;
+		text-decoration: none;
+	    outline: none;
+	}
+
+	&:hover{
+		text-decoration: underline;
+	}
 }
