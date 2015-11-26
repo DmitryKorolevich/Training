@@ -99,7 +99,7 @@ namespace VC.Public.Controllers
 		{
 			if (Validate(model))
 			{
-				if (!await _reCaptchaValidator.Validate(Request.Form["g-Recaptcha-Response"]))
+				if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
 				{
 					ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
 				}

@@ -20,6 +20,8 @@
     },
     "PublicHost": "http://staging.g2-dg.com/",
     "AdminHost": "http://admin.staging.g2-dg.com/",
+    "CustomerServiceToEmail": "gary@g2designgroup.com",
+    "CustomerFeedbackToEmail": "gary@g2designgroup.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
     "Email": {
       "From": "admin.staging@g2designgroup.com",
@@ -41,7 +43,7 @@
       "MerchantPhoneNumber": "8664825887",
       "Key": "7Ux69IBvsRj0Ep7X",
       "Password": "m0Zybyteel4RMp5j904aa1HpB",
-      "PayAccountNumber": "304955066",      
+      "PayAccountNumber": "304955066",
       "ShipServiceUrl": "https://gateway.fedex.com/web-services/ship",
       "LocatorServiceUrl": "https://gateway.fedex.com/web-services"
     },

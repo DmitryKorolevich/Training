@@ -519,6 +519,10 @@ namespace VC.Public.Controllers
                 ViewBag.IdOrder = (int?)idorder;
                 toReturn = items.Select(p => new HelpTicketListItemModel(p)).ToList();
             }
+            else
+            {
+                return GetItemNotAccessibleResult();
+            }
             return View(toReturn);
         }
 
@@ -537,6 +541,10 @@ namespace VC.Public.Controllers
                     {
                         ViewBag.SuccessMessage = TempData[TicketCommentMessageTempData];
                     }
+                }
+                else
+                {
+                    return GetItemNotAccessibleResult();
                 }
             }
             else if (idorder.HasValue)

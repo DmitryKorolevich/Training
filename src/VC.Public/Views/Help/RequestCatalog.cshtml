@@ -1,0 +1,167 @@
+﻿@using VitalChoice.Interfaces.Services
+@using Microsoft.Extensions.OptionsModel
+@using VitalChoice.Infrastructure.Domain.Options
+@model VC.Public.Models.Help.CatalogRequestAddressModel
+@inject IAppInfrastructureService appInfrastructureService;
+@inject IOptions<AppOptions> appOptions;
+
+@{
+    var infrastructure = appInfrastructureService.Get();
+}
+
+@section Meta {
+    <title>Vital Choice | Request Catalog</title>
+}
+
+@section PageScripts {
+    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
+    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+}
+
+<script>
+    successMessage = '@ViewBag.SuccessMessage';
+</script>
+
+<div class="working-area-holder">
+    <div class="left-content-pane">
+        &nbsp;
+    </div>
+    <div class="center-content-pane">
+        <h4>Request a Catalog</h4>
+        <p>
+            <strong>The award-winning* Vital Choice catalog is an easy way to shop and offers a convenient way to plan your next order.</strong>
+        </p>
+        <p>
+            Call toll free 800-608-4825 to order catalogs ...
+            ... and to send some to your friends and family!
+        </p>
+        <p>
+            Or, fill in the form below, and click "Sign Up".
+        </p>
+        <p>
+            We'll send one of our new catalogs to that address ... simply repeat the process to send our catalog to other addresses.
+        </p>
+        @using (Html.BeginForm("RequestCatalog", "Help", null, FormMethod.Post, new { @class = "form-regular medium-small", role = "form" }))
+        {
+            <input id="hdCountry" value="@Html.DisplayForEx(x=>x.IdCountry)" type="hidden">
+            <input id="hdState" value="@Html.DisplayForEx(x=>x.IdState)" type="hidden">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "")
+            <div class="form-group">
+                @Html.LabelFor(m => m.PersonTitle, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.PersonTitle, infrastructure.PersonTitles.Select(p => new SelectListItem() { Text = p.Text, Value = p.Key, }).ToList(), "None", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PersonTitle, "")
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address1, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address1)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.City)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+                    @Html.ValidationMessageFor(m => m.IdCountry)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.IdState, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+                    @Html.ValidationMessageFor(m => m.IdState)
+                </div>
+            </div>
+            <div class="form-group">
+                <!--todo-->
+                @Html.LabelFor(m => m.County, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
+                    @Html.ValidationMessageFor(m => m.County)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PostalCode)
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="g-recaptcha" data-sitekey="@appOptions.Value.GoogleCaptcha.PublicKey"></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="SignUpOnNewsletters"></label>
+                <div class="input-group">
+                    @Html.CheckBoxFor(m => m.SignUpOnNewsletters, new { @class = "form-control" })
+                    <label for="SignUpOnNewsletters">Also sign me up to receive your newsletter.</label>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="form-buttons-group">
+                <input class="yellow" type="submit" value="Sign Up" />
+            </div>
+        }
+        <div class="clear"></div>
+        <p>
+            *Our 2009 Holiday Season catalog won the 2010 Gold Award from Multichannel Merchant. 
+        </p>
+        <p>
+            <strong>To our International Friends</strong>
+        </p>
+        <ul>
+            <li>We can only mail our catalogs to U.S. and Canadian addresses. </li>
+            <li>
+                Our ability to ship packages outside of the United States and Canada is very limited.
+            </li>
+            <li>
+                We can only ship non-perishable items to U.S. territories and a few other destinations
+                outside the U.S. and Canada.
+            </li>
+            <li>Shipments of perishable items to Hawaii and Alaska involve extra fees. </li>
+            <li>All shipments to Canada incur surcharges. </li>
+        </ul>
+        <p>
+            For full information, see our <a href="#">Shipping Policies</a>. 
+        </p>
+        <p>
+            If you still have questions about the feasibility and cost of a shipment to an address outside the continental US, send your inquiries to <a href="mailto:info@vitalchoice.com">info@vitalchoice.com</a>.
+        </p>
+    </div>
+    <div class="right-content-pane">
+        &nbsp;
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using VitalChoice.Core.GlobalFilters;
+﻿using Microsoft.AspNet.Mvc;
+using VitalChoice.Core.GlobalFilters;
 
 namespace VitalChoice.Core.Base
 {
@@ -6,5 +7,9 @@ namespace VitalChoice.Core.Base
     [SetAffiliateCookieFilter]
     public abstract class BaseMvcController : BaseController
     {
+        protected IActionResult GetItemNotAccessibleResult()
+        {
+            return View("ItemNotAccessible");
+        }
     }
 }

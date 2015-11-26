@@ -149,5 +149,15 @@ namespace VitalChoice.Business.Mail
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
+
+        public async Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model)
+        {
+            var body =
+                $"<p>Name - {model.Name}</p><p>Email - {model.Email}</p><p>Comment - {model.Comment}</p><p>Vital Choice Administration,</p><p></p><p>This is an automated message. Do not reply. This mailbox is not monitored.</p>";
+
+            var subject = "Vital Choice - Customer Service Email";
+
+            await emailSender.SendEmailAsync(email, subject, body);
+        }
     }
 }

@@ -14,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -159,6 +160,44 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(o => o.IdCustomer)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();
+            });
+
+            builder.Entity<CatalogRequestAddress>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("CatalogRequestAddresses");
+                entity.HasOne(p => p.Сountry)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdCountry)
+                    .HasPrincipalKey(c => c.Id)
+                    .IsRequired();
+                entity.HasOne(p => p.State)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdState)
+                    .HasPrincipalKey(s => s.Id)
+                    .IsRequired(false);
+                entity.HasMany(a => a.OptionValues)
+                    .WithOne()
+                    .HasForeignKey(o => o.IdCatalogRequestAddress)
+                    .HasPrincipalKey(a => a.Id)
+                    .IsRequired();
+                entity.Ignore(a => a.OptionTypes);
+                entity.Ignore(a => a.IdEditedBy);
+                entity.Ignore(a => a.EditedBy);
+            });
+
+            builder.Entity<CatalogRequestAddressOptionValue>(entity =>
+            {
+                entity.HasKey(o => new { o.IdCatalogRequestAddress, o.IdOptionType });
+                entity.Ignore(o => o.Id);
+                entity.ToTable("CatalogRequestAddressOptionValues");
+                entity.HasOne(v => v.OptionType)
+                    .WithMany()
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id)
+                    .IsRequired();
+                entity.Ignore(v => v.BigValue);
+                entity.Ignore(v => v.IdBigString);
             });
         }
     }

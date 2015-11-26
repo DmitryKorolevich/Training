@@ -20,7 +20,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         public DateTime DateEdited { get; set; }
         public int? IdEditedBy { get; set; }
         public Type ModelType { get; set; }
-        public int IdObjectType { get; set; }
+        public virtual int IdObjectType { get; set; }
 
         [JsonIgnore]
         public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;

@@ -26,5 +26,7 @@ namespace VitalChoice.Business.Mail
         Task SendAffiliateRegistrationSuccess(string email, SuccessfulUserRegistration registration);
 
         Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset);
+
+        Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model);
     }
 }

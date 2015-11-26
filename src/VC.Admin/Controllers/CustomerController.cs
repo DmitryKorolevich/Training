@@ -129,6 +129,7 @@ namespace VC.Admin.Controllers
             model.InceptionDate = DateTime.Now;
             model.TradeClass = 1;
             model.CustomerNotes = new List<CustomerNoteModel>();
+            model.ProfileAddress = new AddressModel();
             model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
             model.Shipping = new List<AddressModel>() { new AddressModel() { AddressType = AddressType.Shipping, Country = new CountryListItemModel(_defaultCountry) } };
             model.StatusCode = (int)CustomerStatus.NotActive;

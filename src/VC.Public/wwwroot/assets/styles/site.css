@@ -1007,6 +1007,30 @@ footer {
   vertical-align: top;
   margin-right: 0px;
 }
+.working-area-holder .left-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+  padding: 10px 15px 0 0;
+  min-height: 325px;
+}
+.working-area-holder .center-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 482px;
+  padding-left: 15px;
+  padding-right: 15px;
+  min-height: 325px;
+  border-left: 1px solid #e3e3e3;
+  border-right: 1px solid #e3e3e3;
+}
+.working-area-holder .right-content-pane {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+  padding: 10px 0 0 15px;
+  min-height: 325px;
+}
 .form-group {
   margin-bottom: 15px;
   float: left;
@@ -1108,6 +1132,9 @@ footer {
   -webkit-border-radius: 5px;
   border-radius: 5px;
   color: red;
+}
+.form-regular .form-group .g-recaptcha {
+  margin-left: 135px;
 }
 .form-regular .form-group .radio-inline {
   padding-left: 10px;
@@ -1459,14 +1486,14 @@ footer {
 .product-main .product-intro-headers h1 {
   font-size: 26px;
   font-weight: bold;
-  line-height: 18px;
-  margin: 0 0 4px 0;
+  line-height: 26px;
+  margin: 0 0 0px 0;
   color: #333333;
 }
 .product-main .product-intro-headers h2 {
   font-size: 21px;
-  margin: 0 0 4px 0;
-  line-height: 18px;
+  margin: 0 0 6px 0;
+  line-height: 21px;
   font-weight: normal;
   color: #333333;
 }
@@ -1549,6 +1576,9 @@ footer {
   color: #333333;
   text-align: left;
   display: block;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 .product-main .product-portion-line {
   display: block;
@@ -1564,9 +1594,13 @@ footer {
   color: #ff0000;
   float: right;
   font-size: 13px;
+  max-width: 100px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .product-main .product-portion-line input[type=radio] {
-  vertical-align: middle;
+  vertical-align: top;
   margin-right: 5px;
 }
 .product-main .product-action-right {
@@ -1635,6 +1669,7 @@ footer {
   -moz-user-select: none;
   -khtml-user-select: none;
   cursor: pointer;
+  outline: none;
 }
 .tabs-control.ui-tabs .ui-tabs-nav .ui-corner-top:hover {
   background-color: #eeedeb;
@@ -1649,6 +1684,7 @@ footer {
   padding: 11px 14px 10px 14px;
   display: block;
   line-height: 17px;
+  outline: none;
 }
 .product-related-accessories {
   padding: 0 30px;
@@ -1809,4 +1845,53 @@ footer {
   margin: 5px 0 15px 0;
   float: left;
   width: 100%;
+}
+.ui-dialog .ui-dialog-content .youtube-popup-container {
+  padding: 0px;
+  width: 485px !important;
+  height: 350px !important;
+}
+.youtube-popup-close {
+  right: 0px;
+  position: absolute;
+}
+.youtube-popup-close img {
+  margin-top: -35px;
+  position: fixed;
+}
+.ui-dialog.youtube-dialog {
+  background-color: #000;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #000;
+  height: 350px !important;
+  padding: 20px ;
+  border: none;
+  width: 485px !important;
+  position: fixed !important;
+}
+.ui-dialog.youtube-dialog .ui-dialog-titlebar {
+  display: none;
+}
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+}
+a.product-recipe-link {
+  display: block;
+  line-height: 14px;
+}
+a.product-recipe-link:visited {
+  color: #2b6c82;
+  text-decoration: none;
+}
+a.product-recipe-link:link {
+  color: #2b6c82;
+  text-decoration: none;
+  outline: none;
+}
+a.product-recipe-link:hover {
+  text-decoration: underline;
 }

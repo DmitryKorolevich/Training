@@ -11,7 +11,9 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string DefaultCultureId { get; set; }
         public string PublicHost { get; set; }
         public string AdminHost { get; set; }
-        public string MainSuperAdminEmail{get;set;}
+        public string MainSuperAdminEmail{get;set; }
+        public string CustomerServiceToEmail { get; set; }
+        public string CustomerFeedbackToEmail { get; set; }
         public string FilesRelativePath { get; set; }
         public string FilesPath { get; set; }
         public Email EmailConfiguration { get; set; }

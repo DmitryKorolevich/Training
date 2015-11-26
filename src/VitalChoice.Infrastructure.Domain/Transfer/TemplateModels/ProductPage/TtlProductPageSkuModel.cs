@@ -4,6 +4,8 @@
     {
 	    public string Code { get; set; }
 
+	    public string SalesText { get; set; }
+
 	    public int PortionsCount { get; set; }
 
 	    public decimal Price { get; set; }

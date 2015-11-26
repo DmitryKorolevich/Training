@@ -91,5 +91,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<int?>> ExpiredTypes { get; set; }
 
         public IList<LookupItem<int>> PromotionBuyTypes { get; set; }
+
+        public IList<LookupItem<string>> PersonTitles { get; set; }
     }
 }
