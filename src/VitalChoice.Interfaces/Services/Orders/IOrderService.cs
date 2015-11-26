@@ -23,5 +23,11 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<PagedList<AffiliateOrderListItemModel>> GetAffiliateOrderPaymentsWithCustomerInfo(AffiliateOrderPaymentFilter filter);
 
         #endregion
+
+        #region HealthWiseOrders
+
+        Task<bool> UpdateHealthwiseOrder(int orderId, bool isHealthwise);
+
+        #endregion
     }
 }

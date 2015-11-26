@@ -341,6 +341,18 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
+            var statistic = await _customerService.GetCustomerOrderStatistics(toReturn.Items.Select(p => p.Id).ToList());
+            foreach(var statisticItem in statistic)
+            {
+                var customer = toReturn.Items.FirstOrDefault(p => p.Id == statisticItem.IdCustomer);
+                if(customer!=null)
+                {
+                    customer.TotalOrders = statisticItem.TotalOrders;
+                    customer.FirstOrderPlaced = statisticItem.FirstOrderPlaced;
+                    customer.LastOrderPlaced = statisticItem.LastOrderPlaced;
+                }
+            }
+
             return toReturn;
         }
 

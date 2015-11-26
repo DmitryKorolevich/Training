@@ -375,6 +375,7 @@ namespace VitalChoice.Core.DependencyInjection
                     (pi, cc) => cc.ResolveNamed<SignInManager<ApplicationUser>>("affiliateSignInManager"));
             builder.RegisterType<CategoryViewService>().As<ICategoryViewService>(); 
 			builder.RegisterType<ProductViewService>().As<IProductViewService>();
+            builder.RegisterType<ContentPageViewService>().As<IContentPageViewService>();
             builder.RegisterType<ProductCategoryService>().As<IProductCategoryService>();
             builder.RegisterType<InventoryCategoryService>().As<IInventoryCategoryService>();
             builder.RegisterType<ProductReviewService>().As<IProductReviewService>();
@@ -402,6 +403,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AddressOptionValueRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<CustomerRepository>()
+                .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
+            builder.RegisterType<OrderRepository>()
                 .WithParameter((pi, cc) => pi.Name == "context", (pi, cc) => cc.Resolve<EcommerceContext>());
             builder.RegisterType<PaymentMethodService>().As<IPaymentMethodService>();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>();
