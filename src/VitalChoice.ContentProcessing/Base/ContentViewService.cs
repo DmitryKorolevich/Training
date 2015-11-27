@@ -33,9 +33,21 @@ namespace VitalChoice.ContentProcessing.Base
             Logger = loggerProvider.CreateLoggerDefault();
         }
 
-        protected virtual Task<TEntity> GetData(IDictionary<string, object> queryData)
+        protected virtual async Task<TEntity> GetData(IDictionary<string, object> queryData)
         {
-            return _defaultProcessor.ExecuteAsync(queryData);
+            var item = await _defaultProcessor.ExecuteAsync(queryData);
+            if (item == null)
+            {
+                Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
+                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
+                return null;
+            }
+            if (item.ContentItem == null)
+            {
+                Logger.LogError("The item {0} have no template", item.Url);
+                return null;
+            }
+            return item;
         }
 
         public virtual async Task<ContentViewModel> GetContentAsync(IDictionary<string, object> queryData)

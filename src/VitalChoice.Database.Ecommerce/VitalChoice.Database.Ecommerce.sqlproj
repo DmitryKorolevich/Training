@@ -220,4 +220,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\CatalogRequests.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VHealthwisePeriods.sql" />
+  </ItemGroup>
 </Project>

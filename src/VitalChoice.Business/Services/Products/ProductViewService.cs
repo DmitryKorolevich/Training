@@ -35,23 +35,6 @@ namespace VitalChoice.Business.Services.Products
 
 	    #region Public
 
-	    protected override async Task<ProductContent> GetData(IDictionary<string, object> queryData)
-	    {
-	        var product = await base.GetData(queryData);
-            if (product == null)
-            {
-                Logger.LogInformation("The product could not be found {" + queryData.FormatDictionary() + "}");
-                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
-                return null;
-            }
-            if (product.ContentItem == null)
-            {
-                Logger.LogError("The product {0} have no template", product.Url);
-                return null;
-            }
-            return product;
-	    }
-
 	    public Task<ContentViewModel> GetProductPageContentAsync(IList<CustomerTypeCode> customerTypeCodes,
 	        Dictionary<string, object> parameters)
 	    {

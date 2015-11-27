@@ -445,7 +445,7 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        public async Task<bool> UpdateHealthwiseOrder(int orderId, bool isHealthwise)
+        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
         {
             var order = await this.SelectAsync(orderId);
             if (order==null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || 

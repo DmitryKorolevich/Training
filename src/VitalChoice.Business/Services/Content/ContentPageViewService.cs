@@ -37,23 +37,6 @@ namespace VitalChoice.Business.Services.Content
 
         #region Public
 
-        protected override async Task<ContentPage> GetData(IDictionary<string, object> queryData)
-        {
-            var item = await base.GetData(queryData);
-            if (item == null)
-            {
-                Logger.LogInformation("The category could not be found {" + queryData.FormatDictionary() + "}");
-                //return explicitly null to see the real result of operation and don't look over code above regarding the real value
-                return null;
-            }
-            if (item.ContentItem == null)
-            {
-                Logger.LogError("The category {0} have no template", item.Url);
-                return null;
-            }
-            return item;
-        }
-
         #endregion
     }
 }
