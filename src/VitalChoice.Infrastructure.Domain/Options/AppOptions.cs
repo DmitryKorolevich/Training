@@ -22,5 +22,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public FedExOptions FedExOptions { get; set; }
         public AvataxOptions Avatax { get; set; }
 	    public GoogleCaptcha GoogleCaptcha { get; set; }
+        public ExportService ExportService { get; set; }
     }
 }

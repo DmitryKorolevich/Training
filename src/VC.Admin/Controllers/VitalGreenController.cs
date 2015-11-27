@@ -7,8 +7,8 @@ using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Interfaces.Services;
 using System;
-using VitalChoice.Business.ExportMaps;
 using Microsoft.Net.Http.Headers;
+using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
@@ -20,17 +20,17 @@ namespace VC.Admin.Controllers
     public class VitalGreenController : BaseApiController
     {
         private readonly IVitalGreenService _vitalGreenService;
-        private readonly IExportService<VitalGreenRequest, VitalGreenRequestCsvMap> _exportVitalGreenRequestService;
+        private readonly ICsvExportService<VitalGreenRequest, VitalGreenRequestCsvMap> _csvExportVitalGreenRequestService;
         private readonly ILogger _logger;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public VitalGreenController(
             IVitalGreenService vitalGreenService,
-            IExportService<VitalGreenRequest, VitalGreenRequestCsvMap> exportVitalGreenRequestService,
+            ICsvExportService<VitalGreenRequest, VitalGreenRequestCsvMap> csvExportVitalGreenRequestService,
             ILoggerProviderExtended loggerProvider)
         {
             _vitalGreenService = vitalGreenService;
-            _exportVitalGreenRequestService = exportVitalGreenRequestService;
+            _csvExportVitalGreenRequestService = csvExportVitalGreenRequestService;
             this._logger = loggerProvider.CreateLoggerDefault();
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
@@ -59,7 +59,7 @@ namespace VC.Admin.Controllers
             {
                 requests.AddRange(date.Requests);
             }
-            var data = _exportVitalGreenRequestService.ExportToCSV(requests);
+            var data = _csvExportVitalGreenRequestService.ExportToCsv(requests);
 
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {

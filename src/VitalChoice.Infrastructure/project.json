@@ -18,6 +18,8 @@
   "frameworks": {
     "dnx451": {
       "dependencies": {
+        "WindowsAzure.ServiceBus": "3.0.9",
+        "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",
         "NLog": "4.0.1"
       }
     },

@@ -17,7 +17,7 @@ using System.Text;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Business.ExportMaps;
+using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -41,7 +41,7 @@ namespace VC.Admin.Controllers
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly Country _defaultCountry;
-        private readonly IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _exportAffiliateOrderListItemService;
+        private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -53,7 +53,7 @@ namespace VC.Admin.Controllers
             ILoggerProviderExtended loggerProvider,
             IDynamicMapper<AffiliateDynamic, Affiliate> mapper,
             IAppInfrastructureService appInfrastructureService,
-            IExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> exportAffiliateOrderListItemService,
+            ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
             IOrderService orderService,
             ICountryService countryService,
             IObjectHistoryLogService objectHistoryLogService)
@@ -63,7 +63,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _objectHistoryLogService = objectHistoryLogService;
             _defaultCountry = appInfrastructureService.Get().DefaultCountry;
-            _exportAffiliateOrderListItemService = exportAffiliateOrderListItemService;
+            _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");

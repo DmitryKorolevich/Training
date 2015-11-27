@@ -1,10 +1,9 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain;
-using VitalChoice.Ecommerce.Domain.Helpers.Export;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.VitalGreen
 {
-    public class VitalGreenRequest : Entity, IExportable
+    public class VitalGreenRequest : Entity
     {
         public string FirstName { get; set; }
 

@@ -8,13 +8,16 @@
   "dependencies": {
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
     "VitalChoice.Ecommerce.Domain": "",
-    "VitalChoice.Workflow": "1.0.0-*"
+    "VitalChoice.Workflow": "1.0.0-*",
+    "SharpSerializer": ""
   },
   "frameworks": {
     "dnx451": { },
     "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-*",
+        "System.Security.Cryptography.Algorithms": "4.0.0-*",
+        "System.Security.Cryptography.Csp": "4.0.0-*",
         "System.Collections": "4.0.11-*",
         "System.Linq": "4.0.1-*",
         "System.Runtime": "4.0.21-*",

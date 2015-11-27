@@ -18,7 +18,7 @@ using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 
 namespace VitalChoice.Infrastructure.Context
 {
-    public class EcommerceContext : EccomerceContextBase
+    public class EcommerceContext : EcommerceContextBase
     {
         public EcommerceContext(IOptions<AppOptionsBase> options): base(options)
         {

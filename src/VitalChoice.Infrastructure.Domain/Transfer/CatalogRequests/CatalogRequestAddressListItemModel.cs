@@ -1,10 +1,8 @@
 ﻿using VitalChoice.Ecommerce.Domain.Attributes;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Helpers.Export;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests
 {
-	public class CatalogRequestAddressListItemModel : IExportable
+	public class CatalogRequestAddressListItemModel
     {
         [Map]
         public string PersonTitle { get; set; }
