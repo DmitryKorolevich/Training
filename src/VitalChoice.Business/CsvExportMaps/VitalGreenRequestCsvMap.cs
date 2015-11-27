@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 
-namespace VitalChoice.Business.ExportMaps
+namespace VitalChoice.Business.CsvExportMaps
 {
     public class VitalGreenRequestCsvMap : CsvClassMap<VitalGreenRequest>
     {

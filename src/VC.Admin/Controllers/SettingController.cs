@@ -14,10 +14,10 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
-using VitalChoice.Business.ExportMaps;
 using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
 using Microsoft.Net.Http.Headers;
 using System;
+using VitalChoice.Business.CsvExportMaps;
 
 namespace VC.Admin.Controllers
 {
@@ -29,7 +29,7 @@ namespace VC.Admin.Controllers
         private readonly IFileService fileService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ICatalogRequestAddressService _catalogRequestAddressService;
-        private readonly IExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> _exportCatalogRequestAddressService;
+        private readonly ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> _exportCatalogRequestAddressService;
         private readonly ILogger logger;
 
         public SettingController(
@@ -39,7 +39,7 @@ namespace VC.Admin.Controllers
             IFileService fileService,
             IObjectHistoryLogService objectHistoryLogService,
             ICatalogRequestAddressService catalogRequestAddressService,
-            IExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
+            ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
             ILoggerProviderExtended loggerProvider)
         {
             this.logViewService = logViewService;
@@ -198,7 +198,7 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetCatalogRequestsReportFile()
         {
             var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
-            var data = _exportCatalogRequestAddressService.ExportToCSV(items);
+            var data = _exportCatalogRequestAddressService.ExportToCsv(items);
 
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {

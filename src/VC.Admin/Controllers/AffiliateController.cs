@@ -17,7 +17,7 @@ using System.Text;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
-using VitalChoice.Business.ExportMaps;
+using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;

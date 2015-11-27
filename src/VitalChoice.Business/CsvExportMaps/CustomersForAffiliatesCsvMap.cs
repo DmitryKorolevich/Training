@@ -1,8 +1,8 @@
-﻿using CsvHelper.Configuration;
-using System.Globalization;
+﻿using System.Globalization;
+using CsvHelper.Configuration;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
-namespace VitalChoice.Business.ExportMaps
+namespace VitalChoice.Business.CsvExportMaps
 {
     public class CustomersForAffiliatesCsvMap : CsvClassMap<ExtendedVCustomer>
     {

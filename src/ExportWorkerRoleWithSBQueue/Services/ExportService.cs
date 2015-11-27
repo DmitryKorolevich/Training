@@ -26,11 +26,4 @@ namespace ExportWorkerRoleWithSBQueue.Services
             throw new NotImplementedException();
         }
     }
-
-    public interface IOrderExportService
-    {
-        void UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod);
-        void UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod);
-        bool ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
-    }
 }

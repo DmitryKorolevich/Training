@@ -1,12 +1,7 @@
 ﻿using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
-using System;
-using VitalChoice.Business.Helpers;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
 
-namespace VitalChoice.Business.ExportMaps
+namespace VitalChoice.Business.CsvExportMaps
 {
     public class CatalogRequestAddressListItemModelCsvMap : CsvClassMap<CatalogRequestAddressListItemModel>
     {

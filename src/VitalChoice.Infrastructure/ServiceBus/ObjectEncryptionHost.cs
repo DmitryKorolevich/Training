@@ -4,19 +4,12 @@ using System.IO;
 using System.Security.Cryptography;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Infrastructure.Domain.Encryption
+namespace VitalChoice.Infrastructure.ServiceBus
 {
-    public struct AesEncryption
-    {
-        public ICryptoTransform Encryptor { get; set; }
-        public ICryptoTransform Decryptor { get; set; }
-        public Aes Aes { get; set; }
-    }
-
     public class ObjectEncryptionHost : IDisposable
     {
         private readonly RSACryptoServiceProvider _rsa = new RSACryptoServiceProvider(4096);
-        private readonly Dictionary<Guid, AesEncryption> _sessions = new Dictionary<Guid, AesEncryption>();
+        private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
 
         public ObjectEncryptionHost()
         {
@@ -56,7 +49,7 @@ namespace VitalChoice.Infrastructure.Domain.Encryption
         {
             lock (_sessions)
             {
-                AesEncryption encryption;
+                SessionInfo encryption;
                 if (_sessions.TryGetValue(session, out encryption))
                 {
                     using (var memory = new MemoryStream())
@@ -81,7 +74,7 @@ namespace VitalChoice.Infrastructure.Domain.Encryption
         {
             lock (_sessions)
             {
-                AesEncryption encryption;
+                SessionInfo encryption;
                 if (_sessions.TryGetValue(session, out encryption))
                 {
                     byte[] plainData;
@@ -107,26 +100,97 @@ namespace VitalChoice.Infrastructure.Domain.Encryption
             return null;
         }
 
-        public void AddSession(Guid session, KeyExchange key)
+        public bool SessionExist(Guid session)
+        {
+            lock (_sessions)
+            {
+                return _sessions.ContainsKey(session);
+            }
+        }
+
+        public bool RegisterSession(Guid session, KeyExchange key)
+        {
+            Aes aes = Aes.Create();
+            if (aes == null)
+                throw new InvalidOperationException("Cannot initialize AES encryption");
+            aes.Key = key.Key;
+            aes.IV = key.IV;
+            aes.Mode = CipherMode.CTS;
+            aes.Padding = PaddingMode.PKCS7;
+            SessionInfo encryption = new SessionInfo
+            {
+                Aes = aes,
+                Encryptor = aes.CreateEncryptor(),
+                Decryptor = aes.CreateDecryptor()
+            };
+            lock (_sessions)
+            {
+                if (_sessions.ContainsKey(session))
+                    _sessions[session] = encryption;
+                else
+                    _sessions.Add(session, encryption);
+            }
+            return true;
+        }
+
+        public KeyExchange GetSessionWithReset(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo aes;
+                if (_sessions.TryGetValue(session, out aes))
+                {
+                    aes.Encryptor = aes.Aes.CreateEncryptor();
+                    aes.Decryptor = aes.Aes.CreateDecryptor();
+                    return new KeyExchange
+                    {
+                        Key = aes.Aes.Key,
+                        IV = aes.Aes.IV
+                    };
+                }
+                return null;
+            }
+        }
+
+        public KeyExchange CreateSession(Guid session)
         {
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
-                    throw new InvalidOperationException($"Session forced rewrite. This operation not allowed. Session id: <{session}>");
+                    return null;
                 Aes aes = Aes.Create();
                 if (aes == null)
                     throw new InvalidOperationException("Cannot initialize AES encryption");
-                aes.Key = key.Key;
-                aes.IV = key.IV;
+                aes.KeySize = 256;
+                aes.GenerateKey();
+                aes.GenerateIV();
                 aes.Mode = CipherMode.CTS;
                 aes.Padding = PaddingMode.PKCS7;
-                AesEncryption encryption = new AesEncryption
+                SessionInfo encryption = new SessionInfo
                 {
                     Aes = aes,
                     Encryptor = aes.CreateEncryptor(),
                     Decryptor = aes.CreateDecryptor()
                 };
                 _sessions.Add(session, encryption);
+                return new KeyExchange
+                {
+                    Key = aes.Key,
+                    IV = aes.IV
+                };
+            }
+        }
+
+        public void RemoveSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo aes;
+                if (_sessions.TryGetValue(session, out aes))
+                {
+                    _sessions.Remove(session);
+                    aes.Dispose();
+                }
             }
         }
 
@@ -137,11 +201,23 @@ namespace VitalChoice.Infrastructure.Domain.Encryption
             {
                 foreach (var session in _sessions)
                 {
-                    session.Value.Decryptor.Dispose();
-                    session.Value.Encryptor.Dispose();
-                    session.Value.Aes.Dispose();
+                    session.Value.Dispose();
                 }
                 _sessions.Clear();
+            }
+        }
+
+        private struct SessionInfo : IDisposable
+        {
+            public ICryptoTransform Encryptor { get; set; }
+            public ICryptoTransform Decryptor { get; set; }
+            public Aes Aes { get; set; }
+
+            public void Dispose()
+            {
+                Encryptor?.Dispose();
+                Decryptor?.Dispose();
+                Aes?.Dispose();
             }
         }
     }

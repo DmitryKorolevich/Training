@@ -18,6 +18,11 @@
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",
       "Server": "vw4v86cs0h.database.windows.net"
     },
+    "ExportService": {
+      "ConnectionString": "",
+      "SendQueueName": "",
+      "ReceiveQueueName": ""
+    },
     "PublicHost": "http://staging.g2-dg.com/",
     "AdminHost": "http://admin.staging.g2-dg.com/",
     "CustomerServiceToEmail": "gary@g2designgroup.com",
