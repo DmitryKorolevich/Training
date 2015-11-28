@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{BEC47A
 	ProjectSection(SolutionItems) = preProject
 		deploy\build-all.cmd = deploy\build-all.cmd
 		deploy\build-only.ps1 = deploy\build-only.ps1
+		..\vc-certs\create_certs.cmd = ..\vc-certs\create_certs.cmd
 		deploy\exclude_projects.ps1 = deploy\exclude_projects.ps1
 		deploy\functions.ps1 = deploy\functions.ps1
 		deploy\global-deploy.ps1 = deploy\global-deploy.ps1
@@ -97,6 +98,8 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExportWorkerRoleWithSBQueue", "src\ExportWorkerRoleWithSBQueue\ExportWorkerRoleWithSBQueue.xproj", "{59BEFC7A-2594-4BCE-9C14-00041D455837}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SharpSerializer", "src\ThirdParty\SharpSerializer\SharpSerializer.xproj", "{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.CertificatesStoreImport", "src\VitalChoice.CertificatesStoreImport\VitalChoice.CertificatesStoreImport.xproj", "{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,6 +309,14 @@ Global
 		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|x64.ActiveCfg = Release|Any CPU
 		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284}.Release|x64.Build.0 = Release|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -340,5 +351,6 @@ Global
 		{A666AFB4-0995-4CEB-AA5A-81E959322DAE} = {FE4DE507-693E-40FA-9AC7-E715AC28866F}
 		{59BEFC7A-2594-4BCE-9C14-00041D455837} = {FE4DE507-693E-40FA-9AC7-E715AC28866F}
 		{D404CC52-CA10-4B3B-8E6A-16CD91EE1284} = {C300EB91-CC66-4E9B-AFAC-B54190B72527}
+		{7ECEF09D-7546-49C5-901B-1FA3A9BAB28F} = {F04F1F6B-2770-45F3-B1F9-475140BEFC41}
 	EndGlobalSection
 EndGlobal

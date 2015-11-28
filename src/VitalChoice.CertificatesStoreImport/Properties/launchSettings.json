@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VitalChoice.CertificatesStoreImport": {
+      "commandName": "VitalChoice.CertificatesStoreImport",
+      "commandLineArgs": "--server d:\\Work\\vc-certs\\VCRoot.pfx 1230123 d:\\Work\\vc-certs\\staging-vc.cer"
+    }
+  }
+}

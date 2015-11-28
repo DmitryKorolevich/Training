@@ -9,7 +9,7 @@ using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 
-namespace VitalChoice.Business.Services.Ecommerce
+namespace VitalChoice.Infrastructure.Ecommerce
 {
     public class ExtendedEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue> :
         DynamicServiceAsync<TDynamic, TEntity, TOptionType, TOptionValue>

@@ -7,7 +7,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
     public abstract class EncryptedServiceBusClient : IDisposable
     {
         private readonly IEncryptedServiceBusClientHost _encryptedBus;
-        private bool _isAuthenticated;
+        private bool IsAuthenticated =>_encryptedBus.IsAuthenticatedClient(SessionId);
 
         protected EncryptedServiceBusClient(IEncryptedServiceBusClientHost encryptedBus)
         {
@@ -18,13 +18,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected Task<T> ProcessCommand<T>(ServiceBusCommand command)
         {
-            if (!_isAuthenticated)
+            if (!IsAuthenticated)
             {
                 if (!_encryptedBus.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
-                _isAuthenticated = true;
             }
 
             return _encryptedBus.ExecuteCommand<T>(command);
@@ -32,13 +31,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected void RunCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
         {
-            if (!_isAuthenticated)
+            if (!IsAuthenticated)
             {
                 if (!_encryptedBus.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
-                _isAuthenticated = true;
             }
 
             _encryptedBus.RunCommand(command, requestAcqureAction);

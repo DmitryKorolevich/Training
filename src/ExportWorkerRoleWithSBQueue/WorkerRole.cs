@@ -40,7 +40,7 @@ namespace ExportWorkerRoleWithSBQueue
         public override void Run()
         {
             Trace.WriteLine("Starting processing of messages");
-
+            _objectEncryptionHost.OnSessionExpired += OnSessionRemoved;
             _client.OnMessage(ProcessMessage);
 
             _completedEvent.WaitOne();
@@ -50,15 +50,6 @@ namespace ExportWorkerRoleWithSBQueue
         {
             switch (receivedMessage.ContentType)
             {
-                case OrderExportServiceConstants.GetPublicKey:
-                    _client.Send(new BrokeredMessage(_objectEncryptionHost.PublicKey)
-                    {
-                        SessionId = receivedMessage.SessionId,
-                        ContentType = receivedMessage.ContentType,
-                        MessageId = receivedMessage.MessageId
-                    });
-                    receivedMessage.Complete();
-                    break;
                 case OrderExportServiceConstants.SetSessionKey:
                     var sessionKey = Guid.Parse(receivedMessage.SessionId);
                     var key = _objectEncryptionHost.RsaDecrypt<KeyExchange>(receivedMessage.GetBody<byte[]>());
@@ -68,7 +59,8 @@ namespace ExportWorkerRoleWithSBQueue
                         {
                             SessionId = receivedMessage.SessionId,
                             ContentType = receivedMessage.ContentType,
-                            MessageId = receivedMessage.MessageId
+                            MessageId = receivedMessage.MessageId,
+                            TimeToLive = TimeSpan.FromMinutes(10)
                         });
                     }
                     receivedMessage.Complete();
@@ -79,7 +71,8 @@ namespace ExportWorkerRoleWithSBQueue
                     {
                         SessionId = receivedMessage.SessionId,
                         ContentType = receivedMessage.ContentType,
-                        MessageId = receivedMessage.MessageId
+                        MessageId = receivedMessage.MessageId,
+                        TimeToLive = TimeSpan.FromMinutes(10)
                     });
                     
                     receivedMessage.Complete();
@@ -87,65 +80,88 @@ namespace ExportWorkerRoleWithSBQueue
                 case OrderExportServiceConstants.ExportOrder:
                     var exportData = _objectEncryptionHost.AesDecrypt<OrderExportData>(receivedMessage.GetBody<byte[]>(),
                         Guid.Parse(receivedMessage.SessionId));
-                    //List<OrderExportError> errors = new List<OrderExportError>();
-                    Parallel.ForEach(exportData.ExportInfo, e =>
+                    if (exportData != null)
                     {
-                        using (var scope = _container.BeginLifetimeScope())
+                        Parallel.ForEach(exportData.ExportInfo, e =>
                         {
-                            var exportService = scope.Resolve<IOrderExportService>();
-                            ICollection<string> errors = null;
-                            bool success;
-                            try
+                            using (var scope = _container.BeginLifetimeScope())
                             {
-                                success = exportService.ExportOrder(e.Id, e.OrderType, out errors);
-                            }
-                            catch (Exception ex)
-                            {
-                                if (errors == null)
+                                var exportService = scope.Resolve<IOrderExportService>();
+                                ICollection<string> errors = null;
+                                bool success;
+                                try
                                 {
-                                    errors = new List<string>();
+                                    success = exportService.ExportOrder(e.Id, e.OrderType, out errors);
                                 }
-                                errors.Add(ex.Message);
-                                success = false;
+                                catch (Exception ex)
+                                {
+                                    if (errors == null)
+                                    {
+                                        errors = new List<string>();
+                                    }
+                                    errors.Add(ex.Message);
+                                    success = false;
+                                }
+                                _respondClient.Send(new BrokeredMessage(new OrderExportItemResult
+                                {
+                                    Id = e.Id,
+                                    Success = success,
+                                    Errors = errors
+                                })
+                                {
+                                    SessionId = receivedMessage.SessionId,
+                                    ContentType = receivedMessage.ContentType,
+                                    MessageId = receivedMessage.MessageId,
+                                    TimeToLive = TimeSpan.FromMinutes(10)
+                                });
                             }
-                            string contentType = receivedMessage.ContentType;
-                            string sessionId = receivedMessage.SessionId;
-                            receivedMessage.Complete();
-
-                            _respondClient.Send(new BrokeredMessage(new OrderExportItemResult
-                            {
-                                Id = e.Id,
-                                Success = success,
-                                Errors = errors
-                            })
-                            {
-                                ContentType = contentType,
-                                SessionId = sessionId
-                            });
-                        }
-                    });
+                        });
+                    }
+                    receivedMessage.Complete();
                     break;
                 case OrderExportServiceConstants.UpdateOrderPayment:
                     var orderPaymentInfo =
                         _objectEncryptionHost.AesDecrypt<OrderPaymentMethodDynamic>(receivedMessage.GetBody<byte[]>(),
                             Guid.Parse(receivedMessage.SessionId));
-                    using (var scope = _container.BeginLifetimeScope())
+                    bool operationResult = orderPaymentInfo != null;
+                    if (operationResult)
                     {
-                        var exportService = scope.Resolve<IOrderExportService>();
-                        exportService.UpdatePaymentMethod(orderPaymentInfo);
-                        receivedMessage.Complete();
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var exportService = scope.Resolve<IOrderExportService>();
+                            exportService.UpdatePaymentMethod(orderPaymentInfo);
+                        }
                     }
+                    _respondClient.Send(new BrokeredMessage(operationResult)
+                    {
+                        SessionId = receivedMessage.SessionId,
+                        ContentType = receivedMessage.ContentType,
+                        MessageId = receivedMessage.MessageId,
+                        TimeToLive = TimeSpan.FromMinutes(10)
+                    });
+                    receivedMessage.Complete();
                     break;
                 case OrderExportServiceConstants.UpdateCustomerPayment:
                     var customerPaymentInfo =
                         _objectEncryptionHost.AesDecrypt<CustomerPaymentMethodDynamic>(receivedMessage.GetBody<byte[]>(),
                             Guid.Parse(receivedMessage.SessionId));
-                    using (var scope = _container.BeginLifetimeScope())
+                    operationResult = customerPaymentInfo != null;
+                    if (operationResult)
                     {
-                        var exportService = scope.Resolve<IOrderExportService>();
-                        exportService.UpdatePaymentMethod(customerPaymentInfo);
-                        receivedMessage.Complete();
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var exportService = scope.Resolve<IOrderExportService>();
+                            exportService.UpdatePaymentMethod(customerPaymentInfo);
+                        }
                     }
+                    _respondClient.Send(new BrokeredMessage(operationResult)
+                    {
+                        SessionId = receivedMessage.SessionId,
+                        ContentType = receivedMessage.ContentType,
+                        MessageId = receivedMessage.MessageId,
+                        TimeToLive = TimeSpan.FromMinutes(10)
+                    });
+                    receivedMessage.Complete();
                     break;
                 default:
                     using (var scope = _container.BeginLifetimeScope())
@@ -182,13 +198,25 @@ namespace ExportWorkerRoleWithSBQueue
             return base.OnStart();
         }
 
+        private void OnSessionRemoved(Guid session)
+        {
+            _client.Send(new BrokeredMessage(session)
+            {
+                ContentType = OrderExportServiceConstants.SessionExpired,
+                TimeToLive = TimeSpan.FromHours(1)
+            });
+        }
+
+
         public override void OnStop()
         {
             // Close the connection to Service Bus Queue
+            _objectEncryptionHost.OnSessionExpired -= OnSessionRemoved;
             _client.Close();
             _respondClient.Close();
             _completedEvent.Set();
             _container.Dispose();
+            _objectEncryptionHost.Dispose();
             base.OnStop();
         }
     }

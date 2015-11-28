@@ -19,7 +19,6 @@ using VitalChoice.Business.Queries.Customer;
 using VitalChoice.DynamicData.Helpers;
 using System.Globalization;
 using VitalChoice.Business.Queries.Affiliates;
-using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -36,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Affiliates
 {

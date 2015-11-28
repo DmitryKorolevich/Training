@@ -20,8 +20,8 @@
     },
     "ExportService": {
       "ConnectionString": "",
-      "SendQueueName": "",
-      "ReceiveQueueName": ""
+      "SendQueueName": "ProcessingQueue",
+      "ReceiveQueueName": "RespondQueue"
     },
     "PublicHost": "http://staging.g2-dg.com/",
     "AdminHost": "http://admin.staging.g2-dg.com/",

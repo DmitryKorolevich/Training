@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "VitalChoice.CertificatesStoreImport Console Application",
+  "authors": [ "multi_000" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+  },
+
+  "commands": {
+    "VitalChoice.CertificatesStoreImport": "VitalChoice.CertificatesStoreImport"
+  },
+
+  "frameworks": {
+    "dnx451": { }
+  }
+}

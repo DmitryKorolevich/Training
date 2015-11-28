@@ -22,8 +22,7 @@ namespace VitalChoice.Workflow.Configuration
 {
     public class Program
     {
-
-        public async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             try
             {
@@ -35,7 +34,7 @@ namespace VitalChoice.Workflow.Configuration
                     Console.WriteLine($"[{DateTime.Now:O}] Configuring DB");
                     var setup = scope.Resolve<ITreeSetup<OrderDataContext, decimal>>();
                     DefaultConfiguration.Configure(setup);
-                    if (await setup.UpdateAsync())
+                    if (setup.UpdateAsync().Result)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine($"[{DateTime.Now:O}] Update Success!");
