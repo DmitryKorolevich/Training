@@ -30,5 +30,13 @@ angular.module('app.core.dataAccess.services.healthwiseService', [])
 	    {
 	        return $http.post(baseUrl + 'MakeHealthwisePeriodPayment', model, getConfig(tracker));
 	    },
+	    markOrder: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'MarkOrder/' + id, null, getConfig(tracker));
+	    },
+	    markCustomerOrders: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'MarkCustomerOrders/' + id, null, getConfig(tracker));
+	    },
 	};
 }]);

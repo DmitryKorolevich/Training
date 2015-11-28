@@ -9,11 +9,11 @@ namespace VitalChoice.Business.Queries.Healthwise
 {
     public class VHealthwisePeriodQuery : QueryObject<VHealthwisePeriod>
     {
-        public VHealthwisePeriodQuery WithNotBilledOnly(bool notBilled)
+        public VHealthwisePeriodQuery WithAllowPaymentOnly(bool notBilled, int? ordersCount)
         {
-            if (notBilled)
+            if (notBilled && ordersCount.HasValue)
             {
-                Add(x => !x.PaidDate.HasValue);
+                Add(x => !x.PaidDate.HasValue && x.OrdersCount>= ordersCount.Value);
             }
             return this;
         }

@@ -49,15 +49,18 @@ namespace VC.Admin.Controllers
     {
         private readonly IHealthwiseService _healthwiseService;
         private readonly IOrderService _orderService;
+        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ILogger _logger;
 
         public HealthwiseController(
             IHealthwiseService healthwiseService,
             IOrderService orderService,
+            IAppInfrastructureService appInfrastructureService,
             ILoggerProviderExtended loggerProvider)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
+            _appInfrastructureService = appInfrastructureService;
             _logger = loggerProvider.CreateLoggerDefault();
         }
 
@@ -73,10 +76,21 @@ namespace VC.Admin.Controllers
             }).ToList();
             foreach(var periodGroup in periodGroups)
             {
-                toReturn.Add(new HealthwiseCustomerListItemModel(periodGroup.Periods));
+                var item = new HealthwiseCustomerListItemModel(periodGroup.Periods);
+                SetAllowPaymentPeriodSetting(item);
+                toReturn.Add(item);
             }
             return toReturn;
 		}
+
+        [NonAction]
+        private void SetAllowPaymentPeriodSetting(HealthwiseCustomerListItemModel model)
+        {
+            foreach (var period in model.Periods)
+            {
+                period.AllowPayment = !period.PaidDate.HasValue && period.OrdersCount >= _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
+            }
+        }
 
         [HttpGet]
         public async Task<Result<HealthwiseCustomerListItemModel>> GetHealthwisePeriod(int id)
@@ -86,6 +100,7 @@ namespace VC.Admin.Controllers
             if(item!=null)
             {
                 toReturn = new HealthwiseCustomerListItemModel(new List<VHealthwisePeriod>() { item});
+                SetAllowPaymentPeriodSetting(toReturn);
             }
             else
             {
@@ -102,12 +117,24 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> MakeHealthwisePeriodPayment([FromBody]HealthwisePeriodMakePaymentModel model)
+        public async Task<Result<bool>> MakeHealthwisePeriodPayment([FromBody]HealthwisePeriodMakePaymentModel model)
         {
             if (!Validate(model))
                 return false;
 
             return await _healthwiseService.MakeHealthwisePeriodPaymentAsync(model.Id, model.Amount, model.Date, model.PayAsGC);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> MarkOrder(int id, [FromBody] object model)
+        {
+            return await _orderService.UpdateHealthwiseOrderAsync(id, true);
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> MarkCustomerOrders(int id, [FromBody] object model)
+        {
+            return await _healthwiseService.MarkOrdersAsHealthwiseForCustomerIdAsync(id);
         }
     }
 }

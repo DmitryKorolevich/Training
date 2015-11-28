@@ -28,6 +28,7 @@ namespace VC.Admin.Models.Healthwise
                 {
                     Periods.Add(new HealthwisePeriodListItemModel(period));
                 }
+                Periods = Periods.OrderByDescending(p => p.StartDate).ToList();
             }
         }
     }

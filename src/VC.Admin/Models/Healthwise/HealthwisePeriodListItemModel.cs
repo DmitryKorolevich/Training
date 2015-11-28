@@ -22,6 +22,10 @@ namespace VC.Admin.Models.Healthwise
 
         public decimal OrderSubtotals { get; set; }
 
+        public DateTime LastOrderDate { get; set; }
+
+        public bool AllowPayment { get; set; }
+
         public HealthwisePeriodListItemModel(VHealthwisePeriod item)
         {
             if(item!=null)
@@ -33,6 +37,7 @@ namespace VC.Admin.Models.Healthwise
                 PaidDate = item.PaidDate;
                 OrdersCount = item.OrdersCount;
                 OrderSubtotals = item.OrderSubtotals;
+                LastOrderDate = item.LastOrderDate;
             }
         }
     }

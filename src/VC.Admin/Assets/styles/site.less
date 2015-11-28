@@ -36,6 +36,8 @@ a.block{ display:block;}
      cursor: pointer; }
 
 .error{ color:red;}
+.important{ color:red;}
+.success{ color:green;}
 
 .modal-lg {
   width: 1150px;
@@ -1132,3 +1134,8 @@ th.sortable-column {
 .affiliates-summary .table .name {width: 150px; }
 .affiliates-summary .table .month {width: 120px; }
 .affiliates-summary .summary .info-label { width: 180px; display: inline-block; margin-right: 10px;}
+
+.healthwise-customers table > tbody > tr.customer-row { cursor:pointer;}
+.healthwise-customers table > tbody > tr.period-row { background: white;}
+.healthwise-customers table > tbody > tr.period-row.allow-paid { background: @table-attention;}
+.healthwise-customers table > tbody > tr.period-row.paid { background: @table-success;}

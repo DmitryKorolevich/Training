@@ -63,9 +63,9 @@ function ($scope, $rootScope, $state, $stateParams, orderService, toaster, modal
             {
                 successSaveHandler(result);
             }).
-                error(function (result) {
-                    errorHandler(result);
-                });
+            error(function (result) {
+                errorHandler(result);
+            });
         } else {
             $scope.forms.form.submitted = true;
         }

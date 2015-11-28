@@ -24,5 +24,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Healthwise
         public int OrdersCount { get; set; }
 
         public decimal OrderSubtotals { get; set; }
+
+        public DateTime LastOrderDate { get; set; }
     }
 }
