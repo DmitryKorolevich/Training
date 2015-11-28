@@ -7,7 +7,6 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Business.Services.Dynamic;
-using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Interfaces.Services.Products;
@@ -26,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Products
 {

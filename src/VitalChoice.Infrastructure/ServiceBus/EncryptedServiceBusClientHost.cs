@@ -36,8 +36,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             var thread = new Thread(ReceiveThread);
             thread.Start();
 
-            var publicKey = ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(new Guid(), OrderExportServiceConstants.GetPublicKey));
-            _encryptionHost = new ObjectEncryptionHost(publicKey);
+            _encryptionHost = new ObjectEncryptionHost(false);
         }
 
         private T ExecutePlainCommand<T>(ServiceBusCommand command)
@@ -52,7 +51,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
-                MessageId = command.CommandId.ToString()
+                MessageId = command.CommandId.ToString(),
+                TimeToLive = TimeSpan.FromMinutes(20)
             });
 
             //BUG: set maximum wait time of command result receive to 20 minutes
@@ -77,13 +77,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
-                MessageId = command.CommandId.ToString()
+                MessageId = command.CommandId.ToString(),
+                TimeToLive = TimeSpan.FromMinutes(5)
             });
 #endif
             return Task.Run(() =>
             {
-                //BUG: set maximum wait time of command result receive to 20 minutes
-                if (!command.ReadyEvent.WaitOne(new TimeSpan(0, 20, 0)))
+                //BUG: set maximum wait time of command result receive to 5 minutes
+                if (!command.ReadyEvent.WaitOne(new TimeSpan(0, 5, 0)))
                 {
                     throw new ApiException($"Command timeout. <{command.CommandName}>");
                 }
@@ -104,9 +105,15 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
-                MessageId = command.CommandId.ToString()
+                MessageId = command.CommandId.ToString(),
+                TimeToLive = TimeSpan.FromMinutes(20)
             });
 #endif
+        }
+
+        public bool IsAuthenticatedClient(Guid sessionId)
+        {
+            return _encryptionHost.SessionExist(sessionId);
         }
 
         public bool AuthenticateClient(Guid sessionId)
@@ -129,7 +136,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _encryptionHost.RemoveSession(sessionId);
         }
 
-        public void CommandComplete(ServiceBusCommandBase command)
+        private void CommandComplete(ServiceBusCommandBase command)
         {
             lock (_exportCommands)
             {
@@ -147,6 +154,15 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _sendClient.OnMessage(message =>
             {
                 ServiceBusCommandBase commandBase;
+                if (message.ContentType == OrderExportServiceConstants.SessionExpired)
+                {
+                    var session = message.GetBody<Guid>();
+                    if (_encryptionHost.RemoveSession(session))
+                    {
+                        message.Complete();
+                    }
+                    return;
+                }
                 lock (_exportCommands)
                 {
                     _exportCommands.TryGetValue(new CommandItem(Guid.Parse(message.MessageId), message.ContentType), out commandBase);
@@ -156,9 +172,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     object body;
                     switch (commandBase.CommandName)
                     {
-                        case OrderExportServiceConstants.GetPublicKey:
-                            body = message.GetBody<RSAParameters>();
-                            break;
                         case OrderExportServiceConstants.SetSessionKey:
                             body = message.GetBody<bool>();
                             break;

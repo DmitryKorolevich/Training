@@ -19,7 +19,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
-using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Settings
 {

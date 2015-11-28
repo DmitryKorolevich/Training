@@ -22,7 +22,6 @@ using VitalChoice.Data.Services;
 using DynamicExpressionVisitor = VitalChoice.DynamicData.Helpers.DynamicExpressionVisitor;
 using VitalChoice.Business.Queries.Affiliate;
 using VitalChoice.Business.Repositories;
-using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -44,6 +43,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Business.Services.Customers
 {

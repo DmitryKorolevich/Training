@@ -67,7 +67,6 @@ using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.DynamicData.Extensions;
 using Autofac.Extensions.DependencyInjection;
 using VitalChoice.Business.Repositories;
-using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Cache;
@@ -81,6 +80,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Infrastructure.Ecommerce;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -280,11 +280,12 @@ namespace VitalChoice.Core.DependencyInjection
                     configuration.GetSection("App:LogPath").Value))
                 .As<ILoggerProviderExtended>().SingleInstance();
 
-            builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
-            builder.RegisterGeneric(typeof(Logger<>))
-                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
-                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
-                .As(typeof(ILogger<>));
+            //TODO: omit ILogger override in config parameter
+            //builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
+            //builder.RegisterGeneric(typeof(Logger<>))
+            //    .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
+            //        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
+            //    .As(typeof(ILogger<>));
 
             builder.RegisterType<LocalizationService>()
                 .As<ILocalizationService>()

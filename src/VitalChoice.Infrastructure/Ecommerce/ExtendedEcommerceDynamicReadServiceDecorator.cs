@@ -9,7 +9,7 @@ using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Transfer;
 
-namespace VitalChoice.Business.Services.Ecommerce
+namespace VitalChoice.Infrastructure.Ecommerce
 {
     public class ExtendedEcommerceDynamicReadServiceDecorator<TDynamic, TEntity> : EcommerceDynamicReadServiceDecorator<TDynamic, TEntity>,
         IExtendedDynamicReadServiceAsync<TDynamic, TEntity> 

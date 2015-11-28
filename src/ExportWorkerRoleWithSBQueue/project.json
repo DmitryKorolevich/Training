@@ -7,14 +7,16 @@
   "licenseUrl": "",
   "scripts": {
     "postbuild": [
-      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/net451/*\" \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue\" /Y /C /I /R /F",
-      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/net451/*\" \"%project:Directory%/../../artifacts/obj/ExportWorkerRoleWithSBQueue/Debug\" /Y /C /I /R /F"
+      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/dnx451/*\" \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue\" /Y /C /I /R /F",
+      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/dnx451/*\" \"%project:Directory%/../../artifacts/obj/ExportWorkerRoleWithSBQueue/Debug\" /Y /C /I /R /F"
     ]
   },
   "dependencies": {
     "WindowsAzure.ServiceBus": "3.0.9",
     "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",
-    "VitalChoice.Core": ""
+    "VitalChoice.Infrastructure": "",
+    "VitalChoice.Business": "",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*"
   },
   "frameworks": {
     "dnx451": {

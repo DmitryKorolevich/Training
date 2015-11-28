@@ -1,32 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
+    public delegate void SessionExpiredEventHandler(Guid session);
+
     public class ObjectEncryptionHost : IDisposable
     {
-        private readonly RSACryptoServiceProvider _rsa = new RSACryptoServiceProvider(4096);
+        private readonly bool _server;
+#if DNX451 || NET451
+        private readonly RSACryptoServiceProvider _rootProvider;
+        private readonly RSACryptoServiceProvider _clientProvider;
+#else
+        private readonly RSA _rootProvider;
+        private readonly RSA _clientProvider;
+#endif
         private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
+        private readonly ManualResetEvent _disposeEvent;
 
-        public ObjectEncryptionHost()
+        /// <summary>
+        /// Server Mode
+        /// </summary>
+        public ObjectEncryptionHost(bool server = true)
         {
-            PublicKey = _rsa.ExportParameters(false);
+            _server = server;
+            var certStore = new X509Store("VCCertStore", StoreLocation.CurrentUser);
+            certStore.Open(OpenFlags.ReadOnly);
+            var certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "VC Root", true);
+            if (certificates.Count != 1)
+                throw new InvalidOperationException(
+                    "Cannot find valid <VC Root> Certificate in Store or more than one certificate with the same subject name installed");
+
+            var rootCert = certificates[0];
+            certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "staging-vc.cloudapp.net", true);
+            if (certificates.Count != 1)
+                throw new InvalidOperationException(
+                    "Cannot find <staging-vc.cloudapp.net> Certificate in Store or more than one certificate with the same subject name installed");
+            var clientCert = certificates[0];
+            var valid = ValidateClientCertificate(rootCert, clientCert);
+            if (!valid)
+            {
+                throw new InvalidOperationException("Client certificate is invalid");
+            }
+            if (server)
+            {
+                if (!rootCert.HasPrivateKey)
+                    throw new InvalidOperationException("Root certificate has no private key imported.");
+#if DNX451 || NET451
+                _rootProvider = (RSACryptoServiceProvider) rootCert.PrivateKey;
+                _clientProvider = (RSACryptoServiceProvider) clientCert.PublicKey.Key;
+#else
+                _rootProvider = rootCert.GetRSAPrivateKey();
+                _clientProvider = clientCert.GetRSAPublicKey();
+#endif
+                _disposeEvent = new ManualResetEvent(false);
+                new Thread(SessionExpirationLookup).Start();
+            }
+            else
+            {
+                if (!clientCert.HasPrivateKey)
+                    throw new InvalidOperationException("Client certificate has no private key imported.");
+#if DNX451 || NET451
+                _rootProvider = (RSACryptoServiceProvider)rootCert.PublicKey.Key;
+                _clientProvider = (RSACryptoServiceProvider)clientCert.PrivateKey;
+#else
+                _rootProvider = rootCert.GetRSAPublicKey();
+                _clientProvider = clientCert.GetRSAPrivateKey();
+#endif
+            }
+#if DNX451 || NET451
+            certStore.Close();
+#else
+            certStore.Dispose();
+#endif
         }
 
-        public ObjectEncryptionHost(RSAParameters keys)
+        public bool ValidateClientCertificate(X509Certificate2 rootCert, X509Certificate2 clientCert)
         {
-            _rsa.ImportParameters(keys);
-            PublicKey = _rsa.ExportParameters(false);
+            X509Chain validationChain = new X509Chain
+            {
+                ChainPolicy =
+                {
+                    RevocationMode = X509RevocationMode.NoCheck,
+                    RevocationFlag = X509RevocationFlag.ExcludeRoot,
+                    VerificationFlags = X509VerificationFlags.IgnoreWrongUsage,
+                    VerificationTime = DateTime.Now,
+                    UrlRetrievalTimeout = TimeSpan.Zero
+                }
+            };
+            validationChain.ChainPolicy.ExtraStore.Add(rootCert);
+            var valid = validationChain.Build(clientCert);
+            return valid;
         }
-
-        public RSAParameters PublicKey { get; }
 
         public T RsaDecrypt<T>(byte[] data)
         {
-            var objectData = _rsa.Decrypt(data, true);
+#if DNX451 || NET451
+            var objectData = _server ? _clientProvider.Decrypt(data, true) : _rootProvider.Decrypt(data, true);
+#else
+            var objectData = _server ? _clientProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA256) : _rootProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
+#endif
             SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
             using (var memory = new MemoryStream(objectData))
             {
@@ -41,7 +120,19 @@ namespace VitalChoice.Infrastructure.ServiceBus
             using (var memory = new MemoryStream())
             {
                 serializer.Serialize(obj, memory);
-                return _rsa.Encrypt(memory.ToArray(), true);
+#if DNX451 || NET451
+                if (_server)
+                {
+                    return _rootProvider.Encrypt(memory.ToArray(), true);
+                }
+                return _clientProvider.Encrypt(memory.ToArray(), true);
+#else
+                if (_server)
+                {
+                    return _rootProvider.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
+                }
+                return _clientProvider.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
+#endif
             }
         }
 
@@ -52,6 +143,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 SessionInfo encryption;
                 if (_sessions.TryGetValue(session, out encryption))
                 {
+                    encryption.Expiration = DateTime.Now.AddHours(1);
                     using (var memory = new MemoryStream())
                     {
                         if (!encryption.Decryptor.CanReuseTransform)
@@ -77,6 +169,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 SessionInfo encryption;
                 if (_sessions.TryGetValue(session, out encryption))
                 {
+                    encryption.Expiration = DateTime.Now.AddHours(1);
                     byte[] plainData;
                     using (var memory = new MemoryStream())
                     {
@@ -121,7 +214,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 Aes = aes,
                 Encryptor = aes.CreateEncryptor(),
-                Decryptor = aes.CreateDecryptor()
+                Decryptor = aes.CreateDecryptor(),
+                Expiration = DateTime.Now.AddHours(1)
             };
             lock (_sessions)
             {
@@ -142,6 +236,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     aes.Encryptor = aes.Aes.CreateEncryptor();
                     aes.Decryptor = aes.Aes.CreateDecryptor();
+                    aes.Expiration = DateTime.Now.AddHours(1);
                     return new KeyExchange
                     {
                         Key = aes.Aes.Key,
@@ -170,7 +265,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     Aes = aes,
                     Encryptor = aes.CreateEncryptor(),
-                    Decryptor = aes.CreateDecryptor()
+                    Decryptor = aes.CreateDecryptor(),
+                    Expiration = DateTime.Now.AddHours(1)
                 };
                 _sessions.Add(session, encryption);
                 return new KeyExchange
@@ -181,7 +277,25 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public void RemoveSession(Guid session)
+        private void SessionExpirationLookup()
+        {
+            while (!_disposeEvent.WaitOne(new TimeSpan(0, 10, 0)))
+            {
+                Guid[] expiredSessions;
+                lock (_sessions)
+                {
+                    expiredSessions =
+                        _sessions.Where(session => session.Value.Expiration <= DateTime.Now).Select(session => session.Key).ToArray();
+                }
+                foreach (var expiredSession in expiredSessions)
+                {
+                    RemoveSession(expiredSession);
+                    OnSessionExpired?.Invoke(expiredSession);
+                }
+            }
+        }
+
+        public bool RemoveSession(Guid session)
         {
             lock (_sessions)
             {
@@ -190,13 +304,19 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     _sessions.Remove(session);
                     aes.Dispose();
+                    return true;
                 }
             }
+            return false;
         }
+
+        public event SessionExpiredEventHandler OnSessionExpired;
 
         public void Dispose()
         {
-            _rsa.Dispose();
+            _disposeEvent?.Dispose();
+            _rootProvider.Dispose();
+            _clientProvider.Dispose();
             lock (_sessions)
             {
                 foreach (var session in _sessions)
@@ -212,6 +332,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             public ICryptoTransform Encryptor { get; set; }
             public ICryptoTransform Decryptor { get; set; }
             public Aes Aes { get; set; }
+            public DateTime Expiration { get; set; }
 
             public void Dispose()
             {
