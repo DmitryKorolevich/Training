@@ -11,6 +11,7 @@
     "Microsoft.AspNet.Http": "1.0.0-*",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
   },
+  "compilationOptions": {"allowUnsafe": true},
   "frameworks": {
     "dnx451": { },
     "dotnet5.4": {

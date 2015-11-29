@@ -99,41 +99,58 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return valid;
         }
 
-        public T RsaDecrypt<T>(byte[] data)
-        {
 #if DNX451 || NET451
-            var objectData = _server ? _clientProvider.Decrypt(data, true) : _rootProvider.Decrypt(data, true);
+        public T RsaDecrypt<T>(byte[] data, RSACryptoServiceProvider rsa)
 #else
-            var objectData = _server ? _clientProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA256) : _rootProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
+        public T RsaDecrypt<T>(byte[] data, RSA rsa)
+#endif
+        {
+            if (data == null)
+                return default(T);
+#if DNX451 || NET451
+            var objectData = rsa.Decrypt(data, true);
+#else
+            var objectData = rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
 #endif
             SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
             using (var memory = new MemoryStream(objectData))
             {
-                return (T) serializer.Deserialize(memory);
+                return (T)serializer.Deserialize(memory);
             }
         }
 
-        public byte[] RsaEncrypt<T>(T obj)
+#if DNX451 || NET451
+        public byte[] RsaEncrypt(object obj, RSACryptoServiceProvider rsa)
+#else
+        public byte[] RsaEncrypt(object obj, RSA rsa)
+#endif
         {
-
+            if (obj == null)
+                return null;
             SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
             using (var memory = new MemoryStream())
             {
                 serializer.Serialize(obj, memory);
 #if DNX451 || NET451
-                if (_server)
-                {
-                    return _rootProvider.Encrypt(memory.ToArray(), true);
-                }
-                return _clientProvider.Encrypt(memory.ToArray(), true);
+                return rsa.Encrypt(memory.ToArray(), true);
 #else
-                if (_server)
-                {
-                    return _rootProvider.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
-                }
-                return _clientProvider.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
+                return rsa.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
 #endif
             }
+        }
+
+        public T RsaDecrypt<T>(byte[] data)
+        {
+            if (data == null)
+                return default(T);
+            return RsaDecrypt<T>(data, _server ? _clientProvider : _rootProvider);
+        }
+
+        public byte[] RsaEncrypt(object obj)
+        {
+            if (obj == null)
+                return null;
+            return RsaEncrypt(obj, _server ? _rootProvider : _clientProvider);
         }
 
         public T AesDecrypt<T>(byte[] data, Guid session)
