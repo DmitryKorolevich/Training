@@ -5,6 +5,7 @@ angular.module('app.modules.healthwise', [
 	'app.modules.healthwise.controllers.markOrderController',
 	'app.modules.healthwise.controllers.markCustomerOrdersController',
 	'app.modules.healthwise.controllers.healthwiseDetailController',
+	'app.modules.healthwise.controllers.moveToPeriodController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

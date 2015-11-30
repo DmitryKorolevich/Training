@@ -28,5 +28,7 @@ namespace VitalChoice.Interfaces.Services.Healthwise
         Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsForMovementAsync(int idPeriod, int count);
 
         Task<bool> MoveHealthwiseOrdersAsync(int idPeriod, ICollection<int> ids);
+
+        Task<HealthwisePeriod> AddPeriodAsync(int idCustomer);
     }
 }

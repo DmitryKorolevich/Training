@@ -22,7 +22,7 @@ namespace VC.Admin.Models.Healthwise
 
         public decimal OrderSubtotals { get; set; }
 
-        public DateTime LastOrderDate { get; set; }
+        public DateTime? LastOrderDate { get; set; }
 
         public bool AllowPayment { get; set; }
 

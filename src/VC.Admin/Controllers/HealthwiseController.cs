@@ -156,5 +156,12 @@ namespace VC.Admin.Controllers
         {
             return await _healthwiseService.MoveHealthwiseOrdersAsync(model.IdPeriod,model.Ids);
         }
+
+        [HttpPost]
+        public async Task<Result<bool>> AddPeriod(int id,[FromBody]object model)
+        {
+            var period =await _healthwiseService.AddPeriodAsync(id);
+            return period != null;
+        }
     }
 }

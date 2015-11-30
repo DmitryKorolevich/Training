@@ -12,11 +12,7 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
         if (result.Success)
         {
             toaster.pop('success', "Success!", "Successfully paid.");
-            $scope.payment = {
-                AllowPayment: false,
-            };
-            loadOrders();
-            loadHealthwise();
+            refresh();
         } else
         {
             var messages = "";
@@ -40,6 +36,15 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
     function errorHandler(result)
     {
         toaster.pop('error', "Error!", "Server error occured");
+    };
+
+    var refresh = function ()
+    {
+        $scope.payment = {
+            AllowPayment: false,
+        };
+        loadOrders();
+        loadHealthwise();
     };
 
     function initialize()
@@ -86,7 +91,8 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
                     if(data)
                     {
                         $scope.options.FirstName=data.FirstName;
-                        $scope.options.LastName=data.LastName;
+                        $scope.options.LastName = data.LastName;
+                        $scope.options.IdCustomer = data.Id;
                         if(data.Periods && data.Periods.length==1)
                         {
                             if(data.Periods[0].AllowPayment)
@@ -146,6 +152,30 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
 
     $scope.openMovePopup = function()
     {
+        var ids = [];
+        $.each($scope.items, function (index, item)
+        {
+            if (item.IsSelected)
+            {
+                ids.push(item.Id);
+            }
+        });
+
+        if (ids.length == 0)
+        {
+            toaster.pop('error', "Error!", "At least one order should be selected");
+            return;
+        }
+
+        modalUtil.open('app/modules/healthwise/partials/moveToPeriodPopup.html', 'moveToPeriodController', {
+            idCustomer: $scope.options.IdCustomer,
+            idPeriodFrom: $scope.id,
+            ids: ids,
+            thenCallback: function (data)
+            {
+                refresh();
+            }
+        });
     };
 
     $scope.allSelectCall = function()

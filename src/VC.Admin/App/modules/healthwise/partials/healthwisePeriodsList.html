@@ -70,7 +70,7 @@
                                 Bill
                             </button>
                             <span data-ng-if="period.AllowPayment && period.OrdersCount!=0" class="important">
-                                {{::(period.OrderSubtotals / period.OrdersCount).toFixed(2) | currency}} {{::period.LastOrderDate | date:"MM/dd/yy"}}
+                                {{::(period.OrderSubtotals / period.OrdersCount).toFixed(2) | currency}} <span data-ng-if="period.LastOrderDate">{{::period.LastOrderDate | date:"MM/dd/yy"}}</span>
                             </span>
                             <span data-ng-if="period.PaidDate" class="important">
                                 Paid: {{::period.PaidAmount | currency}} {{::period.PaidDate | date:"MM/dd/yy"}}

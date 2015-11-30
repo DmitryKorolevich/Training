@@ -58,6 +58,7 @@ namespace VitalChoice.Business.Services.Healthwise
     {
         private readonly IEcommerceRepositoryAsync<VHealthwisePeriod> _vHealthwisePeriodRepository;
         private readonly IEcommerceRepositoryAsync<HealthwiseOrder> _healthwiseOrderRepository;
+        private readonly IEcommerceRepositoryAsync<HealthwisePeriod> _healthwisePeriodRepository;
         private readonly OrderRepository _orderRepository;
         private readonly IOrderService _orderService;
         private readonly IEcommerceRepositoryAsync<Customer> _customerRepository;
@@ -69,6 +70,7 @@ namespace VitalChoice.Business.Services.Healthwise
         public HealthwiseService(
             IEcommerceRepositoryAsync<VHealthwisePeriod> vHealthwisePeriodRepository,
             IEcommerceRepositoryAsync<HealthwiseOrder> healthwiseOrderRepository,
+            IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepository,
             OrderRepository orderRepository,
             IOrderService orderService,
             IEcommerceRepositoryAsync<Customer> customerRepository,
@@ -79,6 +81,7 @@ namespace VitalChoice.Business.Services.Healthwise
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
+            _healthwisePeriodRepository = healthwisePeriodRepository;
             _orderRepository = orderRepository;
             _orderService = orderService;
             _customerRepository = customerRepository;
@@ -193,14 +196,14 @@ namespace VitalChoice.Business.Services.Healthwise
 
             var period = (await _vHealthwisePeriodRepository.Query(p => p.Id == idPeriod).SelectAsync(false)).FirstOrDefault();
 
-            if (period != null && count!=0)
+            if (period != null && count != 0)
             {
                 int maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                 VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(period.IdCustomer).WithNotPaid();
                 var items = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
                 foreach (var item in items)
                 {
-                    if (item.OrdersCount + count <= maxCount && item.Id!= period.Id)
+                    if (item.OrdersCount + count <= maxCount && item.Id != period.Id)
                     {
                         toReturn.Add(item);
                     }
@@ -224,27 +227,27 @@ namespace VitalChoice.Business.Services.Healthwise
                         {
                             int maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
-                            var orders = await healthwiseOrderRepository.Query(p => ids.Contains(p.Id)).Include(p=>p.Order).SelectAsync();
+                            var orders = await healthwiseOrderRepository.Query(p => ids.Contains(p.Id)).Include(p => p.Order).SelectAsync();
 
-                            if (period.OrdersCount+orders.Count>maxCount)
+                            if (period.OrdersCount + orders.Count > maxCount)
                             {
                                 return false;
                             }
                             bool notValidCustomer = false;
-                            foreach(var order in orders)
+                            foreach (var order in orders)
                             {
-                                if(order.Order.IdCustomer!=period.IdCustomer)
+                                if (order.Order.IdCustomer != period.IdCustomer)
                                 {
                                     notValidCustomer = true;
                                     break;
                                 }
                             }
-                            if(notValidCustomer)
+                            if (notValidCustomer)
                             {
                                 return false;
                             }
 
-                            foreach(var order in orders)
+                            foreach (var order in orders)
                             {
                                 order.IdHealthwisePeriod = period.Id;
                             }
@@ -261,6 +264,16 @@ namespace VitalChoice.Business.Services.Healthwise
                 }
             }
             return toReturn;
+        }
+
+        public async Task<HealthwisePeriod> AddPeriodAsync(int idCustomer)
+        {
+            HealthwisePeriod period = new HealthwisePeriod();
+            period.IdCustomer = idCustomer;
+            period.StartDate = DateTime.Now;
+            period.EndDate = period.StartDate.AddYears(1);
+            await _healthwisePeriodRepository.InsertAsync(period);
+            return period;
         }
     }
 }
