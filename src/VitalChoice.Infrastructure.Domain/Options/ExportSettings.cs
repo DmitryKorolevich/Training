@@ -8,7 +8,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
     public class ExportService
     {
         public string ConnectionString { get; set; }
-        public string SendQueueName { get; set; }
-        public string ReceiveQueueName { get; set; }
+        public string PlainQueueName { get; set; }
+        public string EncryptedQueueName { get; set; }
     }
 }

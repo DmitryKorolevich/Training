@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Infrastructure.ServiceBus
@@ -13,7 +14,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
     public class ObjectEncryptionHost : IDisposable
     {
-        private readonly bool _server;
+        public X509Certificate2 CurrentCert => Server ? RootCert : ClientCert;
+        public bool Server { get; }
+        public X509Certificate2 ClientCert { get; }
+        public X509Certificate2 RootCert { get; }
 #if DNX451 || NET451
         private readonly RSACryptoServiceProvider _rootProvider;
         private readonly RSACryptoServiceProvider _clientProvider;
@@ -29,7 +33,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         /// </summary>
         public ObjectEncryptionHost(bool server = true)
         {
-            _server = server;
+            Server = server;
             var certStore = new X509Store("VCCertStore", StoreLocation.CurrentUser);
             certStore.Open(OpenFlags.ReadOnly);
             var certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "VC Root", true);
@@ -38,41 +42,42 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     "Cannot find valid <VC Root> Certificate in Store or more than one certificate with the same subject name installed");
 
             var rootCert = certificates[0];
-            certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "staging-vc.cloudapp.net", true);
-            if (certificates.Count != 1)
-                throw new InvalidOperationException(
-                    "Cannot find <staging-vc.cloudapp.net> Certificate in Store or more than one certificate with the same subject name installed");
-            var clientCert = certificates[0];
-            var valid = ValidateClientCertificate(rootCert, clientCert);
-            if (!valid)
-            {
-                throw new InvalidOperationException("Client certificate is invalid");
-            }
+            RootCert = new X509Certificate2(rootCert.Export(X509ContentType.Cert));
             if (server)
             {
                 if (!rootCert.HasPrivateKey)
                     throw new InvalidOperationException("Root certificate has no private key imported.");
 #if DNX451 || NET451
                 _rootProvider = (RSACryptoServiceProvider) rootCert.PrivateKey;
-                _clientProvider = (RSACryptoServiceProvider) clientCert.PublicKey.Key;
 #else
                 _rootProvider = rootCert.GetRSAPrivateKey();
-                _clientProvider = clientCert.GetRSAPublicKey();
 #endif
                 _disposeEvent = new ManualResetEvent(false);
                 new Thread(SessionExpirationLookup).Start();
             }
             else
             {
+                certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "staging-vc.cloudapp.net",
+                    true);
+                if (certificates.Count != 1)
+                    throw new InvalidOperationException(
+                        "Cannot find <staging-vc.cloudapp.net> Certificate in Store or more than one certificate with the same subject name installed");
+                var clientCert = certificates[0];
+                var valid = ValidateClientCertificate(rootCert, clientCert);
+                if (!valid)
+                {
+                    throw new InvalidOperationException("Client certificate is invalid");
+                }
                 if (!clientCert.HasPrivateKey)
                     throw new InvalidOperationException("Client certificate has no private key imported.");
 #if DNX451 || NET451
-                _rootProvider = (RSACryptoServiceProvider)rootCert.PublicKey.Key;
-                _clientProvider = (RSACryptoServiceProvider)clientCert.PrivateKey;
+                _rootProvider = (RSACryptoServiceProvider) rootCert.PublicKey.Key;
+                _clientProvider = (RSACryptoServiceProvider) clientCert.PrivateKey;
 #else
-                _rootProvider = rootCert.GetRSAPublicKey();
                 _clientProvider = clientCert.GetRSAPrivateKey();
+                _rootProvider = rootCert.GetRSAPublicKey();
 #endif
+                ClientCert = new X509Certificate2(clientCert.Export(X509ContentType.Cert));
             }
 #if DNX451 || NET451
             certStore.Close();
@@ -143,14 +148,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             if (data == null)
                 return default(T);
-            return RsaDecrypt<T>(data, _server ? _clientProvider : _rootProvider);
+            if (Server)
+                throw new InvalidOperationException("You need to specify client RSA explicitly");
+            return RsaDecrypt<T>(data, _rootProvider);
         }
 
         public byte[] RsaEncrypt(object obj)
         {
             if (obj == null)
                 return null;
-            return RsaEncrypt(obj, _server ? _rootProvider : _clientProvider);
+            return RsaEncrypt(obj, Server ? _rootProvider : _clientProvider);
         }
 
         public T AesDecrypt<T>(byte[] data, Guid session)
@@ -220,6 +227,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public bool RegisterSession(Guid session, KeyExchange key)
         {
+            if (!Server)
+                throw new InvalidOperationException("Client cannot register session, please use CreateSession");
             Aes aes = Aes.Create();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
@@ -246,6 +255,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public KeyExchange GetSessionWithReset(Guid session)
         {
+            if (Server)
+                throw new InvalidOperationException("Server cannot get/reset client sessions");
             lock (_sessions)
             {
                 SessionInfo aes;
@@ -266,6 +277,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public KeyExchange CreateSession(Guid session)
         {
+            if (Server)
+                throw new InvalidOperationException("Server cannot create client sessions");
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Autofac;
@@ -73,6 +74,7 @@ namespace ExportWorkerRoleWithSBQueue
                 (IApplicationEnvironment)
                     CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
             var configurationBuilder = new ConfigurationBuilder()
+                .SetBasePath(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);
 
@@ -104,6 +106,22 @@ namespace ExportWorkerRoleWithSBQueue
                     UserName = configuration.GetSection("App:Connection:UserName").Value,
                     Password = configuration.GetSection("App:Connection:Password").Value,
                     Server = configuration.GetSection("App:Connection:Server").Value,
+                };
+                options.ExportService = new ExportService
+                {
+                    ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
+                    EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
+                    PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                };
+                options.Avatax = new AvataxOptions
+                {
+                    AccountNumber = configuration.GetSection("App:Avatax:AccountNumber").Value,
+                    CompanyCode = configuration.GetSection("App:Avatax:CompanyCode").Value,
+                    AccountName = configuration.GetSection("App:Avatax:AccountName").Value,
+                    LicenseKey = configuration.GetSection("App:Avatax:LicenseKey").Value,
+                    ProfileName = configuration.GetSection("App:Avatax:ProfileName").Value,
+                    ServiceUrl = configuration.GetSection("App:Avatax:ServiceUrl").Value,
+                    TurnOffCommit = Convert.ToBoolean(configuration.GetSection("App:Avatax:TurnOffCommit").Value)
                 };
             });
 

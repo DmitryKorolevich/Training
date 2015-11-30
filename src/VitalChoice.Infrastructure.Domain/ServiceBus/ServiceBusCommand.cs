@@ -1,7 +1,8 @@
 using System;
 using System.Threading;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
-namespace VitalChoice.Infrastructure.Domain.Transfer
+namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
     public class ServiceBusCommand : ServiceBusCommandBase
     {

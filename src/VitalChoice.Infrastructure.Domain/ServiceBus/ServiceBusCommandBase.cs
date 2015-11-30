@@ -1,6 +1,6 @@
 using System;
 
-namespace VitalChoice.Infrastructure.Domain.Transfer
+namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
     public delegate void CommandCompleteEventHandler(ServiceBusCommandBase command);
 

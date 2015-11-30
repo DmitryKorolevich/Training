@@ -5,12 +5,6 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-  "scripts": {
-    "postbuild": [
-      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/dnx451/*\" \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue\" /Y /C /I /R /F",
-      "xcopy \"%project:Directory%/../../artifacts/bin/ExportWorkerRoleWithSBQueue/Debug/dnx451/*\" \"%project:Directory%/../../artifacts/obj/ExportWorkerRoleWithSBQueue/Debug\" /Y /C /I /R /F"
-    ]
-  },
   "dependencies": {
     "WindowsAzure.ServiceBus": "3.0.9",
     "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",

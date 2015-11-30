@@ -4,45 +4,47 @@ using System.Threading;
 using Autofac;
 using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.Azure;
+using Microsoft.Extensions.OptionsModel;
 using Microsoft.ServiceBus;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace ExportWorkerRoleWithSBQueue
 {
     public class WorkerRole : RoleEntryPoint
     {
         // The name of your queue
-        const string QueueName = "ProcessingQueue";
-        const string RespondQueueName = "RespondQueue";
-
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
         private IContainer _container;
 
         public override void Run()
         {
             Trace.WriteLine("Starting processing of messages");
-            var hostServer = _container.Resolve<IEncryptedServiceBusHostServer>();
-            _completedEvent.WaitOne();
-            hostServer.Dispose();
+            using (_container.Resolve<IEncryptedServiceBusHostServer>())
+            {
+                _completedEvent.WaitOne();
+            }
         }
 
         public override bool OnStart()
         {
             // Set the maximum number of concurrent connections 
             ServicePointManager.DefaultConnectionLimit = 12;
-
+            _container = Configuration.BuildContainer();
+            var options = _container.Resolve<IOptions<AppOptions>>();
             // Create the queue if it does not exist already
             string connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
             var namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
-            if (!namespaceManager.QueueExists(QueueName))
+            var plainQueName = options.Value.ExportService.PlainQueueName;
+            var encryptedQueName = options.Value.ExportService.EncryptedQueueName;
+            if (!namespaceManager.QueueExists(plainQueName))
             {
-                namespaceManager.CreateQueue(QueueName);
+                namespaceManager.CreateQueue(plainQueName);
             }
-            if (!namespaceManager.QueueExists(RespondQueueName))
+            if (!namespaceManager.QueueExists(encryptedQueName))
             {
-                namespaceManager.CreateQueue(RespondQueueName);
+                namespaceManager.CreateQueue(encryptedQueName);
             }
-            _container = Configuration.BuildContainer();
             return base.OnStart();
         }
 

@@ -5,13 +5,16 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
 using Microsoft.ServiceBus.Messaging;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus;
+using VitalChoice.Interfaces.Services;
 
 namespace ExportWorkerRoleWithSBQueue.Services
 {
@@ -21,7 +24,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
         protected override ObjectEncryptionHost EncryptionHost { get; }
 
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
-        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, IOrderExportService exportService) : base(appOptions)
+        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IOrderExportService exportService) : base(appOptions, loggerProvider)
         {
             _exportService = exportService;
             EncryptionHost = new ObjectEncryptionHost();

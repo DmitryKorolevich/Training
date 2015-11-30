@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Interfaces.Services

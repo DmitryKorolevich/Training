@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
@@ -13,7 +14,7 @@ namespace VitalChoice.Business.Services
     {
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions) : base(appOptions)
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider) : base(appOptions, loggerProvider)
         {
             EncryptionHost = new ObjectEncryptionHost(false);
             var publicKey =
