@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
@@ -23,12 +24,14 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly OrderPaymentMethodMapper _orderPaymentMethodMapper;
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
+        private readonly IProductService _productService;
 
         public OrderMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IEcommerceRepositoryAsync<OrderOptionType> orderRepositoryAsync, OrderAddressMapper orderAddressMapper,
             CustomerMapper customerMapper, DiscountMapper discountMapper,
-            OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper)
+            OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper, ProductMapper productMapper,
+            IProductService productService)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -37,6 +40,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _orderPaymentMethodMapper = orderPaymentMethodMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;
+            _productService = productService;
         }
 
         protected override Expression<Func<OrderOptionValue, int>> ObjectIdReferenceSelector
@@ -91,6 +95,19 @@ namespace VitalChoice.Business.Services.Dynamic
                         Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
                         ProductWithoutSkus = await _productMapper.FromEntityAsync(s.Sku?.Product, withDefaults)
                     }));
+
+                    if (dynamic.Skus != null && dynamic.Skus.Count != 0)
+                    {
+                        var productContents = await _productService.SelectProductContents(dynamic.Skus.Select(p => p.ProductWithoutSkus.Id).ToList());
+                        foreach (var productContent in productContents)
+                        {
+                            var sku = dynamic.Skus.FirstOrDefault(p => p.ProductWithoutSkus.Id == productContent.Id);
+                            if (sku != null)
+                            {
+                                sku.ProductWithoutSkus.Url = productContent.Url;
+                            }
+                        }
+                    }
                 }
 
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;

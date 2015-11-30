@@ -176,8 +176,6 @@ namespace VitalChoice.Business.Services.Products
             return await giftCertificateRepository.Query(expression).SelectAsync(false);
         }
 
-        #region Private
-
         public string GenerateGCCode()
         {
             string toReturn = null;
@@ -200,7 +198,5 @@ namespace VitalChoice.Business.Services.Products
             }
             return toReturn;
         }
-
-        #endregion
     }
 }

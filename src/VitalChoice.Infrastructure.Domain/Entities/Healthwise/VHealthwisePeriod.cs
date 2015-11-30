@@ -21,6 +21,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Healthwise
 
         public string CustomerLastName { get; set; }
 
+        public string CustomerEmail { get; set; }
+
         public int OrdersCount { get; set; }
 
         public decimal OrderSubtotals { get; set; }

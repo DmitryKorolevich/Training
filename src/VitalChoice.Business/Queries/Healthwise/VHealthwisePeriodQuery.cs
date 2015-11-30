@@ -35,5 +35,20 @@ namespace VitalChoice.Business.Queries.Healthwise
             }
             return this;
         }
+
+        public VHealthwisePeriodQuery WithCustomerId(int? idCustomer)
+        {
+            if (idCustomer.HasValue)
+            {
+                Add(x => x.IdCustomer == idCustomer.Value);
+            }
+            return this;
+        }
+
+        public VHealthwisePeriodQuery WithNotPaid()
+        {
+            Add(x => !x.PaidDate.HasValue);
+            return this;
+        }
     }
 }

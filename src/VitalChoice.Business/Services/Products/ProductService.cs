@@ -54,12 +54,17 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
 
-		private async Task<ProductContent> SelectContentForTransfer(int id)
+		public async Task<ProductContent> SelectContentForTransfer(int id)
 		{
 			return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
 		}
 
-		protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
+        public async Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids)
+        {
+            return (await _productContentRepository.Query(p => ids.Contains(p.Id)).Include(p => p.ContentItem).SelectAsync(false)).ToList();
+        }
+
+        protected override IQueryLite<Product> BuildQuery(IQueryLite<Product> query)
         {
             return query.Include(p => p.Skus).ThenInclude(s => s.OptionValues).Include(p => p.ProductsToCategories);
         }

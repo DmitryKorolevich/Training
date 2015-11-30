@@ -38,5 +38,13 @@ angular.module('app.core.dataAccess.services.healthwiseService', [])
 	    {
 	        return $http.post(baseUrl + 'MarkCustomerOrders/' + id, null, getConfig(tracker));
 	    },
+	    getHealthwisePeriodsForMovement: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetHealthwisePeriodsForMovement', filter, getConfig(tracker));
+	    },
+	    moveHealthwiseOrders: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'MoveHealthwiseOrders', model, getConfig(tracker));
+	    },
 	};
 }]);

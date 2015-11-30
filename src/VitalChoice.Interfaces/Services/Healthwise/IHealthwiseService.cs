@@ -21,8 +21,12 @@ namespace VitalChoice.Interfaces.Services.Healthwise
 
         Task<VHealthwisePeriod> GetVHealthwisePeriodAsync(int id);
 
-        Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false);
+        Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false, int? userId=null);
 
         Task<bool> MarkOrdersAsHealthwiseForCustomerIdAsync(int idCustomer);
+
+        Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsForMovementAsync(int idPeriod, int count);
+
+        Task<bool> MoveHealthwiseOrdersAsync(int idPeriod, ICollection<int> ids);
     }
 }

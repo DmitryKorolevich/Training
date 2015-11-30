@@ -5,7 +5,7 @@ GO
 CREATE VIEW [dbo].[VHealthwisePeriods]
 AS
 SELECT hp.Id,hp.StartDate,hp.EndDate, hp.PaidAmount, hp.PaidDate, hp.IdCustomer, 
-	   options.FirstName AS CustomerFirstName, options.LastName AS CustomerLastName,
+	   options.FirstName AS CustomerFirstName, options.LastName AS CustomerLastName, c.Email As CustomerEmail,
 	   ho.Count As OrdersCount, ho.ProductsSubtotals OrderSubtotals, ho.LastOrderDate LastOrderDate
 FROM
 	(SELECT ho.IdHealthwisePeriod, COUNT(ho.IdHealthwisePeriod) As Count, SUM(o.ProductsSubtotal) ProductsSubtotals, MAX(o.DateCreated) As LastOrderDate

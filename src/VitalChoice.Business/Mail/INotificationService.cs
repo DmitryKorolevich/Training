@@ -28,5 +28,7 @@ namespace VitalChoice.Business.Mail
         Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset);
 
         Task SendCustomerServiceEmailAsync(string email, CustomerServiceEmail model);
+
+        Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model);
     }
 }

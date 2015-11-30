@@ -212,6 +212,7 @@
     "app/modules/healthwise/controllers/healthwisePeriodsController.js",
     "app/modules/healthwise/controllers/markOrderController.js",
     "app/modules/healthwise/controllers/markCustomerOrdersController.js",
+    "app/modules/healthwise/controllers/healthwiseDetailController.js",
     "app/modules/healthwise/healthwise.js"
   ]
 }

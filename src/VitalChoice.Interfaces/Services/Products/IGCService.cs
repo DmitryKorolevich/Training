@@ -24,5 +24,7 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<bool> DeleteGiftCertificateAsync(int id);
 
 	    Task<List<GiftCertificate>> GetGiftCertificatesAsync(Expression<Func<GiftCertificate, bool>> expression);
+
+        string GenerateGCCode();
     }
 }

@@ -99,5 +99,10 @@
             });
         };
 
+        $scope.openPeriod = function (id)
+        {
+            $state.go('index.oneCol.healthwiseDetail', { id: id });
+        };
+
         initialize();
     }]);

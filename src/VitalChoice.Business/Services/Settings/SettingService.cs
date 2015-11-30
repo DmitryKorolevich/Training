@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Services.Settings
                                 property.SetValue(toReturn, value, null);
                             }
                         }
-                        if (property.PropertyType == typeof(int?))
+                        if (property.PropertyType == typeof(int?) || property.PropertyType == typeof(int))
                         {
                             int value;
                             if (int.TryParse(setting.Value, out value))

@@ -50,8 +50,7 @@
                         <td>
                             {{::item.FirstName}} {{::item.LastName}}
                         </td>
-                        <td colspan="4">
-                        </td>
+                        <td colspan="4"></td>
                     </tr>
                     <tr data-ng-class="{'paid': period.PaidDate, 'allow-paid': period.AllowPayment}" class="period-row" data-ng-repeat="period in item.Periods">
                         <td>
@@ -67,7 +66,7 @@
                             <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openPeriod(period.Id);">
                                 <i class="fa fa-search"></i>
                             </button>
-                            <button data-ng-if="period.AllowPayment" title="Bill" class="btn btn-default btn-primary btn-xs ma" data-ng-click="pay(item.Id);">
+                            <button data-ng-if="period.AllowPayment" title="Bill" class="btn btn-default btn-primary btn-xs ma" data-ng-click="openPeriod(period.Id);">
                                 Bill
                             </button>
                             <span data-ng-if="period.AllowPayment && period.OrdersCount!=0" class="important">

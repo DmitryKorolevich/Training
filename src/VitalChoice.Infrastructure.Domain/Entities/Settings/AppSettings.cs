@@ -6,6 +6,6 @@
 
         public bool CreditCardAuthorizations { get; set; }
 
-        public int? HealthwisePeriodMaxItemsCount { get; set; }
+        public int HealthwisePeriodMaxItemsCount { get; set; }
     }
 }

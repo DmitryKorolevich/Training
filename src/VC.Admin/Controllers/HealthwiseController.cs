@@ -122,7 +122,14 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
 
-            return await _healthwiseService.MakeHealthwisePeriodPaymentAsync(model.Id, model.Amount, model.Date, model.PayAsGC);
+            var sUserId = Request.HttpContext.User.GetUserId();
+            int tempId;
+            int? userId = null;
+            if (Int32.TryParse(sUserId, out tempId))
+            {
+                userId = tempId;
+            }
+            return await _healthwiseService.MakeHealthwisePeriodPaymentAsync(model.Id, model.Amount, model.Date, model.PayAsGC, userId);
         }
 
         [HttpPost]
@@ -135,6 +142,19 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> MarkCustomerOrders(int id, [FromBody] object model)
         {
             return await _healthwiseService.MarkOrdersAsHealthwiseForCustomerIdAsync(id);
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<HealthwisePeriodListItemModel>>> GetHealthwisePeriodsForMovement([FromBody] HealthwiseOrdersMoveModel model)
+        {
+            var items = await _healthwiseService.GetVHealthwisePeriodsForMovementAsync(model.IdPeriod, model.Ids!=null ? model.Ids.Count : 0);
+            return items.Select(p => new HealthwisePeriodListItemModel(p)).ToList();
+        }
+
+        [HttpPost]
+        public async Task<Result<bool>> MoveHealthwiseOrders([FromBody]HealthwiseOrdersMoveModel model)
+        {
+            return await _healthwiseService.MoveHealthwiseOrdersAsync(model.IdPeriod,model.Ids);
         }
     }
 }
