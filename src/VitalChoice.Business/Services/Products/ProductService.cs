@@ -573,13 +573,42 @@ namespace VitalChoice.Business.Services.Products
             return true;
         }
 
-	    public async Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
+	    public async Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter)
 	    {
-		    return
+		    var temp = 
 			    await
 				    _vCustomerFavoriteRepository.Query(new VCustomerFavoriteQuery().WithCustomerId(filter.IdCustomer))
 					    .OrderBy(x => x.OrderByDescending(z => z.Quantity))
 					    .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+
+		    var productIds = temp.Items.Select(x => x.Id).ToList();
+		    var batch = productIds.Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
+		    var i = 0;
+			var pairs = new List<KeyValuePair<int,string>>();
+            while (batch.Any()) { 
+				pairs.AddRange(_productContentRepository.Query(p => batch.Contains(p.Id)).Select(x=> new KeyValuePair<int, string>(x.Id, x.Url)));
+
+	            i++;
+	            batch = productIds.Skip(i* BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
+            }
+
+			var favorites = new PagedList<VCustomerFavoriteFull>();
+			foreach (var item in temp.Items)
+			{
+				favorites.Items.Add(new VCustomerFavoriteFull
+				{
+					Id = item.Id,
+					IdCustomer = item.Id,
+					ProductName = item.ProductName,
+					ProductThumbnail = item.ProductThumbnail,
+					Quantity = item.Quantity,
+					Url = pairs.Single(x=>x.Key == item.Id).Value
+				});
+			}
+
+		    favorites.Count = temp.Count;
+
+			return favorites;
 	    }
 
         #endregion
@@ -675,7 +704,9 @@ namespace VitalChoice.Business.Services.Products
                             dbProductContent.StatusCode = (RecordStatusCode) model.StatusCode;
                             dbProductContent.ContentItem.Updated = DateTime.Now;
                             dbProductContent.ContentItem.Template = productContent.ContentItem.Template;
-                            dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
+							dbProductContent.ContentItem.Title = productContent.ContentItem.Title;
+	                        dbProductContent.ContentItem.MetaDescription = productContent.ContentItem.MetaDescription;
+							dbProductContent.ContentItem.Description = productContent.ContentItem.Description;
 
                             await _productContentRepository.UpdateAsync(dbProductContent);
                         }

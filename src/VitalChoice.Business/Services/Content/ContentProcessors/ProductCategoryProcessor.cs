@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
@@ -57,8 +58,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             {
                 if (!model.Preview)
                 {
-                    return null;
-                }
+					throw new ApiException("Category not found", HttpStatusCode.NotFound);
+				}
                 targetStatuses.Add(RecordStatusCode.NotActive);
             }
 

@@ -57,7 +57,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<bool> SendProductOutOfStockRequests(ICollection<int> ids);
 
-		Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
+		Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
 
         #endregion
 

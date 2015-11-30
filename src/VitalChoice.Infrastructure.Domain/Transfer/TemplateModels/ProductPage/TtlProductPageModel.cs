@@ -39,7 +39,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public TtlProductPageTabModel DescriptionTab { get; set; }
 
-	    public TtlProductPageTabModel IngredientsTab { get; set; }
+	    public TtlProductIngredientsTabModel IngredientsTab { get; set; }
 
 	    public TtlProductRecipesTabModel RecipesTab { get; set; }
 
