@@ -1,17 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Infrastructure.ServiceBus
+namespace VitalChoice.Business.Services
 {
     public abstract class EncryptedServiceBusClient : IDisposable
     {
-        private readonly IEncryptedServiceBusClientHost _encryptedBus;
-        private bool IsAuthenticated =>_encryptedBus.IsAuthenticatedClient(SessionId);
+        private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
+        private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusClientHost encryptedBus)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
         {
-            _encryptedBus = encryptedBus;
+            _encryptedBusHost = encryptedBusHost;
         }
 
         public Guid SessionId { get; } = new Guid();
@@ -20,26 +22,26 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             if (!IsAuthenticated)
             {
-                if (!_encryptedBus.AuthenticateClient(SessionId))
+                if (!_encryptedBusHost.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
             }
 
-            return _encryptedBus.ExecuteCommand<T>(command);
+            return _encryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        protected void RunCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
+        protected void ProcessCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
         {
             if (!IsAuthenticated)
             {
-                if (!_encryptedBus.AuthenticateClient(SessionId))
+                if (!_encryptedBusHost.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
             }
 
-            _encryptedBus.RunCommand(command, requestAcqureAction);
+            _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
         }
 
         protected void Dispose(bool disposing)
@@ -48,7 +50,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 GC.SuppressFinalize(this);
             }
-            _encryptedBus.RemoveClient(SessionId);
+            _encryptedBusHost.RemoveClient(SessionId);
         }
 
         public void Dispose()

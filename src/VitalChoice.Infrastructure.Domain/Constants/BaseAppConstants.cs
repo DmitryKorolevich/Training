@@ -10,6 +10,7 @@
         public const int DEFAULT_TEXTAREA_FIELD_MAX_SIZE = 250;
         public const int DEFAULT_BIG_TEXT_FIELD_MAX_SIZE = 1000;
         public const int DEFAULT_EMAIL_FIELD_MAX_SIZE = 1000;
+        public const int DEFAULT_MAX_ALLOWED_PARAMS_SQL = 100;
         public const string DEFAULT_FORM_FIELD_NAME = "Field";
     }
 }
