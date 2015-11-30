@@ -148,6 +148,9 @@ namespace VC.Admin.Models.Product
         [Map]
         public string NutritionalTitle { get; set; }
 
+		[Map]
+        public string IngredientsTitle { get; set; }
+
         [Map]
         public string ServingSize { get; set; }
 

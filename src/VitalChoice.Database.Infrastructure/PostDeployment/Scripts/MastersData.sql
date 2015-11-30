@@ -2157,7 +2157,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<span class="facts-nutrition-title">@(NutritionalTitle)</span>%' AND [Name] = 'Product page')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<span class="facts-bottom-hint">%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -2398,7 +2398,7 @@ BEGIN
                 }}
             }}
         }}
-		@(IngredientsTab):param(Name) {{
+		@(IngredientsTab) {{
 		    @if(){{
 		        @ifnot(Hidden){{
 		            <div id="tabs-nutrition">
@@ -2406,12 +2406,12 @@ BEGIN
     		            
     		            @if(@model.NutritionalTitle != null){{
     		                @if(@model.Content != null){{
-    		                    <span class="ingredients-section-begin margin-top-big">Ingredients:</span>
+    		                    <span class="ingredients-section-begin margin-top-medium">Ingredients:</span>
     		                }}
     		                @if(@model.Content == null){{
     		                    <span class="ingredients-section-begin">Ingredients:</span>
     		                }}
-				            <span class="ingredients-product-title">@(@chained)</span>
+				            <span class="ingredients-product-title">@(IngredientsTitle)</span>
 				            <hr/>
 				            <div class="ingredients-nutrition-facts">
 					            <div class="nutrition-facts-line">
@@ -2487,6 +2487,9 @@ BEGIN
 				        	    <hr/>
 					            <div class="nutrition-facts-line">
 						            <span class="facts-info-line">@(AdditionalNotes)</span>
+				        	    </div>
+				        	    <div class="nutrition-facts-line">
+						            <span class="facts-bottom-hint">* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.</span>
 				        	    </div>
 			        	    </div>
 			        	}}

@@ -30,6 +30,7 @@
 				resizable: false,
 				modal: true,
 				minWidth: defaultModalSize,
+				dialogClass: "product-reviews-dialog",
 				open: function () {
 					grecaptcha.render('googleCaptcha', {
 						'sitekey': captchaSiteKey

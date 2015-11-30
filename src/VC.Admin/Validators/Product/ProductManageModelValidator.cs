@@ -145,7 +145,10 @@ namespace VC.Admin.Validators.Product
                 RuleFor(model => model.NutritionalTitle)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.NutritionalTitle, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
-                RuleFor(model => model.ServingSize)
+				RuleFor(model => model.IngredientsTitle)
+				   .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+				   .WithMessage(model => model.IngredientsTitle, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+				RuleFor(model => model.ServingSize)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.ServingSize, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
                 RuleFor(model => model.Servings)

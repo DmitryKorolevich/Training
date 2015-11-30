@@ -9,7 +9,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 	{
 		public string NutritionalTitle { get; set; }
 
-		public string ServingSize { get; set; }
+	    public string IngredientsTitle { get; set; }
+
+	    public string ServingSize { get; set; }
 
 		public string Servings { get; set; }
 

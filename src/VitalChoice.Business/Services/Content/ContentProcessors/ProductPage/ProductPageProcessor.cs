@@ -156,7 +156,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
 	        var productContent = model.Model;
-	        if (eProduct.CategoryIds.Any())
+
+			//BUG: this bullshit I had to implement following Alex's architecture, needs to refactored
+			var title = productContent.ContentItem.Title;
+	        productContent.ContentItem.Title = !string.IsNullOrWhiteSpace(title)
+		        ? title
+		        : $"{eProduct.Name} | {eProduct.Data.SubTitle}";
+			//end of bullshit
+
+			if (eProduct.CategoryIds.Any())
 	        {
 				BuildBreadcrumb(rootNavCategory, eProduct.CategoryIds.First(), breadcrumbItems);
 				breadcrumbItems.Add(new TtlBreadcrumbItemModel()
@@ -267,6 +275,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			        Content = eProduct.Data.Ingredients,
 			        Hidden = eProduct.Data.IngredientsHide,
                     NutritionalTitle = eProduct.Data.NutritionalTitle,
+					IngredientsTitle = eProduct.Data.IngredientsTitle,
 					ServingSize = eProduct.Data.ServingSize,
 					Servings = eProduct.Data.Servings,
 					Calories = eProduct.Data.Calories,
