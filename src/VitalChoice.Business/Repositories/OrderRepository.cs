@@ -20,18 +20,17 @@ namespace VitalChoice.Business.Repositories
         {
         }
 
-        public async Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
+        public Task<List<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids)
         {
             var query = this.DbSet.Where(p => ids.Contains(p.IdCustomer) && p.StatusCode!=(int)RecordStatusCode.Deleted);
             
-            var toReturn = query.GroupBy(p => p.IdCustomer).Select(g => new CustomerOrderStatistic()
+            return query.GroupBy(p => p.IdCustomer).Select(g => new CustomerOrderStatistic()
             {
                 IdCustomer = g.Key,
                 TotalOrders = g.Count(),
                 FirstOrderPlaced = g.Min(p => p.DateCreated),
                 LastOrderPlaced = g.Max(p => p.DateCreated),
-            }).ToList();
-            return toReturn;
+            }).ToListAsync();
         }
     }
 }
