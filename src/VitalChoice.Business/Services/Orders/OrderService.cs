@@ -458,14 +458,18 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
         {
             var order = await this.SelectAsync(orderId);
+            if(order==null)
+            {
+                throw new AppValidationException("Invalid order #");
+            }
             if (order==null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || 
                 order.OrderStatus == OrderStatus.Shipped))
             {
-                return false;
+                throw new AppValidationException("The given order can'be flagged");
             }
             if(!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType!= (int?)SourceOrderType.Web)
             {
-                return false;
+                throw new AppValidationException("The given order can'be flagged");
             }
 
             if (!isHealthwise)

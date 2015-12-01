@@ -86,7 +86,7 @@
                 {
                     $scope.filterItems();
                 }
-            });
+            }, { size: 'xs' });
         };
 
         $scope.flagCustomer = function ()
@@ -96,7 +96,7 @@
                 {
                     $scope.filterItems();
                 }
-            });
+            }, { size: 'xs' });
         };
 
         $scope.openPeriod = function (id)

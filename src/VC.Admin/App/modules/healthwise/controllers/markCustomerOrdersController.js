@@ -64,13 +64,7 @@ angular.module('app.modules.healthwise.controllers.markCustomerOrdersController'
                     healthwiseService.markCustomerOrders(id, $scope.refreshTracker)
                         .success(function (result)
                         {
-                            if (result.Success)
-                            {
-                                successHandler(result);
-                            } else
-                            {
-                                errorHandler(result);
-                            }
+                            successHandler(result);
                         })
                         .error(function (result)
                         {
