@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using Autofac;
+using ExportWorkerRoleWithSBQueue;
 using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.Azure;
 using Microsoft.Extensions.OptionsModel;
@@ -9,7 +10,7 @@ using Microsoft.ServiceBus;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using VitalChoice.Infrastructure.Domain.Options;
 
-namespace ExportWorkerRoleWithSBQueue
+namespace ExportWorker
 {
     public class WorkerRole : RoleEntryPoint
     {

@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.ServiceBus.Messaging;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 

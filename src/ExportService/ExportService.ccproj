@@ -34,25 +34,25 @@
   </PropertyGroup>
   <!-- Items for the project -->
   <ItemGroup>
+    <ProjectReference Include="..\ExportWorker\ExportWorker.csproj">
+      <Name>ExportWorker</Name>
+      <Project>{50d88950-b576-4d70-8ef0-529987eacd63}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>ExportWorker</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ServiceDefinition Include="ServiceDefinition.csdef" />
     <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExportWorkerRoleWithSBQueue\ExportWorkerRoleWithSBQueue.xproj">
-      <Name>ExportWorkerRoleWithSBQueue</Name>
-      <Project>{59befc7a-2594-4bce-9c14-00041d455837}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>ExportWorkerRoleWithSBQueue</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
+    <Folder Include="ExportWorkerContent\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ExportWorkerRoleWithSBQueueContent\" />
-  </ItemGroup>
-  <ItemGroup>
-    <DiagnosticsConfiguration Include="ExportWorkerRoleWithSBQueueContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="ExportWorkerContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
@@ -61,6 +61,7 @@
   </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(ProjectDir)\..\ExportWorkerRoleWithSBQueue\build.cmd $(ProjectDir)\..\..</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

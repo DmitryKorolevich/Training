@@ -14,9 +14,6 @@
   },
   "frameworks": {
     "dnx451": {
-      "frameworkAssemblies": {
-        "Microsoft.WindowsAzure.ServiceRuntime": "2.7.0.0"
-      }
     }
   }
 }

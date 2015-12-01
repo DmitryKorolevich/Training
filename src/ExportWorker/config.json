@@ -1,0 +1,26 @@
+﻿{
+  "App": {
+    "DefaultCacheExpirationTermMinutes": 1440,
+    "ActivationTokenExpirationTermDays": 3,
+    "DefaultCultureId": "en-US",
+    "Connection": {
+      "UserName": "dev_vcdb_login",
+      "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+      "Server": "vw4v86cs0h.database.windows.net"
+    },
+    "ExportService": {
+      "ConnectionString": "",
+      "PlainQueueName": "PlainQueue",
+      "EncryptedQueueName": "EncryptedQueue"
+    },
+    "Avatax": {
+      "AccountNumber": "1100019190",
+      "LicenseKey": "B50461EFC03F20AB",
+      "ServiceUrl": "https://avatax.avalara.net/",
+      "AccountName": "Vital Choice Seafood Inc",
+      "ProfileName": "Vital Choice",
+      "CompanyCode": "VC001",
+      "TurnOffCommit": true
+    }
+  }
+}

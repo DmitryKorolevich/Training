@@ -1,19 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using Autofac;
-using Autofac.Builder;
 using Autofac.Extensions.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services;
@@ -30,12 +24,15 @@ using VitalChoice.Business.Services.Products;
 using VitalChoice.Business.Services.Settings;
 using VitalChoice.Business.Services.Users;
 using VitalChoice.Business.Services.Workflow;
+using VitalChoice.ContentProcessing.Helpers;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Customs;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
+using VitalChoice.DynamicData.Extensions;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Context;
@@ -45,6 +42,7 @@ using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Ecommerce;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Identity.UserStores;
 using VitalChoice.Interfaces.Services;
@@ -59,10 +57,6 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Workflow.Core;
-using VitalChoice.DynamicData.Extensions;
-using VitalChoice.DynamicData.Helpers;
-using VitalChoice.ContentProcessing.Helpers;
-using VitalChoice.Infrastructure.Ecommerce;
 
 namespace ExportWorkerRoleWithSBQueue
 {
@@ -70,11 +64,7 @@ namespace ExportWorkerRoleWithSBQueue
     {
         internal static IContainer BuildContainer()
         {
-            var applicationEnvironment =
-                (IApplicationEnvironment)
-                    CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
             var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(applicationEnvironment.ApplicationBasePath)
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);
 
@@ -139,7 +129,7 @@ namespace ExportWorkerRoleWithSBQueue
             //        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
             //    .As(typeof (ILogger<>));
 
-            var container = BuildContainer(typeof(WorkerRole).GetTypeInfo().Assembly, builder);
+            var container = BuildContainer(typeof(Configuration).GetTypeInfo().Assembly, builder);
             return container;
         }
 

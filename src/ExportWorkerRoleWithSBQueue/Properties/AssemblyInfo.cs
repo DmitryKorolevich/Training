@@ -21,3 +21,4 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("59befc7a-2594-4bce-9c14-00041d455837")]
+[assembly:InternalsVisibleTo("ExportWorker")]

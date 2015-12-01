@@ -12,19 +12,22 @@ namespace WorkerBuilder
     public class Program
     {
         private static string _outRoot;
+
         private static readonly ILibraryExporter LibraryManager =
-            (ILibraryExporter)CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(ILibraryExporter));
+            (ILibraryExporter) CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (ILibraryExporter));
 
         private static readonly IApplicationEnvironment Environment =
             (IApplicationEnvironment)
-                CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));
+                CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
 
-        private static string ConvertMetadataReference(IMetadataReference metadataReference)
+        private static string ConvertMetadataReference(IMetadataReference metadataReference, bool getPathsOnly)
         {
             var embeddedReference = metadataReference as IMetadataEmbeddedReference;
 
             if (embeddedReference != null)
             {
+                if (getPathsOnly)
+                    return Path.Combine(_outRoot, embeddedReference.Name + ".dll");
                 using (var file = File.OpenWrite(Path.Combine(_outRoot, embeddedReference.Name + ".dll")))
                 {
                     file.Write(embeddedReference.Contents, 0, embeddedReference.Contents.Length);
@@ -38,7 +41,10 @@ namespace WorkerBuilder
             {
                 if (fileMetadataReference.Path.ToLowerInvariant().Contains("\\.dnx"))
                 {
-                    using (var file = File.OpenWrite(Path.Combine(_outRoot, Path.GetFileName(fileMetadataReference.Path))))
+                    if (getPathsOnly)
+                        return Path.Combine(_outRoot, Path.GetFileName(fileMetadataReference.Path));
+                    using (
+                        var file = File.OpenWrite(Path.Combine(_outRoot, Path.GetFileName(fileMetadataReference.Path))))
                     {
                         using (var readFile = File.OpenRead(fileMetadataReference.Path))
                         {
@@ -47,6 +53,8 @@ namespace WorkerBuilder
                         }
                     }
                 }
+                if (getPathsOnly)
+                    return null;
                 return fileMetadataReference.Path;
             }
 
@@ -55,10 +63,18 @@ namespace WorkerBuilder
             {
                 if (projectReference.Name != "WorkerBuilder")
                 {
-                    using (var file = File.OpenWrite(Path.Combine(_outRoot, projectReference.Name + ".dll")))
+                    string folderName = Path.Combine(_outRoot, projectReference.Name);
+                    if (getPathsOnly)
+                        return Path.Combine(_outRoot, projectReference.Name + ".dll");
+                    var emitResult = projectReference.EmitAssembly(folderName);
+                    if (!emitResult.Success)
                     {
-                        projectReference.EmitReferenceAssembly(file);
+                        throw new InvalidOperationException($"{string.Join("\n", emitResult.Diagnostics.Select(d => d.FormattedMessage))}");
                     }
+                    File.Copy(Path.Combine(folderName, projectReference.Name + ".dll"), folderName + ".dll", true);
+                    File.Copy(Path.Combine(folderName, projectReference.Name + ".pdb"), folderName + ".pdb", true);
+                    File.Copy(Path.Combine(folderName, projectReference.Name + ".xml"), folderName + ".xml", true);
+                    Directory.Delete(folderName, true);
                 }
                 return null;
             }
@@ -66,7 +82,7 @@ namespace WorkerBuilder
             throw new NotSupportedException();
         }
 
-        private static List<string> GetMetadataReferences()
+        private static List<string> GetMetadataReferences(bool getPathsOnly = false)
         {
             var references = new List<string>();
             //var libraryExport = LibraryManager.GetExport(Environment.ApplicationName);
@@ -83,7 +99,7 @@ namespace WorkerBuilder
             //    }
             //}
             var export = LibraryManager.GetAllExports(Environment.ApplicationName);
-            references.AddRange(export.MetadataReferences.Select(ConvertMetadataReference));
+            references.AddRange(export.MetadataReferences.Select(r => ConvertMetadataReference(r, getPathsOnly)));
 
             return references;
         }
@@ -92,21 +108,37 @@ namespace WorkerBuilder
         {
             _outRoot = Path.GetFullPath(args[0]);
             Console.WriteLine($"Publish Root {_outRoot}");
-            bool silent = false;
-            if (args.Length > 1)
-                silent = args[1] == "-silent";
-            var refs = GetMetadataReferences();
+            var silent = args.Any(a => a == "-silent");
+            var createListFile = args.Any(a => a == "-list");
+            List<string> refs;
+            try
+            {
+                refs = GetMetadataReferences(createListFile);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                return;
+            }
             if (!silent)
             {
                 Console.WriteLine("Using following references:");
                 Console.WriteLine(string.Join("\n", refs.Where(r => r != null)));
             }
-            Console.WriteLine(
-                $"Writing {Path.Combine(_outRoot, @"ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt")} file.");
-            File.WriteAllText(Path.Combine(_outRoot, @"ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt"),
-                string.Join("\r\n",
-                    Directory.GetFileSystemEntries(_outRoot, "*.*", SearchOption.TopDirectoryOnly)
-                        .Where(s => !s.Contains("ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt"))));
+            if (createListFile)
+            {
+                Console.WriteLine(
+                    $"Writing {Path.Combine(_outRoot, @"ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt")} file.");
+                File.WriteAllText(Path.Combine(_outRoot, @"ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt"),
+                    string.Join("\r\n",
+                        refs.Where(
+                            s => s != null && !s.Contains("ExportWorkerRoleWithSBQueue.xproj.FileListAbsolute.txt") && !s.Contains("ExportWorkerRoleWithSBQueue."))
+                            .Select(
+                                s =>
+                                    s.Replace("\\obj\\Debug\\", "\\bin\\").Replace("\\obj\\Release\\", "\\bin\\"))
+                            .Union(new[] {Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.pdb"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.dll"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.xml"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.dll") })));
+            }
         }
     }
 }
