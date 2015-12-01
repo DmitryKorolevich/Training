@@ -535,8 +535,7 @@ namespace VitalChoice.Business.Services.Orders
                 .WithoutIncomplete(filter.OrderStatus)
                 .WithOrderSource(filter.IdOrderSource)
                 .WithPOrderType(filter.POrderType)
-                .
-                WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
+                .WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
 

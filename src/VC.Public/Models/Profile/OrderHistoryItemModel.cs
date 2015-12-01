@@ -12,5 +12,7 @@ namespace VC.Public.Models.Profile
 		public DateTime DateCreated { get; set; }
 
 		public OrderStatus OrderStatus { get; set; }
-	}
+
+        public bool Healthwise { get; set; }
+    }
 }

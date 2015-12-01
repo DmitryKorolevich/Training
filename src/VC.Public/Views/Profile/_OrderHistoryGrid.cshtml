@@ -39,7 +39,7 @@
 					<td>@infrastructure.OrderStatuses.Single(x => x.Key == (int)item.OrderStatus).Text</td>
 					<td>@item.Total.ToString("C2")</td>
 					<td>@item.DateCreated.ToString("MM/dd/yyyy")</td>
-					<td>No</td>
+					<td>@(item.Healthwise ? "Yes" : "No")</td>
 					<td>@Html.ActionLink("Help Desk","HelpTickets", new { idorder= item.Id})</td>
 				</tr>
 			}

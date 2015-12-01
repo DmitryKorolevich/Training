@@ -63,16 +63,15 @@ namespace VC.Public.Controllers
             _helpService = helpService;
         }
 
-        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(ShortOrderFilter filter)
+        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
         {
             var internalId = GetInternalCustomerId();
 
             filter.IdCustomer = internalId;
             filter.Sorting.SortOrder = SortOrder.Desc;
-            filter.Sorting.Path = OrderSortPath.OrderDate;
-
-
-            var orders = await _orderService.GetShortOrdersAsync(filter);
+            filter.Sorting.Path = VOrderSortPath.DateCreated;
+            
+            var orders = await _orderService.GetOrdersAsync(filter);
 
             var ordersModel = new PagedListEx<OrderHistoryItemModel>
             {
@@ -81,7 +80,8 @@ namespace VC.Public.Controllers
                     DateCreated = p.DateCreated,
                     Total = p.Total,
                     Id = p.Id,
-                    OrderStatus = p.OrderStatus
+                    OrderStatus = p.OrderStatus,
+                    Healthwise = p.Healthwise,
                 }).ToList(),
                 Count = orders.Count,
                 Index = filter.Paging.PageIndex
@@ -487,12 +487,12 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> OrderHistory()
         {
-            var filter = new ShortOrderFilter();
+            var filter = new VOrderFilter();
 
             return View(await PopulateHistoryModel(filter));
         }
 
-        public async Task<IActionResult> RefreshOrderHistory(ShortOrderFilter filter)
+        public async Task<IActionResult> RefreshOrderHistory(VOrderFilter filter)
         {
             var model = await PopulateHistoryModel(filter);
 

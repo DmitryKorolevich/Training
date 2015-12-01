@@ -33,6 +33,11 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<IdModel>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             builder.Entity<VCustomerFavorite>(entity =>
             {
                 entity.HasKey(x => x.Id);
