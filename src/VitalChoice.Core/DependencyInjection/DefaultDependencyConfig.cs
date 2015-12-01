@@ -79,6 +79,8 @@ using VitalChoice.Infrastructure.Cache;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Business.Services.Healthwise;
+using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Ecommerce;
 
@@ -427,6 +429,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<VitalGreenService>().As<IVitalGreenService>();
             builder.RegisterType<StylesService>().As<IStylesService>();
             builder.RegisterType<CatalogRequestAddressService>().As<ICatalogRequestAddressService>();
+            builder.RegisterType<HealthwiseService>().As<IHealthwiseService>();
             builder.RegisterMappers(typeof (ProductService).GetTypeInfo().Assembly);
             builder.RegisterModelConverters(projectAssembly);
 

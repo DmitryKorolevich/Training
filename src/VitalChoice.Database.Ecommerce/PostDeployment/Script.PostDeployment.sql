@@ -26,3 +26,4 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetAffiliatesSummaryReport.sql
 :r .\Scripts\VSkus.sql
 :r .\Scripts\VAffiliateNotPaidCommissions.sql
+:r .\Scripts\VHealthwisePeriods.sql

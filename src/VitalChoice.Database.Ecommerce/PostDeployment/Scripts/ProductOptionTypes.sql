@@ -861,3 +861,16 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS (SELECT [Id] FROM [ProductOptionTypes] WHERE Name = N'IngredientsTitle')
+BEGIN
+	INSERT INTO ProductOptionTypes
+	(DefaultValue, IdFieldType, IdObjectType, Name)
+	SELECT NULL, 4, 1, N'IngredientsTitle'
+	UNION
+	SELECT NULL, 4, 2, N'IngredientsTitle'
+	UNION
+	SELECT NULL, 4, 3, N'IngredientsTitle'
+	UNION
+	SELECT NULL, 4, 4, N'IngredientsTitle'
+END

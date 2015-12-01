@@ -227,6 +227,8 @@ namespace VC.Admin.Controllers
             content.ContentItem = new ContentItem();
             content.ContentItem.Template = String.Empty;
             content.ContentItem.Description = String.Empty;
+	        content.ContentItem.Title = model.MetaTitle;
+	        content.ContentItem.MetaDescription = model.MetaDescription;
             transferEntity.ProductContent = content;
             transferEntity.ProductDynamic = item;
 

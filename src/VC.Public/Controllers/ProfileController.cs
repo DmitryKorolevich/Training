@@ -38,8 +38,9 @@ namespace VC.Public.Controllers
     public class ProfileController : BaseMvcController
     {
         private const string TicketCommentMessageTempData = "ticket-comment-messsage";
+		private const string ProductBaseUrl = "/product/";
 
-        private readonly IHttpContextAccessor _contextAccessor;
+		private readonly IHttpContextAccessor _contextAccessor;
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly ICustomerService _customerService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
@@ -62,16 +63,15 @@ namespace VC.Public.Controllers
             _helpService = helpService;
         }
 
-        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(ShortOrderFilter filter)
+        private async Task<PagedListEx<OrderHistoryItemModel>> PopulateHistoryModel(VOrderFilter filter)
         {
             var internalId = GetInternalCustomerId();
 
             filter.IdCustomer = internalId;
             filter.Sorting.SortOrder = SortOrder.Desc;
-            filter.Sorting.Path = OrderSortPath.OrderDate;
-
-
-            var orders = await _orderService.GetShortOrdersAsync(filter);
+            filter.Sorting.Path = VOrderSortPath.DateCreated;
+            
+            var orders = await _orderService.GetOrdersAsync(filter);
 
             var ordersModel = new PagedListEx<OrderHistoryItemModel>
             {
@@ -80,7 +80,8 @@ namespace VC.Public.Controllers
                     DateCreated = p.DateCreated,
                     Total = p.Total,
                     Id = p.Id,
-                    OrderStatus = p.OrderStatus
+                    OrderStatus = p.OrderStatus,
+                    Healthwise = p.Healthwise,
                 }).ToList(),
                 Count = orders.Count,
                 Index = filter.Paging.PageIndex
@@ -447,7 +448,7 @@ namespace VC.Public.Controllers
             {
 	            lines.AddRange(lastOrder.Skus.Select(skuOrdered => new LastOrderLineModel()
 	            {
-		            ProductUrl = skuOrdered.ProductWithoutSkus.Url, IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail, ProductName = skuOrdered.ProductWithoutSkus.Name, PortionsCount = skuOrdered.Sku.Data.QTY, Quantity = skuOrdered.Quantity, SelectedPrice = skuOrdered.Amount.ToString("C2"), SkuCode = skuOrdered.Sku.Code
+		            ProductUrl = ProductBaseUrl + skuOrdered.ProductWithoutSkus.Url, IconLink = skuOrdered.ProductWithoutSkus.Data.Thumbnail, ProductName = skuOrdered.ProductWithoutSkus.Name, PortionsCount = skuOrdered.Sku.Data.QTY, Quantity = skuOrdered.Quantity, SelectedPrice = skuOrdered.Amount.ToString("C2"), SkuCode = skuOrdered.Sku.Code
 	            }));
             }
 
@@ -473,11 +474,10 @@ namespace VC.Public.Controllers
 
             var model = favorites.Items.Select(favorite => new FavoriteModel()
             {
-                //TODO - add reading Url from Infrastructure
                 ProductName = favorite.ProductName,
                 ProductThumbnail = favorite.ProductThumbnail,
-                Url = String.Empty
-            }).ToList();
+                Url = ProductBaseUrl + favorite.Url
+			}).ToList();
 
             ViewBag.MoreExist = !all && favorites.Count > filter.Paging.PageItemCount;
 
@@ -487,12 +487,12 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> OrderHistory()
         {
-            var filter = new ShortOrderFilter();
+            var filter = new VOrderFilter();
 
             return View(await PopulateHistoryModel(filter));
         }
 
-        public async Task<IActionResult> RefreshOrderHistory(ShortOrderFilter filter)
+        public async Task<IActionResult> RefreshOrderHistory(VOrderFilter filter)
         {
             var model = await PopulateHistoryModel(filter);
 

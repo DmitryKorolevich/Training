@@ -3,6 +3,13 @@ using Microsoft.AspNet.Mvc;
 using VC.Public.Models;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Interfaces.Services.Content;
+using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.Mvc.Abstractions;
+using System.IO;
+using Microsoft.AspNet.Mvc.ViewEngines;
+using Microsoft.AspNet.Mvc.Rendering;
 
 namespace VC.Public.Controllers.Content
 {
@@ -44,12 +51,38 @@ namespace VC.Public.Controllers.Content
         [HttpGet]
         public async Task<IActionResult> ContentPage(string url)
         {
+            //var result = await RenderPartialViewToString("~/Views/Help/ContactCustomerService.cshtml", null);
+
             var toReturn = await _contentPageViewService.GetContentAsync(GetParameters());
             if (toReturn != null)
             {
                 return BaseView(new ContentPageViewModel(toReturn));
             }
             return BaseNotFoundView();
+        }
+
+        public async Task<string> RenderPartialViewToString(string viewName, object model)
+        {
+            ModelStateDictionary modelState = new ModelStateDictionary();
+            ViewDataDictionary viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), modelState);
+            ITempDataDictionary tempData = HttpContext.RequestServices.GetService(typeof(ITempDataDictionary)) as ITempDataDictionary;
+            RouteData routeData = new RouteData();
+            ActionDescriptor actionDescriptor = new ActionDescriptor();
+            ActionContext actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
+
+            viewData.Model = model;
+
+            using (StringWriter sw = new StringWriter())
+            {
+                var engine = HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
+                ViewEngineResult viewResult = engine.FindPartialView(actionContext, viewName);
+
+                ViewContext viewContext = new ViewContext(actionContext, viewResult.View, viewData, tempData, sw, new HtmlHelperOptions());
+
+                await viewResult.View.RenderAsync(viewContext);
+
+                return sw.GetStringBuilder().ToString();
+            }
         }
     }
 }

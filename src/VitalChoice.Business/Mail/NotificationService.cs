@@ -159,5 +159,20 @@ namespace VitalChoice.Business.Mail
 
             await emailSender.SendEmailAsync(email, subject, body);
         }
+
+        public async Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model)
+        {
+            var body =
+                $"<p>Your Vital Choice Gift Certificate(s):</p><p>";            
+            foreach (var item in model.Data)
+            {
+                body += $"{item.Key}({item.Value:c} available)<br/>";
+            }
+            body += "</p>";
+
+            var subject = "Your Vital Choice Gift Certificate(s)";
+
+            await emailSender.SendEmailAsync(email, subject, body, toDisplayName: model.FirstName+" "+model.LastName);
+        }
     }
 }

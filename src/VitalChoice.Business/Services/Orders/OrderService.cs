@@ -417,45 +417,59 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
                         var dateNow = DateTime.Now;
-                        var period = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id && dateNow >= p.StartDate && dateNow < p.EndDate).Include(p => p.HealthwiseOrders).SelectAsync(false)).FirstOrDefault();
-                        if (period == null || period.HealthwiseOrders.Count >= maxCount)
+                        var periods = (await healthwisePeriodRepository.Query(p => p.IdCustomer == model.Customer.Id &&
+                            dateNow >= p.StartDate && dateNow < p.EndDate && !p.PaidDate.HasValue).
+                            Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+
+                        bool addedToPeriod = false;
+                        foreach (var period in periods)
                         {
-                            period = new HealthwisePeriod();
+                            if (period.HealthwiseOrders.Count < maxCount)
+                            {
+                                healthwiseOrder = new HealthwiseOrder()
+                                {
+                                    Id = model.Id,
+                                    IdHealthwisePeriod = period.Id
+                                };
+                                _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
+                                addedToPeriod = true;
+                                break;
+                            }
+                        }
+                        if (!addedToPeriod)
+                        {
+                            var period = new HealthwisePeriod();
                             period.IdCustomer = model.Customer.Id;
                             period.StartDate = dateNow;
                             period.EndDate = period.StartDate.AddYears(1);
                             period.HealthwiseOrders = new List<HealthwiseOrder>()
-                        {
-                            new HealthwiseOrder() { Id=model.Id }
-                        };
-                            healthwisePeriodRepository.InsertGraph(period);
-                        }
-                        else
-                        {
-                            healthwiseOrder = new HealthwiseOrder()
                             {
-                                Id = model.Id,
-                                IdHealthwisePeriod = period.Id
+                                new HealthwiseOrder() { Id=model.Id }
                             };
-                            healthwiseOrderRepository.Insert(healthwiseOrder);
+                            _healthwisePeriodRepositoryAsync.InsertGraph(period);
                         }
+
                         await uow.SaveChangesAsync();
                     }
                 }
             }
         }
 
-        public async Task<bool> UpdateHealthwiseOrder(int orderId, bool isHealthwise)
+        public async Task<bool> UpdateHealthwiseOrderAsync(int orderId, bool isHealthwise)
         {
             var order = await this.SelectAsync(orderId);
+            if(order==null)
+            {
+                throw new AppValidationException("Invalid order #");
+            }
             if (order==null || !(order.OrderStatus == OrderStatus.Processed || order.OrderStatus == OrderStatus.Exported || 
                 order.OrderStatus == OrderStatus.Shipped))
             {
-                return false;
+                throw new AppValidationException("The given order can'be flagged");
             }
             if(!order.DictionaryData.ContainsKey("OrderType") || order.Data.OrderType!= (int?)SourceOrderType.Web)
             {
-                return false;
+                throw new AppValidationException("The given order can'be flagged");
             }
 
             if (!isHealthwise)
@@ -468,30 +482,36 @@ namespace VitalChoice.Business.Services.Orders
                 if (healthwiseOrder == null)
                 {
                     var maxCount = _appInfrastructureService.Get().AppSettings.HealthwisePeriodMaxItemsCount;
-                    var dateNow = DateTime.Now;
-                    var period = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id && 
-                        dateNow >= p.StartDate && dateNow < p.EndDate).Include(p => p.HealthwiseOrders).
-                        SelectAsync(false)).FirstOrDefault();
-                    if (period == null || period.HealthwiseOrders.Count >= maxCount)
+                    var orderCreatedDate = order.DateCreated;
+                    var periods = (await _healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == order.Customer.Id &&
+                        orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).
+                        Include(p => p.HealthwiseOrders).SelectAsync(false)).ToList();
+                    bool addedToPeriod = false;
+                    foreach (var period in periods)
                     {
-                        period = new HealthwisePeriod();
+                        if (period.HealthwiseOrders.Count < maxCount)
+                        {
+                            healthwiseOrder = new HealthwiseOrder()
+                            {
+                                Id = orderId,
+                                IdHealthwisePeriod = period.Id
+                            };
+                            _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
+                            addedToPeriod = true;
+                            break;
+                        }
+                    }
+                    if (!addedToPeriod)
+                    {
+                        var period = new HealthwisePeriod();
                         period.IdCustomer = order.Customer.Id;
-                        period.StartDate = dateNow;
+                        period.StartDate = orderCreatedDate;
                         period.EndDate = period.StartDate.AddYears(1);
                         period.HealthwiseOrders = new List<HealthwiseOrder>()
                         {
                             new HealthwiseOrder() { Id=orderId }
                         };
                         _healthwisePeriodRepositoryAsync.InsertGraph(period);
-                    }
-                    else
-                    {
-                        healthwiseOrder = new HealthwiseOrder()
-                        {
-                            Id = orderId,
-                            IdHealthwisePeriod = period.Id
-                        };
-                        _healthwiseOrderRepositoryAsync.Insert(healthwiseOrder);
                     }
                 }
             }
@@ -515,8 +535,7 @@ namespace VitalChoice.Business.Services.Orders
                 .WithoutIncomplete(filter.OrderStatus)
                 .WithOrderSource(filter.IdOrderSource)
                 .WithPOrderType(filter.POrderType)
-                .
-                WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
+                .WithCustomerType(filter.IdCustomerType).WithShippingMethod(filter.IdShippingMethod);
 
             var query = _vOrderRepository.Query(conditions);
 

@@ -1352,6 +1352,9 @@ footer {
 .margin-top-medium {
   margin-top: 30px !important;
 }
+.margin-top-big {
+  margin-top: 50px !important;
+}
 .margin-bottom-medium {
   margin-bottom: 30px !important;
 }
@@ -1587,14 +1590,14 @@ footer {
   border: 0;
   background-color: transparent;
   color: #000000;
-  font-size: 12px;
-  margin: 7px 0 7px 5px;
+  font-size: 13px;
+  margin: 6px 0 6px 0px;
 }
 .product-main .product-portion-line .product-best-value {
   color: #ff0000;
   float: right;
   font-size: 13px;
-  max-width: 100px;
+  max-width: 93px;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1638,6 +1641,37 @@ footer {
 }
 .ui-dialog.ui-widget-content .ui-state-default.main-dialog-button:hover {
   background-color: #FFE03C;
+}
+.ui-dialog .ui-button-text-only .ui-button-text {
+  padding: 7px 12px;
+}
+.ui-dialog.ui-corner-all,
+.ui-dialog .ui-corner-all,
+.ui-dialog .ui-corner-bottom,
+.ui-dialog .ui-corner-right,
+.ui-dialog .ui-corner-br {
+  border-bottom-right-radius: 5px;
+}
+.ui-dialog.ui-corner-all,
+.ui-dialog .ui-corner-all,
+.ui-dialog .ui-corner-bottom,
+.ui-dialog .ui-corner-left,
+.ui-dialog .ui-corner-bl {
+  border-bottom-left-radius: 5px;
+}
+.ui-dialog.ui-corner-all,
+.ui-dialog .ui-corner-all,
+.ui-dialog .ui-corner-top,
+.ui-dialog .ui-corner-right,
+.ui-dialog .ui-corner-tr {
+  border-top-right-radius: 5px;
+}
+.ui-dialog.ui-corner-all,
+.ui-dialog .ui-corner-all,
+.ui-dialog .ui-corner-top,
+.ui-dialog .ui-corner-left,
+.ui-dialog .ui-corner-tl {
+  border-top-left-radius: 5px;
 }
 .tabs-control.ui-tabs {
   border: none;
@@ -1852,12 +1886,14 @@ footer {
   height: 350px !important;
 }
 .youtube-popup-close {
-  right: 0px;
-  position: absolute;
+  position: fixed;
+  z-index: 30000;
 }
 .youtube-popup-close img {
-  margin-top: -35px;
-  position: fixed;
+  margin-top: -15px;
+  margin-left: 20px;
+  position: absolute;
+  z-index: 30001;
 }
 .ui-dialog.youtube-dialog {
   background-color: #000;
@@ -1872,7 +1908,7 @@ footer {
 .ui-dialog.youtube-dialog .ui-dialog-titlebar {
   display: none;
 }
-.ui-dialog .ui-dialog-content {
+.ui-dialog.youtube-dialog .ui-dialog-content {
   position: relative;
   border: 0;
   padding: 0;
@@ -1894,4 +1930,92 @@ a.product-recipe-link:link {
 }
 a.product-recipe-link:hover {
   text-decoration: underline;
+}
+.ingredients-section-begin {
+  display: block;
+  font-weight: bold;
+}
+.ingredients-product-title {
+  font-family: Tahoma;
+  font-size: 13px;
+  line-height: 14px;
+  text-align: left;
+  color: #4c4c4c;
+  display: block;
+  margin-bottom: 25px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts {
+  line-height: 15.6px;
+  font-family: Arial;
+  font-size: 13px;
+  color: #4c4c4c;
+  width: 280px;
+  margin-top: 35px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts hr {
+  color: #e5e5e5;
+  background: #e5e5e5;
+  border: 0;
+  height: 1px;
+  width: 100%;
+  float: left;
+  margin: 8px 0 7px 0;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line {
+  float: left;
+  clear: left;
+  width: inherit;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-static-title {
+  font-size: 24px;
+  font-weight: bold;
+  font-family: Geneva, Arial, Helvetica, san-serif;
+  display: block;
+  margin-bottom: 5px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-nutrition-title {
+  font-weight: bold;
+  font-family: Geneva, Arial, Helvetica, san-serif;
+  display: block;
+  margin-bottom: 4px;
+  margin-top: 3px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-nutrition-line {
+  font-family: Geneva, Arial, Helvetica, san-serif;
+  display: block;
+  margin-bottom: 4px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-hint-line {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-info-subtitle {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-info-line {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-info-value {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  float: right;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-info-indent {
+  margin-left: 10px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-hint-value {
+  float: right;
+  margin-right: 20px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+.product-main .tabs-control .ingredients-nutrition-facts .nutrition-facts-line .facts-bottom-hint {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+.product-reviews-dialog {
+  top: 38px !important;
+}
+.product-reviews-dialog .form-regular .form-group .control-label {
+  font-weight: bold;
 }

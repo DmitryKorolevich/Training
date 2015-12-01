@@ -27,6 +27,12 @@ using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Business.Mail;
 using VitalChoice.Ecommerce.Domain.Mail;
+using System.IO;
+using Microsoft.AspNet.Mvc.ViewEngines;
+using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.Mvc.Abstractions;
 
 namespace VC.Public.Controllers
 {
@@ -113,18 +119,8 @@ namespace VC.Public.Controllers
             }
 
             CustomerServiceRequestModel model = new CustomerServiceRequestModel();
-            model =SetCustomerServiceRequestTypes(model);
-            return View(model);
-        }
 
-        [NonAction]
-        private CustomerServiceRequestModel SetCustomerServiceRequestTypes(CustomerServiceRequestModel model)
-        {
-            model.Types = new List<SelectListItem>() {
-                new SelectListItem() { Text="Customer Service", Value=((int)CustomerServiceRequestType.CustomerService).ToString() },
-                new SelectListItem() { Text="Feedback", Value=((int)CustomerServiceRequestType.Feedback).ToString() },
-            };
-            return model;
+            return View(model);
         }
 
         [HttpPost]
@@ -132,13 +128,11 @@ namespace VC.Public.Controllers
         {
             if (!Validate(model))
             {
-                model = SetCustomerServiceRequestTypes(model);
                 return View(model);
             }
             if (!await _reCaptchaValidator.Validate(Request.Form[ReCaptchaValidator.DefaultPostParamName]))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
-                model = SetCustomerServiceRequestTypes(model);
                 return View(model);
             }
 
@@ -150,7 +144,7 @@ namespace VC.Public.Controllers
                 _options.Value.CustomerFeedbackToEmail;
             await _notificationService.SendCustomerServiceEmailAsync(toEmail, emailData);
 
-            TempData[ContactServiceTempData] = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullyAdded];
+            TempData[ContactServiceTempData] = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
 
             return RedirectToAction("ContactCustomerService");
         }

@@ -1,0 +1,137 @@
+﻿<div class="container-fluid help-ticket">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div data-ng-if="payment.AllowPayment" class="margin-bottom-10px">
+                <button class="btn btn-success width-160px" ladda="editTracker.active()" data-ng-click="save()" unsaved-warning-clear>Bill</button>
+            </div>
+            <div>
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.healthwisePeriods">Manage All</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <div class="well row">
+                        <spinner-overlay data-loading="refreshTracker.active()">
+                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate unsaved-warning-form>
+                                <fieldset>
+                                    <span class="legend">HealthWise Details</span>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-3 control-label">Customer</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{options.FirstName}} {{options.LastName}}</span>
+                                        </div>
+                                    </div>
+                                    <div data-ng-if="options.PaidAmount" class="form-group">
+                                        <label for="" class="col-md-3 control-label">Paid</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{options.PaidAmount | currency}}</span>
+                                        </div>
+                                    </div>
+                                    <div data-ng-if="options.PaidAmount" class="form-group">
+                                        <label for="" class="col-md-3 control-label">Date</label>
+                                        <div class="col-md-9 form-control-static">
+                                            <span>{{options.PaidDate | date:"MM/dd/yy"}} {{::options.PaidDate | date:"h:mm a"}}</span>
+                                        </div>
+                                    </div>
+                                    <div data-ng-if="payment.AllowPayment" class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Amount</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">$</span>
+                                                <input type="text" name="Amount" class="form-control" placeholder="Amount" money min="0.01" max="100000" data-ng-model="payment.Amount" required>
+                                            </div>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Amount.$invalid">
+                                                <small class="error" ng-show="forms.form.Amount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
+                                                <small class="error" ng-show="forms.form.Amount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
+                                                <small class="error" ng-show="forms.form.Amount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
+                                                <small class="error" ng-show="forms.form.Amount.$error.min">{{getValidationMessage("{0} must be over $0.00","GeneralFieldNames.Amount")}}</small>
+                                                <small class="error" ng-show="forms.form.Amount.$error.server">{{serverMessages.GetMessage('Amount')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-ng-if="payment.AllowPayment" class="form-group">
+                                        <label for="date" class="col-md-3 control-label">Date</label>
+                                        <div class="col-md-9">
+                                            <p class="input-group">
+                                                <input type="text" name="Date" class="form-control" placeholder="Date" datepicker-popup="dd-MMM-yyyy" ng-model="payment.Date" is-open="dateOpened" required />
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default" ng-click="stopPropagation($event); dateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </p>
+                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Date.$invalid">
+                                                <small class="error" ng-show="forms.form.Date.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Date")}}</small>
+                                                <small class="error" ng-show="forms.form.Date.$error.server">{{serverMessages.GetMessage('Date')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-ng-if="payment.AllowPayment" class="form-group">
+                                        <label for="PayAsGC" class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" name="PayAsGC" data-ng-model="payment.PayAsGC"/>
+                                                    <strong>Generate And Send GC</strong>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            <div>
+                                <span class="legend">Orders</span>
+                                <div data-ng-if="options.AllowMove" class="row form-group btn-line">
+                                    <div class="col-md-12">
+                                        <button data-ng-click="openMovePopup();" class="btn btn-primary pull-right">Move Orders to Different HW Anniversary</button>
+                                    </div>
+                                </div>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Order Date</th>
+                                            <th>Orders Total</th>
+                                            <th>Details</th>
+                                            <th data-ng-if="options.AllowMove">
+                                                <div class="checkbox-inline">
+                                                    <label class="margin-bottom-0px">
+                                                        <input data-ng-model="options.allSelected" type="checkbox" data-ng-change="allSelectCall();">
+                                                        <strong>Select all</strong>
+                                                    </label>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat-start="item in items">
+                                            <td>
+                                                {{::item.Id}}
+                                            </td>
+                                            <td>
+                                                {{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}
+                                            </td>
+                                            <td>
+                                                {{::item.ProductsSubtotal | currency}}
+                                            </td>
+                                            <td>
+                                                <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openOrder(item.Id);">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </td>
+                                            <td data-ng-if="options.AllowMove">
+                                                <input data-ng-model="item.IsSelected" type="checkbox" data-ng-change="itemSelectChanged(item)">
+                                            </td>
+                                        </tr>
+                                        <tr class="hidden" data-ng-repeat-end></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </spinner-overlay>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

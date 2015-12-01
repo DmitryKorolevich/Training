@@ -679,7 +679,16 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
+											<div class="form-group">
+												<label for="IngredientsTitle" class="col-md-3 control-label">Ingredients</label>
+												<div class="col-md-9">
+													<input type="text" name="IngredientsTitle" class="form-control" placeholder="Ingredients" data-ng-model="product.IngredientsTitle">
+													<div class="error-container" ng-show="forms.submitted && forms.nutritional.IngredientsTitle.$invalid">
+														<small class="error" ng-show="forms.nutritional.IngredientsTitle.$error.server">{{serverMessages.GetMessage('IngredientsTitle')}}</small>
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
                                                 <label for="serving_size" class="col-md-3 control-label">Serving Size</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="ServingSize" class="form-control" placeholder="Serving Size" data-ng-model="product.ServingSize">

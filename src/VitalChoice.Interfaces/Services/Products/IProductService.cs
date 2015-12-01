@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -57,7 +58,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<bool> SendProductOutOfStockRequests(ICollection<int> ids);
 
-		Task<PagedList<VCustomerFavorite>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
+		Task<PagedList<VCustomerFavoriteFull>> GetCustomerFavoritesAsync(VCustomerFavoritesFilter filter);
 
         #endregion
 
@@ -71,8 +72,10 @@ namespace VitalChoice.Interfaces.Services.Products
 
 		Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
 
-		#endregion
+        Task<ICollection<ProductContent>> SelectProductContents(ICollection<int> ids);
 
-		Task<int> GetProductInternalIdAsync(Guid productId);
+        #endregion
+
+        Task<int> GetProductInternalIdAsync(Guid productId);
 	}
 }

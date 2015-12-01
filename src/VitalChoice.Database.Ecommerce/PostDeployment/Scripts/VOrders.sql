@@ -25,8 +25,10 @@ SELECT
 	options.Company,
 	options.FirstName+' '+options.LastName As Customer,
 	st.StateCode,
-	shipOptions.FirstName+' '+shipOptions.LastName As ShipTo
+	shipOptions.FirstName+' '+shipOptions.LastName As ShipTo,
+	CONVERT(bit,CASE WHEN ho.Id IS NULL THEN 0 ELSE 1 END) As Healthwise
 	FROM Orders AS o
+	LEFT JOIN HealthwiseOrders AS ho ON ho.Id = o.Id
 	LEFT JOIN OrderPaymentMethods AS opm ON opm.Id = o.IdPaymentMethod
 	LEFT JOIN OrderOptionTypes AS oopt ON oopt.Name = N'OrderType' AND (oopt.IdObjectType = o.IdObjectType OR oopt.IdObjectType IS NULL)
 	LEFT JOIN OrderOptionValues AS oval ON oval.IdOrder = o.Id AND oval.IdOptionType = oopt.Id
@@ -55,7 +57,6 @@ SELECT
 	) AS piv) AS shipOptions ON shAd.Id = shipOptions.IdOrderAddress
 	LEFT OUTER JOIN [dbo].[States] AS st ON shAd.IdState = st.Id
 	WHERE o.StatusCode!=3
-
 
 GO
 

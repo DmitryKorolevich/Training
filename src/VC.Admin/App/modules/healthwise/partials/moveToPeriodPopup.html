@@ -1,0 +1,45 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Select HealthWise anniversary to move into</h3>
+</div>
+<div class="modal-body">
+    <div data-ng-if="items.length==0" class="row form-group btn-line">
+        <div class="col-md-12">
+            <div class="col-md-10 important padding-0px">Customer doesn't have any HealthWise years available with open positions. Would you like to create a new HealthWise year?</div>
+            <button data-ng-click="addPeriod();" class="btn btn-primary pull-right">Create New</button>
+        </div>
+    </div>
+    <spinner-overlay data-loading="refreshTracker.active()">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Anniversary Dates</th>
+                    <th>Orders This HW Year</th>
+                    <th>Orders Total</th>
+                    <th>Order Average</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in items">
+                    <td>
+                        {{::item.StartDate | date:"MM/dd/yy"}} - {{::item.EndDate | date:"MM/dd/yy"}}
+                    </td>
+                    <td>
+                        {{::item.OrdersCount}}
+                    </td>
+                    <td>{{::item.OrderSubtotals | currency}}</td>
+                    <td data-ng-if="item.OrdersCount!=0">{{::(item.OrderSubtotals / item.OrdersCount).toFixed(2) | currency}}</td>
+                    <td data-ng-if="item.OrdersCount==0">{{::0 | currency}}</td>
+                    <td>
+                        <button title="Move" class="btn btn-default btn-success btn-xs" data-ng-click="move(item.Id);">
+                            Move
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </spinner-overlay>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

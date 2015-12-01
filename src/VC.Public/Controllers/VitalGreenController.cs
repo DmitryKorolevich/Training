@@ -15,6 +15,9 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
+using System.IO;
+using Microsoft.AspNet.Mvc.ViewEngines;
+using Microsoft.AspNet.Mvc.ViewFeatures;
 
 namespace VC.Public.Controllers
 {

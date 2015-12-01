@@ -54,7 +54,7 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-					result.ViewName = "Error";
+					result.ViewName = apiException.Status == HttpStatusCode.NotFound ? "Error404" : "Error";
 					result.StatusCode = (int)apiException.Status;
 				}
 				context.Result = result;

@@ -33,6 +33,11 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<IdModel>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             builder.Entity<VCustomerFavorite>(entity =>
             {
                 entity.HasKey(x => x.Id);
@@ -160,6 +165,12 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey(o => o.IdCustomer)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired();
+            });
+
+            builder.Entity<VHealthwisePeriod>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("VHealthwisePeriods");
             });
 
             builder.Entity<CatalogRequestAddress>(entity =>

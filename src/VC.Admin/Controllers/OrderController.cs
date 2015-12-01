@@ -238,7 +238,10 @@ namespace VC.Admin.Controllers
                     }
                     item.Data.OrderType = orderType.Value;
                     item.ShippingAddress.Id = 0;
-                    item.PaymentMethod.Address.Id = 0;
+                    if (item.PaymentMethod.Address != null)
+                    {
+                        item.PaymentMethod.Address.Id = 0;
+                    }
                     item.PaymentMethod.Id = 0;
                     var context = await _orderService.CalculateOrder(item);
                     item = await _orderService.InsertAsync(item);

@@ -60,6 +60,7 @@
     "app/core/dataAccess/services/helpService.js",
     "app/core/dataAccess/services/promotionService.js",
     "app/core/dataAccess/services/vitalGreenService.js",
+    "app/core/dataAccess/services/healthwiseService.js",
     "app/core/dataAccess/dataAccess.js",
     "app/core/utils/httpInterceptor.js",
     "app/core/utils/modalUtil.js",
@@ -207,6 +208,12 @@
     "app/modules/help/help.js",
     "app/modules/misc/controllers/vitalGreenController.js",
     "app/modules/misc/controllers/catalogRequestsController.js",
-    "app/modules/misc/misc.js"
+    "app/modules/misc/misc.js",
+    "app/modules/healthwise/controllers/healthwisePeriodsController.js",
+    "app/modules/healthwise/controllers/markOrderController.js",
+    "app/modules/healthwise/controllers/markCustomerOrdersController.js",
+    "app/modules/healthwise/controllers/healthwiseDetailController.js",
+    "app/modules/healthwise/controllers/moveToPeriodController.js",
+    "app/modules/healthwise/healthwise.js"
   ]
 }

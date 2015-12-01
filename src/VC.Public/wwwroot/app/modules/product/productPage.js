@@ -10,7 +10,8 @@
 	});
 
 	$("body").on("click", "#btnVideoClose", function () {
-		$("#btnVideoClose").parent().dialog('destroy').remove();
+		$("#btnVideoClose").remove();
+		$('#' + $(".youtube-dialog").attr('aria-describedby')).dialog('destroy').remove;
 		return false;
 	});
 
@@ -30,6 +31,7 @@
 				resizable: false,
 				modal: true,
 				minWidth: defaultModalSize,
+				dialogClass: "product-reviews-dialog",
 				open: function () {
 					grecaptcha.render('googleCaptcha', {
 						'sitekey': captchaSiteKey
@@ -70,14 +72,23 @@
 	$('body').on("click", "a[data-video-id]", function () {
 		var youtubeLink = $(this).attr("data-video-id");
 		$("<div>" +
-				"<a id='btnVideoClose' class='youtube-popup-close' href='#'>" +
-				"	<img src='/assets/images/close_button.png'/>" +
-				"</a>" +
 				"<iframe class='youtube-popup-container' frameborder='0' allowfullscreen='1' title='YouTube video player' " +
-					"src='https://www.youtube.com/embed/" + youtubeLink + "?autoplay=1&amp;iv_load_policy=3&amp;rel=0&amp;showinfo=0&amp;wmode=opaque&amp;enablejsapi=1&amp;origin=http%3A%2F%2Fwww.vitalchoice.com'>" +
+					"src='http://www.youtube.com/embed/" + youtubeLink + "?autoplay=1&iv_load_policy=3&rel=0&showinfo=0&wmode=opaque&enablejsapi=1&origin=http://staging.g2-dg.com/'>" +
 				"</iframe>" +
 			"</div>")
 			.dialog({
+				open: function () {
+					var jCloseButton = $("<a id='btnVideoClose' class='youtube-popup-close' href='#'>" +
+						"	<img src='/assets/images/close_button.png'/>" +
+						"</a>");
+
+					var jYoutube = $(".youtube-dialog");
+
+					jCloseButton.css("top", jYoutube.css("top"));
+					jCloseButton.css("left", jYoutube.offset().left + jYoutube.width());
+
+					jYoutube.before(jCloseButton);
+				},
 				resizable: false,
 				modal: true,
 				dialogClass: "youtube-dialog"
@@ -99,4 +110,13 @@ function reviewSubmitSuccess() {
 
 function reviewSubmitError() {
 	notifyError("Server error occured");
+}
+
+function onYouTubeIframeAPIReady() {
+	ytplayer = document.getElementById(".youtube-popup-container");
+	ytplayer.addEventListener("onStateChange", function (event) {
+		if (event.data == 0) {
+			$(".youtube-dialog").dialog("close");
+		}
+	});
 }

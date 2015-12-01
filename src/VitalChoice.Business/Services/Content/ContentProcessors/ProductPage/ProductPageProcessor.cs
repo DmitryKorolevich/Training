@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -60,7 +61,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 if (!model.Preview)
                 {
-                    return null;
+	                throw new ApiException("Product not found", HttpStatusCode.NotFound);
                 }
                 targetStatuses.Add(RecordStatusCode.NotActive);
             }
@@ -68,7 +69,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 			var eProduct = await _productService.SelectAsync(model.Model.Id, true);
 		    if (eProduct.Hidden)
 		    {
-				return null;
+				throw new ApiException("Product not found", HttpStatusCode.NotFound);
 			}
 
 		    ProductNavCategoryLite rootNavCategory = null;
@@ -155,7 +156,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
 
 	        var productContent = model.Model;
-	        if (eProduct.CategoryIds.Any())
+
+			//BUG: this bullshit I had to implement following Alex's architecture, needs to refactored
+			var title = productContent.ContentItem.Title;
+	        productContent.ContentItem.Title = !string.IsNullOrWhiteSpace(title)
+		        ? title
+		        : $"{eProduct.Name} | {eProduct.Data.SubTitle}";
+			//end of bullshit
+
+			if (eProduct.CategoryIds.Any())
 	        {
 				BuildBreadcrumb(rootNavCategory, eProduct.CategoryIds.First(), breadcrumbItems);
 				breadcrumbItems.Add(new TtlBreadcrumbItemModel()
@@ -260,12 +269,37 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
 	        if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
 	        {
-		        toReturn.IngredientsTab = new TtlProductPageTabModel()
+		        toReturn.IngredientsTab = new TtlProductIngredientsTabModel()
 		        {
 			        TitleOverride = eProduct.Data.IngredientsTitleOverride,
 			        Content = eProduct.Data.Ingredients,
-			        Hidden = eProduct.Data.IngredientsHide
-		        };
+			        Hidden = eProduct.Data.IngredientsHide,
+                    NutritionalTitle = eProduct.Data.NutritionalTitle,
+					IngredientsTitle = eProduct.Data.IngredientsTitle,
+					ServingSize = eProduct.Data.ServingSize,
+					Servings = eProduct.Data.Servings,
+					Calories = eProduct.Data.Calories,
+					CaloriesFromFat = eProduct.Data.CaloriesFromFat,
+					TotalFat = eProduct.Data.TotalFat,
+					TotalFatPercent = eProduct.Data.TotalFatPercent,
+					SaturatedFat = eProduct.Data.SaturatedFat,
+					SaturatedFatPercent = eProduct.Data.SaturatedFatPercent,
+					TransFat = eProduct.Data.TransFat,
+					TransFatPercent = eProduct.Data.TransFatPercent,
+					Cholesterol = eProduct.Data.Cholesterol,
+					CholesterolPercent = eProduct.Data.CholesterolPercent,
+					Sodium = eProduct.Data.Sodium,
+					SodiumPercent = eProduct.Data.SodiumPercent,
+					TotalCarbohydrate = eProduct.Data.TotalCarbohydrate,
+					TotalCarbohydratePercent = eProduct.Data.TotalCarbohydratePercent,
+					DietaryFiber = eProduct.Data.DietaryFiber,
+					DietaryFiberPercent = eProduct.Data.DietaryFiberPercent,
+					Sugars = eProduct.Data.Sugars,
+					SugarsPercent = eProduct.Data.SugarsPercent,
+					Protein = eProduct.Data.Protein,
+					ProteinPercent = eProduct.Data.ProteinPercent,
+					AdditionalNotes = eProduct.Data.AdditionalNotes?.Replace("\n", "<br/>")
+				};
 	        }
 
 			if (eProduct.DictionaryData.ContainsKey("RecipesTitleOverride"))

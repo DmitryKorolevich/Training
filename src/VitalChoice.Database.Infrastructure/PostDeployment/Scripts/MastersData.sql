@@ -2157,7 +2157,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<a class="product-recipe-link" title="@(Name)" href="@(Url)">@(Name)</a>%' AND [Name] = 'Product page')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like '%<span class="facts-bottom-hint">%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -2403,6 +2403,96 @@ BEGIN
 		        @ifnot(Hidden){{
 		            <div id="tabs-nutrition">
     		            @(Content)
+    		            
+    		            @if(@model.NutritionalTitle != null){{
+    		                @if(@model.Content != null){{
+    		                    <span class="ingredients-section-begin margin-top-medium">Ingredients:</span>
+    		                }}
+    		                @if(@model.Content == null){{
+    		                    <span class="ingredients-section-begin">Ingredients:</span>
+    		                }}
+				            <span class="ingredients-product-title">@(IngredientsTitle)</span>
+				            <hr/>
+				            <div class="ingredients-nutrition-facts">
+					            <div class="nutrition-facts-line">
+						            <span class="facts-static-title">Nutrition Facts</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-nutrition-title">@(NutritionalTitle)</span>
+					            </div>
+					            @if(@model.ServingSize != null){{
+					                <div class="nutrition-facts-line">
+					        	        <span class="facts-nutrition-line">Serving Size @(ServingSize)</span>
+					                </div>
+					            }}
+					            @if(@model.Servings != null){{
+					                <div class="nutrition-facts-line">
+						                <span class="facts-nutrition-line">Number of servings: @(Servings)</span>
+					                </div>
+					            }}
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-line">Amount Per Serving</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Calories</span>
+						            <span class="facts-info-line">@(Calories)</span>
+						            <span class="facts-info-value">Calories from Fat @(CaloriesFromFat)</span>
+					            </div>
+					            <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-hint-value">% Daily Value*</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Fat</span>
+						            <span class="facts-info-line">@(TotalFat)</span>
+						            <span class="facts-info-value">@(TotalFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Saturated Fat @(SaturatedFat)</span>
+					        	    <span class="facts-info-value">@(SaturatedFatPercent)</span>
+				        	    </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Trans Fat @(TransFat)</span>
+						             <span class="facts-info-value">@(TransFatPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Cholesterol</span>
+						            <span class="facts-info-line">@(Cholesterol)</span>
+						            <span class="facts-info-value">@(CholesterolPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Sodium</span>
+						            <span class="facts-info-line">@(Sodium)</span>
+						            <span class="facts-info-value">@(SodiumPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-subtitle">Total Carbohydrate</span>
+						            <span class="facts-info-line">@(TotalCarbohydrate)</span>
+						            <span class="facts-info-value">@(TotalCarbohydratePercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Dietary Fiber @(DietaryFiber)</span>
+					                <span class="facts-info-value">@(DietaryFiberPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-indent facts-info-line">Sugars @(Sugars)</span>
+						            <span class="facts-info-value">@(SugarsPercent)</span>
+					            </div>
+					            <div class="nutrition-facts-line">
+					        	    <span class="facts-info-subtitle">Protein</span>
+					        	    <span class="facts-info-line">@(Protein)</span>
+					        	    <span class="facts-info-value">@(ProteinPercent)</span>
+					            </div>
+				        	    <hr/>
+					            <div class="nutrition-facts-line">
+						            <span class="facts-info-line">@(AdditionalNotes)</span>
+				        	    </div>
+				        	    <div class="nutrition-facts-line">
+						            <span class="facts-bottom-hint">* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.</span>
+				        	    </div>
+			        	    </div>
+			        	}}
     			    </div>
 	            }}
 	        }}
