@@ -1886,13 +1886,13 @@ footer {
   height: 350px !important;
 }
 .youtube-popup-close {
-  right: 0px;
-  position: absolute;
+  position: fixed;
   z-index: 30000;
 }
 .youtube-popup-close img {
-  margin-top: -35px;
-  position: fixed;
+  margin-top: -15px;
+  margin-left: 20px;
+  position: absolute;
   z-index: 30001;
 }
 .ui-dialog.youtube-dialog {
