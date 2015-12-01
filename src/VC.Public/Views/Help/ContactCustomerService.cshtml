@@ -11,6 +11,13 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
 
+@{ 
+    var types = new List<SelectListItem>() {
+                new SelectListItem() { Text="Customer Service", Value=((int)VC.Public.Models.Help.CustomerServiceRequestType.CustomerService).ToString() },
+                new SelectListItem() { Text="Feedback", Value=((int)VC.Public.Models.Help.CustomerServiceRequestType.Feedback).ToString() },
+            };
+}
+
 <script>
     successMessage = '@ViewBag.SuccessMessage';
 </script>
@@ -48,7 +55,7 @@
             <div class="form-group">
                 @Html.LabelFor(m => m.Type, new { @class = "control-label" })
                 <div class="input-group">
-                    @Html.DropDownListFor(m => m.Type, Model.Types, new { @class = "form-control" })
+                    @Html.DropDownListFor(m => m.Type, types, new { @class = "form-control" })
                     @Html.ValidationMessageFor(m => m.Type, "")
                 </div>
             </div>

@@ -4,6 +4,11 @@ using Microsoft.AspNet.Html.Abstractions;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.AspNet.Mvc.ViewFeatures;
+using System.IO;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.Mvc.Razor;
+using Microsoft.Net.Http.Server;
 
 namespace VC.Public.Helpers
 {
@@ -46,6 +51,6 @@ namespace VC.Public.Helpers
         public static DateTime ConvertToPST(this DateTime date)
         {
             return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, _pstTimeZoneInfo);
-        } 
-	}
+        }
+    }
 }
