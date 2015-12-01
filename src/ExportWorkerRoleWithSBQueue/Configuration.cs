@@ -3,6 +3,9 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
+using Azure.ApplicationHost;
+using Azure.ApplicationHost.Base;
+using Azure.ApplicationHost.Host;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +67,7 @@ namespace ExportWorkerRoleWithSBQueue
     {
         internal static IContainer BuildContainer()
         {
+            DnxHostedApplication.Init();
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);
@@ -73,8 +77,7 @@ namespace ExportWorkerRoleWithSBQueue
             var services = new ServiceCollection();
 
             services.AddEntityFramework()
-                .AddSqlServer()
-                .AddDbContext<VitalChoiceContext>();
+                .AddSqlServer();
 
             services.Configure<AppOptionsBase>(options =>
             {

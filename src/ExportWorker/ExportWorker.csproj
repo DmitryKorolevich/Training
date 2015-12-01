@@ -47,6 +47,10 @@
     <Reference Include="Avalara.Avatax.Rest">
       <HintPath>..\..\packages\WorkerRole\Avalara.Avatax.Rest.dll</HintPath>
     </Reference>
+    <Reference Include="Azure.ApplicationHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\WorkerRole\Azure.ApplicationHost.dll</HintPath>
+    </Reference>
     <Reference Include="CsvHelper">
       <HintPath>..\..\packages\WorkerRole\CsvHelper.dll</HintPath>
     </Reference>
@@ -212,6 +216,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Dnx">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.ApplicationHost">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.ApplicationHost.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Dnx.Compilation">
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.dll</HintPath>
     </Reference>
@@ -230,11 +240,29 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Dnx.Compilation.DesignTime">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.DesignTime.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.DesignTimeHost.Abstractions">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.DesignTimeHost.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.Host">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.Host.Clr">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Clr.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.Host.Mono">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Mono.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Dnx.Loader">
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Loader.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Dnx.Runtime">
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dnx.Runtime.Internals">
+      <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.Internals.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

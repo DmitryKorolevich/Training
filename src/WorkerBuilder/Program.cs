@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.Dnx.Compilation;
 using Microsoft.Dnx.Compilation.CSharp;
@@ -16,7 +17,7 @@ namespace WorkerBuilder
         private static readonly ILibraryExporter LibraryManager =
             (ILibraryExporter) CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (ILibraryExporter));
 
-        private static readonly IApplicationEnvironment Environment =
+        private static readonly IApplicationEnvironment AppEnvironment =
             (IApplicationEnvironment)
                 CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof (IApplicationEnvironment));
 
@@ -98,7 +99,7 @@ namespace WorkerBuilder
             //        return references;
             //    }
             //}
-            var export = LibraryManager.GetAllExports(Environment.ApplicationName);
+            var export = LibraryManager.GetAllExports(AppEnvironment.ApplicationName);
             references.AddRange(export.MetadataReferences.Select(r => ConvertMetadataReference(r, getPathsOnly)));
 
             return references;
@@ -107,6 +108,7 @@ namespace WorkerBuilder
         public static void Main(string[] args)
         {
             _outRoot = Path.GetFullPath(args[0]);
+            Parallel.ForEach(Directory.GetFiles(_outRoot), File.Delete);
             Console.WriteLine($"Publish Root {_outRoot}");
             var silent = args.Any(a => a == "-silent");
             var createListFile = args.Any(a => a == "-list");
@@ -114,6 +116,15 @@ namespace WorkerBuilder
             try
             {
                 refs = GetMetadataReferences(createListFile);
+                var activeRuntimePath = GetExecutablePath("dnx.exe");
+                Console.WriteLine($"Using runtime: {activeRuntimePath}");
+                var runtimeDlls = Directory.GetFiles(activeRuntimePath, "*.dll");
+                foreach (var dll in runtimeDlls)
+                {
+                    var fileName = Path.GetFileName(dll);
+                    if (fileName != null)
+                        File.Copy(dll, Path.Combine(_outRoot, fileName), true);
+                }
             }
             catch (Exception e)
             {
@@ -139,6 +150,21 @@ namespace WorkerBuilder
                                     s.Replace("\\obj\\Debug\\", "\\bin\\").Replace("\\obj\\Release\\", "\\bin\\"))
                             .Union(new[] {Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.pdb"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.dll"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.xml"), Path.Combine(_outRoot, "ExportWorkerRoleWithSBQueue.dll") })));
             }
+        }
+
+        private static string GetExecutablePath(string name)
+        {
+            var values = Environment.GetEnvironmentVariable("PATH");
+            if (values != null)
+                foreach (var path in values.Split(';'))
+                {
+                    var fullPath = Path.Combine(path, name);
+                    if (File.Exists(fullPath))
+                    {
+                        return Path.GetDirectoryName(fullPath);
+                    }
+                }
+            return null;
         }
     }
 }

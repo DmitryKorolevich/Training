@@ -10,7 +10,8 @@
     "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",
     "VitalChoice.Infrastructure": "",
     "VitalChoice.Business": "",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*"
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Azure.ApplicationHost": ""
   },
   "frameworks": {
     "dnx451": {
