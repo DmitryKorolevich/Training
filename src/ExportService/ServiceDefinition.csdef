@@ -5,5 +5,7 @@
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
       <Setting name="Microsoft.ServiceBus.ConnectionString" />
     </ConfigurationSettings>
+    <LocalResources>
+    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>

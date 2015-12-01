@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WorkerBuilder": {
+      "commandName": "WorkerBuilder",
+      "commandLineArgs": "d:\\Work\\VitalChoice\\artifacts\\obj\\ExportWorkerRoleWithSBQueue\\Debug\\"
+    }
+  }
+}

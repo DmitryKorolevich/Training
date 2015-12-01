@@ -1,0 +1,28 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "WorkerBuilder Console Application",
+  "authors": [ "multi_000" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+  },
+
+  "commands": {
+    "WorkerBuilder": "WorkerBuilder"
+  },
+
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "ExportWorkerRoleWithSBQueue": "",
+        "Microsoft.Dnx.Compilation.CSharp": "1.0.0-*"
+      }
+    }
+  }
+}
