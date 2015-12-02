@@ -6,7 +6,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
 {
     public interface IOrderExportService
     {
-        void UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod);
+        void UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods);
         void UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod);
         bool ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
     }

@@ -8,6 +8,12 @@
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",
       "Server": "vw4v86cs0h.database.windows.net"
     },
+    "ExportConnection": {
+      "UserName": "dev_expdb_login",
+      "Password": "8n8HfhzbzgwbwBgMpmE9vPdz",
+      "Server": "tcp:dad4lghbj.database.windows.net,1433",
+      "Encrypt": true
+    },
     "ExportService": {
       "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
       "PlainQueueName": "PlainQueue",

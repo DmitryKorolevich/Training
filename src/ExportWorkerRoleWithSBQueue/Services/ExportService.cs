@@ -7,7 +7,7 @@ namespace ExportWorkerRoleWithSBQueue.Services
 {
     public class OrderExportService : IOrderExportService
     {
-        public void UpdatePaymentMethod(CustomerPaymentMethodDynamic paymentMethod)
+        public void UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
         {
             throw new NotImplementedException();
         }

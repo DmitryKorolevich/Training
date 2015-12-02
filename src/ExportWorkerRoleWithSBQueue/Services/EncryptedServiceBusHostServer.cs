@@ -95,12 +95,12 @@ namespace ExportWorkerRoleWithSBQueue.Services
                     SendCommand(new ServiceBusCommandBase(command, true));
                     break;
                 case OrderExportServiceCommandConstants.UpdateCustomerPayment:
-                    var customerPaymentInfo = command.Result as CustomerPaymentMethodDynamic;
+                    var customerPaymentInfo = command.Result as CustomerPaymentMethodDynamic[];
                     if (customerPaymentInfo == null)
                     {
                         return false;
                     }
-                    _exportService.UpdatePaymentMethod(customerPaymentInfo);
+                    _exportService.UpdatePaymentMethods(customerPaymentInfo);
                     SendCommand(new ServiceBusCommandBase(command, true));
                     break;
             }
