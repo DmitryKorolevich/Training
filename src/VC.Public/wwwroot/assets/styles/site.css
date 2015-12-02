@@ -1884,6 +1884,10 @@ footer {
   padding: 0px;
   width: 485px !important;
   height: 350px !important;
+  display: block;
+}
+.youtube-popup-container {
+  display: none;
 }
 .youtube-popup-close {
   position: fixed;
