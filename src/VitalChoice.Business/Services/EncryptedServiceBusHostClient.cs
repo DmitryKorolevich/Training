@@ -14,7 +14,8 @@ namespace VitalChoice.Business.Services
     {
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider) : base(appOptions, loggerProvider)
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
+            : base(appOptions, loggerProvider.CreateLoggerDefault())
         {
             EncryptionHost = new ObjectEncryptionHost(false);
             var publicKey =

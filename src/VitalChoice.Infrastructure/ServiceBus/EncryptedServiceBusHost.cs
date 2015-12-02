@@ -32,9 +32,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
         protected abstract ObjectEncryptionHost EncryptionHost { get; }
         protected readonly ILogger Logger;
 
-        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
+        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger)
         {
-            Logger = loggerProvider.CreateLoggerDefault();
+            Logger = logger;
             _disposeEvent = new ManualResetEvent(false);
 #if NET451 || DNX451
             _encryptedClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,

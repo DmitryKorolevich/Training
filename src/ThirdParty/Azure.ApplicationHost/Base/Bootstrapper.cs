@@ -52,10 +52,8 @@ namespace Azure.ApplicationHost.Base
 
                 var configuration = Environment.GetEnvironmentVariable("TARGET_CONFIGURATION") ?? Environment.GetEnvironmentVariable(EnvironmentNames.Configuration) ?? "Debug";
 
-                var applicationEnvironment = new HostApplicationEnvironment(applicationBaseDirectory,
-                                                                        targetFramework,
-                                                                        configuration,
-                                                                        assembly);
+                var applicationEnvironment = new HostApplicationEnvironment(applicationBaseDirectory, targetFramework,
+                    configuration, assembly);
 
                 CallContextServiceLocator.Locator = new ServiceProviderLocator();
                 var compilationAssembly = accessor.Default.Load("Microsoft.Dnx.Compilation");
@@ -69,13 +67,13 @@ namespace Azure.ApplicationHost.Base
                 var serviceProvider = Activator.CreateInstance(serviceProviderType);
 
                 var addMethod =
-                    (Action<object, Type, object>)
+                    (Action<Type, object>)
                         serviceProviderType.GetMethod("Add", new[] {typeof (Type), typeof (object)})
-                            .CreateDelegate(typeof (Action<object, Type, object>));
-                addMethod(serviceProvider, typeof (IAssemblyLoaderContainer), container);
-                addMethod(serviceProvider, typeof (IAssemblyLoadContextAccessor), accessor);
-                addMethod(serviceProvider, typeof (IApplicationEnvironment), applicationEnvironment);
-                addMethod(serviceProvider, typeof (IRuntimeEnvironment), env);
+                            .CreateDelegate(typeof (Action<Type, object>), serviceProvider);
+                addMethod(typeof (IAssemblyLoaderContainer), container);
+                addMethod(typeof (IAssemblyLoadContextAccessor), accessor);
+                addMethod(typeof (IApplicationEnvironment), applicationEnvironment);
+                addMethod(typeof (IRuntimeEnvironment), env);
 
                 CallContextServiceLocator.Locator.ServiceProvider = (IServiceProvider) serviceProvider;
                 PlatformServices.SetDefault(

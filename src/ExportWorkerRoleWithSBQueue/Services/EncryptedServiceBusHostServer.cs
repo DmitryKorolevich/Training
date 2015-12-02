@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -17,7 +18,9 @@ namespace ExportWorkerRoleWithSBQueue.Services
         protected override ObjectEncryptionHost EncryptionHost { get; }
 
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
-        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IOrderExportService exportService) : base(appOptions, loggerProvider)
+
+        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILogger logger,
+            IOrderExportService exportService) : base(appOptions, logger)
         {
             _exportService = exportService;
             EncryptionHost = new ObjectEncryptionHost();

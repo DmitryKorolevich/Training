@@ -16,45 +16,7 @@ namespace Azure.ApplicationHost.Base
 
         public static int Execute(string[] args, BootstrapperContext bootstrapperContext)
         {
-            try
-            {
-                return ExecuteAsync(args, bootstrapperContext).GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                PrintErrors(ex);
-                return 1;
-            }
-        }
-
-        private static void PrintErrors(Exception ex)
-        {
-            while (ex != null)
-            {
-                var suppressStackTrace = (ex.Data["suppressStackTrace"] as bool? == true);
-
-                if (ex is TargetInvocationException ||
-                    ex is AggregateException)
-                {
-                    // Skip these exception messages as they are
-                    // generic
-                }
-                else if (ex is ReflectionTypeLoadException)
-                {
-                    var typeLoadException = ex as ReflectionTypeLoadException;
-
-                    foreach (var loaderException in typeLoadException.LoaderExceptions)
-                    {
-                        Console.Error.WriteLine(suppressStackTrace ? $"Error: {loaderException.Message}" : loaderException.ToString());
-                    }
-                }
-                else
-                {
-                    Console.Error.WriteLine(suppressStackTrace ? $"Error: {ex.Message}" : ex.ToString());
-                }
-
-                ex = ex.InnerException;
-            }
+            return ExecuteAsync(args, bootstrapperContext).GetAwaiter().GetResult();
         }
 
         public static Task<int> ExecuteAsync(string[] args, BootstrapperContext bootstrapperContext)

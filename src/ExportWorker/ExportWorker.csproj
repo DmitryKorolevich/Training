@@ -35,38 +35,48 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime">
+    <Reference Include="Antlr4.Runtime, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Antlr4.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac">
+    <Reference Include="Autofac, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac.Extensions.DependencyInjection">
+    <Reference Include="Autofac.Extensions.DependencyInjection, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Autofac.Extensions.DependencyInjection.dll</HintPath>
     </Reference>
-    <Reference Include="Avalara.Avatax.Rest">
+    <Reference Include="Avalara.Avatax.Rest, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Avalara.Avatax.Rest.dll</HintPath>
     </Reference>
     <Reference Include="Azure.ApplicationHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Azure.ApplicationHost.dll</HintPath>
     </Reference>
-    <Reference Include="CsvHelper">
+    <Reference Include="CsvHelper, Version=2.13.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\CsvHelper.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.Core">
+    <Reference Include="EntityFramework.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\EntityFramework.Core.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.MicrosoftSqlServer">
+    <Reference Include="EntityFramework.MicrosoftSqlServer, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\EntityFramework.MicrosoftSqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.Relational">
+    <Reference Include="EntityFramework.Relational, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\EntityFramework.Relational.dll</HintPath>
     </Reference>
-    <Reference Include="ExportWorkerRoleWithSBQueue">
+    <Reference Include="ExportWorkerRoleWithSBQueue, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\ExportWorkerRoleWithSBQueue.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Antiforgery">
+    <Reference Include="Microsoft.AspNet.Antiforgery, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Antiforgery.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Authentication, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -77,7 +87,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Authentication.Cookies.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Authorization">
+    <Reference Include="Microsoft.AspNet.Authorization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Authorization.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Cors, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -100,19 +111,24 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.DataProtection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Diagnostics.Abstractions">
+    <Reference Include="Microsoft.AspNet.Diagnostics.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Diagnostics.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.FileProviders.Abstractions">
+    <Reference Include="Microsoft.AspNet.FileProviders.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.FileProviders.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.FileProviders.Physical">
+    <Reference Include="Microsoft.AspNet.FileProviders.Physical, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.FileProviders.Physical.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Hosting.Abstractions">
+    <Reference Include="Microsoft.AspNet.Hosting.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Hosting.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Html.Abstractions">
+    <Reference Include="Microsoft.AspNet.Html.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Html.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Http, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -139,71 +155,90 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.JsonPatch">
+    <Reference Include="Microsoft.AspNet.JsonPatch, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.JsonPatch.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Localization">
+    <Reference Include="Microsoft.AspNet.Localization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Localization.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc">
+    <Reference Include="Microsoft.AspNet.Mvc, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Abstractions">
+    <Reference Include="Microsoft.AspNet.Mvc.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.ApiExplorer">
+    <Reference Include="Microsoft.AspNet.Mvc.ApiExplorer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.ApiExplorer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Core">
+    <Reference Include="Microsoft.AspNet.Mvc.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Cors">
+    <Reference Include="Microsoft.AspNet.Mvc.Cors, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Cors.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.DataAnnotations">
+    <Reference Include="Microsoft.AspNet.Mvc.DataAnnotations, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.DataAnnotations.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Formatters.Json">
+    <Reference Include="Microsoft.AspNet.Mvc.Formatters.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Formatters.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Localization">
+    <Reference Include="Microsoft.AspNet.Mvc.Localization, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Localization.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Razor">
+    <Reference Include="Microsoft.AspNet.Mvc.Razor, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.Razor.Host">
+    <Reference Include="Microsoft.AspNet.Mvc.Razor.Host, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.Razor.Host.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Mvc.ViewFeatures">
+    <Reference Include="Microsoft.AspNet.Mvc.ViewFeatures, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Mvc.ViewFeatures.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.PageExecutionInstrumentation.Interfaces">
+    <Reference Include="Microsoft.AspNet.PageExecutionInstrumentation.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.PageExecutionInstrumentation.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Razor">
+    <Reference Include="Microsoft.AspNet.Razor, Version=4.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Razor.Runtime">
+    <Reference Include="Microsoft.AspNet.Razor.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Razor.Runtime.Precompilation">
+    <Reference Include="Microsoft.AspNet.Razor.Runtime.Precompilation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Razor.Runtime.Precompilation.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Routing">
+    <Reference Include="Microsoft.AspNet.Routing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.Routing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.WebUtilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.AspNet.WebUtilities.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Edm, Version=5.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Data.Edm.dll</HintPath>
@@ -216,20 +251,24 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx">
+    <Reference Include="Microsoft.Dnx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.ApplicationHost">
+    <Reference Include="Microsoft.Dnx.ApplicationHost, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.ApplicationHost.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation">
+    <Reference Include="Microsoft.Dnx.Compilation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Dnx.Compilation.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.CSharp">
+    <Reference Include="Microsoft.Dnx.Compilation.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Dnx.Compilation.CSharp.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -240,28 +279,36 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.CSharp.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Compilation.DesignTime">
+    <Reference Include="Microsoft.Dnx.Compilation.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Compilation.DesignTime.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.DesignTimeHost.Abstractions">
+    <Reference Include="Microsoft.Dnx.DesignTimeHost.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.DesignTimeHost.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Host">
+    <Reference Include="Microsoft.Dnx.Host, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Host.Clr">
+    <Reference Include="Microsoft.Dnx.Host.Clr, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Clr.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Host.Mono">
+    <Reference Include="Microsoft.Dnx.Host.Mono, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Host.Mono.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Loader">
+    <Reference Include="Microsoft.Dnx.Loader, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Runtime">
+    <Reference Include="Microsoft.Dnx.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dnx.Runtime.Internals">
+    <Reference Include="Microsoft.Dnx.Runtime.Internals, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Dnx.Runtime.Internals.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -272,7 +319,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Caching.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration">
+    <Reference Include="Microsoft.Extensions.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -283,10 +331,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
+    <Reference Include="Microsoft.Extensions.Configuration.FileExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Json">
+    <Reference Include="Microsoft.Extensions.Configuration.Json, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Configuration.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -317,7 +367,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Console">
+    <Reference Include="Microsoft.Extensions.Logging.Console, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.Extensions.Logging.Console.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.MemoryPool, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -356,7 +407,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Storage, Version=4.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=6.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
@@ -364,14 +416,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLog">
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Remotion.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="SharpSerializer">
+    <Reference Include="SharpSerializer, Version=2.20.0.0, Culture=neutral, PublicKeyToken=8f4f20011571ee5f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\SharpSerializer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -401,23 +455,20 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Templates, Version=2.0.5802.457, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Templates.dll</HintPath>
     </Reference>
-    <Reference Include="Templates.Language">
+    <Reference Include="Templates.Language, Version=1.0.5802.461, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\Templates.Language.dll</HintPath>
     </Reference>
-    <Reference Include="VitalChoice.Business">
+    <Reference Include="VitalChoice.Business, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\VitalChoice.Business.dll</HintPath>
     </Reference>
-    <Reference Include="VitalChoice.ContentProcessing">
+    <Reference Include="VitalChoice.ContentProcessing, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WorkerRole\VitalChoice.ContentProcessing.dll</HintPath>
     </Reference>
     <Reference Include="VitalChoice.Data, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -458,10 +509,12 @@
     <Compile Include="WorkerRole.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <Content Include="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

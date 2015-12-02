@@ -6,6 +6,7 @@ using ExportWorkerRoleWithSBQueue;
 using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.Azure;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.ServiceBus;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -34,8 +35,7 @@ namespace ExportWorker
             _container = Configuration.BuildContainer();
             var options = _container.Resolve<IOptions<AppOptions>>();
             // Create the queue if it does not exist already
-            string connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(options.Value.ExportService.ConnectionString);
             var plainQueName = options.Value.ExportService.PlainQueueName;
             var encryptedQueName = options.Value.ExportService.EncryptedQueueName;
             if (!namespaceManager.QueueExists(plainQueName))

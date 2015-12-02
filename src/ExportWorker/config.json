@@ -9,7 +9,7 @@
       "Server": "vw4v86cs0h.database.windows.net"
     },
     "ExportService": {
-      "ConnectionString": "",
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
       "PlainQueueName": "PlainQueue",
       "EncryptedQueueName": "EncryptedQueue"
     },

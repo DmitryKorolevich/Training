@@ -3,13 +3,14 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
-using Azure.ApplicationHost;
-using Azure.ApplicationHost.Base;
 using Azure.ApplicationHost.Host;
+using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Repositories;
@@ -131,7 +132,9 @@ namespace ExportWorkerRoleWithSBQueue
             //    .WithParameter((pi, cc) => pi.ParameterType == typeof (ILoggerFactory),
             //        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
             //    .As(typeof (ILogger<>));
-
+            builder.RegisterInstance(new ConsoleLogger("Default",
+                (s, level) => level == LogLevel.Critical || level == LogLevel.Error, true)).As<ILogger>();
+            builder.RegisterGeneric(typeof (Logger<>)).As(typeof (ILogger<>));
             var container = BuildContainer(typeof(Configuration).GetTypeInfo().Assembly, builder);
             return container;
         }
@@ -286,7 +289,8 @@ namespace ExportWorkerRoleWithSBQueue
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
-
+            builder.RegisterType<EncryptedServiceBusHostServer>().As<IEncryptedServiceBusHostServer>();
+            builder.RegisterType<OrderExportService>().As<IOrderExportService>();
             var container = builder.Build();
             return container;
         }
