@@ -1,0 +1,35 @@
+﻿<div data-ng-if="item.SubItems && item.SubItems.length > 0">
+    <a class="btn btn-link pull-left" data-nodrag data-ng-click="toggle(this)">
+        <i class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></i>
+    </a>
+</div>
+<div ui-tree-handle class="" data-ng-if="item.SubItems && item.SubItems.length > 0">
+    <div class="ya-treeview-content clearfix">
+        <div class="line">
+            <div class="fixed-right">
+                <span class="amount">{{item.Amount | currency}}</span>
+                <span class="percent">{{item.Percent | number:2}} %</span>
+            </div>
+            <div class="flex-left">
+                <label>{{item.Name}}</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div ui-tree-handle class="" data-ng-if="!item.SubItems || item.SubItems.length == 0" data-ng-click="selectCategory(item.Id);">
+    <div class="ya-treeview-content clearfix">
+        <div class="line">
+            <div class="fixed-right">
+                <span class="amount">{{item.Amount | currency}}</span>
+                <span class="percent">{{item.Percent | number:2}} %</span>
+            </div>
+            <div class="flex-left">
+                <label>{{item.Name}}</label>
+            </div>
+        </div>
+    </div>
+</div>
+<ol ui-tree-nodes="" data-ng-model="item.SubItems" data-ng-class="{hidden: collapsed}">
+    <li ng-repeat="item in item.SubItems" ui-tree-node collapsed="true" data-ng-include="'app/modules/product/partials/productCategoriesStatisticTreeItem.html'">
+    </li>
+</ol>

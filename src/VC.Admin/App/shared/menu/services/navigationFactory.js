@@ -67,7 +67,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
                         { name: 'orderSKUCounts', stateName: 'index.oneCol.orderSKUCounts', stateLabel: 'Order SKU Counts', access: 3 },
                         { name: 'shippedViaReport', stateName: 'index.oneCol.shippedViaReport', stateLabel: 'Shipped Via Report', access: 3 },
-                        { name: 'categorySalesReport', stateName: 'index.oneCol.categorySalesReport', stateLabel: 'Category Sales Report', access: 3 },
+                        { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'transactionRefundReport', stateName: 'index.oneCol.transactionRefundReport', stateLabel: 'Transaction & Refund Report', access: 3 },
 				    ]
 				},

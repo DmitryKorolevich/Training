@@ -17,6 +17,8 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
+using VitalChoice.Data.Repositories.Customs;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -27,6 +29,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<ContentItem> contentItemRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
+        private readonly SPEcommerceRepository sPEcommerceRepository;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
 
@@ -34,16 +37,22 @@ namespace VitalChoice.Business.Services.Products
             IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
             IRepositoryAsync<ContentItem> contentItemRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider, ITtlGlobalCache templatesCache)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            SPEcommerceRepository sPEcommerceRepository,
+            ILoggerProviderExtended loggerProvider,
+            ITtlGlobalCache templatesCache)
         {
             this.productCategoryRepository = productCategoryRepository;
             this.productCategoryEcommerceRepository = productCategoryEcommerceRepository;
             this.contentItemRepository = contentItemRepository;
             this.contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this.contentTypeRepository = contentTypeRepository;
+            this.sPEcommerceRepository = sPEcommerceRepository;
             this.templatesCache = templatesCache;
             logger = loggerProvider.CreateLoggerDefault();
         }
+
+        #region Categories
 
         public async Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter)
         {
@@ -312,9 +321,65 @@ namespace VitalChoice.Business.Services.Products
             };
         }
 
+        #endregion
+
+        #region Statistic
+
+        public async Task<ProductCategoryStatisticTreeItemModel> GetProductCategoriesStatisticAsync(ProductCategoryStatisticFilter filter)
+        {
+            var categoryRoot = await this.GetCategoriesTreeAsync(new ProductCategoryTreeFilter());
+            var statistic = await sPEcommerceRepository.GetProductCategoryStatisticAsync(filter.From, filter.To);
+
+            var toReturn = new ProductCategoryStatisticTreeItemModel(categoryRoot);
+            ProcessProductCategoryStatisticItemAmount(toReturn, statistic);
+            ProcessProductCategoryStatisticItemPercent(toReturn, null);
+            return toReturn;
+        }
+
+        private decimal ProcessProductCategoryStatisticItemAmount(ProductCategoryStatisticTreeItemModel item,ICollection<ProductCategoryStatisticItem> statistic)
+        {
+            if(item.SubItems!=null)
+            {
+                foreach(var subItem in item.SubItems)
+                {
+                    item.Amount += ProcessProductCategoryStatisticItemAmount(subItem, statistic);
+                }
+            }
+
+            var statisticItem = statistic.FirstOrDefault(p => p.Id == item.Id);
+            if(statisticItem!=null)
+            {
+                item.Amount += statisticItem.Amount;
+            }
+            return item.Amount;
+        }
+
+        private void ProcessProductCategoryStatisticItemPercent(ProductCategoryStatisticTreeItemModel item, ProductCategoryStatisticTreeItemModel parentItem)
+        {
+            if(parentItem!=null && parentItem.Amount!=0)
+            {
+                item.Percent = Math.Round(item.Amount*100 / parentItem.Amount,2);
+            }
+
+            if (item.SubItems != null)
+            {
+                foreach (var subItem in item.SubItems)
+                {
+                    ProcessProductCategoryStatisticItemPercent(subItem, item);
+                }
+            }
+        }
+
+        public async Task<ICollection<SkusInProductCategoryStatisticItem>> GetSkusInProductCategoryStatisticAsync(ProductCategoryStatisticFilter filter)
+        {
+            return await sPEcommerceRepository.GetSkusInProductCategoryStatisticAsync(filter.From, filter.To, filter.IdCategory.Value);
+        }
+
+        #endregion
+        
         #region Private
 
-	    private IList<ProductNavCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IDictionary<int, ProductCategoryLite> contentCategories)
+        private IList<ProductNavCategoryLite> ConvertToTransferCategory(IEnumerable<ProductCategory> subCategories, IDictionary<int, ProductCategoryLite> contentCategories)
 	    {
 		    return subCategories.Where(x => contentCategories.ContainsKey(x.Id)).Select(x => new ProductNavCategoryLite
 		    {

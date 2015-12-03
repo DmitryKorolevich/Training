@@ -21,6 +21,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.promotionsController',
 	'app.modules.product.controllers.promotionManageController',
 	'app.modules.product.controllers.outOfStocksController',
+	'app.modules.product.controllers.productCategoriesStatisticController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -43,6 +44,11 @@ angular.module('app.modules.product', [
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
+                .state('index.oneCol.productCategoriesStatistic', {
+                    url: '/report/category-sales-report',
+                    templateUrl: 'app/modules/product/partials/productCategoriesStatistic.html',
+                    controller: 'productCategoriesStatisticController'
+                })
                 /*inventory categories*/
 		        .state('index.oneCol.manageInventoryCategories', {
 		            url: '/products/inventorycategories',

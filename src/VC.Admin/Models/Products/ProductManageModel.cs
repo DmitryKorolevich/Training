@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
+using System;
 
 namespace VC.Admin.Models.Product
 {

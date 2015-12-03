@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VitalChoice.Infrastructure.Context
 {
@@ -59,11 +60,23 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("VSkus");
             });
 
-            builder.Entity<VProductsWithReview>(entity =>
+            builder.Entity<VProductSku>(entity =>
             {
                 entity.HasKey(p => p.IdProduct);
                 entity.Ignore(x => x.Id);
-                entity.ToTable("VProductsWithReviews");
+                entity.Ignore(x => x.EditedByAgentId);
+                entity.ToTable("VProductSkus");
+            });
+
+            builder.Entity<ProductCategoryStatisticItem>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+            });
+
+            builder.Entity<SkusInProductCategoryStatisticItem>(entity =>
+            {
+                entity.HasKey(p => p.Code);
+                entity.Ignore(p => p.Id);
             });
 
             builder.Entity<VCustomer>(entity =>

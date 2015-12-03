@@ -76,7 +76,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 SetSkuOrdering(dynamic.Skus);
                 entity.Hidden = dynamic.Hidden;
                 entity.Name = dynamic.Name;
-                entity.PublicId = dynamic.PublicId;
 
                 if (dynamic.CategoryIds != null)
                 {

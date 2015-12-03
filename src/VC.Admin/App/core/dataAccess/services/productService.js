@@ -29,6 +29,18 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    deleteCategory: function (id, tracker) {
 	        return $http.post(baseUrl + 'DeleteCategory/' + id, null, getConfig(tracker));
 	    },
+	    getProductCategoriesStatistic: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetProductCategoriesStatistic', filter, getConfig(tracker));
+	    },
+	    getProductCategoriesStatisticReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetProductCategoriesStatisticReportFile?from={0}&to={1}&buildNumber={2}'.format(filter.From, filter.To, buildNumber);
+	    },
+	    getSkusInProductCategoryStatistic: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkusInProductCategoryStatistic', filter, getConfig(tracker));
+	    },
 
 	    //inventoryCategories
 	    getInventoryCategoriesTree: function (filter, tracker) {

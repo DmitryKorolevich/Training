@@ -223,4 +223,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VHealthwisePeriods.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetProductCategoryStatistic.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkusInProductCategoryStatistic.sql" />
+  </ItemGroup>
 </Project>

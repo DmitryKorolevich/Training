@@ -26,6 +26,10 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
+using VitalChoice.Business.CsvExportMaps;
+using Microsoft.Net.Http.Headers;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -38,13 +42,18 @@ namespace VC.Admin.Controllers
         private readonly IInventoryCategoryService inventoryCategoryService;
         private readonly IProductReviewService productReviewService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
+        private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
 
-        public ProductController(IProductCategoryService productCategoryService, IProductService productService,
+        public ProductController(IProductCategoryService productCategoryService,
+            IProductService productService,
             IDynamicServiceAsync<ProductDynamic, Product> productUniversalService,
-            IInventoryCategoryService inventoryCategoryService, IProductReviewService productReviewService,
-            ILoggerProviderExtended loggerProvider, IDynamicMapper<ProductDynamic, Product> mapper,
+            IInventoryCategoryService inventoryCategoryService, 
+            IProductReviewService productReviewService,
+            ILoggerProviderExtended loggerProvider,
+            IDynamicMapper<ProductDynamic, Product> mapper,
+            ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             IObjectHistoryLogService objectHistoryLogService)
         {
             this.productCategoryService = productCategoryService;
@@ -52,6 +61,7 @@ namespace VC.Admin.Controllers
             this.productService = productService;
             this.productUniversalService = productUniversalService;
             this.productReviewService = productReviewService;
+            this.productCategoryStatisticTreeItemCSVExportService = productCategoryStatisticTreeItemCSVExportService;
             this.objectHistoryLogService = objectHistoryLogService;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLoggerDefault();
@@ -331,6 +341,64 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteCategory(int id, [FromBody] object model)
         {
             return await productCategoryService.DeleteCategoryAsync(id);
+        }
+
+        [HttpPost]
+        public async Task<Result<ProductCategoryStatisticTreeItemModel>> GetProductCategoriesStatistic([FromBody]ProductCategoryStatisticFilter filter)
+        {
+            return await productCategoryService.GetProductCategoriesStatisticAsync(filter);
+        }
+
+        [HttpGet]
+        public async Task<FileResult> GetProductCategoriesStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to)
+        {
+            var rootItem = await productCategoryService.GetProductCategoriesStatisticAsync(
+                new ProductCategoryStatisticFilter()
+                {
+                    From = from,
+                    To = to
+                });
+
+            List<ProductCategoryStatisticTreeItemModel> items = new List<ProductCategoryStatisticTreeItemModel>();
+            TransformProductCategoryTreeToList(rootItem, items, 1);
+            items.Remove(rootItem);
+
+            var data = productCategoryStatisticTreeItemCSVExportService.ExportToCsv(items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.PRODUCT_CATEGORY_STATISTIC, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        private void TransformProductCategoryTreeToList(ProductCategoryStatisticTreeItemModel item, ICollection<ProductCategoryStatisticTreeItemModel> list, int level)
+        {
+            var prefix = String.Empty;
+            int current = 0;
+            while (current <level)
+            {
+                prefix += "----";
+                current++;
+            }
+            item.Name = prefix + item.Name;
+            item.Percent = item.Percent / 100;
+            list.Add(item);
+            if(item.SubItems!=null)
+            {
+                foreach(var subItem in item.SubItems)
+                {
+                    TransformProductCategoryTreeToList(subItem, list, ++level);
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<SkusInProductCategoryStatisticItem>>> GetSkusInProductCategoryStatistic([FromBody]ProductCategoryStatisticFilter filter)
+        {
+            return (await productCategoryService.GetSkusInProductCategoryStatisticAsync(filter)).ToList();
         }
 
         #endregion

@@ -16,7 +16,7 @@
                 // again, and the 2nd time, the value will be undefined
                 if (inputValue == undefined) return ''
                 var transformedInput = inputValue.replace(/[^0-9]/g, '');
-                if (parseInt(transformedInput) == 0)
+                if (parseInt(transformedInput) == 0 && denyZero)
                 {
                     transformedInput = null;
                 }

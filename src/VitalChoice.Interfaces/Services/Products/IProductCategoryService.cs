@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Interfaces.Services.Products
 {
-	public interface IProductCategoryService
+    public interface IProductCategoryService
     {
         Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter);
         /// <summary>
@@ -18,9 +20,13 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<ProductCategoryContent> GetCategoryAsync(int id);
         Task<ProductCategoryContent> UpdateCategoryAsync(ProductCategoryContent category);
         Task<bool> DeleteCategoryAsync(int id);
-		Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter);
+        Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategoryLiteFilter liteFilter);
 
-		Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory,
-			ProductCategoryLiteFilter liteFilter);
+        Task<ProductNavCategoryLite> GetLiteCategoriesTreeAsync(ProductCategory productRootCategory,
+            ProductCategoryLiteFilter liteFilter);
+
+        Task<ProductCategoryStatisticTreeItemModel> GetProductCategoriesStatisticAsync(ProductCategoryStatisticFilter filter);
+
+        Task<ICollection<SkusInProductCategoryStatisticItem>> GetSkusInProductCategoryStatisticAsync(ProductCategoryStatisticFilter filter);
     }
 }
