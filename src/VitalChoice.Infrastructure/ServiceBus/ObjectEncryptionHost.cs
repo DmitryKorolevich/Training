@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Microsoft.Extensions.OptionsModel;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -12,7 +15,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public delegate void SessionExpiredEventHandler(Guid session);
 
-    public class ObjectEncryptionHost : IDisposable
+    public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
     {
         public X509Certificate2 CurrentCert => Server ? RootCert : ClientCert;
         public bool Server { get; }
@@ -25,18 +28,23 @@ namespace VitalChoice.Infrastructure.ServiceBus
         private readonly RSA _rootProvider;
         private readonly RSA _clientProvider;
 #endif
+        private readonly Aes _localAes;
         private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
 
         /// <summary>
         /// Server Mode
         /// </summary>
-        public ObjectEncryptionHost(bool server = true)
+        public ObjectEncryptionHost(bool server, IOptions<AppOptions> options)
         {
             Server = server;
-            var certStore = new X509Store("VCCertStore", StoreLocation.CurrentUser);
+#if NET451 || DNX451
+            var certStore = new X509Store(StoreLocation.LocalMachine);
+#else
+            var certStore = new X509Store();
+#endif
             certStore.Open(OpenFlags.ReadOnly);
-            var certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "VC Root", true);
+            var certificates = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.ServerCertThumbprint, false);
             if (certificates.Count != 1)
                 throw new InvalidOperationException(
                     "Cannot find valid <VC Root> Certificate in Store or more than one certificate with the same subject name installed");
@@ -57,8 +65,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
             else
             {
-                certificates = certStore.Certificates.Find(X509FindType.FindBySubjectName, "staging-vc.cloudapp.net",
-                    true);
+                certificates = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.ClientCertThumbprint,
+                    false);
                 if (certificates.Count != 1)
                     throw new InvalidOperationException(
                         "Cannot find <staging-vc.cloudapp.net> Certificate in Store or more than one certificate with the same subject name installed");
@@ -84,6 +92,106 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #else
             certStore.Dispose();
 #endif
+            _localAes = GetLocalAes();
+        }
+
+        public T LocalDecrypt<T>(byte[] data)
+        {
+            using (var memory = new MemoryStream())
+            {
+                var decryptor = _localAes.CreateDecryptor();
+
+                using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
+                {
+                    cs.Write(data, 0, data.Length);
+                }
+                memory.Seek(0, SeekOrigin.Begin);
+                SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
+                return (T) serializer.Deserialize(memory);
+            }
+        }
+
+        public byte[] LocalEncrypt(object obj)
+        {
+            byte[] plainData;
+            using (var memory = new MemoryStream())
+            {
+                SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
+                serializer.Serialize(obj, memory);
+                plainData = memory.ToArray();
+            }
+            using (var memory = new MemoryStream())
+            {
+                var encryptor = _localAes.CreateDecryptor();
+                using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
+                {
+                    cs.Write(plainData, 0, plainData.Length);
+                }
+                return memory.ToArray();
+            }
+        }
+
+        private Aes GetLocalAes()
+        {
+            var aes = Aes.Create();
+            if (aes != null)
+            {
+                aes.KeySize = 256;
+                aes.IV = Take(GetPublicKeyHash(), 16);
+                aes.Key = GetPrivateKeyHash();
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+            }
+            return aes;
+        }
+
+        private byte[] Take(byte[] data, int length)
+        {
+            var result = new byte[length];
+            Array.Copy(data, result, length);
+            return result;
+        }
+
+        private byte[] GetPrivateKeyHash()
+        {
+#if DNX451 || NET451
+            var sha = new SHA256CryptoServiceProvider();
+#else
+            var sha = SHA256.Create();
+#endif
+            sha.Initialize();
+            var pk = Server ? _rootProvider.ExportParameters(true) : _clientProvider.ExportParameters(true);
+            using (var memory = new MemoryStream())
+            {
+                memory.Write(pk.D, 0, pk.D.Length);
+                memory.Write(pk.DP, 0, pk.DP.Length);
+                memory.Write(pk.DQ, 0, pk.DQ.Length);
+                memory.Write(pk.Exponent, 0, pk.Exponent.Length);
+                memory.Write(pk.InverseQ, 0, pk.InverseQ.Length);
+                memory.Write(pk.Modulus, 0, pk.Modulus.Length);
+                memory.Write(pk.P, 0, pk.P.Length);
+                memory.Write(pk.Q, 0, pk.Q.Length);
+                memory.Seek(0, SeekOrigin.Begin);
+                return sha.ComputeHash(memory);
+            }
+        }
+
+        private byte[] GetPublicKeyHash()
+        {
+#if DNX451 || NET451
+            var sha = new SHA256CryptoServiceProvider();
+#else
+            var sha = SHA256.Create();
+#endif
+            sha.Initialize();
+            var pk = Server ? _rootProvider.ExportParameters(false) : _clientProvider.ExportParameters(false);
+            using (var memory = new MemoryStream())
+            {
+                memory.Write(pk.Exponent, 0, pk.Exponent.Length);
+                memory.Write(pk.Modulus, 0, pk.Modulus.Length);
+                memory.Seek(0, SeekOrigin.Begin);
+                return sha.ComputeHash(memory);
+            }
         }
 
         public bool ValidateClientCertificate(X509Certificate2 rootCert, X509Certificate2 clientCert)
@@ -144,20 +252,66 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public T RsaDecrypt<T>(byte[] data)
+        public bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result)
         {
-            if (data == null)
-                return default(T);
-            if (Server)
-                throw new InvalidOperationException("You need to specify client RSA explicitly");
-            return RsaDecrypt<T>(data, _rootProvider);
+            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
+            using (var memory = new MemoryStream())
+            {
+                memory.Write(obj.Data, 0, obj.Data.Length);
+                memory.Seek(0, SeekOrigin.Begin);
+                result = (T) serializer.Deserialize(memory);
+#if DNX451 || NET451
+                var rsa = (RSACryptoServiceProvider)obj.Certificate.PublicKey.Key;
+#else
+                var rsa = obj.Certificate.GetRSAPublicKey();
+#endif
+                X509Certificate2 serverCert, clientCert;
+                if (Server)
+                {
+                    serverCert = obj.Certificate;
+                    clientCert = ClientCert;
+                }
+                else
+                {
+                    serverCert = RootCert;
+                    clientCert = obj.Certificate;
+                }
+#if DNX451 || NET451
+                if (ValidateClientCertificate(serverCert, clientCert) &&
+                    rsa.VerifyData(obj.Data, new SHA256CryptoServiceProvider(), obj.Sign))
+#else
+                if (ValidateClientCertificate(serverCert, clientCert) &&
+                    rsa.VerifyData(obj.Data, obj.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+#endif
+
+                return true;
+                result = default(T);
+                return false;
+            }
         }
 
-        public byte[] RsaEncrypt(object obj)
+        public PlainCommandData RsaSignWithConvert(object obj)
         {
             if (obj == null)
+            {
                 return null;
-            return RsaEncrypt(obj, Server ? _rootProvider : _clientProvider);
+            }
+            var result = new PlainCommandData();
+            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
+            using (var memory = new MemoryStream())
+            {
+                var signProvider = Server ? _rootProvider : _clientProvider;
+                serializer.Serialize(obj, memory);
+                result.Data = memory.ToArray();
+                memory.Seek(0, SeekOrigin.Begin);
+#if NET451 || DNX451
+                result.Sign = signProvider.SignData(memory, new SHA256CryptoServiceProvider());
+#else
+                result.Sign = signProvider.SignData(memory, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+#endif
+            }
+            result.Certificate = CurrentCert;
+            return result;
         }
 
         public T AesDecrypt<T>(byte[] data, Guid session)
@@ -186,7 +340,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return default(T);
         }
 
-        public byte[] AesEncrypt<T>(T obj, Guid session)
+        public byte[] AesEncrypt(object obj, Guid session)
         {
             lock (_sessions)
             {
@@ -234,7 +388,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 throw new InvalidOperationException("Cannot initialize AES encryption");
             aes.Key = key.Key;
             aes.IV = key.IV;
-            aes.Mode = CipherMode.CTS;
+            aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
             SessionInfo encryption = new SessionInfo
             {
@@ -289,7 +443,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 aes.KeySize = 256;
                 aes.GenerateKey();
                 aes.GenerateIV();
-                aes.Mode = CipherMode.CTS;
+                aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
                 SessionInfo encryption = new SessionInfo
                 {

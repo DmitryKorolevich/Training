@@ -1,28 +1,31 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using Autofac;
 using ExportWorkerRoleWithSBQueue;
 using ExportWorkerRoleWithSBQueue.Services;
-using Microsoft.Azure;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.ServiceBus;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.ServiceBus;
 
 namespace ExportWorker
 {
     public class WorkerRole : RoleEntryPoint
     {
-        // The name of your queue
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
+        private IOptions<AppOptions> _options;
+        private ILogger _logger;
+        private IObjectEncryptionHost _encryptionHost;
         private IContainer _container;
 
         public override void Run()
         {
             Trace.WriteLine("Starting processing of messages");
-            using (_container.Resolve<IEncryptedServiceBusHostServer>())
+            using (new EncryptedServiceBusHostServer(_options, _logger, _container, _encryptionHost))
             {
                 _completedEvent.WaitOne();
             }
@@ -30,21 +33,32 @@ namespace ExportWorker
 
         public override bool OnStart()
         {
-            // Set the maximum number of concurrent connections 
-            ServicePointManager.DefaultConnectionLimit = 12;
-            _container = Configuration.BuildContainer();
-            var options = _container.Resolve<IOptions<AppOptions>>();
-            // Create the queue if it does not exist already
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(options.Value.ExportService.ConnectionString);
-            var plainQueName = options.Value.ExportService.PlainQueueName;
-            var encryptedQueName = options.Value.ExportService.EncryptedQueueName;
-            if (!namespaceManager.QueueExists(plainQueName))
+            try
             {
-                namespaceManager.CreateQueue(plainQueName);
+                // Set the maximum number of concurrent connections 
+                ServicePointManager.DefaultConnectionLimit = 12;
+                _container = Configuration.BuildContainer();
+                _options = _container.Resolve<IOptions<AppOptions>>();
+                _logger = _container.Resolve<ILogger>();
+                _encryptionHost = _container.Resolve<IObjectEncryptionHost>();
+
+                var namespaceManager =
+                    NamespaceManager.CreateFromConnectionString(_options.Value.ExportService.ConnectionString);
+                var plainQueName = _options.Value.ExportService.PlainQueueName;
+                var encryptedQueName = _options.Value.ExportService.EncryptedQueueName;
+                if (!namespaceManager.QueueExists(plainQueName))
+                {
+                    namespaceManager.CreateQueue(plainQueName);
+                }
+                if (!namespaceManager.QueueExists(encryptedQueName))
+                {
+                    namespaceManager.CreateQueue(encryptedQueName);
+                }
             }
-            if (!namespaceManager.QueueExists(encryptedQueName))
+            catch (Exception e)
             {
-                namespaceManager.CreateQueue(encryptedQueName);
+                if (e.InnerException != null)
+                    throw e.InnerException;
             }
             return base.OnStart();
         }

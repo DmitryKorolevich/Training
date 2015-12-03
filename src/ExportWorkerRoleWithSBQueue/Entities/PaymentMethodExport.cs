@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain;
 
 namespace ExportWorkerRoleWithSBQueue.Entities
 {
-    public class CustomerPaymentMethod : PaymentMethod
+    public class PaymentMethodExport : Entity
     {
-        public int IdCustomer { get; set; }
-        public int IdPaymentMethod { get; set; }
+        public byte[] CreditCardNumber { get; set; }
     }
 }

@@ -50,6 +50,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Ecommerce;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Identity.UserStores;
+using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Avatax;
@@ -107,6 +108,8 @@ namespace ExportWorkerRoleWithSBQueue
                     ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                    ClientCertThumbprint = configuration.GetSection("App:ExportService:ClientCertThumbprint").Value,
+                    ServerCertThumbprint = configuration.GetSection("App:ExportService:ServerCertThumbprint").Value
                 };
                 options.Avatax = new AvataxOptions
                 {
@@ -142,6 +145,8 @@ namespace ExportWorkerRoleWithSBQueue
                     ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                    ClientCertThumbprint = configuration.GetSection("App:ExportService:ClientCertThumbprint").Value,
+                    ServerCertThumbprint = configuration.GetSection("App:ExportService:ServerCertThumbprint").Value
                 };
                 options.Avatax = new AvataxOptions
                 {
@@ -182,6 +187,8 @@ namespace ExportWorkerRoleWithSBQueue
                 .AsSelf()
                 .InstancePerLifetimeScope();
             builder.RegisterType<EcommerceContext>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ExportInfoContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<LogsContext>();
             builder.RegisterGeneric(typeof(RepositoryAsync<>))
@@ -325,8 +332,7 @@ namespace ExportWorkerRoleWithSBQueue
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
-            builder.RegisterType<EncryptedServiceBusHostServer>().As<IEncryptedServiceBusHostServer>();
-            builder.RegisterType<OrderExportService>().As<IOrderExportService>();
+            builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().WithParameter("server", true).SingleInstance();
             var container = builder.Build();
             return container;
         }

@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace ExportWorkerRoleWithSBQueue.Entities
 {
-    public class OrderPaymentMethod : PaymentMethod
+    public class CustomerPaymentMethodExport : PaymentMethodExport
     {
-        public int IdOrder { get; set; }
+        public int IdCustomer { get; set; }
+        public int IdPaymentMethod { get; set; }
     }
 }
