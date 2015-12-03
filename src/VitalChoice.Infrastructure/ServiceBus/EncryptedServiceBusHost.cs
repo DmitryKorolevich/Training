@@ -26,14 +26,19 @@ namespace VitalChoice.Infrastructure.ServiceBus
         private readonly QueueClient _plainClient;
         private readonly QueueClient _encryptedClient;
 #endif
+        private readonly ManualResetEvent _readyToDisposePlain;
+        private readonly ManualResetEvent _readyToDisposeEncrypted;
         private readonly ManualResetEvent _disposeEvent;
         private readonly Dictionary<CommandItem, ServiceBusCommandBase> _commands;
 
-        protected abstract ObjectEncryptionHost EncryptionHost { get; }
+        protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
 
-        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger)
+        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost)
         {
+            EncryptionHost = encryptionHost;
+            _readyToDisposePlain = new ManualResetEvent(true);
+            _readyToDisposeEncrypted = new ManualResetEvent(true);
             Logger = logger;
             _disposeEvent = new ManualResetEvent(false);
 #if NET451 || DNX451
@@ -57,11 +62,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
 #if NET451 || DNX451
             _plainClient.Send(
-                new BrokeredMessage(new PlainCommandData
-                {
-                    Data = EncryptionHost.RsaEncrypt(command.Data),
-                    Certificate = EncryptionHost.CurrentCert
-                })
+                new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command.Data))
                 {
                     ContentType = command.CommandName,
                     SessionId = command.SessionId.ToString(),
@@ -81,11 +82,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
 #if NET451 || DNX451
             _plainClient.Send(
-                new BrokeredMessage(new PlainCommandData
-                {
-                    Data = EncryptionHost.RsaEncrypt(command.Data),
-                    Certificate = EncryptionHost.CurrentCert
-                })
+                new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command.Data))
                 {
                     ContentType = command.CommandName,
                     SessionId = command.SessionId.ToString(),
@@ -94,13 +91,13 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 });
 
             //BUG: set maximum wait time of command result receive to 20 minutes
-            if (!command.ReadyEvent.WaitOne(new TimeSpan(0, 20, 0)))
+            if (!command.ReadyEvent.WaitOne(command.TimeToLeave))
             {
-                throw new ApiException($"Command timeout. <{command.CommandName}>");
+                throw new TimeoutException($"Command timeout. <{command.CommandName}>({command.CommandId})");
             }
 #endif
             CommandComplete(command);
-            return EncryptionHost.RsaDecrypt<T>(command.Result as byte[]);
+            return (T) command.Result;
         }
 
         public void SendCommand(ServiceBusCommandBase command)
@@ -141,9 +138,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return Task.Run(() =>
             {
                 //BUG: set maximum wait time of command result receive to 5 minutes
-                if (!command.ReadyEvent.WaitOne(new TimeSpan(0, 5, 0)))
+                if (!command.ReadyEvent.WaitOne(command.TimeToLeave))
                 {
-                    throw new ApiException($"Command timeout. <{command.CommandName}>");
+                    throw new TimeoutException($"Command timeout. <{command.CommandName}>({command.CommandId})");
                 }
                 CommandComplete(command);
                 return (T) command.Result;
@@ -210,6 +207,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             try
             {
+                _readyToDisposeEncrypted.Reset();
                 ServiceBusCommandBase command;
                 lock (_commands)
                 {
@@ -240,34 +238,26 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 Logger.LogError("<ProcessEncryptedMessage> Error while processing incoming message", e);
                 throw;
             }
+            finally
+            {
+                _readyToDisposeEncrypted.Set();
+            }
         }
 
         private void ProcessPlainMessage(BrokeredMessage message)
         {
             try
             {
+                _readyToDisposePlain.Reset();
                 ServiceBusCommandBase command;
                 lock (_commands)
                 {
                     _commands.TryGetValue(new CommandItem(Guid.Parse(message.MessageId), message.ContentType),
                         out command);
                 }
-                X509Certificate2 serverCert, clientCert;
-                var commandData = message.GetBody<PlainCommandData>();
-                if (EncryptionHost.Server)
+                object body;
+                if (EncryptionHost.RsaCheckSignWithConvert(message.GetBody<PlainCommandData>(), out body))
                 {
-                    serverCert = commandData.Certificate;
-                    clientCert = EncryptionHost.ClientCert;
-                }
-                else
-                {
-                    serverCert = EncryptionHost.RootCert;
-                    clientCert = commandData.Certificate;
-                }
-                if (EncryptionHost.ValidateClientCertificate(serverCert, clientCert))
-                {
-                    var rsa = (RSACryptoServiceProvider) commandData.Certificate.PublicKey.Key;
-                    var body = EncryptionHost.RsaDecrypt<object>(commandData.Data, rsa);
                     if (command != null)
                     {
                         command.RequestAcqureAction?.Invoke(command, body);
@@ -286,7 +276,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 }
                 else
                 {
-                    throw new AccessDeniedException("Invalid client certificate");
+                    throw new AccessDeniedException("Invalid sign");
                 }
             }
             catch (Exception e)
@@ -294,12 +284,18 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 Logger.LogError("<ProcessPlainMessage> Error while processing incoming message", e);
                 throw;
             }
+            finally
+            {
+                _readyToDisposePlain.Set();
+            }
         }
 #endif
 
         public virtual void Dispose()
         {
             _disposeEvent.Set();
+            WaitHandle.WaitAll(new WaitHandle[] {_readyToDisposeEncrypted, _readyToDisposePlain},
+                TimeSpan.FromSeconds(20));
 #if NET451 || DNX451
             _plainClient?.Close();
             _encryptedClient?.Close();

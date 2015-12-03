@@ -14,10 +14,9 @@ namespace VitalChoice.Business.Services
     {
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider)
-            : base(appOptions, loggerProvider.CreateLoggerDefault())
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
+            : base(appOptions, loggerProvider.CreateLoggerDefault(), encryptionHost)
         {
-            EncryptionHost = new ObjectEncryptionHost(false);
             var publicKey =
                 ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(new Guid(),
                     ServiceBusCommandConstants.GetPublicKey));
@@ -46,8 +45,6 @@ namespace VitalChoice.Business.Services
         {
             EncryptionHost.RemoveSession(sessionId);
         }
-
-        protected override ObjectEncryptionHost EncryptionHost { get; }
 
         protected override bool ProcessPlainCommand(ServiceBusCommand command)
         {

@@ -7,6 +7,8 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public X509Certificate2 Certificate { get; set; }
 
         public byte[] Data { get; set; }
+
+        public byte[] Sign { get; set; }
     }
 
     public class KeyExchange

@@ -83,6 +83,7 @@ using VitalChoice.Business.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Healthwise;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Ecommerce;
+using VitalChoice.Infrastructure.ServiceBus;
 
 namespace VitalChoice.Core.DependencyInjection
 {
@@ -181,7 +182,15 @@ namespace VitalChoice.Core.DependencyInjection
 		            Username = configuration.GetSection("App:Email:Username").Value,
 		            Password = configuration.GetSection("App:Email:Password").Value
 	            };
-				options.AzureStorage = new AzureStorage()
+                options.ExportService = new ExportService
+                {
+                    ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
+                    EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
+                    PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
+                    CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value)
+                };
+                options.AzureStorage = new AzureStorage()
 				{
 					StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
 					CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
@@ -462,8 +471,9 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
             builder.RegisterType<ReCaptchaValidator>().AsSelf();
-
-			FinishCustomRegistrations(builder);
+            builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
+            builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().SingleInstance();
+            FinishCustomRegistrations(builder);
 
             var container = builder.Build();
             return container;

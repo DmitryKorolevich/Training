@@ -29,6 +29,13 @@
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",
       "Server": "vw4v86cs0h.database.windows.net"
     },
+    "ExportService": {
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
+      "PlainQueueName": "PlainQueue",
+      "EncryptedQueueName": "EncryptedQueue",
+      "CertThumbprint": "DA049AD9A5823D685AE1DD5F679EE22DB2B38F8F",
+      "EncryptionHostSessionExpire": false
+    },
     "FedExOptions": {
       "AccountNumber": "304955066",
       "MeterNumber": "104067734",

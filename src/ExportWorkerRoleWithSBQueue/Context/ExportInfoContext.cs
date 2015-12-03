@@ -37,13 +37,15 @@ namespace ExportWorkerRoleWithSBQueue.Context
         {
             base.OnModelCreating(builder);
             builder.ForSqlServerUseIdentityColumns();
-            builder.Entity<CustomerPaymentMethod>(entity =>
+            builder.Entity<CustomerPaymentMethodExport>(entity =>
             {
+                entity.Ignore(c => c.Id);
                 entity.ToTable("CustomerPaymentMethods");
                 entity.HasKey(c => new {c.IdCustomer, c.IdPaymentMethod});
             });
-            builder.Entity<OrderPaymentMethod>(entity =>
+            builder.Entity<OrderPaymentMethodExport>(entity =>
             {
+                entity.Ignore(c => c.Id);
                 entity.ToTable("OrderPaymentMethods");
                 entity.HasKey(c => new {c.IdOrder});
             });

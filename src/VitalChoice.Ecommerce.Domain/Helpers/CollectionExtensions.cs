@@ -105,6 +105,34 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
+        public static void MergeUpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection, Action<T1, T2> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                main.UpdateKeyed(toAdd, leftKeySelector, rightKeySelector, updateAction);
+                main.MergeKeyedAdd(toAdd, leftKeySelector, rightKeySelector, projection);
+                main.RemoveAll(main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray());
+            }
+        }
+
+        public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Action<T1, T2> updateAction)
+        {
+            if (main != null && toAdd != null)
+            {
+                Dictionary<TKey, T2> searchIn = toAdd.ToDictionary(rightKeySelector);
+                foreach (var m in main)
+                {
+                    T2 item;
+                    if (searchIn.TryGetValue(leftKeySelector(m), out item))
+                    {
+                        updateAction(m, item);
+                    }
+                }
+            }
+        }
+
         public static void MergeKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, T1> projection)
         {

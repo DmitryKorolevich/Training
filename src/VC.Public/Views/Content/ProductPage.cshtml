@@ -6,7 +6,12 @@
 }
 
 @section PageScripts {
+	<div id='yPlayer1' class='youtube-popup-container'></div>
+	<div id='yPlayer2' class='youtube-popup-container'></div>
+	<div id='yPlayer3' class='youtube-popup-container'></div>
+	<div id='yPlayer4' class='youtube-popup-container'></div>
+
 	<script src="@Url.Content("/app/modules/product/productPage.js")"></script>
-	<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script src="https://www.google.com/recaptcha/api.js"></script>
 }
 @Html.Raw(Model.HTML)
