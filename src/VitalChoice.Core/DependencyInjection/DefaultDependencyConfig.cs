@@ -187,8 +187,8 @@ namespace VitalChoice.Core.DependencyInjection
                     ConnectionString = configuration.GetSection("App:ExportService:ConnectionString").Value,
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
-                    ClientCertThumbprint = configuration.GetSection("App:ExportService:ClientCertThumbprint").Value,
-                    ServerCertThumbprint = configuration.GetSection("App:ExportService:ServerCertThumbprint").Value
+                    CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
+                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value)
                 };
                 options.AzureStorage = new AzureStorage()
 				{
@@ -470,7 +470,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
             builder.RegisterType<ReCaptchaValidator>().AsSelf();
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
-            builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().WithParameter("server", false).SingleInstance();
+            builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().SingleInstance();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

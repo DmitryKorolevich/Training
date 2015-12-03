@@ -7,10 +7,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public interface IObjectEncryptionHost
     {
-        X509Certificate2 CurrentCert { get; }
-        bool Server { get; }
-        X509Certificate2 ClientCert { get; }
-        X509Certificate2 RootCert { get; }
+        X509Certificate2 LocalCert { get; }
         T LocalDecrypt<T>(byte[] data);
         byte[] LocalEncrypt(object obj);
         bool ValidateClientCertificate(X509Certificate2 rootCert, X509Certificate2 clientCert);

@@ -18,8 +18,8 @@
       "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=9bCmTJyWrS2//GpvV5A3+bsPHdyph0ndE8tE14gsD24=",
       "PlainQueueName": "PlainQueue",
       "EncryptedQueueName": "EncryptedQueue",
-      "ServerCertThumbprint": "67795459EEA3AD9D8307B11CFEC5DC0698291350",
-      "ClientCertThumbprint": "DA049AD9A5823D685AE1DD5F679EE22DB2B38F8F"
+      "CertThumbprint": "67795459EEA3AD9D8307B11CFEC5DC0698291350",
+      "EncryptionHostSessionExpire": true
     },
     "Avatax": {
       "AccountNumber": "1100019190",

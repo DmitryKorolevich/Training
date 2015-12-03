@@ -10,7 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string ConnectionString { get; set; }
         public string PlainQueueName { get; set; }
         public string EncryptedQueueName { get; set; }
-        public string ServerCertThumbprint { get; set; }
-        public string ClientCertThumbprint { get; set; }
+        public string CertThumbprint { get; set; }
+        public bool EncryptionHostSessionExpire { get; set; }
     }
 }
