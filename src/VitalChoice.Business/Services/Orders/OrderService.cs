@@ -63,6 +63,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<HealthwiseOrder> _healthwiseOrderRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<HealthwisePeriod> _healthwisePeriodRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
+        private readonly IEncryptedOrderExportService _encryptedOrderExportService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrder> vOrderRepository,
@@ -82,7 +83,7 @@ namespace VitalChoice.Business.Services.Orders
             DynamicExpressionVisitor queryVisitor,
             IEcommerceRepositoryAsync<HealthwiseOrder> healthwiseOrderRepositoryAsync,
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepositoryAsync,
-            IAppInfrastructureService appInfrastructureService)
+            IAppInfrastructureService appInfrastructureService, IEncryptedOrderExportService encryptedOrderExportService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor)
@@ -100,6 +101,7 @@ namespace VitalChoice.Business.Services.Orders
             _healthwiseOrderRepositoryAsync = healthwiseOrderRepositoryAsync;
             _healthwisePeriodRepositoryAsync = healthwisePeriodRepositoryAsync;
             _appInfrastructureService = appInfrastructureService;
+            _encryptedOrderExportService = encryptedOrderExportService;
         }
 
         protected override IQueryLite<Order> BuildQuery(IQueryLite<Order> query)
@@ -271,6 +273,7 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = model.IdEditedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
+                    await _encryptedOrderExportService.UpdateOrderPaymentMethod(model.PaymentMethod);
 
                     transaction.Commit();
                     return entity;
@@ -295,6 +298,7 @@ namespace VitalChoice.Business.Services.Orders
                         model.IdAddedBy = model.IdEditedBy;
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
+                        await _encryptedOrderExportService.UpdateOrderPaymentMethod(model.PaymentMethod);
                     }
 
                     transaction.Commit();
@@ -318,6 +322,7 @@ namespace VitalChoice.Business.Services.Orders
                     model.IdAddedBy = entity.IdAddedBy;
                     await UpdateAffiliateOrderPayment(model, uow);
                     await UpdateHealthwiseOrder(model, uow);
+                    await _encryptedOrderExportService.UpdateOrderPaymentMethod(model.PaymentMethod);
 
                     transaction.Commit();
                     return entity;
@@ -346,6 +351,7 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrder(model, uow);
+                        await _encryptedOrderExportService.UpdateOrderPaymentMethod(model.PaymentMethod);
                     }
 
                     transaction.Commit();

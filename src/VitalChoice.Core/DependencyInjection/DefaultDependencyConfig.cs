@@ -472,7 +472,12 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
             builder.RegisterType<ReCaptchaValidator>().AsSelf();
             builder.RegisterType<EncryptedServiceBusHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
-            builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().SingleInstance();
+            builder.RegisterType<ObjectEncryptionHost>()
+                .As<IObjectEncryptionHost>()
+                .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),
+                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
+                .SingleInstance();
+            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

@@ -12,18 +12,18 @@ namespace VitalChoice.Infrastructure.ServiceBus
         byte[] LocalEncrypt(object obj);
         bool ValidateClientCertificate(X509Certificate2 rootCert, X509Certificate2 clientCert);
 #if DNX451 || NET451
-        T RsaDecrypt<T>(byte[] data, RSACryptoServiceProvider rsa);
-        byte[] RsaEncrypt(object obj, RSACryptoServiceProvider rsa);
+        byte[] RsaDecrypt(byte[] data, RSACryptoServiceProvider rsa);
+        byte[] RsaEncrypt(byte[] data, RSACryptoServiceProvider rsa);
 #else
-        T RsaDecrypt<T>(byte[] data, RSA rsa);
-        byte[] RsaEncrypt(object obj, RSA rsa);
+        byte[] RsaDecrypt(byte[] data, RSA rsa);
+        byte[] RsaEncrypt(byte[] data, RSA rsa);
 #endif
         bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result);
         PlainCommandData RsaSignWithConvert(object obj);
         T AesDecrypt<T>(byte[] data, Guid session);
         byte[] AesEncrypt(object obj, Guid session);
         bool SessionExist(Guid session);
-        bool RegisterSession(Guid session, KeyExchange key);
+        bool RegisterSession(Guid session, byte[] keyCombined);
         KeyExchange GetSessionWithReset(Guid session);
         KeyExchange CreateSession(Guid session);
         bool RemoveSession(Guid session);

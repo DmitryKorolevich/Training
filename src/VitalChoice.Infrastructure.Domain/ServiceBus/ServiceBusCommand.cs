@@ -26,7 +26,6 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
                 currentCommand.Result = result;
                 currentCommand.ReadyEvent.Set();
             };
-            Data = data;
         }
 
         public ManualResetEvent ReadyEvent { get; }

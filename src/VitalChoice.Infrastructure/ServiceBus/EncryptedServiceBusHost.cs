@@ -29,10 +29,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
         private readonly ManualResetEvent _readyToDisposePlain;
         private readonly ManualResetEvent _readyToDisposeEncrypted;
         private readonly ManualResetEvent _disposeEvent;
+        private readonly ManualResetEvent _waitThreadStart = new ManualResetEvent(false);
         private readonly Dictionary<CommandItem, ServiceBusCommandBase> _commands;
 
         protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
+        private readonly string _ignoreLocalLabel = Guid.NewGuid().ToString();
 
         protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost)
         {
@@ -42,24 +44,27 @@ namespace VitalChoice.Infrastructure.ServiceBus
             Logger = logger;
             _disposeEvent = new ManualResetEvent(false);
 #if NET451 || DNX451
-            _encryptedClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,
-                appOptions.Value.ExportService.EncryptedQueueName);
-            _plainClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,
-                appOptions.Value.ExportService.PlainQueueName);
+            try
+            {
+                _encryptedClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,
+                    appOptions.Value.ExportService.EncryptedQueueName);
+                _plainClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,
+                    appOptions.Value.ExportService.PlainQueueName);
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e.Message, e);
+            }
 #endif
             _commands = new Dictionary<CommandItem, ServiceBusCommandBase>();
 
             var thread = new Thread(ReceiveThread);
             thread.Start();
+            _waitThreadStart.WaitOne();
         }
 
         protected void SendPlainCommand(ServiceBusCommandBase command)
         {
-            command.OnComplete = CommandComplete;
-            lock (_commands)
-            {
-                _commands.Add(new CommandItem(command.SessionId, command.CommandName), command);
-            }
 #if NET451 || DNX451
             _plainClient.Send(
                 new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command.Data))
@@ -67,10 +72,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     ContentType = command.CommandName,
                     SessionId = command.SessionId.ToString(),
                     MessageId = command.CommandId.ToString(),
-                    TimeToLive = command.TimeToLeave
+                    TimeToLive = command.TimeToLeave,
+                    Label = _ignoreLocalLabel
                 });
 #endif
-            CommandComplete(command);
+            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
         }
 
         protected T ExecutePlainCommand<T>(ServiceBusCommand command)
@@ -78,7 +84,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             command.OnComplete = CommandComplete;
             lock (_commands)
             {
-                _commands.Add(new CommandItem(command.SessionId, command.CommandName), command);
+                _commands.Add(new CommandItem(command.CommandId, command.CommandName), command);
             }
 #if NET451 || DNX451
             _plainClient.Send(
@@ -87,9 +93,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     ContentType = command.CommandName,
                     SessionId = command.SessionId.ToString(),
                     MessageId = command.CommandId.ToString(),
-                    TimeToLive = command.TimeToLeave
+                    TimeToLive = command.TimeToLeave,
+                    Label = _ignoreLocalLabel
                 });
-
+            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
             //BUG: set maximum wait time of command result receive to 20 minutes
             if (!command.ReadyEvent.WaitOne(command.TimeToLeave))
             {
@@ -102,21 +109,17 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public void SendCommand(ServiceBusCommandBase command)
         {
-            command.OnComplete = CommandComplete;
-            lock (_commands)
-            {
-                _commands.Add(new CommandItem(command.SessionId, command.CommandName), command);
-            }
 #if NET451 || DNX451
             _encryptedClient.Send(new BrokeredMessage(EncryptionHost.AesEncrypt(command.Data, command.SessionId))
             {
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
                 MessageId = command.CommandId.ToString(),
-                TimeToLive = command.TimeToLeave
+                TimeToLive = command.TimeToLeave,
+                Label = _ignoreLocalLabel
             });
 #endif
-            CommandComplete(command);
+            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
         }
 
         public Task<T> ExecuteCommand<T>(ServiceBusCommand command)
@@ -124,7 +127,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             command.OnComplete = CommandComplete;
             lock (_commands)
             {
-                _commands.Add(new CommandItem(command.SessionId, command.CommandName), command);
+                _commands.Add(new CommandItem(command.CommandId, command.CommandName), command);
             }
 #if NET451 || DNX451
             _encryptedClient.Send(new BrokeredMessage(EncryptionHost.AesEncrypt(command.Data, command.SessionId))
@@ -132,9 +135,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
                 MessageId = command.CommandId.ToString(),
-                TimeToLive = command.TimeToLeave
+                TimeToLive = command.TimeToLeave,
+                Label = _ignoreLocalLabel
             });
 #endif
+            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
             return Task.Run(() =>
             {
                 //BUG: set maximum wait time of command result receive to 5 minutes
@@ -152,7 +157,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             lock (_commands)
             {
-                _commands.Add(new CommandItem(command.SessionId, command.CommandName), command);
+                _commands.Add(new CommandItem(command.CommandId, command.CommandName), command);
             }
             command.RequestAcqureAction = commandResultAction;
 #if NET451 || DNX451
@@ -161,9 +166,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 ContentType = command.CommandName,
                 SessionId = command.SessionId.ToString(),
                 MessageId = command.CommandId.ToString(),
-                TimeToLive = command.TimeToLeave
+                TimeToLive = command.TimeToLeave,
+                Label = _ignoreLocalLabel
             });
 #endif
+            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
         }
 
         public bool IsAuthenticatedClient(Guid sessionId)
@@ -199,6 +206,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _plainClient.OnMessage(ProcessPlainMessage);
             _encryptedClient.OnMessage(ProcessEncryptedMessage);
 #endif
+            _waitThreadStart.Set();
+            _waitThreadStart.Dispose();
             _disposeEvent.WaitOne();
         }
 
@@ -207,6 +216,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             try
             {
+                if (message.Label == _ignoreLocalLabel)
+                    return;
                 _readyToDisposeEncrypted.Reset();
                 ServiceBusCommandBase command;
                 lock (_commands)
@@ -216,6 +227,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 }
                 if (command != null)
                 {
+                    Logger.LogInformation($"{command.CommandName} intercepting ({command.CommandId})");
                     var body = EncryptionHost.AesDecrypt<object>(message.GetBody<byte[]>(), command.SessionId);
                     command.RequestAcqureAction?.Invoke(command, body);
                     message.Complete();
@@ -224,12 +236,18 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     var incomingCommand = new ServiceBusCommand(Guid.Parse(message.MessageId), message.ContentType,
                         Guid.Parse(message.MessageId));
+                    Logger.LogInformation($"{incomingCommand.CommandName} received ({incomingCommand.CommandId})");
 
                     var body = EncryptionHost.AesDecrypt<object>(message.GetBody<byte[]>(), incomingCommand.SessionId);
                     incomingCommand.RequestAcqureAction?.Invoke(incomingCommand, body);
                     if (ProcessEncryptedCommand(incomingCommand))
                     {
+                        Logger.LogInformation($"{incomingCommand.CommandName} processing success ({incomingCommand.CommandId})");
                         message.Complete();
+                    }
+                    else
+                    {
+                        Logger.LogWarning($"{incomingCommand.CommandName} processing failed ({incomingCommand.CommandId})");
                     }
                 }
             }
@@ -248,6 +266,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             try
             {
+                if (message.Label == _ignoreLocalLabel)
+                    return;
                 _readyToDisposePlain.Reset();
                 ServiceBusCommandBase command;
                 lock (_commands)
@@ -258,8 +278,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 object body;
                 if (EncryptionHost.RsaCheckSignWithConvert(message.GetBody<PlainCommandData>(), out body))
                 {
+                    Logger.LogInformation($"incoming {message.ContentType} identity validate sucess.");
                     if (command != null)
                     {
+                        Logger.LogInformation($"{command.CommandName} intercepting ({command.CommandId})");
                         command.RequestAcqureAction?.Invoke(command, body);
                         message.Complete();
                     }
@@ -267,10 +289,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     {
                         var incomingCommand = new ServiceBusCommand(Guid.Parse(message.MessageId), message.ContentType,
                             Guid.Parse(message.MessageId));
+                        Logger.LogInformation($"{incomingCommand.CommandName} received ({incomingCommand.CommandId})");
                         incomingCommand.RequestAcqureAction?.Invoke(incomingCommand, body);
                         if (ProcessPlainCommand(incomingCommand))
                         {
                             message.Complete();
+                            Logger.LogInformation($"{incomingCommand.CommandName} processing success ({incomingCommand.CommandId})");
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"{incomingCommand.CommandName} processing failed ({incomingCommand.CommandId})");
                         }
                     }
                 }

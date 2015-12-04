@@ -10,7 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         {
             CommandName = commandName;
             SessionId = sessionId;
-            CommandId = commandId ?? new Guid();
+            CommandId = commandId ?? Guid.NewGuid();
             TimeToLeave = ttl ?? TimeSpan.FromMinutes(20);
         }
 

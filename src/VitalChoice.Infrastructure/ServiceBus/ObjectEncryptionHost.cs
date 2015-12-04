@@ -6,10 +6,11 @@ using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using Newtonsoft.Json;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
@@ -31,40 +32,49 @@ namespace VitalChoice.Infrastructure.ServiceBus
         /// <summary>
         /// Server Mode
         /// </summary>
-        public ObjectEncryptionHost(IOptions<AppOptions> options)
+        public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
+            try
+            {
 #if NET451 || DNX451
-            var certStore = new X509Store(StoreLocation.LocalMachine);
+                var certStore = new X509Store(StoreLocation.LocalMachine);
 #else
-            var certStore = new X509Store();
+                var certStore = new X509Store();
 #endif
-            certStore.Open(OpenFlags.ReadOnly);
-            var certificates = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.CertThumbprint, false);
-            if (certificates.Count == 0)
-                throw new InvalidOperationException(
-                    $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.CertThumbprint}>");
+                certStore.Open(OpenFlags.ReadOnly);
+                var certificates = certStore.Certificates.Find(X509FindType.FindByThumbprint, options.Value.ExportService.CertThumbprint,
+                    false);
+                if (certificates.Count == 0)
+                    throw new InvalidOperationException(
+                        $"Cannot find Certificate in Store with thumbprint <{options.Value.ExportService.CertThumbprint}>");
 
-            var cert = certificates[0];
-            LocalCert = new X509Certificate2(cert.Export(X509ContentType.Cert));
+                var cert = certificates[0];
+                LocalCert = new X509Certificate2(cert.Export(X509ContentType.Cert));
                 if (!cert.HasPrivateKey)
                     throw new InvalidOperationException("Root certificate has no private key imported.");
 #if DNX451 || NET451
-                _signProvider = (RSACryptoServiceProvider) cert.PrivateKey;
+                _signProvider = new RSACryptoServiceProvider();
+                _signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
 #else
                 _signProvider = cert.GetRSAPrivateKey();
 #endif
-            if (options.Value.ExportService.EncryptionHostSessionExpire)
-            {
-                _disposeEvent = new ManualResetEvent(false);
-                new Thread(SessionExpirationLookup).Start();
-                _sessionExpires = true;
-            }
+                if (options.Value.ExportService.EncryptionHostSessionExpire)
+                {
+                    _disposeEvent = new ManualResetEvent(false);
+                    new Thread(SessionExpirationLookup).Start();
+                    _sessionExpires = true;
+                }
 #if DNX451 || NET451
-            certStore.Close();
+                certStore.Close();
 #else
-            certStore.Dispose();
+                certStore.Dispose();
 #endif
-            _localAes = GetLocalAes();
+                _localAes = GetLocalAes();
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e.Message, e);
+            }
         }
 
         public T LocalDecrypt<T>(byte[] data)
@@ -78,20 +88,13 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     cs.Write(data, 0, data.Length);
                 }
                 memory.Seek(0, SeekOrigin.Begin);
-                SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-                return (T) serializer.Deserialize(memory);
+                return (T) DeserializeFrom(memory);
             }
         }
 
         public byte[] LocalEncrypt(object obj)
         {
-            byte[] plainData;
-            using (var memory = new MemoryStream())
-            {
-                SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-                serializer.Serialize(obj, memory);
-                plainData = memory.ToArray();
-            }
+            var plainData = Serialize(obj);
             using (var memory = new MemoryStream())
             {
                 var encryptor = _localAes.CreateDecryptor();
@@ -110,8 +113,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 ChainPolicy =
                 {
                     RevocationMode = X509RevocationMode.NoCheck,
-                    RevocationFlag = X509RevocationFlag.ExcludeRoot,
-                    VerificationFlags = X509VerificationFlags.IgnoreWrongUsage,
+                    RevocationFlag = X509RevocationFlag.EntireChain,
+                    VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority,
                     VerificationTime = DateTime.Now,
                     UrlRetrievalTimeout = TimeSpan.Zero
                 }
@@ -122,102 +125,90 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
 
 #if DNX451 || NET451
-        public T RsaDecrypt<T>(byte[] data, RSACryptoServiceProvider rsa)
+        public byte[] RsaDecrypt(byte[] data, RSACryptoServiceProvider rsa)
 #else
-        public T RsaDecrypt<T>(byte[] data, RSA rsa)
+        public byte[] RsaDecrypt(byte[] data, RSA rsa)
 #endif
         {
             if (data == null)
-                return default(T);
+                return null;
 #if DNX451 || NET451
             var objectData = rsa.Decrypt(data, true);
 #else
             var objectData = rsa.Decrypt(data, RSAEncryptionPadding.OaepSHA256);
 #endif
-            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-            using (var memory = new MemoryStream(objectData))
-            {
-                return (T)serializer.Deserialize(memory);
-            }
+            return objectData;
         }
 
 #if DNX451 || NET451
-        public byte[] RsaEncrypt(object obj, RSACryptoServiceProvider rsa)
+        public byte[] RsaEncrypt(byte[] data, RSACryptoServiceProvider rsa)
 #else
-        public byte[] RsaEncrypt(object obj, RSA rsa)
+        public byte[] RsaEncrypt(byte[] data, RSA rsa)
 #endif
         {
-            if (obj == null)
+            if (data == null)
                 return null;
-            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-            using (var memory = new MemoryStream())
-            {
-                serializer.Serialize(obj, memory);
 #if DNX451 || NET451
-                return rsa.Encrypt(memory.ToArray(), true);
+            return rsa.Encrypt(data, true);
 #else
-                return rsa.Encrypt(memory.ToArray(), RSAEncryptionPadding.OaepSHA256);
+            return rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA256);
 #endif
-            }
         }
+
 
         public bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result)
         {
-            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-            using (var memory = new MemoryStream())
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            if (obj.Data.Length > 0)
             {
-                memory.Write(obj.Data, 0, obj.Data.Length);
-                memory.Seek(0, SeekOrigin.Begin);
-                result = (T) serializer.Deserialize(memory);
+                result = (T) Deserialize(obj.Data);
+            }
+            else
+            {
+                result = default(T);
+            }
 #if DNX451 || NET451
-                var rsa = (RSACryptoServiceProvider)obj.Certificate.PublicKey.Key;
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(((RSACryptoServiceProvider) obj.Certificate.PublicKey.Key).ExportParameters(false));
 #else
-                var rsa = obj.Certificate.GetRSAPublicKey();
+            var rsa = obj.Certificate.GetRSAPublicKey();
 #endif
-                X509Certificate2 serverCert, clientCert;
-                if (_sessionExpires)
-                {
-                    clientCert = obj.Certificate;
-                    serverCert = LocalCert;
-                }
-                else
-                {
-                    serverCert = obj.Certificate;
-                    clientCert = LocalCert;
-                }
+            X509Certificate2 serverCert, clientCert;
+            if (_sessionExpires)
+            {
+                clientCert = obj.Certificate;
+                serverCert = LocalCert;
+            }
+            else
+            {
+                serverCert = obj.Certificate;
+                clientCert = LocalCert;
+            }
 #if DNX451 || NET451
-                if (ValidateClientCertificate(serverCert, clientCert) &&
-                    rsa.VerifyData(obj.Data, new SHA256CryptoServiceProvider(), obj.Sign))
+            if (ValidateClientCertificate(serverCert, clientCert) &&
+                rsa.VerifyData(obj.Data, CryptoConfig.MapNameToOID("SHA256"), obj.Sign))
 #else
                 if (ValidateClientCertificate(serverCert, clientCert) &&
                     rsa.VerifyData(obj.Data, obj.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
 #endif
-
+            {
                 return true;
-                result = default(T);
-                return false;
             }
+            result = default(T);
+            return false;
         }
 
         public PlainCommandData RsaSignWithConvert(object obj)
         {
             if (obj == null)
-            {
-                return null;
-            }
-            var result = new PlainCommandData();
-            SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-            using (var memory = new MemoryStream())
-            {
-                serializer.Serialize(obj, memory);
-                result.Data = memory.ToArray();
-                memory.Seek(0, SeekOrigin.Begin);
+                obj = new object();
+            var result = new PlainCommandData {Data = Serialize(obj)};
 #if NET451 || DNX451
-                result.Sign = _signProvider.SignData(memory, new SHA256CryptoServiceProvider());
+            result.Sign = _signProvider.SignData(result.Data, CryptoConfig.MapNameToOID("SHA256"));
 #else
-                result.Sign = _signProvider.SignData(memory, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            result.Sign = _signProvider.SignData(result.Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 #endif
-            }
             result.Certificate = LocalCert;
             return result;
         }
@@ -240,8 +231,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                             cs.Write(data, 0, data.Length);
                         }
                         memory.Seek(0, SeekOrigin.Begin);
-                        SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-                        return (T) serializer.Deserialize(memory);
+                        return (T) DeserializeFrom(memory);
                     }
                 }
             }
@@ -256,16 +246,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (_sessions.TryGetValue(session, out encryption))
                 {
                     encryption.Expiration = DateTime.Now.AddHours(1);
-                    byte[] plainData;
-                    using (var memory = new MemoryStream())
-                    {
-                        if (!encryption.Encryptor.CanReuseTransform)
+                    if (!encryption.Encryptor.CanReuseTransform)
                             encryption.Encryptor = encryption.Aes.CreateEncryptor();
 
-                        SharpSerializer.Library.SharpSerializer serializer = new SharpSerializer.Library.SharpSerializer(true);
-                        serializer.Serialize(obj, memory);
-                        plainData = memory.ToArray();
-                    }
+                    var plainData = Serialize(obj);
                     using (var memory = new MemoryStream())
                     {
                         using (CryptoStream cs = new CryptoStream(memory, encryption.Encryptor, CryptoStreamMode.Write))
@@ -287,15 +271,17 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public bool RegisterSession(Guid session, KeyExchange key)
+        public bool RegisterSession(Guid session, byte[] keyCombined)
         {
             if (!_sessionExpires)
                 throw new InvalidOperationException("Cannot register session, as it's state not controlled by session expiration.");
             Aes aes = Aes.Create();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
-            aes.Key = key.Key;
-            aes.IV = key.IV;
+            aes.Key = new byte[32];
+            aes.IV = new byte[16];
+            Array.Copy(keyCombined, aes.IV, 16);
+            Array.Copy(keyCombined, 16, aes.Key, 0, 32);
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
             SessionInfo encryption = new SessionInfo
@@ -399,6 +385,96 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 _sessions.Clear();
             }
         }
+
+#if DNX451 || NET451
+        private object DeserializeFrom(Stream stream)
+        {
+            NetDataContractSerializer serializer = new NetDataContractSerializer();
+            return serializer.Deserialize(stream);
+        }
+
+        private void SerializeTo(Stream stream, object obj)
+        {
+            NetDataContractSerializer serializer = new NetDataContractSerializer();
+            serializer.Serialize(stream, obj);
+        }
+#else
+        private object DeserializeFrom(Stream stream)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (var reader = new StreamReader(stream))
+            {
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    return serializer.Deserialize(jsonReader);
+                }
+            }
+        }
+
+        private void SerializeTo(Stream stream, object obj)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (var writer = new StreamWriter(stream))
+            {
+                using (var jsonWriter = new JsonTextWriter(writer))
+                {
+                    serializer.Serialize(jsonWriter, obj);
+                }
+            }
+        }
+#endif
+
+#if DNX451 || NET451
+        private object Deserialize(byte[] data)
+        {
+            NetDataContractSerializer serializer = new NetDataContractSerializer();
+            using (var memory = new MemoryStream(data))
+            {
+                return serializer.Deserialize(memory);
+            }
+        }
+
+        private byte[] Serialize(object obj)
+        {
+            NetDataContractSerializer serializer = new NetDataContractSerializer();
+            using (var memory = new MemoryStream())
+            {
+                serializer.Serialize(memory, obj);
+                return memory.ToArray();
+            }
+        }
+#else
+        private object Deserialize(byte[] data)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (var memory = new MemoryStream(data))
+            {
+                using (var reader = new StreamReader(memory))
+                {
+                    using (var jsonReader = new JsonTextReader(reader))
+                    {
+                        return serializer.Deserialize(jsonReader);
+                    }
+                }
+            }
+        }
+
+        private byte[] Serialize(object obj)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (var memory = new MemoryStream())
+            {
+                using (var writer = new StreamWriter(memory))
+                {
+                    using (var jsonWriter = new JsonTextWriter(writer))
+                    {
+                        serializer.Serialize(jsonWriter, obj);
+                    }
+                }
+                return memory.ToArray();
+            }
+        }
+#endif
 
         private void SessionExpirationLookup()
         {

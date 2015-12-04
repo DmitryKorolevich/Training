@@ -173,9 +173,8 @@ namespace ExportWorkerRoleWithSBQueue
             //    .WithParameter((pi, cc) => pi.ParameterType == typeof (ILoggerFactory),
             //        (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
             //    .As(typeof (ILogger<>));
-            builder.RegisterInstance(new ConsoleLogger("Default",
-                (s, level) => level == LogLevel.Critical || level == LogLevel.Error, true)).As<ILogger>();
-            builder.RegisterGeneric(typeof (Logger<>)).As(typeof (ILogger<>));
+            builder.RegisterType<TraceLogger>().As<ILogger>().SingleInstance();
+            builder.RegisterGeneric(typeof (TraceLogger<>)).As(typeof (ILogger<>)).SingleInstance();
             var container = BuildContainer(typeof(Configuration).GetTypeInfo().Assembly, builder);
             return container;
         }

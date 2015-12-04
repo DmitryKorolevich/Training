@@ -1,10 +1,11 @@
 using System;
+using System.Threading.Tasks;
 
 namespace VitalChoice.Interfaces.Services
 {
     public interface IEncryptedServiceBusHostClient : IEncryptedServiceBusHost
     {
-        bool AuthenticateClient(Guid sessionId);
+        Task<bool> AuthenticateClient(Guid sessionId);
         void RemoveClient(Guid sessionId);
     }
 }

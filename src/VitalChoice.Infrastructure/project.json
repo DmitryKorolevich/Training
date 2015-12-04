@@ -27,7 +27,7 @@
       "dependencies": {
         "System.Runtime": "4.0.21-*",
         "System.Security.Cryptography.X509Certificates": "4.0.0-*",
-        "System.Security.Cryptography.Algorithms" :"4.0.0-*"
+        "System.Security.Cryptography.Algorithms": "4.0.0-*"
       }
     }
   }

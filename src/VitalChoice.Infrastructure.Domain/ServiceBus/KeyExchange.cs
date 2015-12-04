@@ -1,7 +1,11 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
+#if DNX451 || NET451
+    [Serializable]
+#endif
     public class PlainCommandData
     {
         public X509Certificate2 Certificate { get; set; }
@@ -11,6 +15,9 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public byte[] Sign { get; set; }
     }
 
+#if DNX451 || NET451
+    [Serializable]
+#endif
     public class KeyExchange
     {
         public byte[] Key { get; set; }

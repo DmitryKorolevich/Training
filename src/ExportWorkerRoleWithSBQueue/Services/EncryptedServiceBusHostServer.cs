@@ -34,12 +34,12 @@ namespace ExportWorkerRoleWithSBQueue.Services
                     SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:
-                    var key = (KeyExchange) command.Result;
-                    SendPlainCommand(new ServiceBusCommand(command,
-                        EncryptionHost.RegisterSession(command.SessionId, key)));
+                    var keyCombined = (byte[]) command.Result;
+                    SendPlainCommand(new ServiceBusCommandBase(command,
+                        EncryptionHost.RegisterSession(command.SessionId, EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider))));
                     break;
                 case ServiceBusCommandConstants.CheckSessionKey:
-                    SendPlainCommand(new ServiceBusCommand(command, EncryptionHost.SessionExist(command.SessionId)));
+                    SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
                     break;
                 default:
                     return false;

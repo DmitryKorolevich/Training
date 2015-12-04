@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 
@@ -18,26 +18,30 @@ namespace VitalChoice.Business.Services
             : base(appOptions, loggerProvider.CreateLoggerDefault(), encryptionHost)
         {
             var publicKey =
-                ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(new Guid(),
+                ExecutePlainCommand<RSAParameters>(new ServiceBusCommand(Guid.NewGuid(),
                     ServiceBusCommandConstants.GetPublicKey));
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
             _keyExchangeProvider.ImportParameters(publicKey);
         }
 
-        public bool AuthenticateClient(Guid sessionId)
+        public Task<bool> AuthenticateClient(Guid sessionId)
         {
             var keys = EncryptionHost.CreateSession(sessionId);
-            if (keys == null)
+            return Task.Run(() =>
             {
-                if (
-                    ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId,
-                        ServiceBusCommandConstants.CheckSessionKey)))
-                    return true;
-                keys = EncryptionHost.GetSessionWithReset(sessionId);
-            }
-            return ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId, ServiceBusCommandConstants.SetSessionKey)
-            {
-                Data = EncryptionHost.RsaEncrypt(keys, _keyExchangeProvider)
+                if (keys == null)
+                {
+                    if (ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId, ServiceBusCommandConstants.CheckSessionKey)))
+                        return true;
+                    keys = EncryptionHost.GetSessionWithReset(sessionId);
+                }
+                var keyCombined = new byte[keys.IV.Length + keys.Key.Length];
+                Array.Copy(keys.IV, keyCombined, keys.IV.Length);
+                Array.Copy(keys.Key, 0, keyCombined, keys.IV.Length, keys.Key.Length);
+                return ExecutePlainCommand<bool>(new ServiceBusCommand(sessionId, ServiceBusCommandConstants.SetSessionKey)
+                {
+                    Data = EncryptionHost.RsaEncrypt(keyCombined, _keyExchangeProvider)
+                });
             });
         }
 

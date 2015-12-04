@@ -17,26 +17,26 @@ namespace VitalChoice.Business.Services
             _encryptedBusHost = encryptedBusHost;
         }
 
-        public Guid SessionId { get; } = new Guid();
+        public Guid SessionId { get; } = Guid.NewGuid();
 
-        protected Task<T> ProcessCommand<T>(ServiceBusCommand command)
+        protected async Task<T> ProcessCommand<T>(ServiceBusCommand command)
         {
             if (!IsAuthenticated)
             {
-                if (!_encryptedBusHost.AuthenticateClient(SessionId))
+                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
             }
 
-            return _encryptedBusHost.ExecuteCommand<T>(command);
+            return await _encryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        protected void ProcessCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
+        protected async Task ProcessCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
         {
             if (!IsAuthenticated)
             {
-                if (!_encryptedBusHost.AuthenticateClient(SessionId))
+                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
                     throw new AccessDeniedException("Cannot authenticate client");
                 }
