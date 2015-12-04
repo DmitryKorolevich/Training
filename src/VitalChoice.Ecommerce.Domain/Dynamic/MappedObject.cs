@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
@@ -34,9 +35,9 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         public virtual int IdObjectType { get; set; }
 
         [DataMember]
-        internal ICollection<KeyValuePair<string, object>> DynamicValues
+        internal List<KeyValuePair<string, object>> DynamicValues
         {
-            get { return DynamicData; }
+            get { return DynamicData.ToList(); }
             set { DictionaryData.AddRange(value); }
         }
 
