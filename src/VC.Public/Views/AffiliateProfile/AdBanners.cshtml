@@ -1,0 +1,16 @@
+﻿@section Meta {
+	<title>Vital Choice | Affiliate Banners</title>
+}
+
+<script>
+    var idAffiliate = @ViewBag.IdAffiliate ;
+</script>
+
+<div class="working-area-holder">
+	<div class="left-pane clean-border">
+		@await Component.InvokeAsync("AffiliateProfileSidebar")
+	</div>
+	<div class="right-pane clean-indent">
+        @await Component.InvokeAsync("Area", "Affiliate Ad Banners")
+	</div>
+</div>

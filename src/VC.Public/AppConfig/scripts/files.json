@@ -13,6 +13,7 @@
     "assets/scripts/vendor/bootstrap.min.js",
     "assets/scripts/vendor/jquery-ui/jquery-ui.min.js",
     "assets/scripts/vendor/scriptbreaker-multiple-accordion-1.js",
+    "lib/jquery.scrollTo/jquery.scrollTo.js",
     "assets/scripts/plugins.js"
   ]
 }

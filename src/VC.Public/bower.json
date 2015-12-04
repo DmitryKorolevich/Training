@@ -4,7 +4,8 @@
   "dependencies": {
     "jQuery": "~1.11.3",
     "normalize.css": "~3.0.3",
-    "nivoslider": "*"
+    "nivoslider": "*",
+    "jquery.scrollTo": "~2.1.2"
   },
   "exportsOverride": {
     "jQuery": {
