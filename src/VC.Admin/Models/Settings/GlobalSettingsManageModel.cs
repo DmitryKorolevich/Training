@@ -63,7 +63,7 @@ namespace VC.Admin.Models.Setting
         public List<AppSettingItem> Convert()
         {
             List<AppSettingItem> toReturn = new List<AppSettingItem>();
-#if DNX451
+#if NET451
             foreach (var property in typeof(GlobalSettingsManageModel).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public))
             {
                 string value = null;

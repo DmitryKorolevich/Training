@@ -20,7 +20,7 @@ namespace Azure.ApplicationHost.Base
         {
             parsed = null;
             
-            if (frameworkName == FrameworkNames.ShortNames.Dnx451)
+            if (frameworkName == FrameworkNames.ShortNames.net451)
             {
                 parsed = new FrameworkName(FrameworkNames.LongNames.Dnx, new Version(4, 5, 1));
                 return true;
@@ -33,6 +33,11 @@ namespace Azure.ApplicationHost.Base
             else if (frameworkName == FrameworkNames.ShortNames.Dnx46)
             {
                 parsed = new FrameworkName(FrameworkNames.LongNames.Dnx, new Version(4, 6));
+                return true;
+            }
+            else if (frameworkName == FrameworkNames.ShortNames.Dnx461)
+            {
+                parsed = new FrameworkName(FrameworkNames.LongNames.Dnx, new Version(4, 6, 1));
                 return true;
             }
             else if (frameworkName == FrameworkNames.ShortNames.DnxCore50)

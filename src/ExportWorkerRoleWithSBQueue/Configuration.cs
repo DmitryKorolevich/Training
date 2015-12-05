@@ -3,7 +3,6 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Avalara.Avatax.Rest.Services;
-using Azure.ApplicationHost.Host;
 using ExportWorkerRoleWithSBQueue.Context;
 using ExportWorkerRoleWithSBQueue.Services;
 using Microsoft.AspNet.Identity;
@@ -68,9 +67,16 @@ namespace ExportWorkerRoleWithSBQueue
 {
     internal class Configuration
     {
+        internal static void InitializeRuntime()
+        {
+            var hostAssembly = Assembly.Load("Azure.ApplicationHost");
+            var hostedApp = hostAssembly.GetType("Azure.ApplicationHost.Host.DnxHostedApplication");
+            ((Action) hostedApp.GetMethod("Init").CreateDelegate(typeof (Action)))();
+        }
+
         internal static IContainer BuildContainer()
         {
-            DnxHostedApplication.Init();
+            InitializeRuntime();
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .AddJsonFile("config.local.json", true);

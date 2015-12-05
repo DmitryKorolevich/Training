@@ -12,14 +12,14 @@ namespace VitalChoice.Business.Mail
 {
     public class EmailSender :IEmailSender, IDisposable
     {
-#if DNX451
+#if NET451
 		private readonly Email _configuration;
 
 	    private readonly SmtpClient _client;
 #endif
 		public EmailSender(IOptions<AppOptions> options)
 	    {
-#if DNX451
+#if NET451
             _configuration = options.Value.EmailConfiguration;
 
 			_client = new SmtpClient(_configuration.Host, _configuration.Port)
@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Mail
 		public async Task SendEmailAsync(string email, string subject, string message, string fromDisplayName= null, string fromEmail=null, string toDisplayName = "",
             bool isBodyHtml=true)
 		{
-#if DNX451
+#if NET451
             var fromEmailAdddress = fromEmail;
             if(String.IsNullOrEmpty(fromEmailAdddress))
             {

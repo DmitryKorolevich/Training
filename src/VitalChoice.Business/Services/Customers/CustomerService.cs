@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-#if DNX451
+#if NET451
 #endif
 using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Business.Queries.Customer;

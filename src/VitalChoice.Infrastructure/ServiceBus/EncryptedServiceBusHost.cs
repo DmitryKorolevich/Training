@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-#if NET451 || DNX451
+#if NET451 
 using Microsoft.ServiceBus.Messaging;
 #endif
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -22,7 +22,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
         
-#if NET451 || DNX451
+#if NET451 
         private readonly QueueClient _plainClient;
         private readonly QueueClient _encryptedClient;
 #endif
@@ -46,7 +46,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _readyToDisposeEncrypted = new ManualResetEvent(true);
             Logger = logger;
             _commands = new Dictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
-#if NET451 || DNX451
+#if NET451 
             try
             {
                 _encryptedClient = QueueClient.CreateFromConnectionString(appOptions.Value.ExportService.ConnectionString,
@@ -64,7 +64,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected async Task SendPlainCommand(ServiceBusCommandBase command)
         {
-#if NET451 || DNX451
+#if NET451 
             if (await SendPlainAsync(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -74,7 +74,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
-#if NET451 || DNX451
+#if NET451 
             if (await SendPlainAsync(command))
 #endif
             {
@@ -99,7 +99,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public async Task SendCommand(ServiceBusCommandBase command)
         {
-#if NET451 || DNX451
+#if NET451 
             if (await SendEncryptedAsync(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -109,7 +109,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             command.OnComplete = CommandComplete;
             TrackCommand(command);
-#if NET451 || DNX451
+#if NET451 
             if (await SendEncryptedAsync(command))
 #endif
             {
@@ -136,7 +136,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             TrackCommand(command);
             command.RequestAcqureAction = commandResultAction;
-#if NET451 || DNX451
+#if NET451 
             if (await SendEncryptedAsync(command))
 #endif
             Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
@@ -147,7 +147,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             return EncryptionHost.SessionExist(sessionId);
         }
 
-#if NET451 || DNX451
+#if NET451 
         protected virtual BrokeredMessage CreatePlainCommand(ServiceBusCommandBase command)
         {
             return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command.Data))
@@ -199,13 +199,13 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ReceiveMessages()
         {
-#if NET451 || DNX451
+#if NET451 
             _plainClient.OnMessageAsync(ProcessPlainMessage, new OnMessageOptions {AutoComplete = false, MaxConcurrentCalls = 4});
             _encryptedClient.OnMessageAsync(ProcessEncryptedMessage, new OnMessageOptions {AutoComplete = false, MaxConcurrentCalls = 4});
 #endif
         }
 
-#if NET451 || DNX451
+#if NET451 
         private async Task ProcessEncryptedMessage(BrokeredMessage message)
         {
             if (message.CorrelationId == null)
@@ -383,7 +383,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             WaitHandle.WaitAll(new WaitHandle[] {_readyToDisposeEncrypted, _readyToDisposePlain},
                 TimeSpan.FromSeconds(20));
-#if NET451 || DNX451
+#if NET451 
             _plainClient?.Close();
             _encryptedClient?.Close();
 #endif

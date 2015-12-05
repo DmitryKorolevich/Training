@@ -5,9 +5,7 @@ using System;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Extensions.PlatformAbstractions;
-#if DNX451
-
-#else
+#if !DNX461
 using System.Threading;
 #endif
 
@@ -15,7 +13,7 @@ namespace Azure.ApplicationHost.Base
 {
     internal class ServiceProviderLocator : IServiceProviderLocator
     {
-#if DNX451
+#if DNX461
         private const string ServiceProviderDataName = Constants.Constants.BootstrapperHostName + ".ServiceProviderLocator.ServiceProvider";
 
         public IServiceProvider ServiceProvider

@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Settings
         private AppSettings CreateAppSettings(ICollection<AppSettingItem> items)
         {
             AppSettings toReturn = new AppSettings();
-#if DNX451
+#if NET451
             foreach (var property in typeof(AppSettings).GetProperties())
             {
                 AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);

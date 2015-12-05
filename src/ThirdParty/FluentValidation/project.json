@@ -13,8 +13,6 @@
   "frameworks": {
     "net451": {
     },
-    "dnx451": {
-    },
     "dotnet5.4": {
       "dependencies": {
         "System.Linq": "4.0.1-*",

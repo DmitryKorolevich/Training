@@ -48,7 +48,7 @@ namespace Azure.ApplicationHost.Services
             }
         }
 
-#if DNX451 || NET451
+#if DNX461
         private object GetDataCore(string name)
         {
             return AppDomain.CurrentDomain.GetData(name);

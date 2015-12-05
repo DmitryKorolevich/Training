@@ -6,7 +6,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public static class ObjectSerializer
     {
-#if DNX451 || NET451
+#if NET451 || NET451
         public static object DeserializeFrom(Stream stream)
         {
             NetDataContractSerializer serializer = new NetDataContractSerializer();
@@ -44,7 +44,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
 #endif
 
-#if DNX451 || NET451
+#if NET451 || NET451
         public static object Deserialize(byte[] data)
         {
             NetDataContractSerializer serializer = new NetDataContractSerializer();

@@ -12,11 +12,18 @@
     "VitalChoice.Ecommerce": "",
     "VitalChoice.Interfaces": "1.0.0-*",
     "WindowsAzure.Storage": "6.1.1-*",
-    "Templates": "2.4.4-rc1"
+    "Templates": "2.5.3-rc1"
   },
 
   "frameworks": {
-    "dnx451": {
+    "net461": {
+      "dependencies": {
+        "WindowsAzure.ServiceBus": "3.0.9",
+        "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",
+        "NLog": "4.0.1"
+      }
+    },
+    "net451": {
       "dependencies": {
         "WindowsAzure.ServiceBus": "3.0.9",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.1.0",

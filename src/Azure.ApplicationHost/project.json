@@ -7,11 +7,12 @@
     "warningsAsErrors": true
   },
   "dependencies": {
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
     "Microsoft.Dnx.Runtime": "1.0.0-*",
-    "Microsoft.Dnx.Compilation": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.Dnx.Compilation.Abstractions": "1.0.0-*"
   },
   "frameworks": {
-    "dnx451": {}
+    "dnx461": {
+    }
   }
 }

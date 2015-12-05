@@ -1,7 +1,7 @@
 ﻿//using System;
 //using System.IO;
 //using System.Runtime.Serialization;
-//#if DNX451
+//#if NET451
 //using System.Runtime.Serialization.Formatters.Binary;
 //#endif
 
@@ -11,7 +11,7 @@
 //	{
 //		public static T Clone<T>(T source)
 //		{
-//#if DNX451
+//#if NET451
 //			if (!typeof(T).IsSerializable)
 //			{
 //				throw new ArgumentException("The type must be serializable.", nameof(source));

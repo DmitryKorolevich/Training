@@ -1,4 +1,4 @@
-﻿#if DNX451 || DOTNET5_4 || NET45
+﻿#if NET451 || DOTNET5_4 || NET45
 using System.IO;
 using Microsoft.Extensions.PlatformAbstractions;
 
@@ -10,7 +10,7 @@ namespace VitalChoice.Core.Infrastructure
 		{
 			get
 			{
-#if DNX451 || DOTNET5_4
+#if NET451 || DOTNET5_4
 				var locator = CallContextServiceLocator.Locator;
 
 				var appEnv = (IApplicationEnvironment)locator.ServiceProvider.GetService(typeof(IApplicationEnvironment));

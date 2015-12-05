@@ -38,7 +38,7 @@
     "System.Net.Http": "4.0.1-*"
   },
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "dependencies": {
         "EntityFramework.Commands": "7.0.0-*"
       }

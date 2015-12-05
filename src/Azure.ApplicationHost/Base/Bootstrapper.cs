@@ -41,7 +41,7 @@ namespace Azure.ApplicationHost.Base
                     return Task.FromResult(1);
                 }
 
-#if DNX451
+#if DNX461
                 string applicationBaseDirectory = appBase;
 
                 // Set the app domain variable so that AppContext.BaseDirectory works on .NET Framework (and hopefully mono)

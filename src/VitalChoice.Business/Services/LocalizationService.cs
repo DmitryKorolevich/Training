@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services
         public IList<LookupItem<string>> GetStrings(string cultureId)
         {
             List<LookupItem<string>> toReturn = new List<LookupItem<string>>();
-#if DNX451
+#if NET451
             if (_localizationData != null)
             {
                 var assembly =

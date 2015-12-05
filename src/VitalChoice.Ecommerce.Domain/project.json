@@ -13,10 +13,22 @@
   },
   "compilationOptions": {"allowUnsafe": true},
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
         "System.Runtime.Serialization": "4.0.0.0",
-          "System.Xml": "4.0.0.0"
+        "System.Xml": "4.0.0.0",
+        "System.Collections": "4.0.0.0",
+        "System.Linq": "4.0.0.0",
+        "System.Runtime": "4.0.10.0"
+      }
+    },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Runtime.Serialization": "4.0.0.0",
+        "System.Xml": "4.0.0.0",
+        "System.Collections": "",
+        "System.Linq": "4.0.0.0",
+        "System.Runtime": ""
       }
     },
     "dotnet5.4": {

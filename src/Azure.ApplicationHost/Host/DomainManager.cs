@@ -11,7 +11,7 @@ namespace Azure.ApplicationHost.Host
 {
     public static class DnxHostedApplication
     {
-        private static readonly Version DefaultFrameworkVersion = new Version(4, 5, 1);
+        private static readonly Version DefaultFrameworkVersion = new Version(4, 6, 1);
 
         private static ApplicationMainInfo _info;
         private static FrameworkName _dnxTfm;

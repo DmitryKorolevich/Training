@@ -73,7 +73,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FluentValidation", "src\Thi
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.Workflow.Configuration", "src\VitalChoice.Workflow.Configuration\VitalChoice.Workflow.Configuration.xproj", "{7023482F-79DB-4C0D-AD3D-7591C6B16550}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Avalara.Avatax.Rest", "src\ThirdParty\Avalara.Avatax.Rest\Avalara.Avatax.Rest.xproj", "{553CADEB-6C7A-4DC8-9F27-48DFBC4CC972}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Avalara.Avatax.Rest", "src\Avalara.Avatax.Rest\Avalara.Avatax.Rest.xproj", "{553CADEB-6C7A-4DC8-9F27-48DFBC4CC972}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CsvHelper", "src\ThirdParty\CsvHelper\CsvHelper.xproj", "{AF977E74-364C-495E-A841-2C415A76EBAE}"
 EndProject
@@ -101,7 +101,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "WorkerBuilder", "src\Worker
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportWorker", "src\ExportWorker\ExportWorker.csproj", "{50D88950-B576-4D70-8EF0-529987EACD63}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Azure.ApplicationHost", "src\ThirdParty\Azure.ApplicationHost\Azure.ApplicationHost.xproj", "{7829F696-AFC4-4011-B9DE-6F1C24846D67}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Azure.ApplicationHost", "src\Azure.ApplicationHost\Azure.ApplicationHost.xproj", "{7829F696-AFC4-4011-B9DE-6F1C24846D67}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "VitalChoice.Database.ExportInfo", "src\VitalChoice.Database.ExportInfo\VitalChoice.Database.ExportInfo.sqlproj", "{138FEF6B-67A3-48F1-BAD8-B52FE16FD627}"
 EndProject
