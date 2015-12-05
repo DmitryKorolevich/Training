@@ -539,3 +539,125 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Affiliate Ad Banners')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Affiliate Ad Banners', N'<script>
+    window.addEventListener("load", function() {
+        var element = document.createElement("script");
+        element.src = "/app/modules/affiliateprofile/adBanners.js";
+        document.body.appendChild(element);
+    }, false);
+</script>
+<div class="border-form-left ad-banners">
+    <h4 class="h-step1">Step 1 - Select Banner Size</h4>
+    <img class="main-banner" src="/Assets/images/adbanners/logo.jpg">
+    <div class="banner-size banner-size-728" data-banner-size="728" data-width="728" data-height="90">
+        <strong>728 x 90</strong>
+    </div>
+    <div class="banner-size banner-size-125" data-banner-size="125">
+        <strong>125 x 125</strong>
+    </div>
+    <div class="banner-size banner-size-600" data-banner-size="600" data-width="600" data-height="100">
+        <strong>600 x 100</strong>
+    </div>
+	<div class="clear"></div>
+	<div class="banner-size banner-size-160" data-banner-size="160">
+        <strong>160 x 600</strong>
+    </div>
+	<div class="banner-size banner-size-120-600" data-banner-size="120-600">
+        <strong>120 x 600</strong>
+    </div>
+    <div class="banner-size banner-size-300-250" data-banner-size="300-250">
+        <strong>300 x 250</strong>
+    </div>
+    <div class="banner-size banner-size-83" data-banner-size="83">
+        <strong>83 x 31</strong>
+    </div>
+   <div class="banner-size banner-size-250" data-banner-size="250">
+        <strong>250 x 250</strong>
+    </div>
+    <div class="banner-size banner-size-120-90" data-banner-size="120-90">
+        <strong>120 x 90</strong>
+    </div>
+    <div class="banner-size banner-size-234" data-banner-size="234">
+        <strong>234 x 60</strong>
+    </div>
+    <div class="clear"></div>
+    <div class="banner-size banner-size-468" data-banner-size="468">
+        <strong>468 x 60</strong>
+    </div>
+    <div class="banner-size banner-size-300-100" data-banner-size="300-100">
+        <strong>300 x 100</strong>
+    </div>
+	<div class="clear"></div>
+	<h4 class="h-step2">Step 2 - Select Banner</h4>
+	<div class="banners banners-728">
+	    <img src="/Assets/images/adbanners/VC_canned_728x90_B-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_salmon728x90_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC-canned_728x90_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_grilling_728x90_A-5-15.jpg">
+	</div>
+	<div class="banners banners-125">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-125x125-eat-better-feel-A.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-125x125-eat-wild-A.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-125x125-healing-power-B.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-125x125-vitality-A.jpg">
+	</div>
+	<div class="banners banners-600">
+	    <img src="/Assets/images/adbanners/VC_canned600x100_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_supplements_600x100_A 2-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/vc-600x100-bf-cm.jpg">
+	</div>
+	<div class="banners banners-160">
+	    <img src="/Assets/images/adbanners/VC_canned_160x600_A_FDS-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_canned_160x600_C_FDS-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_supplements_160x600_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_supplements_160x600_B-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VCSalmon160x600_A_-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_grilling_160x600_A-5-15-v2.jpg">
+	</div>
+	<div class="banners banners-120-600">
+	    <img src="/Assets/images/adbanners/NY-120x600.jpg">
+	</div>
+	<div class="banners banners-300-250">
+	    <img src="/Assets/images/adbanners/VC_canned_300x250_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_salmon_300x250_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_canned_300x250_B-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_supplements_300x250_A-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_supplements_300x250_B-4-30-13.jpg">
+	    <img src="/Assets/images/adbanners/VC_grilling_300x250_A-5-15.jpg">
+	</div>
+	<div class="banners banners-83">
+	    <img src="/Assets/images/adbanners/Ad_88_31.jpg">
+	</div>
+	<div class="banners banners-250">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-250x250-eat-better-A.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-250x250-eat-wild-A.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-250x250-healing-power-A.jpg">
+	    <img src="/Assets/images/adbanners/VC-affiliate-ad-6-2014-250x250-vitality-A.jpg">
+	</div>
+	<div class="banners banners-120-90">
+	    <img src="/Assets/images/adbanners/Ad_120_90.jpg">
+	</div>
+	<div class="banners banners-234">
+	    <img src="/Assets/images/adbanners/NY-234x60.jpg">
+	</div>
+	<div class="banners banners-468">
+	    <img src="/Assets/images/adbanners/NY-468x60.jpg">
+	</div>
+	<div class="banners banners-300-100">
+	    <img src="/Assets/images/adbanners/VC_grilling_300x100_A-5-15.jpg">
+	</div>
+	<h4 class="h-step3">Step 3 - Banner Code</h4>
+	<textarea class="code-area" rows="5"></textarea>
+</div>
+', 2, GETDATE(), GETDATE())
+
+END
+
+GO

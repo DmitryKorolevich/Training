@@ -23,33 +23,33 @@ using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
 namespace VC.Public.Controllers
 {
-	[AffiliateAuthorize]
-	public class AffiliateProfileController : BaseMvcController
-	{
-		private readonly IHttpContextAccessor _contextAccessor;
-		private readonly IAffiliateUserService _affiliateUserService;
-		private readonly IAffiliateService _affiliateService;
+    [AffiliateAuthorize]
+    public class AffiliateProfileController : BaseMvcController
+    {
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAffiliateUserService _affiliateUserService;
+        private readonly IAffiliateService _affiliateService;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
-		public AffiliateProfileController(
+        public AffiliateProfileController(
             IHttpContextAccessor contextAccessor,
             IAffiliateUserService affiliateUserService,
-			IAffiliateService affiliateService,
+            IAffiliateService affiliateService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper)
-		{
-			_contextAccessor = contextAccessor;
+        {
+            _contextAccessor = contextAccessor;
             _affiliateUserService = affiliateUserService;
             _affiliateService = affiliateService;
             _affiliateMapper = affiliateMapper;
         }
-        
-        private int GetInternalAffiliateId()
-		{
-			var context = _contextAccessor.HttpContext;
-			var internalId = Convert.ToInt32(context.User.GetUserId());
 
-			return internalId;
-		}
+        private int GetInternalAffiliateId()
+        {
+            var context = _contextAccessor.HttpContext;
+            var internalId = Convert.ToInt32(context.User.GetUserId());
+
+            return internalId;
+        }
 
         private async Task<AffiliateDynamic> GetCurrentAffiliateDynamic()
         {
@@ -74,9 +74,9 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         public IActionResult Index()
-		{
-			return View();
-		}
+        {
+            return View();
+        }
 
         [HttpGet]
         public IActionResult ChangePassword()
@@ -201,7 +201,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> PaidOrders(DateTime? from=null, DateTime? to=null, int page=1)
+        public async Task<IActionResult> PaidOrders(DateTime? from = null, DateTime? to = null, int page = 1)
         {
             AffiliateOrderPaymentFilter filter = new AffiliateOrderPaymentFilter();
             filter.IdAffiliate = GetInternalAffiliateId();
@@ -210,7 +210,7 @@ namespace VC.Public.Controllers
             filter.To = to;
             filter.Paging = new Paging();
             filter.Paging.PageIndex = page;
-            if(filter.Paging.PageIndex<1)
+            if (filter.Paging.PageIndex < 1)
             {
                 filter.Paging.PageIndex = 0;
             }
@@ -223,11 +223,18 @@ namespace VC.Public.Controllers
             toReturn.Paging = new PaginationSettings()
             {
                 CurrentPage = page,
-                ItemsPerPage= BaseAppConstants.DEFAULT_LIST_TAKE_COUNT,
+                ItemsPerPage = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT,
                 TotalItems = result.Count,
             };
             toReturn.Items = result.Items.Select(p => new OrderPaymentListItemModel(p)).ToList();
             return View(toReturn);
+        }
+
+        [HttpGet]
+        public IActionResult AdBanners()
+        {
+            ViewBag.IdAffiliate = GetInternalAffiliateId();
+            return View();
         }
 
         #endregion

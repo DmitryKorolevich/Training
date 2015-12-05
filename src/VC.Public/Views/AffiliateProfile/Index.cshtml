@@ -1,14 +1,16 @@
 ﻿@model VC.Public.Models.Profile.ChangePasswordModel
 
 @section Meta {
-	<title>Vital Choice | Vital Choice Web Affiliate Program</title>
+    <title>Vital Choice | Vital Choice Web Affiliate Program</title>
 }
 
 <div class="working-area-holder">
-	<div class="left-pane">
-		@await Component.InvokeAsync("AffiliateProfileSidebar")
-	</div>
-	<div class="right-pane">
-		<h4>Vital Choice Web Affiliate Program</h4>
-	</div>
+    <div class="left-pane clean-border">
+        @await Component.InvokeAsync("AffiliateProfileSidebar")
+    </div>
+    <div class="right-pane clean-indent">
+        <div class="border-form-left">
+            <h4>Vital Choice Web Affiliate Program</h4>
+        </div>
+    </div>
 </div>

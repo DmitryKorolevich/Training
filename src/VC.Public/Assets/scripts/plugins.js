@@ -191,3 +191,58 @@ function reInitFormValidation(form)
         jQuery.validator.unobtrusive.parse($(form));
     }
 };
+
+
+String.prototype.format = function ()
+{
+    return String.format(this, arguments.length == 1 ? arguments[0] : arguments);
+};
+
+String.format = function (fSource, fParams)
+{
+    var _toString = function (fObject, o)
+    {
+        var ctor = function (fObject)
+        {
+            if (typeof fObject == 'number')
+                return Number;
+            else if (typeof fObject == 'boolean')
+                return Boolean;
+            else if (typeof fObject == 'string')
+                return String;
+            else
+                return fObject.constructor;
+        }(fObject);
+        var proto = ctor.prototype;
+        var tFormatter = typeof fObject != 'string' ? proto ? proto.format || proto.toString : fObject.format || fObject.toString : fObject.toString;
+        if (tFormatter)
+        {
+            if (typeof o == 'undefined' || o == "")
+                return tFormatter.call(fObject);
+            return tFormatter.call(fObject, o);
+        }
+        return "";
+    };
+    if (arguments.length == 1)
+        return function ()
+        {
+            return String.format.apply(null, [fSource].concat(Array.prototype.slice.call(arguments, 0)));
+        };
+    if (arguments.length == 2 && typeof fParams != 'object' && typeof fParams != 'array')
+        fParams = [fParams];
+    if (arguments.length > 2)
+        fParams = Array.prototype.slice.call(arguments, 1);
+    fSource = fSource.replace(/\{\{|\}\}|\{([^}: ]+?)(?::([^}]*?))?\}/g, function (match, num, format)
+    {
+        if (match == "{{") return "{";
+        if (match == "}}") return "}";
+        if (typeof fParams[num] != 'undefined' && fParams[num] !== null)
+        {
+            return _toString(fParams[num], format);
+        } else
+        {
+            return "";
+        }
+    });
+    return fSource;
+};
