@@ -188,7 +188,8 @@ namespace VitalChoice.Core.DependencyInjection
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value)
+                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                    ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
                 };
                 options.AzureStorage = new AzureStorage()
 				{
@@ -477,7 +478,7 @@ namespace VitalChoice.Core.DependencyInjection
                 .WithParameter((pi, cc) => pi.ParameterType == typeof (ILogger),
                     (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof (ObjectEncryptionHost)))
                 .SingleInstance();
-            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
+            builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().SingleInstance();
             FinishCustomRegistrations(builder);
 
             var container = builder.Build();

@@ -20,10 +20,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #endif
         bool RsaCheckSignWithConvert<T>(PlainCommandData obj, out T result);
         PlainCommandData RsaSignWithConvert(object obj);
-        T AesDecrypt<T>(byte[] data, Guid session);
-        byte[] AesEncrypt(object obj, Guid session);
+        T AesDecrypt<T>(SymmetricEncryptedCommandData data, Guid session);
+        SymmetricEncryptedCommandData AesEncrypt(object obj, Guid session);
         bool SessionExist(Guid session);
-        bool RegisterSession(Guid session, byte[] keyCombined);
+        bool RegisterSession(Guid session, string hostName, byte[] keyCombined);
         KeyExchange GetSessionWithReset(Guid session);
         KeyExchange CreateSession(Guid session);
         bool RemoveSession(Guid session);

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
@@ -13,16 +15,16 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IOptions<AppOptions> options) : base(encryptedBusHost, options)
         {
         }
 
-        public Task ExportOrders(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
+        public Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
             Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             return Task.Run(() =>
             {
-                ProcessCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder) { Data = exportData },
+                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName) { Data = exportData },
                     (command, o) =>
                     {
                         var exportResult = (OrderExportItemResult)o;
@@ -33,13 +35,13 @@ namespace VitalChoice.Business.Services.Orders
             });
         }
 
-        public Task<List<OrderExportItemResult>> ExportOrders(OrderExportData exportData)
+        public Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
         {
             Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             List<OrderExportItemResult> results = new List<OrderExportItemResult>();
             return Task.Run(() =>
             {
-                ProcessCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder) { Data = exportData },
+                SendCommand(new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName) { Data = exportData },
                     (command, o) =>
                     {
                         var exportResult = (OrderExportItemResult)o;
@@ -51,19 +53,19 @@ namespace VitalChoice.Business.Services.Orders
             });
         }
 
-        public Task<bool> UpdateOrderPaymentMethod(OrderPaymentMethodDynamic orderPaymentMethod)
+        public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
         {
             return
-                ProcessCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment)
+                SendCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment, ServerHostName)
                 {
                     Data = orderPaymentMethod
                 });
         }
 
-        public Task<bool> UpdateCustomerPaymentMethods(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods)
+        public Task<bool> UpdateCustomerPaymentMethodsAsync(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods)
         {
             return
-                ProcessCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment)
+                SendCommand<bool>(new ServiceBusCommand(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment, ServerHostName)
                 {
                     Data = paymentMethods.ToArray()
                 });

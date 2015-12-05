@@ -7,9 +7,9 @@ namespace VitalChoice.Interfaces.Services
 {
     public interface IEncryptedServiceBusHost : IDisposable
     {
-        void SendCommand(ServiceBusCommandBase command);
+        Task SendCommand(ServiceBusCommandBase command);
         Task<T> ExecuteCommand<T>(ServiceBusCommand command);
-        void ExecuteCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> commandResultAction);
+        Task ExecuteCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> commandResultAction);
         bool IsAuthenticatedClient(Guid sessionId);
     }
 }

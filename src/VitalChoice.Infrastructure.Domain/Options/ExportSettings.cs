@@ -12,5 +12,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string EncryptedQueueName { get; set; }
         public string CertThumbprint { get; set; }
         public bool EncryptionHostSessionExpire { get; set; }
+        public string ServerHostName { get; set; }
     }
 }

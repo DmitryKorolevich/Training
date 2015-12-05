@@ -6,12 +6,13 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
     public class ServiceBusCommandBase : IDisposable
     {
-        public ServiceBusCommandBase(Guid sessionId, string commandName, Guid? commandId = null, TimeSpan? ttl = null)
+        public ServiceBusCommandBase(Guid sessionId, string commandName, string destination, Guid? commandId = null, TimeSpan? ttl = null)
         {
             CommandName = commandName;
             SessionId = sessionId;
             CommandId = commandId ?? Guid.NewGuid();
-            TimeToLeave = ttl ?? TimeSpan.FromMinutes(20);
+            Destination = destination;
+            TimeToLeave = ttl ?? TimeSpan.FromSeconds(30);
         }
 
         public ServiceBusCommandBase(ServiceBusCommandBase initialCommand, object data)
@@ -20,6 +21,8 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             SessionId = initialCommand.SessionId;
             CommandId = initialCommand.CommandId;
             TimeToLeave = initialCommand.TimeToLeave;
+            Destination = initialCommand.Source;
+            Source = initialCommand.Destination;
             Data = data;
         }
 
@@ -27,6 +30,8 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public Guid CommandId { get; }
         public TimeSpan TimeToLeave { get; }
         public string CommandName { get; }
+        public string Destination { get; set; }
+        public string Source { get; set; }
         public object Data { get; set; }
 
         public Action<ServiceBusCommandBase, object> RequestAcqureAction { get; set; }

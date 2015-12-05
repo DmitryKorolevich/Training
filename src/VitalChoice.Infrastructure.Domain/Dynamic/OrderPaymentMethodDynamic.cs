@@ -3,6 +3,7 @@ using VitalChoice.Ecommerce.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
+    [DataContract]
     public sealed class OrderPaymentMethodDynamic : MappedObject
     {
         [DataMember]

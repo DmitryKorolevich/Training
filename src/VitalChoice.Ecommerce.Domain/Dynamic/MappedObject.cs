@@ -17,6 +17,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         protected MappedObject()
         {
             StatusCode = (int)RecordStatusCode.Active;
+            DynamicData = new ExpandoObject();
         }
 
         [DataMember]
@@ -29,7 +30,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         public DateTime DateEdited { get; set; }
         [DataMember]
         public int? IdEditedBy { get; set; }
-        [DataMember]
+
         public Type ModelType { get; set; }
         [DataMember]
         public virtual int IdObjectType { get; set; }
@@ -38,7 +39,12 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         internal List<KeyValuePair<string, object>> DynamicValues
         {
             get { return DynamicData.ToList(); }
-            set { DictionaryData.AddRange(value); }
+            set
+            {
+                if (DynamicData == null)
+                    DynamicData = new ExpandoObject();
+                DictionaryData.AddRange(value);
+            }
         }
 
         [JsonIgnore]
@@ -47,7 +53,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         [JsonIgnore]
         public dynamic Data => DynamicData;
 
-        public ExpandoObject DynamicData { get; set; } = new ExpandoObject();
+        public ExpandoObject DynamicData { get; set; }
 
         [JsonIgnore]
         public ICollection<ObjectHistoryLogItem> HistoryLogItems { get; set; }

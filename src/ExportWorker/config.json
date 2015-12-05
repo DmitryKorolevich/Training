@@ -19,7 +19,8 @@
       "PlainQueueName": "PlainQueue",
       "EncryptedQueueName": "EncryptedQueue",
       "CertThumbprint": "67795459EEA3AD9D8307B11CFEC5DC0698291350",
-      "EncryptionHostSessionExpire": true
+      "EncryptionHostSessionExpire": true,
+      "ServerHostName": "export-server"
     },
     "Avatax": {
       "AccountNumber": "1100019190",

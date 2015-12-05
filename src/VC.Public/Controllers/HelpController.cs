@@ -69,13 +69,13 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> RequestCatalog()
+        public Task<IActionResult> RequestCatalog()
         {
             if (TempData.ContainsKey(RequestCatalogTempData))
             {
                 ViewBag.SuccessMessage = TempData[RequestCatalogTempData];
             }
-            return View(GetCatalogRequestAddressPrototype());
+            return Task.FromResult<IActionResult>(View(GetCatalogRequestAddressPrototype()));
         }
 
         [NonAction]
@@ -111,7 +111,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ContactCustomerService()
+        public Task<IActionResult> ContactCustomerService()
         {
             if (TempData.ContainsKey(ContactServiceTempData))
             {
@@ -120,7 +120,7 @@ namespace VC.Public.Controllers
 
             CustomerServiceRequestModel model = new CustomerServiceRequestModel();
 
-            return View(model);
+            return Task.FromResult<IActionResult>(View(model));
         }
 
         [HttpPost]

@@ -24,4 +24,12 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
         public byte[] IV { get; set; }
     }
+
+#if DNX451 || NET451
+    [Serializable]
+#endif
+    public class SymmetricEncryptedCommandData
+    {
+        public byte[] Data { get; set; }
+    }
 }

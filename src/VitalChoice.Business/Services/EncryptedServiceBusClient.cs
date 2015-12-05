@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.OptionsModel;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
@@ -11,38 +13,40 @@ namespace VitalChoice.Business.Services
     {
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
+        protected readonly string ServerHostName;
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IOptions<AppOptions> options)
         {
+            ServerHostName = options.Value.ExportService.ServerHostName;
             _encryptedBusHost = encryptedBusHost;
         }
 
         public Guid SessionId { get; } = Guid.NewGuid();
 
-        protected async Task<T> ProcessCommand<T>(ServiceBusCommand command)
+        protected async Task<T> SendCommand<T>(ServiceBusCommand command)
         {
             if (!IsAuthenticated)
             {
                 if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
-                    throw new AccessDeniedException("Cannot authenticate client");
+                    return default(T);
                 }
             }
 
             return await _encryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        protected async Task ProcessCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
+        protected async Task SendCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
         {
             if (!IsAuthenticated)
             {
                 if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
-                    throw new AccessDeniedException("Cannot authenticate client");
+                    return;
                 }
             }
 
-            _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
+            await _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
         }
 
         protected void Dispose(bool disposing)

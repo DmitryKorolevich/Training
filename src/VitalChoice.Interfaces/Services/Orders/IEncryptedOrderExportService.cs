@@ -8,10 +8,10 @@ namespace VitalChoice.Interfaces.Services.Orders
 {
     public interface IEncryptedOrderExportService
     {
-        Task ExportOrders(OrderExportData exportData, Action<OrderExportItemResult> exportedAction);
-        Task<List<OrderExportItemResult>> ExportOrders(OrderExportData exportData);
-        Task<bool> UpdateOrderPaymentMethod(OrderPaymentMethodDynamic orderPaymentMethod);
-        Task<bool> UpdateCustomerPaymentMethods(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods);
+        Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction);
+        Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData);
+        Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod);
+        Task<bool> UpdateCustomerPaymentMethodsAsync(IEnumerable<CustomerPaymentMethodDynamic> paymentMethods);
         Guid SessionId { get; }
     }
 }

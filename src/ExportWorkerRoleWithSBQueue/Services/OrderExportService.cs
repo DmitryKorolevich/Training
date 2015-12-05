@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ExportWorkerRoleWithSBQueue.Context;
 using ExportWorkerRoleWithSBQueue.Entities;
 using VitalChoice.Data.UnitOfWork;
@@ -21,13 +22,13 @@ namespace ExportWorkerRoleWithSBQueue.Services
             _encryptionHost = encryptionHost;
         }
 
-        public void UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
+        public async Task UpdatePaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods)
         {
             using (var uow = new UnitOfWork(_context))
             {
                 var customerIds = paymentMethods.Select(p => p.IdCustomer).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
-                var customerPayments = rep.Query(c => customerIds.Contains(c.IdCustomer)).Select(true);
+                var customerPayments = await rep.Query(c => customerIds.Contains(c.IdCustomer)).SelectAsync(true);
 
                 customerPayments.MergeUpdateKeyed(paymentMethods,
                     export => export.IdPaymentMethod,
@@ -36,45 +37,45 @@ namespace ExportWorkerRoleWithSBQueue.Services
                     {
                         IdCustomer = dynamic.IdCustomer,
                         IdPaymentMethod = dynamic.Id,
-                        CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic.DynamicData)
+                        CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic)
                     },
-                    (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic.DynamicData));
+                    (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic));
 
-                uow.SaveChanges();
+                await uow.SaveChangesAsync();
             }
         }
 
-        public void UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod)
+        public async Task UpdatePaymentMethod(OrderPaymentMethodDynamic paymentMethod)
         {
             using (var uow = new UnitOfWork(_context))
             {
                 var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
                 var orderPayment =
-                    rep.Query(o => o.IdOrder == paymentMethod.IdOrder).SelectFirstOrDefaultAsync(true).Result;
+                    await rep.Query(o => o.IdOrder == paymentMethod.IdOrder).SelectFirstOrDefaultAsync(true);
 
                 if (orderPayment != null)
                 {
-                    orderPayment.CreditCardNumber = _encryptionHost.LocalEncrypt(paymentMethod.DynamicData);
+                    orderPayment.CreditCardNumber = _encryptionHost.LocalEncrypt(paymentMethod);
                 }
                 else
                 {
-                    rep.InsertAsync(new OrderPaymentMethodExport
+                    await rep.InsertAsync(new OrderPaymentMethodExport
                     {
                         IdOrder = paymentMethod.IdOrder,
-                        CreditCardNumber = _encryptionHost.LocalEncrypt(paymentMethod.DynamicData)
+                        CreditCardNumber = _encryptionHost.LocalEncrypt(paymentMethod)
                     });
                 }
 
-                uow.SaveChanges();
+                await uow.SaveChangesAsync();
             }
         }
 
-        public bool ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors)
+        public Task<bool> ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors)
         {
             using (var uow = new UnitOfWork(_context))
             {
                 errors = new List<string>();
-                return true;
+                return Task.FromResult(true);
             }
         }
     }

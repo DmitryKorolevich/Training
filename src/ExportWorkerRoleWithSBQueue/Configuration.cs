@@ -109,7 +109,8 @@ namespace ExportWorkerRoleWithSBQueue
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value)
+                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                    ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
                 };
                 options.Avatax = new AvataxOptions
                 {
@@ -146,7 +147,8 @@ namespace ExportWorkerRoleWithSBQueue
                     EncryptedQueueName = configuration.GetSection("App:ExportService:EncryptedQueueName").Value,
                     PlainQueueName = configuration.GetSection("App:ExportService:PlainQueueName").Value,
                     CertThumbprint = configuration.GetSection("App:ExportService:CertThumbprint").Value,
-                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value)
+                    EncryptionHostSessionExpire = Convert.ToBoolean(configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
+                    ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
                 };
                 options.Avatax = new AvataxOptions
                 {
@@ -331,6 +333,7 @@ namespace ExportWorkerRoleWithSBQueue
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>();
             builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>();
             builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>();
+            builder.RegisterType<OrderExportService>().As<IOrderExportService>();
             builder.RegisterType<ObjectEncryptionHost>().As<IObjectEncryptionHost>().SingleInstance();
             var container = builder.Build();
             return container;

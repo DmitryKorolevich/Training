@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
@@ -14,10 +15,11 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
-    public delegate void SessionExpiredEventHandler(Guid session);
+    public delegate void SessionExpiredEventHandler(Guid session, string hostName);
 
     public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
     {
+        private readonly ILogger _logger;
         public X509Certificate2 LocalCert { get; }
 #if DNX451 || NET451
         private readonly RSACryptoServiceProvider _signProvider;
@@ -26,7 +28,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 #endif
         private readonly Aes _localAes;
         private readonly bool _sessionExpires;
-        private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
+        private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, ObjectEncryptionHost.SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
 
         /// <summary>
@@ -34,6 +36,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         /// </summary>
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
+            _logger = logger;
             try
             {
 #if NET451 || DNX451
@@ -51,7 +54,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 var cert = certificates[0];
                 LocalCert = new X509Certificate2(cert.Export(X509ContentType.Cert));
                 if (!cert.HasPrivateKey)
-                    throw new InvalidOperationException("Root certificate has no private key imported.");
+                    throw new InvalidOperationException("Certificate has no private key imported.");
 #if DNX451 || NET451
                 _signProvider = new RSACryptoServiceProvider();
                 _signProvider.ImportParameters(((RSACryptoServiceProvider) cert.PrivateKey).ExportParameters(true));
@@ -81,28 +84,33 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             using (var memory = new MemoryStream())
             {
-                var decryptor = _localAes.CreateDecryptor();
-
-                using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
+                using (var decryptor = _localAes.CreateDecryptor())
                 {
-                    cs.Write(data, 0, data.Length);
+
+                    using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
+                    {
+                        cs.Write(data, 0, data.Length);
+                        cs.FlushFinalBlock();
+                        return (T) ObjectSerializer.Deserialize(memory.ToArray());
+                    }
                 }
-                memory.Seek(0, SeekOrigin.Begin);
-                return (T) DeserializeFrom(memory);
             }
         }
 
         public byte[] LocalEncrypt(object obj)
         {
-            var plainData = Serialize(obj);
+            var plainData = ObjectSerializer.Serialize(obj);
             using (var memory = new MemoryStream())
             {
-                var encryptor = _localAes.CreateDecryptor();
-                using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
+                using (var encryptor = _localAes.CreateEncryptor())
                 {
-                    cs.Write(plainData, 0, plainData.Length);
+                    using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
+                    {
+                        cs.Write(plainData, 0, plainData.Length);
+                        cs.FlushFinalBlock();
+                        return memory.ToArray();
+                    }
                 }
-                return memory.ToArray();
             }
         }
 
@@ -130,7 +138,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public byte[] RsaDecrypt(byte[] data, RSA rsa)
 #endif
         {
-            if (data == null)
+            if (data == null || rsa == null)
                 return null;
 #if DNX451 || NET451
             var objectData = rsa.Decrypt(data, true);
@@ -146,7 +154,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public byte[] RsaEncrypt(byte[] data, RSA rsa)
 #endif
         {
-            if (data == null)
+            if (data == null || rsa == null)
                 return null;
 #if DNX451 || NET451
             return rsa.Encrypt(data, true);
@@ -162,7 +170,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
             if (obj.Data.Length > 0)
             {
-                result = (T) Deserialize(obj.Data);
+                result = (T)ObjectSerializer.Deserialize(obj.Data);
             }
             else
             {
@@ -185,82 +193,139 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 serverCert = obj.Certificate;
                 clientCert = LocalCert;
             }
+            if (!ValidateClientCertificate(serverCert, clientCert))
+            {
+                _logger.LogWarning($"Invalid certificate: Server Thumbprint: {serverCert.Thumbprint}, Client Thumbprint: {clientCert.Thumbprint}");
+                return false;
+            }
 #if DNX451 || NET451
-            if (ValidateClientCertificate(serverCert, clientCert) &&
-                rsa.VerifyData(obj.Data, CryptoConfig.MapNameToOID("SHA256"), obj.Sign))
+            if (!rsa.VerifyData(obj.Data, CryptoConfig.MapNameToOID("SHA256"), obj.Sign))
 #else
-                if (ValidateClientCertificate(serverCert, clientCert) &&
-                    rsa.VerifyData(obj.Data, obj.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+            if (!rsa.VerifyData(obj.Data, obj.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
 #endif
             {
-                return true;
+                _logger.LogWarning(
+                    $"Invalid sign: Remote Certificate Thumbprint: {obj.Certificate.Thumbprint}, " +
+                    $"Sign value: {string.Join("", obj.Sign.Select(b => b.ToString("X")))}, " +
+                    $"Data value: {string.Join("", obj.Data.Select(b => b.ToString("X")))}");
+                return false;
             }
-            result = default(T);
-            return false;
+            return true;
         }
 
         public PlainCommandData RsaSignWithConvert(object obj)
         {
             if (obj == null)
                 obj = new object();
-            var result = new PlainCommandData {Data = Serialize(obj)};
+            var result = new PlainCommandData {Data = ObjectSerializer.Serialize(obj)};
 #if NET451 || DNX451
             result.Sign = _signProvider.SignData(result.Data, CryptoConfig.MapNameToOID("SHA256"));
 #else
             result.Sign = _signProvider.SignData(result.Data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 #endif
             result.Certificate = LocalCert;
+            //Verify Self
+#if DNX451 || NET451
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(((RSACryptoServiceProvider)result.Certificate.PublicKey.Key).ExportParameters(false));
+#else
+            var rsa = result.Certificate.GetRSAPublicKey();
+#endif
+#if DNX451 || NET451
+            if (!rsa.VerifyData(result.Data, CryptoConfig.MapNameToOID("SHA256"), result.Sign))
+#else
+            if (!rsa.VerifyData(result.Data, result.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1))
+#endif
+            {
+                throw new CryptographicException("Cannot verify self signature");
+            }
             return result;
         }
 
-        public T AesDecrypt<T>(byte[] data, Guid session)
+        public T AesDecrypt<T>(SymmetricEncryptedCommandData data, Guid session)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+            if (data.Data == null)
+                return default(T);
+            SessionInfo encryption;
             lock (_sessions)
             {
-                SessionInfo encryption;
-                if (_sessions.TryGetValue(session, out encryption))
+                if (!_sessions.TryGetValue(session, out encryption))
+                    return default(T);
+            }
+            encryption.Expiration = DateTime.Now.AddHours(1);
+            byte[] plainData = null;
+            try
+            {
+                using (var memory = new MemoryStream())
                 {
-                    encryption.Expiration = DateTime.Now.AddHours(1);
-                    using (var memory = new MemoryStream())
+                    using (var decryptor = encryption.Aes.CreateDecryptor())
                     {
-                        if (!encryption.Decryptor.CanReuseTransform)
-                            encryption.Decryptor = encryption.Aes.CreateDecryptor();
-
-                        using (CryptoStream cs = new CryptoStream(memory, encryption.Decryptor, CryptoStreamMode.Write))
+                        using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
                         {
-                            cs.Write(data, 0, data.Length);
+                            cs.Write(data.Data, 0, data.Data.Length);
+                            cs.FlushFinalBlock();
+                            plainData = memory.ToArray();
+                            return (T)ObjectSerializer.Deserialize(plainData);
                         }
-                        memory.Seek(0, SeekOrigin.Begin);
-                        return (T) DeserializeFrom(memory);
                     }
                 }
+            }
+            catch (SerializationException)
+            {
+                if (plainData != null)
+                {
+                    _logger.LogError($"Cannot deserialize object \r\n{Encoding.UTF8.GetString(plainData)}");
+                }
+            }
+            catch (CryptographicException e)
+            {
+                _logger.LogError(e.Message, e);
             }
             return default(T);
         }
 
-        public byte[] AesEncrypt(object obj, Guid session)
+        public SymmetricEncryptedCommandData AesEncrypt(object obj, Guid session)
         {
+            if (obj == null)
+                return new SymmetricEncryptedCommandData();
+            SessionInfo encryption;
             lock (_sessions)
             {
-                SessionInfo encryption;
-                if (_sessions.TryGetValue(session, out encryption))
+                if (!_sessions.TryGetValue(session, out encryption))
+                    return new SymmetricEncryptedCommandData();
+            }
+            encryption.Expiration = DateTime.Now.AddHours(1);
+            try
+            {
+                using (var encryptor = encryption.Aes.CreateEncryptor())
                 {
-                    encryption.Expiration = DateTime.Now.AddHours(1);
-                    if (!encryption.Encryptor.CanReuseTransform)
-                            encryption.Encryptor = encryption.Aes.CreateEncryptor();
-
-                    var plainData = Serialize(obj);
+                    var plainData = ObjectSerializer.Serialize(obj);
                     using (var memory = new MemoryStream())
                     {
-                        using (CryptoStream cs = new CryptoStream(memory, encryption.Encryptor, CryptoStreamMode.Write))
+                        using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
                         {
                             cs.Write(plainData, 0, plainData.Length);
+                            cs.FlushFinalBlock();
+                            var encryptedData = memory.ToArray();
+                            return new SymmetricEncryptedCommandData
+                            {
+                                Data = encryptedData
+                            };
                         }
-                        return memory.ToArray();
                     }
                 }
             }
-            return null;
+            catch (CryptographicException e)
+            {
+                _logger.LogError(e.Message, e);
+            }
+            catch (SerializationException)
+            {
+                _logger.LogError($"Cannot serialize object {obj}");
+            }
+            return new SymmetricEncryptedCommandData();
         }
 
         public bool SessionExist(Guid session)
@@ -271,25 +336,26 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        public bool RegisterSession(Guid session, byte[] keyCombined)
+        public bool RegisterSession(Guid session, string hostName, byte[] keyCombined)
         {
             if (!_sessionExpires)
                 throw new InvalidOperationException("Cannot register session, as it's state not controlled by session expiration.");
             Aes aes = Aes.Create();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
-            aes.Key = new byte[32];
-            aes.IV = new byte[16];
-            Array.Copy(keyCombined, aes.IV, 16);
-            Array.Copy(keyCombined, 16, aes.Key, 0, 32);
-            aes.Mode = CipherMode.CBC;
+            aes.KeySize = 256;
+            var key = new byte[32];
+            var iv = new byte[16];
+            Array.Copy(keyCombined, iv, 16);
+            Array.Copy(keyCombined, 16, key, 0, 32);
+            aes.Key = key;
+            aes.IV = iv;
             aes.Padding = PaddingMode.PKCS7;
             SessionInfo encryption = new SessionInfo
             {
                 Aes = aes,
-                Encryptor = aes.CreateEncryptor(),
-                Decryptor = aes.CreateDecryptor(),
-                Expiration = DateTime.Now.AddHours(1)
+                Expiration = DateTime.Now.AddHours(1),
+                HostName = hostName
             };
             lock (_sessions)
             {
@@ -310,8 +376,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 SessionInfo aes;
                 if (_sessions.TryGetValue(session, out aes))
                 {
-                    aes.Encryptor = aes.Aes.CreateEncryptor();
-                    aes.Decryptor = aes.Aes.CreateDecryptor();
                     aes.Expiration = DateTime.Now.AddHours(1);
                     return new KeyExchange
                     {
@@ -337,13 +401,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 aes.KeySize = 256;
                 aes.GenerateKey();
                 aes.GenerateIV();
-                aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
                 SessionInfo encryption = new SessionInfo
                 {
                     Aes = aes,
-                    Encryptor = aes.CreateEncryptor(),
-                    Decryptor = aes.CreateDecryptor(),
                     Expiration = DateTime.Now.AddHours(1)
                 };
                 _sessions.Add(session, encryption);
@@ -386,110 +447,20 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-#if DNX451 || NET451
-        private object DeserializeFrom(Stream stream)
-        {
-            NetDataContractSerializer serializer = new NetDataContractSerializer();
-            return serializer.Deserialize(stream);
-        }
-
-        private void SerializeTo(Stream stream, object obj)
-        {
-            NetDataContractSerializer serializer = new NetDataContractSerializer();
-            serializer.Serialize(stream, obj);
-        }
-#else
-        private object DeserializeFrom(Stream stream)
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            using (var reader = new StreamReader(stream))
-            {
-                using (var jsonReader = new JsonTextReader(reader))
-                {
-                    return serializer.Deserialize(jsonReader);
-                }
-            }
-        }
-
-        private void SerializeTo(Stream stream, object obj)
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            using (var writer = new StreamWriter(stream))
-            {
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    serializer.Serialize(jsonWriter, obj);
-                }
-            }
-        }
-#endif
-
-#if DNX451 || NET451
-        private object Deserialize(byte[] data)
-        {
-            NetDataContractSerializer serializer = new NetDataContractSerializer();
-            using (var memory = new MemoryStream(data))
-            {
-                return serializer.Deserialize(memory);
-            }
-        }
-
-        private byte[] Serialize(object obj)
-        {
-            NetDataContractSerializer serializer = new NetDataContractSerializer();
-            using (var memory = new MemoryStream())
-            {
-                serializer.Serialize(memory, obj);
-                return memory.ToArray();
-            }
-        }
-#else
-        private object Deserialize(byte[] data)
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            using (var memory = new MemoryStream(data))
-            {
-                using (var reader = new StreamReader(memory))
-                {
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        return serializer.Deserialize(jsonReader);
-                    }
-                }
-            }
-        }
-
-        private byte[] Serialize(object obj)
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            using (var memory = new MemoryStream())
-            {
-                using (var writer = new StreamWriter(memory))
-                {
-                    using (var jsonWriter = new JsonTextWriter(writer))
-                    {
-                        serializer.Serialize(jsonWriter, obj);
-                    }
-                }
-                return memory.ToArray();
-            }
-        }
-#endif
-
         private void SessionExpirationLookup()
         {
             while (!_disposeEvent.WaitOne(new TimeSpan(0, 10, 0)))
             {
-                Guid[] expiredSessions;
+                KeyValuePair<Guid, SessionInfo>[] expiredSessions;
                 lock (_sessions)
                 {
                     expiredSessions =
-                        _sessions.Where(session => session.Value.Expiration <= DateTime.Now).Select(session => session.Key).ToArray();
+                        _sessions.Where(session => session.Value.Expiration <= DateTime.Now).ToArray();
                 }
                 foreach (var expiredSession in expiredSessions)
                 {
-                    RemoveSession(expiredSession);
-                    OnSessionExpired?.Invoke(expiredSession);
+                    RemoveSession(expiredSession.Key);
+                    OnSessionExpired?.Invoke(expiredSession.Key, expiredSession.Value.HostName);
                 }
             }
         }
@@ -502,7 +473,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 aes.KeySize = 256;
                 aes.IV = Take(GetPublicKeyHash(), 16);
                 aes.Key = GetPrivateKeyHash();
-                aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
             }
             return aes;
@@ -559,15 +529,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private struct SessionInfo : IDisposable
         {
-            public ICryptoTransform Encryptor { get; set; }
-            public ICryptoTransform Decryptor { get; set; }
             public Aes Aes { get; set; }
             public DateTime Expiration { get; set; }
+            public string HostName { get; set; }
 
             public void Dispose()
             {
-                Encryptor?.Dispose();
-                Decryptor?.Dispose();
                 Aes?.Dispose();
             }
         }

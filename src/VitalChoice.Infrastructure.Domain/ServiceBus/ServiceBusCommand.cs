@@ -6,7 +6,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
     public class ServiceBusCommand : ServiceBusCommandBase
     {
-        public ServiceBusCommand(Guid sessionId, string commandName, Guid? commandId = null) : base(sessionId, commandName, commandId)
+        public ServiceBusCommand(Guid sessionId, string commandName, string destination, Guid? commandId = null) : base(sessionId, commandName, destination, commandId)
         {
             ReadyEvent = new ManualResetEvent(false);
             RequestAcqureAction = (command, result) =>
